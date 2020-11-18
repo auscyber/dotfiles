@@ -1,2 +1,0 @@
-cross-x86_64-w64-mingw32/gcc mingw-gcc.conf
-cross-i686-w64-mingw32/gcc mingw-gcc.conf
