@@ -1,0 +1,7 @@
+
+xmonad.hs:118:1: warning: [-Wtabs]
+    Tab character found here, and in 45 further locations.
+    Please use spaces instead.
+    |
+118 |         [
+    | ^^^^^^^^
