@@ -5,7 +5,7 @@ rsync -avhr /etc/portage/ portage/ --delete
 cp /usr/src/linux/.config $DEST/kernel/
 #zip -r ~/dotfiles/rice.zip  {~/.xmonad,~/st,~/dmenu,~/.xinitrc,~/.Xresources}
 rsync -avhr ~/.xmonad $DEST --delete
-rsync -avhr ~/st $DEST --delete
+rsync -avhr ~/st $DEST --delete --exclude .git
 rsync -avhr ~/.config/polybar $DEST --delete
 rsync -avhr ~/.config/nvim $DEST --delete
 rsync -avhr ~/st $DEST --delete
