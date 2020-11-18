@@ -1,5 +1,6 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =4
+let g:netrw_dirhistcnt =5
+let g:netrw_dirhist_5='/etc/init.d'
 let g:netrw_dirhist_4='/home/auscyber/.xmonad/lib'
 let g:netrw_dirhist_3='/home/auscyber/hask'
 let g:netrw_dirhist_2='/var/db/repos/gentoo/app-vim/airline-themes'
@@ -9,4 +10,3 @@ let g:netrw_dirhist_9='/var/db/repos/gentoo/games-fps'
 let g:netrw_dirhist_8='/var/db/repos/gentoo'
 let g:netrw_dirhist_7='/home/will/vscode/usr/share'
 let g:netrw_dirhist_6='/home/will/vscode/usr'
-let g:netrw_dirhist_5='/home/will/st'

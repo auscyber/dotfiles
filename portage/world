@@ -73,9 +73,7 @@ net-misc/dhcpcd
 net-misc/drive
 net-misc/netifrc
 net-misc/netkit-telnetd
-net-misc/tigervnc
 net-p2p/qbittorrent
-net-vpn/openvpn
 net-wireless/bluez
 net-wireless/hostapd
 net-wireless/iw
@@ -87,7 +85,6 @@ sys-apps/mlocate
 sys-apps/pciutils
 sys-apps/razercfg
 sys-apps/usbutils
-sys-block/gparted
 sys-boot/grub:2
 sys-boot/os-prober
 sys-devel/crossdev
