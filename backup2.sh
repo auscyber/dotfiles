@@ -1,7 +1,7 @@
 HOME=/home/auscyber
 DEST=~/dotfiles 
 cp -r /etc/portage $DEST
-cp /usr/src/linux/.config $DEST/kernel
+cp /usr/src/linux/.config $DEST/kernel/
 #zip -r ~/dotfiles/rice.zip  {~/.xmonad,~/st,~/dmenu,~/.xinitrc,~/.Xresources}
 cp -r ~/.xmonad $DEST
 cp -r ~/st $DEST
