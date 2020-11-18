@@ -12,5 +12,4 @@ cp -r ~/.config/nvim $DEST
 cd ~/dotfiles
 git add ./*
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup"
-git push origin
-
+git push origin master
