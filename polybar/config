@@ -1,0 +1,216 @@
+[global/wm]
+margin-top = 5
+margin-bottom = 5
+[bar/mybar]
+modules-right =   playing-song pulseaudio cpu memory date
+modules-center = time
+modules-left = workspaces-xmonad 
+font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
+font-1 = "Inconsolata Nerd Font:style=Regular:pixelsize=15"
+
+enable-ipc = true
+background = #FF838A
+tray-background = #ffd1dc
+radius = 5.0
+monitor = HDMI-0
+tray-position = right
+tray-detatched = false
+border-top-size = 10
+border-bottom-size = 5
+border-left-size = 10
+border-right-size = 10
+line-size = 3
+height = 25
+
+
+[bar/secbar]
+modules-right =  pulseaudio memory 
+modules-left = cpu2
+font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
+enable-ipc = true
+background = #FF838A
+radius = 5.0
+monitor = DP-3 
+border-top-size = 10
+border-bottom-size = 5
+border-left-size = 10
+border-right-size = 10
+[module/cpu2]
+type = internal/cpu
+format-margin = 5
+interval = 0.5
+; Available tags:
+;   <label> (default)
+;   <bar-load>
+;   <ramp-load>
+;   <ramp-coreload>
+format =    <ramp-coreload>
+
+; Available tokens:
+;   %percentage% (default) - total cpu load averaged over all cores
+;   %percentage-sum% - Cumulative load on all cores
+;   %percentage-cores% - load percentage for each core
+;   %percentage-core[1-9]% - load percentage for specific core
+
+; Spacing between individual per-core ramps
+ramp-coreload-spacing = 1
+ramp-coreload-0 = " ▁"
+ramp-coreload-1 = ▂
+ramp-coreload-2 = ▃
+ramp-coreload-3 = ▄
+ramp-coreload-4 = ▅
+ramp-coreload-5 = ▆
+ramp-coreload-6 = ▇
+ramp-coreload-7 = █
+
+
+
+[module/memory]
+type = internal/memory
+
+; Seconds to sleep between updates
+; Default: 1
+interval = 3
+label =  %gb_used%/%gb_free%
+format-prefix-foreground = #8ba9ff
+format-foreground = #696969
+
+format-prefix-background = #51edd5
+format-prefix = " %{T2}%{T-}"
+format-suffix = " "
+format-background = #8ba9ff
+
+[module/cpu]
+type = internal/cpu
+
+interval = 0.5
+; Available tags:
+;   <label> (default)
+;   <bar-load>
+;   <ramp-load>
+;   <ramp-coreload>
+format =   <label>
+
+; Available tokens:
+;   %percentage% (default) - total cpu load averaged over all cores
+;   %percentage-sum% - Cumulative load on all cores
+;   %percentage-cores% - load percentage for each core
+;   %percentage-core[1-9]% - load percentage for specific core
+
+; Spacing between individual per-core ramps
+ramp-load-spacing = 1
+ramp-load-0 = ▁
+ramp-load-1 = ▂
+ramp-load-2 = ▃
+ramp-load-3 = ▄
+ramp-load-4 = ▅
+ramp-load-5 = ▆
+ramp-load-6 = ▇
+ramp-load-7 = █
+format-ramp-load-background = #51edd5
+format-prefix-foreground = #51edd5
+format-foreground = #696969
+
+format-prefix-background = #9ecbdb
+format-prefix = " %{T2}%{T-}"
+format-background = #51edd5
+
+[colors]
+black = #000
+white = #fff
+blue = #00f
+green = #0f0
+
+[module/date]
+type = internal/date
+date =  %a %d %b
+format-prefix-foreground = #ffd1dc
+format-foreground = #696969
+format-prefix-background = #8ba9ff
+format-font = 3
+format-prefix = " %{T2}%{T-}"
+format-background = #ffd1dc
+
+
+[module/time]
+type = internal/date
+date = %I:%M%P 
+
+
+[module/title-xmonad]
+type = custom/script
+exec = tail -F /tmp/.xmonad-title-log
+exec-if = [ -p /tmp/.xmonad-title-log ]
+tail = true
+
+
+[module/workspaces-xmonad]
+type = custom/script
+exec = tail -F /tmp/.xmonad-workspace-log
+exec-if = [ -p /tmp/.xmonad-workspace-log ]
+tail = true
+format-offset = 10
+
+[module/playing-song]
+type = custom/script
+exec = ~/.xmonad/currentPlay.py
+tail = true
+format-prefix-foreground = #dbd89e
+format-prefix-background = #FF838A
+format-prefix = " %{T2}%{T-}"
+format-background = #dbd89e
+
+[module/pulseaudio]
+type = internal/pulseaudio
+
+
+
+format-volume-prefix-foreground = #9ecbdb
+format-volume-prefix-background = #dbd89e
+format-volume-prefix = " %{T2}%{T-}"
+format-volume-suffix = " "
+format-volume-background = #9ecbdb
+; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
+; If not, uses default sink
+sink = alsa_output.usb-RODE_Microphones_RODE_AI-1_7493DF5C-00.iec958-stereo
+
+; Use PA_VOLUME_UI_MAX (~153%) if true, or PA_VOLUME_NORM (100%) if false
+; Default: true
+use-ui-max = true
+label-active-font = 1
+; Interval for volume increase/decrease (in percent points)
+; Default: 5
+interval = 5
+
+
+; Available tags:
+;   <label-volume> (default)
+;   <ramp-volume>
+;   <bar-volume>
+format-volume = <ramp-volume> <label-volume>
+
+; Available tags:
+;   <label-muted> (default)
+;   <ramp-volume>
+;   <bar-volume>
+;format-muted = <label-muted>
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+;label-volume = %percentage%%
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels% (unreleased)
+label-muted = ﱝ muted
+label-muted-foreground = #666
+
+; Only applies if <ramp-volume> is used
+ramp-volume-0 = 奄
+ramp-volume-1 = 墳
+ramp-volume-2 = 墳
+
+; Right and Middle click (unreleased)
+click-right = pavucontrol &
+; click-middle = 

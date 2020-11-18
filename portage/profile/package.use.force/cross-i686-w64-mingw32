@@ -1,0 +1,4 @@
+cross-i686-w64-mingw32/binutils -multilib
+cross-i686-w64-mingw32/gcc -multilib
+cross-i686-w64-mingw32/mingw64-runtime -multilib
+cross-i686-w64-mingw32/gdb -multilib
