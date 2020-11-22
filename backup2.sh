@@ -14,7 +14,7 @@ cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cp ~/.zshrc $DEST
 cd ~/dotfiles
-git add ./*
+git add -all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup"
 git push origin master
 
