@@ -6,6 +6,7 @@ call plug#begin(stdpath('data') . '/plugged')
 " let Vundle manage Vundle, required
 Plug 'VundleVim/Vundle.vim'
 Plug 'rust-lang/rust.vim'
+Plug 'morhetz/gruvbox'
 let g:airline_powerline_fonts = 1
 let g:airline_theme='fruit_punch'
 " The following are examples of different formats supported.
@@ -30,6 +31,7 @@ let g:vimsence_file_explorer_details = 'Looking for files'
 " Install L9 and avoid a Naming conflict if you've already installed a
 " different version somewhere else.
 " Plugin 'ascenator/L9', {'name': 'newL9'}
+Plug 'preservim/nerdtree'
 Plug 'gentoo/gentoo-syntax'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -37,7 +39,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " All of your Plugins must be added before the following line
 call plug#end()            " required
 filetype plugin indent on    " required
-filetype plugin indent on
 " show existing tab with 4 spaces width
 set tabstop=4
 " when indenting with '>', use 4 spaces width
@@ -176,3 +177,6 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+
+

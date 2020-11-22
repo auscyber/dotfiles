@@ -30,10 +30,12 @@ dev-haskell/stack
 dev-haskell/tf-random
 dev-java/openjdk
 dev-lang/ghc
+dev-lang/nasm
 dev-lang/rust
 dev-python/gst-python
 dev-python/pip
 dev-python/pybluez
+dev-util/ccache
 dev-util/glslang
 dev-util/meson
 dev-util/nvidia-cuda-toolkit
@@ -77,6 +79,7 @@ net-p2p/qbittorrent
 net-wireless/bluez
 net-wireless/hostapd
 net-wireless/iw
+net-wireless/iwd
 net-wireless/wpa_supplicant
 sys-apps/dbus
 sys-apps/debianutils
@@ -84,6 +87,7 @@ sys-apps/iucode_tool
 sys-apps/mlocate
 sys-apps/pciutils
 sys-apps/razercfg
+sys-apps/smartmontools
 sys-apps/usbutils
 sys-boot/grub:2
 sys-boot/os-prober

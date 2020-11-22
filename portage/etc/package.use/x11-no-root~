@@ -76,7 +76,7 @@ sys-boot/grub mount
 app-text/ghostscript-gpl cups
 dev-lang/rust -l rls clippy
 x11-misc/xmobar xft timezone mpris
-x11-misc/polybar pulseaudio polybar i3wm
+x11-misc/polybar pulseaudio polybar -i3wm
 
 # required by media-gfx/graphviz-2.44.1-r1::gentoo
 # required by sci-libs/dcmtk-3.6.5::gentoo
@@ -84,3 +84,10 @@ x11-misc/polybar pulseaudio polybar i3wm
 # required by media-gfx/blender-2.90.1-r1::gentoo[openimageio]
 # required by blender (argument)
 >=media-libs/gd-2.3.0 jpeg truetype png fontconfig
+# required by www-client/firefox-82.0.2::gentoo
+# required by firefox (argument)
+>=media-libs/libpng-1.6.37-r2 apng
+# required by www-client/firefox-82.0.2::gentoo[system-libvpx]
+# required by firefox (argument)
+>=media-libs/libvpx-1.9.0 postproc
+app-admin/doas persist
