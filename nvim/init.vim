@@ -5,7 +5,7 @@ call plug#begin(stdpath('data') . '/plugged')
 
 " let Vundle manage Vundle, required
 Plug 'VundleVim/Vundle.vim'
-Plug 'rust-lang/rust.vim'
+"Plug 'rust-lang/rust.vim'
 Plug 'morhetz/gruvbox'
 let g:airline_powerline_fonts = 1
 let g:airline_theme='fruit_punch'

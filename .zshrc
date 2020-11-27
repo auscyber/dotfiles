@@ -99,4 +99,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim="nvim"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin
+alias e="vim"
+alias sudo="doas"
+alias t="tmux"
+export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin

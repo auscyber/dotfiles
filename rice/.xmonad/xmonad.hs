@@ -29,7 +29,7 @@ main = do
 
 
 
-myWorkspaces =  ["1:\61461 "] ++ ["2:\62056 "] ++ ["3:\61728 "] ++ map show [4..9] 
+myWorkspaces =  ["1:\61461 ","2:\62056 ","3:\61728 ","4:\61884 "] ++ map show [5..9] 
 myStartupHook = do
      spawn "/bin/sh ~/.xmonad/polybar.sh"
      spawn "discord"

@@ -23,3 +23,5 @@ dev-lua/luv luajit
 # # required by neovim (argument)
 dev-lua/mpack luajit
 #
+sys-devel/llvm abi_x86_32
+sys-libs/zlib static-libs
