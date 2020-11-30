@@ -18,14 +18,14 @@ import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Tabbed
+import XMonad.Layout.Gaps
 --import Polybar
 
 
 main = do
       --h <- spawnPipe "xmobar"
-      forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> do
-              safeSpawn "mkfifo" ["/tmp/" ++ file]
-      xmonad $  myConfig
+      forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
+      xmonad myConfig
 
 
 
@@ -45,10 +45,11 @@ myConfig = ewmh $ def {
       , keys = customKeys 
       , modMask = mod4Mask
       --, logHook = xmobarLogHook h 
+      , focusFollowsMouse = False
       , startupHook = myStartupHook
       , logHook = polybarLogHook
       , manageHook = (isFullscreen --> doFullFloat) <+> manageDocks <+>  manageHook def
-      , layoutHook = avoidStruts $ smartBorders $ myLayout 
+      , layoutHook =  myLayout 
       , handleEventHook = handleEventHook def <+> docksEventHook <+> fullscreenEventHook }       
 
 
@@ -60,7 +61,7 @@ stripNumbers x
 
 -- Colors
 mainColor = "#ffc3b6"
-secondaryColor = "#ffd1a8"
+secondaryColor = "#9CB8F"
 tertiaryColor  = "#A3FFE6"
 
 myTerm       = "st"
@@ -75,7 +76,7 @@ polybarLogHook = do
   let wsStr = join $ map (fmt currWs . stripNumbers) $ sort' wss
 
 --  io $ appendFile "/tmp/.xmonad-title-log" (title ++ "\n")
-  io $ appendFile "/tmp/.xmonad-workspace-log" ("%{F#80696e}" ++ wsStr ++ "%{F--}\n")
+  io $ appendFile "/tmp/.xmonad-workspace-log" ("%{F#80696e}" ++ wsStr ++ "%{F--}" ++ title ++"\n")
 
   where fmt currWs ws
           | currWs == ws = "%{F#ffffff}%{u#Ffcfd1}%{+u} " ++ ws ++ " %{-u}%{F#80696e}"
@@ -87,10 +88,11 @@ myTabConfig = def { inactiveBorderColor = "#FF0000"
 myLayout = 
   avoidStruts $ 
   smartBorders $ 
-  tiled 
+  tiled
   ||| Mirror tiled 
   ||| Full
   ||| tabbed shrinkText myTabConfig
+ 
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled   = Tall nmaster delta ratio
@@ -115,11 +117,11 @@ myManageHook = composeAll
     , className =? "Spotify" --> doShift "9"
      ]
 customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $ 
-	[
-	-- Start dmenu
-	--((modm .|. shiftMask, xK_r ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
+    [
+    -- Start dmenu
+    --((modm .|. shiftMask, xK_r ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
     ((modm .|. shiftMask, xK_r), spawn "rofi -show combi")
-	-- Start st
+    -- Start st
 	,((modm .|. shiftMask, xK_t ), spawn $ XMonad.terminal conf)
 	-- Kill currently focused window
 	,((modm .|. shiftMask, xK_c),kill)
@@ -143,15 +145,17 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Move focus to the next window
     , ((mod1Mask,               xK_Tab   ), windows W.focusDown)	
+    -- Move focus to preview window
+    , ((mod1Mask .|. shiftMask, xK_Tab),    windows W.focusUp)
 	,((modm, xK_b     ), spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
 
 	--Push window back into tiling
 	, ((modm,               xK_t     ), withFocused $ windows . W.sink)	
         -- Increment the number of windows in the master area
-        , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
+    , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
  
-        -- Deincrement the number of windows in the master area
-        , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    -- Deincrement the number of windows in the master area
+    , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
         
 	, ((modm,               xK_space ), sendMessage NextLayout)      
 
@@ -159,7 +163,7 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 	-- Xmonad keys
 	[
 	((modm, xK_q ), spawn "xmonad --recompile; xmonad --restart" )
-	,((modm .|. shiftMask,xK_q), io (exitWith ExitSuccess))
+	,((modm .|. shiftMask,xK_q), io exitSuccess)
 	] ++
 	
 
@@ -173,6 +177,4 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 	    , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 	
-
-
 

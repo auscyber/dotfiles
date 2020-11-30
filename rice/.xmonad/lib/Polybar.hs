@@ -1,5 +1,4 @@
 module Polybar (
-test) 
+showWindow) 
 where
 
-test = "hello"

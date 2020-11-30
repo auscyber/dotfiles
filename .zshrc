@@ -102,4 +102,5 @@ alias vim="nvim"
 alias e="vim"
 alias sudo="doas"
 alias t="tmux"
+alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
 export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin
