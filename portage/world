@@ -76,6 +76,7 @@ net-misc/drive
 net-misc/netifrc
 net-misc/netkit-telnetd
 net-misc/tigervnc
+net-misc/utelnetd
 net-p2p/qbittorrent
 net-vpn/openvpn
 net-wireless/bluez
@@ -125,6 +126,7 @@ x11-misc/xclip
 x11-misc/xdiskusage
 x11-misc/xmobar
 x11-misc/xsel
+x11-terms/alacritty
 x11-terms/aterm
 x11-terms/xterm
 x11-wm/xmonad
