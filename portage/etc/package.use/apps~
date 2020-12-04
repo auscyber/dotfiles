@@ -1,5 +1,5 @@
 media-video/ffmpeg chromium x264
-media-gfx/blender cuda cycles openimageio opensubdiv
+media-gfx/blender cuda cycles openimageio opensubdiv tiff
 media-libs/opensubdiv cuda
 */* PYTHON_TARGETS: python3_7
 games-util/steam-launcher abi_x86_32
@@ -23,3 +23,6 @@ dev-lua/luv luajit
 # # required by neovim (argument)
 dev-lua/mpack luajit
 #
+sys-devel/llvm abi_x86_32
+sys-libs/zlib static-libs
+www-client/firefox hwaccel debug system-av1

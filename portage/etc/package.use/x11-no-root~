@@ -74,7 +74,7 @@ sys-boot/grub mount
 # required by @selected
 # required by @world (argument)
 app-text/ghostscript-gpl cups
-dev-lang/rust -l rls clippy rustfmt rust-analizer rust-analyzer
+dev-lang/rust -l rls clippy rustfmt rust-analizer rust-analyzer nightly -test -system-llvm Miri miri
 x11-misc/xmobar xft timezone mpris
 x11-misc/polybar pulseaudio polybar -i3wm
 
@@ -93,4 +93,4 @@ x11-misc/polybar pulseaudio polybar -i3wm
 app-admin/doas persist
 net-wireless/iwd client
 net-misc/tigervnc server
-x11-misc/lightdm qt5
+x11-misc/lightdm qt5 gtk

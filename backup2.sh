@@ -18,3 +18,4 @@ git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup"
 git push origin master
 
+rsync -av -e ssh ~/dotfiles admin@192.168.1.33:NetBackup

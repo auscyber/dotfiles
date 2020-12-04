@@ -39,6 +39,7 @@ dev-util/ccache
 dev-util/glslang
 dev-util/meson
 dev-util/nvidia-cuda-toolkit
+dev-util/perf
 dev-util/vulkan-tools
 dev-vcs/git
 games-action/supertuxkart
@@ -65,6 +66,7 @@ media-video/obs-studio
 net-analyzer/tcpdump
 net-analyzer/wireshark
 net-dns/dnsmasq
+net-fs/nfs-utils
 net-im/discord-bin
 net-im/skypeforlinux
 net-im/teams
@@ -95,6 +97,7 @@ sys-apps/usbutils
 sys-boot/grub:2
 sys-boot/os-prober
 sys-devel/crossdev
+sys-devel/gdb
 sys-firmware/intel-microcode
 sys-fs/dosfstools
 sys-fs/f2fs-tools
@@ -106,6 +109,8 @@ sys-process/htop
 virtual/cron
 virtual/jdk:1.8
 virtual/wine
+www-client/firefox
+www-client/firefox-bin
 www-client/google-chrome
 x11-apps/mesa-progs
 x11-apps/xdpyinfo

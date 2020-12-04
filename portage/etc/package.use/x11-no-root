@@ -74,8 +74,8 @@ sys-boot/grub mount
 # required by @selected
 # required by @world (argument)
 app-text/ghostscript-gpl cups
-dev-lang/rust -l rls clippy rustfmt rust-analizer rust-analyzer
-x11-misc/xmobar xft timezone mpris
+dev-lang/rust -l rls clippy rustfmt rust-analizer rust-analyzer nightly -test -system-llvm Miri miri
+x11-misc/xmobar xft timezone mpris xpm
 x11-misc/polybar pulseaudio polybar -i3wm
 
 # required by media-gfx/graphviz-2.44.1-r1::gentoo

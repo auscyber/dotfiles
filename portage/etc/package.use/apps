@@ -25,3 +25,4 @@ dev-lua/mpack luajit
 #
 sys-devel/llvm abi_x86_32
 sys-libs/zlib static-libs
+www-client/firefox hwaccel -debug system-av1

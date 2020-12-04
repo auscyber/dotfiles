@@ -4,7 +4,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH="/home/auscyber/.oh-my-zsh"
 export _JAVA_AWT_WM_NONREPARENTING=1
-
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -103,4 +102,5 @@ alias e="vim"
 alias sudo="doas"
 alias t="tmux"
 alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin
+export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin
+neofetch
