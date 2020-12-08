@@ -20,3 +20,5 @@ net-im/skypeforlinux Skype-TOS
 # required by media-gfx/blender-2.90.1-r1::gentoo[openimageio]
 # required by blender (argument)
 >=sci-libs/dcmtk-3.6.5 OFFIS
+# required by net-im/discord (argument)
+>=net-im/discord-0.0.13 all-rights-reserved

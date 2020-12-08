@@ -22,13 +22,17 @@ import           XMonad.Util.Run
 import           XMonad.Util.Run                     (safeSpawn)
 import Polybar (polybarPP)
 import DynamicLog
+import XMonad.Prompt
+import XMonad.Prompt.Shell
+
 
 
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "/bin/sh ~/.xmonad/polybar.sh"
      spawn "discord"
-     spawn "picom --config=.config/picom/picom.conf"
+     spawn "feh --bg-center ~/background3.png"
+     spawn "picom --experimental-backend --config=.config/picom/picom.conf"
 
 --Conf
 myWorkspaces =  ["1:\xf015 ","2:\62056 ","3:\61728 ","4:\61884 "] ++ map show [5..9]
@@ -39,7 +43,7 @@ myConfig = ewmh $ def {
       , focusedBorderColor = mainColor
       , workspaces = myWorkspaces
       , keys = customKeys
-      , modMask = mod4Mask
+      , modMask = mod1Mask
       , focusFollowsMouse = False
       , startupHook = myStartupHook
       , logHook = dynamicLogWithPP polybarPP
@@ -59,9 +63,6 @@ tertiaryColor  = "#A3FFE6"
 myTerm       = "st"
 myBorderWidth  = 2
 
---Polybar
-
-
 myTabConfig = def { inactiveBorderColor = "#FF0000"
                   , activeTextColor = "#00FF00"}
 myLayout =
@@ -71,7 +72,6 @@ myLayout =
   ||| Mirror tiled
   ||| Full
   ||| tabbed shrinkText myTabConfig
-
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled   = Tall nmaster delta ratio
@@ -93,21 +93,25 @@ myManageHook = composeAll
     , className =? "Steam" --> doFloat
     , className =? "discord" --> doShift (myWorkspaces !! 2)
     , className =? "jetbrains-idea" --> doFloat
-    , className =? "Spotify" --> doShift "9"
+    , className =? "Spotify" --> doShift "4"
      ]
+
 customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [
     -- Start dmenu
     --((modm .|. shiftMask, xK_r ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
     ((modm .|. shiftMask, xK_r), spawn "rofi -show combi")
     -- Start st
-	,((modm .|. shiftMask, xK_t ), spawn $ XMonad.terminal conf)
+	,((modm .|. shiftMask, xK_t ), spawn $ terminal conf)
 	-- Kill currently focused window
 	,((modm .|. shiftMask, xK_c),kill)
 	--Take screenshot
 	,((mod4Mask .|. shiftMask, xK_s), spawn "~/.xmonad/screenshot-sec.sh")
 	--Chrome
 	,((modm .|. shiftMask, xK_g), spawn "google-chrome-stable")
+    --Start vim
+    ,((modm , xK_d), spawn "st nvim")
+
 	--- Multimedia keys
 	,((0,0x1008ff16), spawn "playerctl previous")
 	,((0,0x1008ff17), spawn "playerctl next")
@@ -138,7 +142,7 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
 
 	, ((modm,               xK_space ), sendMessage NextLayout)
-
+    , ((modm , xK_r ), shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
 	] ++
 	-- Xmonad keys
 	[

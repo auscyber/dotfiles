@@ -75,7 +75,7 @@ sys-boot/grub mount
 # required by @world (argument)
 app-text/ghostscript-gpl cups
 dev-lang/rust -l rls clippy rustfmt rust-analizer rust-analyzer nightly -test -system-llvm Miri miri
-x11-misc/xmobar xft timezone mpris
+x11-misc/xmobar xft timezone mpris xpm
 x11-misc/polybar pulseaudio polybar -i3wm
 
 # required by media-gfx/graphviz-2.44.1-r1::gentoo
@@ -93,4 +93,10 @@ x11-misc/polybar pulseaudio polybar -i3wm
 app-admin/doas persist
 net-wireless/iwd client
 net-misc/tigervnc server
-x11-misc/lightdm qt5 gtk
+x11-misc/lightdm qt5 -gtk
+# required by media-gfx/gimp-2.10.22-r1::gentoo
+# required by gimp (argument)
+>=app-text/poppler-20.12.0 cairo
+# required by media-gfx/gimp-2.10.22-r1::gentoo
+# required by gimp (argument)
+>=media-libs/gegl-0.4.26-r1 cairo

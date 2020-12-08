@@ -20,18 +20,18 @@ def mediaa():
             track = re.search(r"spotify xesam:title\s+(.+)", metadata).group(1)
             current_song = track + " - " + artist
             o = "" #pw_sym("DBD89e")
-           #if songs[len(songs)-1] != current_song:
-           #    if songs[len(songs)-2] == current_song:
-           #        o += " "
-           #        songs.pop(len(songs)-1)
-           #    else:
-           #        o+= " "
-           #        songs.append(current_song)
-           #elif status == "Playing\n":
-           #    o += " "
-           #else:
-           #    o += " "
-            o += " "
+            if songs[len(songs)-1] != current_song:
+                if songs[len(songs)-2] == current_song:
+                    o += " "
+                    songs.pop(len(songs)-1)
+                else:
+                   o+= " "
+                   songs.append(current_song)
+            elif status == "Playing\n":
+               o += " "
+            else:
+               o += " "
+            #o += " "
             o += current_song
             
             if len(songs) > 100:
@@ -39,13 +39,13 @@ def mediaa():
                 
             return o
     except:
-        return "AusCyber"
+        return " "
 
 
 while True:
      try:
         sys.stdout.write(" " + mediaa()+"\n")
      except:
-         sys.stdout.write(" \n")
+         sys.stdout.write("  \n")
      sys.stdout.flush()
      time.sleep(1)

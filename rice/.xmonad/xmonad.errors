@@ -1,7 +1,7 @@
 
-lib/Config.hs:104:1: warning: [-Wtabs]
+lib/Config.hs:105:1: warning: [-Wtabs]
     Tab character found here, and in 35 further locations.
     Please use spaces instead.
     |
-104 |         ,((modm .|. shiftMask, xK_t ), spawn $ XMonad.terminal conf)
+105 |         ,((modm .|. shiftMask, xK_t ), spawn $ terminal conf)
     | ^^^^^^^^

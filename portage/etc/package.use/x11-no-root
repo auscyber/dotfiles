@@ -93,4 +93,13 @@ x11-misc/polybar pulseaudio polybar -i3wm
 app-admin/doas persist
 net-wireless/iwd client
 net-misc/tigervnc server
-x11-misc/lightdm qt5 gtk
+x11-misc/lightdm qt5 -gtk
+# required by media-gfx/gimp-2.10.22-r1::gentoo
+# required by gimp (argument)
+>=app-text/poppler-20.12.0 cairo
+# required by media-gfx/gimp-2.10.22-r1::gentoo
+# required by gimp (argument)
+>=media-libs/gegl-0.4.26-r1 cairo
+# required by app-shells/fish-3.1.2::gentoo
+# required by fish (argument)
+>=dev-libs/libpcre2-10.36 pcre32

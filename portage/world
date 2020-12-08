@@ -17,6 +17,8 @@ app-portage/flaggie
 app-portage/gentoolkit
 app-portage/layman
 app-portage/portage-utils
+app-portage/repoman
+app-shells/fish
 app-shells/gentoo-zsh-completions
 app-shells/zsh
 app-shells/zsh-completions
@@ -54,6 +56,7 @@ media-fonts/noto-emoji
 media-fonts/powerline-symbols
 media-gfx/feh
 media-gfx/fontforge
+media-gfx/gimp
 media-gfx/maim
 media-libs/fontconfig
 media-libs/vulkan-loader
@@ -67,7 +70,7 @@ net-analyzer/tcpdump
 net-analyzer/wireshark
 net-dns/dnsmasq
 net-fs/nfs-utils
-net-im/discord-bin
+net-im/discord
 net-im/skypeforlinux
 net-im/teams
 net-irc/hexchat
@@ -123,7 +126,6 @@ x11-drivers/nvidia-drivers
 x11-libs/libXinerama
 x11-misc/lightdm
 x11-misc/pcmanfm
-x11-misc/picom
 x11-misc/polybar
 x11-misc/rofi
 x11-misc/sddm

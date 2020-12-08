@@ -10,6 +10,7 @@ rsync -avhr ~/.config/polybar $DEST/.config --delete
 rsync -avhr ~/.config/nvim $DEST/.config --delete
 rsync -avhr ~/.config/picom $DEST/.config --delete
 rsync -avhr ~/.config/rofi $DEST/.config --delete
+rsync -avhr ~/picom $DEST/rice --delete
 cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cp ~/.zshrc $DEST
