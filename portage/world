@@ -7,6 +7,7 @@ app-editors/emacs
 app-editors/gvim
 app-editors/neovim
 app-editors/vim
+app-emacs/emacs-daemon
 app-emulation/docker
 app-emulation/virtualbox
 app-eselect/eselect-repository
@@ -32,6 +33,7 @@ dev-haskell/cabal-install
 dev-haskell/stack
 dev-haskell/tf-random
 dev-java/openjdk
+dev-java/openjdk-jre-bin:11
 dev-lang/ghc
 dev-lang/nasm
 dev-python/gst-python
@@ -57,7 +59,7 @@ media-fonts/powerline-symbols
 media-gfx/feh
 media-gfx/fontforge
 media-gfx/gimp
-media-gfx/maim
+media-gfx/pencil
 media-libs/fontconfig
 media-libs/vulkan-loader
 media-plugins/gst-plugins-meta
@@ -87,7 +89,6 @@ net-vpn/openvpn
 net-wireless/bluez
 net-wireless/hostapd
 net-wireless/iw
-net-wireless/iwd
 net-wireless/wpa_supplicant
 sys-apps/dbus
 sys-apps/debianutils
@@ -128,7 +129,6 @@ x11-misc/lightdm
 x11-misc/pcmanfm
 x11-misc/polybar
 x11-misc/rofi
-x11-misc/sddm
 x11-misc/xclip
 x11-misc/xdiskusage
 x11-misc/xmobar

@@ -71,7 +71,7 @@ type = internal/memory
 ; Seconds to sleep between updates
 ; Default: 1
 interval = 3
-label =  %gb_used%/%gb_free%
+label =  %gb_used%/%gb_total%
 format-prefix-foreground = #8ba9ff
 format-foreground = #696969
 

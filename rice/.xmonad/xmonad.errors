@@ -1,7 +1,7 @@
 
-lib/Config.hs:105:1: warning: [-Wtabs]
+lib/Config.hs:103:1: warning: [-Wtabs]
     Tab character found here, and in 35 further locations.
     Please use spaces instead.
     |
-105 |         ,((modm .|. shiftMask, xK_t ), spawn $ terminal conf)
+103 |         ,((modm .|. shiftMask, xK_t ), spawn $ terminal conf)
     | ^^^^^^^^

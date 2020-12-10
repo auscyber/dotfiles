@@ -97,11 +97,15 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin
+# Aliases 
 alias vim="nvim"
 alias e="vim"
 alias sudo="doas"
 alias t="tmux"
 alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin
+alias emacs="emacsclient -t -s /tmp/emacs1000/server"
+eval "$(starship init zsh)"
 export BROWSER=google-chrome-stable
 neofetch

@@ -20,11 +20,10 @@ import qualified XMonad.StackSet                     as W
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
 import           XMonad.Util.Run                     (safeSpawn)
-import Polybar (polybarPP)
-import DynamicLog
-import XMonad.Prompt
-import XMonad.Prompt.Shell
-
+import           Polybar (polybarPP)
+import           DynamicLog
+import           XMonad.Prompt
+import           XMonad.Prompt.Shell
 
 
 myStartupHook = do
@@ -60,7 +59,7 @@ mainColor = "#ffc3b6"
 secondaryColor = "#FFFBB8"
 tertiaryColor  = "#A3FFE6"
 
-myTerm       = "st"
+myTerm       = "alacritty"
 myBorderWidth  = 2
 
 myTabConfig = def { inactiveBorderColor = "#FF0000"
@@ -71,7 +70,6 @@ myLayout =
   tiled
   ||| Mirror tiled
   ||| Full
-  ||| tabbed shrinkText myTabConfig
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled   = Tall nmaster delta ratio
@@ -106,11 +104,11 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 	-- Kill currently focused window
 	,((modm .|. shiftMask, xK_c),kill)
 	--Take screenshot
-	,((mod4Mask .|. shiftMask, xK_s), spawn "~/.xmonad/screenshot-sec.sh")
+	,((modm .|. shiftMask, xK_s), spawn "~/.xmonad/screenshot-sec.sh")
 	--Chrome
 	,((modm .|. shiftMask, xK_g), spawn "google-chrome-stable")
     --Start vim
-    ,((modm , xK_d), spawn "st nvim")
+    ,((modm , xK_d), spawn "st -t NEOVIM nvim")
 
 	--- Multimedia keys
 	,((0,0x1008ff16), spawn "playerctl previous")

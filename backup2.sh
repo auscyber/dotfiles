@@ -6,6 +6,8 @@ cp /usr/src/linux/.config $DEST/kernel/
 #zip -r ~/dotfiles/rice.zip  {~/.xmonad,~/st,~/dmenu,~/.xinitrc,~/.Xresources}
 rsync -avhr ~/.xmonad $DEST/rice --delete --exclude *.o
 rsync -avhr ~/st $DEST/rice --delete --exclude .git
+rsync -avhr ~/.config/alacritty/alacritty.yml $DEST/.config --delete
+rsync -avhr ~/.config/starship.toml $DEST/.config
 rsync -avhr ~/.config/polybar $DEST/.config --delete
 rsync -avhr ~/.config/nvim $DEST/.config --delete
 rsync -avhr ~/.config/picom $DEST/.config --delete
