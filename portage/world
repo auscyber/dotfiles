@@ -29,6 +29,7 @@ cross-i686-w64-mingw32/binutils
 cross-i686-w64-mingw32/mingw64-runtime
 cross-x86_64-w64-mingw32/binutils
 cross-x86_64-w64-mingw32/mingw64-runtime
+dev-games/irrlicht
 dev-haskell/cabal-install
 dev-haskell/stack
 dev-haskell/tf-random
@@ -47,7 +48,6 @@ dev-util/perf
 dev-util/vulkan-tools
 dev-vcs/git
 games-action/supertuxkart
-games-util/steam-launcher
 kde-plasma/breeze-grub
 mail-client/thunderbird-bin
 media-fonts/fontawesome
@@ -72,7 +72,6 @@ net-analyzer/tcpdump
 net-analyzer/wireshark
 net-dns/dnsmasq
 net-fs/nfs-utils
-net-im/discord
 net-im/skypeforlinux
 net-im/teams
 net-irc/hexchat

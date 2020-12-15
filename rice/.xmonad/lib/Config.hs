@@ -24,7 +24,10 @@ import           Polybar (polybarPP)
 import           DynamicLog
 import           XMonad.Prompt
 import           XMonad.Prompt.Shell
-
+import           XMonad.Hooks.ServerMode
+import           XMonad.Layout.Spacing
+import           XMonad.Util.EZConfig
+import           XMonad.Prompt.XMonad
 
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
@@ -46,9 +49,9 @@ myConfig = ewmh $ def {
       , focusFollowsMouse = False
       , startupHook = myStartupHook
       , logHook = dynamicLogWithPP polybarPP
-      , manageHook = (isFullscreen --> doFullFloat) <+> manageDocks <+>  manageHook def
+      , manageHook = (isFullscreen --> doFullFloat) <> manageDocks <>  manageHook def
       , layoutHook =  myLayout
-      , handleEventHook = handleEventHook def <+> docksEventHook <+> fullscreenEventHook }
+      , handleEventHook = serverModeEventHook <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
 
 
 
@@ -65,6 +68,7 @@ myBorderWidth  = 2
 myTabConfig = def { inactiveBorderColor = "#FF0000"
                   , activeTextColor = "#00FF00"}
 myLayout =
+  spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
   avoidStruts $
   smartBorders $
   tiled
@@ -94,69 +98,68 @@ myManageHook = composeAll
     , className =? "Spotify" --> doShift "4"
      ]
 
-customKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
     [
     -- Start dmenu
     --((modm .|. shiftMask, xK_r ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
-    ((modm .|. shiftMask, xK_r), spawn "rofi -show combi")
+    ("M-S-r", spawn "rofi -show combi")
     -- Start st
-	,((modm .|. shiftMask, xK_t ), spawn $ terminal conf)
+	,("M-S-t", spawn $ terminal conf)
 	-- Kill currently focused window
-	,((modm .|. shiftMask, xK_c),kill)
+	,("M-S-c",kill)
 	--Take screenshot
-	,((modm .|. shiftMask, xK_s), spawn "~/.xmonad/screenshot-sec.sh")
+	,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
 	--Chrome
-	,((modm .|. shiftMask, xK_g), spawn "google-chrome-stable")
+	,("M-S-g", spawn "google-chrome-stable")
     --Start vim
-    ,((modm , xK_d), spawn "st -t NEOVIM nvim")
+    ,("M-d", spawn "st -t NEOVIM nvim")
 
 	--- Multimedia keys
-	,((0,0x1008ff16), spawn "playerctl previous")
-	,((0,0x1008ff17), spawn "playerctl next")
-	,((0,0x1008ff14), spawn "playerctl play-pause")
-	,((0,0x1008ff13), spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
-	,((0,0x1008ff11), spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
-	,((0,0x1008ff12), spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+	,("<XF86AudioPrev>", spawn "playerctl previous")
+	,("<XF86AudioNext>", spawn "playerctl next")
+	,("<XF86AudioPlay>", spawn "playerctl play-pause")
+	,("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
+	,("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
+	,("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
 	--  Reset the layouts on the current workspace to default
-	, ((modm .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
-	,((modm, xK_Caps_Lock), sendMessage $ Toggle FULL)
+	, ("M-s-<Space>", setLayout $ XMonad.layoutHook conf)
 
 	-- Swap the focused and the master window
-	, ((modm,               xK_Return), windows $ W.swapMaster . W.focusDown)
+	, ("M-<Return>", windows $ W.swapMaster . W.focusDown)
 
     -- Move focus to the next window
-    , ((mod1Mask,               xK_Tab   ), windows W.focusDown)
+    , ("M-<Tab>", windows W.focusDown)
     -- Move focus to preview window
-    , ((mod1Mask .|. shiftMask, xK_Tab),    windows W.focusUp)
+    , ("M-S-<Tab>",    windows W.focusUp)
     --Polybar toggle
-	,((modm, xK_b     ), spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
+	,("M-b", spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
 
 	--Push window back into tiling
-	, ((modm,               xK_t     ), withFocused $ windows . W.sink)
+	, ("M-<Tab>", withFocused $ windows . W.sink)
         -- Increment the number of windows in the master area
-    , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
+    , ("M-,", sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
-    , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    , ("M-.", sendMessage (IncMasterN (-1)))
 
-	, ((modm,               xK_space ), sendMessage NextLayout)
-    , ((modm , xK_r ), shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
+	, ("M-<Space>", sendMessage NextLayout)
+    , ("M-r", shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
 	] ++
 	-- Xmonad keys
 	[
-	((modm, xK_q ), spawn "xmonad --recompile; xmonad --restart" )
-	,((modm .|. shiftMask,xK_q), io exitSuccess)
+	("M-q", spawn "xmonad --recompile; xmonad --restart" )
+	,("M-S-q", io exitSuccess)
 	] ++
 
 
 	--Workspace keys
-	[((m .|. modm, k), windows $ f i)
-	    | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-            , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+	[("M"++m++'-':show k, windows $ f i)
+	    | (i, k) <- zip (XMonad.workspaces conf) [1..9]
+            , (f, m) <- [(W.greedyView, ""), (W.shift, "-S")]]
 	++
-	 [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-	    | (key, sc) <- zip [xK_e, xK_w] [0..]
-	    , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+	 [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
+	    | (key, sc) <- zip ["-w","-e"] [0..]
+	    , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
 
 
 

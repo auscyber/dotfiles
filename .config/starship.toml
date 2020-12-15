@@ -1,24 +1,21 @@
-# Don't print a new line at the start of the prompt
-add_newline = false
 
-# ~/.config/starship.toml
+#format = """
+#[┌───────────────────>](bold green)
+#[│](bold green) $directory$rust$package$cmd_duration$git_status
+#[└─$character](bold green) """
 
-# Use custom format
-format = """
-[┌───────────────────>](bold green)
-[│](bold green)  $directory$rust$package$python$haskell
-[└─>](bold green) """
+
+[character]                            # The name of the module we are configuring is "character"
+success_symbol = "[➜ ](bold green)"
+error_symbol = "[➜ ](bold red)"
+
+
 
 # Wait 10 milliseconds for starship to check files under the current directory.
 scan_timeout = 10
 
 
-# Replace the "❯" symbol in the prompt with "➜"
-[character]                            # The name of the module we are configuring is "character"
-success_symbol = "[➜ ](bold green)"     # The "success_symbol" segment is being set to "➜" with the color "bold green"
-
-# Disable the package module, hiding it from the prompt completely
-
+# Don't print a new line at the start of the prompt
 
 [aws]
 symbol = " "

@@ -1,5 +1,5 @@
 module Polybar (
-polybarColour,polybarUnderline,polybarUnderlineWithColor,polybarPP) 
+polybarColour,polybarUnderline,polybarUnderlineWithColor,polyBarAction,polybarPP) 
 where
 import DynamicLog
 import XMonad
@@ -27,6 +27,11 @@ polybarUnderline text = "%{+u}" ++ text ++ "%{-u}"
 polybarUnderlineWithColor :: Colour -> String -> String
 polybarUnderlineWithColor color = polybarColour 'u' color . polybarUnderline
 
+
+polyBarAction :: Int -> String -> String-> String
+polyBarAction button command
+    | button > 8 || button <1 = id
+    | otherwise = wrap ("%{A" ++ show button ++ ':':command) "%{A}"
 
 
 stripNumbers :: String -> String
