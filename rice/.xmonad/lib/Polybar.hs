@@ -8,14 +8,17 @@ type Colour = String
 polybarColour :: Char -> Colour -> String -> String
 polybarColour area (_:color) text = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area:"--}"
 
+--FFC9AB
+--E88B84
+--804144
 polybarPP =  def {
-    ppCurrent = polybarColour 'F' "#ffffff" .  polybarUnderlineWithColor "#FFCFD1" . stripNumbers
-    , ppTitle = polybarColour 'F' "#--" . take 100
-    , ppHidden = polybarColour 'F' "#E8B8B0" . stripNumbers
+    ppCurrent = polybarColour 'F' "#FFDB9E" .  polybarUnderlineWithColor "#FFCFD1" . stripNumbers
+    , ppTitle = polybarColour 'F' "#--" . take 90
+    , ppHidden = polybarColour 'F' "#E88B84" . stripNumbers
+    , ppVisible = polybarColour 'F' "#FFC9AB"  . wrap "[" "]" . stripNumbers
+    , ppHiddenNoWindows = polybarColour 'F' "#804144" . stripNumbers
+    , ppSep = polybarColour 'F' "#5754B3" " | "
     , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n"
-    , ppVisible = polybarColour 'F' "#804144"  . wrap "[" "]" . stripNumbers
-    , ppHiddenNoWindows = polybarColour 'F' "#80696e" . stripNumbers
-    , ppSep = polybarColour 'F' "#804144" " | "
 --    , ppOrder = \(x:_:y) -> x:y
 
 }

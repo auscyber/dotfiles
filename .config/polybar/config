@@ -2,13 +2,14 @@
 margin-top = 5
 margin-bottom = 5
 [bar/mybar]
-modules-right =   playing-song pulseaudio cpu memory battery date
+modules-right =   playing-song pulseaudio cpu memory date
 modules-center = time
 modules-left = workspaces-xmonad 
 font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
 font-1 = "Inconsolata Nerd Font:style=Bold:pixelsize=15"
 enable-ipc = true
-background = #FF838A
+foreground = #FFDB9E
+background = #9591FF
 radius = 5.0
 tray-position = right
 tray-detatched = false
@@ -20,18 +21,35 @@ line-size = 3
 height = 25
 module-margin = 1
 
-[bar/secbar]
-modules-right =  pulseaudio memory 
-modules-left = cpu2
+
+[bar/rightbar]
 font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
-enable-ipc = true
+font-1 = "Inconsolata Nerd Font:style=Bold:pixelsize=15"
+
+modules-right = playing-song pulseaudio cpu memory date
+width = 30%
+offset-x = 70%
+[bar/midbar]
+offset-x = 35%
+width = 30%
+fixed-center = true
+modules-center = time
+
+
+[bar/leftbar]
+width = 30%
+modules-left = workspaces-xmonad
+font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
+font-1 = "Inconsolata Nerd Font:style=Bold:pixelsize=15"
 background = #FF838A
-radius = 5.0
-monitor = DP-3 
 border-top-size = 10
 border-bottom-size = 5
 border-left-size = 10
 border-right-size = 10
+radius = 5.0
+
+
+
 [module/cpu2]
 type = internal/cpu
 format-margin = 5
@@ -69,7 +87,7 @@ type = internal/memory
 ; Default: 1
 interval = 3
 label =  %gb_used%/%gb_total%
-format-foreground = #69C9FF
+format-foreground = #C4D1FF
 
 [module/cpu]
 type = internal/cpu
@@ -98,7 +116,7 @@ ramp-load-4 = ▅
 ramp-load-5 = ▆
 ramp-load-6 = ▇
 ramp-load-7 = █
-format-foreground = #51edd5
+format-foreground = #85FFB7
 
 [colors]
 black = #000
@@ -129,7 +147,6 @@ type = custom/script
 exec = ~/.xmonad/currentPlay.py
 tail = true
 format-foreground = #806768
-
 [module/battery]
 type = internal/battery
 

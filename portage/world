@@ -3,13 +3,16 @@ app-admin/grub-customizer
 app-admin/haskell-updater
 app-admin/sysklogd
 app-crypt/hashcat
+app-crypt/p11-kit
 app-editors/emacs
 app-editors/gvim
 app-editors/neovim
+app-editors/neovim-gtk
 app-editors/vim
 app-emacs/emacs-daemon
 app-emulation/docker
 app-emulation/virtualbox
+app-emulation/winetricks
 app-eselect/eselect-repository
 app-misc/neofetch
 app-misc/tmux
@@ -29,6 +32,7 @@ cross-i686-w64-mingw32/binutils
 cross-i686-w64-mingw32/mingw64-runtime
 cross-x86_64-w64-mingw32/binutils
 cross-x86_64-w64-mingw32/mingw64-runtime
+dev-db/sqlite
 dev-games/irrlicht
 dev-haskell/cabal-install
 dev-haskell/stack
@@ -37,7 +41,10 @@ dev-java/openjdk
 dev-java/openjdk-jre-bin:11
 dev-lang/ghc
 dev-lang/nasm
+dev-libs/libgpg-error
+dev-libs/libusb
 dev-python/gst-python
+dev-python/ntlm-auth
 dev-python/pip
 dev-python/pybluez
 dev-util/ccache
@@ -48,6 +55,7 @@ dev-util/perf
 dev-util/vulkan-tools
 dev-vcs/git
 games-action/supertuxkart
+games-util/lutris
 kde-plasma/breeze-grub
 mail-client/thunderbird-bin
 media-fonts/fontawesome
@@ -72,9 +80,11 @@ net-analyzer/tcpdump
 net-analyzer/wireshark
 net-dns/dnsmasq
 net-fs/nfs-utils
+net-im/discord
 net-im/skypeforlinux
 net-im/teams
 net-irc/hexchat
+net-libs/gnutls
 net-libs/nodejs
 net-misc/bridge-utils
 net-misc/dhcpcd
@@ -108,6 +118,7 @@ sys-fs/ntfs3g
 sys-kernel/genkernel
 sys-kernel/gentoo-sources
 sys-kernel/linux-firmware
+sys-libs/readline
 sys-process/htop
 virtual/cron
 virtual/jdk:1.8
@@ -121,6 +132,7 @@ x11-apps/xeyes
 x11-apps/xinput
 x11-apps/xrdb
 x11-apps/xsetroot
+x11-base/xorg-drivers
 x11-base/xorg-server
 x11-drivers/nvidia-drivers
 x11-libs/libXinerama

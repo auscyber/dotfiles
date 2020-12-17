@@ -34,5 +34,4 @@ alias emacs="emacsclient -t -s /tmp/emacs1000/server"
 
 eval "$(starship init zsh)"
 export BROWSER=google-chrome-stable
-neofetch
-exec fish
+~/pfetch

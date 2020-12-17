@@ -1,4 +1,5 @@
 set rnu nu
+colorscheme slate
 call plug#begin(stdpath('data') . '/plugged')
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')

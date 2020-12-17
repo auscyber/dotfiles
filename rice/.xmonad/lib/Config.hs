@@ -17,6 +17,7 @@ import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
 import           XMonad.Layout.Tabbed
 import qualified XMonad.StackSet                     as W
+import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
 import           XMonad.Util.Run                     (safeSpawn)
@@ -32,7 +33,7 @@ import           XMonad.Prompt.XMonad
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "/bin/sh ~/.xmonad/polybar.sh"
-     spawn "discord"
+     spawnOnce "discord"
      spawn "feh --bg-center ~/background3.png"
      spawn "picom --experimental-backend --config=.config/picom/picom.conf"
 
@@ -68,9 +69,9 @@ myBorderWidth  = 2
 myTabConfig = def { inactiveBorderColor = "#FF0000"
                   , activeTextColor = "#00FF00"}
 myLayout =
+  smartBorders $
   spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
   avoidStruts $
-  smartBorders $
   tiled
   ||| Mirror tiled
   ||| Full
@@ -90,27 +91,26 @@ myLayout =
 
 
 myManageHook = composeAll
-    [ className =? "Google-chrome"        --> doShift (myWorkspaces !! 1)
+    [ className =? "Firefox"        --> doShift (myWorkspaces !! 1)
     , className =? "Gimp"           --> doFloat
     , className =? "Steam" --> doFloat
     , className =? "discord" --> doShift (myWorkspaces !! 2)
     , className =? "jetbrains-idea" --> doFloat
     , className =? "Spotify" --> doShift "4"
-     ]
+    ]
 
 customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
     [
-    -- Start dmenu
-    --((modm .|. shiftMask, xK_r ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
+    --Start rofi
     ("M-S-r", spawn "rofi -show combi")
-    -- Start st
+    -- Start alacritty
 	,("M-S-t", spawn $ terminal conf)
 	-- Kill currently focused window
 	,("M-S-c",kill)
 	--Take screenshot
 	,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
 	--Chrome
-	,("M-S-g", spawn "google-chrome-stable")
+	,("M-S-g", spawn "firefox")
     --Start vim
     ,("M-d", spawn "st -t NEOVIM nvim")
 
@@ -135,7 +135,7 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
 	,("M-b", spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
 
 	--Push window back into tiling
-	, ("M-<Tab>", withFocused $ windows . W.sink)
+	, ("M-t", withFocused $ windows . W.sink)
         -- Increment the number of windows in the master area
     , ("M-,", sendMessage (IncMasterN 1))
 
@@ -160,6 +160,4 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
 	 [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
 	    | (key, sc) <- zip ["-w","-e"] [0..]
 	    , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
-
-
 
