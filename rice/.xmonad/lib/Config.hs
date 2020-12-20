@@ -112,7 +112,7 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
 	--Chrome
 	,("M-S-g", spawn "firefox")
     --Start vim
-    ,("M-d", spawn "st -t NEOVIM nvim")
+    ,("M-d", spawn "st -t NEOVIM -e nvim")
 
 	--- Multimedia keys
 	,("<XF86AudioPrev>", spawn "playerctl previous")

@@ -26,7 +26,7 @@ alias e="vim"
 alias sudo="doas"
 alias t="tmux"
 alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
-alias emacs="emacsclient -t -s /tmp/emacs1000/server"
+alias emacs="emacsclient -c -s /tmp/emacs1000/server"
 
 
 

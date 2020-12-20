@@ -39,6 +39,7 @@ dev-haskell/stack
 dev-haskell/tf-random
 dev-java/openjdk
 dev-java/openjdk-jre-bin:11
+dev-lang/clojure
 dev-lang/ghc
 dev-lang/nasm
 dev-libs/libgpg-error

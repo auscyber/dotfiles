@@ -103,3 +103,4 @@ x11-misc/lightdm qt5 -gtk
 # required by app-shells/fish-3.1.2::gentoo
 # required by fish (argument)
 >=dev-libs/libpcre2-10.36 pcre32
+media-libs/mesa vulkan

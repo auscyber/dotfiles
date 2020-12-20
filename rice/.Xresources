@@ -4,7 +4,7 @@
 *.background:   #1d1f21
 *.cursorColor:  #c5c8c6
 ! black
-*.font: 	    Inconsolata\ Nerd\ Font:style=Regular:pixelsize=16
+! *.font: 	    "Inconsolata Nerd Font:style=Regular"
 *.color0:       #282a2e
 *.color8:       #373b41
 

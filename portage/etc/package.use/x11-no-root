@@ -104,3 +104,8 @@ x11-misc/lightdm qt5 -gtk
 # required by fish (argument)
 >=dev-libs/libpcre2-10.36 pcre32
 media-libs/mesa vulkan
+app-editors/emacs gui
+# required by app-editors/emacs-27.1-r3::gentoo
+# required by @selected
+# required by @world (argument)
+>=app-emacs/emacs-common-gentoo-1.6-r4 gui
