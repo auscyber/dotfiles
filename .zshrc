@@ -1,6 +1,6 @@
 autoload -U compinit promptinit
 compinit
-promptinit; prompt gentoo
+#promptinit; prompt gentoo
 
 
 source ~/antigen.zsh
@@ -21,10 +21,10 @@ function set_win_title(){
 }
 precmd_functions+=(set_win_title)
 
-alias vim="nvim"
-alias e="vim"
-alias sudo="doas"
-alias t="tmux"
+#alias vim="nvim"
+#alias e="vim"
+#alias sudo="doas"
+#alias t="tmux"
 alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
 alias emacs="emacsclient -c -s /tmp/emacs1000/server"
 
@@ -33,5 +33,6 @@ alias emacs="emacsclient -c -s /tmp/emacs1000/server"
 
 
 eval "$(starship init zsh)"
-export BROWSER=google-chrome-stable
+export BROWSER=chromium
 ~/pfetch
+[ -f "/home/auscyber/.ghcup/env" ] && source "/home/auscyber/.ghcup/env" # ghcup-env

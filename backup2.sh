@@ -1,7 +1,7 @@
 HOME=/home/auscyber
 DEST=~/dotfiles 
-rsync -avhr /etc/portage/ $DEST/portage/etc/ --delete
-rsync -avh /var/lib/portage/world $DEST/portage/world --delete
+#rsync -avhr /etc/portage/ $DEST/portage/etc/ --delete
+#rsync -avh /var/lib/portage/world $DEST/portage/world --delete
 cp /usr/src/linux/.config $DEST/kernel/
 #zip -r ~/dotfiles/rice.zip  {~/.xmonad,~/st,~/dmenu,~/.xinitrc,~/.Xresources}
 rsync -avhr ~/.xmonad $DEST/rice --delete --exclude *.o
