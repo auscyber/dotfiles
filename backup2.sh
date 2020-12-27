@@ -39,4 +39,4 @@ git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
 git push origin master
 cat dsadsa
-}   1>/dev/null 2>/dev/stdout
+}   > /dev/null
