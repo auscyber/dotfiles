@@ -17,7 +17,7 @@ if grep -q 'Gentoo' <<< "$dis"; then
     cp /usr/src/linux/.config $DEST/kernel/
 elif grep -q 'NixOS' <<< "$dis" ; then
     sync /etc/nixos/ nixos/config
-    sync ~/.config/nixos/ .config/nixos
+    sync ~/.config/nixpkgs/ .config/nixos
 fi
 
 sync ~/.xmonad rice  {.venv,*.o}
