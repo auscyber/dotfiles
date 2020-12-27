@@ -38,4 +38,4 @@ cd ~/dotfiles
 git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
 git push origin master
-}   2>&1
+}   1>/dev/null
