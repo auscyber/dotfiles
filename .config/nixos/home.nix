@@ -10,7 +10,7 @@
   jetbrains.idea-ultimate jdk
   xclip
 
-  polybarFull   meson ninja    git nodejs  playerctl htop alacritty maim discord spotify
+ ghc cabal-install polybarFull   meson ninja    git nodejs  playerctl htop alacritty maim discord spotify
  (picom.overrideAttrs (attrs: {
    src = builtins.fetchTarball {
         url = "https://github.com/jonaburg/picom/archive/next.tar.gz";

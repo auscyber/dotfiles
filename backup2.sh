@@ -2,7 +2,7 @@ HOME=/home/auscyber
 DEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DEST
 function sync () {
-    if [[ -z  $3 ]]; then
+    if [[ -n  $3 ]]; then
         rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete
     else
         rsync -avhr "$1" "$DEST/$2" --delete
