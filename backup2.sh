@@ -37,6 +37,5 @@ cp ~/.zshrc $DEST
 cd ~/dotfiles 
 git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
-git push origin master
-cat dsadsa
+git push origin master -q
 }   > /dev/null
