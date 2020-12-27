@@ -2,11 +2,12 @@
 margin-top = 5
 margin-bottom = 5
 [bar/mybar]
-modules-right =   playing-song pulseaudio cpu memory date
+monitor = HDMI-0
+modules-right =   playing-song pulseaudio cpu temp memory date
 modules-center = time
 modules-left = workspaces-xmonad 
-font-0 = "Inconsolata Nerd Font:style=Regular:size=10"
-font-1 = "Inconsolata Nerd Font:style=Bold:pixelsize=15"
+font-0 = "RobotoMono Nerd Font:style=Medium:size=10"
+font-1 = "RobotoMono Nerd Font:style=Bold:pixelsize=15"
 enable-ipc = true
 foreground = #FFDB9E
 background = #9591FF
@@ -20,6 +21,8 @@ border-right-size = 10
 line-size = 3
 height = 25
 module-margin = 1
+
+
 
 
 [bar/rightbar]
@@ -48,6 +51,16 @@ border-left-size = 10
 border-right-size = 10
 radius = 5.0
 
+[module/temp]
+type = internal/temperature
+interval = 0.5
+format = <ramp> <label>
+hwmon-path = /sys/devices/platform/coretemp.0/hwmon/hwmon3/temp1_input
+base_temperature = 20
+warm-temperature = 60
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
 
 
 [module/cpu2]
@@ -262,3 +275,10 @@ ramp-volume-2 = 墳
 ; Right and Middle click (unreleased)
 click-right = pavucontrol &
 ; click-middle = 
+
+
+
+
+[module/poweroff]
+type = custom/script
+exec = poweroff

@@ -1,4 +1,3 @@
 #!/bin/bash
-killall polybar 
-polybar mybar &&
-polybar secbar &&
+source ~/.zshrc
+xmonad

@@ -1,1 +1,1 @@
-fromList [("Run: ",["st","spotify","spotify","discord","discord","spotify","discord","discord","discord","discord"])]
+fromList [("Run: ",["Discord","firefox","firefox","firefox","firefox","firefox","chromium","chromium","chromium","chromium","chromium","chromium","pavucontrol","chromium","chromium","chromium","chromium","chromium","chromium","alacritty","xterm","xterm","chromium","xterm","st","spotify","spotify","discord","discord","spotify","discord","discord","discord","discord"]),("XMonad: ",["view\"2\""])]

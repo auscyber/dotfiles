@@ -15,7 +15,7 @@ import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
-import           XMonad.Layout.Tabbed
+import           XMonad.Layout.Tabbed 
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
@@ -31,14 +31,26 @@ import           XMonad.Util.EZConfig
 import           XMonad.Prompt.XMonad
 
 myStartupHook = do
-     io $ forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
+     io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "/bin/sh ~/.xmonad/polybar.sh"
-     spawnOnce "discord"
-     spawn "feh --bg-center ~/background3.png"
-     spawn "picom --experimental-backend --config=.config/picom/picom.conf"
+     spawn "xrandr --output DP-3  --left-of HDMI-0"
+     spawnOnce "Discord"
+     spawn "feh --bg-fill ~/background3.png"
+     spawn "picom --experimental-backend --config=/home/auscyber/.config/picom/picom.conf "
 
 --Conf
-myWorkspaces =  ["1:\xf015 ","2:\62056 ","3:\61728 ","4:\61884 "] ++ map show [5..9]
+
+
+workspaceSymbols :: M.Map Int String
+workspaceSymbols = M.fromList $ [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
+getWorkspaceText :: M.Map Int String -> String -> String
+getWorkspaceText xs n = 
+    case M.lookup (read n) xs of
+        Just x -> x
+        _ -> n
+
+
+myWorkspaces = map show [1..9]
 myConfig = ewmh $ def {
        terminal = myTerm
       , borderWidth = myBorderWidth
@@ -49,7 +61,7 @@ myConfig = ewmh $ def {
       , modMask = mod1Mask
       , focusFollowsMouse = False
       , startupHook = myStartupHook
-      , logHook = dynamicLogWithPP polybarPP
+      , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
       , manageHook = (isFullscreen --> doFullFloat) <> manageDocks <>  manageHook def
       , layoutHook =  myLayout
       , handleEventHook = serverModeEventHook <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
@@ -110,7 +122,7 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
 	--Take screenshot
 	,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
 	--Chrome
-	,("M-S-g", spawn "firefox")
+	,("M-S-g", spawn "chromium")
     --Start vim
     ,("M-d", spawn "st -t NEOVIM -e nvim")
 
@@ -143,11 +155,11 @@ customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
     , ("M-.", sendMessage (IncMasterN (-1)))
 
 	, ("M-<Space>", sendMessage NextLayout)
-    , ("M-r", shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
+    , ("M-r", xmonadPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
 	] ++
 	-- Xmonad keys
 	[
-	("M-q", spawn "xmonad --recompile; xmonad --restart" )
+	("M-q", spawn "PATH=$PATH:/home/auscyber/.cabal/bin xmonad --recompile; xmonad --restart" )
 	,("M-S-q", io exitSuccess)
 	] ++
 
