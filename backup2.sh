@@ -20,7 +20,7 @@ elif grep -q 'NixOS' <<< "$dis" ; then
     sync ~/.config/nixos/ .config/nixos
 fi
 
-sync ~/.xmonad rice  *.o
+sync ~/.xmonad rice  {.venv,*.o}
 sync ~/st rice  .git
 sync ~/.config/alacritty/alacritty.yml .config 
 sync ~/.config/starship.toml .config
