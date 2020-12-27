@@ -10,13 +10,12 @@ function sync () {
 }
 
 #Test Distro
-dis = "$(uname -v)"
+dis="$(uname -v)"
 if grep -q 'Gentoo' <<< "$dis"; then
     sync /etc/portage/ portage/etc/ 
     sync /var/lib/portage/world portage/world
     cp /usr/src/linux/.config $DEST/kernel/
 elif grep -q 'NixOS' <<< "$dis" ; then
-    exit
     sync /etc/nixos/ nixos/config
     sync ~/.config/nixos/ .config/nixos
 fi
