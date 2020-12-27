@@ -9,7 +9,8 @@ function sync () {
     fi
 }
 
-#Test Distro
+{
+    #Test Distro
 dis="$(uname -v)"
 if grep -q 'Gentoo' <<< "$dis"; then
     sync /etc/portage/ portage/etc/ 
@@ -32,8 +33,8 @@ sync ~/picom rice
 cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cp ~/.zshrc $DEST
-cd ~/dotfiles
-git add --all
-git commit -a -m "$(date "+%a %d %b %I:%M%P") backup"
+cd ~/dotfiles 
+git add --all -q
+git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
 git push origin master
-
+}  1> /dev/null 2>&1
