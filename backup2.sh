@@ -28,7 +28,7 @@ sync ~/.config/polybar .config
 sync ~/.config/nvim .config 
 sync ~/.config/picom .config 
 sync ~/.config/rofi .config 
-sync ~/picom $DEST/rice 
+sync ~/picom rice 
 cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cp ~/.zshrc $DEST
