@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$(basename $0)"
+cd "$(basename $0 && pwd)"
 sync () {
     if [[ -n  $3 ]]; then
         rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete
