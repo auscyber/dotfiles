@@ -1,8 +1,6 @@
 #!/bin/sh
-HOME=/home/auscyber
-DEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd $DEST
-function sync () {
+cd "$(basename $0)"
+sync () {
     if [[ -n  $3 ]]; then
         rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete
     else
@@ -12,7 +10,7 @@ function sync () {
 
 {
     #Test Distro
-dis="$(uname -v)"
+dis="$(cat /etc/os-release)"
 if grep -q 'Gentoo' <<< "$dis"; then
     sync /etc/portage/ portage/etc/ 
     sync /var/lib/portage/world portage/world
