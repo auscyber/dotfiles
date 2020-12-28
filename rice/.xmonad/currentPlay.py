@@ -7,7 +7,9 @@ songs = []
 songs.append("")
 songs.append("")
 songs.append("")
-
+def action(key,command):
+    a= "%{A"+str(key)+":"+command+":}" 
+    return a
 
 def mediaa():
     try:
@@ -19,7 +21,7 @@ def mediaa():
             artist = re.search(r"spotify xesam:artist\s+(.+)", metadata).group(1)
             track = re.search(r"spotify xesam:title\s+(.+)", metadata).group(1)
             current_song = track + " - " + artist
-            o = "" #pw_sym("DBD89e")
+            o = action(4,"playerctl next")+action(5,"playerctl previous")+action(1,"playerctl play-pause") #pw_sym("DBD89e")
             if songs[len(songs)-1] != current_song:
                 if songs[len(songs)-2] == current_song:
                     o += " "
@@ -31,9 +33,10 @@ def mediaa():
                o += " "
             else:
                o += " "
+            o+="%{A}"
             #o += " "
             o += current_song
-            
+            o += "%{A}%{A}" 
             if len(songs) > 100:
                 songs.pop(0)
                 
@@ -46,6 +49,6 @@ while True:
      try:
         sys.stdout.write(" " + mediaa()+"\n")
      except:
-         sys.stdout.write("  \n")
+        sys.stdout.write("  \n")
      sys.stdout.flush()
      time.sleep(1)

@@ -11,7 +11,8 @@ sync () {
 
 {
     #Test Distro
-dis="$(cat /etc/os-release)"
+eval "$(cat /etc/os-release | head)"
+dis=$NAME
 if grep -q 'Gentoo' <<< "$dis"; then
     sync /etc/portage/ portage/etc/ 
     sync /var/lib/portage/world portage/world

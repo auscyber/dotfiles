@@ -1,14 +1,25 @@
 
-#format = """
-#[┌───────────────────>](bold green)
-#[│](bold green) $directory$rust$package$cmd_duration$git_status
-#[└─$character](bold green) """
+format = """
+[┌───────────────────>](bold green)
+[│](bold green) $directory$custom $username$rust$package$cmd_duration$git_status$nix_shell
+$character"""
 
+[custom.shell]
+command = "echo $STARSHIP_SHELL"
+when = "true"
+format  = "[$output](bold blue)"
 
 [character]                            # The name of the module we are configuring is "character"
-success_symbol = "[➜ ](bold green)"
-error_symbol = "[➜ ](bold red)"
+success_symbol = "[└─➜ ](bold green)"
+error_symbol = "[└─➜ ](bold red)"
 
+
+[username]
+style_user = "white bold"
+style_root = "black bold"
+format = "[$user]($style) "
+disabled = false
+show_always = true
 
 
 # Wait 10 milliseconds for starship to check files under the current directory.

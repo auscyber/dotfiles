@@ -31,8 +31,11 @@
   "/mnt/hdd" = 
     { device = "/dev/sda2";
       fsType = "ntfs";
+      options = [ "defaults" "uid=1000" "auto" "rw"];
     };
+  
    };
+
   swapDevices = [ ];
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";

@@ -1,5 +1,5 @@
 #!/bin/bash
-killall polybar 
+pkill polybar 
 polybar mybar &
 #polybar secbar &
 

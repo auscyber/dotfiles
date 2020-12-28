@@ -21,17 +21,21 @@ getWorkspaceText xs n =
 --E88B84
 --804144
 polybarPP ws =  def {
-    ppCurrent = polybarColour 'F' "#FFDB9E" .  polybarUnderlineWithColor "#FFCFD1" . getWorkspaceText ws
+    ppCurrent = polybarWorkspace (polybarColour 'F' "#FFDB9E" .  polybarUnderlineWithColor "#FFCFD1") ws False
     , ppTitle = polybarColour 'F' "#--" . take 90 
-    , ppHidden = polybarColour 'F' "#E88B84" . getWorkspaceText ws
-    , ppVisible = polybarColour 'F' "#FFC9AB"  . wrap "[" "]" . getWorkspaceText ws
-    , ppHiddenNoWindows = polybarColour 'F' "#5754B3" . getWorkspaceText ws
+    , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
+    , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
+    , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True
     , ppSep = polybarColour 'F' "#5754B3" " | "
-    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n"
+    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadAction 4 "nextws" . xmonadAction 5 "prevws"
+    , ppLayout =  xmonadAction 1 "next-layout" . xmonadAction 3 "default-layout" 
+                        
 --    , ppOrder = \(x:_:y) -> x:y
 
 }
 
+polybarWorkspace :: (String -> String)  -> M.Map Int String -> Bool -> String -> String
+polybarWorkspace format ws bool str = (if bool then switchWS str  else id) . format $ getWorkspaceText ws str
 --Underline Text
 polybarUnderline :: String -> String
 polybarUnderline text = "%{+u}" ++ text ++ "%{-u}"
@@ -40,10 +44,18 @@ polybarUnderlineWithColor :: Colour -> String -> String
 polybarUnderlineWithColor color = polybarColour 'u' color . polybarUnderline
 
 
+switchWS :: String -> String -> String 
+switchWS id = xmonadAction 1 ("view"++id++"") 
+
+
+xmonadAction :: Int -> String -> String -> String
+xmonadAction but x = polyBarAction but ("~/.xmonad/xmonadctl " ++x)
+
+
 polyBarAction :: Int -> String -> String-> String
 polyBarAction button command
     | button > 8 || button <1 = id
-    | otherwise = wrap ("%{A" ++ show button ++ ':':command) "%{A}"
+    | otherwise = wrap ("%{A" ++ show button ++ ":" ++ command ++ ":}") "%{A}"
 
 
 

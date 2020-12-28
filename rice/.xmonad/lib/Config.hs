@@ -1,8 +1,8 @@
 module Config (myConfig) where
 import           Control.Monad
-import           Control.Monad                       (forM_, join)
+import           Data.Functor
 import           Data.Function                       (on)
-import           Data.List                           (sortBy)
+import           Data.List                           ( elemIndex )
 import qualified Data.Map                            as M
 import           Polybar
 import           System.Exit
@@ -15,13 +15,11 @@ import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
-import           XMonad.Layout.Tabbed 
+import           XMonad.Layout.Tabbed
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
-import           XMonad.Util.Run                     (safeSpawn)
-import           Polybar (polybarPP)
 import           DynamicLog
 import           XMonad.Prompt
 import           XMonad.Prompt.Shell
@@ -29,7 +27,7 @@ import           XMonad.Hooks.ServerMode
 import           XMonad.Layout.Spacing
 import           XMonad.Util.EZConfig
 import           XMonad.Prompt.XMonad
-
+import           XMonad.Actions.Commands
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "/bin/sh ~/.xmonad/polybar.sh"
@@ -38,13 +36,27 @@ myStartupHook = do
      spawn "feh --bg-fill ~/background3.png"
      spawn "picom --experimental-backend --config=/home/auscyber/.config/picom/picom.conf "
 
---Conf
+nextWS :: X ()
+nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
+    where   nextTag :: WorkspaceId -> [WorkspaceId] -> WorkspaceId
+            nextTag tag ws = let Just index = tag `elemIndex` ws in if index == (length ws - 1) then head ws else ws !! (index+1)
+prevWS :: X ()
+prevWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
+    where prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
+commandsX :: X [(String, X ())]
+commandsX = asks config Data.Functor.<&> commands
+commands conf = [
+    ("prevws",prevWS)
+    ,("nextws",nextWS)]
+    ++ [(m++show k, windows $ f i)
+            | (i, k) <- zip (XMonad.workspaces conf) [1..9]
+                , (f, m) <- [(W.greedyView, "view"), (W.shift, "moveTo")]]
 
 
 workspaceSymbols :: M.Map Int String
-workspaceSymbols = M.fromList $ [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
+workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
 getWorkspaceText :: M.Map Int String -> String -> String
-getWorkspaceText xs n = 
+getWorkspaceText xs n =
     case M.lookup (read n) xs of
         Just x -> x
         _ -> n
@@ -64,7 +76,7 @@ myConfig = ewmh $ def {
       , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
       , manageHook = (isFullscreen --> doFullFloat) <> manageDocks <>  manageHook def
       , layoutHook =  myLayout
-      , handleEventHook = serverModeEventHook <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
+      , handleEventHook = serverModeEventHookCmd' commandsX  <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
 
 
 
@@ -111,65 +123,65 @@ myManageHook = composeAll
     , className =? "Spotify" --> doShift "4"
     ]
 
-customKeys conf@(XConfig {XMonad.modMask = modm}) = mkKeymap conf $
+customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
     [
     --Start rofi
     ("M-S-r", spawn "rofi -show combi")
     -- Start alacritty
-	,("M-S-t", spawn $ terminal conf)
-	-- Kill currently focused window
-	,("M-S-c",kill)
-	--Take screenshot
-	,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
-	--Chrome
-	,("M-S-g", spawn "chromium")
+        ,("M-S-t", spawn $ terminal conf)
+        -- Kill currently focused window
+        ,("M-S-c",kill)
+        --Take screenshot
+        ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
+        --Chrome
+        ,("M-S-g", spawn "chromium")
     --Start vim
     ,("M-d", spawn "st -t NEOVIM -e nvim")
 
-	--- Multimedia keys
-	,("<XF86AudioPrev>", spawn "playerctl previous")
-	,("<XF86AudioNext>", spawn "playerctl next")
-	,("<XF86AudioPlay>", spawn "playerctl play-pause")
-	,("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
-	,("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
-	,("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
-	--  Reset the layouts on the current workspace to default
-	, ("M-s-<Space>", setLayout $ XMonad.layoutHook conf)
+        --- Multimedia keys
+        ,("<XF86AudioPrev>", spawn "playerctl previous")
+        ,("<XF86AudioNext>", spawn "playerctl next")
+        ,("<XF86AudioPlay>", spawn "playerctl play-pause")
+        ,("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
+        ,("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
+        ,("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+        --  Reset the layouts on the current workspace to default
+        , ("M-s-<Space>", setLayout $ XMonad.layoutHook conf)
 
-	-- Swap the focused and the master window
-	, ("M-<Return>", windows $ W.swapMaster . W.focusDown)
+        -- Swap the focused and the master window
+        , ("M-<Return>", windows $ W.swapMaster . W.focusDown)
 
     -- Move focus to the next window
     , ("M-<Tab>", windows W.focusDown)
     -- Move focus to preview window
     , ("M-S-<Tab>",    windows W.focusUp)
     --Polybar toggle
-	,("M-b", spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
+        ,("M-b", spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
 
-	--Push window back into tiling
-	, ("M-t", withFocused $ windows . W.sink)
+        --Push window back into tiling
+        , ("M-t", withFocused $ windows . W.sink)
         -- Increment the number of windows in the master area
     , ("M-,", sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
     , ("M-.", sendMessage (IncMasterN (-1)))
 
-	, ("M-<Space>", sendMessage NextLayout)
-    , ("M-r", xmonadPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
-	] ++
-	-- Xmonad keys
-	[
-	("M-q", spawn "PATH=$PATH:/home/auscyber/.cabal/bin xmonad --recompile; xmonad --restart" )
-	,("M-S-q", io exitSuccess)
-	] ++
+        , ("M-<Space>", sendMessage NextLayout)
+    , ("M-r", xmonadPromptC (commands conf) (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
+        ] ++
+        -- Xmonad keys
+        [
+        ("M-q", spawn "PATH=$PATH:/home/auscyber/.cabal/bin xmonad --recompile; xmonad --restart" )
+        ,("M-S-q", io exitSuccess)
+        ] ++
 
 
-	--Workspace keys
-	[("M"++m++'-':show k, windows $ f i)
-	    | (i, k) <- zip (XMonad.workspaces conf) [1..9]
+        --Workspace keys
+        [("M"++m++'-':show k, windows $ f i)
+            | (i, k) <- zip (XMonad.workspaces conf) [1..9]
             , (f, m) <- [(W.greedyView, ""), (W.shift, "-S")]]
-	++
-	 [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
-	    | (key, sc) <- zip ["-w","-e"] [0..]
-	    , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
+        ++
+         [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
+            | (key, sc) <- zip ["-w","-e"] [0..]
+            , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
 

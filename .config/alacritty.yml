@@ -34,7 +34,7 @@ colors:
 
 font:
   size: 10
-
+  ligatures: true
   normal:
     family: Hasklug Nerd Font
 

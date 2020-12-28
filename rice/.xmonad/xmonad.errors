@@ -1,7 +1,0 @@
-
-lib/Config.hs:119:1: warning: [-Wtabs]
-    Tab character found here, and in 34 further locations.
-    Please use spaces instead.
-    |
-119 |         ,("M-S-t", spawn $ terminal conf)
-    | ^^^^^^^^

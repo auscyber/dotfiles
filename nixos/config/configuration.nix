@@ -41,7 +41,6 @@
 
 
   # Configure keymap in X11
-   services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e";
 
  fonts.fonts = with pkgs; [
@@ -69,7 +68,7 @@
   users.defaultUserShell = pkgs.zsh;
   users.users.auscyber = {
     isNormalUser = true;
-    extraGroups = ["libvirtd" "wheel" "video" ]; # Enable ‘sudo’ for the user.
+    extraGroups = ["audio" "libvirtd" "wheel" "video" ]; # Enable ‘sudo’ for the user.
     shell = pkgs.zsh;
   };
 
@@ -77,12 +76,11 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget vim zsh 
-    chromium neovim python3
-
-
+    chromium neovim python3 
     #Virtualisation
     qemu OVMF virtmanager dconf
-	
+    (haskellPackages.ghcWithPackages (pkgs: with pkgs; [xmonad-contrib] ))	
+    
   ];
 
   programs.dconf.enable = true;
@@ -90,8 +88,13 @@
 
   nixpkgs.config.allowUnfree = true;
   services.xserver  = {
+	layout = "us";
         enable = true;
 	videoDrivers = [ "nvidia" ];
+	displayManager.lightdm = {
+		enable = true;
+		greeter.enable = true;
+	};
 	displayManager.defaultSession = "none+xmonad";
 	windowManager.xmonad = {
 		enable = true;
@@ -106,6 +109,14 @@
 		};
   };
   hardware.opengl.driSupport32Bit = true;
+  services.cron = {
+    enable = true;
+    systemCronJobs = [
+    "0 0 1-31/2 * *  auscyber . /etc/profile' ${pkgs.bash}/bin/bash /home/auscyber/dotfiles/backup2.sh"
+   ];
+  };
+
+
   virtualisation.libvirtd.enable = true;
 
 
@@ -134,7 +145,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "20.09"; # Did you read the comment?
+  system.stateVersion = "21.03"; # Did you read the comment?
   environment.etc."current-system-packages".text =
 
 	let
