@@ -1,5 +1,7 @@
 { config, pkgs, ... }:
+let haskellPacks = with pkgs.haskellPackages; [ haskell-language-server ];
 
+in
 {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -9,16 +11,18 @@
   #Development
   jetbrains.idea-ultimate jdk
   xclip
+  polybarFull  git nodejs  playerctl htop   
+  #Wow
+  rofi alacritty  feh starship polybar alacritty maim discord spotify
 
- ghc cabal-install polybarFull   meson ninja    git nodejs  playerctl htop alacritty maim discord spotify
  (picom.overrideAttrs (attrs: {
    src = builtins.fetchTarball {
         url = "https://github.com/jonaburg/picom/archive/next.tar.gz";
       };
        }))
 
-  ];
-  
+  ] ++ haskellPacks;
+
 
   # Home Manager needs a bit of information about you and the
   # paths it should manage.

@@ -1,3 +1,4 @@
+module XMonadctl where
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 import System.Environment

@@ -1,5 +1,6 @@
 #!/bin/sh
-cd ~/dotfiles
+DEST=~/dotfiles
+cd $DEST
 sync () {
     if [[ -n  $3 ]]; then
         rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete

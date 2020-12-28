@@ -76,14 +76,9 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim zsh polybar
+    wget vim zsh 
     chromium neovim python3
 
-    #Rice
-    rofi alacritty rustc cargo feh starship 
-    #Haskell
-    stack haskellPackages.haskell-language-server
-    
 
     #Virtualisation
     qemu OVMF virtmanager dconf
