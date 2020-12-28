@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$(basename $0 && pwd)"
+cd ~/dotfiles
 sync () {
     if [[ -n  $3 ]]; then
         rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete
