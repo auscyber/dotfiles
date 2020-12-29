@@ -19,13 +19,14 @@ if grep -q 'Gentoo' <<< "$dis"; then
     cp /usr/src/linux/.config $DEST/kernel/
 elif grep -q 'NixOS' <<< "$dis" ; then
     sync /etc/nixos/ nixos/config
-    sync ~/.config/nixpkgs/ .config/nixos
-elif [! grep -q 'NixOS' <<< "$dis" ] ; then
-sync ~/st rice  .git
-sync ~/.config/polybar .config 
-sync ~/.config/nvim .config 
-sync ~/.config/alacritty/alacritty.yml .config 
-sync ~/.config/picom .config 
+    sync ~/.config/nixpkgs/ .config/nixpkgs
+fi
+if [! grep -q 'NixOS' <<< "$dis" ] ; then
+    sync ~/st rice  .git
+    sync ~/.config/polybar .config 
+    sync ~/.config/nvim .config 
+    sync ~/.config/alacritty/alacritty.yml .config 
+    sync ~/.config/picom .config 
 fi
 
 sync ~/.xmonad rice  {.venv,*.o}

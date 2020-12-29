@@ -20,7 +20,7 @@
     };
 
   "/home" =
-    { device = "/dev/disk/by-uuid/d5e8c31c-eebf-4907-a8ce-309e2ba575aa";
+    { device = "/dev/nvme0n1p5";
       fsType = "ext2";
     };
 
