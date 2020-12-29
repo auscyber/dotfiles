@@ -76,7 +76,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget vim zsh 
-    chromium neovim python3 
+    chromium  python3 
     #Virtualisation
     qemu OVMF virtmanager dconf
     (haskellPackages.ghcWithPackages (pkgs: with pkgs; [xmonad-contrib] ))	
@@ -94,8 +94,13 @@
 	displayManager.lightdm = {
 		enable = true;
 		greeter.enable = true;
+		
 	};
 	displayManager.defaultSession = "none+xmonad";
+	displayManager.autoLogin = {
+		enable = true;
+		user = "auscyber";
+	};
 	windowManager.xmonad = {
 		enable = true;
 	        enableContribAndExtras = true;

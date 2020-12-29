@@ -28,21 +28,26 @@ import           XMonad.Layout.Spacing
 import           XMonad.Util.EZConfig
 import           XMonad.Prompt.XMonad
 import           XMonad.Actions.Commands
+import           XMonad.Util.Cursor
+
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
-     spawn "/bin/sh ~/.xmonad/polybar.sh"
+     spawn "~/.config/polybar/launch.sh"
      spawn "xrandr --output DP-3  --left-of HDMI-0"
+     setDefaultCursor xC_left_ptr 
      spawnOnce "Discord"
      spawn "feh --bg-fill ~/background3.png"
-     spawn "picom --experimental-backend --config=/home/auscyber/.config/picom/picom.conf "
 
 nextWS :: X ()
 nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
     where   nextTag :: WorkspaceId -> [WorkspaceId] -> WorkspaceId
             nextTag tag ws = let Just index = tag `elemIndex` ws in if index == (length ws - 1) then head ws else ws !! (index+1)
 prevWS :: X ()
-prevWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
-    where prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
+prevWS = 
+    gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
+    where 
+        prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
+
 commandsX :: X [(String, X ())]
 commandsX = asks config Data.Functor.<&> commands
 commands conf = [
@@ -54,7 +59,7 @@ commands conf = [
 
 
 workspaceSymbols :: M.Map Int String
-workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
+workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"%{O3}\62056"),(3,"\61728"),(4,"\xf1bc")]
 getWorkspaceText :: M.Map Int String -> String -> String
 getWorkspaceText xs n =
     case M.lookup (read n) xs of
@@ -76,7 +81,8 @@ myConfig = ewmh $ def {
       , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
       , manageHook = (isFullscreen --> doFullFloat) <> manageDocks <>  manageHook def
       , layoutHook =  myLayout
-      , handleEventHook = serverModeEventHookCmd' commandsX  <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
+      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
+
 
 
 
@@ -167,7 +173,7 @@ customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
     , ("M-.", sendMessage (IncMasterN (-1)))
 
         , ("M-<Space>", sendMessage NextLayout)
-    , ("M-r", xmonadPromptC (commands conf) (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
+    , ("M-r", defaultCommands >>= \defaultCommands' -> xmonadPromptC ( commands conf ++ defaultCommands')  (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
         ] ++
         -- Xmonad keys
         [

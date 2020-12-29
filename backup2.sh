@@ -20,20 +20,21 @@ if grep -q 'Gentoo' <<< "$dis"; then
 elif grep -q 'NixOS' <<< "$dis" ; then
     sync /etc/nixos/ nixos/config
     sync ~/.config/nixpkgs/ .config/nixos
+elif [! grep -q 'NixOS' <<< "$dis" ] ; then
+sync ~/st rice  .git
+sync ~/.config/polybar .config 
+sync ~/.config/nvim .config 
+sync ~/.config/alacritty/alacritty.yml .config 
+sync ~/.config/picom .config 
 fi
 
 sync ~/.xmonad rice  {.venv,*.o}
 sync ~/st rice  .git
-sync ~/.config/alacritty/alacritty.yml .config 
 sync ~/.config/starship.toml .config
 sync ~/.config/polybar .config 
-sync ~/.config/nvim .config 
-sync ~/.config/picom .config 
 sync ~/.config/rofi .config 
-sync ~/picom rice 
 cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
-cp ~/.zshrc $DEST
 cd ~/dotfiles 
 git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 

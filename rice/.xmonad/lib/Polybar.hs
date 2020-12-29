@@ -17,12 +17,10 @@ getWorkspaceText xs n =
         _ ->  n
 
 
---FFC9AB
---E88B84
---804144
 polybarPP ws =  def {
-    ppCurrent = polybarWorkspace (polybarColour 'F' "#FFDB9E" .  polybarUnderlineWithColor "#FFCFD1") ws False
-    , ppTitle = polybarColour 'F' "#--" . take 90 
+    ppCurrent = polybarWorkspace (polybarUnderlineWithColor "#FFCFD1" . polybarColour 'F' "#FFDB9E" ) ws False
+    , ppTitle = polybarColour 'F' "#--" 
+    , ppTitleSanitize = take 90
     , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
     , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
     , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True
@@ -35,7 +33,7 @@ polybarPP ws =  def {
 }
 
 polybarWorkspace :: (String -> String)  -> M.Map Int String -> Bool -> String -> String
-polybarWorkspace format ws bool str = (if bool then switchWS str  else id) . format $ getWorkspaceText ws str
+polybarWorkspace format ws bool str = (if bool then moveToWS str . switchWS str  else id) . format $ getWorkspaceText ws str
 --Underline Text
 polybarUnderline :: String -> String
 polybarUnderline text = "%{+u}" ++ text ++ "%{-u}"
@@ -45,8 +43,10 @@ polybarUnderlineWithColor color = polybarColour 'u' color . polybarUnderline
 
 
 switchWS :: String -> String -> String 
-switchWS id = xmonadAction 1 ("view"++id++"") 
+switchWS id = xmonadAction 1 ("view"++id) 
 
+moveToWS :: String -> String -> String
+moveToWS id = xmonadAction 3 ("moveTo"++id)
 
 xmonadAction :: Int -> String -> String -> String
 xmonadAction but x = polyBarAction but ("~/.xmonad/xmonadctl " ++x)
