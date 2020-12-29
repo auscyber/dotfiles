@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 DEST=~/dotfiles
 cd $DEST
 sync () {
@@ -21,7 +22,7 @@ elif grep -q 'NixOS' <<< "$dis" ; then
     sync /etc/nixos/ nixos/config
     sync ~/.config/nixpkgs/ .config/nixpkgs
 fi
-if [! grep -q 'NixOS' <<< "$dis" ] ; then
+if [ ! grep -q 'NixOS' <<< "$dis" ] ; then
     sync ~/st rice  .git
     sync ~/.config/polybar .config 
     sync ~/.config/nvim .config 
