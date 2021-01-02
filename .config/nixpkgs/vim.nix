@@ -11,8 +11,9 @@ let cocSettings = ./coc.vim;
         let g:airline_theme='fruit_punch'
         '';}
         vim-addon-nix
+	vim-indent-guides 
         vim-airline-themes
-        vimsence
+#        vimsence
 	{ plugin = coc-nvim;
 	  config = ''let g:coc_user_config = {'languageserver':{
 	\	'haskell': {

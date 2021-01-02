@@ -7,13 +7,18 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix ./boot.nix    ];
-
+      ./hardware-configuration.nix     ];
+  nix = {
+    package = pkgs.nixFlakes;
+    extraOptions = ''
+        experimental-features = nix-command flakes
+      '';
+  };
   # Use the systemd-boot EFI boot loader.
-#  boot.loader.systemd-boot.enable = true;
-#  boot.loader.efi.canTouchEfiVariables = true;
-#  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-#  boot.loader.grub.useOSProber = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.grub.useOSProber = true;
   networking.hostName = "auspc"; # Define your hostname.
   networking.wireless = { enable = true;  # Enables wireless support via wpa_supplicant.
        networks.NeddySB.pskRaw = "e9331ef6ad7d0a1d67e81afaba284e4544cedb73b33f840c9812fc1991562dcc";
@@ -75,7 +80,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim zsh 
+    wget vim 
     chromium  python3 
     #Virtualisation
     qemu OVMF virtmanager dconf
@@ -87,32 +92,39 @@
   
 
   nixpkgs.config.allowUnfree = true;
-  services.xserver  = {
-	layout = "us";
-        enable = true;
-	videoDrivers = [ "nvidia" ];
-	displayManager.lightdm = {
-		enable = true;
-		greeter.enable = true;
-		
-	};
-	displayManager.defaultSession = "none+xmonad";
-	displayManager.autoLogin = {
-		enable = true;
-		user = "auscyber";
-	};
-	windowManager.xmonad = {
-		enable = true;
-	        enableContribAndExtras = true;
-		extraPackages = haskellPackages:[
-			haskellPackages.xmonad-contrib
-			haskellPackages.xmonad-extras
-			haskellPackages.xmonad
+ services.xserver  = {
+   layout = "us";
+       enable = true;
+   
+   videoDrivers = [ "nvidia" ];
+   displayManager.lightdm = {
+   	enable = true;
+   	greeter.enable = true;
+   	
+   };
+   #displayManager.startx.enable = true;
+   displayManager.defaultSession = "none+xmonad";
+   displayManager.autoLogin = {
+   	enable = true;
+   	user = "auscyber";
+   };
+   windowManager.awesome = {
+     enable = true;
+     luaModules = with pkgs.luaPackages; [
+       luarocks ];
+   };
+   windowManager.xmonad = {
+   	enable = true;
+           enableContribAndExtras = true;
+   	extraPackages = haskellPackages:[
+   		haskellPackages.xmonad-contrib
+   		haskellPackages.xmonad-extras
+   		haskellPackages.xmonad
 
-			];  		
+   		];  		
 
-		};
-  };
+   	};
+ };
   hardware.opengl.driSupport32Bit = true;
   services.cron = {
     enable = true;

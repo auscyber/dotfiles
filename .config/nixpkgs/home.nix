@@ -1,16 +1,22 @@
-conf@{ config, pkgs, system, lib, ... }:
+conf@{ config, pkgs, system, lib, ... }: 
 
-let impConf = fil: import fil conf;
+
+let  moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz); 
+    pkgs = import <nixpkgs> {config = config.nixpkgs.config; overlays = [    moz_overlay (import ./powercord.nix)  (self: super: {rust = super.latest.rustChannels.nightly.rust; } )];};
+    impConf = fil: import fil conf;
     haskellPacks = with pkgs.haskellPackages; [  haskell-language-server ];
     neovim = impConf ./vim.nix;
     zsh = impConf ./zsh.nix ;
     alacritty = impConf ./alacritty.nix ;
     picom = impConf ./picom.nix ;
     rofi = impConf ./rofi.nix ;
+    emacs = impConf ./emacs.nix;
+    eww = impConf ./eww.nix;
 in   
 {
     
   programs = {
+
      vim = {
     enable = true;
     plugins = with pkgs.vimPlugins; [ vim-airline vim-addon-nix ];
@@ -19,31 +25,33 @@ in
       set mouse=a
     '';
   };
-    inherit rofi zsh neovim alacritty;
+    inherit rofi zsh neovim alacritty emacs;
     home-manager.enable = true;
   };
   services = {
+    
     inherit picom;
   };
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
   #Development
+  osu-lazer
   jetbrains.idea-ultimate jdk
-  xclip
+  xclip ripgrep discord-canary
+  cabal-install
   polybarFull  git nodejs  playerctl htop   
   #rice
-  fish feh starship maim discord spotify 
+  fish feh starship maim 
+    spotify 
   
-
+  eww
 
 
   ] ++ haskellPacks;
-
-
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "auscyber";
-  home.homeDirectory = "/home/auscyber";
+  home.homeDirectory ="/home/auscyber";
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards

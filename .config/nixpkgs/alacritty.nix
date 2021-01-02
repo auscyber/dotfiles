@@ -37,7 +37,7 @@ in
       '';
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       inherit src;
-      outputHash = "1nya7qi36lbhrzpgl8caxj1hd8krvhwv4d93qsq7sllzgpcyp2i1";
+      outputHash = "IYrr2X2fUn2wxiM1sjnceaIGg+yKIfruz3BRMyI+yts=";
     }); 
     
     }));

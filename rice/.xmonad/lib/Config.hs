@@ -15,7 +15,7 @@ import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
-import           XMonad.Layout.Tabbed
+import           XMonad.Layout.Tabbed 
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
@@ -35,7 +35,7 @@ myStartupHook = do
      spawn "~/.config/polybar/launch.sh"
      spawn "xrandr --output DP-3  --left-of HDMI-0"
      setDefaultCursor xC_left_ptr 
-     spawnOnce "Discord"
+     spawnOnce "DiscordCanary"
      spawn "feh --bg-fill ~/background3.png"
 
 nextWS :: X ()
@@ -59,7 +59,8 @@ commands conf = [
 
 
 workspaceSymbols :: M.Map Int String
-workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"%{O3}\62056"),(3,"\61728"),(4,"\xf1bc")]
+workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
+--workspaceSymbols = M.fromList [ (1,"\xf10c"),(2,"\x2B24"),(3,"\x2B24"),(4,"\x2B24")  ]
 getWorkspaceText :: M.Map Int String -> String -> String
 getWorkspaceText xs n =
     case M.lookup (read n) xs of
@@ -142,7 +143,7 @@ customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
         --Chrome
         ,("M-S-g", spawn "chromium")
     --Start vim
-    ,("M-d", spawn "st -t NEOVIM -e nvim")
+    ,("M-d", spawn "emacs")
 
         --- Multimedia keys
         ,("<XF86AudioPrev>", spawn "playerctl previous")

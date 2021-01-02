@@ -18,12 +18,16 @@ getWorkspaceText xs n =
 
 
 polybarPP ws =  def {
-    ppCurrent = polybarWorkspace (polybarUnderlineWithColor "#FFCFD1" . polybarColour 'F' "#FFDB9E" ) ws False
-    , ppTitle = polybarColour 'F' "#--" 
-    , ppTitleSanitize = take 90
+    {-ppCurrent = polybarWorkspace (polybarUnderlineWithColor "#FFCFD1" . polybarColour 'F' "#FFDB9E" ) ws False
     , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
     , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
-    , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True
+    , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True -}
+    ppCurrent = \x ->  switchWS x $ polybarColour 'F' "#FFDB9E" "\xf111 "
+    , ppHidden = \x ->  switchWS x $ polybarColour 'F' "#E88B84" "\xf10c "
+    , ppVisible  = \x -> switchWS x $ polybarColour 'F' "#FFC9AB" "\xf10c "
+    , ppHiddenNoWindows = \x -> switchWS x $ polybarColour 'F' "#5754B3" "\xf10c "
+    , ppTitleSanitize = take 90
+    , ppTitle = polybarColour 'F' "#--" 
     , ppSep = polybarColour 'F' "#5754B3" " | "
     , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadAction 4 "nextws" . xmonadAction 5 "prevws"
     , ppLayout =  xmonadAction 1 "next-layout" . xmonadAction 3 "default-layout" 

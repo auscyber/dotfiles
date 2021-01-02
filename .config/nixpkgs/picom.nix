@@ -4,9 +4,9 @@
    enable = true;
    experimentalBackends = true;
    fade = false;
-   shadow = true;
+   shadow = false;
    shadowOffsets = [(-30) (-30)];
-   shadowOpacity = "0.5";
+   shadowOpacity = "0.25";
    shadowExclude = ["name = 'xmonad'"];
    vSync = true;
    refreshRate = 60;
