@@ -1,8 +1,7 @@
 conf@{ config, pkgs, system, lib, ... }: 
 
 
-let  moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz); 
-    pkgs = import <nixpkgs> {config = config.nixpkgs.config; overlays = [    moz_overlay (import ./powercord.nix)  (self: super: {rust = super.latest.rustChannels.nightly.rust; } )];};
+let      pkgs = import <nixpkgs> {config = config.nixpkgs.config; overlays = [    (import ./powercord.nix)  ];};
     impConf = fil: import fil conf;
     haskellPacks = with pkgs.haskellPackages; [  haskell-language-server ];
     neovim = impConf ./vim.nix;
@@ -11,7 +10,6 @@ let  moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixp
     picom = impConf ./picom.nix ;
     rofi = impConf ./rofi.nix ;
     emacs = impConf ./emacs.nix;
-    eww = impConf ./eww.nix;
 in   
 {
     
@@ -35,7 +33,9 @@ in
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
   #Development
-  osu-lazer
+  pcmanfm
+  steam multimc
+  osu-lazer gimp
   jetbrains.idea-ultimate jdk
   xclip ripgrep discord-canary
   cabal-install
@@ -43,11 +43,11 @@ in
   #rice
   fish feh starship maim 
     spotify 
+#  (import ./eww.nix)  
+
   
-  eww
-
-
-  ] ++ haskellPacks;
+  ] ++ (with pkgs.haskellPackages; [haskell-language-server]) 
+    ++ (with nodePackages; [typescript-language-server typescript purescript-language-server]);
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "auscyber";

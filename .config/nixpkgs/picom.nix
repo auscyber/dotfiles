@@ -20,7 +20,8 @@
 # Corners
 corner-radius = 10.0;
 rounded-corners-exclude = [
-    "class_g = 'Polybar'"
+    "class_g = 'Polybar'",
+    "class_g = 'Minecraft'"
 ]
 round-borders = 1;
 

@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix     ];
+./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
@@ -15,10 +15,10 @@
       '';
   };
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  boot.loader.grub.useOSProber = true;
+# boot.loader.systemd-boot.enable = true;
+# boot.loader.efi.canTouchEfiVariables = true;
+# boot.loader.efi.efiSysMountPoint = "/boot/efi";
+# boot.loader.grub.useOSProber = true;
   networking.hostName = "auspc"; # Define your hostname.
   networking.wireless = { enable = true;  # Enables wireless support via wpa_supplicant.
        networks.NeddySB.pskRaw = "e9331ef6ad7d0a1d67e81afaba284e4544cedb73b33f840c9812fc1991562dcc";
@@ -57,7 +57,7 @@
   services.blueman.enable = true;
   # Enable sound.
   sound.enable = true;
- hardware.pulseaudio = {
+  hardware.pulseaudio = {
     enable = true;
 
     # NixOS allows either a lightweight build (default) or full build of PulseAudio to be installed.
@@ -95,14 +95,23 @@
  services.xserver  = {
    layout = "us";
        enable = true;
-   
+   config = ''
+
+Section "InputClass"
+            Identifier "My Mouse"
+            MatchIsPointer "yes"
+            Option "AccelerationProfile" "-1"
+            Option "AccelerationScheme" "none"
+            Option "AccelSpeed" "-1"
+EndSection
+   '';
    videoDrivers = [ "nvidia" ];
    displayManager.lightdm = {
    	enable = true;
    	greeter.enable = true;
    	
    };
-   #displayManager.startx.enable = true;
+#   displayManager.startx.enable = true;
    displayManager.defaultSession = "none+xmonad";
    displayManager.autoLogin = {
    	enable = true;
@@ -164,21 +173,11 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "21.03"; # Did you read the comment?
   environment.etc."current-system-packages".text =
-
-	let
-
+  let
 	packages = builtins.map (p: "${p.name}") config.environment.systemPackages;
-
 	sortedUnique = builtins.sort builtins.lessThan (lib.unique packages);
-
 	formatted = builtins.concatStringsSep "\n" sortedUnique;
-
 	in
-
 	formatted;
-
-
-
-	
 }
 

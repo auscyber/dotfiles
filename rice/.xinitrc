@@ -1,1 +1,1 @@
-exec dbus-run-session xmonad
+exec dbus-run-session awesome

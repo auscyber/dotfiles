@@ -1,7 +1,7 @@
 
 format = """
 [┌───────────────────>](bold green)
-[│](bold green) $directory$custom $username$rust$package$cmd_duration$git_status$nix_shell
+[│](bold green) $directory$custom $username$rust$package$cmd_duration$git_status$nix_shell$haskell
 $character"""
 
 [custom.shell]

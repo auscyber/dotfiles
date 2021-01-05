@@ -1,3 +1,4 @@
+
 module Config (myConfig) where
 import           Control.Monad
 import           Data.Functor
@@ -34,7 +35,7 @@ myStartupHook = do
      io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "~/.config/polybar/launch.sh"
      spawn "xrandr --output DP-3  --left-of HDMI-0"
-     setDefaultCursor xC_left_ptr 
+--     setDefaultCursor xC_left_ptr 
      spawnOnce "DiscordCanary"
      spawn "feh --bg-fill ~/background3.png"
 
@@ -57,7 +58,6 @@ commands conf = [
             | (i, k) <- zip (XMonad.workspaces conf) [1..9]
                 , (f, m) <- [(W.greedyView, "view"), (W.shift, "moveTo")]]
 
-
 workspaceSymbols :: M.Map Int String
 workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
 --workspaceSymbols = M.fromList [ (1,"\xf10c"),(2,"\x2B24"),(3,"\x2B24"),(4,"\x2B24")  ]
@@ -67,7 +67,6 @@ getWorkspaceText xs n =
         Just x -> x
         _ -> n
 
-
 myWorkspaces = map show [1..9]
 myConfig = ewmh $ def {
        terminal = myTerm
@@ -76,7 +75,7 @@ myConfig = ewmh $ def {
       , focusedBorderColor = mainColor
       , workspaces = myWorkspaces
       , keys = customKeys
-      , modMask = mod1Mask
+      , modMask = mod4Mask
       , focusFollowsMouse = False
       , startupHook = myStartupHook
       , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
@@ -124,8 +123,9 @@ myLayout =
 myManageHook = composeAll
     [ className =? "Firefox"        --> doShift (myWorkspaces !! 1)
     , className =? "Gimp"           --> doFloat
-    , className =? "Steam" --> doFloat
     , className =? "discord" --> doShift (myWorkspaces !! 2)
+    , className =? "Steam" --> doFloat
+    , className =? "steam" --> doFloat
     , className =? "jetbrains-idea" --> doFloat
     , className =? "Spotify" --> doShift "4"
     ]

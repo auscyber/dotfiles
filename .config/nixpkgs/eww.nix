@@ -1,5 +1,11 @@
-{pkgs, ...}:
-with pkgs;
+let moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
+  nixpkgs = import <nixpkgs> { overlays = [ moz_overlay 
+  (self: super: {
+      rustc = super.latest.rustChannels.nightly.rust;
+      inherit (super.latest.rustChannels.nightly) cargo rust rust-fmt rust-std clippy;
+  })]; };
+in
+with nixpkgs;
 rustPlatform.buildRustPackage rec {
   pname = "eww";
   version = "0.1.0";

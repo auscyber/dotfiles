@@ -8,11 +8,14 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
   boot.loader.grub = {
-
     useOSProber = true;
     efiSupport = true;
     version = 2;
     device = "nodev";
+#    extraConfig = " set theme=(\$drive2)/usr/share/grub/themes/breeze/theme.txt";
+#    splashImage  ="/usr/share/grub/themes/breeze/background.png";
+#    splashImage = null;
+    gfxmodeEfi = "1920x1080";
   };
   
 }

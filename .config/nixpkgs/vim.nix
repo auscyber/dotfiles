@@ -13,7 +13,8 @@ let cocSettings = ./coc.vim;
         vim-addon-nix
 	vim-indent-guides 
         vim-airline-themes
-#        vimsence
+        purescript-vim
+        vimsence
 	{ plugin = coc-nvim;
 	  config = ''let g:coc_user_config = {'languageserver':{
 	\	'haskell': {
@@ -27,7 +28,14 @@ let cocSettings = ./coc.vim;
 	\	  'filetypes': [
 	\	    'nix'
 	\	  ]
-	\	}}}
+	\	},
+    \     "purescript": {
+    \         "command": "purescript-language-server",
+    \         "args": ["--stdio"],
+    \         "filetypes": ["purescript"],
+    \         "rootPatterns": ["bower.json", "psc-package.json", "spago.dhall"]
+    \       }
+    \  }}
 
 
 	  ''; }
@@ -36,8 +44,10 @@ let cocSettings = ./coc.vim;
         extraConfig = ''
           set rnu nu
           set hidden
-	  
-	  so ${cocSettings}
+          syntax on
+          filetype on
+          filetype plugin indent on
+	      so ${cocSettings}
 
 
 
