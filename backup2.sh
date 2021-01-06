@@ -36,7 +36,7 @@ if  ! grep -q 'NixOS' <<< "$dis"  ; then
     sync ~/.config/picom .config 
 fi
 
-sync ~/.emacs.d .emacs.d
+sync ~/.emacs.d .
 sync ~/.xmonad rice  {.venv,*.o}
 sync ~/st rice  .git
 sync ~/.config/starship.toml .config
@@ -48,4 +48,4 @@ cd ~/dotfiles
 git add --all
 git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
 git push origin master -q
-}  # > /dev/null
+}   > /dev/null
