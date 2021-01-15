@@ -3,11 +3,10 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, lib, pkgs, ... }:
-
 {
   imports =
     [ # Include the results of the hardware scan.
-./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
+./espanso.nix ./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
@@ -70,13 +69,13 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.defaultUserShell = pkgs.zsh;
+  users.mutableUsers = true;
   users.users.auscyber = {
     isNormalUser = true;
     extraGroups = ["audio" "libvirtd" "wheel" "video" ]; # Enable ‘sudo’ for the user.
     shell = pkgs.zsh;
   };
-
+  programs.zsh.enable = true;
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -109,14 +108,15 @@ EndSection
    displayManager.lightdm = {
    	enable = true;
    	greeter.enable = true;
-   	
+    background = "/home/auscyber/background3.png";
    };
+#    desktopManager.plasma5.enable = true;
 #   displayManager.startx.enable = true;
    displayManager.defaultSession = "none+xmonad";
-   displayManager.autoLogin = {
-   	enable = true;
-   	user = "auscyber";
-   };
+#   displayManager.autoLogin = {
+#   	enable = true;
+#   	user = "auscyber";
+#   };
    windowManager.awesome = {
      enable = true;
      luaModules = with pkgs.luaPackages; [
@@ -142,7 +142,6 @@ EndSection
    ];
   };
 
-
   virtualisation.libvirtd.enable = true;
 
 
@@ -158,7 +157,7 @@ EndSection
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
+  #services.espanso.enable = true;
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

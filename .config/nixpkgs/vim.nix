@@ -10,11 +10,8 @@ let cocSettings = ./coc.vim;
         let g:airline_powerline_fonts = 1
         let g:airline_theme='fruit_punch'
         '';}
-        vim-addon-nix
-	vim-indent-guides 
-        vim-airline-themes
-        purescript-vim
-        vimsence
+        vim-addon-nix vim-indent-guides vim-airline-themes
+        purescript-vim vimsence fzf-vim
 	{ plugin = coc-nvim;
 	  config = ''let g:coc_user_config = {'languageserver':{
 	\	'haskell': {

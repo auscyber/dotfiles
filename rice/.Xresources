@@ -31,7 +31,7 @@
 ! cyan
 *.color6:       #5e8d87
 *.color14:      #8abeb7
-
+Xcursor.theme: Oxygen\ 18\ white
 ! white
 *.color7:       #707880
 *.color15:      #c5c8c6

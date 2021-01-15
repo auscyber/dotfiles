@@ -1,5 +1,5 @@
-module Config (myConfig) where
 
+module Config (myConfig) where
 import           Control.Monad
 import           Data.Functor
 import           Data.Function                       (on)
@@ -28,7 +28,6 @@ import           XMonad.Hooks.ServerMode
 import           XMonad.Layout.Spacing
 import           XMonad.Util.EZConfig
 import           XMonad.Prompt.XMonad
-import           XMonad.Prompt.Window
 import           XMonad.Actions.Commands
 import           XMonad.Util.Cursor
 
@@ -142,7 +141,7 @@ customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
         --Take screenshot
         ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
         --Chrome
-        ,("M-S-g", spawn "firefox")
+        ,("M-S-g", spawn "chromium")
     --Start vim
     ,("M-d", spawn "emacsclient -c")
 
@@ -175,16 +174,13 @@ customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
     , ("M-.", sendMessage (IncMasterN (-1)))
 
         , ("M-<Space>", sendMessage NextLayout)
-    , ("M-r", shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  })  )
+    , ("M-r", defaultCommands >>= \defaultCommands' -> xmonadPromptC ( commands conf ++ defaultCommands')  (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Inconsolata Nerd Font:style=Regular:size=12"  })  )
         ] ++
         -- Xmonad keys
         [
         ("M-q", spawn "PATH=$PATH:/home/auscyber/.cabal/bin xmonad --recompile; xmonad --restart" )
         ,("M-S-q", io exitSuccess)
-        ,("M-l",nextWS)
-        ,("M-h",prevWS)
         ] ++
-
 
         --Workspace keys
         [("M"++m++'-':show k, windows $ f i)

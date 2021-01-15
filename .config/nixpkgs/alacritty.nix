@@ -46,7 +46,7 @@ in
 	x = 10;
 	y = 10;
       };
-      background_opacity = 0.8;
+      background_opacity = 0.9;
       colors = {
 	primary = {
 	    background= "0x1d1f21";
@@ -56,9 +56,9 @@ in
 	normal = {
 	    black=   "0x282a2e";
 	    red=     "0xa54242";
-	    green=   "0x8c9440";
+	    green=   "0x7c9440";
 	    yellow=  "0xde935f" ;
-	    blue =     "0x5f819d" ;
+	    blue =    "0x5f819d" ;
 	    magenta =  "0x85678f" ;
 	    cyan =    "0x5e8d87" ;
 	    white =   "0x707880" ;

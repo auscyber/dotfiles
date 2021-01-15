@@ -1,7 +1,14 @@
 conf@{ config, pkgs, system, lib, ... }: 
 
 
-let      pkgs = import <nixpkgs> {config = config.nixpkgs.config; overlays = [    (import ./powercord.nix)  ];};
+let      pkgs = import <nixpkgs> {
+          config = config.nixpkgs.config; 
+          overlays = [   (import ./st.nix)  (import ./powercord.nix)  ];
+          packageOverrides = pkgs: {
+              openssl = pkgs.libressl; 
+          };
+
+          };
     impConf = fil: import fil conf;
     haskellPacks = with pkgs.haskellPackages; [  haskell-language-server ];
     neovim = impConf ./vim.nix;
@@ -11,11 +18,10 @@ let      pkgs = import <nixpkgs> {config = config.nixpkgs.config; overlays = [  
     rofi = impConf ./rofi.nix ;
     emacs = impConf ./emacs.nix;
 in   
-{
+rec {
     
   programs = {
-
-     vim = {
+    vim = {
     enable = true;
     plugins = with pkgs.vimPlugins; [ vim-airline vim-addon-nix ];
     settings = { ignorecase = true; };
@@ -27,31 +33,36 @@ in
     home-manager.enable = true;
   };
   services = {
-    
+    emacs.enable = true; 
     inherit picom;
   };
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
   #Development
-  pcmanfm
-  steam multimc
+#  st
+  firefox
+  pcmanfm (blender.override {
+    cudaSupport = true;
+  })
+  fzf
+  dolphin steam multimc 
   osu-lazer gimp
   jetbrains.idea-ultimate jdk
   xclip ripgrep discord-canary
-  cabal-install
+  cabal-install 
   polybarFull  git nodejs  playerctl htop   
-  #rice
-  fish feh starship maim 
-    spotify 
-#  (import ./eww.nix)  
-
+  fish feh maim 
+    spotify libnotify
+  opam clojure clojure-lsp
   
   ] ++ (with pkgs.haskellPackages; [haskell-language-server]) 
-    ++ (with nodePackages; [typescript-language-server typescript purescript-language-server]);
+    ++ (with nodePackages; [typescript-language-server typescript purescript-language-server])
+    ++ (with ocamlPackages; [dune ocaml opam]);
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "auscyber";
   home.homeDirectory ="/home/auscyber";
+  home.sessionVariables.EDITOR = "vim";
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards

@@ -20,22 +20,23 @@
   enableCompletion = true;
   sessionVariables = {
     PATH = "$PATH:/home/auscyber/.emacs.d/bin";
+    EDITOR = "nvim";
   };
   shellAliases = {
     e = "vim";
     t = "tmux";
+    hm = "home-manager";
     ghc_env = ''{
      nix-shell -p "haskellPackages.ghcWithPackages (pkgs: with pkgs; $1)" 
     }
     '';
-#    emacs = "emacsclient -c -s /tmp/emacs1000/server";
+    emacs = "emacsclient -t";
   };
   initExtra = ''
-    bindkey  "^[[H"   beginning-of-line
-    bindkey  "^[[F"   end-of-line
-    bindkey  "^[[3~"  delete-char
-    eval "$(starship init zsh)"
-  echo hi
+setopt SOURCE_TRACE
+echo hello
+. ${pkgs.fzf}/share/fzf/completion.zsh
+. ${pkgs.fzf}/share/fzf/key-bindings.zsh
   '';
 
 }

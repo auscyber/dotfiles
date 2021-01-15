@@ -8,6 +8,8 @@
    shadowOffsets = [(-30) (-30)];
    shadowOpacity = "0.25";
    shadowExclude = ["name = 'xmonad'"];
+   blur = true;
+   blurExclude = [ "class_g = 'slop'" ];
    vSync = true;
    refreshRate = 60;
    package = (pkgs.picom.overrideAttrs (attrs: {

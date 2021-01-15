@@ -3,7 +3,7 @@ import XMonad
 import XMonad.Prompt
 
 
-data AusPrompt = AusPrompt String
+newtype AusPrompt = AusPrompt String
 
 instance XPrompt AusPrompt where
     showXPrompt (AusPrompt "launch") = "Run: "
