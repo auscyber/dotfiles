@@ -119,11 +119,11 @@ iconConfig = def { iconConfigIcons = icons }
 icons :: XMonad.Query [WorkSpaceIconSet]
 icons = composeAll [
     className =? "discord" --> baseIconSet "\xfb6e" 
-    , className =? "Discord" --> baseIconSet "\xf268"
+    , className =? "Chromium-browser" --> baseIconSet "\xf268"
     , className =? "Firefox" --> baseIconSet "\63288"
     , className =? "Spotify" <||>  className =? "spotify" --> baseIconSet "阮"
-    , className =? "jetbrains-idea" --> baseIconSet "\xe7b5" ]
-
+    , className =? "jetbrains-idea" --> baseIconSet "\xe7b5" 
+    , className =? "Skype" --> baseIconSet "\61822"]
 
 
 
@@ -180,6 +180,7 @@ scratchpadSet :: [(String,NamedScratchpad)]
 scratchpadSet = 
             [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating )
             , ("M-C-d", NS "discord" "DiscordCanary" (("discord" `isSuffixOf`) <$> className) defaultFloating )
+            , ("M-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating )
             ]
 
 getScratchPads :: NamedScratchPadSet -> NamedScratchpads 

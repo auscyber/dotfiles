@@ -32,7 +32,7 @@ rec {
 #  st
   firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh
   pcmanfm   fzf vimHugeX jdk jre
-   multimc razergenie  lutris
+  multimc razergenie  lutris skypeforlinux
   osu-lazer gimp arandr ccls
   jetbrains.idea-ultimate 
   xclip ripgrep discord-canary
