@@ -513,7 +513,7 @@ foreach my $link (@links) {
         my $linkname = basename($link);
         $entryName = "($linkname - $date - $version)";
     }
-    addEntry("NixOS - $entryName", $link);
+    addEntry("NixOS - $entryName", $link . "--class nixos");
 }
 
 my $grubBootPath = $grubBoot->path;
@@ -525,7 +525,7 @@ sub addProfile {
     my ($profile, $description) = @_;
 
     # Add entries for all generations of this profile.
-    $conf .= "submenu \"$description\" {\n" if $grubVersion == 2;
+    $conf .= "submenu \"$description\" --class nixos{\n" if $grubVersion == 2;
 
     sub nrFromGen { my ($x) = @_; $x =~ /\/\w+-(\d+)-link/; return $1; }
 

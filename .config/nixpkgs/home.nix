@@ -10,16 +10,9 @@ let      pkgs = import <nixpkgs> {
 
           };
     impConf = fil: import fil conf;
-    haskellPacks = with pkgs.haskellPackages; [  haskell-language-server ];
-    neovim = impConf ./vim.nix;
-    zsh = impConf ./zsh.nix ;
-    alacritty = impConf ./alacritty.nix ;
-    picom = impConf ./picom.nix ;
-    rofi = impConf ./rofi.nix ;
-    emacs = impConf ./emacs.nix;
 in   
 rec {
-    
+   imports = [ ./alacritty.nix ./rofi.nix ./vim.nix ./emacs.nix ./picom.nix ];
   programs = {
     vim = {
     enable = true;
@@ -29,33 +22,28 @@ rec {
       set mouse=a
     '';
   };
-    inherit rofi zsh neovim alacritty emacs;
+    command-not-found.enable = true;
     home-manager.enable = true;
   };
-  services = {
-    emacs.enable = true; 
-    inherit picom;
-  };
+ 
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
   #Development
 #  st
-  firefox
-  pcmanfm (blender.override {
-    cudaSupport = true;
-  })
-  fzf
-  dolphin steam multimc 
-  osu-lazer gimp
-  jetbrains.idea-ultimate jdk
+  firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh
+  pcmanfm   fzf vimHugeX jdk jre
+   multimc razergenie  lutris
+  osu-lazer gimp arandr ccls
+  jetbrains.idea-ultimate 
   xclip ripgrep discord-canary
-  cabal-install 
+  cabal-install cargo 
   polybarFull  git nodejs  playerctl htop   
   fish feh maim 
-    spotify libnotify
+  spotify libnotify
   opam clojure clojure-lsp
-  
+  starship 
   ] ++ (with pkgs.haskellPackages; [haskell-language-server]) 
+    ++ ([(pkgs.haskellPackages.ghcWithPackages (pk: with pk; [dbus xmonad-contrib]))])
     ++ (with nodePackages; [typescript-language-server typescript purescript-language-server])
     ++ (with ocamlPackages; [dune ocaml opam]);
   # Home Manager needs a bit of information about you and the

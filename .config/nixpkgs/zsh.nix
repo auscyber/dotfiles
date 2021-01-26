@@ -34,7 +34,6 @@
   };
   initExtra = ''
 setopt SOURCE_TRACE
-echo hello
 . ${pkgs.fzf}/share/fzf/completion.zsh
 . ${pkgs.fzf}/share/fzf/key-bindings.zsh
   '';

@@ -2,15 +2,16 @@
 let super = pkgs;
 in
 {
-
+ programs.alacritty =  {
  
     enable = true;
     package = (pkgs.alacritty.overrideAttrs (old: rec {
+#     src = old.src;
     src = pkgs.fetchFromGitHub {
       owner = "zenixls2";
       repo = "alacritty";
       rev = "ligature";
-      sha256 = "1wcqlnd2vss7p3b92xgvi22h31y29xv26hcnrv7b9z5p54aqmx8y";
+      sha256 = "WUdbpp8Wjl/Li5ovWIdhHQnrrxJjSf/DOGXQFlYMEzA=";
     };
     installPhase =
       ''
@@ -37,7 +38,7 @@ in
       '';
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       inherit src;
-      outputHash = "IYrr2X2fUn2wxiM1sjnceaIGg+yKIfruz3BRMyI+yts=";
+      outputHash = "uiefL+3qk6RQo+4I4onhD4zXuVXZypTpv+ULfUF4luE=";
     }); 
     
     }));
@@ -48,35 +49,33 @@ in
       };
       background_opacity = 0.9;
       colors = {
-	primary = {
-	    background= "0x1d1f21";
-	    foreground= "0xc5c8c6";
-
-	};
-	normal = {
-	    black=   "0x282a2e";
-	    red=     "0xa54242";
-	    green=   "0x7c9440";
-	    yellow=  "0xde935f" ;
-	    blue =    "0x5f819d" ;
-	    magenta =  "0x85678f" ;
-	    cyan =    "0x5e8d87" ;
-	    white =   "0x707880" ;
-
-
-	};
-	bright = {
-	      black =   "0x373b41";
-	      red =  "0xcc6666";
-	      green=   "0xb5bd68";
-	      yellow=  "0xf0c674";
-	      blue=    "0x81a2be";
-	      magenta= "0xb294bb";
-	      cyan=    "0x8abeb7";
-	      white=   "0xc5c8c6";
-
-	};
-
+  # Default colors
+  primary = {
+    background = "0x161616";
+    foreground = "0xffffff";
+};
+  # Normal colors
+  normal = {
+    black=   "0x222222";
+    red=     "0xe84f4f";
+    green =   "0xb7ce42";
+    yellow=  "0xfea63c";
+    blue=    "0x66aabb";
+    magenta= "0xb7416e";
+    cyan=    "0x6d878d";
+    white=   "0xdddddd";
+  };
+  # Bright co"ors
+  bright = {
+    black =   "0x666666";
+    red =     "0xd23d3d";
+    green =    "0xbde077";
+    yellow =  "0xffe863";
+    blue =    "0xaaccbb";
+    magenta = "0xe16a98";
+    cyan =    "0x42717b";
+    white =   "0xcccccc";	
+    };
       };
       font = {
 	size = 10;
@@ -87,6 +86,7 @@ in
 	};
       };
     };
+  };
   }
 
 

@@ -36,12 +36,14 @@ if  ! grep -q 'NixOS' <<< "$dis"  ; then
     sync ~/.config/picom .config 
 fi
 
+sync ~/.config/fish .config
 sync ~/.emacs.d .
 sync ~/.xmonad rice  {.venv,*.o}
 sync ~/st rice  .git
 sync ~/.config/starship.toml .config
 sync ~/.config/polybar .config 
 sync ~/.config/rofi .config 
+cp ~/.zshrc .zshrc
 cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cd ~/dotfiles 

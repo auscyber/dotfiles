@@ -1,6 +1,6 @@
 {pkgs, ...}:
 {
-
+  programs.rofi = {
   enable = true;
   terminal = "alacritty";
   theme = "slate";
@@ -8,5 +8,5 @@
   extraConfig = ''
     combi-modiL "window,run,drun,ssh";
   '';
-
+  };
 }

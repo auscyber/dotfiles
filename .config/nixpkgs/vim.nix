@@ -2,6 +2,7 @@
 let cocSettings = ./coc.vim;
     in
 {
+    programs.neovim = {
     enable = true;
     vimAlias = true;
     plugins = with pkgs.vimPlugins; [ 
@@ -10,8 +11,8 @@ let cocSettings = ./coc.vim;
         let g:airline_powerline_fonts = 1
         let g:airline_theme='fruit_punch'
         '';}
-        vim-addon-nix vim-indent-guides vim-airline-themes
-        purescript-vim vimsence fzf-vim
+        vim-addon-nix vim-indent-guides vim-airline-themes vim-fish
+        purescript-vim vimsence fzf-vim indentLine
 	{ plugin = coc-nvim;
 	  config = ''let g:coc_user_config = {'languageserver':{
 	\	'haskell': {
@@ -31,7 +32,22 @@ let cocSettings = ./coc.vim;
     \         "args": ["--stdio"],
     \         "filetypes": ["purescript"],
     \         "rootPatterns": ["bower.json", "psc-package.json", "spago.dhall"]
+    \       },
+    \ "rust": {
+    \  "command": "rust-analyzer",
+    \  "filetypes": ["rust"],
+    \ "rootPatterns": ["Cargo.toml"]
+    \  },
+    \   "ccls": {
+    \   "command": "ccls",
+    \   "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"],
+    \   "rootPatterns": [".ccls", "compile_commands.json", ".git/", ".hg/"],
+    \   "initializationOptions": {
+    \       "cache": {
+    \         "directory": "/tmp/ccls"
     \       }
+    \     }
+    \   }
     \  }}
 
 
@@ -52,4 +68,4 @@ let cocSettings = ./coc.vim;
           '';
 
 
-  }
+  };}

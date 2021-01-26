@@ -1,36 +1,48 @@
-module Config (myConfig) where
+{-# LANGUAGE OverloadedStrings, DeriveDataTypeable #-}
+module Config (myConfig,NameSet,ExtraState) where
 
 import           Control.Monad
 import           Data.Functor
 import           Data.Function                       (on)
-import           Data.List                           ( elemIndex )
+import           Data.List                           (isSuffixOf, elemIndex )
 import qualified Data.Map                            as M
 import           Polybar
 import           System.Exit
 import           XMonad
-import           XMonad.Hooks.EwmhDesktops
-import           XMonad.Hooks.ManageDocks
+import           XMonad.Hooks.EwmhDesktops 
+import           XMonad.Hooks.ManageDocks 
 import           XMonad.Hooks.ManageHelpers
 import qualified XMonad.Layout.Fullscreen            as F
 import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
-import           XMonad.Layout.NoBorders
+import           XMonad.Layout.NoBorders 
 import           XMonad.Layout.Tabbed 
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
+import qualified XMonad.Util.ExtensibleState as XS
+import           XMonad.Util.NamedScratchpad
 import           DynamicLog
+import           XMonad.Hooks.DynamicLog
 import           XMonad.Prompt
 import           XMonad.Prompt.Shell
 import           XMonad.Hooks.ServerMode
 import           XMonad.Layout.Spacing
 import           XMonad.Util.EZConfig
-import           XMonad.Prompt.XMonad
+import           XMonad.Actions.Search
 import           XMonad.Prompt.Window
 import           XMonad.Actions.Commands
 import           XMonad.Util.Cursor
+import           DBus
+import           DBus.Client
+import           Media
+import ExtraState
+
+
+
+
 
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
@@ -39,6 +51,10 @@ myStartupHook = do
 --     setDefaultCursor xC_left_ptr 
      spawnOnce "DiscordCanary"
      spawn "feh --bg-fill ~/background3.png"
+
+dbusAction :: (Client -> IO ()) -> X ()
+dbusAction action =  XS.gets dbus_client >>= (id >=> io . action)
+
 
 nextWS :: X ()
 nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
@@ -59,9 +75,6 @@ commands conf = [
             | (i, k) <- zip (XMonad.workspaces conf) [1..9]
                 , (f, m) <- [(W.greedyView, "view"), (W.shift, "moveTo")]]
 
-workspaceSymbols :: M.Map Int String
-workspaceSymbols = M.fromList  [ (1,"\xf015"),(2,"\62056"),(3,"\61728"),(4,"\xf1bc")]
---workspaceSymbols = M.fromList [ (1,"\xf10c"),(2,"\x2B24"),(3,"\x2B24"),(4,"\x2B24")  ]
 getWorkspaceText :: M.Map Int String -> String -> String
 getWorkspaceText xs n =
     case M.lookup (read n) xs of
@@ -69,22 +82,47 @@ getWorkspaceText xs n =
         _ -> n
 
 myWorkspaces = map show [1..9]
-myConfig = ewmh $ def {
+
+
+removedKeys :: [String]
+removedKeys = ["M-p","M-S-p" , "M-S-e","M-S-o","M-b" ]
+myConfig = 
+    flip additionalKeysP myKeys $ 
+    flip removeKeysP removedKeys $
+    ewmh $ def {
        terminal = myTerm
       , borderWidth = myBorderWidth
       , normalBorderColor = secondaryColor
       , focusedBorderColor = mainColor
       , workspaces = myWorkspaces
-      , keys = customKeys
       , modMask = mod4Mask
       , focusFollowsMouse = False
       , startupHook = myStartupHook
-      , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
-      , manageHook = (isFullscreen --> doFullFloat) <> manageDocks <>  manageHook def
+--      , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
+      , logHook = do
+            wsNames <- XS.gets workspaceNames 
+            let pp = polybarPP wsNames 
+            dynamicLogIcons' iconConfig pp  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar >>=  io . ppOutput pp
+      , manageHook = myManageHook 
       , layoutHook =  myLayout
-      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  <> handleEventHook def <> docksEventHook <> fullscreenEventHook }
+      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  
+      <> handleEventHook def 
+      <> docksEventHook 
+      <> fullscreenEventHook }
 
+baseIconSet :: String -> XMonad.Query [WorkSpaceIconSet ]
+baseIconSet str = pure [NameSet { current = str, hidden = str, visible = str, showOverlayIcons = True } ]
 
+iconConfig :: IconConfig 
+iconConfig = def { iconConfigIcons = icons }
+
+icons :: XMonad.Query [WorkSpaceIconSet]
+icons = composeAll [
+    className =? "discord" --> baseIconSet "\xfb6e" 
+    , className =? "Discord" --> baseIconSet "\xf268"
+    , className =? "Firefox" --> baseIconSet "\63288"
+    , className =? "Spotify" <||>  className =? "spotify" --> baseIconSet "阮"
+    , className =? "jetbrains-idea" --> baseIconSet "\xe7b5" ]
 
 
 
@@ -107,7 +145,7 @@ myLayout =
   ||| Mirror tiled
   ||| Full
   where
-    -- default tiling algorithm partitions the screen into two panes
+    -- default tiling algorithm partitions the screen into two panes 
     tiled   = Tall nmaster delta ratio
 
     -- The default number of windows in the master pane
@@ -129,69 +167,88 @@ myManageHook = composeAll
     , className =? "steam" --> doFloat
     , className =? "jetbrains-idea" --> doFloat
     , className =? "Spotify" --> doShift "4"
+    , className =? "Ghidra" --> doFloat
+    , ("Minecraft" `isPrefixOf`) <$> className  --> doFullFloat 
+    , namedScratchpadManageHook scratchpads
+    , manageDocks 
     ]
 
-customKeys conf@XConfig {XMonad.modMask = modm} = mkKeymap conf $
-    [
-    --Start rofi
-    ("M-S-r", spawn "rofi -show combi")
-    -- Start alacritty
-        ,("M-S-t", spawn $ terminal conf)
+
+
+type NamedScratchPadSet = [(String,NamedScratchpad)]
+scratchpadSet :: [(String,NamedScratchpad)]
+scratchpadSet = 
+            [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating )
+            , ("M-C-d", NS "discord" "DiscordCanary" (("discord" `isSuffixOf`) <$> className) defaultFloating )
+            ]
+
+getScratchPads :: NamedScratchPadSet -> NamedScratchpads 
+getScratchPads = map snd
+getScratchPadKeys :: NamedScratchPadSet -> [(String,X ())]
+getScratchPadKeys ns = map mapFunc ns
+    where mapFunc (key,NS {name = name'}) = (key,namedScratchpadAction ns' name')
+          ns' = getScratchPads ns
+
+scratchpads = getScratchPads scratchpadSet
+scratchpadKeys = getScratchPadKeys scratchpadSet
+
+appKeys= [("M-S-r", spawn "rofi -show combi")
+        -- Start alacritty
+        ,("M-S-t", spawn myTerm)
         -- Kill currently focused window
         ,("M-S-c",kill)
         --Take screenshot
         ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
         --Chrome
-        ,("M-S-g", spawn "firefox")
-    --Start vim
-    ,("M-d", spawn "emacsclient -c")
+        ,("M-S-g", spawn "chromium")
+        --Start emacs
+        ,("M-d", spawn "emacsclient -c")
 
+        ]
+
+
+myKeys =  concat
+            [ scratchpadKeys
+            , multiScreenKeys
+            , appKeys
+            , customKeys ]
+
+multiScreenKeys = [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip ["-w","-e"] [0..]
+        , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
+
+
+customKeys =  
+    [
         --- Multimedia keys
-        ,("<XF86AudioPrev>", spawn "playerctl previous")
-        ,("<XF86AudioNext>", spawn "playerctl next")
-        ,("<XF86AudioPlay>", spawn "playerctl play-pause")
+        ("<XF86AudioPrev>",dbusAction previous )
+        ,("<XF86AudioNext>", dbusAction next)
+        ,("<XF86AudioPlay>", dbusAction playPause)
         ,("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
         ,("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
         ,("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
         --  Reset the layouts on the current workspace to default
-        , ("M-s-<Space>", setLayout $ XMonad.layoutHook conf)
 
         -- Swap the focused and the master window
-        , ("M-<Return>", windows $ W.swapMaster . W.focusDown)
 
     -- Move focus to the next window
-    , ("M-<Tab>", windows W.focusDown)
     -- Move focus to preview window
-    , ("M-S-<Tab>",    windows W.focusUp)
     --Polybar toggle
-        ,("M-b", spawn "echo cmd:toggle | tee /tmp/polybar_mqueue.* >/dev/null" )
+    ,("M-b", spawn "polybar-msg cmd toggle" )
 
         --Push window back into tiling
-        , ("M-t", withFocused $ windows . W.sink)
         -- Increment the number of windows in the master area
-    , ("M-,", sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
-    , ("M-.", sendMessage (IncMasterN (-1)))
 
-        , ("M-<Space>", sendMessage NextLayout)
-    , ("M-r", shellPrompt (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  })  )
+    , ("M-r", promptSearch (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) hoogle  )
         ] ++
         -- Xmonad keys
         [
-        ("M-q", spawn "PATH=$PATH:/home/auscyber/.cabal/bin xmonad --recompile; xmonad --restart" )
-        ,("M-S-q", io exitSuccess)
-        ,("M-l",nextWS)
+        ("M-l",nextWS)
         ,("M-h",prevWS)
-        ] ++
+        ]
 
 
-        --Workspace keys
-        [("M"++m++'-':show k, windows $ f i)
-            | (i, k) <- zip (XMonad.workspaces conf) [1..9]
-            , (f, m) <- [(W.greedyView, ""), (W.shift, "-S")]]
-        ++
-         [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
-            | (key, sc) <- zip ["-w","-e"] [0..]
-            , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
-
+    --Workspace keys
+    

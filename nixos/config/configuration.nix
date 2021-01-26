@@ -3,16 +3,32 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, lib, pkgs, ... }:
+let
+  myHaskellPackages = pkgs.haskellPackages.override {
+    overrides = self: super: rec {
+    xmonad  = self.callCabal2nix "xmonad" (builtins.fetchGit {
+	url = "http://github.com/xmonad/xmonad.git";
+        rev = "a90558c07e3108ec2304cac40e5d66f74f52b803";
+#         rev = "master";
+      })
+      {};
+    
+    xmonad-contrib = self.callCabal2nix "xmonad-contrib" (builtins.fetchGit {
+	url = "http://github.com/auscyber/xmonad-contrib";
+	rev = "9abf0266bb2bf190962e7c0640bc4ca0e3d1b3ac";
+#	rev = "master";
+    }) {}; 
+    };
+  };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
-./espanso.nix ./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
-  nix = {
-    package = pkgs.nixFlakes;
+./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
+  nix = { package = pkgs.nixFlakes;
     extraOptions = ''
         experimental-features = nix-command flakes
-      '';
-  };
+      ''; };
   # Use the systemd-boot EFI boot loader.
 # boot.loader.systemd-boot.enable = true;
 # boot.loader.efi.canTouchEfiVariables = true;
@@ -28,6 +44,7 @@
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
+  hardware.openrazer.enable = true;
   networking.useDHCP = false;
   networking.interfaces.enp4s0.useDHCP = true;
   networking.interfaces.wlo1.useDHCP = true;
@@ -72,18 +89,24 @@
   users.mutableUsers = true;
   users.users.auscyber = {
     isNormalUser = true;
-    extraGroups = ["audio" "libvirtd" "wheel" "video" ]; # Enable ‘sudo’ for the user.
-    shell = pkgs.zsh;
+    extraGroups = ["audio" "libvirtd" "plugdev" "wheel" "video" ]; # Enable ‘sudo’ for the user.
+    shell = pkgs.fish;
   };
+  programs.sway = {
+    enable = true;
+
+  };
+  programs.fish.enable = true;
   programs.zsh.enable = true;
+  hardware.opengl.enable = true;
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget vim 
     chromium  python3 
     #Virtualisation
+    plasma5.breeze-grub
     qemu OVMF virtmanager dconf
-    (haskellPackages.ghcWithPackages (pkgs: with pkgs; [xmonad-contrib] ))	
     
   ];
 
@@ -105,10 +128,11 @@ Section "InputClass"
 EndSection
    '';
    videoDrivers = [ "nvidia" ];
+#   videoDrivers = [ "nouveau" ];
    displayManager.lightdm = {
    	enable = true;
    	greeter.enable = true;
-    background = "/home/auscyber/background3.png";
+    background = "/usr/share/pixmaps/background1.jpg";
    };
 #    desktopManager.plasma5.enable = true;
 #   displayManager.startx.enable = true;
@@ -125,13 +149,11 @@ EndSection
    windowManager.xmonad = {
    	enable = true;
            enableContribAndExtras = true;
-   	extraPackages = haskellPackages:[
-   		haskellPackages.xmonad-contrib
-   		haskellPackages.xmonad-extras
-   		haskellPackages.xmonad
-
-   		];  		
-
+   	   extraPackages = haskellPackages: [
+	   	(myHaskellPackages.callCabal2nix "xmonad" (./.) {})
+	   	(myHaskellPackages.callCabal2nix "xmonad-contrib" (./.) {})
+	   ];
+	   
    	};
  };
   hardware.opengl.driSupport32Bit = true;

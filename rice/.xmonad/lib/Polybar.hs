@@ -1,20 +1,21 @@
+{-# LANGUAGE TupleSections #-}
 module Polybar (
-polybarColour,polybarUnderline,polybarUnderlineWithColor,polyBarAction,polybarPP) 
+switchMoveWindowsPolybar, dynamicLogIcons',polybarColour,polybarUnderline,polybarUnderlineWithColor,polybarPP,IconConfig(..)) 
 where
-import DynamicLog
-import XMonad
-import qualified Data.Map                            as M
 
+import DynamicLog
+import XMonad.Hooks.DynamicLog
+import XMonad
+import Data.Maybe
+import qualified Data.Map                            as M
+import Data.List
+import ExtraState
+import qualified XMonad.StackSet as S
+import qualified XMonad.Util.ExtensibleState as XS
 --Process Colours
 type Colour = String
 polybarColour :: Char -> Colour -> String -> String
 polybarColour area (_:color) text = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area:"--}"
-
-getWorkspaceText :: M.Map Int String -> String -> String
-getWorkspaceText xs n = 
-    case M.lookup (read n) xs of
-        Just x ->  x
-        _ ->  n
 
 
 polybarPP ws =  def {
@@ -22,45 +23,83 @@ polybarPP ws =  def {
     , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
     , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
     , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True -}
-    ppCurrent = \x ->  switchWS x $ polybarColour 'F' "#FFDB9E" "\xf111 "
-    , ppHidden = \x ->  switchWS x $ polybarColour 'F' "#E88B84" "\xf10c "
-    , ppVisible  = \x -> switchWS x $ polybarColour 'F' "#FFC9AB" "\xf10c "
-    , ppHiddenNoWindows = \x -> switchWS x $ polybarColour 'F' "#5754B3" "\xf10c "
+    ppCurrent =  polybarColour 'F' "#FFDB9E" . current .  checkIcon ws
+    , ppHidden =  polybarColour 'F' "#E88B84" . hidden . checkIcon ws
+    , ppVisible  = polybarColour 'F' "#FFC9AB" . hidden . checkIcon ws
+    , ppHiddenNoWindows = polybarColour 'F' "#5754B3" . hidden . checkIcon ws
     , ppTitleSanitize = take 90
     , ppTitle = polybarColour 'F' "#--" 
     , ppSep = polybarColour 'F' "#5754B3" " | "
-    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadAction 4 "nextws" . xmonadAction 5 "prevws"
-    , ppLayout =  xmonadAction 1 "next-layout" . xmonadAction 3 "default-layout" 
+    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n"  . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws"
+   , ppLayout =  xmonadPolybarAction  1 "next-layout" . xmonadPolybarAction 3 "default-layout" 
                         
 --    , ppOrder = \(x:_:y) -> x:y
 
 }
+checkIcon :: M.Map WorkspaceId WorkSpaceIconSet -> String -> WorkSpaceIconSet
+checkIcon ws wsid = M.findWithDefault (basicIconSet wsid) wsid ws
 
-polybarWorkspace :: (String -> String)  -> M.Map Int String -> Bool -> String -> String
-polybarWorkspace format ws bool str = (if bool then moveToWS str . switchWS str  else id) . format $ getWorkspaceText ws str
+type IconSet = Query [WorkSpaceIconSet]
+data IconConfig = IconConfig {
+        iconConfigIcons :: Query [WorkSpaceIconSet] 
+        , iconConfigStack :: [String] -> String
+        }
+
+
+instance Default IconConfig where
+    def = IconConfig {
+    iconConfigIcons = composeAll [
+        className =? "discord" --> appIcon "\xfb6e" 
+        , className =? "Spotify" <||> className =? "spotify" -->  appIcon "阮"]
+    , iconConfigStack = ("["<>) . (<>"]") . unwords 
+    }
+appIcon :: String -> IconSet
+appIcon = pure . (:[]) . basicIconSet
+
+basicIconSet :: String -> WorkSpaceIconSet
+basicIconSet x = NameSet { current = x,visible = x,hidden =x, showOverlayIcons = True }
+
+dynamicLogIcons' :: IconConfig -> PP -> X PP
+dynamicLogIcons' IconConfig{ iconConfigIcons = is, iconConfigStack = stack } pp = do
+        ws <- gets windowset   
+        let workspaces' = map S.workspace (S.current ws : S.visible ws) <> S.hidden ws
+        icons <- M.fromList . (maybeToList =<<) <$> mapM (getIcons is) workspaces' 
+        pure $ pp {
+            ppCurrent = ppCurrent pp . concatIcons current . iconLookup icons 
+            ,ppVisible =  ppVisible pp . concatIcons visible . iconLookup icons
+            ,ppHidden = ppHidden pp . concatIcons hidden . iconLookup icons
+            ,ppHiddenNoWindows = ppHiddenNoWindows pp . concatIcons hidden . iconLookup icons
+        }
+        where iconLookup icons x = M.findWithDefault [basicIconSet x] x icons
+              concatIcons f y 
+                    | length y > 1 = stack $ map f y
+                    | otherwise = concatMap f y
+                              
+getIcons :: IconSet -> S.Workspace WorkspaceId l Window -> X (Maybe (WorkspaceId,[WorkSpaceIconSet]))
+getIcons is w = do
+            let windows'' stack' = [S.focus stack'] ++ S.up stack' ++ S.down stack'
+            a <- sequence $ foldMap (runQuery is) . windows'' <$> S.stack w
+            pure $ (S.tag w,) <$> (a >>= \x -> if null x then Nothing else Just  x)
+            
+switchMoveWindowsPolybar :: PP -> PP
+switchMoveWindowsPolybar pp = pp
+            { ppCurrent = switchAndMove (ppCurrent pp)
+            , ppHidden = switchAndMove (ppHidden pp)
+            , ppVisible = switchAndMove (ppVisible pp)
+            , ppHiddenNoWindows = switchAndMove (ppHiddenNoWindows pp)
+            }
+            where switchAndMove f x =  xmonadPolybarAction 1 ("view"++x) . xmonadPolybarAction 3 ("moveTo"++x) $ f x
+
+
+
+    
+
+--polybarWorkspace :: (String -> String)  -> Bool -> String -> String
+--polybarWorkspace format bool str = (if bool then moveToWS str . switchWS str  else id) . format $ str
 --Underline Text
 polybarUnderline :: String -> String
 polybarUnderline text = "%{+u}" ++ text ++ "%{-u}"
 --Underline Polybar Text with Colour
 polybarUnderlineWithColor :: Colour -> String -> String
 polybarUnderlineWithColor color = polybarColour 'u' color . polybarUnderline
-
-
-switchWS :: String -> String -> String 
-switchWS id = xmonadAction 1 ("view"++id) 
-
-moveToWS :: String -> String -> String
-moveToWS id = xmonadAction 3 ("moveTo"++id)
-
-xmonadAction :: Int -> String -> String -> String
-xmonadAction but x = polyBarAction but ("~/.xmonad/xmonadctl " ++x)
-
-
-polyBarAction :: Int -> String -> String-> String
-polyBarAction button command
-    | button > 8 || button <1 = id
-    | otherwise = wrap ("%{A" ++ show button ++ ":" ++ command ++ ":}") "%{A}"
-
-
-
 
