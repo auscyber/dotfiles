@@ -21,6 +21,7 @@ import           XMonad.Layout.Tabbed
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.SpawnOnce
 import           XMonad.Util.NamedWindows            (getName)
+import           XMonad.Actions.CycleWS
 import           XMonad.Util.Run
 import qualified XMonad.Util.ExtensibleState as XS
 import           XMonad.Util.NamedScratchpad
@@ -38,10 +39,7 @@ import           XMonad.Util.Cursor
 import           DBus
 import           DBus.Client
 import           Media
-import ExtraState
-
-
-
+import           ExtraState
 
 
 myStartupHook = do
@@ -56,15 +54,15 @@ dbusAction :: (Client -> IO ()) -> X ()
 dbusAction action =  XS.gets dbus_client >>= (id >=> io . action)
 
 
-nextWS :: X ()
-nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
-    where   nextTag :: WorkspaceId -> [WorkspaceId] -> WorkspaceId
-            nextTag tag ws = let Just index = tag `elemIndex` ws in if index == (length ws - 1) then head ws else ws !! (index+1)
-prevWS :: X ()
-prevWS = 
-    gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
-    where 
-        prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
+--nextWS :: X ()
+--nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
+--    where   nextTag :: WorkspaceId -> [WorkspaceId] -> WorkspaceId
+--            nextTag tag ws = let Just index = tag `elemIndex` ws in if index == (length ws - 1) then head ws else ws !! (index+1)
+--prevWS :: X ()
+--prevWS = 
+--    gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
+--    where 
+--        prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
 
 commandsX :: X [(String, X ())]
 commandsX = asks config Data.Functor.<&> commands
@@ -86,6 +84,7 @@ myWorkspaces = map show [1..9]
 
 removedKeys :: [String]
 removedKeys = ["M-p","M-S-p" , "M-S-e","M-S-o","M-b" ]
+
 myConfig = 
     flip additionalKeysP myKeys $ 
     flip removeKeysP removedKeys $
@@ -123,7 +122,7 @@ icons = composeAll [
     , className =? "Firefox" --> baseIconSet "\63288"
     , className =? "Spotify" <||>  className =? "spotify" --> baseIconSet "阮"
     , className =? "jetbrains-idea" --> baseIconSet "\xe7b5" 
-    , className =? "Skype" --> baseIconSet "\61822"]
+    , className =? "Skype" --> baseIconSet "\61822" ]
 
 
 
@@ -220,35 +219,23 @@ multiScreenKeys = [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows .
 
 
 customKeys =  
-    [
-        --- Multimedia keys
-        ("<XF86AudioPrev>",dbusAction previous )
-        ,("<XF86AudioNext>", dbusAction next)
-        ,("<XF86AudioPlay>", dbusAction playPause)
-        ,("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
-        ,("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
-        ,("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
-        --  Reset the layouts on the current workspace to default
-
-        -- Swap the focused and the master window
-
-    -- Move focus to the next window
-    -- Move focus to preview window
-    --Polybar toggle
-    ,("M-b", spawn "polybar-msg cmd toggle" )
-
-        --Push window back into tiling
-        -- Increment the number of windows in the master area
-
-    -- Deincrement the number of windows in the master area
+    [ ("<XF86AudioPrev>",dbusAction previous )
+    , ("<XF86AudioNext>", dbusAction next)
+    , ("<XF86AudioPlay>", dbusAction playPause)
+    , ("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
+    , ("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
+    , ("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+    --  Reset the layouts on the current workspace to default
+    -- Swap the focused and the master window
+    -- Polybar toggle
+    , ("M-b", spawn "polybar-msg cmd toggle" )
 
     , ("M-r", promptSearch (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) hoogle  )
-        ] ++
-        -- Xmonad keys
-        [
-        ("M-l",nextWS)
-        ,("M-h",prevWS)
-        ]
+    ] ++
+    -- Xmonad keys
+    [ ("M-l",nextWS)
+    , ("M-h",prevWS)
+    ]
 
 
     --Workspace keys

@@ -1,10 +1,10 @@
 module ExtraState (NameSet(..),WorkSpaceIconSet,ExtraState,dbus_client,workspaceNames) where
 
 import qualified Data.Map as M
-import XMonad
+import           XMonad
 import           DBus
 import           DBus.Client
-import XMonad.Prompt
+import           XMonad.Prompt
 
 data NameSet l = 
         NameSet { current :: l
