@@ -10,6 +10,7 @@ let      pkgs = import <nixpkgs> {
 
           };
     impConf = fil: import fil conf;
+         myHaskellPackages = import ./haskell.nix { inherit pkgs; };
 in   
 rec {
    imports = [ ./alacritty.nix ./rofi.nix ./vim.nix ./emacs.nix ./picom.nix ];
@@ -30,20 +31,20 @@ rec {
   home.packages = with pkgs; [
   #Development
 #  st
-  firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh
-  pcmanfm   fzf vimHugeX jdk jre
+  firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh emacs
+  pcmanfm   fzf vimHugeX jdk jre vscode
   multimc razergenie  lutris skypeforlinux
   osu-lazer gimp arandr ccls
   jetbrains.idea-ultimate 
-  xclip ripgrep discord-canary
+  xclip ripgrep discord
   cabal-install cargo 
   polybarFull  git nodejs  playerctl htop   
   fish feh maim 
   spotify libnotify
   opam clojure clojure-lsp
   starship 
-  ] ++ (with pkgs.haskellPackages; [haskell-language-server]) 
-    ++ ([(pkgs.haskellPackages.ghcWithPackages (pk: with pk; [dbus xmonad-contrib]))])
+  ] ++ (with pkgs.haskellPackages; [Agda haskell-language-server]) 
+    ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [dbus xmonad-contrib]))])
     ++ (with nodePackages; [typescript-language-server typescript purescript-language-server])
     ++ (with ocamlPackages; [dune ocaml opam]);
   # Home Manager needs a bit of information about you and the

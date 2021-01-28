@@ -58,7 +58,14 @@
  (telephone-line-mode 1)
  )
 ;; Hooks so haskell and literate haskell major modes trigger LSP setup
+(transient-mark-mode 1)
 
+;;;;Org mode configuration
+;; Enable Org mode
+(require 'org)
+;; Make Org mode work with files ending in .org
+ (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;; The above is the default in recent emacsen
 (use-package ligature
   :load-path "~/.emacs.d/ligature.el"
   :config
@@ -115,3 +122,6 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Hasklug Nerd Font" :foundry "ADBO" :slant normal :weight normal :height 103 :width normal)))))
 
+
+(load-file (let ((coding-system-for-read 'utf-8))
+                (shell-command-to-string "agda-mode locate")))

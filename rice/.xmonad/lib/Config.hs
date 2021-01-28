@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings, DeriveDataTypeable #-}
-module Config (myConfig,NameSet,ExtraState) where
+module Config (myConfig,ExtraState) where
 
 import           Control.Monad
+import           Data.Bifunctor
 import           Data.Functor
 import           Data.Function                       (on)
-import           Data.List                           (isSuffixOf, elemIndex )
+import           Data.List                           (nub,nubBy,isSuffixOf, elemIndex )
 import qualified Data.Map                            as M
 import           Polybar
 import           System.Exit
@@ -40,29 +41,18 @@ import           DBus
 import           DBus.Client
 import           Media
 import           ExtraState
-
+import           WorkspaceSet
 
 myStartupHook = do
      io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
      spawn "~/.config/polybar/launch.sh"
-     spawn "xrandr --output DP-3  --left-of HDMI-0"
+     spawn "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
 --     setDefaultCursor xC_left_ptr 
-     spawnOnce "DiscordCanary"
      spawn "feh --bg-fill ~/background3.png"
 
 dbusAction :: (Client -> IO ()) -> X ()
 dbusAction action =  XS.gets dbus_client >>= (id >=> io . action)
 
-
---nextWS :: X ()
---nextWS = gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView  $  nextTag tag ws
---    where   nextTag :: WorkspaceId -> [WorkspaceId] -> WorkspaceId
---            nextTag tag ws = let Just index = tag `elemIndex` ws in if index == (length ws - 1) then head ws else ws !! (index+1)
---prevWS :: X ()
---prevWS = 
---    gets (W.currentTag . windowset) >>= \tag -> asks (XMonad.workspaces . XMonad.config ) >>= \ws -> windows . W.greedyView $ prevTag tag ws
---    where 
---        prevTag tag ws = let Just index = tag `elemIndex` ws in if index == 0 then last ws else ws !! (index-1)
 
 commandsX :: X [(String, X ())]
 commandsX = asks config Data.Functor.<&> commands
@@ -84,11 +74,16 @@ myWorkspaces = map show [1..9]
 
 removedKeys :: [String]
 removedKeys = ["M-p","M-S-p" , "M-S-e","M-S-o","M-b" ]
-
+createKeybinds :: [(WorkspaceSetId,[WorkspaceId])] -> [((KeyMask,KeySym),X ())]
+createKeybinds wsSets = map f keySets
+    where totalws = map (uncurry changeWorkspaces) (("default",workspaces myConfig): wsSets)
+          keySets = nub $ concatMap (map fst . snd) totalws
+          f key = createWsKeybind key $ [(wsId, action) | (wsId,actions) <- totalws,(key',action) <- actions,key' == key] 
 myConfig = 
+    flip additionalKeys (createKeybinds workspaceSets) $
     flip additionalKeysP myKeys $ 
     flip removeKeysP removedKeys $
-    ewmh $ def {
+    ewmhFullscreen $ def {
        terminal = myTerm
       , borderWidth = myBorderWidth
       , normalBorderColor = secondaryColor
@@ -98,31 +93,38 @@ myConfig =
       , focusFollowsMouse = False
       , startupHook = myStartupHook
 --      , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
-      , logHook = do
-            wsNames <- XS.gets workspaceNames 
-            let pp = polybarPP wsNames 
-            dynamicLogIcons' iconConfig pp  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar >>=  io . ppOutput pp
+      , logHook = myLogHook
       , manageHook = myManageHook 
       , layoutHook =  myLayout
-      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  
-      <> handleEventHook def 
+      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  <> handleEventHook def 
       <> docksEventHook 
-      <> fullscreenEventHook }
+      }
 
-baseIconSet :: String -> XMonad.Query [WorkSpaceIconSet ]
-baseIconSet str = pure [NameSet { current = str, hidden = str, visible = str, showOverlayIcons = True } ]
+myLogHook :: X ()
+myLogHook = do
+            wsNames <- XS.gets workspaceNames 
+            let pp = polybarPP wsNames 
+            --dynamicLogIconsConvert (iconConfig pp)  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
+            filterOutInvalidWSet (polybarPP M.empty) >>= DynamicLog.dynamicLogString   >>= io . ppOutput pp
 
-iconConfig :: IconConfig 
-iconConfig = def { iconConfigIcons = icons }
+workspaceSets :: [(WorkspaceSetId,[WorkspaceId])]
+workspaceSets = 
+    [ ("bob",["hi","no"] <> map show [1..5])
+    , ("jim",map show [1..4])
+    ]
 
-icons :: XMonad.Query [WorkSpaceIconSet]
+iconConfig :: PP -> IconConfig 
+iconConfig pp = def { iconConfigPP = pp, iconConfigIcons = icons }
+
+icons :: IconSet
 icons = composeAll [
-    className =? "discord" --> baseIconSet "\xfb6e" 
-    , className =? "Chromium-browser" --> baseIconSet "\xf268"
-    , className =? "Firefox" --> baseIconSet "\63288"
-    , className =? "Spotify" <||>  className =? "spotify" --> baseIconSet "阮"
-    , className =? "jetbrains-idea" --> baseIconSet "\xe7b5" 
-    , className =? "Skype" --> baseIconSet "\61822" ]
+    className =? "discord" --> appIcon "\xfb6e" 
+    , className =? "Chromium-browser" --> appIcon "\xf268"
+    , className =? "Firefox" --> appIcon "\63288"
+    , className =? "Spotify" <||>  className =? "spotify" --> appIcon "阮"
+    , className =? "jetbrains-idea" --> appIcon "\xe7b5" 
+    , className =? "Skype" --> appIcon "\61822" 
+    , ("vim" `isPrefixOf`) <$> title --> appIcon "\59333"]
 
 
 
@@ -170,6 +172,7 @@ myManageHook = composeAll
     , ("Minecraft" `isPrefixOf`) <$> className  --> doFullFloat 
     , namedScratchpadManageHook scratchpads
     , manageDocks 
+    , workspaceSetHook workspaceSets
     ]
 
 
@@ -178,7 +181,7 @@ type NamedScratchPadSet = [(String,NamedScratchpad)]
 scratchpadSet :: [(String,NamedScratchpad)]
 scratchpadSet = 
             [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating )
-            , ("M-C-d", NS "discord" "DiscordCanary" (("discord" `isSuffixOf`) <$> className) defaultFloating )
+            , ("M-C-d", NS "discord" "Discord" (("discord" `isSuffixOf`) <$> className) defaultFloating )
             , ("M-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating )
             ]
 
@@ -217,7 +220,6 @@ multiScreenKeys = [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows .
         | (key, sc) <- zip ["-w","-e"] [0..]
         , (f, m) <- [(W.view, ""), (W.shift, "-S")]]
 
-
 customKeys =  
     [ ("<XF86AudioPrev>",dbusAction previous )
     , ("<XF86AudioNext>", dbusAction next)
@@ -229,8 +231,10 @@ customKeys =
     -- Swap the focused and the master window
     -- Polybar toggle
     , ("M-b", spawn "polybar-msg cmd toggle" )
-
     , ("M-r", promptSearch (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) hoogle  )
+    , ("M-m", XS.modify nextWorkspaceSet >> (join $ asks (logHook . config) ))
+    , ("M-n",XS.modify previousWorkspaceSet >> (join $ asks (logHook . config)))
+
     ] ++
     -- Xmonad keys
     [ ("M-l",nextWS)
@@ -238,5 +242,4 @@ customKeys =
     ]
 
 
-    --Workspace keys
     

@@ -4,22 +4,7 @@
 
 { config, lib, pkgs, ... }:
 let
-  myHaskellPackages = pkgs.haskellPackages.override {
-    overrides = self: super: rec {
-    xmonad  = self.callCabal2nix "xmonad" (builtins.fetchGit {
-	url = "http://github.com/xmonad/xmonad.git";
-        rev = "a90558c07e3108ec2304cac40e5d66f74f52b803";
-#         rev = "master";
-      })
-      {};
-    
-    xmonad-contrib = self.callCabal2nix "xmonad-contrib" (builtins.fetchGit {
-	url = "http://github.com/auscyber/xmonad-contrib";
-	rev = "9abf0266bb2bf190962e7c0640bc4ca0e3d1b3ac";
-#	rev = "master";
-    }) {}; 
-    };
-  };
+  myHaskellPackages = import /home/auscyber/.config/nixpkgs/haskell.nix { inherit pkgs; };
 in
 {
   imports =
@@ -102,7 +87,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim 
+     wget vim 
     chromium  python3 
     #Virtualisation
     plasma5.breeze-grub
@@ -150,9 +135,9 @@ EndSection
    	enable = true;
            enableContribAndExtras = true;
    	   extraPackages = haskellPackages: [
-	   	(myHaskellPackages.callCabal2nix "xmonad" (./.) {})
-	   	(myHaskellPackages.callCabal2nix "xmonad-contrib" (./.) {})
-	   ];
+	   	myHaskellPackages.xmonad-contrib
+		myHaskellPackages.xmonad
+		];
 	   
    	};
  };
@@ -165,7 +150,7 @@ EndSection
   };
 
   virtualisation.libvirtd.enable = true;
-
+  environment.pathsToLink = [ "/share/agda" ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -1,6 +1,1 @@
-configuration {
- modi: "window,drun,ssh,combi";
- theme: "slate";
- font: "Inconsolata 10";
- combi-modi: "window,run,drun,ssh";
- }
+/nix/store/jd41661z55y6v2yd5bykmp53ncqimqj7-home-manager-files/.config/rofi/config.rasi
