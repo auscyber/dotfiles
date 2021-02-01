@@ -1,0 +1,8 @@
+
+lib/Config.hs:105:111: warning: [-Wdeprecations]
+    In the use of ‘namedScratchpadFilterOutWorkspacePP’
+    (imported from XMonad.Util.NamedScratchpad):
+    Deprecated: "Use XMonad.Hooks.DynamicLog.filterOutWsPP [scratchpadWorkspaceTag] instead"
+    |
+105 |             filterOutInvalidWSet pp >>= dynamicLogIconsConvert . iconConfig >>= DynamicLog.dynamicLogString . namedScratchpadFilterOutWorkspacePP   >>= io . ppOutput pp
+    |                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

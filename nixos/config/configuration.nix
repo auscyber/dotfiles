@@ -88,7 +88,7 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
      wget vim 
-    chromium  python3 
+    chromium  python3  
     #Virtualisation
     plasma5.breeze-grub
     qemu OVMF virtmanager dconf
@@ -142,12 +142,12 @@ EndSection
    	};
  };
   hardware.opengl.driSupport32Bit = true;
-  services.cron = {
-    enable = true;
-    systemCronJobs = [
-    "0 0 1-31/2 * *  auscyber . /etc/profile' ${pkgs.bash}/bin/bash /home/auscyber/dotfiles/backup2.sh"
-   ];
-  };
+#  services.cron = {
+#    enable = true;
+#    systemCronJobs = [
+#    "0 0 1-31/2 * *  auscyber . /etc/profile' ${pkgs.bash}/bin/bash /home/auscyber/dotfiles/backup2.sh"
+#   ];
+#  };
 
   virtualisation.libvirtd.enable = true;
   environment.pathsToLink = [ "/share/agda" ];

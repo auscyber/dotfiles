@@ -48,6 +48,6 @@ cp ~/.xinitrc $DEST/rice/
 cp ~/.Xresources $DEST/rice/
 cd ~/dotfiles 
 git add --all
-git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
-git push origin master -q
+#git commit -a -m "$(date "+%a %d %b %I:%M%P") backup" 
+#git push origin master -q
 }   > /dev/null

@@ -1,12 +1,15 @@
-{-# LANGUAGE TemplateHaskell, DeriveDataTypeable, TupleSections #-}
-module WorkspaceSet (createWsKeybind,fixTag,changeWorkspaces,filterOutInvalidWSet,nextWorkspaceSet, previousWorkspaceSet, WorkspaceSetId,workspaceSetHook,runOnWorkspace,workspaceSetKeys) where
+{-# LANGUAGE RankNTypes, TemplateHaskell, DeriveDataTypeable, TupleSections #-}
+module WorkspaceSet (
+        cleanWS',createDefaultWorkspaceKeybinds,
+
+        switchToWsSet,createWsKeybind,fixTag,changeWorkspaces,filterOutInvalidWSet,nextWSSet, prevWSSet, WorkspaceSetId,workspaceSetHook) where
 import System.IO
 import           XMonad
 import qualified XMonad.Util.ExtensibleState as XS 
 import qualified XMonad.StackSet as W
 import XMonad.Hooks.DynamicLog
 import           Control.Lens
-import           Data.List (nubBy,find)
+import           Data.List (nub,nubBy,find)
 import           Data.Bifunctor
 import           Data.Maybe (fromMaybe)
 import           Control.Monad
@@ -20,6 +23,7 @@ type WorkspaceSetId = String
 data WorkspaceSet  = 
     WorkspaceSet { _workspaceSetName :: WorkspaceSetId
                  , _workspaceNames :: [WorkspaceId]
+                 , _currentWorkspaceTag :: WorkspaceId
                  } deriving (Typeable,Read,Show)
 
 $(makeLenses ''WorkspaceSet)
@@ -27,18 +31,21 @@ $(makeLenses ''WorkspaceSet)
 
 data WorkspaceState = 
     WorkspaceState { _currentWorkspaceSet :: WorkspaceSet
-                   , _workspaceSetsUp :: [WorkspaceSet] 
+                   , _workspaceSetsUp :: [WorkspaceSet]
                    , _workspaceSetsDown :: [WorkspaceSet]
-                   , _origInput :: [(WorkspaceSetId,[WorkspaceId])]
+                   , _initialised :: Bool
                    } deriving (Typeable,Read,Show)
 
 $(makeLenses ''WorkspaceState)
+
+
+
 --Discriminator
 discrim = "-|-"
 
 instance  ExtensionClass WorkspaceState where
-    initialValue = WorkspaceState { _currentWorkspaceSet = WorkspaceSet "default" [], _workspaceSetsUp = mempty, _workspaceSetsDown = mempty , _origInput = mempty}
---    extensionType = PersistentExtension 
+    initialValue = WorkspaceState (WorkspaceSet "default" [] mempty) mempty  mempty False
+    extensionType = PersistentExtension 
 
 runOnWorkspace :: WorkspaceSetId -> X () -> X()
 runOnWorkspace wsSet act = do
@@ -46,27 +53,35 @@ runOnWorkspace wsSet act = do
     when (_workspaceSetName currentWorkspaceSet == wsSet) act
 
 newWorkspaceState :: [WorkspaceId] -> [WorkspaceSet] -> WorkspaceState
-newWorkspaceState orig wsSets =WorkspaceState ( WorkspaceSet "default" orig) mempty wsSets mempty
-getWorkspaces :: WorkspaceState -> [WorkspaceSet]
-getWorkspaces = liftA3 (\x y z -> z:(x<>y)) _workspaceSetsUp _workspaceSetsDown _currentWorkspaceSet
+newWorkspaceState orig wsSets =WorkspaceState (createWorkspaceSet "default" orig ) mempty wsSets False
 
 
+getWorkspaceSets :: WorkspaceState -> [WorkspaceSet]
+getWorkspaceSets = (<>) <$> view workspaceSetsUp <*> view workspaceSetsDown
 
+getWorkspacesWithCurrent :: WorkspaceState -> [WorkspaceSet]
+getWorkspacesWithCurrent = (<>) 
+    <$> (reverse . view workspaceSetsUp) 
+    <*> ((:) <$> view currentWorkspaceSet <*> view workspaceSetsDown)
+
+createWorkspaceSet :: WorkspaceSetId -> [WorkspaceId] -> WorkspaceSet 
+createWorkspaceSet wsId (x:xs) = WorkspaceSet wsId (x:xs) x
 
 workspaceSetHook :: [(WorkspaceSetId,[WorkspaceId])] -> ManageHook
 workspaceSetHook wssets = do
     l <- liftX $ asks (layoutHook . config)
-    orig' <- liftX $ XS.gets _origInput
-    if orig' /= wssets 
+    initialised' <- liftX $ XS.gets _initialised
+    if not initialised'
     then do
-            let wssets' = map (uncurry WorkspaceSet) wssets
+            let wssets' = map (uncurry createWorkspaceSet) wssets
             ws <- liftX $ asks (workspaces . config)
             liftX $ XS.put (newWorkspaceState ws wssets')
-            liftX $ XS.modify (set origInput wssets)
+            liftX $ XS.modify (set initialised True)
             workspaceSetHook wssets
        else do
-        modifiedTags <- liftX $ XS.gets (concatMap modifyTags  . getWorkspaces)
-        
+        modifiedTags <- liftX $ XS.gets (concatMap modifyTags  . getWorkspaceSets)
+        tag' <- liftX $ gets (W.currentTag . windowset) 
+        liftX $ XS.modify (set (currentWorkspaceSet . currentWorkspaceTag) .  flip cleanWS tag' . modifyTags <$> view currentWorkspaceSet  <*> id)
         pure (Endo $ f modifiedTags l)
    where 
     f modifiedTags layout winset = 
@@ -84,58 +99,105 @@ fixTag wsSet
 modifyTags :: WorkspaceSet -> [WorkspaceId]
 modifyTags = liftA2 (map . fixTag ) (view workspaceSetName) (view workspaceNames) 
 
-nextWorkspaceSet :: WorkspaceState -> WorkspaceState
-nextWorkspaceSet ws
-    | views workspaceSetsDown null ws = ws
-    | otherwise = 
-        let (newWorkspaceSet:workspaceSetsDown') = _workspaceSetsDown ws
-            oldWorkspaceSet = _currentWorkspaceSet ws
-        in over workspaceSetsUp (oldWorkspaceSet:)  . (workspaceSetsDown .~ workspaceSetsDown') . (currentWorkspaceSet .~ newWorkspaceSet) $ ws
 
-previousWorkspaceSet :: WorkspaceState -> WorkspaceState
-previousWorkspaceSet ws
-    | views workspaceSetsUp null ws = ws
-    | otherwise = 
-        let (newWorkspaceSet:workspaceSetsUp') = _workspaceSetsUp ws
-            oldWorkspaceSet = _currentWorkspaceSet ws
-        in over workspaceSetsDown (oldWorkspaceSet:)  . (workspaceSetsUp .~ workspaceSetsUp') . (currentWorkspaceSet .~ newWorkspaceSet) $ ws
+
+
+switchToWsSet :: WorkspaceSetId -> X ()
+switchToWsSet wsSetId = do
+    runQuery (workspaceSetHook mempty) 0
+    workspaceSets <- XS.gets getWorkspacesWithCurrent
+    case break ((==wsSetId) . view workspaceSetName) workspaceSets of
+        (xs,ws:ss) -> do 
+            XS.modify (set currentWorkspaceSet ws)
+            io $ appendFile "/home/auscyber/invalidws.log" ("invalid WS" <> wsSetId <> "\n")
+            windows $ W.greedyView (fixTag (_workspaceSetName ws) (_currentWorkspaceTag ws))
+            XS.modify (set workspaceSetsDown ss)
+            XS.modify (set workspaceSetsUp (reverse xs))
+            join (asks (logHook . config))
+        _ ->  io $ appendFile "/home/auscyber/.debug-log" "failed" 
+  where 
+    f :: (ScreenId,Core.WindowSpace) -> W.Screen WorkspaceId (Layout Window) Window ScreenId sd  -> (W.Screen WorkspaceId (Layout Window) Window ScreenId sd,Maybe Core.WindowSpace)
+    f 
+      (scrnId,workspace') 
+      scrn@(W.Screen workspace'' scrnId' _)
+        | scrnId == scrnId' = (scrn { W.workspace = workspace'},Just workspace'')
+        | otherwise = (scrn,Nothing)
+
+
 
 filterOutInvalidWSet :: PP -> X PP
 filterOutInvalidWSet pp = do
     invalid <- ignoreWsSet
     right <- XS.gets (modifyTags . _currentWorkspaceSet)
+    name <- XS.gets (view (currentWorkspaceSet . workspaceSetName))
     pure $ 
-        pp { ppSort = fmap (. {-over (traverse . SL.tagLens) (cleanWS at)  . -}  f invalid) (ppSort pp)
+        pp { ppSort = fmap (. {-over (traverse . SL.tagLens) (cleanWS right)  .-}   f invalid) (ppSort pp)
            , ppCurrent = ppSection ppCurrent right
            , ppVisible = ppSection ppVisible right
            , ppHidden = ppSection ppHidden right
            , ppHiddenNoWindows = ppSection ppHiddenNoWindows  right
+           , ppOrder = \(x:xs) -> if name == "default" then x:xs else x:name:xs
            }
   where 
     f invalid = filter (not . (`elem` invalid) . W.tag)
     ppSection f at =  f pp . cleanWS at 
 
-createWsKeybind :: (KeyMask,KeySym) -> [(WorkspaceSetId ,X ())] -> ((KeyMask,KeySym),X ())
+createWsKeybind :: Eq a => a -> [(WorkspaceSetId ,X ())] -> (a,X ())
 createWsKeybind key binds = (key,f)
   where 
     cleanWS = nubBy (\x y -> fst x == fst y) binds
     f = do
         origWS <- asks (workspaces . config)
-        XS.gets (view (currentWorkspaceSet . workspaceSetName)) >>= \ws -> fromMaybe (return ()) (snd <$> find ((ws ==) . fst) cleanWS)
+        XS.gets (view (currentWorkspaceSet . workspaceSetName)) >>= \ws -> maybe (return ()) snd (find ((ws ==) . fst) cleanWS)
 
-
-
+cleanWS' :: X ([WindowSpace]  -> [WindowSpace])
+cleanWS' = do
+    invalid <- ignoreWsSet
+    right <- XS.gets (modifyTags . _currentWorkspaceSet)
+    pure $ over (traverse . SL.tagLens) (cleanWS  right)
+    where f invalid = filter (not . (`elem` invalid) . W.tag)
 
 changeWorkspaces :: WorkspaceSetId -> [WorkspaceId] -> (WorkspaceSetId,[((KeyMask,KeySym ),X ())])
 changeWorkspaces wsSet ws = (wsSet,[((m .|. mod4Mask, k), windows $ f i)
         | (i, k) <- zip (map (fixTag wsSet ) ws) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]])
 
+createDefaultWorkspaceKeybinds :: XConfig l -> [(WorkspaceSetId,[WorkspaceId])] -> [((KeyMask,KeySym),X ())]
+createDefaultWorkspaceKeybinds xconf = createKeybinds' . map (uncurry changeWorkspaces) . (("default",workspaces xconf):)
 
+createKeybinds' :: Eq a => [(WorkspaceSetId,[(a,X ())])] -> [(a,X ())]
+createKeybinds' keys = map f keySets
+    where keySets = nub $ concatMap (map fst . snd) keys
+          f key = createWsKeybind key $ [(wsId, action) | (wsId,actions) <- keys,(key',action) <- actions,key' == key] 
+
+nextWSSet :: Bool  -- ^ Cycle workspacsets
+             -> X ()
+nextWSSet cycle = do
+    a <- XS.gets ( view workspaceSetsDown)
+    case a of
+        [] -> when cycle $ do
+           a <- XS.gets (reverse . view workspaceSetsUp) 
+           case a of
+                (x:xs) -> switchToWsSet (_workspaceSetName x)
+                _ -> pure ()
+        (x:_) -> switchToWsSet (_workspaceSetName x)
+
+prevWSSet :: Bool
+             -> X ()
+prevWSSet cycle = do
+    a <- XS.gets (  view workspaceSetsUp)
+    case a of
+        [] -> when cycle $ do
+           a <- XS.gets (reverse . view workspaceSetsDown) 
+           case a of
+                (x:xs) -> switchToWsSet (_workspaceSetName x)
+                _ -> pure ()
+        (x:_) -> switchToWsSet (_workspaceSetName x)
+   
 cleanWS :: [WorkspaceId] -> WorkspaceId -> WorkspaceId 
 cleanWS at wsId =
     if wsId `elem` at then
-        fromMaybe wsId (checkFunc wsId [])
+        fromMaybe (head at) (checkFunc wsId [])
     else wsId
   where 
     checkFunc :: String -> String -> Maybe String
@@ -145,18 +207,8 @@ cleanWS at wsId =
     checkFunc [] _ = Nothing
 
 ignoreWsSet :: X [WorkspaceId]
-ignoreWsSet = do
-    a <- XS.gets allTags
-    debug (concat a)
-    pure a
+ignoreWsSet = XS.gets allTags
 
 allTags :: WorkspaceState -> [WorkspaceId]
 allTags = concatMap modifyTags . liftA2 (<>) (view workspaceSetsUp) (view workspaceSetsDown)
-
-
-workspaceSetKeys :: WorkspaceSetId -> [(a,X ())] -> [(a, X ())]
-workspaceSetKeys = map  . second . runOnWorkspace
-
-debug :: MonadIO m => String -> m ()
-debug x = io $ appendFile "/home/auscyber/.debug-log" (x<>"\n")
 

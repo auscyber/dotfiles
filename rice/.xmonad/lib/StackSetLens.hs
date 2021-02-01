@@ -1,4 +1,4 @@
-module StackSetLens (currentLens,visibleLens,hiddenLens,floatingLens,tagLens,layoutLens,stackLens,focusLens,upLens,downLens) where
+module StackSetLens (currentLens,visibleLens,hiddenLens,floatingLens,tagLens,layoutLens,stackLens,focusLens,upLens,downLens,workspaceLens,screenLens,screenDetailLens) where
 
 import XMonad
 import qualified XMonad.StackSet as W
@@ -25,6 +25,16 @@ hiddenLens f s@W.StackSet{W.hidden = hidden'} = (\x -> s { W.hidden = x}) <$> f 
 floatingLens :: Lens' (W.StackSet i l a sid sd) (M.Map a W.RationalRect)
 floatingLens f s@W.StackSet{W.floating = floating'} = (\x -> s { W.floating = x}) <$> f floating'
 
+
+--Screen Lens
+workspaceLens :: Lens' (W.Screen i l a sid sd) (W.Workspace i l a)
+workspaceLens f s@W.Screen{W.workspace = workspace'} = (\x -> s { W.workspace = x}) <$> f workspace'
+
+screenLens :: Lens' (W.Screen i l a sid sd) sid
+screenLens f s@W.Screen{W.screen = screen'} = (\x -> s { W.screen = x}) <$> f screen'
+
+screenDetailLens :: Lens' (W.Screen i l a sid sd) sd
+screenDetailLens f s@W.Screen{W.screenDetail = screenDetail'} = (\x -> s { W.screenDetail = x}) <$> f screenDetail'
 
 -- Workspace lenses
 

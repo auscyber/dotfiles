@@ -44,11 +44,11 @@ import           ExtraState
 import           WorkspaceSet
 
 myStartupHook = do
-     io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
-     spawn "~/.config/polybar/launch.sh"
-     spawn "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
+    io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
+    spawn "~/.config/polybar/launch.sh"
+    spawn "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
 --     setDefaultCursor xC_left_ptr 
-     spawn "feh --bg-fill ~/background3.png"
+    spawn "feh --bg-fill ~/background3.png"
 
 dbusAction :: (Client -> IO ()) -> X ()
 dbusAction action =  XS.gets dbus_client >>= (id >=> io . action)
@@ -74,13 +74,8 @@ myWorkspaces = map show [1..9]
 
 removedKeys :: [String]
 removedKeys = ["M-p","M-S-p" , "M-S-e","M-S-o","M-b" ]
-createKeybinds :: [(WorkspaceSetId,[WorkspaceId])] -> [((KeyMask,KeySym),X ())]
-createKeybinds wsSets = map f keySets
-    where totalws = map (uncurry changeWorkspaces) (("default",workspaces myConfig): wsSets)
-          keySets = nub $ concatMap (map fst . snd) totalws
-          f key = createWsKeybind key $ [(wsId, action) | (wsId,actions) <- totalws,(key',action) <- actions,key' == key] 
 myConfig = 
-    flip additionalKeys (createKeybinds workspaceSets) $
+    flip additionalKeys (createDefaultWorkspaceKeybinds myConfig workspaceSets) $
     flip additionalKeysP myKeys $ 
     flip removeKeysP removedKeys $
     ewmhFullscreen $ def {
@@ -93,23 +88,25 @@ myConfig =
       , focusFollowsMouse = False
       , startupHook = myStartupHook
 --      , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
-      , logHook = myLogHook
+      , logHook = myLogHook >> (cleanWS' >>= ewmhDesktopsLogHookCustom )
       , manageHook = myManageHook 
       , layoutHook =  myLayout
-      , handleEventHook = serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  <> handleEventHook def 
+      , handleEventHook = ewmhDesktopsEventHook <> serverModeEventHookCmd' (liftM2 (<>) commandsX defaultCommands)  <> handleEventHook def 
       <> docksEventHook 
       }
+
+
 
 myLogHook :: X ()
 myLogHook = do
             wsNames <- XS.gets workspaceNames 
             let pp = polybarPP wsNames 
-            --dynamicLogIconsConvert (iconConfig pp)  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
-            filterOutInvalidWSet (polybarPP M.empty) >>= DynamicLog.dynamicLogString   >>= io . ppOutput pp
+            --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
+            filterOutInvalidWSet pp >>= dynamicLogIconsConvert . iconConfig >>= DynamicLog.dynamicLogString . namedScratchpadFilterOutWorkspacePP   >>= io . ppOutput pp
 
 workspaceSets :: [(WorkspaceSetId,[WorkspaceId])]
 workspaceSets = 
-    [ ("bob",["hi","no"] <> map show [1..5])
+    [ ("bob",map show [1..5])
     , ("jim",map show [1..4])
     ]
 
@@ -231,9 +228,9 @@ customKeys =
     -- Swap the focused and the master window
     -- Polybar toggle
     , ("M-b", spawn "polybar-msg cmd toggle" )
-    , ("M-r", promptSearch (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) hoogle  )
-    , ("M-m", XS.modify nextWorkspaceSet >> (join $ asks (logHook . config) ))
-    , ("M-n",XS.modify previousWorkspaceSet >> (join $ asks (logHook . config)))
+    , ("M-r", promptSearchBrowser (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) "chromium" hoogle  )
+    , ("M-m", nextWSSet True )
+    , ("M-n", prevWSSet True)
 
     ] ++
     -- Xmonad keys

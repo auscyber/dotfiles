@@ -34,7 +34,7 @@ rec {
   firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh emacs
   pcmanfm   fzf vimHugeX jdk jre vscode
   multimc razergenie  lutris skypeforlinux
-  osu-lazer gimp arandr ccls
+  osu-lazer gimp arandr ccls 
   jetbrains.idea-ultimate 
   xclip ripgrep discord
   cabal-install cargo 
@@ -43,7 +43,7 @@ rec {
   spotify libnotify
   opam clojure clojure-lsp
   starship 
-  ] ++ (with pkgs.haskellPackages; [Agda haskell-language-server]) 
+  ] ++ (with myHaskellPackages; [agda-stdlib Agda haskell-language-server]) 
     ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [dbus xmonad-contrib]))])
     ++ (with nodePackages; [typescript-language-server typescript purescript-language-server])
     ++ (with ocamlPackages; [dune ocaml opam]);

@@ -4,6 +4,7 @@ alias hm="home-manager"
 alias vim="nvim"
 alias e="vim"
 alias t="tmux"
+alias emacs="emacsclient -t"
 export EDITOR="vim"
 function ghc_env
     nix-shell -p "haskellPackages.ghcWithPackages (pkgs: with pkgs; [ $argv ])"
