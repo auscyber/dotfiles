@@ -184,6 +184,7 @@ scratchpadSet =
 
 getScratchPads :: NamedScratchPadSet -> NamedScratchpads 
 getScratchPads = map snd
+
 getScratchPadKeys :: NamedScratchPadSet -> [(String,X ())]
 getScratchPadKeys ns = map mapFunc ns
     where mapFunc (key,NS {name = name'}) = (key,namedScratchpadAction ns' name')
@@ -192,7 +193,7 @@ getScratchPadKeys ns = map mapFunc ns
 scratchpads = getScratchPads scratchpadSet
 scratchpadKeys = getScratchPadKeys scratchpadSet
 
-appKeys= [("M-S-r", spawn "rofi -show combi")
+appKeys = [("M-S-r", spawn "rofi -show combi")
         -- Start alacritty
         ,("M-S-t", spawn myTerm)
         -- Kill currently focused window
