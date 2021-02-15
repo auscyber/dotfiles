@@ -2,7 +2,7 @@ module StackSetLens (currentLens,visibleLens,hiddenLens,floatingLens,tagLens,lay
 
 import XMonad
 import qualified XMonad.StackSet as W
-import Control.Lens
+import Lens.Micro
 import qualified Data.Map as M
 
 

@@ -48,9 +48,9 @@ in
 
   # Configure keymap in X11
   # services.xserver.xkbOptions = "eurosign:e";
-
+  services.espanso.enable = true;
  fonts.fonts = with pkgs; [
-	(nerdfonts.override { fonts = ["Inconsolata" "Hasklig" "RobotoMono"]; } )
+	(nerdfonts.override { fonts = ["FiraCode" "Inconsolata" "Hasklig" "RobotoMono"]; } )
   ];
 
   # Enable CUPS to print documents.
@@ -65,7 +65,14 @@ in
     # Only the full build has Bluetooth support, so it must be selected here.
     package = pkgs.pulseaudioFull;
   };
-
+#  services.jack = {
+#	jackd.enable = true;
+#
+#	alsa.enable = false;
+#	loopback = {
+#		enable = true;
+#	};
+#  };
   hardware.bluetooth.enable = true;
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -74,14 +81,19 @@ in
   users.mutableUsers = true;
   users.users.auscyber = {
     isNormalUser = true;
-    extraGroups = ["audio" "libvirtd" "plugdev" "wheel" "video" ]; # Enable ‘sudo’ for the user.
-    shell = pkgs.fish;
+    extraGroups = ["jackaudio" "audio" "libvirtd" "plugdev" "wheel" "video" ]; # Enable ‘sudo’ for the user.
+    shell = pkgs.zsh;
   };
   programs.sway = {
     enable = true;
 
   };
-  programs.fish.enable = true;
+  security.sudo = {
+	enable = true;
+#	extraRules = {
+	  
+#	};
+  };
   programs.zsh.enable = true;
   hardware.opengl.enable = true;
   # List packages installed in system profile. To search, run:
@@ -90,7 +102,7 @@ in
      wget vim 
     chromium  python3  
     #Virtualisation
-    plasma5.breeze-grub
+    breeze-grub
     qemu OVMF virtmanager dconf
     
   ];
@@ -119,7 +131,7 @@ EndSection
    	greeter.enable = true;
     background = "/usr/share/pixmaps/background1.jpg";
    };
-#    desktopManager.plasma5.enable = true;
+    desktopManager.plasma5.enable = true;
 #   displayManager.startx.enable = true;
    displayManager.defaultSession = "none+xmonad";
 #   displayManager.autoLogin = {

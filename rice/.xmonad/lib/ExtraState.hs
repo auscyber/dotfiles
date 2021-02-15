@@ -5,7 +5,7 @@ import           XMonad
 import           DBus
 import           DBus.Client
 import           XMonad.Prompt
-import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.DynamicIcons
 data ExtraState = ExtraState { dbus_client :: X Client, workspaceNames :: M.Map String Icon} deriving Typeable 
 
 instance ExtensionClass ExtraState where

@@ -1,19 +1,16 @@
 conf@{ config, pkgs, system, lib, ... }: 
 
 
-let      pkgs = import <nixpkgs> {
-          config = config.nixpkgs.config; 
-          overlays = [   (import ./st.nix)  (import ./powercord.nix)  ];
-          packageOverrides = pkgs: {
-              openssl = pkgs.libressl; 
-          };
-
-          };
-    impConf = fil: import fil conf;
+let     impConf = fil: import fil conf;
          myHaskellPackages = import ./haskell.nix { inherit pkgs; };
 in   
 rec {
-   imports = [ ./alacritty.nix ./rofi.nix ./vim.nix ./emacs.nix ./picom.nix ];
+   imports = [./vim.nix ./alacritty.nix ./rofi.nix  ./emacs.nix ./picom.nix ];
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url = https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz;
+    }))
+  ];
   programs = {
     vim = {
     enable = true;
@@ -31,27 +28,30 @@ rec {
   home.packages = with pkgs; [
   #Development
 #  st
-  firefox tmux rust-analyzer     wineWowPackages.stable carnix  gitAndTools.gh emacs
-  pcmanfm   fzf vimHugeX jdk jre vscode
-  multimc razergenie  lutris skypeforlinux
-  osu-lazer gimp arandr ccls 
-  jetbrains.idea-ultimate 
+  ((pkgs.gradleGen.override {
+    java = jdk8;
+  }).gradle_latest)
+  firefox tmux rust-analyzer     wineWowPackages.stable   emacs kotlin
+  pcmanfm fzf vscode openjdk8 xorg.xmodmap
+  multimc skypeforlinux
+  arandr ccls libreoffice
+  jetbrains.idea-ultimate  libnotify
   xclip ripgrep discord
-  cabal-install cargo 
-  polybarFull  git nodejs  playerctl htop   
-  fish feh maim 
-  spotify libnotify
-  opam clojure clojure-lsp
-  starship 
-  ] ++ (with myHaskellPackages; [agda-stdlib Agda haskell-language-server]) 
-    ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [dbus xmonad-contrib]))])
-    ++ (with nodePackages; [typescript-language-server typescript purescript-language-server])
-    ++ (with ocamlPackages; [dune ocaml opam]);
+  polybarFull  nodejs git playerctl htop eclipses.eclipse-java
+  fish feh maim teams
+  spotify lua
+  unzip
+  starship ardour slack
+  luaPackages.lua-lsp 
+  ] ++ (with myHaskellPackages; [stylish-haskell agda-stdlib Agda haskell-language-server])
+    ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [discord-haskell microlens-th microlens dbus xmonad-contrib cabal-install]))])
+    ++ (with nodePackages; [yarn typescript-language-server typescript purescript-language-server p3x-onenote])
+    ++ (with ocamlPackages; [utop dune ocaml opam merlin]);
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "auscyber";
   home.homeDirectory ="/home/auscyber";
-  home.sessionVariables.EDITOR = "vim";
+  home.sessionVariables.EDITOR = "nvim";
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards

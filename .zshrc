@@ -1,16 +1,16 @@
-
 # }}} End configuration added by Zim install
 autoload -U compinit promptinit
 compinit
 #promptinit; #prompt gentoo
 export _JAVA_AWT_WM_NONREPARENTING=1
-
+ZSH_CUSTOM=$HOME/.zsh-plugins
 source ~/antigen.zsh
 antigen use oh-my-zsh
 #antigen bundle git@github.com:spwhitt/nix-zsh-completions.git
 antigen bundle zsh-users/zsh-completions
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle chisui/zsh-nix-shell
 antigen apply
 
 export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin
@@ -41,5 +41,6 @@ alias windows="sudo grub-reboot 2 --boot-directory=/efi && sudo reboot"
 alias emacs="emacsclient -t "
 eval "$(starship init zsh)"
 export EDITOR=vim
-export VISUAL=gvim
 export BROWSER=chromium
+# opam configuration
+test -r /home/auscyber/.opam/opam-init/init.zsh && . /home/auscyber/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true

@@ -11,7 +11,7 @@ in
       owner = "zenixls2";
       repo = "alacritty";
       rev = "ligature";
-      sha256 = "WUdbpp8Wjl/Li5ovWIdhHQnrrxJjSf/DOGXQFlYMEzA=";
+      sha256 = "2Th2aojTN36MgYSFXiACcBkTpTou/X1Ub5JR2sgZa34=";
     };
     installPhase =
       ''
@@ -38,7 +38,7 @@ in
       '';
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       inherit src;
-      outputHash = "uiefL+3qk6RQo+4I4onhD4zXuVXZypTpv+ULfUF4luE=";
+      outputHash = "XMvLUAL25X1CL70EL0ziyhsK9fz6N1XGQ5aLyAeEWkk=";
     }); 
     
     }));
@@ -47,7 +47,7 @@ in
 	x = 10;
 	y = 10;
       };
-      background_opacity = 0.9;
+#      background_opacity = 0.9;
       colors = {
   # Default colors
   primary = {

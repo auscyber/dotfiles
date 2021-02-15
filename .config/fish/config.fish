@@ -1,5 +1,7 @@
+export _JAVA_AWT_WM_NONREPARENTING=1
 set fish_greeting
 starship init fish | source
+# export PATH=~/.cargo/bin:$PATH
 alias hm="home-manager"
 alias vim="nvim"
 alias e="vim"

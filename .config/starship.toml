@@ -1,6 +1,6 @@
 
 format = """
-$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$character
+$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$character
 """
 
 [custom.shell]

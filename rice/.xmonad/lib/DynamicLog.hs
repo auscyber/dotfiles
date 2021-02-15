@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, PatternGuards #-}
+{-# LANGUAGE TupleSections,FlexibleContexts, PatternGuards #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -21,7 +21,7 @@
 module DynamicLog (
     DynamicLog.dynamicLogString,
     polyBarAction,xmonadPolybarAction,
-
+    workspaceFilter
     -- $todo
   ) where
 
@@ -32,7 +32,7 @@ import Control.Applicative (liftA2)
 import Control.Monad (msum)
 import Data.Char ( isSpace, ord )
 import Data.List (intercalate, stripPrefix, isPrefixOf, sortBy)
-import Data.Maybe ( isJust, catMaybes, mapMaybe, fromMaybe )
+import Data.Maybe ( isJust, catMaybes, mapMaybe, maybeToList, fromMaybe )
 import Data.Ord ( comparing )
 import qualified Data.Map as M
 import qualified XMonad.StackSet as S
@@ -48,7 +48,7 @@ import qualified XMonad.Util.ExtensibleState as XS
 import XMonad.Layout.LayoutModifier
 import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.ManageDocks
-
+import XMonad.Hooks.DynamicIcons
 polyBarAction :: Int -> String -> String-> String
 polyBarAction button command
     | button > 8 || button <1 = id
@@ -98,5 +98,33 @@ dynamicLogString pp = do
                         , ppTitle  pp $ ppTitleSanitize pp wt
                         ]
                         ++ catMaybes extras
+baseIconSet :: String -> Icon
+baseIconSet x =
+    Icon { iconCurrent = x
+         , iconVisible = x
+         , iconHidden = x
+         , iconHiddenNoWindows = x
+         }
+
+workspaceFilter :: IconConfig -> X ([WindowSpace] -> [WindowSpace])
+workspaceFilter iconConfig = do
+    ws <- gets (S.workspaces . windowset)
+    icons <- M.fromList . (maybeToList =<<) <$> mapM (getIcons (iconConfigIcons iconConfig)) ws
+    pure $ map (\x -> x { S.tag =  workspace x icons})
+  where
+    workspace x icons 
+        | isJust $ S.stack x =  case iconLookup (S.tag x) icons of
+            [] -> S.tag x
+            x -> concatIcons iconHidden x
+        | otherwise = S.tag x
+    iconLookup x icons = M.findWithDefault [baseIconSet x] x icons
+    concatIcons f y
+        | length y > 1 = iconConfigStack iconConfig $ map f y
+        | otherwise = concatMap f y
+
+getIcons :: IconSet -> WindowSpace -> X (Maybe (WorkspaceId, [Icon]))
+getIcons is w = do
+    validIcons <- sequence $ foldMap (runQuery is) . S.integrate <$> S.stack w
+    pure $ (S.tag w,) <$> (validIcons >>= \x -> if null x then Nothing else Just x)
 
 
