@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 #     ___              ______      __             
 #    /   | __  _______/ ____/_  __/ /_  ___  _____
 #   / /| |/ / / / ___/ /   / / / / __ \/ _ \/ ___/
@@ -37,8 +37,8 @@ if  ! grep -q 'NixOS' <<< "$dis"  ; then
 fi
 
 sync ~/.config/fish .config
-sync ~/.emacs.d . {elpa}
-sync ~/.xmonad rice  {.venv,*.o}
+sync ~/.emacs.d . "{elpa}"
+sync ~/.xmonad rice  "{.venv,*.o}"
 sync ~/st rice  .git
 sync ~/.config/starship.toml .config
 sync ~/.config/polybar .config 
