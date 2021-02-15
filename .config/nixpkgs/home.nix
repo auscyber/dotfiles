@@ -23,7 +23,10 @@ rec {
     command-not-found.enable = true;
     home-manager.enable = true;
   };
- 
+  services.dunst = {
+    enable = false;
+  };
+
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
   #Development
@@ -34,30 +37,21 @@ rec {
   firefox tmux rust-analyzer     wineWowPackages.stable   emacs kotlin
   pcmanfm fzf vscode openjdk8 xorg.xmodmap
   multimc skypeforlinux
-  arandr ccls libreoffice
+  arandr ccls libreoffice steam
   jetbrains.idea-ultimate  libnotify
   xclip ripgrep discord
   polybarFull  nodejs git playerctl htop eclipses.eclipse-java
   fish feh maim teams
   spotify lua
-  unzip
+  unzip scala
   starship ardour slack
   luaPackages.lua-lsp 
-  ] ++ (with myHaskellPackages; [stylish-haskell agda-stdlib Agda haskell-language-server])
-    ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [discord-haskell microlens-th microlens dbus xmonad-contrib cabal-install]))])
+  ] ++ (with myHaskellPackages; [stylish-haskell agda-stdlib Agda haskell-language-server taffybar])
+    ++ ([(myHaskellPackages.ghcWithPackages (pk: with pk; [discord-haskell microlens-th microlens taffybar dbus xmonad-contrib cabal-install]))])
     ++ (with nodePackages; [yarn typescript-language-server typescript purescript-language-server p3x-onenote])
     ++ (with ocamlPackages; [utop dune ocaml opam merlin]);
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
   home.username = "auscyber";
   home.homeDirectory ="/home/auscyber";
   home.sessionVariables.EDITOR = "nvim";
-  # This value determines the Home Manager release that your
-  # configuration is compatible with. This helps avoid breakage
-  # when a new Home Manager release introduces backwards
-  # incompatible changes.
-  # You can update Home Manager without changing this value. See
-  # the Home Manager release notes for a list of state version
-  # changes in each release.
   home.stateVersion = "21.03";
 }

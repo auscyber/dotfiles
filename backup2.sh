@@ -39,7 +39,7 @@ fi
 sync ~/.config/fish .config
 sync ~/.emacs.d . "elpa/*"
 sync ~/.xmonad rice  "{.venv,*.o}"
-sync ~/st rice  .git
+#sync ~/st rice  .git
 sync ~/.config/starship.toml .config
 sync ~/.config/polybar .config 
 sync ~/.config/rofi .config 

@@ -1,56 +1,60 @@
-{-# LANGUAGE OverloadedStrings, DeriveDataTypeable #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings  #-}
 module Config (myConfig,ExtraState) where
 
 import           Control.Monad
+import           DBus
+import           DBus.Client
 import           Data.Bifunctor
-import           Data.Functor
 import           Data.Function                       (on)
-import           Data.List                           (nub,nubBy,isSuffixOf, elemIndex )
+import           Data.Functor
+import           Data.List                           (elemIndex, isSuffixOf,
+                                                      nub, nubBy)
 import qualified Data.Map                            as M
+import           DynamicLog
+import           ExtraState
+import           Media
 import           Polybar
 import           System.Exit
+import           WorkspaceSet
+import           XMonad.Util.Hacks
 import           XMonad
-import           XMonad.Hooks.EwmhDesktops 
-import           XMonad.Hooks.ManageDocks 
+import           XMonad.Actions.Commands
+import           XMonad.Actions.CycleWS
+import           XMonad.Actions.Search
+import           XMonad.Actions.WorkspaceNames
+import           XMonad.Hooks.DynamicIcons
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
+import           XMonad.Hooks.ServerMode
 import qualified XMonad.Layout.Fullscreen            as F
 import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
-import           XMonad.Layout.NoBorders 
-import           XMonad.Layout.Tabbed 
-import qualified XMonad.StackSet                     as W
-import           XMonad.Util.SpawnOnce
-import           XMonad.Util.NamedWindows            (getName)
-import           XMonad.Actions.CycleWS
-import           XMonad.Util.Run
-import qualified XMonad.Util.ExtensibleState as XS
-import           XMonad.Util.NamedScratchpad
-import           DynamicLog
-import           XMonad.Hooks.DynamicLog
-import           XMonad.Prompt
-import           XMonad.Prompt.XMonad
-import           XMonad.Prompt.Shell
-import           XMonad.Hooks.ServerMode
+import           XMonad.Layout.NoBorders
 import           XMonad.Layout.Spacing
-import           XMonad.Util.EZConfig
-import           XMonad.Actions.Search
+import           XMonad.Layout.Tabbed
+import           XMonad.Prompt
+import           XMonad.Prompt.Shell
 import           XMonad.Prompt.Window
-import           XMonad.Actions.Commands
+import           XMonad.Prompt.XMonad
+import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor
-import           DBus
-import           DBus.Client
-import           Media
-import           ExtraState
-import           WorkspaceSet
-import           XMonad.Hooks.DynamicIcons
+import           XMonad.Util.EZConfig
+import qualified XMonad.Util.ExtensibleState         as XS
+import           XMonad.Util.NamedScratchpad
+import           XMonad.Util.NamedWindows            (getName)
+import           XMonad.Util.Run
+import           XMonad.Util.SpawnOnce
 myStartupHook = do
-    ewmhDesktopsStartup 
+    ewmhDesktopsStartup
 --    spawn "xmodmap ~/.vim-keyswitch"
     io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
     spawn "~/.config/polybar/launch.sh"
     spawn "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
---     setDefaultCursor xC_left_ptr 
+--     setDefaultCursor xC_left_ptr
     spawn "feh --bg-fill ~/ghost.png"
 
 dbusAction :: (Client -> IO ()) -> X ()
@@ -61,7 +65,7 @@ getWorkspaceText :: M.Map Int String -> String -> String
 getWorkspaceText xs n =
     case M.lookup (read n) xs of
         Just x -> x
-        _ -> n
+        _      -> n
 
 myWorkspaces = map show [1..9]
 
@@ -98,6 +102,7 @@ myEventHook = mconcat
     , serverModeEventHookCmd
     , handleEventHook def
     , docksEventHook
+    , windowedFullscreenFixEventHook
     ]
 
 
@@ -105,6 +110,8 @@ myEventHook = mconcat
 myLogHook :: X ()
 myLogHook =
      XS.gets (polybarPP  . workspaceNames)
+--    pure (polybarPP M.empty)
+--        >>= workspaceNamesPP
     --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
     {- filterOutInvalidWSet pp -}
         >>= \pp -> dynamicLogIconsConvert (iconConfig pp)
@@ -121,13 +128,13 @@ iconConfig :: PP -> IconConfig
 iconConfig pp = def { iconConfigPP = pp, iconConfigIcons = icons }
 
 icons :: IconSet
-icons = composeAll [
-     className =? "Discord" --> appIcon "\xfb6e"
+icons = composeAll 
+    [ className =? "Discord" --> appIcon "\xfb6e"
     , className =? "Chromium-browser" --> appIcon "\xf268"
     , className =? "Firefox" --> appIcon "\63288"
     , className =? "Spotify" <||>  className =? "spotify" --> appIcon "阮"
-    , className =? "jetbrains-idea" --> appIcon "\xe7b5" 
-    , className =? "Skype" --> appIcon "\61822" 
+    , className =? "jetbrains-idea" --> appIcon "\xe7b5"
+    , className =? "Skype" --> appIcon "\61822"
     , ("nvim" `isPrefixOf`) <$> title --> appIcon "\59333"]
 
 
@@ -188,6 +195,7 @@ scratchpadSet =
             [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating )
             , ("M-C-d", NS "discord" "Discord" (("discord" `isSuffixOf`) <$> className) defaultFloating )
             , ("M-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating )
+            , ("M-C-t", NS "teams" "teams" (className =? "Microsoft Teams - Preview") nonFloating )
             ]
 
 getScratchPads :: NamedScratchPadSet -> NamedScratchpads
@@ -241,6 +249,7 @@ customKeys =
     , ("M-n", prevWSSet True)
     , ("M-S-m" ,  moveToNextWsSet True)
     , ("M-S-n" , moveToPrevWsSet True)
+    , ("M-S-l" , renameWorkspace def)
     ]
 
 workspaceKeys =

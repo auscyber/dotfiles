@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, modulesPath, ... }:
 
 with lib;
 
@@ -92,7 +92,7 @@ in
 {
 
   ###### interface
-  disabledModules = [ <nixos/nixos/modules/system/boot/loader/grub/grub.nix> ];
+  disabledModules = [  <nixos/nixos/modules/system/boot/loader/grub/grub.nix> ];
   options = {
 
     boot.loader.grub = {

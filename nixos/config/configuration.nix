@@ -10,7 +10,9 @@ in
   imports =
     [ # Include the results of the hardware scan.
 ./grub.nix      ./hardware-configuration.nix    ./boot.nix ];
-  nix = { package = pkgs.nixFlakes;
+
+ nix = { 
+ package = pkgs.nixFlakes;
     extraOptions = ''
         experimental-features = nix-command flakes
       ''; };

@@ -21,7 +21,7 @@
    }));
    extraOptions = ''
 # Corners
-corner-radius = 10.0;
+corner-radius = 5.0;
 rounded-corners-exclude = [
     "class_g = 'Polybar'",
     "class_g = 'Minecraft* 1.16.4'",
