@@ -37,7 +37,7 @@ if  ! grep -q 'NixOS' <<< "$dis"  ; then
 fi
 
 sync ~/.config/fish .config
-sync ~/.emacs.d . "{elpa/*}"
+sync ~/.emacs.d . "elpa/*"
 sync ~/.xmonad rice  "{.venv,*.o}"
 sync ~/st rice  .git
 sync ~/.config/starship.toml .config
