@@ -10,7 +10,7 @@ DEST=~/dotfiles
 cd $DEST
 sync () {
     if [[ -n  $3 ]]; then
-        rsync -avhr "$1" "$DEST/$2"  --exclude $3 --delete
+        rsync -avhr "$1" "$DEST/$2"  --exclude "$3" --delete
     else
         rsync -avhr "$1" "$DEST/$2" --delete
     fi
@@ -37,7 +37,7 @@ if  ! grep -q 'NixOS' <<< "$dis"  ; then
 fi
 
 sync ~/.config/fish .config
-sync ~/.emacs.d .
+sync ~/.emacs.d . {.elpa}
 sync ~/.xmonad rice  {.venv,*.o}
 sync ~/st rice  .git
 sync ~/.config/starship.toml .config
