@@ -201,7 +201,7 @@ getScratchPadKeys ns = map mapFunc ns
 scratchpads = getScratchPads scratchpadSet
 scratchpadKeys = getScratchPadKeys scratchpadSet
 
-appKeys = [("M-S-r", spawn "rofi -show combi")
+appKeys= [("M-S-r", spawn "rofi -show combi")
         -- Start alacritty
         ,("M-S-t", spawn myTerm)
         --Take screenshot
