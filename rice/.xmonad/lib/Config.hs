@@ -17,7 +17,6 @@ import           Media
 import           Polybar
 import           System.Exit
 import           WorkspaceSet
-import           XMonad.Util.Hacks
 import           XMonad
 import           XMonad.Actions.Commands
 import           XMonad.Actions.CycleWS
@@ -29,6 +28,7 @@ import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Hooks.ServerMode
+import           XMonad.Hooks.WindowSwallowing
 import qualified XMonad.Layout.Fullscreen            as F
 import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
@@ -42,6 +42,7 @@ import           XMonad.Prompt.Window
 import           XMonad.Prompt.XMonad
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor
+import           XMonad.Util.Hacks
 import           XMonad.Util.EZConfig
 import qualified XMonad.Util.ExtensibleState         as XS
 import           XMonad.Util.NamedScratchpad
@@ -73,6 +74,7 @@ myWorkspaces = map show [1..9]
 removedKeys :: [String]
 removedKeys = ["M-p","M-S-p" , "M-S-e","M-S-o","M-b" ]
 myConfig =
+     flip additionalKeys xineramaKeys $ 
 --    flip additionalKeys (createDefaultWorkspaceKeybinds myConfig workspaceSets) $
     flip additionalKeysP myKeys $
     flip removeKeysP removedKeys $
@@ -103,6 +105,7 @@ myEventHook = mconcat
     , handleEventHook def
     , docksEventHook
     , windowedFullscreenFixEventHook
+    , swallowEventHook (className =? "Alacritty") (return True)
     ]
 
 
@@ -141,11 +144,11 @@ icons = composeAll
 
 -- Colors
 mainColor = "#FFEBEF"
-secondaryColor = "#FFD1DC"
+secondaryColor = "#8BB2C1"
 tertiaryColor  = "#A3FFE6"
 
 myTerm       = "alacritty"
-myBorderWidth  = 1
+myBorderWidth  = 2
 
 myTabConfig = def { inactiveBorderColor = "#FF0000"
                   , activeTextColor = "#00FF00"}
@@ -184,6 +187,8 @@ myManageHook = composeAll
     , ("Minecraft" `isPrefixOf`) <$> className  --> doFullFloat
     , namedScratchpadManageHook scratchpads
     , manageDocks
+    , className =? "ableton live 10 lite.exe" --> doFloat
+--    , className =? "Xmessage" --> doFloat
 --    , workspaceSetHook workspaceSets
     ]
 
@@ -226,7 +231,8 @@ myKeys =  concat
             , multiScreenKeys
             , appKeys
             , customKeys
-            , workspaceKeys
+--            , xineramaKeys
+--            , workspaceKeys
             ]
 
 multiScreenKeys = [("M"++m++key, screenWorkspace sc >>= flip whenJust (windows . f))
@@ -249,11 +255,16 @@ customKeys =
     , ("M-n", prevWSSet True)
     , ("M-S-m" ,  moveToNextWsSet True)
     , ("M-S-n" , moveToPrevWsSet True)
-    , ("M-S-l" , renameWorkspace def)
+--    , ("M1-<Tab>", nextWS )
+--    , ("M1-S-<Tab>", prevWS)
     ]
+
+xineramaKeys = [((m .|. mod4Mask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip [xK_e, xK_w] [0..]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+
 
 workspaceKeys =
     [ ("M-l",nextWS)
     , ("M-h",prevWS)
     ]
-

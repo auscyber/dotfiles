@@ -35,14 +35,14 @@ rec {
     java = jdk8;
   }).gradle_latest)
   firefox tmux rust-analyzer     wineWowPackages.stable   emacs kotlin
-  pcmanfm fzf vscode openjdk8 xorg.xmodmap
+  pcmanfm fzf vscode openjdk8 xorg.xmodmap xorg.xmessage
   multimc skypeforlinux
   arandr ccls libreoffice steam
-  jetbrains.idea-ultimate  libnotify
+  jetbrains.idea-ultimate  libnotify stack
   xclip ripgrep discord
   polybarFull  nodejs git playerctl htop eclipses.eclipse-java
   fish feh maim teams
-  spotify lua
+  lua  (spotify.overrideAttrs (attrs : { nativeInputs = [ gnutls];} ))
   unzip scala
   starship ardour slack
   luaPackages.lua-lsp 

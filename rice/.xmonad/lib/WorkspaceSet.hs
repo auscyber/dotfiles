@@ -13,27 +13,80 @@
 -----------------------------------------------------------------------------
 
 module WorkspaceSet (
-        cleanWS',createDefaultWorkspaceKeybinds,
+        -- * Usage
+        -- $usage
+
+        -- * Output
+        workspaceSetHook, cleanWS', filterOutInvalidWSet,
+
+        -- * Keybinds
+        createDefaultWorkspaceKeybinds,
         createKeybinds',
-        switchToWsSet,createWsKeybind,fixTag,changeWorkspaces,filterOutInvalidWSet,moveToWsSet,moveToNextWsSet,moveToPrevWsSet,nextWSSet, prevWSSet, WorkspaceSetId,workspaceSetHook) where
-import System.IO
+        createWsKeybind,
+        changeWorkspaces,
+        runOnWorkspace,
+
+        -- * Navigation
+        switchToWsSet, moveToWsSet,moveToNextWsSet,moveToPrevWsSet,nextWSSet, prevWSSet,
+
+        -- * State Manipulation
+        fixTag, workspaceState,
+        WorkspaceState(..),WorkspaceSet(..),
+        WorkspaceSetId,
+        ) where
 import           XMonad
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.StackSet as W
-import XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.DynamicLog (PP(..))
 import           Lens.Micro
 import           Lens.Micro.Extras
 import           Lens.Micro.TH
 import           Data.List (nub,nubBy,find)
-import           Data.Bifunctor
+import           Data.Bifunctor (first)
 import           Data.Maybe (fromMaybe)
-import           Control.Monad
-import Control.Applicative
-import           Data.Monoid
+import           Control.Monad (when,join)
+import           Control.Applicative (liftA2)
+import           Data.Monoid (Endo(..))
 import qualified XMonad.Core as Core
 
-type WorkspaceSetId = String
+-- $usage
+-- Allows for multiple and dynamic sets of workspaces
+--
+-- NOTE: The default workspace is known internally as "default"
+--
+-- Depending on which 'WorkspaceSet', there can be dynamic keybinds
+-- For example,
+--
+-- > workspaceSets :: [(WorkspaceSetId,[WorkspaceId])]
+-- > workspaceSets =
+-- >    [ ("work",map show [1..5])
+-- >    , ("school",map show [1..4])
+-- >    ]
+--
+-- and then add the ManageHook
+--
+-- > manageHook = workspaceSetHook workspaceSets
+--
+-- To enable workspace navigation, workspace keybinds need to be dynamic
+--
+-- > main = xmonad $ def
+-- >    {
+-- >    } `additionalKeys` (createDefaultWorkspaceKeybinds myConfig workspaceSets)
+--
+-- Other keybinds can also be added
+--
+-- >  main = xmonad $ def
+-- >    {
+-- >    } `additionalKeysP` 
+-- >        (createKeybinds "M-S" 
+-- >            [ ("work", spawn "slack")
+-- >            , ("school", spawn "spotify")
+-- >            ])
+--
 
+-- | Type for 'WorkspaceSet' names
+type WorkspaceSetId = String
+-- | A set of workspaces
 data WorkspaceSet  =
     WorkspaceSet { _workspaceSetName :: WorkspaceSetId
                  , _workspaceNames :: [WorkspaceId]
@@ -42,7 +95,7 @@ data WorkspaceSet  =
 
 $(makeLenses ''WorkspaceSet)
 
-
+-- | Internal state for 'WorkspaceSet's
 data WorkspaceState =
     WorkspaceState { _currentWorkspaceSet :: WorkspaceSet
                    , _workspaceSetsUp :: [WorkspaceSet]
@@ -61,9 +114,11 @@ instance  ExtensionClass WorkspaceState where
     initialValue = WorkspaceState (WorkspaceSet "default" [] mempty) mempty  mempty False
     extensionType = PersistentExtension
 
-runOnWorkspace :: WorkspaceSetId -> X () -> X()
+
+--- | Only runs when the 'WorkspaceSet' is a specific 'WorkspaceSetId'
+runOnWorkspace :: WorkspaceSetId -> X () -> X ()
 runOnWorkspace wsSet act = do
-    currentWorkspaceSet <- XS.gets (view currentWorkspaceSet)
+    currentWorkspaceSet <- XS.gets (^. currentWorkspaceSet)
     when (_workspaceSetName currentWorkspaceSet == wsSet) act
 
 newWorkspaceState :: [WorkspaceId] -> [WorkspaceSet] -> WorkspaceState
@@ -71,7 +126,7 @@ newWorkspaceState orig wsSets =WorkspaceState (createWorkspaceSet "default" orig
 
 
 getWorkspaceSets :: WorkspaceState -> [WorkspaceSet]
-getWorkspaceSets = (<>) <$> view workspaceSetsUp <*> view workspaceSetsDown
+getWorkspaceSets = (<>) <$> (^. workspaceSetsUp) <*> (^. workspaceSetsDown)
 
 getWorkspacesWithCurrent :: WorkspaceState -> [WorkspaceSet]
 getWorkspacesWithCurrent = (<>)
@@ -81,21 +136,24 @@ getWorkspacesWithCurrent = (<>)
 createWorkspaceSet :: WorkspaceSetId -> [WorkspaceId] -> WorkspaceSet
 createWorkspaceSet wsId (x:xs) = WorkspaceSet wsId (x:xs) x
 
+
+-- | 'MangeHook' for showing and managing 'WorkspaceSet's
 workspaceSetHook :: [(WorkspaceSetId,[WorkspaceId])] -> ManageHook
-workspaceSetHook wssets = do
-    l <- liftX $ asks (layoutHook . config)
-    initialised' <- liftX $ XS.gets _initialised
+workspaceSetHook wssets = liftX $ do
+    l <-  asks (layoutHook . config)
+    initialised' <-  XS.gets _initialised
     if not initialised'
     then do
-            let wssets' = map (uncurry createWorkspaceSet) wssets
-            ws <- liftX $ asks (workspaces . config)
-            liftX $ XS.put (newWorkspaceState ws wssets')
-            liftX $ XS.modify (set initialised True)
-            modifiedTags <- liftX $ XS.gets (concatMap modifyTags  . getWorkspaceSets)
-            pure (Endo $ f modifiedTags l)
-       else do
-        tag' <- liftX $ gets (W.currentTag . windowset)
-        liftX $ XS.modify (set (currentWorkspaceSet . currentWorkspaceTag) .  flip cleanWS tag' . modifyTags <$> view currentWorkspaceSet  <*> id)
+        let wssets' = map (uncurry createWorkspaceSet) wssets
+        ws <-  asks (workspaces . config)
+        XS.put (newWorkspaceState ws wssets')
+        XS.modify (set initialised True)
+        modifiedTags <- XS.gets (concatMap modifyTags  . getWorkspaceSets)
+        pure (Endo $ f modifiedTags l)
+    else do
+        tag' <- gets (W.currentTag . windowset)
+        XS.modify (
+            set (currentWorkspaceSet . currentWorkspaceTag) .  flip cleanWS tag' . modifyTags <$> view currentWorkspaceSet  <*> id)
         mempty
    where
     f modifiedTags layout winset =
@@ -105,7 +163,10 @@ workspaceSetHook wssets = do
             foldr (\x acc -> if x`elem` tags then acc else over W.hiddenL (createWorkspace x:) acc)
                 winset modifiedTags
 
-fixTag :: WorkspaceSetId -> WorkspaceId -> WorkspaceId
+-- | Given a 'WorkspaceSetId' and a 'WorkspaceId' within that 'WorkspaceSet', show the true 'WorkspaceId'
+fixTag :: WorkspaceSetId  -- ^ 'WorkspaceSet' that it is part of
+       -> WorkspaceId  -- ^ 'WorkspaceId' to fix
+       -> WorkspaceId -- ^ Fixed 'WorkspaceId'
 fixTag wsSet
     | wsSet /= "default" = ((wsSet++discrim)++)
     | otherwise = id
@@ -113,9 +174,7 @@ fixTag wsSet
 modifyTags :: WorkspaceSet -> [WorkspaceId]
 modifyTags = liftA2 (map . fixTag ) (view workspaceSetName) (view workspaceNames)
 
-
-
-
+-- | Given a 'WorkspaceSet' , switch to it
 moveToWsSet :: WorkspaceSetId -> X ()
 moveToWsSet wsSetId = do
     workspaceSets <- XS.gets getWorkspacesWithCurrent
@@ -123,8 +182,9 @@ moveToWsSet wsSetId = do
         (_,ws:_) -> windows $ W.shift (fixTag (_workspaceSetName ws) (_currentWorkspaceTag ws))
         _ -> pure ()
 
-
-moveToNextWsSet :: Bool -> X ()
+-- | Switch to the next WorkspaceSet
+moveToNextWsSet :: Bool  -- ^ Enable cycling
+                -> X ()
 moveToNextWsSet cycle = do
     a <- XS.gets ( view workspaceSetsDown)
     case a of
@@ -135,8 +195,9 @@ moveToNextWsSet cycle = do
                 _ -> pure ()
         (x:_) -> moveToWsSet (_workspaceSetName x)
 
-moveToPrevWsSet :: Bool
-             -> X ()
+-- | Switch to previous WorkspaceSet
+moveToPrevWsSet :: Bool -- ^ Enable Cycling
+                -> X ()
 moveToPrevWsSet cycle = do
     a <- XS.gets (  view workspaceSetsUp)
     case a of
@@ -147,6 +208,9 @@ moveToPrevWsSet cycle = do
                 _ -> pure ()
         (x:_) -> moveToWsSet (_workspaceSetName x)
 
+-- | Change 'WorkspaceState' given a function
+workspaceState :: (WorkspaceState -> WorkspaceState) -> X ()
+workspaceState = XS.modify
 
 
 switchToWsSet :: WorkspaceSetId -> X ()
@@ -155,15 +219,15 @@ switchToWsSet wsSetId = do
     workspaceSets <- XS.gets getWorkspacesWithCurrent
     case break ((==wsSetId) . view workspaceSetName) workspaceSets of
         (xs,ws:ss) -> do
-            XS.modify (set currentWorkspaceSet ws)
+            workspaceState $ set currentWorkspaceSet ws
             windows $ W.greedyView (fixTag (_workspaceSetName ws) (_currentWorkspaceTag ws))
-            XS.modify (set workspaceSetsDown ss)
-            XS.modify (set workspaceSetsUp (reverse xs))
+            workspaceState $  set workspaceSetsDown ss
+            workspaceState $  set workspaceSetsUp (reverse xs)
             join (asks (logHook . config))
         _ ->  pure ()
 
 
-
+-- | Given a 'PP' , filter out not visible 'WorkspaceSet's
 filterOutInvalidWSet :: PP -> X PP
 filterOutInvalidWSet pp = do
     invalid <- ignoreWsSet
@@ -181,7 +245,11 @@ filterOutInvalidWSet pp = do
     f invalid = filter (not . (`elem` invalid) . W.tag)
     ppSection f at =  f pp . cleanWS at
 
-createWsKeybind :: Eq a => a -> [(WorkspaceSetId ,X ())] -> (a,X ())
+-- | Given a key and a series of actions for that key, create a keybind
+createWsKeybind :: Eq a
+                => a -- ^ The key to use (Can be ('KeyMask','KeySym') or a 'String) depending on what keys are in use
+                -> [(WorkspaceSetId, X ())] -- ^ The 'WorkspaceSetId' and accompanying X actions
+                -> (a,X ()) -- ^ The outputted Keybind
 createWsKeybind key binds = (key,f)
   where
     cleanWS = nubBy (\x y -> fst x == fst y) binds
@@ -203,9 +271,11 @@ changeWorkspaces wsSet ws = (wsSet,[((m .|. mod4Mask, k), windows $ f i)
         | (i, k) <- zip (map (fixTag wsSet ) ws) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]])
 
+-- | Create sensible defaults based on XMonad defaults.
 createDefaultWorkspaceKeybinds :: XConfig l -> [(WorkspaceSetId,[WorkspaceId])] -> [((KeyMask,KeySym),X ())]
 createDefaultWorkspaceKeybinds xconf = createKeybinds' . map (uncurry changeWorkspaces) . (("default",workspaces xconf):)
 
+-- | From a set of a 'WorkspaceSetId' and keybinds, reify them into a list of keybinds
 createKeybinds' :: Eq a => [(WorkspaceSetId,[(a,X ())])] -> [(a,X ())]
 createKeybinds' keys = map f keySets
     where keySets = nub $ concatMap (map fst . snd) keys
@@ -235,11 +305,11 @@ prevWSSet cycle = do
                 _ -> pure ()
         (x:_) -> switchToWsSet (_workspaceSetName x)
 
+-- | Filter out invalid 'WorkspaceSet'
 cleanWS :: [WorkspaceId] -> WorkspaceId -> WorkspaceId
-cleanWS at wsId =
-    if wsId `elem` at then
-        fromMaybe wsId (checkFunc wsId [])
-    else wsId
+cleanWS at wsId
+    | wsId `elem` at = fromMaybe wsId (checkFunc wsId [])
+    | otherwise  =   wsId
   where
     checkFunc :: String -> String -> Maybe String
     checkFunc (x:xs) acc
@@ -252,4 +322,3 @@ ignoreWsSet = XS.gets allTags
 
 allTags :: WorkspaceState -> [WorkspaceId]
 allTags = concatMap modifyTags . liftA2 (<>) (view workspaceSetsUp) (view workspaceSetsDown)
-

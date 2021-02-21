@@ -47,7 +47,7 @@ in
 	x = 10;
 	y = 10;
       };
-#      background_opacity = 0.9;
+      background_opacity = 0.9;
       colors = {
   # Default colors
   primary = {
