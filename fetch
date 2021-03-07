@@ -1,0 +1,101 @@
+#!/bin/sh
+
+fg_c() {
+    tput setaf $1
+}
+bg_c(){
+    tput setab $1
+}
+fg_t(){
+    echo -en "\x1b[38;2;$1;$2;$3""m"
+}
+bg_t(){
+    echo -en "\x1b[48;2;$1;$2;$3""m"
+}
+
+
+BOLD=$(tput bold)
+
+BLACK=239
+WHITE=15
+
+
+B_BG=$(bg_c $BLACK)
+B_FG=$(fg_c $BLACK)
+NORMAL=$(tput sgr0)
+W_BG=$(bg_c $WHITE)
+W_FG=$(fg_c $WHITE)
+
+
+os="$(. "/etc/os-release" && printf "%s\n" "$ID")"
+packages=$(pacman -Qq | wc -l)
+uptime="$(uptime -p | sed -e "s|up ||g" -e "s|,||g")"
+kernel="$(uname -r)"
+cpu="$(cat /proc/cpuinfo | grep "model name" | awk -F ":" '{ print $2}' | uniq)"
+
+memfree="$(cat /proc/meminfo | awk -F ":" '/MemFree/ {print $2}')"
+memtotal="$(cat /proc/meminfo | awk -F ":" '/MemTotal/ {print $2}')"
+category="$(fg_t 158 203 219 ;echo $BOLD)"
+eye_color="$(fg_c 236)"
+
+cat << EOF
+    
+      ${W_BG}     ${NORMAL}
+     ${W_BG}       ${NORMAL}
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL}  $os
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}cpu:${NORMAL} $cpu 
+    ${W_BG}${B_FG}         ${NORMAL}           
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}uptime:${NORMAL} $uptime 
+    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
+    ${W_BG}${B_FG} |       ${NORMAL}
+    ${W_BG}${B_FG}  ,  | , ${NORMAL}
+    ${W_BG}${B_FG} ,  ,    ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} |  |  | ${NORMAL}
+EOF
+
+
+
+
+
+
+
+#cat << EOF
+#    ${W_FG},;;;;,       
+#  /${W_BG}      ${NORMAL}\\
+# /${W_BG}        ${NORMAL}\\
+#;${W_BG} ${B_BG}  ${W_BG} ${B_BG}  ${W_BG}    ${NORMAL}$(fg_c $WHITE);${NORMAL}
+#|${W_BG}          ${NORMAL}|${NORMAL}
+#|${W_BG}${B_FG}  ,   ,   ${NORMAL}|
+#|${W_BG}${B_FG}          ${NORMAL}|
+#|${W_BG}${B_FG} ,    , , ${NORMAL}|
+#|${W_BG}${B_FG}          ${NORMAL}|
+#|${W_BG}${B_FG}   , ,  , ${NORMAL}|
+#|${W_BG}${B_FG}          ${NORMAL}|
+#|${W_BG}${B_FG}  ,     , ${NORMAL}|
+#|${W_BG}${B_FG} ,   ,    ${NORMAL}|
+#|${W_BG}${B_FG}          ${NORMAL}|
+#|${W_BG}${B_FG} |   |  | ${NORMAL}|
+#EOF
+
+
+#cat << EOF
+#   ,;;;;,
+#  /      \\
+# /        \\
+#;  ${B_FG}0   0   ${NORMAL};
+#|          |
+#|  ,   ,   |
+#|          |
+#| ,    , , |
+#|          |
+#|   , ,  , |
+#|          |
+#|  ,     , |
+#| ,   ,    |
+#|          |
+#| |   |  | |
+#EOF
+
