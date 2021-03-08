@@ -15,7 +15,7 @@ bg_t(){
 
 
 BOLD=$(tput bold)
-
+ITALIC=$(tput sitm)
 BLACK=239
 WHITE=15
 
@@ -37,24 +37,102 @@ memfree="$(cat /proc/meminfo | awk -F ":" '/MemFree/ {print $2}')"
 memtotal="$(cat /proc/meminfo | awk -F ":" '/MemTotal/ {print $2}')"
 category="$(fg_t 158 203 219 ;echo $BOLD)"
 eye_color="$(fg_c 236)"
+song=$(playerctl metadata --format "{{title}} - {{artist}}")
+wm=$DESKTOP_SESSION
+
+
+
+#cat << EOF
+#    
+#      ${W_BG}     ${NORMAL}            
+#     ${W_BG}       ${NORMAL}      
+#    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
+#    ${W_BG}${B_FG}         ${NORMAL}         
+#    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
+#    ${W_BG}${B_FG}         ${NORMAL}         ${category} :${NORMAL} $os
+#    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category} :${NORMAL}$cpu   
+#    ${W_BG}${B_FG}         ${NORMAL}         ${category} :${NORMAL} $packages (pacman)
+#    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category} :${NORMAL} $uptime 
+#    ${W_BG}${B_FG} |       ${NORMAL}         ${category}ﲶ :${NORMAL} $kernel 
+#    ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category} :${NORMAL} $song
+#    ${W_BG}${B_FG} ,  ,    ${NORMAL}
+#    ${W_BG}${B_FG}         ${NORMAL}
+#    ${W_BG}${B_FG} |  |  | ${NORMAL}
+#EOF
+
 
 cat << EOF
     
-      ${W_BG}     ${NORMAL}
-     ${W_BG}       ${NORMAL}
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}
+      ${W_FG}▄▄▄▄▄${NORMAL}            
+     ${W_BG}       ${NORMAL}      
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
     ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL}  $os
-    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}cpu:${NORMAL} $cpu 
-    ${W_BG}${B_FG}         ${NORMAL}           
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}uptime:${NORMAL} $uptime 
-    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
-    ${W_BG}${B_FG} |       ${NORMAL}
-    ${W_BG}${B_FG}  ,  | , ${NORMAL}
-    ${W_BG}${B_FG} ,  ,    ${NORMAL}
-    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL} $cpu   
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
+    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}uptime:${NORMAL} $uptime 
+    ${W_BG}${B_FG} |       ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
+    ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}wm:${NORMAL} $wm
+    ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}bar:${NORMAL} polybar
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}music:${NORMAL} $song
     ${W_BG}${B_FG} |  |  | ${NORMAL}
+    
 EOF
+
+#cat << EOF
+#    
+#      ${W_FG}▄▄▄▄▄${NORMAL}            
+#     ${W_BG}       ${NORMAL}      
+#    ${W_FG}▐${W_BG} ${eye_color} ${W_BG} ${eye_color} ${W_BG} ${NORMAL}${W_FG}▌${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
+#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         
+#    ${W_FG}▐${W_BG}${B_FG} ,  ,  ${NORMAL}${W_FG}▌${NORMAL}         
+#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         ${category}os:${NORMAL}  $os
+#    ${W_FG}▐${W_BG}${B_FG},   , ,${NORMAL}${W_FG}▌${NORMAL}         ${category}cpu:${NORMAL} $cpu   
+#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
+#    ${W_FG}▐${W_BG}${B_FG}  ,   ,${NORMAL}${W_FG}▌${NORMAL}         ${category}uptime:${NORMAL} $uptime 
+#    ${W_FG}▐${W_BG}${B_FG}|      ${NORMAL}${W_FG}▌${NORMAL}         ${category}kernel:${NORMAL} $kernel 
+#    ${W_FG}▐${W_BG}${B_FG} ,  | ,${NORMAL}${W_FG}▌${NORMAL}         ${category}wm:${NORMAL} $wm
+#    ${W_FG}▐${W_BG}${B_FG},  ,   ${NORMAL}${W_FG}▌${NORMAL}         ${category}music:${NORMAL} $song
+#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}
+#    ${W_FG}▐${W_BG}${B_FG}|  |  |${NORMAL}${W_FG}▌${NORMAL}
+#    
+#EOF
+
+
+
+
+#cat << EOF
+#
+#    ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
+#
+#                      ${W_BG}     ${NORMAL}            
+#                     ${W_BG}       ${NORMAL}      
+#                    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         
+#                    ${W_BG}${B_FG}         ${NORMAL}         
+#                    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
+#                    ${W_BG}${B_FG}         ${NORMAL}         
+#                    ${W_BG}${B_FG} ,   , , ${NORMAL}         
+#                    ${W_BG}${B_FG}         ${NORMAL}         
+#                    ${W_BG}${B_FG}   ,   , ${NORMAL}         
+#                    ${W_BG}${B_FG} |       ${NORMAL}         
+#                    ${W_BG}${B_FG}  ,  | , ${NORMAL}
+#                    ${W_BG}${B_FG} ,  ,    ${NORMAL}
+#                    ${W_BG}${B_FG}         ${NORMAL}
+#                    ${W_BG}${B_FG} |  |  | ${NORMAL}
+#       ${category}os${NORMAL}  
+#             $os
+#       ${category}cpu${NORMAL} 
+#            $cpu   
+#       ${category}packages${NORMAL} 
+#             $packages (pacman)
+#       ${category}uptime${NORMAL} 
+#             $uptime 
+#       ${category}kernel${NORMAL} 
+#             $kernel             
+#EOF
+
+
 
 
 
