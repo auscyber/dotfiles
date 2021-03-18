@@ -1,0 +1,13 @@
+name = "dotfiles"
+id = "17504290032302696503"
+systems = []
+
+[[links]]
+name = "get_aud"
+src = "get_audio.lua"
+destination = "get_aud"
+
+[[links]]
+name = "ghost.png"
+src = "/home/auscyber/ghost.png"
+destination = "ghost.png"
