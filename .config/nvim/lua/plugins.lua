@@ -27,6 +27,7 @@ return require('packer').startup(function()
     use {'akinsho/nvim-bufferline.lua', config = function()
 	    	require 'bufferline'.setup { options = {separator_style = {'',''}} }
 	end}
+--    use {'shougo/deoplete.nvim', post_ = function () vim.api.nvim_command [[let g:deoplete#enable_at_startup = 1]] end}
     use 'nathanaelkane/vim-indent-guides'
     use 'Yggdroot/indentLine'
     use 'jacoborus/tender.vim'
@@ -41,15 +42,15 @@ return require('packer').startup(function()
 	}
 
 -- Languages
+    use 'nvim-lua/completion-nvim'
 
     use 'ziglang/zig.vim'
-    use 'rafcamlet/coc-nvim-lua'
+--    use 'rafcamlet/coc-nvim-lua'
+--    use 'neoclide/coc.nvim'
     use (require 'nvim_lsp')
     use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'
     use 'derekelkins/agda-vim'
     use 'dag/vim-fish'
     use 'purescript-contrib/purescript-vim'
-    use 'neoclide/coc.nvim'
-
 end)

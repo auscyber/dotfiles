@@ -1,9 +1,12 @@
 M = {'neovim/nvim-lspconfig'}
 
-local function on_attach (client, bufnr)
+M.config = function ()
+    local nvim_lsp = require('lspconfig')
+    local comp = require 'completion'
+local on_attach = function (client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
+  comp.on_attach(client,bufnr)
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   -- Mappings.
@@ -20,10 +23,11 @@ local function on_attach (client, bufnr)
   buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   buf_set_keymap('n', '<leader>a', [[<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR> ]], opts)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+
 
   -- Set some keybinds conditional on server capabilities
   if client.resolved_capabilities.document_formatting then
@@ -48,12 +52,9 @@ local function on_attach (client, bufnr)
 end
 
 
-function M.config()
-    local nvim_lsp = require('lspconfig')
-
     -- Use a loop to conveniently both setup defined servers
     -- and map buffer local keybindings when the language server attaches
-    local servers = { "pyright","ocamlls","rust-analyzer", "tsserver", "hls", "zls"}
+    local servers = { "pyright","ocamlls","rust_analyzer", "tsserver", "hls", "zls"}
     for _, lsp in ipairs(servers) do
       nvim_lsp[lsp].setup { on_attach = on_attach }
     end
@@ -62,39 +63,39 @@ function M.config()
 	-- set the path to the sumneko installation; if you previously installed via the now deprecated :LspInstall, use
 	local sumneko_root_path = '$HOME/lua-language-server'
 	local sumneko_binary = sumneko_root_path.."/bin/"..system_name.."/lua-language-server"
-	nvim_lsp.sumneko_lua.setup {
-	  on_attach = on_attach,
-	  cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
-	  settings = {
-	    Lua = {
-	      runtime = {
-		-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-		version = 'LuaJIT',
-		-- Setup your lua path
-		path = vim.split(package.path, ';'),
-	      },
-	      diagnostics = {
-		-- Get the language server to recognize the `vim` global
-		globals = {'vim'},
-	      },
-	      workspace = {
-		-- Make the server aware of Neovim runtime files
-		library = {
-		  [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-		  [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-		},
-	      },
-	      -- Do not send telemetry data containing a randomized but unique identifier
-	      telemetry = {
-		enable = false,
-	      },
-	    },
-	  },
-	}
+--	nvim_lsp.sumneko_lua.setup {
+--	  on_attach = on_attach,
+--	  cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
+--	  settings = {
+--	    Lua = {
+--	      runtime = {
+--		-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+--		version = 'LuaJIT',
+--		-- Setup your lua path
+--		path = vim.split(package.path, ';'),
+--	      },
+--	      diagnostics = {
+--		-- Get the language server to recognize the `vim` global
+--		globals = {'vim'},
+--	      },
+--	      workspace = {
+--		-- Make the server aware of Neovim runtime files
+--		library = {
+--		  [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+--		  [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+--		},
+--	      },
+--	      -- Do not send telemetry data containing a randomized but unique identifier
+--	      telemetry = {
+--		enable = false,
+--	      },
+--	    },
+--	  },
+--	}
 vim.o.completeopt = "menuone,noinsert,noselect"
 
 vim.g.completion_enable_auto_popup = 1
 end
-M.ft = {"haskell","rust"}
+M.ft = {"haskell","rust", "lua", "python"}
 
 return M
