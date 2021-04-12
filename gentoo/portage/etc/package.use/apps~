@@ -1,0 +1,28 @@
+media-video/ffmpeg chromium x264
+media-gfx/blender cuda cycles openimageio opensubdiv tiff
+media-libs/opensubdiv cuda
+*/* PYTHON_TARGETS: python3_7
+games-util/steam-launcher abi_x86_32
+app-text/xmlto text
+www-client/w3m imlib
+app-editors/vim python
+app-editors/gvim python
+app-shells/zsh unicode pcre
+dev-lang/python sqlite
+net-wireless/wpa_supplicant qt5
+sys-boot/grub fonts mount themes truetype
+sys-firmware/intel-microcode initramfs
+www-client/chromium waapi widevine
+# required by app-editors/neovim-0.4.4::gentoo
+# # required by neovim (argument)
+dev-lua/lpeg luajit
+# # required by app-editors/neovim-0.4.4::gentoo
+# # required by neovim (argument)
+dev-lua/luv luajit
+# # required by app-editors/neovim-0.4.4::gentoo
+# # required by neovim (argument)
+dev-lua/mpack luajit
+#
+sys-devel/llvm abi_x86_32
+sys-libs/zlib static-libs
+www-client/firefox hwaccel debug system-av1

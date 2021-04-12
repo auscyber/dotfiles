@@ -71,11 +71,11 @@ if [ "$1" = "-s" ]; then
     cat << EOF
       ${W_FG}▄▄▄▄▄${NORMAL}            
      ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}$time ${NORMAL}
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL}  $os
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL} $cpu   
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)i'm a bad liar with a savior complex${NORMAL} 
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}$time ${NORMAL}
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}os:${NORMAL} $os
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}cpu:${NORMAL}$cpu
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
 EOF
     exit 0
 fi
@@ -88,14 +88,14 @@ cat << EOF
     ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
     ${W_BG}${B_FG}         ${NORMAL}         
     ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}date:${NORMAL} $date
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL}  $os
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL} $cpu   
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL} $os
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL}$cpu   
     ${W_BG}${B_FG}         ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
     ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
     ${W_BG}${B_FG} |       ${NORMAL}         ${category}uptime:${NORMAL} $uptime 
     ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
     ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}wm:${NORMAL} $wm
-    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}         ${category}music:${NORMAL} $song 
     ${W_BG}${B_FG} |  |  | ${NORMAL}
     
 EOF

@@ -3,13 +3,8 @@ id = "17504290032302696503"
 systems = []
 
 [[links]]
-name = "get_aud"
-src = "get_audio.lua"
-destination = "get_aud"
-
-[[links]]
 name = "ghost.png"
-src = "$HOME/ghost.png"
+src = "$HOME/backgrounds/ghost.png"
 destination = "ghost.png"
 
 [[links]]
@@ -41,3 +36,23 @@ destination = ".config/picom"
 name = ".config/starship.toml"
 src = "$HOME/.config/starship.toml"
 destination = ".config/starship.toml"
+
+[[links]]
+name = "xmonad/my-xmonad.cabal"
+src = "$HOME/.xmonad/my-xmonad.cabal"
+destination = "xmonad/my-xmonad.cabal"
+
+[[links]]
+name = "xmonad/stack.yaml"
+src = "$HOME/.xmonad/stack.yaml"
+destination = "xmonad/stack.yaml"
+
+[[links]]
+name = "xmonad/lib"
+src = "$HOME/.xmonad/lib"
+destination = "xmonad/lib"
+
+[[links]]
+name = "xmonad"
+src = "$HOME/.xmonad/xmonad.hs"
+destination = "xmonad"
