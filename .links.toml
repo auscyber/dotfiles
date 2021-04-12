@@ -71,3 +71,8 @@ destination = ".config/polybar/scripts"
 name = ".config/polybar/launch_laptop.sh"
 src = "$HOME/.config/polybar/launch.sh"
 destination = ["laptop", ".config/polybar/launch_laptop.sh"]
+
+[[links]]
+name = "xmonad/build"
+src = "/home/auscyber/.xmonad/build"
+destination = "xmonad/build"
