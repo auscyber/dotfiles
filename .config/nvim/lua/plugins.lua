@@ -18,21 +18,34 @@ return require('packer').startup(function()
     use 'hugolgst/vimsence'
     use 'jiangmiao/auto-pairs'
 
+
     -- Aesthetics
     use 'camspiers/animate.vim'
     use 'ntpeters/vim-better-whitespace'
     use 'kyazdani42/nvim-web-devicons'
     use 'ryanoasis/vim-devicons'
-    use 'akinsho/nvim-bufferline.lua'
+    use {'akinsho/nvim-bufferline.lua', config = function()
+	    	require 'bufferline'.setup { options = {separator_style = {'',''}} }
+	end}
     use 'nathanaelkane/vim-indent-guides'
     use 'Yggdroot/indentLine'
     use 'jacoborus/tender.vim'
     use  {'vim-airline/vim-airline',
         requires = {'vim-airline/vim-airline-themes','jacoborus/tender.vim'},
         config = function() vim.g.airline_theme = 'tender'end }
+    use 'christoomey/vim-tmux-navigator'
+    use {
+  	'nvim-telescope/telescope.nvim',
+  	    requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}},
+	    config = function () require'telescope'.setup{} end
+	}
 
+-- Languages
+
+    use 'ziglang/zig.vim'
     use 'rafcamlet/coc-nvim-lua'
---    use (require 'nvim_lsp')    -- Languages
+    use (require 'nvim_lsp')
+    use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'
     use 'derekelkins/agda-vim'
     use 'dag/vim-fish'

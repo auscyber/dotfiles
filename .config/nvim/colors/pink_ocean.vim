@@ -14,7 +14,7 @@ function! s:h(group, fg, bg, attr)
 endfun
 
 " let g:colors_name="auscyber_theme"
-" let colors_name="auscyber_theme"
+let g:colors_name="pink_ocean"
 
 let s:bg = "#1F1F1F"
 

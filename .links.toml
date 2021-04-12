@@ -1,6 +1,6 @@
 name = "dotfiles"
 id = "17504290032302696503"
-systems = []
+systems = ["desktop", "laptop"]
 
 [[links]]
 name = "ghost.png"
@@ -56,3 +56,23 @@ destination = "xmonad/lib"
 name = "xmonad"
 src = "$HOME/.xmonad/xmonad.hs"
 destination = "xmonad"
+
+[[links]]
+name = ".config/polybar/config.ini"
+src = "/home/auscyber/.config/polybar/config.ini"
+destination = ".config/polybar/config.ini"
+
+[[links]]
+name = ".config/polybar/launch_desktop.sh"
+src = "/home/auscyber/.config/polybar/launch.sh"
+destination = ".config/polybar/launch_desktop.sh"
+
+[[links]]
+name = ".config/polybar/launch_desktop.sh"
+src = "/home/auscyber/.config/polybar/launch.sh"
+destination = ["desktop", ".config/polybar/launch_desktop.sh"]
+
+[[links]]
+name = ".config/polybar/scripts"
+src = "/home/auscyber/.config/polybar/scripts"
+destination = ".config/polybar/scripts"
