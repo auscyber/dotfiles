@@ -18,11 +18,6 @@ src = "$HOME/.config/alacritty.yml"
 destination = ".config/alacritty.yml"
 
 [[links]]
-name = ".config/polybar"
-src = "$HOME/.config/polybar"
-destination = ".config/polybar"
-
-[[links]]
 name = ".config/rofi"
 src = "$HOME/.config/rofi"
 destination = ".config/rofi"
@@ -59,15 +54,20 @@ destination = "xmonad"
 
 [[links]]
 name = ".config/polybar/config.ini"
-src = "/home/auscyber/.config/polybar/config.ini"
+src = "$HOME/.config/polybar/config.ini"
 destination = ".config/polybar/config.ini"
 
 [[links]]
 name = ".config/polybar/launch_desktop.sh"
-src = "/home/auscyber/.config/polybar/launch.sh"
+src = "$HOME/.config/polybar/launch.sh"
 destination = ["desktop", ".config/polybar/launch_desktop.sh"]
 
 [[links]]
 name = ".config/polybar/scripts"
-src = "/home/auscyber/.config/polybar/scripts"
+src = "$HOME/.config/polybar/scripts"
 destination = ".config/polybar/scripts"
+
+[[links]]
+name = ".config/polybar/launch_laptop.sh"
+src = "$HOME/.config/polybar/launch.sh"
+destination = ["laptop", ".config/polybar/launch_laptop.sh"]
