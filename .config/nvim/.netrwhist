@@ -1,12 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =6
-let g:netrw_dirhist_6='/var/db/repos/gentoo/app-vim/airline'
-let g:netrw_dirhist_5='/etc/init.d'
-let g:netrw_dirhist_4='/home/auscyber/.xmonad/lib'
-let g:netrw_dirhist_3='/home/auscyber/hask'
-let g:netrw_dirhist_2='/var/db/repos/gentoo/app-vim/airline-themes'
-let g:netrw_dirhist_1='/var/db/repos/gentoo/app-vim'
-let g:netrw_dirhist_0='/var/db/repos/gentoo'
-let g:netrw_dirhist_9='/var/db/repos/gentoo/games-fps'
-let g:netrw_dirhist_8='/var/db/repos/gentoo'
-let g:netrw_dirhist_7='/home/will/vscode/usr/share'
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/home/auscyber/code/discord'
+let g:netrw_dirhist_2='/home/auscyber/code/ocaml/helloworld'
+let g:netrw_dirhist_1='/home/auscyber/.config'

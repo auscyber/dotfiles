@@ -9,5 +9,35 @@ destination = "get_aud"
 
 [[links]]
 name = "ghost.png"
-src = "/home/auscyber/ghost.png"
+src = "$HOME/ghost.png"
 destination = "ghost.png"
+
+[[links]]
+name = ".config/nvim"
+src = "$HOME/.config/nvim"
+destination = ".config/nvim"
+
+[[links]]
+name = ".config/alacritty.yml"
+src = "$HOME/.config/alacritty.yml"
+destination = ".config/alacritty.yml"
+
+[[links]]
+name = ".config/polybar"
+src = "$HOME/.config/polybar"
+destination = ".config/polybar"
+
+[[links]]
+name = ".config/rofi"
+src = "$HOME/.config/rofi"
+destination = ".config/rofi"
+
+[[links]]
+name = ".config/picom"
+src = "$HOME/.config/picom"
+destination = ".config/picom"
+
+[[links]]
+name = ".config/starship.toml"
+src = "$HOME/.config/starship.toml"
+destination = ".config/starship.toml"

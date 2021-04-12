@@ -1,1 +1,10 @@
-/nix/store/c9pmwbzzl0nxsjmz9yx2ww1dyvnnm744-home-manager-files/.config/rofi/config.rasi
+configuration {
+combi-modi: "window,run,drun,ssh";
+font: "Inconsolata 10";
+location: 0;
+modi: "combi";
+terminal: "alacritty";
+theme: "slate";
+xoffset: 0;
+yoffset: 0;
+}
