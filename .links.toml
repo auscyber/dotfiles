@@ -65,11 +65,6 @@ destination = ".config/polybar/config.ini"
 [[links]]
 name = ".config/polybar/launch_desktop.sh"
 src = "/home/auscyber/.config/polybar/launch.sh"
-destination = ".config/polybar/launch_desktop.sh"
-
-[[links]]
-name = ".config/polybar/launch_desktop.sh"
-src = "/home/auscyber/.config/polybar/launch.sh"
 destination = ["desktop", ".config/polybar/launch_desktop.sh"]
 
 [[links]]
