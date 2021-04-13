@@ -75,4 +75,7 @@ destination = ["laptop", ".config/polybar/launch_laptop.sh"]
 [[links]]
 name = "xmonad/build"
 src = "$HOME/.xmonad/build"
-destination = "xmonad/build"
+
+[links.destination]
+desktop = "xmonad/build"
+laptop = "xmonad/build_laptop"
