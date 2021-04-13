@@ -81,3 +81,8 @@ destination = "xmonad/build"
 name = "xmonad/screenshot-sec.sh"
 src = "/home/auscyber/.xmonad/screenshot-sec.sh"
 destination = "xmonad/screenshot-sec.sh"
+
+[[links]]
+name = ".config/fontconfig"
+src = "/home/auscyber/.config/fontconfig"
+destination = ".config/fontconfig"
