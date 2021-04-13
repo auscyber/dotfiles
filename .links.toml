@@ -70,19 +70,17 @@ destination = ".config/polybar/scripts"
 [[links]]
 name = ".config/polybar/launch_laptop.sh"
 src = "$HOME/.config/polybar/launch.sh"
-destination = ["laptop", ".config/polybar/launch_laptop.sh"]
 
 [links.destination]
 desktop = "xmonad/build"
 laptop = "xmonad/build_laptop"
-destination = "xmonad/build"
 
 [[links]]
 name = "xmonad/screenshot-sec.sh"
-src = "/home/auscyber/.xmonad/screenshot-sec.sh"
+src = "$HOME/.xmonad/screenshot-sec.sh"
 destination = "xmonad/screenshot-sec.sh"
 
 [[links]]
 name = ".config/fontconfig"
-src = "/home/auscyber/.config/fontconfig"
+src = "$HOME/.config/fontconfig"
 destination = ".config/fontconfig"
