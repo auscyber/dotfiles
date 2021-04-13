@@ -46,7 +46,7 @@ return require('packer').startup(function()
 
     use 'ziglang/zig.vim'
 --    use 'rafcamlet/coc-nvim-lua'
---    use 'neoclide/coc.nvim'
+    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end }
     use (require 'nvim_lsp')
     use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'

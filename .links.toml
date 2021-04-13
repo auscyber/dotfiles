@@ -76,3 +76,8 @@ destination = ["laptop", ".config/polybar/launch_laptop.sh"]
 name = "xmonad/build"
 src = "$HOME/.xmonad/build"
 destination = "xmonad/build"
+
+[[links]]
+name = "xmonad/screenshot-sec.sh"
+src = "/home/auscyber/.xmonad/screenshot-sec.sh"
+destination = "xmonad/screenshot-sec.sh"
