@@ -44,13 +44,14 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/auto-pairs"
   },
-  ["coc-nvim-lua"] = {
-    loaded = true,
-    path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/coc-nvim-lua"
-  },
   ["coc.nvim"] = {
+    config = { "\27LJ\1\2P\0\0\2\0\4\0\0064\0\0\0007\0\1\0007\0\2\0%\1\3\0>\0\2\1G\0\1\0  so ~/.config/nvim/coc.vim \17nvim_command\bapi\bvim\0" },
     loaded = true,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/coc.nvim"
+  },
+  ["completion-nvim"] = {
+    loaded = true,
+    path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/completion-nvim"
   },
   ["fzf.vim"] = {
     loaded = true,
@@ -74,7 +75,7 @@ _G.packer_plugins = {
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-bufferline.lua"
   },
   ["nvim-lspconfig"] = {
-    config = { "\27LJ\1\2˜\6\0\0\r\1-\0R4\0\0\0%\1\1\0>\0\2\0023\1\2\0004\2\3\0\16\3\1\0>\2\2\4T\5\6€6\a\6\0007\a\4\a3\b\5\0+\t\0\0:\t\6\b>\a\2\1A\5\3\3N\5ø%\2\a\0%\3\b\0\16\4\3\0%\5\t\0\16\6\2\0%\a\n\0$\4\a\0047\5\v\0007\5\4\0053\6\f\0+\a\0\0:\a\6\0063\a\r\0;\4\1\a\16\b\3\0%\t\14\0$\b\t\b;\b\3\a:\a\15\0063\a%\0003\b\22\0003\t\16\0004\n\17\0007\n\18\n4\v\19\0007\v\20\v%\f\21\0>\n\3\2:\n\20\t:\t\23\b3\t\25\0003\n\24\0:\n\26\t:\t\27\b3\t \0002\n\0\b4\v\17\0007\v\28\v7\v\29\v%\f\30\0>\v\2\2)\f\2\0009\f\v\n4\v\17\0007\v\28\v7\v\29\v%\f\31\0>\v\2\2)\f\2\0009\f\v\n:\n!\t:\t\"\b3\t#\0:\t$\b:\b&\a:\a'\6>\5\2\0014\5\17\0007\5(\5%\6*\0:\6)\0054\5\17\0007\5+\5'\6\1\0:\6,\5G\0\1\0\0À!completion_enable_auto_popup\6g\30menuone,noinsert,noselect\16completeopt\6o\rsettings\bLua\1\0\0\14telemetry\1\0\1\venable\1\14workspace\flibrary\1\0\0\28$VIMRUNTIME/lua/vim/lsp\20$VIMRUNTIME/lua\vexpand\afn\16diagnostics\fglobals\1\0\0\1\2\0\0\bvim\fruntime\1\0\0\6;\tpath\fpackage\nsplit\bvim\1\0\1\fversion\vLuaJIT\bcmd\14/main.lua\1\3\0\0\0\a-E\1\0\0\16sumneko_lua\25/lua-language-server\n/bin/\30$HOME/lua-language-server\nLinux\14on_attach\1\0\0\nsetup\vipairs\1\a\0\0\fpyright\focamlls\18rust-analyzer\rtsserver\bhls\bzls\14lspconfig\frequire\0" },
+    config = { "\27LJ\1\2A\2\0\3\1\3\0\a4\0\0\0007\0\1\0007\0\2\0+\1\0\0C\2\0\0=\0\1\1G\0\1\0\1À\24nvim_buf_set_keymap\bapi\bvimA\2\0\3\1\3\0\a4\0\0\0007\0\1\0007\0\2\0+\1\0\0C\2\0\0=\0\1\1G\0\1\0\1À\24nvim_buf_set_option\bapi\bvim·\16\1\2\n\0012\0\0011\2\0\0001\3\1\0+\4\0\0007\4\2\4\16\5\0\0\16\6\1\0>\4\3\1\16\4\3\0%\5\3\0%\6\4\0>\4\3\0013\4\5\0\16\5\2\0%\6\6\0%\a\a\0%\b\b\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\t\0%\b\n\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\v\0%\b\f\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\r\0%\b\14\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\15\0%\b\16\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\17\0%\b\18\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\19\0%\b\20\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\21\0%\b\22\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\23\0%\b\24\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\25\0%\b\26\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\27\0%\b\28\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\29\0%\b\30\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a\31\0%\b \0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a!\0%\b\"\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a#\0%\b$\0\16\t\4\0>\5\5\1\16\5\2\0%\6\6\0%\a%\0%\b&\0\16\t\4\0>\5\5\0017\5'\0007\5(\5\15\0\5\0T\6\a€\16\5\2\0%\6\6\0%\a)\0%\b*\0\16\t\4\0>\5\5\1T\5\n€7\5'\0007\5+\5\15\0\5\0T\6\6€\16\5\2\0%\6\6\0%\a)\0%\b,\0\16\t\4\0>\5\5\0017\5'\0007\5-\5\15\0\5\0T\6\6€4\5.\0007\5/\0057\0050\5%\0061\0)\a\1\0>\5\3\0010\0\0€G\0\1\0\1À·\3      hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow\n      hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow\n      hi LspReferenceWrite cterm=bold ctermbg=red guibg=LightYellow\n      augroup lsp_document_highlight\n        autocmd! * <buffer>\n        autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()\n        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()\n      augroup END\n    \14nvim_exec\bapi\bvim\23document_highlight0<cmd>lua vim.lsp.buf.range_formatting()<CR>\30document_range_formatting*<cmd>lua vim.lsp.buf.formatting()<CR>\r<space>f\24document_formatting\26resolved_capabilities2<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>\r<space>q0<cmd>lua vim.lsp.diagnostic.goto_next()<CR>\a]d0<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>\a[d<<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>\r<space>a*<cmd>lua vim.lsp.buf.references()<CR>\agr@<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR> \14<leader>a&<cmd>lua vim.lsp.buf.rename()<CR>\14<space>rn/<cmd>lua vim.lsp.buf.type_definition()<CR>\r<space>DJ<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>\14<space>wl7<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>\14<space>wr4<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>\14<space>wa.<cmd>lua vim.lsp.buf.signature_help()<CR>\n<C-k>.<cmd>lua vim.lsp.buf.implementation()<CR>\agi%<Cmd>lua vim.lsp.buf.hover()<CR>\6K*<Cmd>lua vim.lsp.buf.definition()<CR>\agd+<Cmd>lua vim.lsp.buf.declaration()<CR>\agD\6n\1\0\2\vsilent\2\fnoremap\2\27v:lua.vim.lsp.omnifunc\romnifunc\14on_attach\0\0ú\2\1\0\v\0\19\0$4\0\0\0%\1\1\0>\0\2\0024\1\0\0%\2\2\0>\1\2\0021\2\3\0003\3\4\0004\4\5\0\16\5\3\0>\4\2\4T\a\5€6\t\b\0007\t\6\t3\n\a\0:\2\b\n>\t\2\1A\a\3\3N\aù%\4\t\0%\5\n\0\16\6\5\0%\a\v\0\16\b\4\0%\t\f\0$\6\t\0064\a\r\0007\a\14\a%\b\16\0:\b\15\a4\a\r\0007\a\17\a'\b\1\0:\b\18\a0\0\0€G\0\1\0!completion_enable_auto_popup\6g\30menuone,noinsert,noselect\16completeopt\6o\bvim\25/lua-language-server\n/bin/\30$HOME/lua-language-server\nLinux\14on_attach\1\0\0\nsetup\vipairs\1\6\0\0\fpyright\focamlls\rtsserver\bhls\bzls\0\15completion\14lspconfig\frequire\0" },
     loaded = false,
     needs_bufread = false,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/opt/nvim-lspconfig"
@@ -157,11 +158,15 @@ try_loadstring("\27LJ\1\2p\0\0\4\0\b\0\v4\0\0\0%\1\1\0>\0\2\0027\0\2\0003\1\6\00
 try_loadstring("\27LJ\1\2;\0\0\2\0\3\0\a4\0\0\0%\1\1\0>\0\2\0027\0\2\0002\1\0\0>\0\2\1G\0\1\0\nsetup\14telescope\frequire\0", "config", "telescope.nvim")
 -- Config for: vim-airline
 try_loadstring("\27LJ\1\0026\0\0\2\0\4\0\0054\0\0\0007\0\1\0%\1\3\0:\1\2\0G\0\1\0\vtender\18airline_theme\6g\bvim\0", "config", "vim-airline")
+-- Config for: coc.nvim
+try_loadstring("\27LJ\1\2P\0\0\2\0\4\0\0064\0\0\0007\0\1\0007\0\2\0%\1\3\0>\0\2\1G\0\1\0  so ~/.config/nvim/coc.vim \17nvim_command\bapi\bvim\0", "config", "coc.nvim")
 vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]
   -- Filetype lazy-loads
-vim.cmd [[au FileType rust ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "rust" }, _G.packer_plugins)]]
+vim.cmd [[au FileType lua ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "lua" }, _G.packer_plugins)]]
 vim.cmd [[au FileType haskell ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "haskell" }, _G.packer_plugins)]]
+vim.cmd [[au FileType rust ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "rust" }, _G.packer_plugins)]]
+vim.cmd [[au FileType python ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "python" }, _G.packer_plugins)]]
 vim.cmd("augroup END")
 END
 
