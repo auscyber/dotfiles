@@ -59,6 +59,16 @@ end
       nvim_lsp[lsp].setup { on_attach = on_attach }
     end
     local system_name = "Linux"
+    local pid = vim.fn.getpid()
+-- On linux/darwin if using a release build, otherwise under scripts/OmniSharp(.Core)(.cmd)
+    local omnisharp_bin = "/home/auscyber/.vscode/extensions/ms-dotnettools.csharp-1.23.11/.omnisharp/1.37.8/run"
+-- on Windows
+-- local omnisharp_bin = "/path/to/omnisharp/OmniSharp.exe"
+    require'lspconfig'.omnisharp.setup{
+    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
+    on_attach = on_attach
+    }
+
 
 	-- set the path to the sumneko installation; if you previously installed via the now deprecated :LspInstall, use
 	local sumneko_root_path = '$HOME/lua-language-server'
@@ -96,6 +106,6 @@ vim.o.completeopt = "menuone,noinsert,noselect"
 
 vim.g.completion_enable_auto_popup = 1
 end
-M.ft = {"haskell","rust", "lua", "python"}
+M.ft = {"haskell","rust", "lua", "python", "cs"}
 
 return M

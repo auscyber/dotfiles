@@ -3,9 +3,9 @@ id = "17504290032302696503"
 systems = ["desktop", "laptop"]
 
 [[links]]
-name = "ghost.png"
-src = "$HOME/backgrounds/ghost.png"
-destination = "ghost.png"
+name = "backgrounds"
+src = "$HOME/backgrounds"
+destination = "backgrounds"
 
 [[links]]
 name = ".config/nvim"
@@ -84,5 +84,10 @@ destination = "xmonad/screenshot-sec.sh"
 
 [[links]]
 name = ".config/fontconfig"
-src = "/home/auscyber/.config/fontconfig"
+src = "$HOME/.config/fontconfig"
 destination = ".config/fontconfig"
+
+[[links]]
+name = "dotfiles"
+src = "$HOME/.zshrc"
+destination = ".zshrc"

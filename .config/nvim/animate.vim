@@ -1,15 +1,25 @@
+
+let g:nerd_tree_open = 0
+
 function NerdTree() abort
-   :NERDTreeToggle
-   wincmd H | vertical resize 0
-   call animate#window_percent_width(0.20) 
+   if g:nerd_tree_open
+	   call animate#window_percent_width(0.01)
+	   :NERDTreeClose
+	   let g:nerd_tree_open = 0
+   else
+	   :NERDTreeFocus
+	   let g:nerd_tree_open = 1
+	   wincmd H | vertical resize 0
+	   call animate#window_percent_width(0.10)
+    endif
 endfunction
-nmap <M-t> :call NerdTree()<CR>
+nmap <silent><M-t> :call NerdTree()<CR>
 
 function AnimatedSplit() abort
     new | wincmd L | vertical resize 0
     call animate#window_percent_width(0.50)
 endfunction
-nmap <C-w>v :call AnimatedSplit()<CR>
+nmap <silent><C-w>v :call AnimatedSplit()<CR>
 
 "let g:fzf_layout = {
 " \ 'window': 'new | wincmd J | resize 1 | call animate#window_percent_height(0.5)'

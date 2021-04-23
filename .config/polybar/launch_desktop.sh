@@ -2,5 +2,5 @@
 pkill polybar 
 ~/eww/target/debug/eww reload
 ~/eww/target/debug/eww daemon
-polybar mybar --config=~/.config/polybar/config.ini &
+polybar desktopbar --config=~/.config/polybar/config.ini &
 

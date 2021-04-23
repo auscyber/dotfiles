@@ -92,10 +92,11 @@ cat << EOF
     ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL}$cpu   
     ${W_BG}${B_FG}         ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
     ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
-    ${W_BG}${B_FG} |       ${NORMAL}         ${category}uptime:${NORMAL} $uptime 
+    ${W_BG}${B_FG} |       ${NORMAL}         ${category}gpu:${NORMAL} $(nvidia-smi -L) 
     ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
     ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}wm:${NORMAL} $wm
     ${W_BG}${B_FG}         ${NORMAL}         ${category}music:${NORMAL} $song 
+    ${W_BG}${B_FG}         ${NORMAL}
     ${W_BG}${B_FG} |  |  | ${NORMAL}
     
 EOF

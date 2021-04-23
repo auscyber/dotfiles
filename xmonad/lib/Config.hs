@@ -51,15 +51,15 @@ import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
 import           XMonad.Util.SpawnOnce
-
+import           SysDependent
 
 onLaunch =
-    [ "picom --experimental-backends"
-    , "lxspolkit"
+    [ "picom --experimental-backends --daemon --dbus"
+    , "lxpolkit"
     , "dunst"
     , "~/.config/polybar/launch.sh"
     , "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
-    , "feh --bg-fill ~/ghost.png"
+    , "feh --bg-fill ~/backgrounds/ghost.png"
     , "xset m 0 0"
     ]
 
@@ -74,7 +74,7 @@ rclonemounts =
 mountRclone :: (String,String,[String]) -> String
 mountRclone (name,location,extra_args) = "rclone mount " ++ name ++ ": " ++ location ++ " " ++ unwords extra_args ++ " --daemon"
 
-once = map mountRclone rclonemounts
+once = map mountRclone rclonemounts ++ ["emacs --daemon"]
 
 myStartupHook = do
     ewmhDesktopsStartup
@@ -248,7 +248,7 @@ appKeys= [("M-S-r", spawn "rofi -show combi")
         --Take screenshot
         ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
         --Chrome
-        ,("M-S-g", spawn "chromium")
+        ,("M-S-g", spawn "google-chrome-stable")
         --Start emacs
         ,("M-d", spawn "emacsclient -c")
         ]
