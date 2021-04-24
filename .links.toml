@@ -70,16 +70,14 @@ destination = ".config/polybar/scripts"
 [[links]]
 name = ".config/polybar/launch_laptop.sh"
 src = "$HOME/.config/polybar/launch.sh"
-destination = ["laptop", ".config/polybar/launch_laptop.sh"]
 
-[[links]]
-name = "xmonad/build"
-src = "$HOME/.xmonad/build"
-destination = "xmonad/build"
+[links.destination]
+desktop = "xmonad/build"
+laptop = "xmonad/build_laptop"
 
 [[links]]
 name = "xmonad/screenshot-sec.sh"
-src = "/home/auscyber/.xmonad/screenshot-sec.sh"
+src = "$HOME/.xmonad/screenshot-sec.sh"
 destination = "xmonad/screenshot-sec.sh"
 
 [[links]]
