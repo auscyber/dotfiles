@@ -40,6 +40,7 @@ packages = [ 'vim',
             'nodejs',
             'feh',
             'xclip',
+            'pulseaudio',
 #            'discord',
 #            'dunst',
 #            'fzf',
@@ -105,8 +106,43 @@ dots --system {computer} sync
         pass
 #        sys_command(f"cp \"{path}\" \"{self.mount}{self.home}/{self.destination}\"")
 
+def get_partition(disk, mountpoint,message="Select partition"):
+    for (num, partition) in enumerate(disk.partition):
+        print(f"({num}): {partition}")
+    if (index_str := input(message+': ')):
+        index = int(index_str)
+        if index < len(disk.partition) and index > -1:
+            return disk.partition[index]
+        else:
+            raise archinstall.DiskError("Partition is out of list")
+
+
 # Select a harddrive and a disk password
 harddrive = archinstall.select_disk(archinstall.all_disks())
+extra_partitions = {}
+if len(list(filter(lambda x : x.filesystem_supported, harddrive.partition))) > 0:
+    if (option := archinstall.ask_for_disk_layout()) == 'abort':
+        archinstall.log(f"Safely aborting the installation. No changes to the disk or system has been made.")
+        exit(1)
+    elif option == 'keep-existing':
+        boot = get_partition(harddrive, "/boot",message="Choose boot partition")
+        root = get_partition(harddrive,"/",message="Choose root partition")
+    elif option == 'format-all':
+        boot = None
+        root = None
+        print("formatting entire disk")
+else:
+    boot = None
+    root = None
+
+while (input("Continue? ")) == "y":
+    mountpoint = input("Mountpoint: ")
+    disk = archinstall.select_disk(archinstall.all_disks())
+    part = get_partition(disk,mountpoint)
+    extra_partitions[mountpoint] = {'disk' : disk, 'part' : part}
+
+
+
 disk_password = getpass.getpass(prompt='Disk password (leave blank to not encrypt): ')
 
 if disk_password is None:
@@ -128,13 +164,13 @@ def install_on(mountpoint):
         if installation.minimal_installation():
             installation.set_hostname(f"{USER}-{pc_name}")
             installation.add_bootloader()
-            # Optionally enable networking:
-            installation.copy_ISO_network_config(enable_services=True)
             installation.install_profile('xorg')
             installation.set_timezone(timezone)
             installation.add_additional_packages(packages)
             installation.user_create(USER, user_pasword, sudo=True)
             installation.user_set_pw('root', "toor")
+            installation.add_additional_packages("networkmanager")
+            installation.enable_service('NetworkManager.service')
             with open(mountpoint+'/etc/sudoers',"a+") as f:
                 f.write("Defaults !requiretty \n Defaults !tty_tickets")
             with UserHook() as h:
@@ -148,35 +184,42 @@ def install_on(mountpoint):
 #    archinstall.log(f" * devel (password: {})")
 
 if harddrive:
-    harddrive.keep_partitions = False
+    if root is None or boot is None:
+        harddrive.keep_partitions = False
+        print("using whole drive")
 
     print(f" ! Formatting {harddrive} in ", end='')
     archinstall.do_countdown()
 
     # First, we configure the basic filesystem layout
     with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:
-    	# We use the entire disk instead of setting up partitions on your own
-    	if not harddrive.keep_partitions:
-    		fs.use_entire_disk(root_filesystem_type='ext4')
+        # We use the entire disk instead of setting up partitions on your own
+        if not harddrive.keep_partitions:
+            fs.use_entire_disk(root_filesystem_type='ext4')
+            boot = fs.find_partition('/boot')
+            root = fs.find_partition('/')
 
-    	boot = fs.find_partition('/boot')
-    	root = fs.find_partition('/')
+        root.allow_formatting = True
+        if not input("keep_boot?: "):
+            boot.allow_formatting = True
+            boot.format('vfat')
 
-    	boot.format('vfat')
+        for mp in extra_partitions:
+            mp['part'].mount('/mnt'+mp)
+        # We encrypt the root partition if we got a password to do so with,
+        # Otherwise we just skip straight to formatting and installation
+        if len(disk_password) > 0:
+            print("encrypting")
+            root.encrypted = True
+            root.encrypt(password=disk_password)
 
-    	# We encrypt the root partition if we got a password to do so with,
-    	# Otherwise we just skip straight to formatting and installation
-    	if disk_password is not None:
-    		root.encrypted = True
-    		root.encrypt(password=disk_password)
+            with archinstall.luks2(root, 'luksloop', disk_password) as unlocked_root:
+            	unlocked_root.format(root.filesystem)
+            	unlocked_root.mount('/mnt')
+        else:
+            root.format(root.filesystem)
+            root.mount('/mnt')
 
-    		with archinstall.luks2(root, 'luksloop', disk_password) as unlocked_root:
-    			unlocked_root.format(root.filesystem)
-    			unlocked_root.mount('/mnt')
-    	else:
-    		root.format(root.filesystem)
-    		root.mount('/mnt')
-
-    	boot.mount('/mnt/boot')
+        boot.mount('/mnt/boot')
 
 install_on('/mnt')
