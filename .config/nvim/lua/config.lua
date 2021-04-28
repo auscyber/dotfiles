@@ -17,7 +17,10 @@ o.signcolumn = 'yes'
 wo.rnu = true
 wo.nu = true
 o.termguicolors = true
+--vim.o.guifont= "Hasklug Nerd Font:h15"
+--vim.api.nvim_command [[ let g:neovide_fullscreen=v:true ]]
 vim.api.nvim_command [[
+
 colorscheme pink_ocean
 so ~/.config/nvim/animate.vim
 filetype plugin indent on

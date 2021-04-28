@@ -143,7 +143,7 @@ myLogHook =
 --        >>= workspaceNamesPP
     --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
     {- filterOutInvalidWSet pp -}
-        >>= \pp -> dynamicLogIconsConvert (iconConfig pp)
+        >>= \pp -> dynamicIconsPP (def { iconConfigIcons = icons }) pp
         >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar  . filterOutWsPP [scratchpadWorkspaceTag]
         >>= io . ppOutput pp
 
@@ -153,18 +153,15 @@ workspaceSets =
     , ("jim",map show [1..4])
     ]
 
-iconConfig :: PP -> IconConfig
-iconConfig pp = def { iconConfigPP = pp, iconConfigIcons = icons }
-
-icons :: IconSet
+icons :: XMonad.Query [String]
 icons = composeAll
-    [ className =? "Discord" --> appIcon "\xfb6e"
-    , className =? "Chromium-browser" --> appIcon "\xf268"
-    , className =? "Firefox" --> appIcon "\63288"
-    , className =? "Spotify" <||>  className =? "spotify" --> appIcon "阮"
-    , className =? "jetbrains-idea" --> appIcon "\xe7b5"
-    , className =? "Skype" --> appIcon "\61822"
-    , ("nvim" `isPrefixOf`) <$> title --> appIcon "\59333"
+    [ className =? "Discord" -->   appIcon "\xfb6e"
+    , className =? "Chromium-browser" -->   appIcon "\xf268"
+    , className =? "Firefox" -->   appIcon "\63288"
+    , className =? "Spotify" <||>  className =? "spotify" -->   appIcon "阮"
+    , className =? "jetbrains-idea" -->   appIcon "\xe7b5"
+    , className =? "Skype" -->   appIcon "\61822"
+    , ("nvim" `isPrefixOf`) <$> title -->   appIcon "\59333"
     ]
 
 
@@ -278,11 +275,13 @@ customKeys =
     -- Swap the focused and the master window
     -- Polybar toggle
     , ("M-b", spawn "polybar-msg cmd toggle" )
-    , ("M-r", promptSearchBrowser (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) "chromium" hoogle  )
+--    , ("M-r", promptSearchBrowser promptConfig "chromium" hoogle )
+    , ("M-r", shellPrompt promptConfig )
     , ("M-m", nextWSSet True )
     , ("M-n", prevWSSet True)
     , ("M-S-m" ,  moveToNextWsSet True)
     , ("M-S-n" , moveToPrevWsSet True)
+
 --    , ("M1-<Tab>", nextWS )
 --    , ("M1-S-<Tab>", prevWS)
     ]
@@ -291,6 +290,10 @@ xineramaKeys = [((m .|. mod4Mask, key), screenWorkspace sc >>= flip whenJust (wi
         | (key, sc) <- zip [xK_e, xK_w] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
+promptConfig = (def {
+        fgColor = mainColor,position = CenteredAt 0.3 0.5
+        , font = "xft:Hasklug Nerd Font:style=Regular:size=12"
+        })
 
 workspaceKeys =
     [ ("M-l",nextWS)

@@ -33,10 +33,10 @@ polybarPP ws =  def {
     , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
     , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
     , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True -}
-    ppCurrent =  polybarColour 'F' colourCurrent . iconCurrent .  checkIcon ws
-    , ppHidden =  polybarColour 'F' colourHidden . iconHidden . checkIcon ws
-    , ppVisible  = polybarColour 'F' colourVisible . iconCurrent . checkIcon ws
-    , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . iconHiddenNoWindows . checkIcon ws
+    ppCurrent =  polybarColour 'F' colourCurrent . iconCurrent
+    , ppHidden =  polybarColour 'F' colourHidden . iconHidden
+    , ppVisible  = polybarColour 'F' colourVisible . iconCurrent 
+    , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . iconHidden
     , ppTitleSanitize = take 70
     , ppTitle = polybarColour 'F' "#FFFFFF"
     , ppSep = polybarColour 'F' "#4D3636" " | "
@@ -52,14 +52,18 @@ switchMoveWindowsPolybar pp = pp
             , ppHiddenNoWindows = switchAndMove (ppHiddenNoWindows pp)
             }
             where switchAndMove f x =  xmonadPolybarAction 1 ("view\\\"" ++ x ++  "\\\"") . xmonadPolybarAction 3 ("moveTo\""++x++"\"") $ f x
-checkIcon :: M.Map WorkspaceId Icon -> String -> Icon
-checkIcon ws wsid =   M.findWithDefault (baseIconSet wsid) wsid ws
+
+defaultIcons = map show [1..10]
+iconCurrent x
+    | x`elem` defaultIcons = "\xf111"
+    | otherwise = x
+
+iconHidden x
+    | x`elem` defaultIcons = "\xf10c"
+    | otherwise = x
 
 
-
-
-baseIconSet :: String -> Icon
-baseIconSet x = Icon x x x x
+--iconCurrent = \xf10c""\xf10c"
 
 --polybarWorkspace :: (String -> String)  -> Bool -> String -> String
 --polybarWorkspace format bool str = (if bool then moveToWS str . switchWS str  else id) . format $ str

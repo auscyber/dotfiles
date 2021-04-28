@@ -2,8 +2,8 @@ M = {'neovim/nvim-lspconfig'}
 
 M.config = function ()
     local nvim_lsp = require('lspconfig')
-    local comp = require 'completion'
 local on_attach = function (client, bufnr)
+  local comp = require 'completion'
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
   comp.on_attach(client,bufnr)
@@ -27,7 +27,7 @@ local on_attach = function (client, bufnr)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-
+--  buf_set_keymap('n', '<C-space>', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
   -- Set some keybinds conditional on server capabilities
   if client.resolved_capabilities.document_formatting then
@@ -49,12 +49,14 @@ local on_attach = function (client, bufnr)
       augroup END
     ]], false)
   end
-end
+    end
+
+
 
 
     -- Use a loop to conveniently both setup defined servers
     -- and map buffer local keybindings when the language server attaches
-    local servers = { "pyright","ocamlls", "tsserver", "hls", "zls"}
+    local servers = { "pyright","ocamlls", "tsserver", "hls", "zls", "ocamllsp"}
     for _, lsp in ipairs(servers) do
       nvim_lsp[lsp].setup { on_attach = on_attach }
     end
@@ -64,12 +66,21 @@ end
     local omnisharp_bin = "/home/auscyber/.vscode/extensions/ms-dotnettools.csharp-1.23.11/.omnisharp/1.37.8/run"
 -- on Windows
 -- local omnisharp_bin = "/path/to/omnisharp/OmniSharp.exe"
-    require'lspconfig'.omnisharp.setup{
+    nvim_lsp.omnisharp.setup{
     cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
     on_attach = on_attach
     }
 
+    require('nlua.lsp.nvim').setup(require('lspconfig'), {
+  on_attach = on_attach,
 
+  -- Include globals you want to tell the LSP are real :)
+  globals = {
+    -- Colorbuddy
+    "Color", "c", "Group", "g", "s",
+  }
+})
+    
 	-- set the path to the sumneko installation; if you previously installed via the now deprecated :LspInstall, use
 	local sumneko_root_path = '$HOME/lua-language-server'
 	local sumneko_binary = sumneko_root_path.."/bin/"..system_name.."/lua-language-server"
@@ -102,10 +113,12 @@ end
 --	    },
 --	  },
 --	}
+print("hi")
 vim.o.completeopt = "menuone,noinsert,noselect"
 
 vim.g.completion_enable_auto_popup = 1
 end
-M.ft = {"haskell","rust", "lua", "python", "cs"}
+M.ft = {"haskell","rust", "lua", "python", "cs", "ocaml"}
+M.requires = { 'tjdevries/nlua.nvim', 'nvim-lua/completion-nvim' }
 
 return M

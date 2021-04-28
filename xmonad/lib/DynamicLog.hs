@@ -21,7 +21,6 @@
 module DynamicLog (
     DynamicLog.dynamicLogString,
     polyBarAction,xmonadPolybarAction,
-    workspaceFilter
     -- $todo
   ) where
 
@@ -97,33 +96,4 @@ dynamicLogString pp = do
                         , ppTitle  pp $ ppTitleSanitize pp wt
                         ]
                         ++ catMaybes extras
-baseIconSet :: String -> Icon
-baseIconSet x =
-    Icon { iconCurrent = x
-         , iconVisible = x
-         , iconHidden = x
-         , iconHiddenNoWindows = x
-         }
-
-workspaceFilter :: IconConfig -> X ([WindowSpace] -> [WindowSpace])
-workspaceFilter iconConfig = do
-    ws <- gets (S.workspaces . windowset)
-    icons <- M.fromList . (maybeToList =<<) <$> mapM (getIcons (iconConfigIcons iconConfig)) ws
-    pure $ map (\x -> x { S.tag =  workspace x icons})
-  where
-    workspace x icons 
-        | isJust $ S.stack x =  case iconLookup (S.tag x) icons of
-            [] -> S.tag x
-            y -> concatIcons iconHidden y
-        | otherwise = S.tag x
-    iconLookup x icons = M.findWithDefault [baseIconSet x] x icons
-    concatIcons f y
-        | length y > 1 = iconConfigStack iconConfig $ map f y
-        | otherwise = concatMap f y
-
-getIcons :: IconSet -> WindowSpace -> X (Maybe (WorkspaceId, [Icon]))
-getIcons is w = do
-    validIcons <- sequence $ foldMap (runQuery is) . S.integrate <$> S.stack w
-    pure $ (S.tag w,) <$> (validIcons >>= \x -> if null x then Nothing else Just x)
-
 

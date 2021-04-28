@@ -89,3 +89,18 @@ destination = ".config/fontconfig"
 name = "dotfiles"
 src = "$HOME/.zshrc"
 destination = ".zshrc"
+
+[[links]]
+name = "dotfiles"
+src = "$HOME/.tmux"
+destination = ".tmux"
+
+[[links]]
+name = "dotfiles"
+src = "$HOME/.tmux.conf.local"
+destination = ".tmux.conf.local"
+
+[[links]]
+name = ".tmux"
+src = "$HOME/.tmux.conf"
+destination = ".tmux/tmux.conf"

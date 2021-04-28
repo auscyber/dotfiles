@@ -70,15 +70,15 @@ return require('packer').startup(function()
 	}
 
 -- Languages
-    use 'nvim-lua/completion-nvim'
 
     use 'ziglang/zig.vim'
 --    use 'rafcamlet/coc-nvim-lua'
-    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end }
+    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end, ft={"rust"}}
     use (require 'nvim_lsp')
     use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'
     use 'derekelkins/agda-vim'
     use 'dag/vim-fish'
     use 'purescript-contrib/purescript-vim'
+
 end)
