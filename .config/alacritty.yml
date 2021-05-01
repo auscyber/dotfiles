@@ -10,7 +10,7 @@ colors:
   primary:
     background: '0x1d1f21'
     foreground: '0xc5c8c6'
-  # Normal colors
+  # Norm15
   normal:
     black:   '0x282a2e'
     red:     '0xa54242'
@@ -33,7 +33,7 @@ colors:
     white:   '0xc5c8c6'
 
 font:
-  size: 7
+  size: 10
   ligatures: true
   normal:
     family: Hasklug Nerd Font

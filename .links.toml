@@ -4,9 +4,9 @@ default = "desktop"
 systems = ["desktop", "laptop"]
 
 [[links]]
-name = "ghost.png"
-src = "$HOME/backgrounds/ghost.png"
-destination = "ghost.png"
+name = "backgrounds"
+src = "$HOME/backgrounds"
+destination = "backgrounds"
 
 [[links]]
 name = ".config/nvim"
@@ -90,9 +90,29 @@ src = "$HOME/.config/fontconfig"
 destination = ".config/fontconfig"
 
 [[links]]
+<<<<<<< HEAD
 name = "xmonad/my-xmonad_laptop.cabal"
 src = "$HOME/.xmonad/my-xmonad.cabal"
 
 [links.destination]
 laptop = "xmonad/my-xmonad_laptop.cabal"
 desktop = "xmonad/my-xmonad.cabal"
+[[links]]
+name = "dotfiles"
+src = "$HOME/.zshrc"
+destination = ".zshrc"
+
+[[links]]
+name = "dotfiles"
+src = "$HOME/.tmux"
+destination = ".tmux"
+
+[[links]]
+name = "dotfiles"
+src = "$HOME/.tmux.conf.local"
+destination = ".tmux.conf.local"
+
+[[links]]
+name = ".tmux"
+src = "$HOME/.tmux.conf"
+destination = ".tmux/tmux.conf"

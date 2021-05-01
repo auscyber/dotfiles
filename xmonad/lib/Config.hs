@@ -51,15 +51,15 @@ import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
 import           XMonad.Util.SpawnOnce
-
+import           SysDependent
 
 onLaunch =
-    [ "picom --experimental-backends"
-    , "lxspolkit"
+    [ "picom --experimental-backends --daemon --dbus"
+    , "lxpolkit"
     , "dunst"
     , "~/.config/polybar/launch.sh"
     , "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
-    , "feh --bg-fill ~/ghost.png"
+    , "feh --bg-fill ~/backgrounds/ghost.png"
     , "xset m 0 0"
     ]
 
@@ -74,7 +74,7 @@ rclonemounts =
 mountRclone :: (String,String,[String]) -> String
 mountRclone (name,location,extra_args) = "rclone mount " ++ name ++ ": " ++ location ++ " " ++ unwords extra_args ++ " --daemon"
 
-once = map mountRclone rclonemounts
+once = map mountRclone rclonemounts ++ ["emacs --daemon"]
 
 myStartupHook = do
     ewmhDesktopsStartup
@@ -143,7 +143,7 @@ myLogHook =
 --        >>= workspaceNamesPP
     --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
     {- filterOutInvalidWSet pp -}
-        >>= \pp -> dynamicLogIconsConvert (iconConfig pp)
+        >>= \pp -> dynamicIconsPP (def { iconConfigIcons = icons }) pp
         >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar  . filterOutWsPP [scratchpadWorkspaceTag]
         >>= io . ppOutput pp
 
@@ -153,18 +153,15 @@ workspaceSets =
     , ("jim",map show [1..4])
     ]
 
-iconConfig :: PP -> IconConfig
-iconConfig pp = def { iconConfigPP = pp, iconConfigIcons = icons }
-
-icons :: IconSet
+icons :: XMonad.Query [String]
 icons = composeAll
-    [ className =? "Discord" --> appIcon "\xfb6e"
-    , className =? "Chromium-browser" --> appIcon "\xf268"
-    , className =? "Firefox" --> appIcon "\63288"
-    , className =? "Spotify" <||>  className =? "spotify" --> appIcon "阮"
-    , className =? "jetbrains-idea" --> appIcon "\xe7b5"
-    , className =? "Skype" --> appIcon "\61822"
-    , ("nvim" `isPrefixOf`) <$> title --> appIcon "\59333"
+    [ className =? "Discord" -->   appIcon "\xfb6e"
+    , className =? "Chromium-browser" -->   appIcon "\xf268"
+    , className =? "Firefox" -->   appIcon "\63288"
+    , className =? "Spotify" <||>  className =? "spotify" -->   appIcon "阮"
+    , className =? "jetbrains-idea" -->   appIcon "\xe7b5"
+    , className =? "Skype" -->   appIcon "\61822"
+    , ("nvim" `isPrefixOf`) <$> title -->   appIcon "\59333"
     ]
 
 
@@ -248,7 +245,7 @@ appKeys= [("M-S-r", spawn "rofi -show combi")
         --Take screenshot
         ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
         --Chrome
-        ,("M-S-g", spawn "chromium")
+        ,("M-S-g", spawn "google-chrome-stable")
         --Start emacs
         ,("M-d", spawn "emacsclient -c")
         ]
@@ -278,11 +275,13 @@ customKeys =
     -- Swap the focused and the master window
     -- Polybar toggle
     , ("M-b", spawn "polybar-msg cmd toggle" )
-    , ("M-r", promptSearchBrowser (def {fgColor = mainColor,position = CenteredAt 0.3 0.5, font = "xft:Hasklug Nerd Font:style=Regular:size=12"  }) "chromium" hoogle  )
+--    , ("M-r", promptSearchBrowser promptConfig "chromium" hoogle )
+    , ("M-r", shellPrompt promptConfig )
     , ("M-m", nextWSSet True )
     , ("M-n", prevWSSet True)
     , ("M-S-m" ,  moveToNextWsSet True)
     , ("M-S-n" , moveToPrevWsSet True)
+
 --    , ("M1-<Tab>", nextWS )
 --    , ("M1-S-<Tab>", prevWS)
     ]
@@ -291,6 +290,10 @@ xineramaKeys = [((m .|. mod4Mask, key), screenWorkspace sc >>= flip whenJust (wi
         | (key, sc) <- zip [xK_e, xK_w] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
+promptConfig = (def {
+        fgColor = mainColor,position = CenteredAt 0.3 0.5
+        , font = "xft:Hasklug Nerd Font:style=Regular:size=12"
+        })
 
 workspaceKeys =
     [ ("M-l",nextWS)
