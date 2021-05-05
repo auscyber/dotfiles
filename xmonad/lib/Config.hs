@@ -29,6 +29,7 @@ import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Hooks.ServerMode
 import           XMonad.Hooks.WindowSwallowing
+import           XMonad.Hooks.ScreenCorners
 import qualified XMonad.Layout.Fullscreen            as F
 import           XMonad.Layout.Gaps
 import           XMonad.Layout.MultiToggle
@@ -47,6 +48,7 @@ import           XMonad.Util.Cursor
 import           XMonad.Util.EZConfig
 import qualified XMonad.Util.ExtensibleState         as XS
 import           XMonad.Util.Hacks
+import           XMonad.Util.WorkspaceCompare
 import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.Run
@@ -71,6 +73,7 @@ rclonemounts =
     , ("onedrive_school","~/onedrive_school",[])
     ]
 
+
 mountRclone :: (String,String,[String]) -> String
 mountRclone (name,location,extra_args) = "rclone mount " ++ name ++ ": " ++ location ++ " " ++ unwords extra_args ++ " --daemon"
 
@@ -80,6 +83,7 @@ myStartupHook = do
     ewmhDesktopsStartup
     mapM_ (\x -> spawn (x++" &")) onLaunch
     mapM_ (\x -> spawnOnce (x++" &")) once
+    addScreenCorner SCLowerRight (spawn "alacritty")
     io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
 --     setDefaultCursor xC_left_ptr
 
@@ -116,7 +120,7 @@ myConfig =
       , startupHook = myStartupHook
 --      , borderWidth = 1
 --    , logHook = dynamicLogWithPP (polybarPP workspaceSymbols )
-      , logHook = myLogHook  {- do
+      , logHook = polybarLogHook {- do
         wsNames <- XS.gets workspaceNames
         workspaceFilter (iconConfig $ polybarPP wsNames)  >>= \x -> cleanWS' >>= \y ->  ewmhDesktopsLogHookCustom (y ) -}
       , manageHook = myManageHook
@@ -132,20 +136,31 @@ myEventHook = mconcat
     , docksEventHook
     , windowedFullscreenFixEventHook
     , swallowEventHook (className =? "Alacritty") (return True)
+    , screenCornerEventHook
     ]
 
 
 
-myLogHook :: X ()
-myLogHook =
+polybarLogHook :: X ()
+polybarLogHook =
      XS.gets (polybarPP  . workspaceNames)
 --    pure (polybarPP M.empty)
 --        >>= workspaceNamesPP
     --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
     {- filterOutInvalidWSet pp -}
-        >>= \pp -> dynamicIconsPP (def { iconConfigIcons = icons }) pp
-        >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar  . filterOutWsPP [scratchpadWorkspaceTag]
+        >>=  dynamicIconsPP (def { iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]"), iconConfigIcons = icons })
+        >>= \pp -> pure pp
+        >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . filterOutWsPP [scratchpadWorkspaceTag]
         >>= io . ppOutput pp
+        >> ewmhDesktopsLogHookCustom (filterOutWs [scratchpadWorkspaceTag])
+
+ewwLogHook :: X ()
+ewwLogHook = do
+        PP { ppRename = ren } <- dynamicIconsPP (def { iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]"), iconConfigIcons = icons }) def
+        let func = map (\ws -> ws { W.tag = ren (W.tag ws) ws })
+        let func2 = map (\ws -> ws { W.tag = if W.tag ws `elem` map show [1..9] then "\xf10c" else W.tag ws  })
+        ewmhDesktopsLogHookCustom (func2. func . filterOutWs [scratchpadWorkspaceTag] )
+
 
 workspaceSets :: [(WorkspaceSetId,[WorkspaceId])]
 workspaceSets =
@@ -177,6 +192,7 @@ myBorderWidth  = 2
 myTabConfig = def { inactiveBorderColor = "#FF0000"
                   , activeTextColor = "#00FF00"}
 myLayout =
+  screenCornerLayoutHook $
   smartBorders $
   spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
   avoidStruts $
@@ -222,9 +238,12 @@ type NamedScratchPadSet = [(String,NamedScratchpad)]
 scratchpadSet :: [(String,NamedScratchpad)]
 scratchpadSet =
             [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating )
+            , ("M-C-o", NS "onenote" "ps3x-onenote" (className =? "p3x-onenote") nonFloating)
             , ("M-C-d", NS "discord" "discocss" (("discord" `isSuffixOf`) <$> className) nonFloating )
             , ("M-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating )
-            , ("M-C-t", NS "teams" "teams" (className =? "Microsoft Teams - Preview") nonFloating )
+            , ("M-C-t", NS "terminal" (myTerm ++ " -t \"scratchpad term\"") (title =? "scratchpad term") defaultFloating )
+            , ("M-C-S-m", NS "mail" "thunderbird" (className =? "Mail" <||> className =? "thunderbird") nonFloating) 
+--            , ("M-C-t", NS "teams" "teams" (className =? "Microsoft Teams - Preview") nonFloating )
             , ("M-C-a", NS "authy" "authy" (className =? "Authy Desktop") defaultFloating )
             ]
 
@@ -239,15 +258,15 @@ getScratchPadKeys ns = map mapFunc ns
 scratchpads = getScratchPads scratchpadSet
 scratchpadKeys = getScratchPadKeys scratchpadSet
 
-appKeys= [("M-S-r", spawn "rofi -show combi")
+appKeys = map (second spawn) [("M-S-r", "rofi -show combi")
         -- Start alacritty
-        ,("M-S-t", spawn myTerm)
+        ,("M-S-t", myTerm)
         --Take screenshot
-        ,("M-S-s", spawn "~/.xmonad/screenshot-sec.sh")
+        ,("M-S-s", "~/.xmonad/screenshot-sec.sh")
         --Chrome
-        ,("M-S-g", spawn "google-chrome-stable")
+        ,("M-S-g", "firefox")
         --Start emacs
-        ,("M-d", spawn "emacsclient -c")
+        ,("M-d", "emacsclient -c")
         ]
 
 
@@ -256,7 +275,6 @@ myKeys =  concat
             , multiScreenKeys
             , appKeys
             , customKeys
---            , xineramaKeys
 --            , workspaceKeys
             ]
 
@@ -285,10 +303,6 @@ customKeys =
 --    , ("M1-<Tab>", nextWS )
 --    , ("M1-S-<Tab>", prevWS)
     ]
-
-xineramaKeys = [((m .|. mod4Mask, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_e, xK_w] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 promptConfig = (def {
         fgColor = mainColor,position = CenteredAt 0.3 0.5

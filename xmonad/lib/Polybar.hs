@@ -11,6 +11,7 @@ import DynamicLog
 import System.IO.Unsafe
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.DynamicIcons
+import Control.Monad ((>=>), (<=<))
 import XMonad
 import Data.Maybe
 import qualified Data.Map                            as M
@@ -21,7 +22,12 @@ import qualified XMonad.Util.ExtensibleState as XS
 --Process Colours
 type Colour = String
 polybarColour :: Char -> Colour -> String -> String
-polybarColour area (_:color) text = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area:"--}"
+polybarColour area color text 
+    | area `notElem` validAreas = error "Invalid Text Area"
+    | length color == 7 = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area:"--}"
+    | otherwise = error "Invalid colour"
+  where
+    validAreas = "FBRuoT"
 
 
 colourCurrent = "#f9f9f9"
@@ -35,31 +41,35 @@ polybarPP ws =  def {
     , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True -}
     ppCurrent =  polybarColour 'F' colourCurrent . iconCurrent
     , ppHidden =  polybarColour 'F' colourHidden . iconHidden
-    , ppVisible  = polybarColour 'F' colourVisible . iconCurrent 
+    , ppVisible  = polybarColour 'F' colourVisible . iconCurrent
     , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . iconHidden
-    , ppTitleSanitize = take 70
+    , ppTitleSanitize = take 70 . ppTitle def
     , ppTitle = polybarColour 'F' "#FFFFFF"
     , ppSep = polybarColour 'F' "#4D3636" " | "
-    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n"  . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws"
+    , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n"  . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws" 
     , ppLayout =  xmonadPolybarAction  1 "next-layout" . xmonadPolybarAction 3 "default-layout"
+  --  , ppOrder = \(x:xs) -> wrap "%{T2}" "%{T-}" x:xs
 --    , ppOrder = \(x:_:y) -> x:y
     }
+
 switchMoveWindowsPolybar :: PP -> PP
 switchMoveWindowsPolybar pp = pp
-            { ppCurrent = switchAndMove (ppCurrent pp)
-            , ppHidden = switchAndMove (ppHidden pp)
-            , ppVisible = switchAndMove (ppVisible pp)
-            , ppHiddenNoWindows = switchAndMove (ppHiddenNoWindows pp)
+            { ppRename = ppRename pp >=> switchAndMove
             }
-            where switchAndMove f x =  xmonadPolybarAction 1 ("view\\\"" ++ x ++  "\\\"") . xmonadPolybarAction 3 ("moveTo\""++x++"\"") $ f x
+  where
+    switchAndMove b a 
+        | b `notElem` defaultIcons = switchAndMoveF  (S.tag a) b
+        | otherwise = b
+
+switchAndMoveF x = xmonadPolybarAction 1 ("view\\\"" ++ x ++  "\\\"") . xmonadPolybarAction 3 ("moveTo\""++x++"\"")
 
 defaultIcons = map show [1..10]
 iconCurrent x
-    | x`elem` defaultIcons = "\xf111"
+    | x`elem` defaultIcons = switchAndMoveF x "\xf111"
     | otherwise = x
 
 iconHidden x
-    | x`elem` defaultIcons = "\xf10c"
+    | x`elem` defaultIcons = switchAndMoveF x "\xf10c"
     | otherwise = x
 
 

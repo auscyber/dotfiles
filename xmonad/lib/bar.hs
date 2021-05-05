@@ -24,7 +24,7 @@ bar :: Bool -> Client -> Ref.IORef String -> IO ()
 bar bool client lastMessage = do
     status <- getPlayStatus client
     track <- getTrack client
-    ifNothing lastMessage "\6884 " (liftM2 (\y x -> show x <> show y) track status)
+    ifNothing lastMessage "\61441 " (liftM2 (\y x -> show x <> show y) track status)
 
 
 ifNothing :: Ref.IORef String -> String -> Maybe String -> IO ()
