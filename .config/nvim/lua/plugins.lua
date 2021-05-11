@@ -18,6 +18,7 @@ return require('packer').startup(function()
 	vim.api.nvim_command [[ autocmd BufWrite plugins.lua PackerCompile]]
 	end
 	}
+    use 'junegunn/fzf'
     use 'junegunn/fzf.vim'
     use 'preservim/nerdtree'
     use 'hugolgst/vimsence'
@@ -52,7 +53,7 @@ return require('packer').startup(function()
     use 'kyazdani42/nvim-web-devicons'
     use 'ryanoasis/vim-devicons'
     use {'akinsho/nvim-bufferline.lua', config = function()
-	    	require 'bufferline'.setup { options = {separator_style = {'',''}} }
+	    	require 'bufferline'.setup { options = { separator_style = {'',''} }}
 	end}
 --    use {'shougo/deoplete.nvim', post_ = function () vim.api.nvim_command [[let g:deoplete#enable_at_startup = 1]] end}
     use 'nathanaelkane/vim-indent-guides'
@@ -73,7 +74,7 @@ return require('packer').startup(function()
 
     use 'ziglang/zig.vim'
 --    use 'rafcamlet/coc-nvim-lua'
-    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end, ft={"rust"}}
+--    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end, ft={"rust"}, requires = {"antoinemadec/coc-fzf"}}
     use (require 'nvim_lsp')
     use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'

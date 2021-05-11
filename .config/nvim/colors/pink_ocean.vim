@@ -18,6 +18,8 @@ let g:colors_name="pink_ocean"
 
 let s:bg = "#1F1F1F"
 
+hi Search guibg=#ffd1dc
+hi BufferLineTabSelected guifg=#ffd1dc
 hi Constant ctermfg=217 guifg=#ffa0a0
 hi Normal  ctermfg=251 ctermbg=235 guifg=#eeeeee guibg=#282828
 hi CursorLineNr ctermfg=224 guifg=#ffd1dc
