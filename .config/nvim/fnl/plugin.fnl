@@ -33,8 +33,6 @@
   :hugolgst/vimsence {}
   :jiangmiao/auto-pairs {}
   :Olical/conjure {}
-
-
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
   :ryanoasis/vim-devicons {}
@@ -68,12 +66,12 @@
   :rafcamlet/coc-nvim-lua {}
   :neoclide/coc.nvim {
                       :config (fn [] (vim.api.command "so ~/.config/nvim/coc.vim"))
-                      :ft ["rust"]
+                      :ft [:rust]
                       :requires ["antoinemadec/coc-fzf"]}
 
   :nvim-lua/completion-nvim {}
   :nvim-lua/lsp_extensions.nvim {}
-  :neovim/nvim-lspconfig {:mod :nvim_lsp}
+  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua]}
   :rust-lang/rust.vim {}
   :udalov/kotlin-vim {}
   :derekelkins/agda-vim {}
