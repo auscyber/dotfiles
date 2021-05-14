@@ -8,7 +8,6 @@ if fn.empty(fn.glob(install_path)) > 0 then
   execute 'packadd packer.nvim'
   vim.api.nvim_command [[PackerSync]]
 end
-
 vim.cmd [[packadd packer.nvim]]
 
 return require('packer').startup(function()
@@ -73,8 +72,11 @@ return require('packer').startup(function()
 -- Languages
 
     use 'ziglang/zig.vim'
---    use 'rafcamlet/coc-nvim-lua'
---    use {'neoclide/coc.nvim', config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end, ft={"rust"}, requires = {"antoinemadec/coc-fzf"}}
+    use 'rafcamlet/coc-nvim-lua'
+    use {'neoclide/coc.nvim', 
+        config = function () vim.api.nvim_command [[ so ~/.config/nvim/coc.vim ]] end, 
+        ft={"rust"}, 
+        requires = {"antoinemadec/coc-fzf"}}
     use (require 'nvim_lsp')
     use 'rust-lang/rust.vim'
     use 'udalov/kotlin-vim'

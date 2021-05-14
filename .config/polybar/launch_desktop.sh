@@ -1,6 +1,6 @@
 #!/bin/sh
 pkill polybar 
-~/eww/target/debug/eww reload
-~/eww/target/debug/eww daemon
+eww reload
+eww daemon
 polybar desktopbar --config=~/.config/polybar/config.ini &
 
