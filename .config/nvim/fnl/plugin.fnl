@@ -35,6 +35,7 @@
   :Olical/conjure {}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
+  :yamatsum/nvim-nonicons {}
   :ryanoasis/vim-devicons {}
   :kyazdani42/nvim-tree.lua {}
   :akinsho/nvim-bufferline.lua {:mod :bufferline}
@@ -71,7 +72,7 @@
 
   :nvim-lua/completion-nvim {}
   :nvim-lua/lsp_extensions.nvim {}
-  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua]}
+  :neovim/nvim-lspconfig {:mod :nvim_lsp} ;:ft [:haskell :rust :typescript :javascript :lua]}
   :rust-lang/rust.vim {}
   :udalov/kotlin-vim {}
   :derekelkins/agda-vim {}
