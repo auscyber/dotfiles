@@ -20,7 +20,7 @@ local on_attach = function (client, bufnr)
   buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
   buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   buf_set_keymap('n', '<leader>a', [[<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR> ]], opts)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
@@ -46,6 +46,7 @@ local on_attach = function (client, bufnr)
         autocmd! * <buffer>
         autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+        autocmd BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}
       augroup END
     ]], false)
   end
@@ -56,11 +57,10 @@ local on_attach = function (client, bufnr)
 
     -- Use a loop to conveniently both setup defined servers
     -- and map buffer local keybindings when the language server attaches
-    local servers = { "pyright","ocamlls", "tsserver", "hls", "zls", "ocamllsp"}
+    local servers = { "rust_analyzer", "pyright","ocamlls", "tsserver", "hls", "rnix-lsp"}
     for _, lsp in ipairs(servers) do
       nvim_lsp[lsp].setup { on_attach = on_attach }
     end
-    local system_name = "Linux"
     local pid = vim.fn.getpid()
 -- On linux/darwin if using a release build, otherwise under scripts/OmniSharp(.Core)(.cmd)
     local omnisharp_bin = "/home/auscyber/.vscode/extensions/ms-dotnettools.csharp-1.23.11/.omnisharp/1.37.8/run"
@@ -79,46 +79,61 @@ local on_attach = function (client, bufnr)
     -- Colorbuddy
     "Color", "c", "Group", "g", "s",
   }
-})
+    })
     
 	-- set the path to the sumneko installation; if you previously installed via the now deprecated :LspInstall, use
+    local system_name = "Linux"
 	local sumneko_root_path = '$HOME/lua-language-server'
 	local sumneko_binary = sumneko_root_path.."/bin/"..system_name.."/lua-language-server"
---	nvim_lsp.sumneko_lua.setup {
---	  on_attach = on_attach,
---	  cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
---	  settings = {
---	    Lua = {
---	      runtime = {
---		-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
---		version = 'LuaJIT',
---		-- Setup your lua path
---		path = vim.split(package.path, ';'),
---	      },
---	      diagnostics = {
---		-- Get the language server to recognize the `vim` global
---		globals = {'vim'},
---	      },
---	      workspace = {
---		-- Make the server aware of Neovim runtime files
---		library = {
---		  [vim.fn.expand('$VIMRUNTIME/lua')] = true,
---		  [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
---		},
---	      },
---	      -- Do not send telemetry data containing a randomized but unique identifier
---	      telemetry = {
---		enable = false,
---	      },
---	    },
---	  },
---	}
-print("hi")
+    print(sumneko_binary, "-E", sumneko_root_path .. "/main.lua")
+	nvim_lsp.sumneko_lua.setup {
+	  on_attach = on_attach,
+	  cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
+	  settings = {
+	    Lua = {
+	      runtime = {
+		-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+		version = 'LuaJIT',
+		-- Setup your lua path
+		path = vim.split(package.path, ';'),
+	      },
+	      diagnostics = {
+		-- Get the language server to recognize the `vim` global
+		globals = {'vim'},
+	      },
+	      workspace = {
+		-- Make the server aware of Neovim runtime files
+		library = {
+		  [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+		  [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+		},
+	      },
+	      -- Do not send telemetry data containing a randomized but unique identifier
+	      telemetry = {
+		enable = false,
+	      },
+	    },
+	  },
+	}
+vim.api.nvim_command [[ echo "hi" ]]
 vim.o.completeopt = "menuone,noinsert,noselect"
 
 vim.g.completion_enable_auto_popup = 1
 end
-M.ft = {"haskell","rust", "lua", "python", "cs", "ocaml"}
-M.requires = { 'tjdevries/nlua.nvim', 'nvim-lua/completion-nvim' }
+M.ft = {"haskell","rust", "lua", "python", "cs", "ocaml", "typescript","javascript", "nix"}
+M.requires = { 'tjdevries/nlua.nvim', {
+
+    'nvim-lua/completion-nvim',
+    config = function ()
+        vim.api.nvim_command [[
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+imap <silent> <c-space> <Plug>(completion_trigger)
+
+        ]]
+    end
+},
+    'nvim-lua/lsp_extensions.nvim'
+}
 
 return M

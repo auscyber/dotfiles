@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 fg_c() {
     tput setaf $1
@@ -27,8 +27,9 @@ W_BG=$(bg_c $WHITE)
 W_FG=$(fg_c $WHITE)
 
 
-os="$(. "/etc/os-release" && printf "%s\n" "$ID")"
-packages=$(pacman -Qq | wc -l)
+
+os="$(source /etc/os-release && echo $PRETTY_NAME)"
+packages=$(apt-mark showmanual | wc -l)
 uptime="$(uptime -p | sed -e "s|up ||g" -e "s|,||g")"
 kernel="$(uname -r)"
 cpu="$(cat /proc/cpuinfo | grep "model name" | awk -F ":" '{ print $2}' | uniq)"
@@ -91,7 +92,7 @@ cat << EOF
     ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL} $os
     ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL}$cpu   
     ${W_BG}${B_FG}         ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
-    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
+    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages (apt)
     ${W_BG}${B_FG} |       ${NORMAL}         ${category}gpu:${NORMAL} $(nvidia-smi -L) 
     ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
     ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}wm:${NORMAL} $wm
