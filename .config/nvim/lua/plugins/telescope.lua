@@ -38,4 +38,5 @@ local _2amodule_2a = _0_0
 local _2amodule_name_2a = "plugins.telescope"
 do local _ = ({nil, _0_0, nil, {{}, nil, nil, nil}})[2] end
 telescope.setup({defaults = {mappings = {i = {["<esc>"] = actions.close}}}})
-return utils.keymap("n", "<C-p>", ":Telescope find_files<CR>")
+utils.keymap("n", "<C-f>", ":Telescope find_files<CR>")
+return utils.keymap("n", "<C-b>", "<cmd> lua require'telescope.builtin'.buffers {}<CR>")
