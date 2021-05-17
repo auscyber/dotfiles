@@ -27,9 +27,10 @@
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
-    (imap "<c-space>" "<Plug>(completion_trigger)")
+    (imap :<c-space> "<Plug>(completion_trigger)")
     (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
-    (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\""))
+    (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
+    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>"))
 
 
 
@@ -57,3 +58,4 @@
 (init-lsp :tsserver)
 (init-lsp :hls)
 (init-lsp :gopls)
+(init-lsp :rust_analyzer)

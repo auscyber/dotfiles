@@ -1,8 +1,8 @@
 (module plugin
-  {autoload {vim aniseed.nvim
-             a aniseed.core
-             packer packer}})
-
+  {require {nvim aniseed.nvim
+            a aniseed.core
+            packer packer}
+   require-macros [macros]})
 (defn safe-require-plugin-config [name]
   (let [(ok? val-or-err) (pcall require (.. :plugins. name))]
     (when (not ok?)
@@ -47,10 +47,10 @@
     {:requires ["vim-airline/vim-airline-themes" "jacoborus/tender.vim"]
           :mod :airline-theme} 
   :christoomey/vim-tmux-navigator {}
-;  :nvim-telescope/telescope.nvim
-;    {
-;     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]]
-;     :mod :telescope}
+  :nvim-telescope/telescope.nvim
+    {
+     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]]
+     :mod :telescope}
 
 
 
@@ -65,19 +65,27 @@
   :Olical/aniseed {}
   :ziglang/zig.vim {}
   :rafcamlet/coc-nvim-lua {}
-  :neoclide/coc.nvim {
-                      :config (fn [] (vim.api.command "so ~/.config/nvim/coc.vim"))
-                      :ft [:rust]
-                      :requires ["antoinemadec/coc-fzf"]}
+;  :neoclide/coc.nvim {
+;                      :config (fn [] (vim.api.nvim_command "so ~/.config/nvim/coc.vim"))
+;                      :ft [:rust]
+;                      :requires ["antoinemadec/coc-fzf"]
 
   :nvim-lua/completion-nvim {}
   :nvim-lua/lsp_extensions.nvim {}
   :neovim/nvim-lspconfig {:mod :nvim_lsp} ;:ft [:haskell :rust :typescript :javascript :lua]}
+  :kosayoda/nvim-lightbulb {
+                            :config
+                              (fn []
+                                (let [nvim (require :aniseed.nvim)]
+                                  (autocmd "CursorHold,CursorHoldI" "*" "lua require'nvim-lightbulb'.update_lightbulb()")))}
+
   :rust-lang/rust.vim {}
   :udalov/kotlin-vim {}
   :derekelkins/agda-vim {}
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {}
   :wbthomason/packer.nvim {}
-  :eraserhd/parinfer-rust {:run "cargo build --release"})
+  :eraserhd/parinfer-rust {:run "cargo build --release"}
+  :nvim-treesitter/nvim-treesitter {:do "TSUpdate"}
+  :campsiers/animate.vim {:mod :animate})
 

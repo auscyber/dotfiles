@@ -21,11 +21,11 @@ local autoload = (require("aniseed.autoload")).autoload
 local function _1_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _1_()
-    return {autoload("aniseed.core"), autoload("packer"), autoload("aniseed.nvim")}
+    return {require("aniseed.core"), require("aniseed.nvim"), require("packer")}
   end
   ok_3f_0_, val_0_ = pcall(_1_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {autoload = {a = "aniseed.core", packer = "packer", vim = "aniseed.nvim"}}
+    _0_0["aniseed/local-fns"] = {["require-macros"] = {macros = true}, require = {a = "aniseed.core", nvim = "aniseed.nvim", packer = "packer"}}
     return val_0_
   else
     return print(val_0_)
@@ -33,11 +33,11 @@ local function _1_(...)
 end
 local _local_0_ = _1_(...)
 local a = _local_0_[1]
-local packer = _local_0_[2]
-local vim = _local_0_[3]
+local nvim = _local_0_[2]
+local packer = _local_0_[3]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "plugin"
-do local _ = ({nil, _0_0, nil, {{}, nil, nil, nil}})[2] end
+do local _ = ({nil, _0_0, nil, {{nil}, nil, nil, nil}})[2] end
 local safe_require_plugin_config
 do
   local v_0_
@@ -88,6 +88,7 @@ local function _2_()
   return vim.api.nvim_command("let g:deoplete#enable_at_startup = 1")
 end
 local function _3_()
-  return vim.api.command("so ~/.config/nvim/coc.vim")
+  local nvim0 = require("aniseed.nvim")
+  return nvim0.ex.autocmd("CursorHold,CursorHoldI", "*", "lua require'nvim-lightbulb'.update_lightbulb()")
 end
-return use("junegunn/fzf", {}, "junegunn/fzf.vim", {}, "preservim/nerdtree", {}, "hugolgst/vimsence", {}, "jiangmiao/auto-pairs", {}, "Olical/conjure", {}, "ntpeters/vim-better-whitespace", {}, "kyazdani42/nvim-web-devicons", {}, "yamatsum/nvim-nonicons", {}, "ryanoasis/vim-devicons", {}, "kyazdani42/nvim-tree.lua", {}, "akinsho/nvim-bufferline.lua", {mod = "bufferline"}, "shougo/deoplete.nvim", {post_ = _2_}, "nathanaelkane/vim-indent-guides", {}, "Yggdroot/indentLine", {}, "jacoborus/tender.vim", {}, "vim-airline/vim-airline", {mod = "airline-theme", requires = {"vim-airline/vim-airline-themes", "jacoborus/tender.vim"}}, "christoomey/vim-tmux-navigator", {}, "onsails/lspkind-nvim", {}, "Olical/aniseed", {}, "ziglang/zig.vim", {}, "rafcamlet/coc-nvim-lua", {}, "neoclide/coc.nvim", {config = _3_, ft = {"rust"}, requires = {"antoinemadec/coc-fzf"}}, "nvim-lua/completion-nvim", {}, "nvim-lua/lsp_extensions.nvim", {}, "neovim/nvim-lspconfig", {mod = "nvim_lsp"}, "rust-lang/rust.vim", {}, "udalov/kotlin-vim", {}, "derekelkins/agda-vim", {}, "dag/vim-fish", {}, "purescript-contrib/purescript-vim", {}, "wbthomason/packer.nvim", {}, "eraserhd/parinfer-rust", {run = "cargo build --release"})
+return use("junegunn/fzf", {}, "junegunn/fzf.vim", {}, "preservim/nerdtree", {}, "hugolgst/vimsence", {}, "jiangmiao/auto-pairs", {}, "Olical/conjure", {}, "ntpeters/vim-better-whitespace", {}, "kyazdani42/nvim-web-devicons", {}, "yamatsum/nvim-nonicons", {}, "ryanoasis/vim-devicons", {}, "kyazdani42/nvim-tree.lua", {}, "akinsho/nvim-bufferline.lua", {mod = "bufferline"}, "shougo/deoplete.nvim", {post_ = _2_}, "nathanaelkane/vim-indent-guides", {}, "Yggdroot/indentLine", {}, "jacoborus/tender.vim", {}, "vim-airline/vim-airline", {mod = "airline-theme", requires = {"vim-airline/vim-airline-themes", "jacoborus/tender.vim"}}, "christoomey/vim-tmux-navigator", {}, "nvim-telescope/telescope.nvim", {mod = "telescope", requires = {{"nvim-lua/popup.nvim"}, {"nvim-lua/plenary.nvim"}}}, "onsails/lspkind-nvim", {}, "Olical/aniseed", {}, "ziglang/zig.vim", {}, "rafcamlet/coc-nvim-lua", {}, "nvim-lua/completion-nvim", {}, "nvim-lua/lsp_extensions.nvim", {}, "neovim/nvim-lspconfig", {mod = "nvim_lsp"}, "kosayoda/nvim-lightbulb", {config = _3_}, "rust-lang/rust.vim", {}, "udalov/kotlin-vim", {}, "derekelkins/agda-vim", {}, "dag/vim-fish", {}, "purescript-contrib/purescript-vim", {}, "wbthomason/packer.nvim", {}, "eraserhd/parinfer-rust", {run = "cargo build --release"}, "nvim-treesitter/nvim-treesitter", {["do"] = "TSUpdate"}, "campsiers/animate.vim", {mod = "animate"})

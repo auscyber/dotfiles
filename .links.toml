@@ -1,5 +1,6 @@
 name = "dotfiles"
 id = "17504290032302696503"
+default = "desktop"
 systems = ["desktop", "laptop"]
 
 [[links]]
@@ -40,7 +41,7 @@ destination = "xmonad/my-xmonad.cabal"
 [[links]]
 name = "xmonad/stack.yaml"
 src = "$HOME/.xmonad/stack.yaml"
-destination = "xmonad/stack.yaml"
+destination = ["desktop,"xmonad/stack.yaml"]
 
 [[links]]
 name = "xmonad/lib"
@@ -50,7 +51,7 @@ destination = "xmonad/lib"
 [[links]]
 name = "xmonad"
 src = "$HOME/.xmonad/xmonad.hs"
-destination = "xmonad"
+destination = ["desktop", "xmonad/lib/xmonad.hs"]
 
 [[links]]
 name = ".config/polybar/config.ini"
@@ -60,7 +61,10 @@ destination = ".config/polybar/config.ini"
 [[links]]
 name = ".config/polybar/launch_desktop.sh"
 src = "$HOME/.config/polybar/launch.sh"
-destination = ["desktop", ".config/polybar/launch_desktop.sh"]
+
+[links.destination]
+laptop = ".config/polybar/launch_laptop.sh"
+desktop = ".config/polybar/launch_desktop.sh"
 
 [[links]]
 name = ".config/polybar/scripts"
@@ -68,11 +72,11 @@ src = "$HOME/.config/polybar/scripts"
 destination = ".config/polybar/scripts"
 
 [[links]]
-name = ".config/polybar/launch_laptop.sh"
-src = "$HOME/.config/polybar/launch.sh"
+name = "xmonad/build"
+src = "$HOME/.xmonad/build"
 
 [links.destination]
-desktop = "xmonad/build"
+desktop = "xmonad/build_desktop"
 laptop = "xmonad/build_laptop"
 
 [[links]]
@@ -85,6 +89,14 @@ name = ".config/fontconfig"
 src = "$HOME/.config/fontconfig"
 destination = ".config/fontconfig"
 
+[[links]]
+<<<<<<< HEAD
+name = "xmonad/my-xmonad_laptop.cabal"
+src = "$HOME/.xmonad/my-xmonad.cabal"
+
+[links.destination]
+laptop = "xmonad/my-xmonad_laptop.cabal"
+desktop = "xmonad/my-xmonad.cabal"
 [[links]]
 name = "dotfiles"
 src = "$HOME/.zshrc"
