@@ -1,3 +1,4 @@
+local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugins/bufferline.fnl"
 local _0_0
 do
   local name_0_ = "plugins.bufferline"

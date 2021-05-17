@@ -1,3 +1,4 @@
+local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugins/nvim_lsp.fnl"
 local _0_0
 do
   local name_0_ = "plugins.nvim_lsp"
@@ -83,4 +84,5 @@ local function init_lsp(lsp_name, _3fopts)
   return lsp[lsp_name].setup(merged_opts)
 end
 init_lsp("tsserver")
-return init_lsp("hls")
+init_lsp("hls")
+return init_lsp("gopls")

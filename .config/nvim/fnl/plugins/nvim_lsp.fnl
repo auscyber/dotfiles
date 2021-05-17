@@ -56,3 +56,4 @@
 
 (init-lsp :tsserver)
 (init-lsp :hls)
+(init-lsp :gopls)
