@@ -7,8 +7,8 @@
 
 (fn window_percent_width [...] (animate_fn "window_percent_width" ...))
 
-(utils.keymap
-  :n "<C-w>v"
-  "lua require'plugins.animate'.animated_split()" {:noremap true})
+;(utils.keymap
+; :n "<C-w>v"
+; "lua require'plugins.animate'.animated_split()" {:noremap true})
 
 {:animated_split (fn animated_split [] (nvim.command "new | wincmd L | vertical resize 0 ") (window_percent_width 0.50))}
