@@ -35,7 +35,7 @@
   :Olical/conjure {}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
-  :yamatsum/nvim-nonicons {}
+;  :yamatsum/nvim-nonicons {}
   :ryanoasis/vim-devicons {}
   :kyazdani42/nvim-tree.lua {}
   :akinsho/nvim-bufferline.lua {:mod :bufferline}
@@ -87,5 +87,8 @@
   :wbthomason/packer.nvim {}
   :eraserhd/parinfer-rust {:run "cargo build --release"}
   :nvim-treesitter/nvim-treesitter {:do "TSUpdate"}
-  :campsiers/animate.vim {:mod :animate})
+  :campsiers/animate.vim {:mod :animate}
+  :elkowar/nvim-gehzu {}
+  :andweeb/presence.nvim {:mod :presence})
+
 

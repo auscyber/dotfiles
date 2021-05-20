@@ -30,7 +30,8 @@
     (imap :<c-space> "<Plug>(completion_trigger)")
     (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
-    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>"))
+    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>"))
 
 
 
@@ -45,6 +46,7 @@
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
          augroup END"
        false))))
 
