@@ -61,3 +61,4 @@
 (init-lsp :hls)
 (init-lsp :gopls)
 (init-lsp :rust_analyzer)
+(init-lsp :clangd)

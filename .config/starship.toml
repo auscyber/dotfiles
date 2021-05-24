@@ -1,15 +1,15 @@
 format = """
-$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$character
+$shell$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character
 """
 
-[custom.shell]
-command = "echo $STARSHIP_SHELL"
-when = "true"
-format  = "[$output](bold blue)"
+[shell]
+disabled = true
 
 [character]
 success_symbol = "[❯](bold light blue)"
 error_symbol = "[❯](bold white)"
+
+
 
 
 

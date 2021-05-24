@@ -30,7 +30,6 @@
   :junegunn/fzf {}
   :junegunn/fzf.vim {}
   :preservim/nerdtree {}
-  :hugolgst/vimsence {}
   :jiangmiao/auto-pairs {}
   :Olical/conjure {}
   :ntpeters/vim-better-whitespace {}

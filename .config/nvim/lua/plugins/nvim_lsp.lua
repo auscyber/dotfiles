@@ -72,12 +72,13 @@ local function on_attach(client, bufnr)
     inoremap("<Tab>", "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     inoremap("<S-Tab>", "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
     map("<space>a", "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    map("ff", "<cmd>lua vim.lsp.buf.formatting()<CR>")
   end
   if client.resolved_capabilities.document_highlight then
     utils.highlight("LspReferenceRead", {gui = "underline"})
     utils.highlight("LspReferenceText", {gui = "underline"})
     utils.highlight("LspReferenceWrite", {gui = "underline"})
-    return vim.api.nvim_exec("augroup lsp_document_highlight\n           autocmd! * <buffer>\n           autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()\n           autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()\n         augroup END", false)
+    return vim.api.nvim_exec("augroup lsp_document_highlight\n           autocmd! * <buffer>\n           autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()\n           autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()\n           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()\n         augroup END", false)
   end
 end
 local function init_lsp(lsp_name, _3fopts)
@@ -87,4 +88,5 @@ end
 init_lsp("tsserver")
 init_lsp("hls")
 init_lsp("gopls")
-return init_lsp("rust_analyzer")
+init_lsp("rust_analyzer")
+return init_lsp("clangd")

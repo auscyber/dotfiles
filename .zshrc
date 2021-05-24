@@ -14,7 +14,7 @@ antigen bundle chisui/zsh-nix-shell
 antigen apply
 
 NPM_PACKAGES="${HOME}/.npm-packages"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin
+export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin
 # Aliases 
 
 function set_win_title(){
@@ -47,10 +47,10 @@ eval "$(starship init zsh)"
 
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
 export EDITOR=vim
+export editor=$EDITOR
 export BROWSER=firefox
 source ~/.cargo/env
 source ~/.nix-profile/etc/profile.d/nix.sh
-# opam configuration
 test -r /home/auscyber/.opam/opam-init/init.zsh && . /home/auscyber/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 fetch -s
 export GTK2_RC_FILES=$HOME/.gtkrc-2.0

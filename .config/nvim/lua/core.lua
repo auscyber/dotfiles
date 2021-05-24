@@ -40,5 +40,27 @@ local bo = nvim.bo
 local wo = nvim.o
 local o = nvim.o
 o.mouse = "a"
+o.guifont = "Hasklug Nerd Font:12"
 o.termguicolors = true
-return nvim.ex.colorscheme("pink_ocean")
+nvim.ex.colorscheme("pink_ocean")
+bo.tabstop = 4
+bo.shiftwidth = 4
+bo.expandtab = true
+o.tabstop = 4
+o.shiftwidth = 4
+o.hidden = true
+o.updatetime = 300
+o.signcolumn = "yes"
+wo.rnu = true
+wo.nu = true
+nvim.command("set rnu nu")
+local function switch_fullscreen()
+  local nvim0 = require("aniseed.nvim")
+  if vim.g.neovide_fullscreen then
+    return nvim0.command("let g:neovide_fullscreen=v:false")
+  else
+    return nvim0.command("let g:neovide_fullscreen=v:true")
+  end
+end
+nvim.ex.nmap("<F11>", "<cmd> lua require 'core'.switch_fullscreen() <Cr>")
+return {switch_fullscreen = switch_fullscreen}

@@ -1,3 +1,4 @@
+local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugins/animate.fnl"
 local _0_0
 do
   local name_0_ = "plugins.animate"
@@ -42,7 +43,6 @@ end
 local function window_percent_width(...)
   return animate_fn("window_percent_width", ...)
 end
-utils.keymap("n", "<C-w>v", "lua require'plugins.animate'.animated_split()", {noremap = true})
 local function animated_split()
   nvim.command("new | wincmd L | vertical resize 0 ")
   return window_percent_width(0.5)
