@@ -1,4 +1,9 @@
 #source /etc/profile
+NPM_PACKAGES="${HOME}/.npm-packages"
+export DENO_INSTALL="/home/auscyber/.deno"
+export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:${DENO_INSTALL}/bin
+# Aliases 
+fpath=(~/.zsh $fpath)
 autoload -U compinit promptinit
 compinit
 #promptinit; #prompt gentoo
@@ -13,9 +18,7 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle chisui/zsh-nix-shell
 antigen apply
 
-NPM_PACKAGES="${HOME}/.npm-packages"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin
-# Aliases 
+
 
 function set_win_title(){
     echo -ne "\033]0; Alacritty: $(basename $PWD) \007"

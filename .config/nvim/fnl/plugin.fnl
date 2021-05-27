@@ -30,7 +30,7 @@
   :junegunn/fzf {}
   :junegunn/fzf.vim {}
   :preservim/nerdtree {}
-  :jiangmiao/auto-pairs {}
+  :windwp/nvim-autopairs {:mod :autopairs}
   :Olical/conjure {}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
@@ -80,7 +80,7 @@
 
   :rust-lang/rust.vim {}
   :udalov/kotlin-vim {}
-  :derekelkins/agda-vim {}
+  :derekelkins/agda-vim {:config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {}
   :wbthomason/packer.nvim {}

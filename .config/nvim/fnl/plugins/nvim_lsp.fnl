@@ -3,7 +3,8 @@
              a aniseed.core
              nvim aniseed.nvim
              completion completion
-             utils utils}
+             utils utils
+             npairs nvim-autopairs}
 
    require-macros [macros]})
 
@@ -11,11 +12,28 @@
 (set nvim.g.completion_enable_auto_popup 1)
 
 
+(set _G.LOL {})
 
+(set _G.LOL.completion_confirm (fn []
+                                 (lua "
+ if vim.fn.pumvisible() ~= 0  then
+    if vim.fn.complete_info()[\"selected\"] ~= -1 then
+      completion.confirmCompletion()
+      return npairs.esc(\"<c-y>\")
+    else
+      vim.api.nvim_select_popupmenu_item(0 , false , false ,{})
+      completion.confirmCompletion()
+      return npairs.esc(\"<c-n><c-y>\")
+    end
+  else
+    return npairs.autopairs_cr()
+  end
 
+                                  ")))
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
+  (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
         map (fn [key command] "lol" (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent true})) 
@@ -31,7 +49,10 @@
     (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
     (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
-    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>"))
+    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
+    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
+    (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
+
 
 
 
@@ -62,3 +83,6 @@
 (init-lsp :gopls)
 (init-lsp :rust_analyzer)
 (init-lsp :clangd)
+;(init-lsp :denols)
+(init-lsp :ocamllsp)
+(init-lsp :pyls)
