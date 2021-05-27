@@ -36,7 +36,7 @@
   :kyazdani42/nvim-web-devicons {}
 ;  :yamatsum/nvim-nonicons {}
   :ryanoasis/vim-devicons {}
-  :kyazdani42/nvim-tree.lua {}
+  :kyazdani42/nvim-tree.lua {:mod :tree}
   :akinsho/nvim-bufferline.lua {:mod :bufferline}
   :shougo/deoplete.nvim {:post_ (fn [] (vim.api.nvim_command "let g:deoplete#enable_at_startup = 1"))}
   :nathanaelkane/vim-indent-guides {}
