@@ -21,7 +21,7 @@
 
 (nvim.command "set rnu nu")
 
-(fn switch_fullscreen []
+(fn _G.switch_fullscreen []
       (local nvim (require :aniseed.nvim))
       (if vim.g.neovide_fullscreen 
 ;      (set nvim.g.neovide_fullscreen false)
@@ -29,5 +29,5 @@
         (nvim.command "let g:neovide_fullscreen=v:false")
        (nvim.command "let g:neovide_fullscreen=v:true")))
 
-(_: nmap :<F11> "<cmd> lua require 'core'.switch_fullscreen() <Cr>")
+(_: nmap :<F11> "<Expr>v:lua.switch_fullscreen() <Cr>")
 {:switch_fullscreen switch_fullscreen}
