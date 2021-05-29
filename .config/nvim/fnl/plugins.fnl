@@ -1,4 +1,4 @@
-(module plugin
+(module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
    require-macros [macros]})
@@ -6,12 +6,11 @@
 ;(defn- use [...]
 ;  "Iterates through the arguments as pairs and calls packer's use function for
 ;  each of them. Works around Fennel not liking mixed associative and sequential
-;  tables as well."
-;  (let [pkgs [...]]
+;  tables as well." (let [pkgs [...]]
 ;    (packer.startup
 ;      (fn [use]
 ;        (for [i 1 (a.count pkgs) 2]
-;          (packer-use pkgs i 
+;          (packer-use pkgs i
 ;            (use (a.assoc opts 1 name))))))))
 
 
@@ -24,21 +23,21 @@
   :junegunn/fzf {}
   :junegunn/fzf.vim {}
 ;  :preservim/nerdtree {}
-  :windwp/nvim-autopairs {:mod :plugins.autopairs}
+  :windwp/nvim-autopairs {:mod :autopairs}
   :Olical/conjure {}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
 ;  :yamatsum/nvim-nonicons {}
   :ryanoasis/vim-devicons {}
-  :kyazdani42/nvim-tree.lua {:mod :plugins.tree}
-  :akinsho/nvim-bufferline.lua {:mod :plugins.bufferline}
+  :kyazdani42/nvim-tree.lua {:mod :tree}
+  :akinsho/nvim-bufferline.lua {:mod :bufferline}
   :shougo/deoplete.nvim {:post_ (fn [] (vim.api.nvim_command "let g:deoplete#enable_at_startup = 1"))}
   :nathanaelkane/vim-indent-guides {}
   :Yggdroot/indentLine {}
   :jacoborus/tender.vim {}
-  :vim-airline/vim-airline 
-    {:requires ["vim-airline/vim-airline-themes" "jacoborus/tender.vim"]
-          :mod :plugins.airline-theme} 
+;  :vim-airline/vim-airline
+;    {:requires ["vim-airline/vim-airline-themes" "jacoborus/tender.vim"]
+;          :mod :airline-theme}
   :christoomey/vim-tmux-navigator {}
   :nvim-telescope/telescope.nvim
     {
@@ -55,7 +54,7 @@
   :onsails/lspkind-nvim {}
   :Olical/aniseed {}
   :ziglang/zig.vim {:ft [:zig]}
-  :rafcamlet/coc-nvim-lua {}
+;  :rafcamlet/coc-nvim-lua {}
 ;  :neoclide/coc.nvim {
 ;                      :config (fn [] (vim.api.nvim_command "so ~/.config/nvim/coc.vim"))
 ;                      :ft [:rust]
@@ -63,7 +62,7 @@
 
   :nvim-lua/completion-nvim {}
   :nvim-lua/lsp_extensions.nvim {}
-  :neovim/nvim-lspconfig {:mod :plugins.nvim_lsp :ft [:haskell :rust :typescript :javascript :lua]}
+  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua :zig :go]}
   :kosayoda/nvim-lightbulb {
                             :config
                               (fn []
@@ -72,13 +71,15 @@
 
   :rust-lang/rust.vim {:ft [:rust]}
   :udalov/kotlin-vim {:ft [:kotlin]}
-  :derekelkins/agda-vim {:config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
+  :derekelkins/agda-vim {:ft [:agda] :config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
   :dag/vim-fish {}
-  :purescript-contrib/purescript-vim {}
-  :eraserhd/parinfer-rust {:run "cargo build --release"}
+  :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
+  :eraserhd/parinfer-rust {:ft [:fennel] :run "cargo build --release"}
   :nvim-treesitter/nvim-treesitter {:do "TSUpdate"}
 ;  :camspiers/animate.vim {:mod :animate}
   :elkowar/nvim-gehzu {}
+;  :glepnir/galaxyline.nvim {:mod :galaxyline}
+  :famiu/feline.nvim {:mod :feline}
   :andweeb/presence.nvim {:mod :presence})
 
 

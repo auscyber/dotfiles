@@ -86,3 +86,4 @@
 ;(init-lsp :denols)
 (init-lsp :ocamllsp)
 (init-lsp :pyls)
+(init-lsp :zls)

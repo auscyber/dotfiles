@@ -1,4 +1,4 @@
 (module init {
               autoload {a aniseed.core}})
-(require :plugin)
+(require :plugins)
 (require :core)

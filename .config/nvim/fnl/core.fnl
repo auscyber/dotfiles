@@ -8,6 +8,7 @@
 (set o.guifont "Hasklug Nerd Font:12")
 (set o.termguicolors true)
 (_: colorscheme :pink_ocean)
+(set o.showmode false)
 (set bo.tabstop 4)
 (set bo.shiftwidth 4)
 (set bo.expandtab  true)

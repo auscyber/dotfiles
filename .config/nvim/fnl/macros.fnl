@@ -30,7 +30,7 @@
                                        ;(print ,(. block :mod))
                                        ;(time
                                          ;(
-                                          require ,(. block :mod))))
+                                          require ,(.. :plugins. (. block :mod)))))
          (a.assoc block :mod)
          (table.insert use-statements block)))
   
