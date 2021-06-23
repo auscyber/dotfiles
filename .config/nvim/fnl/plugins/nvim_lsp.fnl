@@ -4,6 +4,7 @@
              nvim aniseed.nvim
              completion completion
              utils utils
+             lspkind lspkind
              npairs nvim-autopairs}
 
    require-macros [macros]})
@@ -33,6 +34,7 @@
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
+  (lspkind.init {})
   (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
         map (fn [key command] "lol" (nvim.buf_set_keymap bufnr :n key command opts))
@@ -52,7 +54,8 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
-
+;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
+  (vim.api.nvim_exec "autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = 'NonText', enabled = {'ChainingHint' }}" false)
 
 
 

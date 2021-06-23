@@ -39,72 +39,47 @@
 (set properties.force_inactive.buftypes [ "terminal"])
 
 (tset components.left.active 1  {
-                                 :provider "▊ "
+                                 :provider " "
                                  :hl {
-                                      :fg colors.light_red}})
+                                      :fg colors.cyan
+                                      :bg "NONE"}})
 
 
 (tset components.left.active 2  {
-                                 :provider  (fn [] " ")
+                                 :provider  (fn [] "  ")
                                  :hl (fn []
-                                      (local val {})
+                                      (local val {:bg colors.cyan})
                                       (set val.name (vi_mode_utils.get_mode_highlight_name))
                                       (set val.fg (vi_mode_utils.get_mode_color))
                                       (set val.style "bold")
                                       val)
-                                 :right_sep " "})
+                                 :right_sep {:str " " :hl {:bg colors.cyan}}})
 
 
 (tset components.left.active 3  {
                                  :provider  "file_info"
                                  :hl {
                                       :fg "white"
-                                      :bg colors.light_red
+                                      :bg colors.grey
                                       :style "bold"}
-                                 :left_sep  [" " "slant_left_2"
-                                              {:str  " " :hl  {:bg colors.light_red :fg  "NONE"}}]
-                                 :right_sep  ["slant_right_2" " "]})
+                                 :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
+;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
+                                 :right_sep  [" "]})
 
 
 (tset components.left.active 4  {:provider  "file_size"
                                   :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
-                                  :right_sep  [" " {:str :slant_left_2_thin :hl {:fg  :fg :bg  :bg}}]})
-
-
-(tset components.left.active 5  {
-                                  :provider  "position"
-                                  :left_sep  " "
-                                  :right_sep  [" "
-                                                {:str  "slant_right_2_thin"
-                                                    :hl  {:fg  "fg"
-                                                           :bg  "bg"}}]})
-
-
-(tset components.left.active 6  {
-                                  :provider  "diagnostic_errors"
-                                  :enabled  (fn [] (lsp.diagnostics_exist "Error"))
-                                  :hl  { :fg  "red"}})
-
-
-(tset components.left.active 7  {
-                                  :provider  "diagnostic_warnings"
-                                  :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
-                                  :hl  { :fg  "yellow"}})
-
-
-(tset components.left.active 8  {
-                                  :provider  "diagnostic_hints"
-                                  :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
-                                  :hl  { :fg  "cyan"}})
-
-
-(tset components.left.active 9  {
-                                  :provider  "diagnostic_info"
-                                  :enabled  (fn [] (lsp.diagnostics_exist "Information"))
-                                  :hl  { :fg  "skyblue"}})
+                                  :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]})
 
 
 (tset components.right.active 1  {
+                                   :provider  "position"
+                                   :left_sep  [{:str :left_rounded :hl {:fg colors.light_red :bg :NONE}}]
+                                   :hl {:bg colors.light_red :fg colors.white :style :bold} 
+                                   :right_sep  [{:str " " :hl {:bg colors.light_red}}]})
+
+
+(tset components.right.active 2  {
                                    :provider  "git_branch"
                                    :hl  {
                                           :fg  "white"
@@ -114,26 +89,23 @@
                                                 (local val  {:hl  {:fg  "NONE" :bg  "black"}})
                                                 (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
                                                 val)})
-                                                
 
 
-(tset components.right.active 2  {
+(tset components.right.active 3  {
                                   :provider  "git_diff_added"
                                   :hl  {
                                         :fg  "green"
                                         :bg  "black"}})
-    
 
 
-(tset components.right.active 3  {
+(tset components.right.active 4  {
                                   :provider  "git_diff_changed"
                                   :hl  {
                                         :fg  "orange"
                                         :bg  "black"}})
-    
 
 
-(tset components.right.active 4  {
+(tset components.right.active 5  {
                                   :provider  "git_diff_removed"
                                   :hl  {
                                         :fg  "red"
@@ -143,10 +115,10 @@
                                                (if b.gitsigns_status_dict (set val.str  " ") (set val.str  ""))
                                                val)})
 
-                              
 
 
-(tset components.right.active 5  {
+
+(tset components.right.active 6  {
                                   :provider  "line_percentage"
                                   :hl  {
                                         :style  "bold"}
@@ -154,32 +126,64 @@
                                   :right_sep  " "})
 
 
-(tset components.right.active 6  {
+(tset components.right.active 7  {
                                   :provider  "scroll_bar"
                                   :hl  {
                                         :fg  colors.light_red
                                         :style  "bold"}})
-    
+
+
+(tset components.right.active 8  {
+                                   :provider  "diagnostic_errors"
+                                   :enabled  (fn [] (lsp.diagnostics_exist "Error"))
+                                   :hl  { :fg  "red"}})
+
+
+(tset components.right.active 9  {
+                                   :provider  "diagnostic_warnings"
+                                   :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
+                                   :hl  { :fg  "yellow"}})
+
+
+(tset components.right.active 10  {
+                                    :provider  "diagnostic_hints"
+                                    :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
+                                    :hl  { :fg  "cyan"}})
+
+
+(tset components.right.active 11  {
+                                    :provider  "diagnostic_info"
+                                    :enabled  (fn [] (lsp.diagnostics_exist "Information"))
+                                    :hl  { :fg  "skyblue"}})
+(tset components.right.active 12 {
+                                  :provider " "
+                                  :right_sep {:str :right_rounded :hl {:fg :bg :bg :NONE}}})
+
 
 
 (tset components.left.inactive 1  {
                                     :provider  "file_type"
                                     :hl  {
                                            :fg  "white"
-                                           :bg  "oceanblue"
+                                           :bg  colors.cyan}
+                                    :left_sep  [{:str " " :hl {:fg :NONE :bg :NONE}} :left_rounded {
+                                                                                                    :str  " "
+                                                                                                    :hl  {
+                                                                                                           :fg  :NONE
+                                                                                                           :bg  colors.cyan}}]
+                                    :right_sep {:str " " :hl {:bg colors.cyan}}})
+(tset components.left.inactive 2  {
+                                    :provider  "file_info"
+                                    :hl  {
+                                           :fg  "white"
+                                           :bg  colors.dark_cyan
                                            :style  "bold"}
-                               
-                                    :left_sep  {
-                                                 :str  " "
-                                                 :hl  {
-                                                        :fg  "NONE"
-                                                        :bg  "oceanblue"}}
-        
-                               
+                                    :left_sep {:str " " :hl {:bg colors.dark_cyan}}
                                     :right_sep  [{:str  " "
                                                      :hl  {:fg  "NONE"
-                                                            :bg  "oceanblue"}} "slant_right"]})
-    
+                                                            :bg  colors.dark_cyan}} {:str "right_rounded" :hl {:bg "NONE" :fg colors.dark_cyan}}]})
+
+
 
 
 -- This table is equal to the default colors table
@@ -225,30 +229,26 @@
 (local vi_mode_colors {
                        :NORMAL  colors.white
                        :OP  "green"
-                       :INSERT  "red"
-                       :VISUAL  "skyblue"
-                       :BLOCK  "skyblue"
-                       :REPLACE  "violet"
+                       :INSERT  colors.dark_cyan
+                       :VISUAL  colors.blue
+                       :BLOCK  colors.blue
+                       :REPLACE  colors.red
                        ["V-REPLACE"]  "violet"
                        :ENTER  "cyan"
                        :MORE  "cyan"
                        :SELECT  "orange"
-                       :COMMAND  "green"
+                       :COMMAND  colors.cyan
                        :SHELL  "green"
                        :TERM  "green"
                        :NONE  "yellow"})
 
 
 (feline.setup {
-               :default_fg "#D0D0D0" 
+               :default_fg "#D0D0D0"
                :default_bg colors.purple
                :colors colors
                :separators separators
                :components components
                :properties properties
                :vi_mode_colors vi_mode_colors})
-
-
-
-
 

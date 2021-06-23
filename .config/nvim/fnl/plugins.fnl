@@ -60,9 +60,8 @@
 ;                      :ft [:rust]
 ;                      :requires ["antoinemadec/coc-fzf"]
 
-  :nvim-lua/completion-nvim {}
-  :nvim-lua/lsp_extensions.nvim {}
-  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua :zig :go]}
+  :SirVer/ultisnips {}
+  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact] :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim]}
   :kosayoda/nvim-lightbulb {
                             :config
                               (fn []
@@ -71,15 +70,17 @@
 
   :rust-lang/rust.vim {:ft [:rust]}
   :udalov/kotlin-vim {:ft [:kotlin]}
-  :derekelkins/agda-vim {:ft [:agda] :config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
+;  :derekelkins/agda-vim {:ft [:agda]} ; :config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
   :eraserhd/parinfer-rust {:ft [:fennel] :run "cargo build --release"}
-  :nvim-treesitter/nvim-treesitter {:do "TSUpdate"}
+  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground]}
 ;  :camspiers/animate.vim {:mod :animate}
   :elkowar/nvim-gehzu {}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
+  :tpope/vim-fugitive {}
   :famiu/feline.nvim {:mod :feline}
-  :andweeb/presence.nvim {:mod :presence})
+  :andweeb/presence.nvim {:mod :presence}
+  :ShinKage/nvim-idris2 {})
 
 

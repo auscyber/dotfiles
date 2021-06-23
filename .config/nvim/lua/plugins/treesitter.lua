@@ -1,7 +1,7 @@
-local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugins/airline-theme.fnl"
+local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugins/treesitter.fnl"
 local _0_
 do
-  local name_0_ = "airline-theme"
+  local name_0_ = "plugins.treesitter"
   local module_0_
   do
     local x_0_ = package.loaded[name_0_]
@@ -25,21 +25,21 @@ autoload = _1_
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {autoload("aniseed.nvim"), autoload("dotfiles.util")}
+    return {require("nvim-treesitter.parsers"), require("nvim-treesitter.configs")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_["aniseed/local-fns"] = {autoload = {nvim = "aniseed.nvim", util = "dotfiles.util"}}
+    _0_["aniseed/local-fns"] = {require = {parsers = "nvim-treesitter.parsers", treesitter = "nvim-treesitter.configs"}}
     return val_0_
   else
     return print(val_0_)
   end
 end
 local _local_0_ = _2_(...)
-local nvim = _local_0_[1]
-local util = _local_0_[2]
+local parsers = _local_0_[1]
+local treesitter = _local_0_[2]
 local _2amodule_2a = _0_
-local _2amodule_name_2a = "airline-theme"
+local _2amodule_name_2a = "plugins.treesitter"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
-nvim.g.airline_theme = "tender"
-return nil
+parsers.get_parser_configs()["agda"] = {filetype = "agda", install_info = {files = {"src/parser.c", "src/scanner.cc"}, url = "~/packages/tree-sitter-agda"}}
+return treesitter.setup({autopairs = {enable = true}, ensure_installed = {"rust", "haskell", "agda", "javascript", "c", "fennel", "go", "zig", "query"}, highlight = {enable = true}, playground = {enable = true}, query_linter = {enable = true}})
