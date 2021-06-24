@@ -70,6 +70,7 @@ end
 _G.LOL.completion_confirm = _3_
 local function on_attach(client, bufnr)
   completion.on_attach(client, bufnr)
+  vim.g.completion_enable_snippet = "UltiSnips"
   lspkind.init({})
   npairs.setup({})
   do
@@ -97,6 +98,8 @@ local function on_attach(client, bufnr)
     map("<C-K>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     map("<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
     imap("<c-space>", "<Plug>(completion_trigger)")
+    imap("<tab>", "<Plug>(completion_smart_tab)")
+    imap("<s-tab>", "<Plug>(completion_smart_s_tab)")
     inoremap("<Tab>", "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     inoremap("<S-Tab>", "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
     map("<space>a", "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
@@ -104,6 +107,7 @@ local function on_attach(client, bufnr)
     map("<leader>a", "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     inoremap("<CR>", "v:lua.LOL.completion_confirm()")
   end
+  nvim.ex.autocmd("BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
   vim.api.nvim_exec("autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' \194\187 ', highlight = 'NonText', enabled = {'ChainingHint' }}", false)
   if client.resolved_capabilities.document_highlight then
     utils.highlight("LspReferenceRead", {gui = "underline"})
@@ -121,6 +125,7 @@ init_lsp("hls")
 init_lsp("gopls")
 init_lsp("rust_analyzer")
 init_lsp("clangd")
+initlsp("rnix-lsp")
 init_lsp("ocamllsp")
 init_lsp("pyls")
 return init_lsp("zls")

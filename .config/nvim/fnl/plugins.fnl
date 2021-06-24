@@ -60,7 +60,7 @@
 ;                      :ft [:rust]
 ;                      :requires ["antoinemadec/coc-fzf"]
 
-  :SirVer/ultisnips {}
+  :norcalli/snippets.nvim {}
   :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact] :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim]}
   :kosayoda/nvim-lightbulb {
                             :config
@@ -73,7 +73,7 @@
 ;  :derekelkins/agda-vim {:ft [:agda]} ; :config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
-  :eraserhd/parinfer-rust {:ft [:fennel] :run "cargo build --release"}
+;  :eraserhd/parinfer-rust {:ft [:fennel] :run "nix-shell --run \"cargo build --release\""}
   :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground]}
 ;  :camspiers/animate.vim {:mod :animate}
   :elkowar/nvim-gehzu {}
@@ -81,6 +81,7 @@
   :tpope/vim-fugitive {}
   :famiu/feline.nvim {:mod :feline}
   :andweeb/presence.nvim {:mod :presence}
+  :LnL7/vim-nix  {}
   :ShinKage/nvim-idris2 {})
 
 

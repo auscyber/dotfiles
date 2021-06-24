@@ -34,6 +34,7 @@
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
+  (set vim.g.completion_enable_snippet "UltiSnips")
   (lspkind.init {})
   (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
@@ -48,13 +49,15 @@
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
     (imap :<c-space> "<Plug>(completion_trigger)")
+    (imap :<tab> "<Plug>(completion_smart_tab)")
+    (imap :<s-tab> "<Plug>(completion_smart_s_tab)")
     (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
     (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
-;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
+    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
   (vim.api.nvim_exec "autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = 'NonText', enabled = {'ChainingHint' }}" false)
 
 
@@ -86,6 +89,7 @@
 (init-lsp :gopls)
 (init-lsp :rust_analyzer)
 (init-lsp :clangd)
+(initlsp :rnix-lsp)
 ;(init-lsp :denols)
 (init-lsp :ocamllsp)
 (init-lsp :pyls)
