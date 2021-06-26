@@ -74,7 +74,7 @@
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
 ;  :eraserhd/parinfer-rust {:ft [:fennel] :run "nix-shell --run \"cargo build --release\""}
-  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground]}
+;  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground]}
 ;  :camspiers/animate.vim {:mod :animate}
   :elkowar/nvim-gehzu {}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}

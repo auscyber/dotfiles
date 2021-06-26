@@ -152,11 +152,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-tree.lua"
   },
-  ["nvim-treesitter"] = {
-    config = { "\27LJ\2\n.\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\23plugins.treesitter\frequire\0" },
-    loaded = true,
-    path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter"
-  },
   ["nvim-web-devicons"] = {
     loaded = true,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-web-devicons"
@@ -164,10 +159,6 @@ _G.packer_plugins = {
   ["packer.nvim"] = {
     loaded = true,
     path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/packer.nvim"
-  },
-  playground = {
-    loaded = true,
-    path = "/home/auscyber/.local/share/nvim/site/pack/packer/start/playground"
   },
   ["plenary.nvim"] = {
     loaded = true,
@@ -253,14 +244,6 @@ time([[Config for nvim-bufferline.lua]], false)
 time([[Config for feline.nvim]], true)
 try_loadstring("\27LJ\2\n*\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\19plugins.feline\frequire\0", "config", "feline.nvim")
 time([[Config for feline.nvim]], false)
--- Config for: nvim-autopairs
-time([[Config for nvim-autopairs]], true)
-try_loadstring("\27LJ\2\n-\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\22plugins.autopairs\frequire\0", "config", "nvim-autopairs")
-time([[Config for nvim-autopairs]], false)
--- Config for: presence.nvim
-time([[Config for presence.nvim]], true)
-try_loadstring("\27LJ\2\n,\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\21plugins.presence\frequire\0", "config", "presence.nvim")
-time([[Config for presence.nvim]], false)
 -- Config for: telescope.nvim
 time([[Config for telescope.nvim]], true)
 try_loadstring("\27LJ\2\n-\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\22plugins.telescope\frequire\0", "config", "telescope.nvim")
@@ -269,39 +252,43 @@ time([[Config for telescope.nvim]], false)
 time([[Config for nvim-tree.lua]], true)
 try_loadstring("\27LJ\2\n(\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\17plugins.tree\frequire\0", "config", "nvim-tree.lua")
 time([[Config for nvim-tree.lua]], false)
--- Config for: nvim-treesitter
-time([[Config for nvim-treesitter]], true)
-try_loadstring("\27LJ\2\n.\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\23plugins.treesitter\frequire\0", "config", "nvim-treesitter")
-time([[Config for nvim-treesitter]], false)
+-- Config for: nvim-autopairs
+time([[Config for nvim-autopairs]], true)
+try_loadstring("\27LJ\2\n-\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\22plugins.autopairs\frequire\0", "config", "nvim-autopairs")
+time([[Config for nvim-autopairs]], false)
+-- Config for: presence.nvim
+time([[Config for presence.nvim]], true)
+try_loadstring("\27LJ\2\n,\0\0\3\0\2\0\0036\0\0\0'\2\1\0D\0\2\0\21plugins.presence\frequire\0", "config", "presence.nvim")
+time([[Config for presence.nvim]], false)
 vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]
   -- Filetype lazy-loads
 time([[Defining lazy-load filetype autocommands]], true)
-vim.cmd [[au FileType javascript ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "javascript" }, _G.packer_plugins)]]
-vim.cmd [[au FileType lua ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "lua" }, _G.packer_plugins)]]
+vim.cmd [[au FileType rust ++once lua require("packer.load")({'nvim-lspconfig', 'rust.vim'}, { ft = "rust" }, _G.packer_plugins)]]
 vim.cmd [[au FileType haskell ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "haskell" }, _G.packer_plugins)]]
-vim.cmd [[au FileType zig ++once lua require("packer.load")({'zig.vim', 'nvim-lspconfig'}, { ft = "zig" }, _G.packer_plugins)]]
+vim.cmd [[au FileType go ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "go" }, _G.packer_plugins)]]
 vim.cmd [[au FileType kotlin ++once lua require("packer.load")({'kotlin-vim'}, { ft = "kotlin" }, _G.packer_plugins)]]
 vim.cmd [[au FileType c ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "c" }, _G.packer_plugins)]]
-vim.cmd [[au FileType cpp ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "cpp" }, _G.packer_plugins)]]
-vim.cmd [[au FileType table: 0x7fbc4d6c0938 ++once lua require("packer.load")({'purescript-vim'}, { ft = "table: 0x7fbc4d6c0938" }, _G.packer_plugins)]]
-vim.cmd [[au FileType rust ++once lua require("packer.load")({'nvim-lspconfig', 'rust.vim'}, { ft = "rust" }, _G.packer_plugins)]]
-vim.cmd [[au FileType go ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "go" }, _G.packer_plugins)]]
-vim.cmd [[au FileType ft ++once lua require("packer.load")({'purescript-vim'}, { ft = "ft" }, _G.packer_plugins)]]
-vim.cmd [[au FileType typescriptreact ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "typescriptreact" }, _G.packer_plugins)]]
 vim.cmd [[au FileType typescript ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "typescript" }, _G.packer_plugins)]]
+vim.cmd [[au FileType typescriptreact ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "typescriptreact" }, _G.packer_plugins)]]
+vim.cmd [[au FileType table: 0x7fb7278e76a0 ++once lua require("packer.load")({'purescript-vim'}, { ft = "table: 0x7fb7278e76a0" }, _G.packer_plugins)]]
+vim.cmd [[au FileType ft ++once lua require("packer.load")({'purescript-vim'}, { ft = "ft" }, _G.packer_plugins)]]
+vim.cmd [[au FileType cpp ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "cpp" }, _G.packer_plugins)]]
+vim.cmd [[au FileType zig ++once lua require("packer.load")({'nvim-lspconfig', 'zig.vim'}, { ft = "zig" }, _G.packer_plugins)]]
+vim.cmd [[au FileType javascript ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "javascript" }, _G.packer_plugins)]]
+vim.cmd [[au FileType lua ++once lua require("packer.load")({'nvim-lspconfig'}, { ft = "lua" }, _G.packer_plugins)]]
 time([[Defining lazy-load filetype autocommands]], false)
 vim.cmd("augroup END")
 vim.cmd [[augroup filetypedetect]]
-time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]], true)
-vim.cmd [[source /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]]
-time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]], false)
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/purescript-vim/ftdetect/purescript.vim]], true)
 vim.cmd [[source /home/auscyber/.local/share/nvim/site/pack/packer/opt/purescript-vim/ftdetect/purescript.vim]]
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/purescript-vim/ftdetect/purescript.vim]], false)
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]], true)
 vim.cmd [[source /home/auscyber/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]]
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]], false)
+time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]], true)
+vim.cmd [[source /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]]
+time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim]], false)
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/kotlin-vim/ftdetect/kotlin.vim]], true)
 vim.cmd [[source /home/auscyber/.local/share/nvim/site/pack/packer/opt/kotlin-vim/ftdetect/kotlin.vim]]
 time([[Sourcing ftdetect script at: /home/auscyber/.local/share/nvim/site/pack/packer/opt/kotlin-vim/ftdetect/kotlin.vim]], false)

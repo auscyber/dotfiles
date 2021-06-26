@@ -9,6 +9,7 @@
 
    require-macros [macros]})
 
+(vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menuone,noinsert,noselect")
 (set nvim.g.completion_enable_auto_popup 1)
 
@@ -57,10 +58,9 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
-    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
-  (vim.api.nvim_exec "autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = 'NonText', enabled = {'ChainingHint' }}" false)
+;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
 
-
+  (print "initalised")
 
   (if client.resolved_capabilities.document_highlight
    (do
@@ -81,7 +81,7 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialize a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {}))]
+  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {})) ]
     ((. lsp lsp-name :setup) merged-opts)))
 
 (init-lsp :tsserver)
