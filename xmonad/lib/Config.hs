@@ -67,19 +67,22 @@ onLaunch =
     "~/.config/polybar/launch.sh",
     "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off",
     "feh --bg-fill ~/backgrounds/ghost.png",
-    "xset m 0 0"
+    "xset m 0 0",
+  "xset s on && xset s 300",
+  "1password --silent",
+  "xss-lock i3lock"
   ]
 
 rclonemounts =
-  --    [ ("driveschool","~/school_drive",["--vfs-cache-mode full","--vfs-cache-max-age 10m"])
-  [ ("cache", "~/school_drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m", "--allow-other"]),
-    ("drivepersonal", "~/drive", []),
+  [ ("driveschool", "~/school_drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"]),
+    --  [ ("cache", "~/school_drive", []),
+    ("drivepersonal", "~/drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"]),
     ("photos", "~/Pictures", []),
     ("onedrive_school", "~/onedrive_school", [])
   ]
 
 mountRclone :: (String, String, [String]) -> String
-mountRclone (name, location, extra_args) = "rclone mount " ++ name ++ ": " ++ location ++ " " ++ unwords extra_args ++ " --daemon"
+mountRclone (name, location, extra_args) = concat ["rclone mount ", name, ": ", location, " ", unwords extra_args, " --daemon"]
 
 once = map mountRclone rclonemounts ++ ["emacs --daemon"]
 
@@ -87,7 +90,7 @@ myStartupHook = do
   ewmhDesktopsStartup
   mapM_ (\x -> spawn (x ++ " &")) onLaunch
   mapM_ (\x -> spawnOnce (x ++ " &")) once
-  addScreenCorner SCLowerRight (spawn "alacritty")
+  --  addScreenCorner SCLowerRight (spawn "alacritty")
   io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
 
 --     setDefaultCursor xC_left_ptr
@@ -138,9 +141,9 @@ myEventHook =
       serverModeEventHookCmd,
       handleEventHook def,
       docksEventHook,
-      windowedFullscreenFixEventHook,
-      swallowEventHook (className =? "Alacritty") (return True),
-      screenCornerEventHook
+      windowedFullscreenFixEventHook
+      --swallowEventHook (className =? "Alacritty") (return True),
+      --      screenCornerEventHook
     ]
 
 polybarLogHook :: X ()
@@ -179,7 +182,7 @@ icons =
       className =? "Spotify" <||> className =? "spotify" --> appIcon "阮",
       className =? "jetbrains-idea" --> appIcon "\xe7b5",
       className =? "Skype" --> appIcon "\61822",
-      ("nvim" `isPrefixOf`) <$> title --> appIcon "\59333"
+      (("nvim" `isPrefixOf`) <$> title <&&> (className =? "Alacritty")) --> appIcon "\59333"
     ]
 
 -- Colors
@@ -200,14 +203,14 @@ myTabConfig =
     }
 
 myLayout =
-  screenCornerLayoutHook $
-    smartBorders $
-      spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
-        avoidStruts $
-          onWorkspace "9" simpleFloat $
-            tiled
-              ||| Mirror tiled
-              ||| Full
+  --  screenCornerLayoutHook $
+  smartBorders $
+    spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
+      avoidStruts $
+        onWorkspace "9" simpleFloat $
+          tiled
+            ||| Mirror tiled
+            ||| Full
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled = Tall nmaster delta ratio
@@ -224,8 +227,8 @@ myLayout =
 
 myManageHook =
   composeAll
-    [ className =? "Firefox" --> doShift (myWorkspaces !! 1),
-      className =? "Gimp" --> doFloat,
+    [ className =? "Gimp" --> doFloat,
+    --className =? "Firefox" --> doShift (myWorkspaces !! 1),
       className =? "Steam" --> doFloat,
       className =? "steam" --> doFloat,
       className =? "jetbrains-idea" --> doFloat,
@@ -245,13 +248,14 @@ type NamedScratchPadSet = [(String, NamedScratchpad)]
 scratchpadSet :: [(String, NamedScratchpad)]
 scratchpadSet =
   [ ("M-C-s", NS "spotify" "spotify" (className =? "Spotify") defaultFloating),
-    ("M-C-o", NS "onenote" "ps3x-onenote" (className =? "p3x-onenote") nonFloating),
-    ("M-C-d", NS "discord" "discocss" (("discord" `isSuffixOf`) <$> className) nonFloating),
-    ("M-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating),
+    ("M-C-o", NS "onenote" "p3x-onenote" (className =? "p3x-onenote") nonFloating),
+    ("M-C-d", NS "discord" "Discord" (("discord" `isSuffixOf`) <$> className) nonFloating),
+    ("M-S-C-m", NS "skype" "skypeforlinux" (className =? "Skype") defaultFloating),
     ("M-C-t", NS "terminal" (myTerm ++ " -t \"scratchpad term\"") (title =? "scratchpad term") defaultFloating),
-    ("M-C-S-m", NS "mail" "thunderbird" (className =? "Mail" <||> className =? "thunderbird") nonFloating),
-    --            , ("M-C-t", NS "teams" "teams" (className =? "Microsoft Teams - Preview") nonFloating )
-    ("M-C-a", NS "authy" "authy" (className =? "Authy Desktop") defaultFloating)
+    ("M-C-m", NS "mail" "thunderbird" (className =? "Mail" <||> className =? "thunderbird") nonFloating),
+    ("M-S-C-t", NS "teams" "teams" (className =? "Microsoft Teams - Preview") nonFloating),
+    ("M-C-a", NS "authy" "authy" (className =? "Authy Desktop") defaultFloating),
+    ("M-C-p", NS "1password" "1password" (className =? "1Password") nonFloating)
   ]
 
 getScratchPads :: NamedScratchPadSet -> NamedScratchpads
@@ -270,7 +274,7 @@ scratchpadKeys = getScratchPadKeys scratchpadSet
 appKeys =
   map
     (second spawn)
-    [ ("M-S-r", "rofi -show combi"),
+    [ ("M-S-r", "~/.config/rofi/bin/launcher_colorful"),
       -- Start alacritty
       ("M-S-t", myTerm),
       --Take screenshot
@@ -287,7 +291,7 @@ myKeys =
       multiScreenKeys,
       appKeys,
       customKeys
-        --            , workspaceKeys
+      --            , workspaceKeys
     ]
 
 multiScreenKeys =
