@@ -1,7 +1,7 @@
 #source /etc/profile
 NPM_PACKAGES="${HOME}/.npm-packages"
 export DENO_INSTALL="/home/auscyber/.deno"
-export PATH=$PATH:~/.local/bin:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:${DENO_INSTALL}/bin
+export PATH=$PATH:~/.cargo/bin:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:${DENO_INSTALL}/bin:/opt/jdk8u292-b10
 # Aliases 
 fpath=(~/.zsh $fpath)
 autoload -U compinit promptinit
@@ -53,7 +53,6 @@ export EDITOR=vim
 export editor=$EDITOR
 export BROWSER=firefox
 source ~/.cargo/env
-source ~/.nix-profile/etc/profile.d/nix.sh
 test -r /home/auscyber/.opam/opam-init/init.zsh && . /home/auscyber/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 fetch -s
 export GTK2_RC_FILES=$HOME/.gtkrc-2.0
