@@ -6,5 +6,6 @@ modi: "combi";
 terminal: "alacritty";
 theme: "slate";
 xoffset: 0;
+show-icons: true;
 yoffset: 0;
 }

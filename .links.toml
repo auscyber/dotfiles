@@ -20,7 +20,7 @@ destination = ".config/alacritty.yml"
 
 [[links]]
 name = ".config/rofi"
-src = "$HOME/.config/rofi"
+src = "$HOME/.config/rofi.old"
 destination = ".config/rofi"
 
 [[links]]
@@ -41,7 +41,7 @@ destination = "xmonad/my-xmonad.cabal"
 [[links]]
 name = "xmonad/stack.yaml"
 src = "$HOME/.xmonad/stack.yaml"
-destination = ["desktop,"xmonad/stack.yaml"]
+destination = ["desktop", "xmonad/stack.yaml"]
 
 [[links]]
 name = "xmonad/lib"
@@ -63,8 +63,8 @@ name = ".config/polybar/launch_desktop.sh"
 src = "$HOME/.config/polybar/launch.sh"
 
 [links.destination]
-laptop = ".config/polybar/launch_laptop.sh"
 desktop = ".config/polybar/launch_desktop.sh"
+laptop = ".config/polybar/launch_laptop.sh"
 
 [[links]]
 name = ".config/polybar/scripts"
@@ -76,8 +76,8 @@ name = "xmonad/build"
 src = "$HOME/.xmonad/build"
 
 [links.destination]
-desktop = "xmonad/build_desktop"
 laptop = "xmonad/build_laptop"
+desktop = "xmonad/build_desktop"
 
 [[links]]
 name = "xmonad/screenshot-sec.sh"
@@ -90,13 +90,13 @@ src = "$HOME/.config/fontconfig"
 destination = ".config/fontconfig"
 
 [[links]]
-<<<<<<< HEAD
 name = "xmonad/my-xmonad_laptop.cabal"
 src = "$HOME/.xmonad/my-xmonad.cabal"
 
 [links.destination]
-laptop = "xmonad/my-xmonad_laptop.cabal"
 desktop = "xmonad/my-xmonad.cabal"
+laptop = "xmonad/my-xmonad_laptop.cabal"
+
 [[links]]
 name = "dotfiles"
 src = "$HOME/.zshrc"
@@ -116,3 +116,18 @@ destination = ".tmux.conf.local"
 name = ".tmux"
 src = "$HOME/.tmux.conf"
 destination = ".tmux/tmux.conf"
+
+[[links]]
+name = ".config/dunst"
+src = "$HOME/.config/dunst"
+destination = ".config/dunst"
+
+[[links]]
+name = "phoebelyrics"
+src = "$HOME/Music/phoebe"
+destination = "phoebelyrics"
+
+[[links]]
+name = ".config/rofi_themed"
+src = "/home/auscyber/.config/rofi"
+destination = ".config/rofi_themed"

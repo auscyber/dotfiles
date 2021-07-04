@@ -3,19 +3,41 @@
              a aniseed.core
              nvim aniseed.nvim
              completion completion
-             utils utils}
+             utils utils
+             lspkind lspkind
+             npairs nvim-autopairs}
 
    require-macros [macros]})
 
+(vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menuone,noinsert,noselect")
 (set nvim.g.completion_enable_auto_popup 1)
 
 
+(set _G.LOL {})
 
+(set _G.LOL.completion_confirm (fn []
+                                 (lua "
+ if vim.fn.pumvisible() ~= 0  then
+    if vim.fn.complete_info()[\"selected\"] ~= -1 then
+      completion.confirmCompletion()
+      return npairs.esc(\"<c-y>\")
+    else
+      vim.api.nvim_select_popupmenu_item(0 , false , false ,{})
+      completion.confirmCompletion()
+      return npairs.esc(\"<c-n><c-y>\")
+    end
+  else
+    return npairs.autopairs_cr()
+  end
 
+                                  ")))
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
+  (set vim.g.completion_enable_snippet "UltiSnips")
+  (lspkind.init {})
+  (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
         map (fn [key command] "lol" (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent true})) 
@@ -28,11 +50,17 @@
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
     (imap :<c-space> "<Plug>(completion_trigger)")
+    (imap :<tab> "<Plug>(completion_smart_tab)")
+    (imap :<s-tab> "<Plug>(completion_smart_s_tab)")
     (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
     (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
-    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>"))
+    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
+    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
+    (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
+;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
 
-
+  (print "initalised")
 
   (if client.resolved_capabilities.document_highlight
    (do
@@ -45,6 +73,7 @@
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
          augroup END"
        false))))
 
@@ -52,9 +81,16 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialize a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {}))]
+  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {})) ]
     ((. lsp lsp-name :setup) merged-opts)))
 
 (init-lsp :tsserver)
 (init-lsp :hls)
+(init-lsp :gopls)
 (init-lsp :rust_analyzer)
+(init-lsp :clangd)
+(initlsp :rnix-lsp)
+;(init-lsp :denols)
+(init-lsp :ocamllsp)
+(init-lsp :pyls)
+(init-lsp :zls)

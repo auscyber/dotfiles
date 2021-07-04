@@ -2,8 +2,8 @@
 pkgs.haskellPackages.override {
     overrides = self: super: rec {
     xmonad = self.callCabal2nix "xmonad" (pkgs.fetchFromGitHub {
-      repo = "xmonad";
-      owner = "auscyberman";
+      repo = "X11";
+      owner = "xmonad";
       rev = "master";
       sha256="sha256-9oEiVz0YQhv/pMfBO3thM9QwNvUN6fWa+HDDzqU3iQI=";
     }) {};

@@ -1,3 +1,4 @@
+local _2afile_2a = "/home/auscyber/.config/nvim/fnl/plugin.fnl"
 local _0_0
 do
   local name_0_ = "plugin"
@@ -20,11 +21,11 @@ local autoload = (require("aniseed.autoload")).autoload
 local function _1_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _1_()
-    return {require("aniseed.core"), require("aniseed.nvim"), require("packer")}
+    return {require("aniseed.core"), require("aniseed.nvim")}
   end
   ok_3f_0_, val_0_ = pcall(_1_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {["require-macros"] = {macros = true}, require = {a = "aniseed.core", nvim = "aniseed.nvim", packer = "packer"}}
+    _0_0["aniseed/local-fns"] = {["require-macros"] = {macros = true}, require = {a = "aniseed.core", nvim = "aniseed.nvim"}}
     return val_0_
   else
     return print(val_0_)
@@ -33,61 +34,74 @@ end
 local _local_0_ = _1_(...)
 local a = _local_0_[1]
 local nvim = _local_0_[2]
-local packer = _local_0_[3]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "plugin"
 do local _ = ({nil, _0_0, nil, {{nil}, nil, nil, nil}})[2] end
-local safe_require_plugin_config
-do
-  local v_0_
-  do
-    local v_0_0
-    local function safe_require_plugin_config0(name)
-      local ok_3f, val_or_err = pcall(require, ("plugins." .. name))
-      if not ok_3f then
-        return print(("dotfiles error: " .. val_or_err))
-      end
-    end
-    v_0_0 = safe_require_plugin_config0
-    _0_0["safe-require-plugin-config"] = v_0_0
-    v_0_ = v_0_0
+local packer_0_ = require("packer")
+local function _3_(_2_0)
+  _2_0({"wbthomason/packer.nvim"})
+  _2_0({"junegunn/fzf"})
+  _2_0({"junegunn/fzf.vim"})
+  local function _4_()
+    return require("plugins.autopairs")
   end
-  local t_0_ = (_0_0)["aniseed/locals"]
-  t_0_["safe-require-plugin-config"] = v_0_
-  safe_require_plugin_config = v_0_
-end
-local use
-do
-  local v_0_
-  local function use0(...)
-    local pkgs = {...}
-    local function _2_(use1)
-      for i = 1, a.count(pkgs), 2 do
-        local name = pkgs[i]
-        local opts = pkgs[(i + 1)]
-        do
-          local _3_0 = opts.mod
-          if _3_0 then
-            safe_require_plugin_config(_3_0)
-          else
-          end
-        end
-        use1(a.assoc(opts, 1, name))
-      end
-      return nil
-    end
-    return packer.startup(_2_)
+  _2_0({"windwp/nvim-autopairs", config = _4_})
+  _2_0({"Olical/conjure"})
+  _2_0({"ntpeters/vim-better-whitespace"})
+  _2_0({"kyazdani42/nvim-web-devicons"})
+  _2_0({"ryanoasis/vim-devicons"})
+  local function _5_()
+    return require("plugins.tree")
   end
-  v_0_ = use0
-  local t_0_ = (_0_0)["aniseed/locals"]
-  t_0_["use"] = v_0_
-  use = v_0_
+  _2_0({"kyazdani42/nvim-tree.lua", config = _5_})
+  local function _6_()
+    return require("plugins.bufferline")
+  end
+  _2_0({"akinsho/nvim-bufferline.lua", config = _6_})
+  local function _7_()
+    return vim.api.nvim_command("let g:deoplete#enable_at_startup = 1")
+  end
+  _2_0({"shougo/deoplete.nvim", post_ = _7_})
+  _2_0({"nathanaelkane/vim-indent-guides"})
+  _2_0({"Yggdroot/indentLine"})
+  _2_0({"jacoborus/tender.vim"})
+  local function _8_()
+    return require("plugins.airline-theme")
+  end
+  _2_0({"vim-airline/vim-airline", config = _8_, requires = {"vim-airline/vim-airline-themes", "jacoborus/tender.vim"}})
+  _2_0({"christoomey/vim-tmux-navigator"})
+  local function _9_()
+    return require("plugins.telescope")
+  end
+  _2_0({"nvim-telescope/telescope.nvim", config = _9_, requires = {{"nvim-lua/popup.nvim"}, {"nvim-lua/plenary.nvim"}}})
+  _2_0({"onsails/lspkind-nvim"})
+  _2_0({"Olical/aniseed"})
+  _2_0({"ziglang/zig.vim", ft = {"zig"}})
+  _2_0({"nvim-lua/completion-nvim"})
+  _2_0({"nvim-lua/lsp_extensions.nvim"})
+  local function _10_()
+    return require("plugins.nvim_lsp")
+  end
+  _2_0({"neovim/nvim-lspconfig", config = _10_, ft = {"haskell", "rust", "typescript", "javascript", "lua"}})
+  local function _11_()
+    local nvim0 = require("aniseed.nvim")
+    return nvim0.ex.autocmd("CursorHold,CursorHoldI", "*", "lua require'nvim-lightbulb'.update_lightbulb()")
+  end
+  _2_0({"kosayoda/nvim-lightbulb", config = _11_})
+  _2_0({"rust-lang/rust.vim", ft = {"rust"}})
+  _2_0({"udalov/kotlin-vim", ft = {"kotlin"}})
+  local function _12_()
+    return vim.api.nvim_command("let maplocalleader = \",\"")
+  end
+  _2_0({"derekelkins/agda-vim", config = _12_, ft = {"agda"}})
+  _2_0({"dag/vim-fish"})
+  _2_0({"purescript-contrib/purescript-vim", ft = {"ft", {"purescript"}}})
+  _2_0({"eraserhd/parinfer-rust", ft = {"fennel"}, run = "cargo build --release"})
+  _2_0({"nvim-treesitter/nvim-treesitter", ["do"] = "TSUpdate"})
+  _2_0({"elkowar/nvim-gehzu"})
+  local function _13_()
+    return require("plugins.presence")
+  end
+  return _2_0({"andweeb/presence.nvim", config = _13_})
 end
-local function _2_()
-  return vim.api.nvim_command("let g:deoplete#enable_at_startup = 1")
-end
-local function _3_()
-  local nvim0 = require("aniseed.nvim")
-  return nvim0.ex.autocmd("CursorHold,CursorHoldI", "*", "lua require'nvim-lightbulb'.update_lightbulb()")
-end
-return use("junegunn/fzf", {}, "junegunn/fzf.vim", {}, "preservim/nerdtree", {}, "hugolgst/vimsence", {}, "jiangmiao/auto-pairs", {}, "Olical/conjure", {}, "ntpeters/vim-better-whitespace", {}, "kyazdani42/nvim-web-devicons", {}, "yamatsum/nvim-nonicons", {}, "ryanoasis/vim-devicons", {}, "kyazdani42/nvim-tree.lua", {}, "akinsho/nvim-bufferline.lua", {mod = "bufferline"}, "shougo/deoplete.nvim", {post_ = _2_}, "nathanaelkane/vim-indent-guides", {}, "Yggdroot/indentLine", {}, "jacoborus/tender.vim", {}, "vim-airline/vim-airline", {mod = "airline-theme", requires = {"vim-airline/vim-airline-themes", "jacoborus/tender.vim"}}, "christoomey/vim-tmux-navigator", {}, "nvim-telescope/telescope.nvim", {mod = "telescope", requires = {{"nvim-lua/popup.nvim"}, {"nvim-lua/plenary.nvim"}}}, "onsails/lspkind-nvim", {}, "Olical/aniseed", {}, "ziglang/zig.vim", {}, "rafcamlet/coc-nvim-lua", {}, "nvim-lua/completion-nvim", {}, "nvim-lua/lsp_extensions.nvim", {}, "neovim/nvim-lspconfig", {mod = "nvim_lsp"}, "kosayoda/nvim-lightbulb", {config = _3_}, "rust-lang/rust.vim", {}, "udalov/kotlin-vim", {}, "derekelkins/agda-vim", {}, "dag/vim-fish", {}, "purescript-contrib/purescript-vim", {}, "wbthomason/packer.nvim", {}, "eraserhd/parinfer-rust", {run = "cargo build --release"}, "nvim-treesitter/nvim-treesitter", {["do"] = "TSUpdate"}, "campsiers/animate.vim", {mod = "animate"})
+return packer_0_.startup(_3_)
