@@ -1,4 +1,5 @@
 import archinstall, getpass, os
+import pty
 from archinstall.lib.general import sys_command
 # Select a harddrive and a disk password
 archinstall.log(f"Minimal only supports:")
@@ -53,7 +54,8 @@ packages = [ 'vim',
 aur_packages = ['neovim-nightly-bin','yay', 'polybar', "picom-jonaburg-git", "spotify" , "slack", "teams"]
 
 class UserHook:
-    def __init__(self, user="auscyber", mount="/mnt", home=None, location=".bashrc", computer="desktop"):
+    def __init__(self, installation,user="auscyber", mount="/mnt", home=None, location=".bashrc", computer="desktop"):
+        self.installation = installation
         self.user = user
         self.home = home
         self.mount = mount
@@ -63,10 +65,14 @@ class UserHook:
         self.command = f"""\
 #!/bin/bash
 set -e
-sudo pacman -Syu
-cd ~
-mv "{self.home}/{location}" "{self.home}/{location}.old"
 echo Running Post Install script
+for i in `env | sed 's/=.*//'` ; do
+    unset $i
+done
+source /etc/profile
+sudo pacman -Syu
+cd {self.home}
+mv "{self.home}/{location}" "{self.home}/{location}.old"
 sleep 2
 git clone https://github.com/auscyberman/dotfiles.git
 echo "Copying dotfiles"
@@ -82,10 +88,11 @@ dots --system {computer} sync
         return self
 
     def __exit__(self, a, b, c):
-        with open(f"{self.mount}{self.home}/{self.location}","w+") as f:
+        actual_loc =  f"{self.home}/{self.location}"
+        with open(self.mount+actual_loc,"w+") as f: 
             f.write(self.command)
-        installation.run_command(f"chown {USER} {self.home}/{self.location}")
-
+        self.installation.run_command("chmod +x "+actual_loc)
+        pty.spawn(["/usr/bin/arch-chroot","-u",self.user,self.mount,"bash",actual_loc])  
     def add_aur_packages(self, packages): 
         if not self.yay_done:
             self.command += f"""
@@ -173,7 +180,7 @@ def install_on(mountpoint):
             installation.enable_service('NetworkManager.service')
             with open(mountpoint+'/etc/sudoers',"a+") as f:
                 f.write("Defaults !requiretty \n Defaults !tty_tickets")
-            with UserHook() as h:
+            with UserHook(installation) as h:
                 h.set_shell("/bin/zsh")
                 h.add_aur_packages(aur_packages)
 
