@@ -8,7 +8,7 @@
                                           :filetype :agda})
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :agda :javascript :c :fennel :go :zig :query]
+                   :ensure_installed [:rust :haskell :agda :javascript :c :fennel :go :zig :query :nix]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}

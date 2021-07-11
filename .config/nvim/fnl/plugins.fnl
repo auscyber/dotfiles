@@ -61,7 +61,10 @@
 ;                      :requires ["antoinemadec/coc-fzf"]
 
   :norcalli/snippets.nvim {}
-  :neovim/nvim-lspconfig {:mod :nvim_lsp :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact] :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim]}
+  :neovim/nvim-lspconfig { :mod :nvim_lsp 
+                          :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix]
+                          :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals]
+                          }
   :kosayoda/nvim-lightbulb {
                             :config
                               (fn []

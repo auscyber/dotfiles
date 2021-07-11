@@ -3,7 +3,7 @@
             telescope telescope
             actions telescope.actions}})
 
-(telescope.setup 
+(telescope.setup
   {:defaults {:mappings {:i {:<esc> actions.close}}}})
 
 

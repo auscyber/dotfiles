@@ -71,7 +71,7 @@ end
 _G.LOL.completion_confirm = _3_
 local function on_attach(client, bufnr)
   completion.on_attach(client, bufnr)
-  vim.g.completion_enable_snippet = "UltiSnips"
+  vim.g.completion_enable_snippet = "snippets.nvim"
   lspkind.init({})
   npairs.setup({})
   do
@@ -108,7 +108,6 @@ local function on_attach(client, bufnr)
     map("<leader>a", "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     inoremap("<CR>", "v:lua.LOL.completion_confirm()")
   end
-  print("initalised")
   if client.resolved_capabilities.document_highlight then
     utils.highlight("LspReferenceRead", {gui = "underline"})
     utils.highlight("LspReferenceText", {gui = "underline"})
@@ -121,11 +120,12 @@ local function init_lsp(lsp_name, _3fopts)
   return lsp[lsp_name].setup(merged_opts)
 end
 init_lsp("tsserver")
-init_lsp("hls")
+init_lsp("hls", {settings = {languageServerHaskell = {formattingProvider = "stylish-haskell"}}})
 init_lsp("gopls")
 init_lsp("rust_analyzer")
 init_lsp("clangd")
-initlsp("rnix-lsp")
+init_lsp("rnix")
 init_lsp("ocamllsp")
 init_lsp("pyls")
-return init_lsp("zls")
+init_lsp("zls")
+return init_lsp("metals")

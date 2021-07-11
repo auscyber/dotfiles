@@ -35,7 +35,7 @@
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
-  (set vim.g.completion_enable_snippet "UltiSnips")
+  (set vim.g.completion_enable_snippet "snippets.nvim")
   (lspkind.init {})
   (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
@@ -60,7 +60,6 @@
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
 ;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
 
-  (print "initalised")
 
   (if client.resolved_capabilities.document_highlight
    (do
@@ -81,16 +80,17 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialize a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {})) ]
+  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {}))]
     ((. lsp lsp-name :setup) merged-opts)))
 
 (init-lsp :tsserver)
-(init-lsp :hls)
+(init-lsp :hls {:settings {:languageServerHaskell {:formattingProvider :stylish-haskell}}})
 (init-lsp :gopls)
 (init-lsp :rust_analyzer)
 (init-lsp :clangd)
-(initlsp :rnix-lsp)
+(init-lsp :rnix)
 ;(init-lsp :denols)
 (init-lsp :ocamllsp)
 (init-lsp :pyls)
 (init-lsp :zls)
+(init-lsp :metals)

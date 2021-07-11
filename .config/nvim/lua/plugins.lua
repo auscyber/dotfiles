@@ -81,7 +81,7 @@ local function _4_(_3_)
   local function _10_()
     return require("plugins.nvim_lsp")
   end
-  _3_({"neovim/nvim-lspconfig", config = _10_, ft = {"haskell", "rust", "typescript", "javascript", "lua", "zig", "go", "c", "cpp", "typescriptreact"}, requires = {"nvim-lua/completion-nvim", "nvim-lua/lsp_extensions.nvim"}})
+  _3_({"neovim/nvim-lspconfig", config = _10_, ft = {"haskell", "rust", "typescript", "javascript", "lua", "zig", "go", "c", "cpp", "typescriptreact", "scala", "nix"}, requires = {"nvim-lua/completion-nvim", "nvim-lua/lsp_extensions.nvim", "scalameta/nvim-metals"}})
   local function _11_()
     local nvim0 = require("aniseed.nvim")
     return nvim0.ex.autocmd("CursorHold,CursorHoldI", "*", "lua require'nvim-lightbulb'.update_lightbulb()")

@@ -42,4 +42,4 @@ local _2amodule_2a = _0_
 local _2amodule_name_2a = "plugins.treesitter"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
 parsers.get_parser_configs()["agda"] = {filetype = "agda", install_info = {files = {"src/parser.c", "src/scanner.cc"}, url = "~/packages/tree-sitter-agda"}}
-return treesitter.setup({autopairs = {enable = true}, ensure_installed = {"rust", "haskell", "agda", "javascript", "c", "fennel", "go", "zig", "query"}, highlight = {enable = true}, playground = {enable = true}, query_linter = {enable = true}})
+return treesitter.setup({autopairs = {enable = true}, ensure_installed = {"rust", "haskell", "agda", "javascript", "c", "fennel", "go", "zig", "query", "nix"}, highlight = {enable = true}, playground = {enable = true}, query_linter = {enable = true}})

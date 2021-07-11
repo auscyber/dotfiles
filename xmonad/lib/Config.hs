@@ -1,64 +1,60 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 module Config (myConfig, ExtraState) where
 
-import Control.Monad
-import DBus
-import DBus.Client
-import Data.Bifunctor
-import Data.Function (on)
-import Data.Functor
-import Data.List
-  ( elemIndex,
-    isSuffixOf,
-    nub,
-    nubBy,
-  )
-import qualified Data.Map as M
-import DynamicLog
-import ExtraState
-import Media
-import Polybar
-import SysDependent
-import System.Exit
-import WorkspaceSet
-import XMonad
-import XMonad.Actions.Commands
-import XMonad.Actions.CycleWS
-import XMonad.Actions.Search
-import XMonad.Actions.WorkspaceNames
-import XMonad.Hooks.DynamicIcons
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.ManageHelpers
-import XMonad.Hooks.ScreenCorners
-import XMonad.Hooks.ServerMode
-import XMonad.Hooks.WindowSwallowing
-import qualified XMonad.Layout.Fullscreen as F
-import XMonad.Layout.Gaps
-import XMonad.Layout.MultiToggle
-import XMonad.Layout.MultiToggle.Instances
-import XMonad.Layout.NoBorders
-import XMonad.Layout.PerWorkspace (onWorkspace)
-import XMonad.Layout.SimpleFloat
-import XMonad.Layout.Spacing
-import XMonad.Layout.Tabbed
-import XMonad.Prompt
-import XMonad.Prompt.Shell
-import XMonad.Prompt.Window
-import XMonad.Prompt.XMonad
-import qualified XMonad.StackSet as W
-import XMonad.Util.Cursor
-import XMonad.Util.EZConfig
-import qualified XMonad.Util.ExtensibleState as XS
-import XMonad.Util.Hacks
-import XMonad.Util.NamedScratchpad
-import XMonad.Util.NamedWindows (getName)
-import XMonad.Util.Run
-import XMonad.Util.SpawnOnce
-import XMonad.Util.WorkspaceCompare
+import           Control.Monad
+import           DBus
+import           DBus.Client
+import           Data.Bifunctor
+import           Data.Function                       (on)
+import           Data.Functor
+import           Data.List                           (elemIndex, isSuffixOf,
+                                                      nub, nubBy)
+import qualified Data.Map                            as M
+import           DynamicLog
+import           ExtraState
+import           Media
+import           Polybar
+import           SysDependent
+import           System.Exit
+import           WorkspaceSet
+import           XMonad
+import           XMonad.Actions.Commands
+import           XMonad.Actions.CycleWS
+import           XMonad.Actions.Search
+import           XMonad.Actions.WorkspaceNames
+import           XMonad.Hooks.DynamicIcons
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.ManageDocks
+import           XMonad.Hooks.ManageHelpers
+import           XMonad.Hooks.ScreenCorners
+import           XMonad.Hooks.ServerMode
+import           XMonad.Hooks.WindowSwallowing
+import qualified XMonad.Layout.Fullscreen            as F
+import           XMonad.Layout.Gaps
+import           XMonad.Layout.MultiToggle
+import           XMonad.Layout.MultiToggle.Instances
+import           XMonad.Layout.NoBorders
+import           XMonad.Layout.PerWorkspace          (onWorkspace)
+import           XMonad.Layout.SimpleFloat
+import           XMonad.Layout.Spacing
+import           XMonad.Layout.Tabbed
+import           XMonad.Prompt
+import           XMonad.Prompt.Shell
+import           XMonad.Prompt.Window
+import           XMonad.Prompt.XMonad
+import qualified XMonad.StackSet                     as W
+import           XMonad.Util.Cursor
+import           XMonad.Util.EZConfig
+import qualified XMonad.Util.ExtensibleState         as XS
+import           XMonad.Util.Hacks
+import           XMonad.Util.NamedScratchpad
+import           XMonad.Util.NamedWindows            (getName)
+import           XMonad.Util.Run
+import           XMonad.Util.SpawnOnce
+import           XMonad.Util.WorkspaceCompare
 
 onLaunch =
   [ "picom --experimental-backends --daemon --dbus",
@@ -68,17 +64,17 @@ onLaunch =
     "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off",
     "feh --bg-fill ~/backgrounds/ghost.png",
     "xset m 0 0",
-  "xset s on && xset s 300",
-  "1password --silent",
-  "xss-lock i3lock"
+    "xset s on && xset s 300",
+    "1password --silent",
+    "xss-lock i3lock"
   ]
 
 rclonemounts =
-  [ ("driveschool", "~/school_drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"]),
+  [ ("driveschool", "~/school_drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"])
     --  [ ("cache", "~/school_drive", []),
-    ("drivepersonal", "~/drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"]),
-    ("photos", "~/Pictures", []),
-    ("onedrive_school", "~/onedrive_school", [])
+  , ("drivepersonal", "~/drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"])
+  , ("photos", "~/Pictures", [])
+  , ("onedrive_school", "~/onedrive_school", [])
   ]
 
 mountRclone :: (String, String, [String]) -> String
@@ -102,7 +98,7 @@ getWorkspaceText :: M.Map Int String -> String -> String
 getWorkspaceText xs n =
   case M.lookup (read n) xs of
     Just x -> x
-    _ -> n
+    _      -> n
 
 myWorkspaces = map show [1 .. 9]
 
@@ -146,6 +142,14 @@ myEventHook =
       --      screenCornerEventHook
     ]
 
+myIconConfig :: IconConfig
+myIconConfig =
+  def
+    { iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]")
+    , iconConfigIcons = icons
+    , iconFilterFunction = getMasterIcon
+    }
+
 polybarLogHook :: X ()
 polybarLogHook =
   XS.gets (polybarPP . workspaceNames)
@@ -153,7 +157,7 @@ polybarLogHook =
     --        >>= workspaceNamesPP
     --  >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . namedScratchpadFilterOutWorkspacePP>>=  io . ppOutput pp
     {- filterOutInvalidWSet pp -}
-    >>= dynamicIconsPP (def {iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]"), iconConfigIcons = icons})
+    >>= dynamicIconsPP myIconConfig
     >>= \pp ->
       pure pp
         >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar . filterOutWsPP [scratchpadWorkspaceTag]
@@ -228,7 +232,7 @@ myLayout =
 myManageHook =
   composeAll
     [ className =? "Gimp" --> doFloat,
-    --className =? "Firefox" --> doShift (myWorkspaces !! 1),
+      --className =? "Firefox" --> doShift (myWorkspaces !! 1),),
       className =? "Steam" --> doFloat,
       className =? "steam" --> doFloat,
       className =? "jetbrains-idea" --> doFloat,
