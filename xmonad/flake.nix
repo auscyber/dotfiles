@@ -20,9 +20,9 @@
       haskellPackages_overlay = (final: prev: {
         haskellPackages = prev.haskellPackages.override {
           overrides = self: super: rec {
-            xmonad = self.callCabal2nix "xmonad" inputs.xmonad { };
+            xmonad = self.callCabal2nix "xmonad" xmonad { };
             xmonad-contrib =
-              self.callCabal2nix "xmonad-contrib" inputs.xmonad-contrib { };
+              self.callCabal2nix "xmonad-contrib" xmonad-contrib { };
             my-xmonad = self.callCabal2nix "my-xmonad" ./. { };
 
           };
