@@ -14,7 +14,7 @@
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
   };
-  outputs = { self, nixpkgs, xmonad, xmonad-contrib }:
+  outputs = { self, nixpkgs, xmonad, xmonad-contrib, flake-utils }:
     let
       cabal2nix = nixpkgs.haskellPackages.callCabal2nix;
       haskellPackages_overlay = (final: prev: {
