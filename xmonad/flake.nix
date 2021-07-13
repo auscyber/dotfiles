@@ -30,7 +30,7 @@
 
       });
       pkgs = import nixpkgs {
-        overlays = [ haskellPackages (final: prev: {
+        overlays = [ haskellPackages_overlay (final: prev: {
           my-xmonad = final.haskellPackages.my-xmonad;
           xmonad = final.haskellPackages.xmonad;
           xmonad-contrib = final.haskellPackages.xmonad-contrib;
