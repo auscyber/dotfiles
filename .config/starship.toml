@@ -1,5 +1,5 @@
 format = """
-$shell$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character
+$hostname$shell$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character
 """
 
 [shell]
@@ -9,7 +9,8 @@ disabled = true
 success_symbol = "[❯](bold light blue)"
 error_symbol = "[❯](bold white)"
 
-
+[hostname]
+ssh_only = true
 
 
 
