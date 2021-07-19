@@ -31,8 +31,14 @@ resolver:
 #   - wai
 packages:
 - .
-- /home/auscyber/xmonad
-- /home/auscyber/xmonad-contrib
+- location:
+    git: https://github.com/auscyberman/xmonad.git
+    commit: 9198f307eb2c5bce3751c4e7b91172ac6c18ffe0
+  extra-dep: true
+- location:
+    git: https://github.com/auscyberman/xmonad-contrib.git
+    commit: 5d0a3de24dae6035acb4426ff54748aa77e99d94
+  extra-dep: true
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
