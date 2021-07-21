@@ -41,11 +41,8 @@
   :christoomey/vim-tmux-navigator {}
   :nvim-telescope/telescope.nvim
     {
-     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]]
+     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"] {1 "nvim-telescope/telescope-frecency.nvim" :requires ["tami5/sql.nvim"]} ]
      :mod :telescope}
-
-
-
 
 
 ;
@@ -60,8 +57,10 @@
 ;                      :ft [:rust]
 ;                      :requires ["antoinemadec/coc-fzf"]
 
-  :norcalli/snippets.nvim {}
-  :neovim/nvim-lspconfig { :mod :nvim_lsp 
+  :norcalli/snippets.nvim {:config (fn [] (set vim.g.completion_enable_snippet "snippets.nvim")) }
+  :norcalli/nvim-colorizer.lua {:config (fn [] (set vim.o.termguicolors true)
+                                                ((. (require "colorizer") :setup)))}
+  :neovim/nvim-lspconfig { :mod :nvim_lsp
                           :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix]
                           :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals]
                           }
@@ -77,7 +76,7 @@
   :dag/vim-fish {}
   :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
 ;  :eraserhd/parinfer-rust {:ft [:fennel] :run "nix-shell --run \"cargo build --release\""}
-  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground]}
+  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground :folke/twilight.nvim]}
 ;  :camspiers/animate.vim {:mod :animate}
   :elkowar/nvim-gehzu {}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
@@ -85,6 +84,7 @@
   :famiu/feline.nvim {:mod :feline}
   :andweeb/presence.nvim {:mod :presence}
   :LnL7/vim-nix  {}
+  :tikhomirov/vim-glsl {}
   :ShinKage/nvim-idris2 {})
 
 

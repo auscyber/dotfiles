@@ -35,7 +35,6 @@
 
 (fn on_attach [client bufnr]
   (completion.on_attach client bufnr)
-  (set vim.g.completion_enable_snippet "snippets.nvim")
   (lspkind.init {})
   (npairs.setup {}) 
   (let [ opts {:noremap true :silent true}
@@ -60,9 +59,8 @@
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
 ;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
 
-
-  (if client.resolved_capabilities.document_highlight
-   (do
+    ;(autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()")
+  (if client.resolved_capabilities.document_highlight (do
   ;   (a.println "bob")
      (utils.highlight "LspReferenceRead"  {:gui "underline"})
      (utils.highlight "LspReferenceText"  {:gui "underline"})
@@ -84,13 +82,13 @@
     ((. lsp lsp-name :setup) merged-opts)))
 
 (init-lsp :tsserver)
-(init-lsp :hls {:settings {:languageServerHaskell {:formattingProvider :stylish-haskell}}})
+(init-lsp :hls {:settings {:languageServerHaskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
 (init-lsp :rust_analyzer)
 (init-lsp :clangd)
 (init-lsp :rnix)
 ;(init-lsp :denols)
 (init-lsp :ocamllsp)
-(init-lsp :pyls)
+(init-lsp :pylsp)
 (init-lsp :zls)
 (init-lsp :metals)
