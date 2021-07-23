@@ -1,7 +1,7 @@
 module AusPrompt where
+
 import XMonad
 import XMonad.Prompt
-
 
 newtype AusPrompt = AusPrompt String
 

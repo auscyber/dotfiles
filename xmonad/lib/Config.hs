@@ -26,6 +26,7 @@ import WorkspaceSet
 import XMonad
 import XMonad.Actions.Commands
 import XMonad.Actions.CycleWS
+import XMonad.Actions.KeyRemap
 import XMonad.Actions.Search
 import XMonad.Actions.WorkspaceNames
 import XMonad.Hooks.DynamicIcons
@@ -81,6 +82,15 @@ rclonemounts =
     , ("onedrive_school", "~/onedrive_school", [])
     ]
 
+gameMap :: KeymapTable
+gameMap =
+    KeymapTable
+        [ ((0, xK_1), (0, xK_Left))
+        , ((0, xK_2), (0, xK_Up))
+        , ((0, xK_minus), (0, xK_Down))
+        , ((0, xK_plus), (0, xK_Right))
+        ]
+
 mountRclone :: (String, String, [String]) -> String
 mountRclone (name, location, extra_args) = concat ["rclone mount ", name, ": ", location, " ", unwords extra_args, " --daemon"]
 
@@ -91,6 +101,7 @@ myStartupHook = do
     mapM_ (\x -> spawn (x ++ " &")) onLaunch
     mapM_ (\x -> spawnOnce (x ++ " &")) once
     --  addScreenCorner SCLowerRight (spawn "alacritty")
+    setDefaultKeyRemap emptyKeyRemap [gameMap, emptyKeyRemap]
     io $ forM_ [".xmonad-workspace-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
 
 --     setDefaultCursor xC_left_ptr
@@ -202,7 +213,7 @@ tertiaryColor = "#A3FFE6"
 
 myTerm = "alacritty"
 
-myBorderWidth = 2
+myBorderWidth = 1
 
 myTabConfig =
     def
@@ -325,8 +336,11 @@ customKeys =
     , ("M-n", prevWSSet True)
     , ("M-S-m", moveToNextWsSet True)
     , ("M-S-n", moveToPrevWsSet True)
+    , ("C-M-`", setKeyRemap gameMap)
+    , ("C-M-S-`", setKeyRemap emptyKeyRemap)
+    --
     --    , ("M1-<Tab>", nextWS )
-    --    , ("M1-S-<Tab>", prevWS)
+    --    , ("M1-S-<Tab>", prevWS)S)
     ]
 
 promptConfig =
