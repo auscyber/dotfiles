@@ -3,9 +3,9 @@
 -- We simply bootstrap packer and Aniseed here.
 -- It's then up to Aniseed to compile and load fnl/init.fnl
 
+
 local execute = vim.api.nvim_command
 local fn = vim.fn
-
 local pack_path = fn.stdpath("data") .. "/site/pack"
 local fmt = string.format
 
