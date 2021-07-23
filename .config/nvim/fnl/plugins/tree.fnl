@@ -3,4 +3,4 @@
             a aniseed.core
             tree nvim-tree.config}
    require-macros [macros]})
-(nvim.set_keymap :n :<C-n> "<Cmd>NvimTreeToggle<CR>" {:noremap true :silent true})
+(nvim.set_keymap :n :<C-t> "<Cmd>NvimTreeToggle<CR>" {:noremap true :silent true})

@@ -3,16 +3,6 @@
             a aniseed.core}
    require-macros [macros]})
 
-;(defn- use [...]
-;  "Iterates through the arguments as pairs and calls packer's use function for
-;  each of them. Works around Fennel not liking mixed associative and sequential
-;  tables as well." (let [pkgs [...]]
-;    (packer.startup
-;      (fn [use]
-;        (for [i 1 (a.count pkgs) 2]
-;          (packer-use pkgs i
-;            (use (a.assoc opts 1 name))))))))
-
 
 ;; Plugins to be managed by packer.
 (packer-use
@@ -24,7 +14,7 @@
   :junegunn/fzf.vim {}
 ;  :preservim/nerdtree {}
   :windwp/nvim-autopairs {:mod :autopairs}
-  :Olical/conjure {}
+  :Olical/conjure {:ft "fnl"}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
 ;  :yamatsum/nvim-nonicons {}
@@ -34,15 +24,19 @@
   :shougo/deoplete.nvim {:post_ (fn [] (vim.api.nvim_command "let g:deoplete#enable_at_startup = 1"))}
   :nathanaelkane/vim-indent-guides {}
   :Yggdroot/indentLine {}
-  :jacoborus/tender.vim {}
+;  :jacoborus/tender.vim {}
 ;  :vim-airline/vim-airline
 ;    {:requires ["vim-airline/vim-airline-themes" "jacoborus/tender.vim"]
 ;          :mod :airline-theme}
   :christoomey/vim-tmux-navigator {}
   :nvim-telescope/telescope.nvim
     {
-     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"] {1 "nvim-telescope/telescope-frecency.nvim" :requires ["tami5/sql.nvim"]} ]
+     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]  {1 :nvim-telescope/telescope-frecency.nvim
+                                                                     :requires {1 :tami5/sql.nvim :mod :sqlite}}]
+
+;     :cmd "Telescope frecency"
      :mod :telescope}
+
 
 
 ;
@@ -57,13 +51,13 @@
 ;                      :ft [:rust]
 ;                      :requires ["antoinemadec/coc-fzf"]
 
-  :norcalli/snippets.nvim {:config (fn [] (set vim.g.completion_enable_snippet "snippets.nvim")) }
+  :norcalli/snippets.nvim {:config (fn [] (set vim.g.completion_enable_snippet "snippets.nvim"))}
   :norcalli/nvim-colorizer.lua {:config (fn [] (set vim.o.termguicolors true)
-                                                ((. (require "colorizer") :setup)))}
+                                               ((. (require "colorizer") :setup)))}
   :neovim/nvim-lspconfig { :mod :nvim_lsp
                           :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix]
-                          :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals]
-                          }
+                          :requires [:nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals]}
+
   :kosayoda/nvim-lightbulb {
                             :config
                               (fn []
@@ -73,18 +67,19 @@
   :rust-lang/rust.vim {:ft [:rust]}
   :udalov/kotlin-vim {:ft [:kotlin]}
 ;  :derekelkins/agda-vim {:ft [:agda]} ; :config (fn [] (vim.api.nvim_command "let maplocalleader = \",\""))}
-  :dag/vim-fish {}
+  :dag/vim-fish {:ft :fish}
   :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
-;  :eraserhd/parinfer-rust {:ft [:fennel] :run "nix-shell --run \"cargo build --release\""}
+  :ranfdev/parinfer-rust {:ft [:fennel] :run "nix-shell --run \"cargo build --release\""}
   :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground :folke/twilight.nvim]}
 ;  :camspiers/animate.vim {:mod :animate}
-  :elkowar/nvim-gehzu {}
+  :elkowar/nvim-gehzu {:ft :fnl}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
   :tpope/vim-fugitive {}
   :famiu/feline.nvim {:mod :feline}
   :andweeb/presence.nvim {:mod :presence}
-  :LnL7/vim-nix  {}
-  :tikhomirov/vim-glsl {}
-  :ShinKage/nvim-idris2 {})
+  :LnL7/vim-nix  {:ft :nix}
+  :tikhomirov/vim-glsl {:ft :glsl}
+  :tweekmonster/startuptime.vim {:cmd :StartupTime}
+  :ShinKage/nvim-idris2 {:ft :idris})
 
 

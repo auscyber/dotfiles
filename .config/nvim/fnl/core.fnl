@@ -33,3 +33,7 @@
 (_: nmap :<F11> "<Expr>v:lua.switch_fullscreen() <Cr>")
 {:switch_fullscreen switch_fullscreen}
 (_: autocmd  "BufNewFile,BufRead" "*.agda" "setf agda")
+
+
+
+

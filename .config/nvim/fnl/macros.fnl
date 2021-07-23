@@ -33,7 +33,7 @@
                                           require ,(.. :plugins. (. block :mod)))))
          (a.assoc block :mod)
          (table.insert use-statements block)))
-  
+
      (let [use-sym (gensym)]
        `(let [packer# (require "packer")]
           (packer#.startup
