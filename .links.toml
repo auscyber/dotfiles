@@ -5,129 +5,129 @@ systems = ["desktop", "laptop"]
 
 [[links]]
 name = "backgrounds"
-src = "$HOME/backgrounds"
-destination = "backgrounds"
+destination = "$HOME/backgrounds"
+src = "backgrounds"
 
 [[links]]
 name = ".config/nvim"
-src = "$HOME/.config/nvim"
-destination = ".config/nvim"
+destination = "$HOME/.config/nvim"
+src = ".config/nvim"
 
 [[links]]
 name = ".config/alacritty.yml"
-src = "$HOME/.config/alacritty.yml"
-destination = ".config/alacritty.yml"
+destination = "$HOME/.config/alacritty.yml"
+src = ".config/alacritty.yml"
 
 [[links]]
 name = ".config/rofi"
-src = "$HOME/.config/rofi.old"
-destination = ".config/rofi"
+destination = "$HOME/.config/rofi.old"
+src = ".config/rofi"
 
 [[links]]
 name = ".config/picom"
-src = "$HOME/.config/picom"
-destination = ".config/picom"
+destination = "$HOME/.config/picom"
+src = ".config/picom"
 
 [[links]]
 name = ".config/starship.toml"
-src = "$HOME/.config/starship.toml"
-destination = ".config/starship.toml"
+destination = "$HOME/.config/starship.toml"
+src = ".config/starship.toml"
 
 [[links]]
 name = "xmonad/my-xmonad.cabal"
-src = "$HOME/.xmonad/my-xmonad.cabal"
-destination = "xmonad/my-xmonad.cabal"
+destination = "$HOME/.xmonad/my-xmonad.cabal"
+src = "xmonad/my-xmonad.cabal"
 
 [[links]]
 name = "xmonad/stack.yaml"
-src = "$HOME/.xmonad/stack.yaml"
-destination = ["desktop", "xmonad/stack.yaml"]
+destination = "$HOME/.xmonad/stack.yaml"
+src = ["desktop", "xmonad/stack.yaml"]
 
 [[links]]
 name = "xmonad/lib"
-src = "$HOME/.xmonad/lib"
-destination = "xmonad/lib"
+destination = "$HOME/.xmonad/lib"
+src = "xmonad/lib"
 
 [[links]]
 name = "xmonad"
-src = "$HOME/.xmonad/xmonad.hs"
-destination = ["desktop", "xmonad/lib/xmonad.hs"]
+destination = "$HOME/.xmonad/xmonad.hs"
+src = ["desktop", "xmonad/lib/xmonad.hs"]
 
 [[links]]
 name = ".config/polybar/config.ini"
-src = "$HOME/.config/polybar/config.ini"
-destination = ".config/polybar/config.ini"
+destination = "$HOME/.config/polybar/config.ini"
+src = ".config/polybar/config.ini"
 
 [[links]]
 name = ".config/polybar/launch_desktop.sh"
-src = "$HOME/.config/polybar/launch.sh"
+destination = "$HOME/.config/polybar/launch.sh"
 
-[links.destination]
+[links.src]
 desktop = ".config/polybar/launch_desktop.sh"
 laptop = ".config/polybar/launch_laptop.sh"
 
 [[links]]
 name = ".config/polybar/scripts"
-src = "$HOME/.config/polybar/scripts"
-destination = ".config/polybar/scripts"
+destination = "$HOME/.config/polybar/scripts"
+src = ".config/polybar/scripts"
 
 [[links]]
 name = "xmonad/build"
-src = "$HOME/.xmonad/build"
+destination = "$HOME/.xmonad/build"
 
-[links.destination]
+[links.src]
 laptop = "xmonad/build_laptop"
 desktop = "xmonad/build_desktop"
 
 [[links]]
 name = "xmonad/screenshot-sec.sh"
-src = "$HOME/.xmonad/screenshot-sec.sh"
-destination = "xmonad/screenshot-sec.sh"
+destination = "$HOME/.xmonad/screenshot-sec.sh"
+src = "xmonad/screenshot-sec.sh"
 
 [[links]]
 name = ".config/fontconfig"
-src = "$HOME/.config/fontconfig"
-destination = ".config/fontconfig"
+destination = "$HOME/.config/fontconfig"
+src = ".config/fontconfig"
 
 [[links]]
 name = "xmonad/my-xmonad_laptop.cabal"
-src = "$HOME/.xmonad/my-xmonad.cabal"
+destination = "$HOME/.xmonad/my-xmonad.cabal"
 
-[links.destination]
+[links.src]
 desktop = "xmonad/my-xmonad.cabal"
 laptop = "xmonad/my-xmonad_laptop.cabal"
 
 [[links]]
 name = "dotfiles"
-src = "$HOME/.zshrc"
-destination = ".zshrc"
+destination = "$HOME/.zshrc"
+src = ".zshrc"
 
 [[links]]
 name = "dotfiles"
-src = "$HOME/.tmux"
-destination = ".tmux"
+destination = "$HOME/.tmux"
+src = ".tmux"
 
 [[links]]
 name = "dotfiles"
-src = "$HOME/.tmux.conf.local"
-destination = ".tmux.conf.local"
+destination = "$HOME/.tmux.conf.local"
+src = ".tmux.conf.local"
 
 [[links]]
 name = ".tmux"
-src = "$HOME/.tmux.conf"
-destination = ".tmux/tmux.conf"
+destination = "$HOME/.tmux.conf"
+src = ".tmux/tmux.conf"
 
 [[links]]
 name = ".config/dunst"
-src = "$HOME/.config/dunst"
-destination = ".config/dunst"
+destination = "$HOME/.config/dunst"
+src = ".config/dunst"
 
 [[links]]
 name = "phoebelyrics"
-src = "$HOME/Music/phoebe"
-destination = "phoebelyrics"
+destination = "$HOME/Music/phoebe"
+src = "phoebelyrics"
 
 [[links]]
 name = ".config/rofi_themed"
-src = "/home/auscyber/.config/rofi"
-destination = ".config/rofi_themed"
+destination = "/home/auscyber/.config/rofi"
+src = ".config/rofi_themed"

@@ -26,10 +26,19 @@ NORMAL=$(tput sgr0)
 W_BG=$(bg_c $WHITE)
 W_FG=$(fg_c $WHITE)
 
+if apt --help  1> /dev/null 2>&1
+    then
+        package_manager="apt"
+        packages=$(apt list --installed | wc -l)
+elif nixos-rebuild --help 2>&1 1> /dev/null 
+    then
+    packages=$(cat /etc/current-system-packages | wc -l)
+    package_manager="nix"
+fi
+
 
 
 os="$(source /etc/os-release && echo $PRETTY_NAME)"
-packages=$(cat /etc/current-system-packages | wc -l)
 uptime="$(uptime -p | sed -e "s|up ||g" -e "s|,||g")"
 kernel="$(uname -r)"
 cpu="$(cat /proc/cpuinfo | grep "model name" | awk -F ":" '{ print $2}' | uniq)"
@@ -96,7 +105,7 @@ cat << EOF
     ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL} $os
     ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL}$cpu   
     ${W_BG}${B_FG}         ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
-    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages (apt)
+    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages ($package_manager)
     ${W_BG}${B_FG} |       ${NORMAL}         ${category}gpu:${NORMAL}$gpu
     ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
     ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}wm:${NORMAL} $wm
