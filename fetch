@@ -29,7 +29,7 @@ W_FG=$(fg_c $WHITE)
 if apt --help  1> /dev/null 2>&1
     then
         package_manager="apt"
-        packages=$(apt list --installed | wc -l)
+        packages=$(apt list --installed 2> /dev/null | wc -l)
 elif nixos-rebuild --help 2>&1 1> /dev/null 
     then
     packages=$(cat /etc/current-system-packages | wc -l)
