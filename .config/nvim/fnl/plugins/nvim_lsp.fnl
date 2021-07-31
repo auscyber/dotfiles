@@ -85,7 +85,7 @@
 (init-lsp :tsserver)
 (init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
-(init-lsp :rust_analyzer)
+(init-lsp :rust_analyzer {:settings {:rust-analyzer {:checkOnSave {:command :clippy} :procMacro {:enable true}}}})
 (init-lsp :clangd)
 (init-lsp :rnix)
 ;(init-lsp :denols)

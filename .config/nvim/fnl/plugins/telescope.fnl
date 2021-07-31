@@ -2,11 +2,12 @@
   {require {utils utils
             telescope telescope
             actions telescope.actions}})
+            
 
 
-; (telescope.load_extension "frecency")
 (telescope.setup
   {:defaults {:mappings {:i {:<esc> actions.close}}}})
+; (telescope.load_extension "frecency")
 
 
 (utils.keymap :n :<C-f> ":Telescope frecency<CR>")

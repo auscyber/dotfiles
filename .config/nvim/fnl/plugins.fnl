@@ -14,9 +14,10 @@
   :junegunn/fzf.vim {}
 ;  :preservim/nerdtree {}
   :windwp/nvim-autopairs {:mod :autopairs}
-  :Olical/conjure {:ft "fnl"}
   :ntpeters/vim-better-whitespace {}
   :kyazdani42/nvim-web-devicons {}
+
+  :tweekmonster/startuptime.vim {:cmd :StartupTime}
 ;  :yamatsum/nvim-nonicons {}
   :ryanoasis/vim-devicons {}
   :kyazdani42/nvim-tree.lua {:mod :tree}
@@ -27,6 +28,7 @@
   :andweeb/presence.nvim {:mod :presence}
   :tpope/vim-fugitive {}
   :famiu/feline.nvim {:mod :feline}
+  :iamcco/markdown-preview.nvim {:run "cd app && yarn install"}
 
 ;  :jacoborus/tender.vim {}
 ;  :vim-airline/vim-airline
@@ -35,8 +37,8 @@
   :christoomey/vim-tmux-navigator {}
   :nvim-telescope/telescope.nvim
     {
-     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]  {1 :nvim-telescope/telescope-frecency.nvim
-                                                                     :requires {1 :tami5/sql.nvim :mod :sqlite}}]
+     :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]  {1 :nvim-telescope/telescope-frecency.nvim :requires [{1 :tami5/sql.nvim :mod :sqlite}]}]
+
 
 ;     :cmd "Telescope frecency"
      :mod :telescope}
@@ -45,6 +47,8 @@
 
 ; Languages
 ;
+
+  :Olical/conjure {:ft :fnl}
   :onsails/lspkind-nvim {}
   :Olical/aniseed {}
   :ziglang/zig.vim {:ft [:zig]}
@@ -77,12 +81,15 @@
                               (fn []
                                 (let [nvim (require :aniseed.nvim)]
                                   (autocmd "CursorHold,CursorHoldI" "*" "lua require'nvim-lightbulb'.update_lightbulb()")))}
-  :elkowar/nvim-gehzu {:ft :fnl}
 
-  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground :folke/twilight.nvim]}
+  :folke/persistence.nvim {
+                            :event "BufReadPre"
+                            :module "persistence" :config (fn [] ((. (require "persistence") setup)))}
+
+  :elkowar/nvim-gehzu {:ft :fnl}
+  :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground :folke/twilight.nvim]})
 ;  :camspiers/animate.vim {:mod :animate}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
-  :tweekmonster/startuptime.vim {:cmd :StartupTime})
 
 
 
