@@ -25,4 +25,4 @@
 * [neovim](https://github.com/neovim/neovim) 
 * [Polybar](https://github.com/polybar/polybar)
 * [rofi-themes](https://github.com/adi1090x/rofi)
-* [*A large amount of vim/neovim plugins*](.config/nvim/fn/plugins.fnl)
+* [*A large amount of vim/neovim plugins*](.config/nvim/fnl/plugins.fnl)
