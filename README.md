@@ -2,17 +2,18 @@
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 
-
 ### Mine
-* [fetch](fetch)  
+* [dotfile sync](https://github.com/auscyberman/dotfile-sync) is a program i wrote to manage dotfiles, my configuration is [here](.links.toml)
+* [fetch](fetch)
     
 ![large](screenshots/fetch/large.jpg)
 ![small](screenshots/fetch/small.jpg)
-* [vim theme "pink ocean"](.config/nvim/colors/pink_ocean.vim)
-![xmonad](screenshots/theme/xmonad.jpg)
+* [vim theme "pink ocean"](.config/nvim/colors/pink_ocean.vim)  
+![xmonad](screenshots/theme/xmonad.jpg)  
 ![rust](screenshots/theme/rust.jpg)
 * [Polybar Theme](.config/polybar/config.ini)  
 ![bar](screenshots/polybar/whole.jpg)
+* [extensive xmonad configuratio](xmonad)
 
 
 ### Not mine
