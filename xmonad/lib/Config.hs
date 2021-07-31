@@ -211,7 +211,7 @@ secondaryColor = "#8BB2C1"
 
 tertiaryColor = "#A3FFE6"
 
-myTerm = "alacritty"
+myTerm = "wezterm"
 
 myBorderWidth = 1
 

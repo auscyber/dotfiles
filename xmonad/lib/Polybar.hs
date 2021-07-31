@@ -33,7 +33,7 @@ polybarColour area color text
 
 colourCurrent = "#f9f9f9"
 colourVisible = "#5AB1BB"
-colourHidden = "#ffd1dc"
+colourHidden = "#ffeFdc"
 colourHiddenNoWindows = "#343434"
 polybarPP ws =
     def
@@ -41,12 +41,13 @@ polybarPP ws =
           , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
           , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
           , ppHiddenNoWindows = polybarWorkspace (polybarColour 'F' "#5754B3") ws True -}
-          ppCurrent = polybarColour 'F' colourCurrent . iconCurrent
-        , ppHidden = polybarColour 'F' colourHidden . iconHidden
-        , ppVisible = polybarColour 'F' colourVisible . iconCurrent
-        , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . iconHidden
-        , ppTitleSanitize = take 70 . ppTitle def
+          ppCurrent = polybarUnderlineWithColor colourCurrent . pad -- . iconCurrent
+        , ppHidden = polybarUnderlineWithColor colourHidden . pad -- .  iconHidden
+        , ppVisible = polybarUnderlineWithColor colourVisible . pad -- .  iconCurrent
+        , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . wrap " " " " -- . iconHidden
+        , ppTitleSanitize = shorten 70 . ppTitle def
         , ppTitle = polybarColour 'F' "#FFFFFF"
+        , ppWsSep = ""
         , ppSep = polybarColour 'F' "#4D3636" " | "
         , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws"
         , ppLayout = xmonadPolybarAction 1 "next-layout" . xmonadPolybarAction 3 "default-layout"
