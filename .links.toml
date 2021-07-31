@@ -34,26 +34,35 @@ destination = "$HOME/.config/starship.toml"
 src = ".config/starship.toml"
 
 [[links]]
-name = "xmonad/my-xmonad.cabal"
+name = "xmonad-config/my-xmonad.cabal"
 destination = "$HOME/.xmonad/my-xmonad.cabal"
-src = "xmonad/my-xmonad.cabal"
+src = "xmonad-config/my-xmonad.cabal"
 
 [[links]]
-name = "xmonad/stack.yaml"
+name = "xmonad-config/stack.yaml"
 destination = "$HOME/.xmonad/stack.yaml"
 system = "desktop"
-src = "xmonad/stack.yaml"
+src = "xmonad-config/stack.yaml"
 
 [[links]]
-name = "xmonad/lib"
+name = "xmonad-config/lib"
 destination = "$HOME/.xmonad/lib"
-src = "xmonad/lib"
+src = "xmonad-config/lib"
 
 [[links]]
 name = "xmonad"
 destination = "$HOME/.xmonad/xmonad.hs"
 system = "desktop"
-src = "xmonad/lib/xmonad.hs"
+src = "xmonad-config/lib/xmonad.hs"
+[[links]]
+name = "flake"
+destination = "$HOME/.xmonad/flake.nix"
+src = "xmonad-config/flake.nix"
+[[links]]
+name = "flake lock"
+destination = "$HOME/.xmonad/flake.lock"
+src = "xmonad-config/flake.lock"
+
 
 [[links]]
 name = ".config/polybar/config.ini"
@@ -74,17 +83,17 @@ destination = "$HOME/.config/polybar/scripts"
 src = ".config/polybar/scripts"
 
 [[links]]
-name = "xmonad/build"
+name = "xmonad-config/build"
 destination = "$HOME/.xmonad/build"
-default_path = "xmonad/build_laptop"
+default_path = "xmonad-config/build_laptop"
 
 [links.source_map]
-desktop = "xmonad/build_desktop"
+desktop = "xmonad-config/build_desktop"
 
 [[links]]
-name = "xmonad/screenshot-sec.sh"
+name = "xmonad-config/screenshot-sec.sh"
 destination = "$HOME/.xmonad/screenshot-sec.sh"
-src = "xmonad/screenshot-sec.sh"
+src = "xmonad-config/screenshot-sec.sh"
 
 [[links]]
 name = ".config/fontconfig"
@@ -92,12 +101,12 @@ destination = "$HOME/.config/fontconfig"
 src = ".config/fontconfig"
 
 [[links]]
-name = "xmonad/my-xmonad_laptop.cabal"
+name = "xmonad-config/my-xmonad_laptop.cabal"
 destination = "$HOME/.xmonad/my-xmonad.cabal"
-default_path = "xmonad/my-xmonad.cabal"
+default_path = "xmonad-config/my-xmonad.cabal"
 
 [links.source_map]
-laptop = "xmonad/my-xmonad_laptop.cabal"
+laptop = "xmonad-config/my-xmonad_laptop.cabal"
 
 [[links]]
 name = "dotfiles"
