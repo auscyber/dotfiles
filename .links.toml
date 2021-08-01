@@ -131,3 +131,9 @@ src = "phoebelyrics"
 name = ".config/rofi_themed"
 destination = "/home/auscyber/.config/rofi"
 src = ".config/rofi_themed"
+
+[[links]]
+name = "fetch"
+destination = "$HOME/.local/bin/fetch"
+src = "fetch"
+
