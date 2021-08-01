@@ -2,7 +2,7 @@
 NPM_PACKAGES="${HOME}/.npm-packages"
 export DENO_INSTALL="/home/auscyber/.deno"
 export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:${DENO_INSTALL}/bin:/opt/jdk8u292-b10
-# Aliases 
+# Aliases
 fpath=(~/.zsh $fpath)
 #promptinit; #prompt gentoo
 export _JAVA_AWT_WM_NONREPARENTING=1
@@ -43,7 +43,7 @@ alias windows="sudo grub-reboot 2 && sudo reboot"
 eval "$(starship init zsh)"
 #export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
-export EDITOR=vim
+export EDITOR=nvim
 export editor=$EDITOR
 export BROWSER=firefox
 source ~/.cargo/env

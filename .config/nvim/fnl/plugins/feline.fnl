@@ -227,7 +227,7 @@
 
 -- This table is equal to the default vi_mode_colors table
 (local vi_mode_colors {
-                       :NORMAL  colors.white
+                       :NORMAL colors.white
                        :OP  "green"
                        :INSERT  colors.dark_cyan
                        :VISUAL  colors.blue
