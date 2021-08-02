@@ -54,15 +54,16 @@ name = "xmonad"
 destination = "$HOME/.xmonad/xmonad.hs"
 system = "desktop"
 src = "xmonad-config/lib/xmonad.hs"
+
 [[links]]
 name = "flake"
 destination = "$HOME/.xmonad/flake.nix"
 src = "xmonad-config/flake.nix"
+
 [[links]]
 name = "flake lock"
 destination = "$HOME/.xmonad/flake.lock"
 src = "xmonad-config/flake.lock"
-
 
 [[links]]
 name = ".config/polybar/config.ini"
@@ -157,3 +158,13 @@ src = "setIcon.sh"
 name = "wezterm"
 destination = "/home/auscyber/.config/wezterm"
 src = ".config/wezterm"
+
+[[links]]
+name = "nitrogen"
+destination = "/home/auscyber/.config/nitrogen"
+src = ".config/nitrogen"
+
+[[links]]
+name = "fetch_home"
+src = "fetch"
+destination = "$HOME/fetch"

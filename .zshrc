@@ -35,6 +35,9 @@ alias fzf="fzf --reverse --height 40%"
 alias vim="nvim"
 alias e="vim"
 #alias sudo="doas"
+run () {
+    nix run nixpkgs#$@
+}
 alias t="tmux"
 alias hm=home-manager
 alias grep="grep --color=auto"

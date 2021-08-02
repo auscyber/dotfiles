@@ -33,4 +33,4 @@ hi PreProc guifg=#DB5461 ctermfg=167
 hi Special guifg=#ffd1dc ctermfg=224
 hi Error guibg=#DB5461 ctermfg=167
 hi Pmenu guifg=#121212 guibg=#FFFFFF ctermfg=16 ctermbg=231
-hi NonText guifg=#1F1F1F ctermfg=16
+hi NonText guifg=#8BB2C1 ctermfg=16

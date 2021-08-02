@@ -38,150 +38,169 @@
 
 (set properties.force_inactive.buftypes [ "terminal"])
 
-(tset components.left.active 1  {
-                                 :provider " "
-                                 :hl {
-                                      :fg colors.cyan
-                                      :bg "NONE"}})
+(tset components.left :active
+     [
+      {
+       :provider " "
+       :hl {
+            :fg colors.cyan
+            :bg "NONE"}}
 
 
-(tset components.left.active 2  {
-                                 :provider  (fn [] "  ")
-                                 :hl (fn []
-                                      (local val {:bg colors.cyan})
-                                      (set val.name (vi_mode_utils.get_mode_highlight_name))
-                                      (set val.fg (vi_mode_utils.get_mode_color))
-                                      (set val.style "bold")
-                                      val)
-                                 :right_sep {:str " " :hl {:bg colors.cyan}}})
+      {
+       :provider  (fn [] "  ")
+       :hl (fn []
+            (local val {:bg colors.cyan})
+            (set val.name (vi_mode_utils.get_mode_highlight_name))
+            (set val.fg (vi_mode_utils.get_mode_color))
+            (set val.style "bold")
+            val)
+       :right_sep {:str " " :hl {:bg colors.cyan}}}
 
 
-(tset components.left.active 3  {
-                                 :provider  "file_info"
-                                 :hl {
-                                      :fg "white"
-                                      :bg colors.grey
-                                      :style "bold"}
-                                 :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
+      {
+       :provider  "file_info"
+       :type :relative-short
+       :hl {
+            :fg "white"
+            :bg colors.grey
+            :style "bold"}
+       :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
-                                 :right_sep  [" "]})
+        :right_sep  [" "]}
 
 
-(tset components.left.active 4  {:provider  "file_size"
-                                  :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
-                                  :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]})
+
+      {:provider  "file_size"
+        :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
+        :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
+(tset components.mid :active
+      [
+        {
+         :provider :lsp_client_names
+         :hl {:fg colors.white :bg colors.grey}
+         :enabled (fn [] (> (length (vim.lsp.get_active_clients)) 0))
+         :right_sep  [{:str :right_rounded  :hl {:fg colors.grey :bg :NONE}}]
+         :left_sep  [{:str :left_rounded :hl {:fg colors.grey :bg :NONE}}]}])
 
 
-(tset components.right.active 1  {
-                                   :provider  "position"
-                                   :left_sep  [{:str :left_rounded :hl {:fg colors.light_red :bg :NONE}}]
-                                   :hl {:bg colors.light_red :fg colors.white :style :bold} 
-                                   :right_sep  [{:str " " :hl {:bg colors.light_red}}]})
+(tset components.right :active
+    [
+      
+
+      {
+
+        :provider  "position"
+        :hl {:bg colors.light_red :fg colors.white :style :bold} 
+        :right_sep  [{:str " " :hl {:bg colors.light_red}}]
+        :left_sep  [{:str :left_rounded :hl {:fg colors.light_red :bg :NONE}}]}
 
 
-(tset components.right.active 2  {
-                                   :provider  "git_branch"
+      {
+                        :provider  "git_branch"
+                        :hl  {
+                               :fg  "white"
+                               :bg  "black"
+                               :style  "bold"}
+                        :right_sep  (fn []
+                                     (local val  {:hl  {:fg  "NONE" :bg  "black"}})
+                                     (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
+                                     val)}
+
+
+      {
+          :provider  "git_diff_added"
                                    :hl  {
-                                          :fg  "white"
-                                          :bg  "black"
-                                          :style  "bold"}
-                                   :right_sep  (fn []
-                                                (local val  {:hl  {:fg  "NONE" :bg  "black"}})
-                                                (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
-                                                val)})
+                                         :fg  "green"
+                                         :bg  "black"}}
 
 
-(tset components.right.active 3  {
-                                  :provider  "git_diff_added"
-                                  :hl  {
-                                        :fg  "green"
-                                        :bg  "black"}})
+      {
+       :provider  "git_diff_changed"
+       :hl  {
+             :fg  "orange"
+             :bg  "black"}}
 
 
-(tset components.right.active 4  {
-                                  :provider  "git_diff_changed"
-                                  :hl  {
-                                        :fg  "orange"
-                                        :bg  "black"}})
-
-
-(tset components.right.active 5  {
-                                  :provider  "git_diff_removed"
-                                  :hl  {
-                                        :fg  "red"
-                                        :bg  "black"}
-                                  :right_sep  (fn []
-                                               (local val  {:hl  {:fg  "NONE" :bg  "black"}})
-                                               (if b.gitsigns_status_dict (set val.str  " ") (set val.str  ""))
-                                               val)})
+      {
+       :provider  "git_diff_removed"
+       :hl  {
+             :fg  "red"
+             :bg  "black"}
+       :right_sep  (fn []
+                    (local val  {:hl  {:fg  "NONE" :bg  "black"}})
+                    (if b.gitsigns_status_dict (set val.str  " ") (set val.str  ""))
+                    val)}
 
 
 
 
-(tset components.right.active 6  {
-                                  :provider  "line_percentage"
-                                  :hl  {
-                                        :style  "bold"}
-                                  :left_sep  "  "
-                                  :right_sep  " "})
+      {
+       :provider  "line_percentage"
+       :hl  {
+             :style  "bold"}
+       :left_sep  "  "
+       :right_sep  " "}
 
 
-(tset components.right.active 7  {
-                                  :provider  "scroll_bar"
-                                  :hl  {
-                                        :fg  colors.light_red
-                                        :style  "bold"}})
+      {
+       :provider  "scroll_bar"
+       :hl  {
+             :fg  colors.light_red
+             :style  "bold"}}
 
 
-(tset components.right.active 8  {
-                                   :provider  "diagnostic_errors"
-                                   :enabled  (fn [] (lsp.diagnostics_exist "Error"))
-                                   :hl  { :fg  "red"}})
+      {
+        :provider  "diagnostic_errors"
+        :enabled  (fn [] (lsp.diagnostics_exist "Error"))
+        :hl  { :fg  "red"}}
 
 
-(tset components.right.active 9  {
-                                   :provider  "diagnostic_warnings"
-                                   :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
-                                   :hl  { :fg  "yellow"}})
+      {
+        :provider  "diagnostic_warnings"
+        :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
+        :hl  { :fg  "yellow"}}
 
 
-(tset components.right.active 10  {
-                                    :provider  "diagnostic_hints"
-                                    :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
-                                    :hl  { :fg  "cyan"}})
+      {
+        :provider  "diagnostic_hints"
+        :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
+        :hl  { :fg  "cyan"}}
 
 
-(tset components.right.active 11  {
-                                    :provider  "diagnostic_info"
-                                    :enabled  (fn [] (lsp.diagnostics_exist "Information"))
-                                    :hl  { :fg  "skyblue"}})
-(tset components.right.active 12 {
-                                  :provider " "
-                                  :right_sep {:str :right_rounded :hl {:fg :bg :bg :NONE}}})
+      {
+                :provider  "diagnostic_info"
+                :enabled  (fn [] (lsp.diagnostics_exist "Information"))
+                :hl  { :fg  "skyblue"}}
+      {
+       :provider " "
+       :right_sep {:str :right_rounded :hl {:fg :bg :bg :NONE}}}])
 
 
 
-(tset components.left.inactive 1  {
-                                    :provider  "file_type"
-                                    :hl  {
-                                           :fg  "white"
-                                           :bg  colors.cyan}
-                                    :left_sep  [{:str " " :hl {:fg :NONE :bg :NONE}} :left_rounded {
-                                                                                                    :str  " "
-                                                                                                    :hl  {
-                                                                                                           :fg  :NONE
-                                                                                                           :bg  colors.cyan}}]
-                                    :right_sep {:str " " :hl {:bg colors.cyan}}})
-(tset components.left.inactive 2  {
-                                    :provider  "file_info"
-                                    :hl  {
-                                           :fg  "white"
-                                           :bg  colors.dark_cyan
-                                           :style  "bold"}
-                                    :left_sep {:str " " :hl {:bg colors.dark_cyan}}
-                                    :right_sep  [{:str  " "
-                                                     :hl  {:fg  "NONE"
-                                                            :bg  colors.dark_cyan}} {:str "right_rounded" :hl {:bg "NONE" :fg colors.dark_cyan}}]})
+(tset components.left :inactive
+    [
+      {
+       :provider  "file_type"
+       :hl  {
+              :fg  "white"
+              :bg  colors.cyan}
+       :left_sep  [{:str " " :hl {:fg :NONE :bg :NONE}} :left_rounded {
+                                                                       :str  " "
+                                                                       :hl  {
+                                                                              :fg  :NONE
+                                                                              :bg  colors.cyan}}]
+       :right_sep {:str " " :hl {:bg colors.cyan}}}
+      {
+        :provider  "file_info"
+        :hl  {
+               :fg  "white"
+               :bg  colors.dark_cyan
+               :style  "bold"}
+        :left_sep {:str " " :hl {:bg colors.dark_cyan}}
+        :right_sep  [{:str  " "
+                         :hl  {:fg  "NONE"
+                                :bg  colors.dark_cyan}} {:str "right_rounded" :hl {:bg "NONE" :fg colors.dark_cyan}}]}])
 
 
 

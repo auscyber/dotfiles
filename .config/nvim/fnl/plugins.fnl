@@ -48,7 +48,7 @@
 ; Languages
 ;
 
-  :Olical/conjure {:ft :fnl}
+  :Olical/conjure {:ft :fennel}
   :onsails/lspkind-nvim {}
   :Olical/aniseed {}
   :ziglang/zig.vim {:ft [:zig]}

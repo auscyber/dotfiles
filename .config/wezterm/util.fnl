@@ -1,11 +1,12 @@
-(fn merge [tablea ...]
-  (each [num te (ipairs [...])]
-    (print te)
-   (each [key value (pairs te)]
-     (tset tablea key value))))
 
-(fn merge_files [tablea ...]
-  (each [num value (ipairs [...])]
-        (merge tablea (require value))))
+(let [lume (require :lume)]
+  (fn merge_files [tablea ...]
+    (var tableb tablea)
+    (each [num value (ipairs [...])]
+      (let [t (require value)]
+        (set tableb (lume.merge tableb t))))
+    tableb)
 
-{: merge : merge_files}
+  {: merge_files})
+
+

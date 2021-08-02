@@ -1,7 +1,7 @@
 (local wezterm (require :wezterm))
 (local util (require :util))
-
 (local base {
+             :enable_wayland false
              :window_padding  {
                                :left 10
                                ; This will become the scrollbar width if you have enabled the scrollbar!
@@ -14,5 +14,5 @@
              :font  (wezterm.font "Hasklug Nerd Font")
              :font_size  10
              :color_scheme  "Guezwhoz"})
-;(util.merge_files base :tab_bar)
-base
+(util.merge_files base :tab_bar)
+;base

@@ -49,7 +49,10 @@ lyric="$(cat ~/Music/phoebe/cleaned/*/* | shuf -n 1)"
 
 memused="$(free -m | awk '/Mem/ {print $3}')"
 memtotal="$(free -m | awk '/Mem/ {print $2}')"
-category="$(fg_t 158 203 219 ;echo $BOLD)"
+main_color="$(fg_t 255 216 158)"
+#category="$(fg_t 158 203 219 ;echo $BOLD)"
+category="$main_color$(echo $BOLD)"
+
 eye_color="$(fg_c 236)"
 if playerctl metadata > /dev/null 2>&1; then
     song=$(playerctl metadata --format "{{title}} - {{artist}}")
@@ -84,7 +87,7 @@ if [ "$1" = "-s" ]; then
     cat << EOF
       ${W_FG}▄▄▄▄▄${NORMAL}            
      ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)$lyric${NORMAL} 
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$main_color$lyric${NORMAL} 
     ${W_BG}${B_FG}         ${NORMAL}         ${category}$time ${NORMAL}
     ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}os:${NORMAL} $os
     ${W_BG}${B_FG}         ${NORMAL}         ${category}cpu:${NORMAL}$cpu
@@ -99,7 +102,7 @@ cat << EOF
     
       ${W_FG}▄▄▄▄▄${NORMAL}            
      ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)$lyric${NORMAL}
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$main_color$lyric${NORMAL}
     ${W_BG}${B_FG}         ${NORMAL}         
     ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}date:${NORMAL} $date
     ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL} $os
