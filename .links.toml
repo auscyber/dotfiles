@@ -145,6 +145,11 @@ destination = "/home/auscyber/.config/rofi"
 src = ".config/rofi_themed"
 
 [[links]]
+name = "fetch"
+destination = "$HOME/.local/bin/fetch"
+src = "fetch"
+
+[[links]]
 name = "nix-vscode"
 destination = "/home/auscyber/nix-vscode"
 src = "nix-vscode"
