@@ -5,7 +5,8 @@
              completion completion
              utils utils
              lspkind lspkind
-             npairs nvim-autopairs}
+             npairs nvim-autopairs
+             rust-tools rust-tools}
 
    require-macros [macros]})
 
@@ -85,6 +86,7 @@
 (init-lsp :tsserver)
 (init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
+(rust-tools.setup {})
 (init-lsp :rust_analyzer {:settings {:rust-analyzer {:checkOnSave {:command :clippy} :procMacro {:enable true}}}})
 (init-lsp :clangd)
 (init-lsp :rnix)

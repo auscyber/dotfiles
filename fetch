@@ -30,10 +30,14 @@ if apt --help  1> /dev/null 2>&1
     then
         package_manager="apt"
         packages=$(apt list --installed 2> /dev/null | wc -l)
-elif nixos-rebuild --help 2>&1 1> /dev/null 
+elif nixos-rebuild --help  1> /dev/null  2>&1
     then
     packages=$(cat /etc/current-system-packages | wc -l)
     package_manager="nix"
+elif pacman --help 1> /dev/null 2>&1
+then
+    packages=$(pacman -Q | wc -l)
+    package_manager="pacman"
 fi
 
 
@@ -49,8 +53,8 @@ lyric="$(cat ~/Music/phoebe/cleaned/*/* | shuf -n 1)"
 
 memused="$(free -m | awk '/Mem/ {print $3}')"
 memtotal="$(free -m | awk '/Mem/ {print $2}')"
-main_color="$(fg_t 255 216 158)"
-#category="$(fg_t 158 203 219 ;echo $BOLD)"
+#main_color="$(fg_t 255 216 158)"
+main_color="$(fg_t 158 203 219 )"
 category="$main_color$(echo $BOLD)"
 
 eye_color="$(fg_c 236)"

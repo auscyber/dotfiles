@@ -6,9 +6,11 @@
 ;                                          :install_info {:url "~/packages/tree-sitter-agda"
 ;                                                         :files [:src/parser.c :src/scanner.cc]}
 ;                                          :filetype :agda}})
+; (set vim.wo.foldmethod "expr")
+; (set vim.wo.foldexpr "nvim_treesitter#foldexpr()")
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix]
+                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp ]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}

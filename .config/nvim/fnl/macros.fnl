@@ -25,12 +25,12 @@
          (a.assoc block 1 name)
          (when (. block :mod)
            ;(a.assoc block :config `#((. (require "utils") :safe-require) ,(. block :mod)))
-           (a.assoc block :config `#(
-                                     ;do
+           (a.assoc block :config `#(do
                                        ;(print ,(. block :mod))
                                        ;(time
                                          ;(
-                                          require ,(.. :plugins. (. block :mod)))))
+                                          ,(-?> block (. :config) (unpack))
+                                          (require ,(.. :plugins. (. block :mod))))))
          (a.assoc block :mod)
          (table.insert use-statements block)))
 
