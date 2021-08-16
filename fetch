@@ -1,16 +1,15 @@
-#!/usr/bin/env bash
-
+#!/bin/sh
 fg_c() {
-    tput setaf $1
+    tput setaf "$1"
 }
 bg_c(){
-    tput setab $1
+    tput setab "$1"
 }
 fg_t(){
-    echo -en "\x1b[38;2;$1;$2;$3""m"
+    printf  "\x1b[38;2;%s;%s;%s""m" "$@"
 }
 bg_t(){
-    echo -en "\x1b[48;2;$1;$2;$3""m"
+    printf "\x1b[48;2;%1;%2;%3""m" "$@"
 }
 
 
@@ -32,7 +31,7 @@ if apt --help  1> /dev/null 2>&1
         packages=$(apt list --installed 2> /dev/null | wc -l)
 elif nixos-rebuild --help  1> /dev/null  2>&1
     then
-    packages=$(cat /etc/current-system-packages | wc -l)
+    packages=$(wc -l < /etc/current-system-packages)
     package_manager="nix"
 elif pacman --help 1> /dev/null 2>&1
 then
@@ -42,10 +41,10 @@ fi
 
 
 
-os="$(source /etc/os-release && echo $PRETTY_NAME)"
+os="$(. /etc/os-release && echo "$PRETTY_NAME")"
 uptime="$(uptime -p | sed -e "s|up ||g" -e "s|,||g")"
 kernel="$(uname -r)"
-cpu="$(cat /proc/cpuinfo | grep "model name" | awk -F ":" '{ print $2}' | uniq)"
+cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
 gpu="$(nvidia-smi -L | sed -E 's/\(.*//' | awk -F ":" '{print $2}')"
 
 lyric="$(cat ~/Music/phoebe/cleaned/*/* | shuf -n 1)"
@@ -55,7 +54,7 @@ memused="$(free -m | awk '/Mem/ {print $3}')"
 memtotal="$(free -m | awk '/Mem/ {print $2}')"
 #main_color="$(fg_t 255 216 158)"
 main_color="$(fg_t 158 203 219 )"
-category="$main_color$(echo $BOLD)"
+category="$main_color$BOLD"
 
 eye_color="$(fg_c 236)"
 if playerctl metadata > /dev/null 2>&1; then
