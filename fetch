@@ -1,4 +1,6 @@
 #!/bin/sh
+location="$(readlink $0)"
+dotfiles=${location%/*}
 fg_c() {
     tput setaf "$1"
 }
