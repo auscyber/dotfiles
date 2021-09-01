@@ -49,7 +49,10 @@ kernel="$(uname -r)"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
 gpu="$(nvidia-smi -L | sed -E 's/\(.*//' | awk -F ":" '{print $2}')"
 
-lyric="$(cat ~/Music/phoebe/cleaned/*/* | shuf -n 1)"
+lyric="$(cat ~/Music/phoebe/cleaned/*/* 2>&- | shuf -n 1)"
+if [[ -z $lyric ]]; then
+    lyric="phoebe bridgers"
+fi
 
 
 memused="$(free -m | awk '/Mem/ {print $3}')"
