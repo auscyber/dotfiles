@@ -95,9 +95,9 @@ uptime=$(uptime -p)
 
 small () {
     _small=bob
-    HEIGHT=7
+    HEIGHT=6
     WIDTH=14
-    cat << EOF
+    cat <<EOF
       ${W_FG}▄▄▄▄▄${NORMAL}            
      ${W_BG}       ${NORMAL}      
     ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${NORMAL} 
@@ -105,7 +105,6 @@ small () {
     ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
     ${W_BG}${B_FG}         ${NORMAL}         
     ${W_BG}${B_FG} ,   , , ${NORMAL}         
-
 EOF
 }
 
