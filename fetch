@@ -1,6 +1,5 @@
 #!/bin/sh
-location="$(readlink $0)"
-dotfiles=${location%/*}
+COLS=$(tput cols)
 fg_c() {
     tput setaf "$1"
 }
@@ -15,27 +14,48 @@ bg_t(){
 }
 
 
+
+up () {
+    printf "\033[%dA" "$1"
+#    line=$((line-$1))
+}
+down () {
+    printf "\033[%dB" "$1"
+#    line=$((line+$1))
+}
+
+left () {
+    printf "\033[%dD" "$1"
+}
+right () {
+    printf "\033[%dC" "$1"
+}
+
+
 BOLD=$(tput bold)
 ITALIC=$(tput sitm)
 BLACK=239
 WHITE=15
 
-
 B_BG=$(bg_c $BLACK)
 B_FG=$(fg_c $BLACK)
-NORMAL=$(tput sgr0)
+NORMAL="$(printf "\033[m")"
 W_BG=$(bg_c $WHITE)
 W_FG=$(fg_c $WHITE)
 
-if apt --help  1> /dev/null 2>&1
+
+
+
+
+if command -v apt 1> /dev/null 2>&1
     then
         package_manager="apt"
         packages=$(apt list --installed 2> /dev/null | wc -l)
-elif nixos-rebuild --help  1> /dev/null  2>&1
+elif command -v nixos-rebuild 1> /dev/null  2>&1
     then
     packages=$(wc -l < /etc/current-system-packages)
     package_manager="nix"
-elif pacman --help 1> /dev/null 2>&1
+elif command -v pacman 1> /dev/null 2>&1
 then
     packages=$(pacman -Q | wc -l)
     package_manager="pacman"
@@ -43,14 +63,13 @@ fi
 
 
 
-os="$(. /etc/os-release && echo "$PRETTY_NAME")"
-uptime="$(uptime -p | sed -e "s|up ||g" -e "s|,||g")"
+os="$(. /etc/os-release && printf "$PRETTY_NAME")"
 kernel="$(uname -r)"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
 gpu="$(nvidia-smi -L | sed -E 's/\(.*//' | awk -F ":" '{print $2}')"
 
 lyric="$(cat ~/Music/phoebe/cleaned/*/* 2>&- | shuf -n 1)"
-if [[ -z $lyric ]]; then
+if [ -z "$lyric" ]; then
     lyric="phoebe bridgers"
 fi
 
@@ -72,154 +91,125 @@ time=$(date "+%I:%M %p")
 date=$(date "+%a %d %b %G")
 uptime=$(uptime -p)
 
-#cat << EOF
-#    
-#      ${W_BG}     ${NORMAL}            
-#     ${W_BG}       ${NORMAL}      
-#    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
-#    ${W_BG}${B_FG}         ${NORMAL}         
-#    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
-#    ${W_BG}${B_FG}         ${NORMAL}         ${category} :${NORMAL} $os
-#    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category} :${NORMAL}$cpu   
-#    ${W_BG}${B_FG}         ${NORMAL}         ${category} :${NORMAL} $packages (pacman)
-#    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category} :${NORMAL} $uptime 
-#    ${W_BG}${B_FG} |       ${NORMAL}         ${category}ﲶ :${NORMAL} $kernel 
-#    ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category} :${NORMAL} $song
-#    ${W_BG}${B_FG} ,  ,    ${NORMAL}
-#    ${W_BG}${B_FG}         ${NORMAL}
-#    ${W_BG}${B_FG} |  |  | ${NORMAL}
-#EOF
 
-#Small
-if [ "$1" = "-s" ]; then
+
+small () {
+    _small=bob
+    HEIGHT=7
+    WIDTH=14
     cat << EOF
       ${W_FG}▄▄▄▄▄${NORMAL}            
      ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$main_color$lyric${NORMAL} 
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}$time ${NORMAL}
-    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}os:${NORMAL} $os
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}cpu:${NORMAL}$cpu
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${NORMAL} 
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         
 
 EOF
-    exit 0
+}
+
+large () {
+    HEIGHT=14
+    WIDTH=15
+down 1
+cat << EOF
+      ${W_FG}▄▄▄▄▄${NORMAL}            
+     ${W_BG}       ${NORMAL}      
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG} ,   , , ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}   ,   , ${NORMAL}         
+    ${W_BG}${B_FG} |       ${NORMAL}         
+    ${W_BG}${B_FG}  ,  | , ${NORMAL}         
+    ${W_BG}${B_FG} ,  ,    ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG} |  |  | ${NORMAL}
+EOF
+down 1
+}
+
+
+
+print_phoebe () {
+    down 1
+    right 1
+    WIDTH=30
+#    HEIGHT=50
+#    wezterm imgcat --width $WIDTH ~/backgrounds/phoeb.png
+    HEIGHT=15
+    wezterm imgcat --width $WIDTH ~/backgrounds/sadbridgers.png
+
+
+}
+
+case $1 in
+	-s)
+		small
+		;;
+	-p)
+		print_phoebe;;
+	*)
+		large
+		;;
+esac
+line=$HEIGHT
+up_c () {
+    up "$1"
+    line=$((line-$1))
+}
+down_c() {
+    down "$1"
+    line=$((line+$1))
+}
+
+offset () {
+    left "$COLS"
+    right $((WIDTH+7))
+}
+
+segment () {
+    offset
+    printf "%s" "$1"
+    down_c 1
+}
+data () {
+    _variable="$1"
+    if [ -z "${2+x}" ]; then
+        _variable_value=" $(eval "printf \"%s\" \"\$$1\"")"
+    else
+        _variable_value="$2"
+    fi
+    segment "$category$_variable:$NORMAL$_variable_value"
+}
+
+
+
+up_c $HEIGHT
+
+segment "$ITALIC$main_color$lyric$NORMAL"
+
+if [ -z $_small ]; then
+    data "date"
+else
+    segment "${category}$time"
+fi
+data "os"
+data "cpu" "$cpu"
+data "mem" " ${memused}MB / ${memtotal}MB"
+if [ -z $_small ]; then
+    data "packages" " $packages ($package_manager)"
+    data "gpu" "$gpu"
+    data "kernel"
+    data "wm"
+    data "song"
+    data "uptime"
 fi
 
 
-cat << EOF
-    
-      ${W_FG}▄▄▄▄▄${NORMAL}            
-     ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${ITALIC}$main_color$lyric${NORMAL}
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         ${category}date:${NORMAL} $date
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}os:${NORMAL} $os
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         ${category}cpu:${NORMAL}$cpu   
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}mem:${NORMAL} ${memused}MB / ${memtotal}MB
-    ${W_BG}${B_FG}   ,   , ${NORMAL}         ${category}packages:${NORMAL} $packages ($package_manager)
-    ${W_BG}${B_FG} |       ${NORMAL}         ${category}gpu:${NORMAL}$gpu
-    ${W_BG}${B_FG}  ,  | , ${NORMAL}         ${category}kernel:${NORMAL} $kernel 
-    ${W_BG}${B_FG} ,  ,    ${NORMAL}         ${category}wm:${NORMAL} $wm
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}music:${NORMAL} $song 
-    ${W_BG}${B_FG}         ${NORMAL}         ${category}uptime:${NORMAL} $uptime
-    ${W_BG}${B_FG} |  |  | ${NORMAL}
-    
-EOF
-
-#cat << EOF
-#    
-#      ${W_FG}▄▄▄▄▄${NORMAL}            
-#     ${W_BG}       ${NORMAL}      
-#    ${W_FG}▐${W_BG} ${eye_color} ${W_BG} ${eye_color} ${W_BG} ${NORMAL}${W_FG}▌${NORMAL}         ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
-#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         
-#    ${W_FG}▐${W_BG}${B_FG} ,  ,  ${NORMAL}${W_FG}▌${NORMAL}         
-#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         ${category}os:${NORMAL}  $os
-#    ${W_FG}▐${W_BG}${B_FG},   , ,${NORMAL}${W_FG}▌${NORMAL}         ${category}cpu:${NORMAL} $cpu   
-#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}         ${category}packages:${NORMAL} $packages (pacman)
-#    ${W_FG}▐${W_BG}${B_FG}  ,   ,${NORMAL}${W_FG}▌${NORMAL}         ${category}uptime:${NORMAL} $uptime 
-#    ${W_FG}▐${W_BG}${B_FG}|      ${NORMAL}${W_FG}▌${NORMAL}         ${category}kernel:${NORMAL} $kernel 
-#    ${W_FG}▐${W_BG}${B_FG} ,  | ,${NORMAL}${W_FG}▌${NORMAL}         ${category}wm:${NORMAL} $wm
-#    ${W_FG}▐${W_BG}${B_FG},  ,   ${NORMAL}${W_FG}▌${NORMAL}         ${category}music:${NORMAL} $song
-#    ${W_FG}▐${W_BG}${B_FG}       ${NORMAL}${W_FG}▌${NORMAL}
-#    ${W_FG}▐${W_BG}${B_FG}|  |  |${NORMAL}${W_FG}▌${NORMAL}
-#    
-#EOF
-
-
-
-
-#cat << EOF
-#
-#    ${ITALIC}$(fg_t 158 203 219)jesus christ i'm so blue all the time ${NORMAL}
-#
-#                      ${W_BG}     ${NORMAL}            
-#                     ${W_BG}       ${NORMAL}      
-#                    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         
-#                    ${W_BG}${B_FG}         ${NORMAL}         
-#                    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
-#                    ${W_BG}${B_FG}         ${NORMAL}         
-#                    ${W_BG}${B_FG} ,   , , ${NORMAL}         
-#                    ${W_BG}${B_FG}         ${NORMAL}         
-#                    ${W_BG}${B_FG}   ,   , ${NORMAL}         
-#                    ${W_BG}${B_FG} |       ${NORMAL}         
-#                    ${W_BG}${B_FG}  ,  | , ${NORMAL}
-#                    ${W_BG}${B_FG} ,  ,    ${NORMAL}
-#                    ${W_BG}${B_FG}         ${NORMAL}
-#                    ${W_BG}${B_FG} |  |  | ${NORMAL}
-#       ${category}os${NORMAL}  
-#             $os
-#       ${category}cpu${NORMAL} 
-#            $cpu   
-#       ${category}packages${NORMAL} 
-#             $packages (pacman)
-#       ${category}uptime${NORMAL} 
-#             $uptime 
-#       ${category}kernel${NORMAL} 
-#             $kernel             
-#EOF
-
-
-
-
-
-
-
-
-
-#cat << EOF
-#    ${W_FG},;;;;,       
-#  /${W_BG}      ${NORMAL}\\
-# /${W_BG}        ${NORMAL}\\
-#;${W_BG} ${B_BG}  ${W_BG} ${B_BG}  ${W_BG}    ${NORMAL}$(fg_c $WHITE);${NORMAL}
-#|${W_BG}          ${NORMAL}|${NORMAL}
-#|${W_BG}${B_FG}  ,   ,   ${NORMAL}|
-#|${W_BG}${B_FG}          ${NORMAL}|
-#|${W_BG}${B_FG} ,    , , ${NORMAL}|
-#|${W_BG}${B_FG}          ${NORMAL}|
-#|${W_BG}${B_FG}   , ,  , ${NORMAL}|
-#|${W_BG}${B_FG}          ${NORMAL}|
-#|${W_BG}${B_FG}  ,     , ${NORMAL}|
-#|${W_BG}${B_FG} ,   ,    ${NORMAL}|
-#|${W_BG}${B_FG}          ${NORMAL}|
-#|${W_BG}${B_FG} |   |  | ${NORMAL}|
-#EOF
-
-
-#cat << EOF
-#   ,;;;;,
-#  /      \\
-# /        \\
-#;  ${B_FG}0   0   ${NORMAL};
-#|          |
-#|  ,   ,   |
-#|          |
-#| ,    , , |
-#|          |
-#|   , ,  , |
-#|          |
-#|  ,     , |
-#| ,   ,    |
-#|          |
-#| |   |  | |
-#EOF
-
+down $((HEIGHT-line))
+printf "\n"
