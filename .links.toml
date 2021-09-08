@@ -3,6 +3,8 @@ id = "17504290032302696503"
 default = "desktop"
 systems = ["desktop", "laptop"]
 
+
+
 [[links]]
 name = "backgrounds"
 destination = "$HOME/backgrounds"
@@ -55,15 +57,6 @@ destination = "$HOME/.xmonad/xmonad.hs"
 system = "desktop"
 src = "xmonad-config/lib/xmonad.hs"
 
-[[links]]
-name = "flake"
-destination = "$HOME/.xmonad/flake.nix"
-src = "xmonad-config/flake.nix"
-
-[[links]]
-name = "flake lock"
-destination = "$HOME/.xmonad/flake.lock"
-src = "xmonad-config/flake.lock"
 
 [[links]]
 name = ".config/polybar/config.ini"
@@ -173,3 +166,26 @@ src = ".config/nitrogen"
 name = "fetch_home"
 src = "fetch"
 destination = "$HOME/fetch"
+
+[[links]]
+name = "fennel"
+src = "libs/fennel.lua"
+destination = "$HOME/.fennel.lua"
+
+[[links]]
+name = "wezterm fennel"
+src = "libs/fennel.lua"
+destination = "$HOME/.config/wezterm/fennel.lua"
+[[links]]
+name = "awesome fennel"
+src = "libs/fennel.lua"
+destination = "$HOME/.config/awesome/fennel.lua"
+
+
+
+
+
+[[links]]
+name = "awesome"
+src = ".config/awesome"
+destination = "$HOME/.config/awesome"
