@@ -137,11 +137,13 @@ down 1
 print_phoebe () {
     down 1
     right 1
-    WIDTH=30
+    WIDTH=27
 #    HEIGHT=50
 #    wezterm imgcat --width $WIDTH ~/backgrounds/phoeb.png
-    HEIGHT=15
+    HEIGHT=14
     wezterm imgcat --width $WIDTH ~/backgrounds/sadbridgers.png
+#    wezterm imgcat --height $HEIGHT ~/backgrounds/sadbridgers.png
+
 
 
 }
