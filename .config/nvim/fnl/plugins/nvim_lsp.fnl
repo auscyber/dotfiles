@@ -6,9 +6,41 @@
              utils utils
              lspkind lspkind
              npairs nvim-autopairs
-             rust-tools rust-tools}
+             rust-tools rust-tools
+             configs lspconfig.configs}
 
    require-macros [macros]})
+
+;(when (not lsp.idris2_lsp)
+;  (set configs.idris2_lsp {
+;    :default_config  {
+;                      :cmd  ["idris2-lsp"]; -- if not available in PATH, provide the absolute path
+;                      :filetypes ["idris2"]
+;                      }
+;      :on_new_config  (fn [new_config  new_root_dir]
+;        {
+;          :new_config
+;          {:cmd  ["idris2-lsp"]
+;            :capabilities {
+;                       "workspace"
+;                          {"semanticTokens" {:refreshSupport true} }}}}
+;      )
+;      :root_dir  (fn [fname]
+;        (let [scandir  (require "plenary.scandir")
+;             find_ipkg_ancestor (fn [fname]
+;            (lsp.util.search_ancestors fname (fn [path]
+;              (local res  (scandir.scan_dir path {:depth 1 :search_pattern ".+%.ipkg"}))
+;            (when (not (vim.tbl_isempty res))
+;              path
+;            )
+;          )
+;        ))]
+;        (or (find_ipkg_ancestor fname) (lsp.util.find_git_ancestor fname) (vim.loop.os_homedir))
+;      ))
+;      :settings []
+;    }
+;))
+
 
 (vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menuone,noinsert,noselect")
@@ -48,7 +80,6 @@
     (map :K "<Cmd>lua vim.lsp.buf.hover()<CR>")
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-;    (map :<leader>rn "<cmd> lua vim.lsp.)
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
     (imap :<c-space> "<Plug>(completion_trigger)")
     (imap :<tab> "<Plug>(completion_smart_tab)")
@@ -76,6 +107,84 @@
          augroup END"
                                                          false))))
 
+(lua "
+     local lspconfig = require('lspconfig')
+local configs = require('lspconfig/configs')
+if not lspconfig.idris2_lsp then
+  configs.idris2_lsp = {
+    default_config = {
+      cmd = {'idris2-lsp'}; -- if not available in PATH, provide the absolute path
+      filetypes = {'idris2'};
+      on_new_config = function(new_config, new_root_dir)
+        new_config.cmd = {'idris2-lsp'}
+        new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
+      end;
+      root_dir = function(fname)
+        local scandir = require('plenary.scandir')
+        local find_ipkg_ancestor = function(fname)
+          return lspconfig.util.search_ancestors(fname, function(path)
+            local res = scandir.scan_dir(path, {depth=1; search_pattern='.+%.ipkg'})
+            if not vim.tbl_isempty(res) then
+              return path
+            end
+          end)
+        end
+        return find_ipkg_ancestor(fname) or lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
+      end;
+      settings = {};
+    };
+  }
+end
+-- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
+local autostart_semantic_highlightning = true
+lspconfig.idris2_lsp.setup {
+  on_init = custom_init,
+  on_attach = function(client)
+    if autostart_semantic_highlightning then
+      vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
+        { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+    end
+    on_attach(client)
+  end,
+  autostart = true,
+  handlers = {
+    ['workspace/semanticTokens/refresh'] = function(err, method, params, client_id, bufnr, config)
+      if autostart_semantic_highlightning then
+        vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
+          { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+      end
+      return vim.NIL
+    end,
+    ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+      -- temporary handler until native support lands
+      local client = vim.lsp.get_client_by_id(client_id)
+      local legend = client.server_capabilities.semanticTokensProvider.legend
+      local token_types = legend.tokenTypes
+      local data = result.data
+
+      local ns = vim.api.nvim_create_namespace('nvim-lsp-semantic')
+      vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+      local tokens = {}
+      local prev_line, prev_start = nil, 0
+      for i = 1, #data, 5 do
+        local delta_line = data[i]
+        prev_line = prev_line and prev_line + delta_line or delta_line
+        local delta_start = data[i + 1]
+        prev_start = delta_line == 0 and prev_start + delta_start or delta_start
+        local token_type = token_types[data[i + 3] + 1]
+        vim.api.nvim_buf_add_highlight(bufnr, ns, 'LspSemantic_' .. token_type, prev_line, prev_start, prev_start + data[i + 2])
+      end
+    end
+  },
+}
+
+-- Set here your preferred colors for semantic values
+vim.cmd [[highlight link LspSemantic_type Include]]   -- Type constructors
+vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
+vim.cmd [[highlight link LspSemantic_enumMember Number]]   -- Data constructors
+vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
+vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+")
 
 
 (fn init-lsp [lsp-name ?opts]
@@ -87,7 +196,10 @@
 (init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
 (rust-tools.setup {})
-(init-lsp :rust_analyzer {:settings {:rust-analyzer {:checkOnSave {:command :clippy} :procMacro {:enable true}}}})
+(init-lsp :rust_analyzer {:settings
+                          {:rust-analyzer
+                           {:checkOnSave {:command :clippy}
+                            :procMacro {:enable true}}}})
 (init-lsp :clangd)
 (init-lsp :rnix)
 ;(init-lsp :denols)
@@ -95,3 +207,6 @@
 (init-lsp :pylsp)
 (init-lsp :zls)
 (init-lsp :metals)
+(init-lsp :dhall_lsp_server)
+(init-lsp :purescriptls)
+; (init-lsp :idris2_lsp)

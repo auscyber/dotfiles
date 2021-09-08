@@ -50,6 +50,7 @@
 
               :Olical/conjure {:ft [:fennel :racket :clojure]}
               :wlangstroth/vim-racket {}
+              :vmchale/dhall-vim {}
               :onsails/lspkind-nvim {}
               :Olical/aniseed {}
               :ziglang/zig.vim {:ft [:zig]}
@@ -63,7 +64,7 @@
               :tikhomirov/vim-glsl {:ft :glsl}
 
               :dag/vim-fish {:ft :fish}
-              :purescript-contrib/purescript-vim {:ft [:ft [:purescript]]}
+              :purescript-contrib/purescript-vim {:ft [:purescript]}
               :ranfdev/parinfer-rust {:ft [:fennel :racket :scheme] :run "cargo build --release"}
 
 ;  :rafcamlet/coc-nvim-lua {}
@@ -76,7 +77,7 @@
                                                            ((. (require "colorizer") :setup)))}
               ; Lsp plugins
               :neovim/nvim-lspconfig { :mod :nvim_lsp
-                                      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix]
+                                      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2]
                                       :requires [:simrat39/rust-tools.nvim :nvim-lua/completion-nvim :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals]}
 
               :kosayoda/nvim-lightbulb {
@@ -89,10 +90,9 @@
              ;                           :event "BufReadPre"
              ;                           :module "persistence" :config (fn [] ((. (require "persistence") setup)))}
 
+              :elkowar/yuck.vim {}
               :elkowar/nvim-gehzu {:ft :fnl}
               :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :mod :treesitter :requires [:nvim-treesitter/playground :folke/twilight.nvim]})
 ;  :camspiers/animate.vim {:mod :animate}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
-
-
 
