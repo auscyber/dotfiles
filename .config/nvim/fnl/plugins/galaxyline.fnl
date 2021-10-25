@@ -45,7 +45,7 @@
                                                                 :cv colors.red :ce colors.red :r colors.cyan
                                                                 :rm  colors.cyan  ["r?"] colors.cyan
                                                                 ["!"] colors.red :t colors.red})
-                                       (_: hi (.. "GalaxyViMode guifg=" (. mode_color (vim.fn.mode))))
+                                       ;(_: hi (.. "GalaxyViMode guifg=" (. mode_color (vim.fn.mode))))
                                        " ")
 ;                                                  (fn [] (if (not (buffer_not_empty)) color.dark_cyan color.cyan))]
                            :separator "  "

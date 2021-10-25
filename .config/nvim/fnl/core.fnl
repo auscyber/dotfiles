@@ -7,7 +7,8 @@
 (set o.mouse "a")
 (set o.termguicolors true)
 (set o.guifont "Hasklug Nerd Font:h10")
-(_: colorscheme :pink_ocean)
+(nvim.command "colorscheme pink_ocean")
+;(_: colorscheme :pink_ocean)
 (set o.showmode false)
 (set bo.tabstop 4)
 (set bo.shiftwidth 4)
@@ -29,6 +30,6 @@
         (nvim.command "let g:neovide_fullscreen=v:false")
        (nvim.command "let g:neovide_fullscreen=v:true")))
 
-(_: nmap :<F11> "<Expr>v:lua.switch_fullscreen() <Cr>")
-{:switch_fullscreen switch_fullscreen}
-(_: autocmd  "BufNewFile,BufRead" "*.agda" "setf agda")
+;(_: nmap :<F11> "<Expr>v:lua.switch_fullscreen() <Cr>")
+;{:switch_fullscreen switch_fullscreen}
+;(_: autocmd  "BufNewFile,BufRead" "*.agda" "setf agda")

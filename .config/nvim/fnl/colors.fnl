@@ -1,5 +1,7 @@
 (module colors)
 
+(def fg "#D0D0D0")
+(def bg purple)
 (def white :#FFFFFF)
 (def pink :#ffd1dc)
 (def light_red :#ffa0a0)

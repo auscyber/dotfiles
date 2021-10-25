@@ -1,80 +1,57 @@
 (module plugins.feline
-  {require {feline feline
-            colors colors
-            lsp feline.providers.lsp
-            vi_mode_utils feline.providers.vi_mode}})
+             {require {feline feline
+                       colors colors
+                       lsp feline.providers.lsp
+                       vi_mode_utils feline.providers.vi_mode}})
 
 
 (local b vim.b)
 (local fnn vim.fn)
 
-(local properties {
-                   :force_inactive {
-                                    :filetypes  {}
-                                    :buftypes  {}
-                                    :bufnames  {}}})
+(set vim.o.termguicolors true)
 
 
-(local components {
-                   :left {
-                          :active {}
-                          :inactive {}}
-                   :mid {
-                         :active {}
-                         :inactive {}}
-                   :right {
-                           :active {}
-                           :inactive {}}})
+(local components {:active [{} {} {}]
+                   :inactive [{} {} {}]})
 
 
-(set properties.force_inactive.filetypes [
-                                          "NvimTree"
-                                          "dbui"
-                                          "packer"
-                                          "startify"
-                                          "fugitive"
-                                          "fugitiveblame"])
+
+(tset components.active  1     [
+                                {
+                                 :provider " "
+                                 :hl {
+                                      :fg colors.cyan
+                                      :bg "NONE"}}
 
 
-(set properties.force_inactive.buftypes [ "terminal"])
-
-(tset components.left :active
-     [
-      {
-       :provider " "
-       :hl {
-            :fg colors.cyan
-            :bg "NONE"}}
-
-
-      {
-       :provider  (fn [] "  ")
-       :hl (fn []
-            (local val {:bg colors.cyan})
-            (set val.name (vi_mode_utils.get_mode_highlight_name))
-            (set val.fg (vi_mode_utils.get_mode_color))
-            (set val.style "bold")
-            val)
-       :right_sep {:str " " :hl {:bg colors.cyan}}}
+                                {
+                                 :provider  (fn [] "  ")
+                                 :hl (fn []
+                                      (local val {:bg colors.cyan})
+                                      (set val.name (vi_mode_utils.get_mode_highlight_name))
+                                      (set val.fg (vi_mode_utils.get_mode_color))
+                                      (set val.style "bold")
+                                      val)
+                                 :right_sep {:str " " :hl {:bg colors.cyan}}}
 
 
-      {
-       :provider  "file_info"
-       :type :relative-short
-       :hl {
-            :fg "white"
-            :bg colors.grey
-            :style "bold"}
-       :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
+                                {
+                                 :provider  "file_info"
+                                 :type :relative-short
+                                 :hl {
+                                      :fg "white"
+                                      :bg colors.grey
+                                      :style "bold"}
+                                 :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
-        :right_sep  [" "]}
+                                  :right_sep  [" "]}
 
 
 
-      {:provider  "file_size"
-        :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
-        :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
-(tset components.mid :active
+                                {:provider  "file_size"
+                                  :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
+                                  :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
+(tset components.active 2 
       [
         {
          :provider :lsp_client_names
@@ -84,7 +61,7 @@
          :left_sep  [{:str :left_rounded :hl {:fg colors.grey :bg :NONE}}]}])
 
 
-(tset components.right :active
+(tset components.active 3 
     [
       
 
@@ -178,7 +155,7 @@
 
 
 
-(tset components.left :inactive
+(tset components.inactive 1
     [
       {
        :provider  "file_type"
@@ -263,11 +240,18 @@
 
 
 (feline.setup {
-               :default_fg "#D0D0D0"
-               :default_bg colors.purple
                :colors colors
                :separators separators
+               :force_inactive {
+                                :filetypes  [
+                                              "NvimTree"
+                                              "dbui"
+                                              "packer"
+                                              "startify"
+                                              "fugitive"
+                                              "fugitiveblame"]
+                                :buftypes [ "terminal"]
+                                :bufnames []}
                :components components
-               :properties properties
                :vi_mode_colors vi_mode_colors})
 

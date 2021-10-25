@@ -7,6 +7,7 @@
              lspkind lspkind
              npairs nvim-autopairs
              rust-tools rust-tools
+             cmp cmp
              configs lspconfig.configs}
 
    require-macros [macros]})
@@ -41,6 +42,13 @@
 ;    }
 ;))
 
+;(error "hi")
+
+
+(cmp.setup {
+            :sources { :name :nvim_lsp}})
+            
+           
 
 (vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menuone,noinsert,noselect")
@@ -72,7 +80,7 @@
   (npairs.setup {})
   (let [ opts {:noremap true :silent true}
         map (fn [key command] "lol" (nvim.buf_set_keymap bufnr :n key command opts))
-        imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent true}))
+        imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
         inoremap (fn [key command] (nvim.buf_set_keymap bufnr :i key command (a.merge opts {:expr true})))]
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
     (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>")
@@ -90,7 +98,6 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
     (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
-;    (autocmd "BufEnter,BufWinEnter,TabEnter *.rs :lua require'lsp_extensions'.inlay_hints{}")
 
     ;(autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()")
   (if client.resolved_capabilities.document_highlight (do
@@ -189,7 +196,9 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 
 (fn init-lsp [lsp-name ?opts]
   "initialize a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach} (or ?opts {}))]
+  (let [merged-opts (a.merge {:on_attach on_attach} 
+                               ;:capabilties ((. (require "cmp_nvim_lsp") :update_capabilities) (vim.lsp.protocol.make_client_capabilities))} 
+                            (or ?opts {}))]
     ((. lsp lsp-name :setup) merged-opts)))
 
 (init-lsp :tsserver)
