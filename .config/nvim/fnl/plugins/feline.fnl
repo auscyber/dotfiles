@@ -15,7 +15,6 @@
                    :inactive [{} {} {}]})
 
 
-
 (tset components.active  1     [
                                 {
                                  :provider " "

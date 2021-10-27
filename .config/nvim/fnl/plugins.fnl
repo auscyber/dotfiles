@@ -1,8 +1,9 @@
 (module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
-   require-macros [macros]})
-
+   require-macros [macros]
+   })
+;(import-macros {: packer-use} :macros)
 ;; Plugins to be managed by packer.
 ; TODO FIX STUFF
 
@@ -17,18 +18,19 @@
       :ntpeters/vim-better-whitespace {}
       :kyazdani42/nvim-web-devicons {}
 
-      :lewis6991/gitsigns.nvim {:requires [:nvim-lua/plenary.nvim] :mod gitsigns}
+      :lewis6991/gitsigns.nvim {:requires [:nvim-lua/plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
       :tweekmonster/startuptime.vim {:cmd :StartupTime}
 ;  :y
       :ryanoasis/vim-devicons {}
-      :kyazdani42/nvim-tree.lua {:mod tree}
-      :akinsho/nvim-bufferline.lua {:mod bufferline}
+      :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)} ;:mod tree}
+      :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline) }; :mod bufferline}
 ;    ogo/deoplete.nvim {:post_ (fn [] (vim.api.nvim_command "let g:deoplete#enable_at_startup = 1"))}
       :nathanaelkane/vim-indent-guides {}
       :Yggdroot/indentLine {}
-      :andweeb/presence.nvim {:mod presence}
+      :andweeb/presence.nvim {:config #(require :plugins.presence)}; :mod presence}
+      :wakatime/vim-wakatime {}
       :tpope/vim-fugitive {}
-      :TimUntersberger/neogit {:requires [:nvim-lua/plenary.nvim] :mod neogit}
+      :TimUntersberger/neogit {:requires [:nvim-lua/plenary.nvim] :config #(require :plugins.neogit)} ;:mod neogit}
       :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
       :iamcco/markdown-preview.nvim {:run "cd app && yarn install"}
       :tjdevries/train.nvim {}
@@ -81,7 +83,8 @@
                               :requires [{1 :simrat39/rust-tools.nvim :requires [:nvim-lua/plenary.nvim :nvim-lua/popup.nvim :mfussenegger/nvim-dap]} 
                                          {1 :rafaelsq/completion-nvim :branch :changeHandlerSignature} 
                                          :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals "hrsh7th/cmp-nvim-lsp" "hrsh7th/cmp-buffer" "hrsh7th/nvim-cmp"] 
-                               :mod nvim_lsp}
+                                :config #(require "plugins.nvim_lsp")}
+                              ; :mod nvim_lsp}
 
       :kosayoda/nvim-lightbulb {
                                 :config

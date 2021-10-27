@@ -10,7 +10,7 @@
 (set vim.wo.foldexpr "nvim_treesitter#foldexpr()")
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :agda :nix :cpp]
+                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :agda :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}
