@@ -8,15 +8,12 @@
  */
 
 configuration {
-/*	font:							"Iosevka Nerd Font 10"; */
-    font:                           "Sans 10"; 
+	font:							"Iosevka Nerd Font 10";
     show-icons:                     true;
 	icon-theme: 					"Papirus";
-    display-combi: 					" ";
+    display-drun: 					"";
     drun-display-format:            "{name}";
     disable-history:                false;
-    fullscreen:                     false;
-	hide-scrollbar: 				true;
 	sidebar-mode: 					false;
 }
 
@@ -40,7 +37,7 @@ prompt {
 	padding: 						0.30% 1% 0% -0.5%;
 	background-color: 				@al;
 	text-color: 					@fg;
-	font:							"Hasklug Nerd Font 12";
+	font:							"FantasqueSansMono Nerd Font 12";
 }
 
 entry {
@@ -96,11 +93,17 @@ element {
 }
 
 element-icon {
+    background-color: 				inherit;
+    text-color:       				inherit;
+    horizontal-align:               0.5;
+    vertical-align:                 0.5;
     size:                           24px;
     border:                         0px;
 }
 
 element-text {
+    background-color: 				@al;
+    text-color:       				inherit;
     expand:                         true;
     horizontal-align:               0;
     vertical-align:                 0.5;

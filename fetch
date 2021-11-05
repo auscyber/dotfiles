@@ -1,4 +1,6 @@
 #!/bin/sh
+LC_ALL=C
+LANG=C
 COLS=$(tput cols)
 fg_c() {
     tput setaf "$1"
@@ -46,16 +48,15 @@ W_FG=$(fg_c $WHITE)
 
 
 
-
-if command -v apt 1> /dev/null 2>&1
+if command -v apt 1> /dev/null 
     then
         package_manager="apt"
         packages=$(apt list --installed 2> /dev/null | wc -l)
-elif command -v nixos-rebuild 1> /dev/null  2>&1
+elif command -v nixos-rebuild 1> /dev/null  
     then
     packages=$(wc -l < /etc/current-system-packages)
     package_manager="nix"
-elif command -v pacman 1> /dev/null 2>&1
+elif command -v pacman 1> /dev/null 
 then
     packages=$(pacman -Q | wc -l)
     package_manager="pacman"
@@ -66,9 +67,9 @@ fi
 os="$(. /etc/os-release && printf "$PRETTY_NAME")"
 kernel="$(uname -r)"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
-gpu="$(nvidia-smi -L | sed -E 's/\(.*//' | awk -F ":" '{print $2}')"
+gpu="$(nvidia-smi -L | awk -F ":" '{b=gensub(/\(.*/,"","g",$2); print $2}')"
 
-lyric="$(cat ~/Music/phoebe/cleaned/*/* 2>&- | shuf -n 1)"
+lyric="$( shuf -n 1 < ~/Music/phoebe/lyricslist 2>&- )"
 if [ -z "$lyric" ]; then
     lyric="phoebe bridgers"
 fi

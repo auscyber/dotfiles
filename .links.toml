@@ -3,8 +3,6 @@ id = "17504290032302696503"
 default = "desktop"
 systems = ["desktop", "laptop"]
 
-
-
 [[links]]
 name = "backgrounds"
 destination = "$HOME/backgrounds"
@@ -22,7 +20,7 @@ src = ".config/alacritty.yml"
 
 [[links]]
 name = ".config/rofi"
-destination = "$HOME/.config/rofi.old"
+destination = "$HOME/.config/rofi"
 src = ".config/rofi"
 
 [[links]]
@@ -56,7 +54,6 @@ name = "xmonad"
 destination = "$HOME/.xmonad/xmonad.hs"
 system = "desktop"
 src = "xmonad-config/lib/xmonad.hs"
-
 
 [[links]]
 name = ".config/polybar/config.ini"
@@ -113,16 +110,6 @@ destination = "$HOME/.tmux"
 src = ".tmux"
 
 [[links]]
-name = "dotfiles"
-destination = "$HOME/.tmux.conf.local"
-src = ".tmux.conf.local"
-
-[[links]]
-name = ".tmux"
-destination = "$HOME/.tmux.conf"
-src = ".tmux/tmux.conf"
-
-[[links]]
 name = ".config/dunst"
 destination = "$HOME/.config/dunst"
 src = ".config/dunst"
@@ -164,28 +151,36 @@ src = ".config/nitrogen"
 
 [[links]]
 name = "fetch_home"
-src = "fetch"
 destination = "$HOME/fetch"
+src = "fetch"
 
 [[links]]
 name = "fennel"
-src = "libs/fennel.lua"
 destination = "$HOME/.fennel.lua"
+src = "libs/fennel.lua"
 
 [[links]]
 name = "wezterm fennel"
-src = "libs/fennel.lua"
 destination = "$HOME/.config/wezterm/fennel.lua"
+src = "libs/fennel.lua"
+
 [[links]]
 name = "awesome fennel"
-src = "libs/fennel.lua"
 destination = "$HOME/.config/awesome/fennel.lua"
-
-
-
-
+src = "libs/fennel.lua"
 
 [[links]]
 name = "awesome"
-src = ".config/awesome"
 destination = "$HOME/.config/awesome"
+src = ".config/awesome"
+
+[[links]]
+name = ".tmux.conf"
+destination = "/home/auscyber/.tmux.conf"
+src = ".tmux.conf"
+
+[[links]]
+name = "pacman hooks"
+destination = "/etc/pacman.d/hooks"
+src = "pacman.d/hooks"
+

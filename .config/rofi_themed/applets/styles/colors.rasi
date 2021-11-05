@@ -19,5 +19,4 @@
  *
  */
 
-@import "material-dark/light_pink.rasi"
-/*@import "dark.rasi"*/
+@import "dark.rasi"

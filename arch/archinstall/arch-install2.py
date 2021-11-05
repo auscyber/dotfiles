@@ -53,64 +53,64 @@ packages = [ 'vim',
 
 aur_packages = ['neovim-nightly-bin','yay', 'polybar', "picom-jonaburg-git", "spotify" , "slack", "teams"]
 
-class UserHook:
-    def __init__(self, installation,user="auscyber", mount="/mnt", home=None, location=".bashrc", computer="desktop"):
-        self.installation = installation
-        self.user = user
-        self.home = home
-        self.mount = mount
-        self.location = location
-        if home is None:
-            self.home = f"/home/{user}"
-        self.command = f"""\
-#!/bin/bash
-set -e
-echo Running Post Install script
-for i in `env | sed 's/=.*//'` ; do
-    unset $i
-done
-source /etc/profile
-sudo pacman -Syu
-cd {self.home}
-mv "{self.home}/{location}" "{self.home}/{location}.old"
-sleep 2
-git clone https://github.com/auscyberman/dotfiles.git
-echo "Copying dotfiles"
-mkdir -p ~/.local/bin
-wget https://github.com/AusCyberman/dotfile-sync/releases/download/0.01/dots -O ~/.local/bin/dots
-chmod +x ~/.local/bin/dots
-export PATH=$PATH:~/.local/bin
-cd dotfiles
-dots --system {computer} sync
-"""
-        self.yay_done = False
-    def __enter__(self):
-        return self
-
-    def __exit__(self, a, b, c):
-        actual_loc =  f"{self.home}/{self.location}"
-        with open(self.mount+actual_loc,"w+") as f: 
-            f.write(self.command)
-        self.installation.run_command("chmod +x "+actual_loc)
-        pty.spawn(["/usr/bin/arch-chroot","-u",self.user,self.mount,"bash",actual_loc])  
-    def add_aur_packages(self, packages): 
-        if not self.yay_done:
-            self.command += f"""
-            mkdir ~/.cache
-            cd ~/.cache
-            git clone https://aur.archlinux.org/yay
-            cd yay
-            makepkg -si --noconfirm
-            """
-        fixed_pack = ''.join(sum([[a for a in b+' '] for b in packages],[]))
-        self.command += f"""
-        yay -Sy {fixed_pack}
-        """
-    def set_shell(self, path="/bin/zsh"):
-        self.command += f"chsh -s {path}"
-
-    def copy_to_home(self,path,destination):
-        pass
+##class UserHook:
+#    def __init__(self, installation,user="auscyber", mount="/mnt", home=None, location=".bashrc", computer="desktop"):
+#        self.installation = installation
+#        self.user = user
+#        self.home = home
+#        self.mount = mount
+#        self.location = location
+#        if home is None:
+#            self.home = f"/home/{user}"
+#        self.command = f"""\
+##!/bin/bash
+#set -e
+#echo Running Post Install script
+#for i in `env | sed 's/=.*//'` ; do
+#    unset $i
+#done
+#source /etc/profile
+#sudo pacman -Syu
+#cd {self.home}
+#mv "{self.home}/{location}" "{self.home}/{location}.old"
+#sleep 2
+#git clone https://github.com/auscyberman/dotfiles.git
+#echo "Copying dotfiles"
+#mkdir -p ~/.local/bin
+#wget https://github.com/AusCyberman/dotfile-sync/releases/download/0.01/dots -O ~/.local/bin/dots
+#chmod +x ~/.local/bin/dots
+#export PATH=$PATH:~/.local/bin
+#cd dotfiles
+#dots --system {computer} sync
+#"""
+#        self.yay_done = False
+#    def __enter__(self):
+#        return self
+#
+#    def __exit__(self, a, b, c):
+#        actual_loc =  f"{self.home}/{self.location}"
+#        with open(self.mount+actual_loc,"w+") as f: 
+#            f.write(self.command)
+#        self.installation.run_command("chmod +x "+actual_loc)
+#        pty.spawn(["/usr/bin/arch-chroot","-u",self.user,self.mount,"bash",actual_loc])  
+#    def add_aur_packages(self, packages): 
+#        if not self.yay_done:
+#            self.command += f"""
+#            mkdir ~/.cache
+#            cd ~/.cache
+#            git clone https://aur.archlinux.org/yay
+#            cd yay
+#            makepkg -si --noconfirm
+#            """
+#        fixed_pack = ''.join(sum([[a for a in b+' '] for b in packages],[]))
+#        self.command += f"""
+#        yay -Sy {fixed_pack}
+#        """
+#    def set_shell(self, path="/bin/zsh"):
+#        self.command += f"chsh -s {path}"
+#
+#    def copy_to_home(self,path,destination):
+#        pass
 #        sys_command(f"cp \"{path}\" \"{self.mount}{self.home}/{self.destination}\"")
 
 def get_partition(disk, mountpoint,message="Select partition"):
@@ -165,25 +165,24 @@ pc_name = input("Computer name: ")
 
 def install_on(mountpoint):
     # We kick off the installer by telling it where the
-    with archinstall.Installer(mountpoint) as installation:
+    with archinstall.Installer(mountpoint) as i:
         # Strap in the base system, add a boot loader and configure
         # some other minor details as specified by this profile and user.
-        if installation.minimal_installation():
-            installation.set_hostname(f"{USER}-{pc_name}")
-            installation.add_bootloader()
-            installation.install_profile('xorg')
-            installation.set_timezone(timezone)
-            installation.add_additional_packages(packages)
-            installation.user_create(USER, user_pasword, sudo=True)
-            installation.user_set_pw('root', "toor")
-            installation.add_additional_packages("networkmanager")
-            installation.enable_service('NetworkManager.service')
+        if i.minimal_installation():
+            i.set_hostname(f"{USER}-{pc_name}")
+            i.add_bootloader()
+            i.install_profile('xorg')
+            i.set_timezone(timezone)
+            i.add_additional_packages(packages)
+            i.user_create(USER, user_pasword, sudo=True)
+            i.user_set_pw('root', "toor")
+            i.add_additional_packages("networkmanager")
+            i.enable_service('NetworkManager.service')
             with open(mountpoint+'/etc/sudoers',"a+") as f:
                 f.write("Defaults !requiretty \n Defaults !tty_tickets")
-            with UserHook(installation) as h:
-                h.set_shell("/bin/zsh")
-                h.add_aur_packages(aur_packages)
-
+            i.arch_chroot(f"su {user} -c 'cd $(mktemp -d) && git clone https://aur.archlinux.org/yay-bin.git . && makepkg -sim --noconfirm'")
+            i.arch_chroot(f'su {user} -c "yay -Syu --needed --noconfirm {" ".join(dependencies_aur)}"')
+            i.arch_chroot(f'su {user} -c "curl -L https://nixos.org/nix/install | sh"')
 # Once this is done, we output some useful information to the user
 # And the installation is complete.
 #    archinstall.log(f"There are two new accounts in your installation after reboot:")

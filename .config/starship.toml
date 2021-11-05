@@ -1,13 +1,15 @@
-format = """
-$hostname$shell$status$directory$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character
-"""
+format = """$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character"""
+
+scan_timeout = 10
 
 [shell]
-disabled = true
+disabled = false
+powershell_indicator = "[pwsh](blue)"
+zsh_indicator = "[zsh](green)"
 
 [character]
-success_symbol = "[❯](bold light blue)"
-error_symbol = "[❯](bold white)"
+success_symbol = "[λ](bold  195)"
+error_symbol = "[λ](bold white)"
 
 [hostname]
 ssh_only = true
@@ -15,7 +17,7 @@ ssh_only = true
 
 
 [username]
-style_user = "white bold"
+style_user = "white"
 style_root = "black bold"
 format = "[$user]($style) "
 disabled = false
@@ -23,7 +25,6 @@ show_always = true
 
 
 # Wait 10 milliseconds for starship to check files under the current directory.
-scan_timeout = 10
 
 
 # Don't print a new line at the start of the prompt
