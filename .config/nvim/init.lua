@@ -28,9 +28,9 @@ end
 ensure("wbthomason", "packer.nvim")
 ensure("Olical", "aniseed")
 
+vim.o.termguicolors = true
 
 -- Enable Aniseed's automatic compilation and loading of Fennel source code.
-require("packer_compiled")
 vim.g["aniseed#env"] = {
   module = "init",
   compile = true

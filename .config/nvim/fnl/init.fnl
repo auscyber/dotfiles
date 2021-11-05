@@ -1,6 +1,7 @@
 (module init {
-              require {core core
-                       plugins plugins}
+              require {_ core
+                       _ plugins
+                       _ packer_compiled}
               autoload {a aniseed.core
                         fennel aniseed.fennel}})
 

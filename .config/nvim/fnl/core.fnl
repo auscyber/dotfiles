@@ -5,7 +5,7 @@
 (local wo nvim.o)
 (local o nvim.o)
 (set o.mouse "a")
-(set o.termguicolors true)
+(set vim.o.termguicolors true)
 (set o.guifont "Hasklug Nerd Font:h10")
 (nvim.command "colorscheme pink_ocean")
 ;(_: colorscheme :pink_ocean)

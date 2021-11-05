@@ -7,10 +7,10 @@
              lspkind lspkind
              npairs nvim-autopairs
              rust-tools rust-tools
-             cmp cmp
+;             cmp cmp
              configs lspconfig.configs}
 
-   require-macros [macros]})
+   require-macros [macros zest.macros]})
 
 ;(when (not lsp.idris2_lsp)
 ;  (set configs.idris2_lsp {
@@ -45,8 +45,8 @@
 ;(error "hi")
 
 
-(cmp.setup {
-            :sources { :name :nvim_lsp}})
+;(cmp.setup {
+;            :sources { :name :nvim_lsp}})
             
            
 
@@ -110,6 +110,7 @@
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+           autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
 \"           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
          augroup END"
                                                          false))))
