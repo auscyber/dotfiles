@@ -44,7 +44,10 @@
                                   (icollect [_# v# (ipairs use-statements)]
                                       `(,use-sym ,v#))))
                               :config {:compile_path (.. (vim.fn.stdpath "config") "/lua/packer_compiled.lua")
-                                       :display {:open_fn (fn [] ((. (require "packer.util") :float) {:border :single}))}}})))))
+                                       :display {:open_fn (fn [] (let [(b# win# buf#) ((. (require "packer.util") :float) {:border :rounded})]
+                                                                   (vim.api.nvim_win_set_option win# :winhighlight "PmenuThumb:Normal,FloatBorder:Normal,Normal:Normal,StatusLine:Normal")
+                                                                   (vim.api.nvim_buf_set_name buf# :Packer)
+                                                                   (values b# win# buf#)))}}})))))
 
  :viml->fn
  (fn [name]
