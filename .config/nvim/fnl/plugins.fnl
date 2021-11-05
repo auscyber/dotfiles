@@ -1,3 +1,4 @@
+(require-macros :macros)
 (module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
@@ -10,6 +11,7 @@
 
 (packer-use
       :Olical/aniseed {:branch :develop}
+      :lewis6991/impatient.nvim {:config #(require "impatient") }
       :wbthomason/packer.nvim {}
       :junegunn/fzf {}
       :junegunn/fzf.vim {}
@@ -40,7 +42,6 @@
 ;  :v
 ;    iline-themes" "jacoborus/tender.vim"]
       :christoomey/vim-tmux-navigator {}
-      :lewis6991/impatient.nvim {:config #(require "impatient")}
       :nvim-telescope/telescope.nvim
         {
          :requires [["nvim-lua/popup.nvim"] ["nvim-lua/plenary.nvim"]  {1 :nvim-telescope/telescope-frecency.nvim :requires [:tami5/sql.nvim]}]
@@ -53,7 +54,7 @@
       :vhyrro/neorg {:require [[:nvim-lua/plenary.nvim] [:hrsh7th/nvim-compe]] :mod neorg}
 
       :Olical/conjure {:ft [:fennel :racket :clojure]}
-      :wlangstroth/vim-racket {}
+      :wlangstroth/vim-racket {:ft :racket}
       :vmchale/dhall-vim {}
       :onsails/lspkind-nvim {}
       :ziglang/zig.vim {:ft [:zig]}
@@ -79,28 +80,33 @@
                                                    ((. (require "colorizer") :setup)))}
       ; Lsp plugins
       :neovim/nvim-lspconfig { 
-                              :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2]
+                              :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1]
                               :requires [{1 :simrat39/rust-tools.nvim :requires [:nvim-lua/plenary.nvim :nvim-lua/popup.nvim :mfussenegger/nvim-dap]} 
                                          {1 :rafaelsq/completion-nvim :branch :changeHandlerSignature} 
-                                         :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals "hrsh7th/cmp-nvim-lsp" "hrsh7th/cmp-buffer" "hrsh7th/nvim-cmp"] 
+                                         :nvim-lua/lsp_extensions.nvim :scalameta/nvim-metals "hrsh7th/cmp-nvim-lsp" "hrsh7th/cmp-buffer" "hrsh7th/nvim-cmp"
+                                          {1 :kosayoda/nvim-lightbulb 
+                                                :config
+                                              (fn []
+                                                (let [nvim (require :aniseed.nvim)]
+                                                    (autocmd "CursorHold,CursorHoldI" "*" "lua require'nvim-lightbulb'.update_lightbulb()")))}
+
+                                                  ] 
                                 :config #(require "plugins.nvim_lsp")}
                               ; :mod nvim_lsp}
 
-      :kosayoda/nvim-lightbulb {
-                                :config
-                                  (fn []
-                                    (let [nvim (require :aniseed.nvim)]
-                                      (autocmd "CursorHold,CursorHoldI" "*" "lua require'nvim-lightbulb'.update_lightbulb()")))}
-
+      :rcarriga/nvim-notify {:config #(set vim.notify (require "notify"))}
+      
       :folke/todo-comments.nvim {:requires :nvim-lua/plenary.nvim :mod todo}
+      :tsbohc/zest.nvim {:config #(let [zest (require :zest)] (zest.setup))}
 ;    
 ;    n "BufReadPre"
 ;    ue "persistence" :config (fn [] ((. (require "persistence") setup)))
-
+      :fhill2/floating.nvim {}
       :elkowar/yuck.vim {}
       :elkowar/nvim-gehzu {:ft :fnl}
       :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :requires [:nvim-treesitter/playground :folke/twilight.nvim] :config #(require "plugins.treesitter")} ; :mod treesitter}
-      :puremourning/vimspector {})
+      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
+      :mfussenegger/nvim-dap {:config #(require :plugins.dap) :requires [:rcarriga/nvim-dap-ui]})
 ;  :camspiers/animate.vim {:mod :animate}
 ;  :glepnir/galaxyline.nvim {:mod :galaxyline}
 

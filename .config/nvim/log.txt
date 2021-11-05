@@ -1,0 +1,133 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.006  000.006: --- NVIM STARTING ---
+000.183  000.177: locale set
+000.360  000.177: inits 1
+000.368  000.008: window checked
+002.344  001.977: parsing arguments
+002.410  000.066: expanding arguments
+002.428  000.018: inits 2
+002.701  000.273: init highlight
+002.702  000.001: waiting for UI
+003.188  000.485: done waiting for UI
+003.211  000.023: init screen for UI
+003.222  000.012: init default mappings
+003.273  000.050: init default autocommands
+003.309  000.007  000.007: sourcing /usr/share/nvim/archlinux.vim
+003.311  000.025  000.018: sourcing /etc/xdg//nvim/sysinit.vim
+009.797  000.016  000.016: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/presence.nvim/autoload/presence.vim
+011.079  000.028  000.028: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/autoload/nvim_treesitter.vim
+020.726  000.014  000.014: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/zig.vim/ftdetect/zig.vim
+020.753  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/idris2-vim/ftdetect/idris2.vim
+020.772  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/idris2-vim/ftdetect/lidris2.vim
+020.807  000.023  000.023: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim
+020.830  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/kotlin-vim/ftdetect/kotlin.vim
+020.852  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/agda-vim/ftdetect/agda.vim
+020.872  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/vim-nix/ftdetect/nix.vim
+020.906  000.020  000.020: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/vim-glsl/ftdetect/glsl.vim
+020.955  000.035  000.035: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/vim-fish/ftdetect/fish.vim
+020.975  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/opt/purescript-vim/ftdetect/purescript.vim
+020.982  017.657  017.469: sourcing /home/auscyber/.config/nvim/init.lua
+020.988  000.034: sourcing vimrc file(s)
+024.592  000.017  000.017: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/aniseed/ftdetect/fennel.vim
+024.640  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/dhall-vim/ftdetect/dhall.vim
+024.716  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/neorg/ftdetect/norg.vim
+024.901  000.015  000.015: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/elixir.vim
+024.919  000.006  000.006: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/fennel.vim
+024.937  000.009  000.009: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/fish.vim
+024.956  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gdresource.vim
+024.974  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gdscript.vim
+024.991  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/glimmer.vim
+025.009  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gomod.vim
+025.029  000.012  000.012: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/graphql.vim
+025.051  000.012  000.012: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/hcl.vim
+025.067  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/heex.vim
+025.085  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/hjson.vim
+025.102  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/json5.vim
+025.135  000.013  000.013: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/julia.vim
+025.157  000.011  000.011: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/ledger.vim
+025.174  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/nix.vim
+025.193  000.009  000.009: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/ql.vim
+025.217  000.014  000.014: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/query.vim
+025.236  000.009  000.009: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/surface.vim
+025.253  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/teal.vim
+025.269  000.007  000.007: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/tlaplus.vim
+025.294  000.011  000.011: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/yang.vim
+025.315  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/zig.vim
+025.408  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-fugitive/ftdetect/fugitive.vim
+025.464  000.026  000.026: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-racket/ftdetect/racket.vim
+025.507  000.009  000.009: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/yuck.vim/ftdetect/yuck.vim
+025.575  000.008  000.008: sourcing /usr/share/vim/vimfiles/ftdetect/PKGBUILD.vim
+025.596  000.013  000.013: sourcing /usr/share/vim/vimfiles/ftdetect/meson.vim
+025.893  004.772  004.473: sourcing /usr/local/share/nvim/runtime/filetype.vim
+026.067  000.023  000.023: sourcing /usr/local/share/nvim/runtime/ftplugin.vim
+026.236  000.020  000.020: sourcing /usr/local/share/nvim/runtime/indent.vim
+026.471  000.051  000.051: sourcing /usr/local/share/nvim/runtime/syntax/synload.vim
+027.316  001.047  000.996: sourcing /usr/local/share/nvim/runtime/syntax/syntax.vim
+028.100  000.021  000.021: sourcing /usr/local/share/nvim/runtime/plugin/diagnostic.vim
+028.244  000.134  000.134: sourcing /usr/local/share/nvim/runtime/plugin/gzip.vim
+028.264  000.008  000.008: sourcing /usr/local/share/nvim/runtime/plugin/health.vim
+028.332  000.058  000.058: sourcing /usr/local/share/nvim/runtime/plugin/man.vim
+028.647  000.131  000.131: sourcing /usr/local/share/nvim/runtime/pack/dist/opt/matchit/plugin/matchit.vim
+028.713  000.371  000.240: sourcing /usr/local/share/nvim/runtime/plugin/matchit.vim
+028.822  000.098  000.098: sourcing /usr/local/share/nvim/runtime/plugin/matchparen.vim
+028.846  000.012  000.012: sourcing /usr/local/share/nvim/runtime/plugin/netrwPlugin.vim
+028.945  000.008  000.008: sourcing /home/auscyber/.local/share/nvim/rplugin.vim
+028.950  000.094  000.087: sourcing /usr/local/share/nvim/runtime/plugin/rplugin.vim
+029.034  000.076  000.076: sourcing /usr/local/share/nvim/runtime/plugin/shada.vim
+029.071  000.017  000.017: sourcing /usr/local/share/nvim/runtime/plugin/spellfile.vim
+029.185  000.100  000.100: sourcing /usr/local/share/nvim/runtime/plugin/tarPlugin.vim
+029.255  000.055  000.055: sourcing /usr/local/share/nvim/runtime/plugin/tohtml.vim
+029.282  000.013  000.013: sourcing /usr/local/share/nvim/runtime/plugin/tutor.vim
+029.413  000.119  000.119: sourcing /usr/local/share/nvim/runtime/plugin/zipPlugin.vim
+029.846  000.375  000.375: sourcing /usr/share/vim/vimfiles/plugin/fzf.vim
+029.999  001.598: loading rtp plugins
+032.857  000.849  000.849: sourcing /home/auscyber/.config/nvim/colors/pink_ocean.vim
+033.663  003.300  002.451: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/aniseed/plugin/aniseed.vim
+033.896  000.139  000.139: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/completion-nvim/plugin/completion.vim
+034.011  000.012  000.012: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/fzf/plugin/fzf.vim
+034.523  000.447  000.447: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/fzf.vim/plugin/fzf.vim
+034.771  000.109  000.109: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/markdown-preview.nvim/plugin/mkdp.vim
+035.482  000.635  000.635: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/neogit/plugin/neogit.vim
+036.068  000.449  000.449: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-cmp/plugin/cmp.lua
+036.146  000.024  000.024: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-colorizer.lua/plugin/colorizer.vim
+036.334  000.041  000.041: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-tree.lua/plugin/nvim-tree-startup.lua
+036.697  000.320  000.320: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-treesitter/plugin/nvim-treesitter.vim
+036.808  000.025  000.025: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/nvim-web-devicons/plugin/nvim-web-devicons.vim
+037.028  000.145  000.145: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/playground/plugin/nvim-treesitter-playground.vim
+037.117  000.022  000.022: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/plenary.nvim/plugin/plenary.vim
+037.198  000.010  000.010: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/presence.nvim/plugin/presence.vim
+037.266  000.011  000.011: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/rust-tools.nvim/plugin/rust-tools.vim
+037.368  000.020  000.020: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/telescope-frecency.nvim/plugin/frecency.vim
+037.510  000.085  000.085: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/telescope.nvim/plugin/telescope.vim
+037.589  000.016  000.016: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/todo-comments.nvim/plugin/todo.vim
+037.816  000.046  000.046: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/train.nvim/autoload/train/builtin.vim
+037.857  000.209  000.163: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/train.nvim/plugin/train.vim
+037.941  000.019  000.019: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/twilight.nvim/plugin/twilight.vim
+038.261  000.257  000.257: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-better-whitespace/plugin/better-whitespace.vim
+039.437  001.096  001.096: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-devicons/plugin/webdevicons.vim
+040.234  000.719  000.719: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-fugitive/plugin/fugitive.vim
+040.557  000.105  000.105: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-indent-guides/autoload/indent_guides.vim
+040.746  000.435  000.330: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-indent-guides/plugin/indent_guides.vim
+040.879  000.048  000.048: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-tmux-navigator/plugin/tmux_navigator.vim
+051.161  010.217  010.217: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/vim-wakatime/plugin/wakatime.vim
+051.379  000.085  000.085: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/zest.nvim/plugin/init.lua
+051.456  002.560: loading packages
+051.920  000.379  000.379: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/indentLine/after/plugin/indentLine.vim
+052.563  000.564  000.564: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/cmp-buffer/after/plugin/cmp_buffer.lua
+052.758  000.144  000.144: sourcing /home/auscyber/.local/share/nvim/site/pack/packer/start/cmp-nvim-lsp/after/plugin/cmp_nvim_lsp.lua
+052.808  000.265: loading after plugins
+052.820  000.012: inits 3
+053.480  000.660: reading ShaDa
+054.021  000.541: opening buffers
+054.462  000.441: BufEnter autocommands
+054.464  000.002: editing files in windows
+061.821  007.356: VimEnter autocommands
+061.825  000.005: UIEnter autocommands
+061.826  000.001: before starting main loop
+063.166  001.340: first screen update
+063.169  000.002: --- NVIM STARTED ---

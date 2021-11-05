@@ -79,7 +79,7 @@
   (lspkind.init {})
   (npairs.setup {})
   (let [ opts {:noremap true :silent true}
-        map (fn [key command] "lol" (nvim.buf_set_keymap bufnr :n key command opts))
+        map (fn [key command] (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
         inoremap (fn [key command] (nvim.buf_set_keymap bufnr :i key command (a.merge opts {:expr true})))]
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
@@ -110,7 +110,7 @@
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
+\"           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
          augroup END"
                                                          false))))
 
@@ -218,4 +218,6 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 (init-lsp :metals)
 (init-lsp :dhall_lsp_server)
 (init-lsp :purescriptls)
+(init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"})
+;(init-lsp)
 ; (init-lsp :idris2_lsp)

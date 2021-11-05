@@ -21,8 +21,11 @@ let s:bg = "#1F1F1F"
 hi Search guibg=#ffd1dc
 hi BufferLineTabSelected guifg=#ffd1dc
 hi Constant ctermfg=217 guifg=#ffa0a0
+"if exists("g:neovide_refresh_rate")
+    hi Normal guibg=#1f1f1f
+"endif
 hi Normal  ctermfg=251 ctermbg=235 guifg=#eeeeee 
-" guibg=#282828
+hi Folded  guifg=#A04668 guibg=#282828
 hi CursorLineNr ctermfg=224 guifg=#ffd1dc
 hi LineNr guifg=#ffd1dc ctermfg=224
 hi Statement guifg=#8BB2C1 ctermfg=109

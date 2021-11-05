@@ -30,11 +30,10 @@ ensure("Olical", "aniseed")
 
 
 -- Enable Aniseed's automatic compilation and loading of Fennel source code.
+require("packer_compiled")
 vim.g["aniseed#env"] = {
   module = "init",
   compile = true
 }
 
-if packer_bootstrap then
-    require("packer").sync()
-end
+
