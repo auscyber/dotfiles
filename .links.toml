@@ -165,6 +165,11 @@ destination = "$HOME/.config/wezterm/fennel.lua"
 src = "libs/fennel.lua"
 
 [[links]]
+name = "wezterm lume"
+destination = "$HOME/.config/wezterm/lume.lua"
+src = "libs/lume.lua"
+
+[[links]]
 name = "awesome fennel"
 destination = "$HOME/.config/awesome/fennel.lua"
 src = "libs/fennel.lua"
@@ -183,4 +188,3 @@ src = ".tmux.conf"
 name = "pacman hooks"
 destination = "/etc/pacman.d/hooks"
 src = "pacman.d/hooks"
-

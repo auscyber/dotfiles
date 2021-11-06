@@ -16,6 +16,9 @@
 
  :packer-use
  (fn [...]
+   "Use packer plugins
+   Takes a list of package names and a table of the configuration for it
+   "
    (let [a (require "aniseed.core")
          args [...]
          use-statements []]

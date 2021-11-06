@@ -10,7 +10,6 @@
              lspkind lspkind
              npairs nvim-autopairs
              rust-tools rust-tools
-;             cmp cmp
              configs lspconfig.configs}
 
    require-macros [macros zest.macros]})
@@ -20,10 +19,7 @@
 
 ;(vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menu,menuone,noselect")
-;(set nvim.g.completion_enable_auto_popup 1)
 
-
-(set _G.LOL {})
 
 (fn on_attach [client bufnr]
   (cmp.setup {
@@ -51,7 +47,7 @@
   (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
   (lspkind.init {})
   (npairs.setup {})
-  (let [ opts {:noremap true :silent true}
+  (let [opts {:noremap true :silent true}
         map (fn [key command] (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
         inoremap (fn [key command] (nvim.buf_set_keymap bufnr :i key command (a.merge opts {:expr true})))]
@@ -64,10 +60,10 @@
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
     (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
-    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>"))
+    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
 ;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
 
-    ;(autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()")
+    (autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()"))
   (if client.resolved_capabilities.document_highlight (do
   ;   (a.println "bob")
                                                        (utils.highlight "LspReferenceRead"  {:gui "underline"})
@@ -79,7 +75,6 @@
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
            autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
-\"           autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting()
          augroup END"
                                                          false))))
 

@@ -1,4 +1,3 @@
-(require-macros :macros)
 (module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
@@ -83,19 +82,19 @@
 ;  :n
 ;    [ (vim.api.nvim_command "so ~/.config/nvim/coc.vim"))
 ;    atoinemadec/coc-fzf"]
-    :L3mON4D3/luasnip {:module :luasnip :requires :saadparwaiz1/cmp_luasnip}
-    :hrsh7th/nvim-cmp {:module :cmp :requires [:luasnip {1 :hrsh7th/cmp-buffer :module :cmp} {1 :hrsh7th/cmp-path :module :cmp} {1 :hrsh7th/cmp-cmdline :module :cmp}]}
+    :L3mON4D3/luasnip {:module :luasnip :requires [{1 :saadparwaiz1/cmp_luasnip :module_pattern :luasnip}]}
+    :hrsh7th/nvim-cmp {:module :cmp :requires [:luasnip]} ; :hrsh7th/cmp-buffer :hrsh7th/cmp-path  :hrsh7th/cmp-cmdline ]}
     ; Lsp plugins
     :neovim/nvim-lspconfig {
                               :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1]
-                              :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :mfussenegger/nvim-dap] :module :rust-tools}
+                              :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
 ;                                         {1 :rafaelsq/completion-nvim :branch :changeHandlerSignature :module :completion}
                                          {1 :nvim-lua/lsp_extensions.nvim :module :lsp_extensions} {1 :scalameta/nvim-metals :requires :plenary.nvim}
                                           {1 :kosayoda/nvim-lightbulb :module :nvim-lightbulb }
                                           {1 :onsails/lspkind-nvim :module :lspkind}
                                           :which-key.nvim
                                           :nvim-cmp
-                                          :hrsh7th/cmp-nvim-lsp
+                                          {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
                                             ]
                                 :config #(require "plugins.nvim_lsp")}
                               ; :mod nvim_lsp}
