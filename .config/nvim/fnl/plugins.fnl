@@ -1,7 +1,7 @@
 (module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
-   require-macros [macros zest.macros]
+   require-macros [macros]
    })
 ;; Plugins to be managed by packer.
 ; TODO FIX STUFF
@@ -103,4 +103,3 @@
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
       :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]}
       )
-

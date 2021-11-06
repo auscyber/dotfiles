@@ -6,7 +6,10 @@
 (local o nvim.o)
 (set o.mouse "a")
 (set vim.o.termguicolors true)
-(set o.guifont "FiraCode Nerd Font:h10")
+(if (vim.fn.has "windows")
+  (do
+    (set o.guifont "FiraCode Nerd Font:h13"))
+  (set o.guifont "FiraCode Nerd Font:h10"))
 (nvim.command "colorscheme pink_ocean")
 ;(_: colorscheme :pink_ocean)
 (set o.showmode false)

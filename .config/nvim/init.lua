@@ -24,6 +24,10 @@ function ensure (user, repo)
   end
 end
 
+vim.o.shellslash = true
+
+
+
 -- Bootstrap essential plugins required for installing and loading the rest.
 ensure("wbthomason", "packer.nvim")
 ensure("Olical", "aniseed")

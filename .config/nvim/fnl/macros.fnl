@@ -20,9 +20,9 @@
    Takes a list of package names and a table of the configuration for it
    "
    (let [a (require "aniseed.core")
+	 sep (package.config:sub 1 1)
          args [...]
          use-statements []]
-
         (for [i 1 (a.count args) 2]
           (let [name (. args i)
                 block (. args (+ i 1))]
@@ -46,7 +46,7 @@
                                 ,(unpack
                                   (icollect [_# v# (ipairs use-statements)]
                                       `(,use-sym ,v#))))
-                              :config {:compile_path (.. (vim.fn.stdpath "config") "/lua/packer_compiled.lua")
+                              :config {:compile_path (.. (vim.fn.stdpath "config") ,sep "lua" ,sep "packer_compiled.lua")
                                        :display {:open_fn (fn [] (let [(b# win# buf#) ((. (require "packer.util") :float) {:border :rounded})]
                                                                    (vim.api.nvim_win_set_option win# :winhighlight "PmenuThumb:Normal,FloatBorder:Normal,Normal:Normal,StatusLine:Normal")
                                                                    (vim.api.nvim_buf_set_name buf# :Packer)
