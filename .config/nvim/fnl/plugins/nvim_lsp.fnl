@@ -2,7 +2,10 @@
   {autoload {lsp lspconfig
              a aniseed.core
              nvim aniseed.nvim
-             completion completion
+             luasnip luasnip
+             cmp cmp
+             cmp_nvim_lsp cmp_nvim_lsp
+             cmp_autopairs nvim-autopairs.completion.cmp
              utils utils
              lspkind lspkind
              npairs nvim-autopairs
@@ -12,70 +15,40 @@
 
    require-macros [macros zest.macros]})
 
-;(when (not lsp.idris2_lsp)
-;  (set configs.idris2_lsp {
-;    :default_config  {
-;                      :cmd  ["idris2-lsp"]; -- if not available in PATH, provide the absolute path
-;                      :filetypes ["idris2"]
-;                      }
-;      :on_new_config  (fn [new_config  new_root_dir]
-;        {
-;          :new_config
-;          {:cmd  ["idris2-lsp"]
-;            :capabilities {
-;                       "workspace"
-;                          {"semanticTokens" {:refreshSupport true} }}}}
-;      )
-;      :root_dir  (fn [fname]
-;        (let [scandir  (require "plenary.scandir")
-;             find_ipkg_ancestor (fn [fname]
-;            (lsp.util.search_ancestors fname (fn [path]
-;              (local res  (scandir.scan_dir path {:depth 1 :search_pattern ".+%.ipkg"}))
-;            (when (not (vim.tbl_isempty res))
-;              path
-;            )
-;          )
-;        ))]
-;        (or (find_ipkg_ancestor fname) (lsp.util.find_git_ancestor fname) (vim.loop.os_homedir))
-;      ))
-;      :settings []
-;    }
-;))
 
-;(error "hi")
+(rust-tools.setup {})
 
-
-;(cmp.setup {
-;            :sources { :name :nvim_lsp}})
-            
-           
-
-(vim.lsp.set_log_level "debug")
-(set nvim.o.completeopt "menuone,noinsert,noselect")
-(set nvim.g.completion_enable_auto_popup 1)
+;(vim.lsp.set_log_level "debug")
+(set nvim.o.completeopt "menu,menuone,noselect")
+;(set nvim.g.completion_enable_auto_popup 1)
 
 
 (set _G.LOL {})
 
-(set _G.LOL.completion_confirm (fn []
-                                 (lua "
- if vim.fn.pumvisible() ~= 0  then
-    if vim.fn.complete_info()[\"selected\"] ~= -1 then
-      completion.confirmCompletion()
-      return npairs.esc(\"<c-y>\")
-    else
-      vim.api.nvim_select_popupmenu_item(0 , false , false ,{})
-      completion.confirmCompletion()
-      return npairs.esc(\"<c-n><c-y>\")
-    end
-  else
-    return npairs.autopairs_cr()
-  end
-
-                                  ")))
-
 (fn on_attach [client bufnr]
-  (completion.on_attach client bufnr)
+  (cmp.setup {
+              :snippet {
+                        :expand (fn [args] (luasnip.lsp_expand args.body))}
+              :mapping {
+                        :<C-d> (cmp.mapping (cmp.mapping.scroll_docs -4) [ :i :c])
+                        :<C-f> (cmp.mapping (cmp.mapping.scroll_docs 4) [ :i :c])
+                        :<C-Space> (cmp.mapping (cmp.mapping.complete) [ :i :c])
+                        :<C-e> (cmp.mapping {
+                                                :i (cmp.mapping.abort)
+                                                :c  (cmp.mapping.close)})
+                        :<Up> (cmp.mapping.select_prev_item {:behavior cmp.SelectBehavior.Select})
+                        :<Down> (cmp.mapping.select_next_item {:behavior cmp.SelectBehavior.Select})
+                        :<Tab> (cmp.mapping.select_next_item)
+                        :<S-Tab> (cmp.mapping.select_prev_item)
+                        :<CR> (cmp.mapping.confirm {:behavior  cmp.ConfirmBehavior.Replace :select true})}
+              :formatting {:format (lspkind.cmp_format)}
+              :experimental {
+                             :ghost_text true}
+              :sources (cmp.config.sources [
+                                            {:name :nvim_lsp}
+                                            {:name :luasnip}]
+                                          [{:name :buffer}])})
+  (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
   (lspkind.init {})
   (npairs.setup {})
   (let [ opts {:noremap true :silent true}
@@ -89,15 +62,10 @@
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
-    (imap :<c-space> "<Plug>(completion_trigger)")
-    (imap :<tab> "<Plug>(completion_smart_tab)")
-    (imap :<s-tab> "<Plug>(completion_smart_s_tab)")
-    (inoremap "<Tab>" "pumvisible() ? \"\\<C-n>\" : \"\\<Tab>\"")
-    (inoremap "<S-Tab>" "pumvisible() ? \"\\<C-p>\" : \"\\<S-Tab>\"")
     (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
-    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
-    (inoremap :<CR> "v:lua.LOL.completion_confirm()"))
+    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>"))
+;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
 
     ;(autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()")
   (if client.resolved_capabilities.document_highlight (do
@@ -194,10 +162,12 @@ vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
 vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 ")
 
+(local capabilities (cmp_nvim_lsp.update_capabilities (vim.lsp.protocol.make_client_capabilities)))
 
 (fn init-lsp [lsp-name ?opts]
   "initialize a language server with defaults"
   (let [merged-opts (a.merge {:on_attach on_attach} 
+                             : capabilities
                                ;:capabilties ((. (require "cmp_nvim_lsp") :update_capabilities) (vim.lsp.protocol.make_client_capabilities))} 
                             (or ?opts {}))]
     ((. lsp lsp-name :setup) merged-opts)))
@@ -205,7 +175,6 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 (init-lsp :tsserver)
 (init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
-(rust-tools.setup {})
 (init-lsp :rust_analyzer {:settings
                           {:rust-analyzer
                            {:checkOnSave {:command :clippy}
@@ -222,3 +191,4 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 (init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"})
 ;(init-lsp)
 ; (init-lsp :idris2_lsp)
+

@@ -37,6 +37,7 @@ hi PreProc guifg=#DB5461 ctermfg=167
 hi Special guifg=#ffd1dc ctermfg=224
 hi Error guibg=#DB5461 ctermfg=167
 hi Pmenu  guifg=#1f1f1f guibg=#FFFFFF ctermfg=16 ctermbg=231
+"hi VertSplit guibg=#1f1f1f
 hi NonText guifg=#8BB2C1 ctermfg=16
 hi DiffAdd guibg=#8BB2C1
 hi link DiffChange Folded
