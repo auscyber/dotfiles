@@ -1,18 +1,17 @@
 (module plugins.nvim_lsp
-  {autoload {lsp lspconfig
+  {require {_ plugins.cmp}
+   autoload {lsp lspconfig
+             cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
              nvim aniseed.nvim
              luasnip luasnip
              cmp cmp
-             cmp_nvim_lsp cmp_nvim_lsp
-             cmp_autopairs nvim-autopairs.completion.cmp
              utils utils
              lspkind lspkind
              npairs nvim-autopairs
              rust-tools rust-tools
              configs lspconfig.configs}
-
-   require-macros [macros zest.macros]})
+     require-macros [macros zest.macros]})
 
 
 (rust-tools.setup {})
@@ -22,29 +21,9 @@
 
 
 (fn on_attach [client bufnr]
-  (cmp.setup {
-              :snippet {
-                        :expand (fn [args] (luasnip.lsp_expand args.body))}
-              :mapping {
-                        :<C-d> (cmp.mapping (cmp.mapping.scroll_docs -4) [ :i :c])
-                        :<C-f> (cmp.mapping (cmp.mapping.scroll_docs 4) [ :i :c])
-                        :<C-Space> (cmp.mapping (cmp.mapping.complete) [ :i :c])
-                        :<C-e> (cmp.mapping {
-                                                :i (cmp.mapping.abort)
-                                                :c  (cmp.mapping.close)})
-                        :<Up> (cmp.mapping.select_prev_item {:behavior cmp.SelectBehavior.Select})
-                        :<Down> (cmp.mapping.select_next_item {:behavior cmp.SelectBehavior.Select})
-                        :<Tab> (cmp.mapping.select_next_item)
-                        :<S-Tab> (cmp.mapping.select_prev_item)
-                        :<CR> (cmp.mapping.confirm {:behavior  cmp.ConfirmBehavior.Replace :select true})}
-              :formatting {:format (lspkind.cmp_format)}
-              :experimental {
-                             :ghost_text true}
-              :sources (cmp.config.sources [
-                                            {:name :nvim_lsp}
-                                            {:name :luasnip}]
-                                          [{:name :buffer}])})
-  (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
+  (cmp.setup.buffer {:formatting
+                     {:format (lspkind.cmp_format)}
+                     :sources [{:name :nvim_lsp} {:name :buffer} {:name :luasnip}]})
   (lspkind.init {})
   (npairs.setup {})
   (let [opts {:noremap true :silent true}
@@ -63,9 +42,8 @@
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
 ;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
 
-    (autocmd :BufWritePre :<buffer> "lua vim.lsp.buf.formatting()"))
+    (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.formatting()"))
   (if client.resolved_capabilities.document_highlight (do
-  ;   (a.println "bob")
                                                        (utils.highlight "LspReferenceRead"  {:gui "underline"})
                                                        (utils.highlight "LspReferenceText"  {:gui "underline"})
                                                        (utils.highlight "LspReferenceWrite" {:gui "underline"})
@@ -163,7 +141,6 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
   "initialize a language server with defaults"
   (let [merged-opts (a.merge {:on_attach on_attach} 
                              : capabilities
-                               ;:capabilties ((. (require "cmp_nvim_lsp") :update_capabilities) (vim.lsp.protocol.make_client_capabilities))} 
                             (or ?opts {}))]
     ((. lsp lsp-name :setup) merged-opts)))
 

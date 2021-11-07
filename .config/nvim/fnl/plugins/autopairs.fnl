@@ -2,3 +2,4 @@
                               util dotfiles.util
                               autopairs nvim-autopairs}})
 
+(autopairs.setup {})
