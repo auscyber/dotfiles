@@ -1,0 +1,40 @@
+name:                my-xmonad
+version:             0.1.0.0
+build-type:          Simple
+cabal-version:      >=1.2
+
+executable my-xmonad
+  main-is:             xmonad.hs
+  -- other-modules lists custom modules in my ~/.xmonad/lib/ directory
+  other-modules: WorkspaceSet, DynamicLog, Config,StackSetLens,Polybar, ExtraState, Media, SysDependent, Eww
+  build-depends:       base
+                     , xmonad >= 0.15
+                     , xmonad-contrib >= 0.15
+             , X11 >= 1.10
+             , containers
+                , dbus
+             , utf8-string
+             , microlens
+             , microlens-th
+             , aeson
+             , bytestring
+  hs-source-dirs:      lib
+  default-language:    Haskell2010
+executable media-bar
+  main-is:  bar.hs
+  hs-source-dirs: lib
+  other-modules: Polybar, DynamicLog, ExtraState
+  build-depends: base, X11, dbus, xmonad, xmonad-contrib, containers, process
+executable xmonadctl
+  main-is: xmonadctl.hs
+  hs-source-dirs: lib
+  build-depends: base, X11
+executable my-xmobar
+  main-is: xmobar.hs
+  hs-source-dirs: lib
+  build-depends: base, xmobar
+-- executable xmonadoutput
+--  main-is: xmonadoutput.hs
+--  hs-source-dirs: lib
+--  build-depends: base, aeson , unix, bytestring, xmonad, xmonad-contrib
+

@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# As of 0.13, xmonad --recompile will look for a custom build script.
+
+set -e
+mv bin/my-xmonad "$1"
