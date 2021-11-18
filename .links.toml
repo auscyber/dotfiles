@@ -3,6 +3,11 @@ id = "17504290032302696503"
 default = "desktop"
 systems = ["desktop", "laptop"]
 
+[[programs]]
+app_name = "pacman"
+enabled = true
+links = ["pacman hooks"]
+
 [[links]]
 name = "backgrounds"
 destination = "$HOME/backgrounds"
@@ -188,3 +193,23 @@ src = ".tmux.conf"
 name = "pacman hooks"
 destination = "/etc/pacman.d/hooks"
 src = "pacman.d/hooks"
+sudo_required = true
+
+[[links]]
+name = "background"
+destination = "/usr/share/pixmaps/phoebebridgers.jpg"
+src = "backgrounds/phoebebridgers-2.jpg"
+sudo_required = true
+user_owner = "lightdm"
+
+[[links]]
+name = ".emacs.d"
+destination = "/home/auscyber/.emacs.d"
+src = ".emacs.d"
+
+[[links]]
+name = "mkinitcpio arch"
+sudo_required = true
+src = "scripts/mkinitcpio-install"
+system = "desktop"
+destination = "/usr/share/libalpm/scripts/mkinicpio-install"
