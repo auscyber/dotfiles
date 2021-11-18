@@ -1,0 +1,10 @@
+[Trigger]
+Operation=Upgrade
+Type=Package
+Target=refind
+
+[Action]
+Description = Updating rEFInd on ESP
+When=PostTransaction
+Exec=/usr/bin/refind-install --shim /usr/share/shim-signed/shimx64.efi --localkeys
+
