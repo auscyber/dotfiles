@@ -48,11 +48,11 @@ W_FG=$(fg_c $WHITE)
 
 
 
-if command -v apt 1> /dev/null 
+if command -v apt 1> /dev/null
     then
         package_manager="apt"
         packages=$(apt list --installed 2> /dev/null | wc -l)
-elif command -v nixos-rebuild 1> /dev/null  
+elif command -v nixos-rebuild 1> /dev/null
     then
     packages=$(wc -l < /etc/current-system-packages)
     package_manager="nix"
@@ -67,12 +67,23 @@ fi
 os="$(. /etc/os-release && printf "$PRETTY_NAME")"
 kernel="$(uname -r)"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
-gpu="$(nvidia-smi -L | awk -F ":" '{b=gensub(/\(.*/,"","g",$2); print $2}')"
+command -v lspci >/dev/null && {
+		gpu=$(lspci -mm | grep -i 'vga\|display')
+		gpu=${gpu##*Corporation\"}
+		gpu=${gpu#*\[AMD/ATI\]}
+		gpu=${gpu%%\]*}
+		gpu=${gpu##*\[}
+		gpu=" ${gpu#*\"}"
+#		set -- "${gpu%%\"*}"
+#		case $* in
+#			*/*Mobile*) gpu=" $1 $2 Mobile";;
+#			*/*) gpu=" $1 $2";;
+#			*) gpu=" $*";;
+#		esac
+}
 
 lyric="$( shuf -n 1 < ~/Music/phoebe/lyricslist 2>&- )"
-if [ -z "$lyric" ]; then
-    lyric="phoebe bridgers"
-fi
+lyric=${lyric:-"phoebe bridgers"}
 
 
 memused="$(free -m | awk '/Mem/ {print $3}')"
@@ -95,7 +106,7 @@ uptime=$(uptime -p)
 
 
 small () {
-    _small=bob
+    _small=""
     HEIGHT=6
     WIDTH=14
     cat <<EOF
@@ -181,21 +192,19 @@ segment () {
 }
 data () {
     _variable="$1"
-    if [ -z "${2+x}" ]; then
-        _variable_value=" $(eval "printf \"%s\" \"\$$1\"")"
-    else
-        _variable_value="$2"
-    fi
+    _variable_value=${2:-" $(eval "printf \"%s\" \"\$$1\"")"}
+    if [[ -n _variable_value ]]
+    then
     segment "$category$_variable:$NORMAL$_variable_value"
+    fi
 }
-
-
 
 up_c $HEIGHT
 
 segment "$ITALIC$main_color$lyric$NORMAL"
 
-if [ -z $_small ]; then
+if [ -z ${_small+x} ]; 
+then
     data "date"
 else
     segment "${category}$time"
@@ -203,7 +212,7 @@ fi
 data "os"
 data "cpu" "$cpu"
 data "mem" " ${memused}MB / ${memtotal}MB"
-if [ -z $_small ]; then
+if [ -z ${_small+x} ]; then
     data "packages" " $packages ($package_manager)"
     data "gpu" "$gpu"
     data "kernel"
