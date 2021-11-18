@@ -3,7 +3,7 @@
             telescope telescope
             actions telescope.actions}})
 
-(when (vim.fn.has :windows)
+(when (> (vim.fn.has :win32) 0)
   (let [fmt string.format
         exec vim.api.nvim_command
         destpath (.. (vim.fn.stdpath "data") "\\site\\sqlite")

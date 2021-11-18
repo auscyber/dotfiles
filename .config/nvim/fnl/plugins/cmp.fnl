@@ -1,5 +1,6 @@
 (module plugins.nvim_lsp
-  {require {cmp_nvim_lsp cmp_nvim_lsp
+  {require {luasnip luansip
+            cmp_nvim_lsp cmp_nvim_lsp
             _ cmp_buffer
             _ cmp_luasnip
             cmp cmp

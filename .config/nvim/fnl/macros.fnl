@@ -20,7 +20,7 @@
    Takes a list of package names and a table of the configuration for it
    "
    (let [a (require "aniseed.core")
-	 sep (package.config:sub 1 1)
+         sep (package.config:sub 1 1)
          args [...]
          use-statements []]
         (for [i 1 (a.count args) 2]
@@ -32,11 +32,11 @@
                                           (require ,(.. :plugins. (tostring (. block :mod))))
                                           (,(-?> block (. :config))))))
             (a.assoc block :mod)
- ;           (when (. block :config)
- ;             (a.assoc block :config `(fn []
- ;                                       (let [(ok?# res#) (pcall ,(. block :config) ,name)]
- ;                                         (when (not ok?#)
- ;                                           (error "Failure loading config for" ,(tostring name) res#))))))
+            (when (. block :config)
+              (a.assoc block :config `(fn []
+                                        (let [(ok?# res#) (pcall ,(. block :config) ,name)]
+                                          (when (not ok?#)
+                                            (error "Failure loading config for" ,(tostring name) res#))))))
             (table.insert use-statements block)))
 
     (let [use-sym (gensym)]

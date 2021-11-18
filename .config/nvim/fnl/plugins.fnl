@@ -65,7 +65,6 @@
   :vmchale/dhall-vim {:ft :dhall}
   :ziglang/zig.vim {:ft [:zig]}
   :edwinb/idris2-vim {:ft [:idris2]}
-  :rust-lang/rust.vim {:ft :rust}
   :udalov/kotlin-vim {:ft :kotlin}
   :derekelkins/agda-vim {:ft :agda :config #(vim.api.nvim_command "let maplocalleader = \",\"")}
   :LnL7/vim-nix  {:ft :nix}
@@ -81,8 +80,8 @@
     :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
     :L3mON4D3/luasnip {:module :luasnip}
     :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
-    :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel] :opt true }
-    :hrsh7th/nvim-cmp {:module :plugins.cmp :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer]}
+    :hrsh7th/cmp-nvim-lua {:ft [:lua ] :opt true }
+    :hrsh7th/nvim-cmp {:module :plugins.cmp :ft [:lua] :requires [:cmp_luasnip :luasnip :cmp-buffer]}
     ; Lsp plugins
     :neovim/nvim-lspconfig {
                               :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1]

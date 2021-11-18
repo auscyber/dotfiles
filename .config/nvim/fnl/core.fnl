@@ -6,7 +6,7 @@
 (local o nvim.o)
 (set o.mouse "a")
 (set vim.o.termguicolors true)
-(if (vim.fn.has "windows")
+(if (> (vim.fn.has "win32") 0)
   (do
     (set o.guifont "FiraCode Nerd Font:h13"))
   (set o.guifont "FiraCode Nerd Font:h10"))

@@ -1,10 +1,11 @@
 (module plugins.nvim_lsp
-  {require {_ plugins.cmp}
+  {require {
+            luasnip luasnip
+            _ plugins.cmp}
    autoload {lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
              nvim aniseed.nvim
-             luasnip luasnip
              cmp cmp
              utils utils
              lspkind lspkind
@@ -14,13 +15,12 @@
      require-macros [macros zest.macros]})
 
 
-(rust-tools.setup {})
 
 ;(vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menu,menuone,noselect")
 
 
-(fn on_attach [client bufnr]
+(defn on_attach [client bufnr]
   (cmp.setup.buffer {:formatting
                      {:format (lspkind.cmp_format)}
                      :sources [{:name :nvim_lsp} {:name :buffer} {:name :luasnip}]})
@@ -56,57 +56,40 @@
          augroup END"
                                                          false))))
 
+(local capabilities (cmp_nvim_lsp.update_capabilities (vim.lsp.protocol.make_client_capabilities)))
+
 (lua "
      local lspconfig = require('lspconfig')
-local configs = require('lspconfig/configs')
-if not lspconfig.idris2_lsp then
-  configs.idris2_lsp = {
-    default_config = {
-      cmd = {'idris2-lsp'}; -- if not available in PATH, provide the absolute path
-      filetypes = {'idris2'};
-      on_new_config = function(new_config, new_root_dir)
-        new_config.cmd = {'idris2-lsp'}
-        new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
-      end;
-      root_dir = function(fname)
-        local scandir = require('plenary.scandir')
-        local find_ipkg_ancestor = function(fname)
-          return lspconfig.util.search_ancestors(fname, function(path)
-            local res = scandir.scan_dir(path, {depth=1; search_pattern='.+%.ipkg'})
-            if not vim.tbl_isempty(res) then
-              return path
-            end
-          end)
-        end
-        return find_ipkg_ancestor(fname) or lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
-      end;
-      settings = {};
-    };
-  }
-end
 -- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
 local autostart_semantic_highlightning = true
 lspconfig.idris2_lsp.setup {
-  on_init = custom_init,
-  on_attach = function(client)
+  on_new_config = function(new_config, new_root_dir)
+    new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
+  end,
+  on_attach = function(client,bufnr)
     if autostart_semantic_highlightning then
       vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
-        { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+        {textDocument = vim.lsp.util.make_text_document_params()}, nil)
     end
-    on_attach(client)
+    -- Example of how to request a single kind of code action with a keymap,
+    -- refer to the table in the README for the appropriate key for each command.
+    vim.cmd [[nnoremap <Leader>cs <Cmd>lua vim.lsp.buf.code_action({diagnostics={},only={'refactor.rewrite.CaseSplit'}})<CR>]]
+    on_attach(client,bufnr)
   end,
   autostart = true,
+  capabilities = capabilities,
   handlers = {
-    ['workspace/semanticTokens/refresh'] = function(err, method, params, client_id, bufnr, config)
+    ['workspace/semanticTokens/refresh'] = function(err,  params, ctx, config)
       if autostart_semantic_highlightning then
         vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
           { textDocument = vim.lsp.util.make_text_document_params() }, nil)
       end
       return vim.NIL
     end,
-    ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+    ['textDocument/semanticTokens/full'] = function(err,  result, ctx, config)
       -- temporary handler until native support lands
-      local client = vim.lsp.get_client_by_id(client_id)
+      local bufnr = ctx.bufnr
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
       local legend = client.server_capabilities.semanticTokensProvider.legend
       local token_types = legend.tokenTypes
       local data = result.data
@@ -121,7 +104,10 @@ lspconfig.idris2_lsp.setup {
         local delta_start = data[i + 1]
         prev_start = delta_line == 0 and prev_start + delta_start or delta_start
         local token_type = token_types[data[i + 3] + 1]
-        vim.api.nvim_buf_add_highlight(bufnr, ns, 'LspSemantic_' .. token_type, prev_line, prev_start, prev_start + data[i + 2])
+        local line = vim.api.nvim_buf_get_lines(bufnr, prev_line, prev_line + 1, false)[1]
+        local byte_start = vim.str_byteindex(line, prev_start)
+        local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
+        vim.api.nvim_buf_add_highlight(bufnr, ns, 'LspSemantic_' .. token_type, prev_line, byte_start, byte_end)
       end
     end
   },
@@ -133,13 +119,19 @@ vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
 vim.cmd [[highlight link LspSemantic_enumMember Number]]   -- Data constructors
 vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
 vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+vim.cmd [[highlight link LspSemantic_namespace Identifier]] -- Explicit namespaces
+vim.cmd [[highlight link LspSemantic_postulate Define]] -- Postulates
+vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
 ")
 
-(local capabilities (cmp_nvim_lsp.update_capabilities (vim.lsp.protocol.make_client_capabilities)))
+
 
 (fn init-lsp [lsp-name ?opts]
-  "initialize a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach} 
+  "initialise a language server with defaults"
+;  (if (and (~= ?opts nil) (~= ?opts.on_attach nil))
+;    (do
+;      (a.merge ?opts :on_attach (fn [client bufnr] (on_attach client bufnr) (?opts.on_attach client bufnr))))
+  (let [merged-opts (a.merge {:on_attach on_attach}
                              : capabilities
                             (or ?opts {}))]
     ((. lsp lsp-name :setup) merged-opts)))
@@ -147,10 +139,12 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 (init-lsp :tsserver)
 (init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
 (init-lsp :gopls)
-(init-lsp :rust_analyzer {:settings
-                          {:rust-analyzer
-                           {:checkOnSave {:command :clippy}
-                            :procMacro {:enable true}}}})
+(rust-tools.setup {:server {: capabilities
+                            :settings
+                            {:rust-analyzer
+                             {:checkOnSave {:command :clippy}
+                              :procMacro {:enable true}}}
+                            :on_attach (fn [client bufnr]  (on_attach client bufnr) ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}})
 (init-lsp :clangd)
 (init-lsp :rnix)
 ;(init-lsp :denols)
