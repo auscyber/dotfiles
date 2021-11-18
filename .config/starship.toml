@@ -1,4 +1,4 @@
-format = """$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character"""
+format = """$hostname$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character"""
 
 scan_timeout = 10
 
@@ -12,6 +12,7 @@ success_symbol = "[λ](bold  195)"
 error_symbol = "[λ](bold white)"
 
 [hostname]
+format = "[$hostname](bold green) "
 ssh_only = true
 
 
