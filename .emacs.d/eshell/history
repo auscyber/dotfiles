@@ -1,7 +1,0 @@
-hello
-vim
-echo $SHELL
-clear
-:q
-exit
-ghci
