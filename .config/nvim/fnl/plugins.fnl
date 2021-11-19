@@ -80,8 +80,8 @@
     :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
     :L3mON4D3/luasnip {:module :luasnip}
     :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
-    :hrsh7th/cmp-nvim-lua {:ft [:lua ] :opt true }
-    :hrsh7th/nvim-cmp {:module :plugins.cmp :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer]}
+    :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]  }
+    :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer ] :config #(require :plugins.cmp)}
     ; Lsp plugins
     :nvim-lua/lsp-status.nvim {:module :lsp-status}
     :neovim/nvim-lspconfig {
@@ -102,4 +102,6 @@
        :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :requires [:nvim-treesitter/playground :folke/twilight.nvim] :config #(require "plugins.treesitter")} ; :mod treesitter}
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
       :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]}
+      :camspiers/animate.vim {:module :animate}
       )
+
