@@ -374,6 +374,8 @@ appKeys =
           ("M-S-g", "google-chrome-stable", doc "Launch Chrome")
         , --Start emacs
           ("M-d", "emacsclient -c", doc "Start emacs client")
+        -- start nvim
+        , ("M-S-n", "wezterm start -- nvim", doc $ "Launch neovim with neovim")
         ]
 
 myKeys = map (\(x, y, _) -> (x, y)) keyCombination
@@ -412,8 +414,8 @@ customKeys =
     , ("M-C-r", shellPrompt promptConfig, Just "Open xmonad run prompt")
     , ("M-m", nextWSSet True, Nothing)
     , ("M-n", prevWSSet True, Nothing)
-    , ("M-S-m", moveToNextWsSet True, Nothing)
-    , ("M-S-n", moveToPrevWsSet True, Nothing)
+--    , ("M-S-m", moveToNextWsSet True, Nothing)
+--    , ("M-S-n", moveToPrevWsSet True, Nothing)
     , ("M-C-`", setKeyRemap gameMap, Nothing)
     , ("M-C-S-`", setKeyRemap emptyKeyRemap, Nothing)
     , ("M-C-h", spawn $ "xmessage \'" ++ documentation ++ "\'", doc "Show help")
