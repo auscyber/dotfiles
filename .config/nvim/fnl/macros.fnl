@@ -32,11 +32,11 @@
                                           (require ,(.. :plugins. (tostring (. block :mod))))
                                           (,(-?> block (. :config))))))
             (a.assoc block :mod)
-            (when (. block :config)
-              (a.assoc block :config `(fn []
-                                        (let [(ok?# res#) (pcall ,(. block :config) ,name)]
-                                          (when (not ok?#)
-                                            (error "Failure loading config for" ,(tostring name) res#))))))
+;            (when (. block :config)
+;              (a.assoc block :config `(fn []
+;                                        (let [(ok?# res#) (pcall ,(. block :config) ,name)]
+;                                          (when (not ok?#)
+;                                            (error "Failure loading config for" ,(tostring name) res#))))))
             (table.insert use-statements block)))
 
     (let [use-sym (gensym)]

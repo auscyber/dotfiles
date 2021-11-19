@@ -1,8 +1,9 @@
 (module core
   {require {_ plugins
             _ packer_compiled
-            nvim aniseed.nvim}
-   autoload {a aniseed.core
+            }
+   autoload {nvim aniseed.nvim
+             a aniseed.core
              fennel aniseed.fennel}
 
    require-macros [macros]})
