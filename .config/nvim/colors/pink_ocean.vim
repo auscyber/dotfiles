@@ -43,3 +43,7 @@ hi DiffAdd guibg=#8BB2C1
 hi link DiffChange Folded
 hi Directory guifg=#8BB2C1
 hi link DiffDelete Statement
+hi SignColumn guibg=#1f1f1f
+hi DiffDelete guibg=#DB5461 guifg=#eeeeee
+hi DiffChange guibg=#a04668
+hi DiffAdd guibg=#7dde92 guifg=#1f1f1f
