@@ -81,8 +81,9 @@
     :L3mON4D3/luasnip {:module :luasnip}
     :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
     :hrsh7th/cmp-nvim-lua {:ft [:lua ] :opt true }
-    :hrsh7th/nvim-cmp {:module :plugins.cmp :ft [:lua] :requires [:cmp_luasnip :luasnip :cmp-buffer]}
+    :hrsh7th/nvim-cmp {:module :plugins.cmp :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer]}
     ; Lsp plugins
+    :nvim-lua/lsp-status.nvim {:module :lsp-status}
     :neovim/nvim-lspconfig {
                               :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1]
                               :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
@@ -92,9 +93,10 @@
                                           {1 :onsails/lspkind-nvim :module :lspkind}
                                           :which-key.nvim
                                           :nvim-cmp
+                                          :luasnip
                                           {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
                                             ]
-                                :config #(require "plugins.nvim_lsp")}
+                                :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}
 
        :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :requires [:nvim-treesitter/playground :folke/twilight.nvim] :config #(require "plugins.treesitter")} ; :mod treesitter}

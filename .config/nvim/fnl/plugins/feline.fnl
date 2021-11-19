@@ -58,7 +58,10 @@
          :enabled (fn [] (> (length (vim.lsp.get_active_clients)) 0))
          :right_sep  [{:str :right_rounded  :hl {:fg colors.grey :bg :NONE}}]
          :left_sep  [{:str :left_rounded :hl {:fg colors.grey :bg :NONE}}]}])
-
+(fn nc [...]
+  (accumulate [str "" _ v (ipairs [...])]
+        (if v
+          (.. str v) str)))
 
 (tset components.active 3 
     [
@@ -78,6 +81,7 @@
                                :fg  "white"
                                :bg  "black"
                                :style  "bold"}
+                        :left_sep " "
                         :right_sep  (fn []
                                      (local val  {:hl  {:fg  "NONE" :bg  "black"}})
                                      (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
@@ -120,13 +124,6 @@
 
 
       {
-       :provider  "scroll_bar"
-       :hl  {
-             :fg  colors.light_red
-             :style  "bold"}}
-
-
-      {
         :provider  "diagnostic_errors"
         :enabled  (fn [] (lsp.diagnostics_exist "Error"))
         :hl  { :fg  "red"}}
@@ -143,11 +140,46 @@
         :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
         :hl  { :fg  "cyan"}}
 
-
       {
                 :provider  "diagnostic_info"
                 :enabled  (fn [] (lsp.diagnostics_exist "Information"))
                 :hl  { :fg  "skyblue"}}
+      {:provider (fn []
+                   (local lsp-status (require :lsp-status))
+                   (local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
+                   (local buf_messages (lsp-status.messages))
+                   (local msgs {})
+                   (each [_ msg (ipairs buf_messages)]
+                     (let [client_name (.. "[" msg.name "]")]
+                          (table.insert
+                            msgs
+                            (nc client_name " "
+                                (if msg.progress
+
+                                  ; add spinner if the spinner exists
+                                  (nc
+                                    (when msg.spinner
+                                      (.. (. spinner_frames (+ 1 (% msg.spinner (length spinner_frames)))) " "))
+
+                                    ; add the title
+                                    msg.title
+
+                                    ; if there is a message add the message
+                                    (nc " " msg.message)
+
+                                    ; add the percentage
+                                    (when msg.percentage
+                                      (string.format " (%.0f%%%%)" msg.percentage)))
+                                  msg.content)))))
+                   (nc (table.concat msgs " ")))
+       :right_sep " "
+       :enabled #(length (vim.lsp.buf_get_clients))}
+
+      {:provider  "scroll_bar"
+       :hl  {
+             :fg  colors.light_red
+             :style  "bold"}}
+
       {
        :provider " "
        :right_sep {:str :right_rounded :hl {:fg :bg :bg :NONE}}}])
@@ -247,6 +279,7 @@
                                               "dbui"
                                               "packer"
                                               "startify"
+                                              "NeogitStatus"
                                               "fugitive"
                                               "fugitiveblame"]
                                 :buftypes [ "terminal"]

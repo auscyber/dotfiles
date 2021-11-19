@@ -1,5 +1,5 @@
 (module plugins.nvim_lsp
-  {require {luasnip luansip
+  {require {luasnip luasnip
             cmp_nvim_lsp cmp_nvim_lsp
             _ cmp_buffer
             _ cmp_luasnip
@@ -30,4 +30,4 @@
                                           [{:name :buffer}])})
 
 (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
-(def-autocmd-fn [:FileType] [:<buffer> :lua :fennel] (cmp.setup.buffer {:sources [{:name :nvim_lua}]}))
+(def-autocmd-fn [:FileType] [(table.concat [:<buffer> :lua :fennel] ",")] (cmp.setup.buffer {:sources [{:name :nvim_lua}]}))

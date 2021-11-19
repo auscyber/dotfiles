@@ -1,6 +1,5 @@
-(module plugins.nvim_lsp
+(module plugins.lsp
   {require {
-            luasnip luasnip
             _ plugins.cmp}
    autoload {lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
@@ -11,6 +10,7 @@
              lspkind lspkind
              npairs nvim-autopairs
              rust-tools rust-tools
+             lsp-status lsp-status
              configs lspconfig.configs}
      require-macros [macros zest.macros]})
 
@@ -24,6 +24,7 @@
   (cmp.setup.buffer {:formatting
                      {:format (lspkind.cmp_format)}
                      :sources [{:name :nvim_lsp} {:name :buffer} {:name :luasnip}]})
+  (lsp-status.on_attach client)
   (lspkind.init {})
   (npairs.setup {})
   (let [opts {:noremap true :silent true}
@@ -56,7 +57,8 @@
          augroup END"
                                                          false))))
 
-(local capabilities (cmp_nvim_lsp.update_capabilities (vim.lsp.protocol.make_client_capabilities)))
+(lsp-status.register_progress)
+(local capabilities (cmp_nvim_lsp.update_capabilities (vim.tbl_extend :keep (vim.lsp.protocol.make_client_capabilities) lsp-status.capabilities)))
 
 (lua "
      local lspconfig = require('lspconfig')
@@ -128,33 +130,38 @@ vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
-;  (if (and (~= ?opts nil) (~= ?opts.on_attach nil))
-;    (do
-;      (a.merge ?opts :on_attach (fn [client bufnr] (on_attach client bufnr) (?opts.on_attach client bufnr))))
   (let [merged-opts (a.merge {:on_attach on_attach}
                              : capabilities
                             (or ?opts {}))]
-    ((. lsp lsp-name :setup) merged-opts)))
+    (if (~= merged_opts.fts nil)
+        (let [fts (if (= (type merged_opts.fts) :table)
+                    (table.concat  merged_opts.fts ",") merged_opts.fts)]
+          (a.assoc merged_opts :fts)
+         (vim.cmd (vlua-format (.. "au FileType " fts " ++once call %s()") (fn [] ((. lsp lsp-name :setup) merged-opts) (vim.cmd ::LspStart)))))
+      ((. lsp lsp-name :setup) merged-opts))))
 
-(init-lsp :tsserver)
-(init-lsp :hls {:settings {:haskell {:formattingProvider :fourmolu}}})
-(init-lsp :gopls)
-(rust-tools.setup {:server {: capabilities
-                            :settings
-                            {:rust-analyzer
-                             {:checkOnSave {:command :clippy}
-                              :procMacro {:enable true}}}
-                            :on_attach (fn [client bufnr]  (on_attach client bufnr) ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}})
-(init-lsp :clangd)
-(init-lsp :rnix)
-;(init-lsp :denols)
-(init-lsp :ocamllsp)
-(init-lsp :pylsp)
-(init-lsp :zls)
-(init-lsp :metals)
-(init-lsp :dhall_lsp_server)
-(init-lsp :purescriptls)
-(init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"})
+(def-augroup :LspAuGroup
+  (init-lsp :tsserver {:fts [:typescript :javascript]})
+  (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
+  (init-lsp :gopls {:fts :go})
+  (def-autocmd-fn [:FileType] [:rust]
+      (do (rust-tools.setup {:server {: capabilities
+                                      :settings
+                                      {:rust-analyzer
+                                       {:checkOnSave {:command :clippy}
+                                        :procMacro {:enable true}}}
+                                      :on_attach (fn [client bufnr]  
+                                                    (on_attach client bufnr) 
+                                                    ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}) (vim.cmd ::LspStart)))
+  (init-lsp :clangd {:fts [:cpp :c]})
+  (init-lsp :rnix)
+  (init-lsp :ocamllsp)
+  (init-lsp :pylsp)
+  (init-lsp :zls)
+  (init-lsp :metals)
+  (init-lsp :dhall_lsp_server)
+  (init-lsp :purescriptls)
+  (init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"}))
 ;(init-lsp)
 ; (init-lsp :idris2_lsp)
 

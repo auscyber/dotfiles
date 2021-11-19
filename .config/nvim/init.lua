@@ -14,7 +14,6 @@ function ensure (user, repo)
   local install_path = fmt("%s/packer/start/%s", pack_path, repo, repo)
   if fn.empty(fn.glob(install_path)) > 0 then
     execute(fmt("!git clone https://github.com/%s/%s %s", user, repo, install_path))
-    execute(fmt("packadd %s", repo))
     if user == "wbthomason" and repo == "packer.nvim" then
 	    packer_bootstrap = true
     end
@@ -39,8 +38,7 @@ vim.o.termguicolors = true
 
 -- Enable Aniseed's automatic compilation and loading of Fennel source code.
 vim.g["aniseed#env"] = {
-  module = "init",
+  module = "core",
   compile = true
 }
-
 

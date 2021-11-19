@@ -1,5 +1,10 @@
 (module core
-  {require {nvim aniseed.nvim}
+  {require {_ plugins
+            _ packer_compiled
+            nvim aniseed.nvim}
+   autoload {a aniseed.core
+             fennel aniseed.fennel}
+
    require-macros [macros]})
 (local bo nvim.bo)
 (local wo nvim.o)
