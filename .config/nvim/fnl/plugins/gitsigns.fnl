@@ -1,8 +1,8 @@
 (module plugins.gitsigns
   {require {gitsigns gitsigns}})
 (gitsigns.setup {:signs  {
-                          :add  {:hl  "DiffAdd" :text  "│" :numhl  "GitSignsAddNr"}
-                          :change  {:hl  "DiffChange" :text  "│" :numhl  "GitSignsChangeNr"}
-                          :changedelete  {:hl  "DiffChange" :text  "~" :numhl  "GitSignsChangeNr"}
-                          :delete  {:hl  "DiffDelete" :text  "_" :numhl  "GitSignsDeleteNr"}
-                          :topdelete  {:hl  "DiffDelete" :text  "‾" :numhl  "GitSignsDeleteNr"}}})
+                          :add  {:hl  "GitSignsDiffAdd" :text  "" :numhl  "GitSignsAddNr"}
+                          :change  {:hl  "GitSignsDiffChange" :text  "柳" :numhl  "GitSignsChangeNr"}
+                          :changedelete  {:hl  "GitSignsDiffChange" :text  "" :numhl  "GitSignsChangeNr"}
+                          :delete  {:hl  "GitSignsDiffDelete" :text  "" :numhl  "GitSignsDeleteNr"}
+                          :topdelete  {:hl  "GitSignsDiffDelete" :text  "" :numhl  "GitSignsDeleteNr"}}})

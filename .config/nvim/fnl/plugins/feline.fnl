@@ -15,42 +15,38 @@
                    :inactive [{} {} {}]})
 
 
-(tset components.active  1     [
-                                {
-                                 :provider " "
-                                 :hl {
-                                      :fg colors.cyan
-                                      :bg "NONE"}}
+(tset components.active  1 
+      [
+       {
+        :provider  (fn [] "  ")
+        :left_sep ["  " {:str " " :hl {:fg colors.cyan :bg :NONE}}]
+        :hl (fn []
+             (local val {:bg colors.cyan})
+             (set val.name (vi_mode_utils.get_mode_highlight_name))
+             (set val.fg (vi_mode_utils.get_mode_color))
+             (set val.style "bold")
+             val)
+        :right_sep {:str " " :hl {:bg colors.dark_cyan}}}
 
 
-                                {
-                                 :provider  (fn [] "  ")
-                                 :hl (fn []
-                                      (local val {:bg colors.cyan})
-                                      (set val.name (vi_mode_utils.get_mode_highlight_name))
-                                      (set val.fg (vi_mode_utils.get_mode_color))
-                                      (set val.style "bold")
-                                      val)
-                                 :right_sep {:str " " :hl {:bg colors.cyan}}}
-
-
-                                {
-                                 :provider  "file_info"
-                                 :type :relative-short
-                                 :hl {
-                                      :fg "white"
-                                      :bg colors.grey
-                                      :style "bold"}
-                                 :left_sep  [{:str  " " :hl {:bg colors.grey}}] 
+       {
+        :provider  "file_info"
+        :type :relative-short
+        :hl {
+             :fg "white"
+             :bg colors.dark_cyan
+             :style "bold"}
+        :left_sep  [{:str  " " :hl {:bg colors.dark_cyan}}]
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
-                                  :right_sep  [" "]}
+         :right_sep  [" "]}
 
 
 
-                                {:provider  "file_size"
-                                  :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
-                                  :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
-(tset components.active 2 
+       {:provider  "file_size"
+         :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
+         :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
+
+(tset components.active 2
       [
         {
          :provider :lsp_client_names
@@ -63,16 +59,15 @@
         (if v
           (.. str v) str)))
 
-(tset components.active 3 
+(tset components.active 3
     [
-      
 
       {
 
         :provider  "position"
-        :hl {:bg colors.light_red :fg colors.white :style :bold} 
-        :right_sep  [{:str " " :hl {:bg colors.light_red}}]
-        :left_sep  [{:str :left_rounded :hl {:fg colors.light_red :bg :NONE}}]}
+        :hl {:bg colors.red :fg colors.white :style :bold}
+        :right_sep  [{:str " " :hl {:bg colors.red}} " "]
+        :left_sep  [{:str :left_rounded :hl {:fg colors.red :bg :NONE}}]}
 
 
       {
@@ -81,7 +76,6 @@
                                :fg  "white"
                                :bg  "black"
                                :style  "bold"}
-                        :left_sep " "
                         :right_sep  (fn []
                                      (local val  {:hl  {:fg  "NONE" :bg  "black"}})
                                      (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
@@ -119,8 +113,7 @@
        :provider  "line_percentage"
        :hl  {
              :style  "bold"}
-       :left_sep  "  "
-       :right_sep  " "}
+       :right_sep " "} 
 
 
       {
@@ -177,7 +170,7 @@
 
       {:provider  "scroll_bar"
        :hl  {
-             :fg  colors.light_red
+             :fg  colors.red
              :style  "bold"}}
 
       {
@@ -213,19 +206,6 @@
 
 
 
--- This table is equal to the default colors table
-(local colors {
-               :black  "#1B1B1B"
-               :skyblue  "#50B0F0"
-               :cyan  "#009090"
-               :green  "#60A040"
-               :oceanblue  "#0066cc"
-               :magenta  "#C26BDB"
-               :orange  "#FF9000"
-               :red  "#D10000"
-               :violet  "#9E93E8"
-               :white  "#FFFFFF"
-               :yellow  "#E1E120"})
 
 
 -- This table is equal to the default separators table

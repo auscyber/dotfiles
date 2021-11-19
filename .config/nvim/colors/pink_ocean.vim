@@ -46,4 +46,7 @@ hi link DiffDelete Statement
 hi SignColumn guibg=#1f1f1f
 hi DiffDelete guibg=#DB5461 guifg=#eeeeee
 hi DiffChange guibg=#a04668
-hi DiffAdd guibg=#7dde92 guifg=#1f1f1f
+hi DiffAdd guibg=#2dde92 guifg=#1f1f1f
+hi GitSignsDiffAdd guifg=#2dde92
+hi GitSignsDiffChange guifg=#ffa0a0
+hi GitSignsDiffDelete guifg=#DB5461
