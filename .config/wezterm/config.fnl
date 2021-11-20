@@ -1,5 +1,10 @@
 (local wezterm (require :wezterm))
 (local util (require :util))
+
+(local os (let [(p _) (io.popen "uname -o 2>/dev/null" :r)]
+            (var res (p:read))
+            (p:close)
+            res))
 (local base {
               :color_schemes  {
                                "Pink Ocean" 
@@ -15,6 +20,7 @@
 ;                                :background "#282828"}}
                                 :background "#1c1c1c"}}
 
+              :enable_scroll_bar (~= os "GNU/Linux")
               :enable_wayland false
               :window_padding  {
                                 :left 10
@@ -25,7 +31,7 @@
                                 :bottom  5}
 
               :window_background_opacity  0.8
-              :font  (wezterm.font "FiraCode Nerd Font")
+              :font  (wezterm.font "Hasklug Nerd Font")
               :font_size  10
               :color_scheme "Pink Ocean"})
 ;             :color_scheme  "Guezwhoz"})
