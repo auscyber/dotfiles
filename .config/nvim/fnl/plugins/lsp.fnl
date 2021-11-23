@@ -126,7 +126,7 @@ vim.cmd [[highlight link LspSemantic_postulate Define]] -- Postulates
 vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
 ")
 
-
+(a.assoc _G :enabled_servers {})
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
@@ -137,7 +137,12 @@ vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
         (let [fts (if (= (type merged_opts.fts) :table)
                     (table.concat  merged_opts.fts ",") merged_opts.fts)]
           (a.assoc merged_opts :fts)
-         (vim.cmd (vlua-format (.. "au FileType " fts " ++once call %s()") (fn [] ((. lsp lsp-name :setup) merged-opts) (vim.cmd ::LspStart)))))
+         (vim.cmd (vlua-format (.. "au FileType " fts " ++once call %s()")
+                               (fn []
+                                 (when (not (. _G.enabled_servers lsp-name))
+                                   ((. lsp lsp-name :setup) merged-opts)
+                                   (vim.cmd ::LspStart)
+                                   (a.assoc _G.enabled_servers lsp-name true))))))
       ((. lsp lsp-name :setup) merged-opts))))
 
 (def-augroup :LspAuGroup
@@ -161,17 +166,17 @@ vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
                               :workspace {:library (vim.api.nvim_get_runtime_file "" true)}
                               :telemtry {:enable false}}})
 
-                                
+
         (vim.cmd ::LspStart)))
-            
+
   (def-autocmd-fn [:FileType] [:rust]
       (do (rust-tools.setup {:server {: capabilities
                                       :settings
                                       {:rust-analyzer
                                        {:checkOnSave {:command :clippy}
                                         :procMacro {:enable true}}}
-                                      :on_attach (fn [client bufnr]  
-                                                    (on_attach client bufnr) 
+                                      :on_attach (fn [client bufnr]
+                                                    (on_attach client bufnr)
                                                     ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}) (vim.cmd ::LspStart)))
   (init-lsp :clangd {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})

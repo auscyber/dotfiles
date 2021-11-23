@@ -1,7 +1,9 @@
 (module plugins {require {nvim aniseed.nvim
                           a aniseed.core}
                  require-macros [macros]})
-   
+
+
+
 ;; Plugins to be managed by packer.
 ; TODO FIX STUFF
 
@@ -38,12 +40,20 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:
   ;;; quality of life improvements ;;;
   ;;;:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  :glepnir/dashboard-nvim {:config #(require "plugins.dashboard")}
+  :folke/persistence.nvim {:event :BufReadPre :module :persistence :config #((. (require "persistence") :setup))}
   :christoomey/vim-tmux-navigator {}
   :folke/which-key.nvim {:config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
-  :Yggdroot/indentLine {}
-  :ntpeters/vim-better-whitespace {}
-  :nathanaelkane/vim-indent-guides {}
+;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
+  :lukas-reineke/indent-blankline.nvim
+    {:config
+     #((. (require :indent_blankline) :setup) {:show_current_context true :show_current_context_start true :filetype_exclude [:packer :dashboard :telescope]})}
+  :ntpeters/vim-better-whitespace {:config #(do
+                                              (set vim.g.better_whitespace_filetypes_blacklist [:dashboard :diff :git :gitcommit :unite :qf :help :markdown :fugitive])
+                                              (set vim.g.strip_whitespace_confirm 0)
+                                              (set vim.g.strip_whitespace_on_save 1))}
+;  :nathanaelkane/vim-indent-guides {}
   :jghauser/mkdir.nvim {:config  #(require "mkdir")}
 
   :tweekmonster/startuptime.vim {:cmd :StartupTime}
@@ -69,14 +79,14 @@
   :ranfdev/parinfer-rust {:ft [:fennel :racket :scheme] :run "cargo build --release"}
   :elkowar/yuck.vim {:ft :yuck}
   :elkowar/nvim-gehzu {:ft :fnl}
-  :vhyrro/neorg {:ft :org :require [[:plenary.nvim] [:hrsh7th/nvim-compe]] :mod neorg}
+;  :vhyrro/neorg {:after [:nvim-treesitter :neorg]  :require [[:plenary.nvim]] :config #(require :plugins.neorg)} ;:mod neorg}
 
     ; Completion
     :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
     :L3mON4D3/luasnip {:module :luasnip}
     :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
     :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
-    :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer ] :config #(require :plugins.cmp)}
+    :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel :norg] :requires [:cmp_luasnip :luasnip :cmp-buffer ] :config #(require :plugins.cmp)}
     ; Lsp plugins
     :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
     :nvim-lua/lsp-status.nvim {:module :lsp-status}
@@ -91,12 +101,14 @@
                                           :nvim-cmp
                                           :luasnip
                                           {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}]
-                                            
+
                                 :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}
 
-       :nvim-treesitter/nvim-treesitter {:do "TSUpdate" :requires [:nvim-treesitter/playground :folke/twilight.nvim] :config #(require "plugins.treesitter")} ; :mod treesitter}
+    :nvim-treesitter/nvim-treesitter
+        {:do "TSUpdate"
+         :requires [:nvim-treesitter/playground :folke/twilight.nvim "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
       :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
-      
+
 

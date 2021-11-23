@@ -31,5 +31,6 @@
 
 (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
 (def-augroup :CmpLua
+  (def-autocmd-fn [:FileType] [:norg] (cmp.setup.buffer {:sources [{:name neorg}]}))
   (def-autocmd-fn [:FileType] [:lua] (cmp.setup.buffer {:sources [{:name :nvim_lua} {:name :luasnip} {:name :buffer}]}))
   (def-autocmd-fn [:FileType] [:fennel] (cmp.setup.buffer {:sources [{:name :nvim_lua} {:name :buffer}]})))

@@ -15,7 +15,7 @@
                    :inactive [{} {} {}]})
 
 
-(tset components.active  1 
+(tset components.active  1
       [
        {
         :provider  (fn [] "  ")
@@ -113,7 +113,8 @@
        :provider  "line_percentage"
        :hl  {
              :style  "bold"}
-       :right_sep " "} 
+       :left_sep " "
+       :right_sep " "}
 
 
       {
