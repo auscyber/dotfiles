@@ -24,8 +24,8 @@ hi Constant ctermfg=217 guifg=#ffa0a0
 "if exists("g:neovide_refresh_rate")
     hi Normal guibg=#1f1f1f
 "endif
-hi Normal  ctermfg=251 ctermbg=235 guifg=#eeeeee 
-hi Folded  guifg=#A04668 guibg=#282828
+hi Normal ctermfg=251 ctermbg=235 guifg=#eeeeee
+hi Folded guifg=#A04668 guibg=#282828
 hi CursorLineNr ctermfg=224 guifg=#ffd1dc
 hi LineNr guifg=#ffd1dc ctermfg=224
 hi Statement guifg=#8BB2C1 ctermfg=109
@@ -50,3 +50,4 @@ hi DiffAdd guibg=#2dde92 guifg=#1f1f1f
 hi GitSignsDiffAdd guifg=#2dde92
 hi GitSignsDiffChange guifg=#ffa0a0
 hi GitSignsDiffDelete guifg=#DB5461
+hi IndentBlanklineChar guifg=#303038

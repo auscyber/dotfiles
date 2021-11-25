@@ -20,12 +20,14 @@
   :tsbohc/zest.nvim {:config #(let [zest (require :zest)] (zest.setup))}
 
   ;; gui features
+  :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
-  :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)} ;:mod tree}
+  :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
   :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)}; :mod bufferline}
   :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
   :nvim-telescope/telescope.nvim
-        {
+        {:cmd :Telescope
+         :keys [:<C-f>]
          :requires [ :nvim-telescope/telescope-packer.nvim "plenary.nvim"  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
@@ -59,7 +61,7 @@
   :tweekmonster/startuptime.vim {:cmd :StartupTime}
   :andweeb/presence.nvim {:config #(require :plugins.presence)}; :mod presence}
       :wakatime/vim-wakatime {}
-      :tjdevries/train.nvim {}
+      :tjdevries/train.nvim {:opt true}
 
 
   ;Language support
@@ -90,6 +92,7 @@
     ; Lsp plugins
     :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
     :nvim-lua/lsp-status.nvim {:module :lsp-status}
+    :simrat39/symbols-outline.nvim {:opt true}
     :neovim/nvim-lspconfig {
                               :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1]
                               :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
@@ -100,15 +103,18 @@
                                           :which-key.nvim
                                           :nvim-cmp
                                           :luasnip
-                                          {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}]
+                                          {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
+                                          :symbols-outline.nvim]
 
                                 :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}
 
     :nvim-treesitter/nvim-treesitter
         {:do "TSUpdate"
-         :requires [:nvim-treesitter/playground :folke/twilight.nvim "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
+         :requires [:nvim-treesitter/playground {1 :folke/twilight.nvim :cmd :Twilight} "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
       :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
+(when _G.packer_bootstrap
+  ((. (require "packer") :sync)))
 

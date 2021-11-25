@@ -18,8 +18,9 @@
 
 
 (telescope.setup
-  {:defaults {:mappings {:i {:<esc> actions.close}}}}
- (telescope.load_extension "frecency"))
+  {:defaults {:mappings {:i {:<esc> actions.close}}}})
+(telescope.load_extension "frecency")
+(telescope.load_extension "notify")
 
 
 (utils.keymap :n :<C-f> "<cmd> lua require 'telescope.builtin'.find_files()<CR>")

@@ -17,7 +17,6 @@
 (eval-when-compile
   ;; Following line is not needed if use-package.el is in ~/.emacs.d
   (require 'use-package))
-
 (use-package which-key
   :config (which-key-mode))
 (use-package lsp-mode
@@ -33,6 +32,7 @@
   (lsp-mode . lsp-enable-which-key-integration)
   :commands lsp)
 
+(add-hook 'after-init-hook 'global-company-mode)
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
@@ -96,7 +96,7 @@
  '(global-display-line-numbers-mode t)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(which-key-posframe company-box company-cabal rust-mode unicode-fonts doom-modeline atom-one-dark-theme purescript-mode company which-key tide nix-mode flycheck lsp-ui use-package lsp-mode evil telephone-line))
+   '(org which-key-posframe company-box company-cabal rust-mode unicode-fonts doom-modeline atom-one-dark-theme purescript-mode company which-key tide nix-mode flycheck lsp-ui use-package lsp-mode evil telephone-line))
  '(scroll-bar-mode nil)
  '(tetris-x-colors
    [[229 192 123]

@@ -150,12 +150,13 @@ vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
   (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
   (def-autocmd-fn [:FileType] [:lua]
-      (let [system_name
+      (let [packer (. (require "packer") :config)
+            system_name
             (if (= (vim.fn.has "mac") 1) "macOS"
               (if (= (vim.fn.has "unix") 1) "Linux"
                 (if (= (vim.fn.has "win32") 1) "Windows"
                   (error "Unsupported system"))))
-            sumneko_root_path (.. (vim.fn.stdpath "data") "/site/pack/packer/start/lua-language-server")
+            sumneko_root_path (..  packer.package_root "/" packer.plugin_package "/start/lua-language-server")
             sumneko_binary (.. sumneko_root_path "/bin/" system_name "/lua-language-server")]
         (init-lsp :sumneko_lua
                   {:cmd [sumneko_binary "-E" (.. sumneko_root_path "/main.lua")]
