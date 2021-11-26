@@ -20,6 +20,7 @@
   :tsbohc/zest.nvim {:config #(let [zest (require :zest)] (zest.setup))}
 
   ;; gui features
+  :ellisonleao/glow.nvim {}
   :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
@@ -63,8 +64,18 @@
       :wakatime/vim-wakatime {}
       :tjdevries/train.nvim {:opt true}
 
+  ; Completion
+  :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
+  :L3mON4D3/luasnip {:module :luasnip}
+  :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
+  :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
+  :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel :norg] :requires [:cmp_luasnip :luasnip :cmp-buffer ] :config #(require :plugins.cmp)}
+
 
   ;Language support
+  :nvim-treesitter/nvim-treesitter
+        {:do "TSUpdate"
+         :requires [:nvim-treesitter/playground {1 :folke/twilight.nvim :cmd :Twilight} "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
   :github/copilot.vim {:opt true}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}
   :Olical/conjure {:ft [:fennel :racket :clojure]}
@@ -81,14 +92,8 @@
   :ranfdev/parinfer-rust {:ft [:fennel :racket :scheme] :run "cargo build --release"}
   :elkowar/yuck.vim {:ft :yuck}
   :elkowar/nvim-gehzu {:ft :fnl}
-;  :vhyrro/neorg {:after [:nvim-treesitter :neorg]  :require [[:plenary.nvim]] :config #(require :plugins.neorg)} ;:mod neorg}
+  :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
 
-    ; Completion
-    :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
-    :L3mON4D3/luasnip {:module :luasnip}
-    :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
-    :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
-    :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel :norg] :requires [:cmp_luasnip :luasnip :cmp-buffer ] :config #(require :plugins.cmp)}
     ; Lsp plugins
     :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
     :nvim-lua/lsp-status.nvim {:module :lsp-status}
@@ -109,9 +114,6 @@
                                 :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}
 
-    :nvim-treesitter/nvim-treesitter
-        {:do "TSUpdate"
-         :requires [:nvim-treesitter/playground {1 :folke/twilight.nvim :cmd :Twilight} "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
       :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
