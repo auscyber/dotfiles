@@ -9,15 +9,16 @@
 
 
 (packer-use
-  ; Startup and typical operation
-  :Olical/aniseed {:branch :develop}
-  :lewis6991/impatient.nvim {:config #(require "impatient")}
-  :wbthomason/packer.nvim {}
-
-  ; libraries
+  ;; libraries
   :nvim-lua/plenary.nvim {:module :plenary}
   :tami5/sqlite.lua {:module :sqlite}
   :tsbohc/zest.nvim {:config #(let [zest (require :zest)] (zest.setup))}
+
+  ; Startup and typical operation
+  :Olical/aniseed {:branch :develop}
+  :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
+  :wbthomason/packer.nvim {}
+
 
   ;; gui features
   :ellisonleao/glow.nvim {}

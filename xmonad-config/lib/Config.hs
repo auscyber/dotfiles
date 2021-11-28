@@ -147,7 +147,7 @@ gameMap =
 mountRclone :: (String, String, [String]) -> String
 mountRclone (name, location, extra_args) = concat ["rclone mount ", name, ": ", location, " ", unwords extra_args, " --daemon"]
 
-once = map mountRclone rclonemounts ++ ["emacs --daemon"]
+once = map mountRclone rclonemounts -- ++ ["emacs --daemon"]
 
 myStartupHook = do
     ewmhDesktopsStartup
@@ -374,8 +374,8 @@ appKeys =
           ("M-S-g", "google-chrome-stable", doc "Launch Chrome")
         , --Start emacs
           ("M-d", "emacsclient -c", doc "Start emacs client")
-        -- start nvim
-        , ("M-S-n", "wezterm start -- nvim", doc $ "Launch neovim with neovim")
+        , -- start nvim
+          ("M-S-n", "wezterm start -- nvim", doc $ "Launch neovim with neovim")
         ]
 
 myKeys = map (\(x, y, _) -> (x, y)) keyCombination
@@ -414,9 +414,9 @@ customKeys =
     , ("M-C-r", shellPrompt promptConfig, Just "Open xmonad run prompt")
     , ("M-m", nextWSSet True, Nothing)
     , ("M-n", prevWSSet True, Nothing)
---    , ("M-S-m", moveToNextWsSet True, Nothing)
---    , ("M-S-n", moveToPrevWsSet True, Nothing)
-    , ("M-C-`", setKeyRemap gameMap, Nothing)
+    , --    , ("M-S-m", moveToNextWsSet True, Nothing)
+      --    , ("M-S-n", moveToPrevWsSet True, Nothing)
+      ("M-C-`", setKeyRemap gameMap, Nothing)
     , ("M-C-S-`", setKeyRemap emptyKeyRemap, Nothing)
     , ("M-C-h", spawn $ "xmessage \'" ++ documentation ++ "\'", doc "Show help")
     --
@@ -425,12 +425,11 @@ customKeys =
     ]
 
 promptConfig =
-    ( def
+    def
         { fgColor = mainColor
         , position = CenteredAt 0.3 0.5
         , font = "xft:Hasklug Nerd Font:style=Regular:size=12"
         }
-    )
 
 workspaceKeys =
     [ ("M-L", nextWS)
