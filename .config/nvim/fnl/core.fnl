@@ -1,7 +1,6 @@
 (module core
   {require {_ plugins
-            _ packer_compiled
-            }
+            _ packer_compiled}
    autoload {nvim aniseed.nvim
              a aniseed.core
              fennel aniseed.fennel}

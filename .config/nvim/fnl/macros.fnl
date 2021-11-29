@@ -1,22 +1,7 @@
-{:augroup
- (fn [name ...]
-   `(do
-      (nvim.ex.augroup ,(tostring name))
-      (nvim.ex.autocmd_)
-      ,...
-      (nvim.ex.augroup :END)))
-
- :autocmd
- (fn [...]
-   `(nvim.ex.autocmd ,...))
-
- :_:
- (fn [name ...]
-   `((. nvim.ex ,(tostring name)) ,...))
-
+{
  :packer-use
  (fn [...]
-   "Use packer plugins
+   "use packer plugins
    Takes a list of package names and a table of the configuration for it
    "
    (let [a (require "aniseed.core")
@@ -50,8 +35,6 @@
                                        :display {:open_fn (fn [] (let [(b# win# buf#) ((. (require "packer.util") :float) {:border :rounded})]
                                                                    (vim.api.nvim_win_set_option win# :winhighlight "PmenuThumb:Normal,FloatBorder:Normal,Normal:Normal,StatusLine:Normal")
                                                                    (vim.api.nvim_buf_set_name buf# :Packer)
-                                                                   (values b# win# buf#)))}}})))))
+                                                                   (values b# win# buf#)))}}})))))}
 
- :viml->fn
- (fn [name]
-   `(.. "lua require('" *module-name* "')['" ,(tostring name) "']()"))}
+

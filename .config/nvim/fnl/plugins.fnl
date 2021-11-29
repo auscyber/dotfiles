@@ -3,11 +3,8 @@
                  require-macros [macros]})
 
 
-
 ;; Plugins to be managed by packer.
 ; TODO FIX STUFF
-
-
 (packer-use
   ;; libraries
   :nvim-lua/plenary.nvim {:module :plenary}
@@ -29,9 +26,10 @@
   :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
-         :keys [:<C-f>]
+         :keys [:<C-f> :<C-b>]
          :requires [ :nvim-telescope/telescope-packer.nvim "plenary.nvim"  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
+
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
   :kyazdani42/nvim-web-devicons {}
   :TimUntersberger/neogit {:cmd :Neogit :requires [:plenary.nvim] :config #(require :plugins.neogit)} ;:mod neogit}
@@ -62,8 +60,8 @@
 
   :tweekmonster/startuptime.vim {:cmd :StartupTime}
   :andweeb/presence.nvim {:config #(require :plugins.presence)}; :mod presence}
-      :wakatime/vim-wakatime {}
-      :tjdevries/train.nvim {:opt true}
+  :wakatime/vim-wakatime {}
+  :tjdevries/train.nvim {:opt true}
 
   ; Completion
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}

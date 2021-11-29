@@ -51,3 +51,4 @@ hi GitSignsDiffAdd guifg=#2dde92
 hi GitSignsDiffChange guifg=#ffa0a0
 hi GitSignsDiffDelete guifg=#DB5461
 hi IndentBlanklineChar guifg=#303038
+hi NeorgHeading1Title font='Hasklug Nerd Font 30'
