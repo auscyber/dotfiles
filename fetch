@@ -48,24 +48,32 @@ W_FG=$(fg_c $WHITE)
 
 
 
-if command -v apt 1> /dev/null
+packages () {
+    if command -v apt 1> /dev/null
+        then
+            package_data="${package_data} $(apt list --installed 2> /dev/null | wc -l) (apt)"
+    fi
+    if command -v nix 1> /dev/null
+        then
+            _package_count=0
+            if command -v home-manager 1>/dev/null
+            then
+                _package_count="$(($_package_count+$(cat ~/.nix-profile/etc/packagecount)))"
+            fi
+            package_data="${package_data} $_package_count (nix)"
+    #        package_data="${packages+ }$(wc -l < /etc/current-system-packages) (nix)"
+    fi
+    if command -v pacman 1> /dev/null
     then
-        package_manager="apt"
-        packages=$(apt list --installed 2> /dev/null | wc -l)
-elif command -v nixos-rebuild 1> /dev/null
-    then
-    packages=$(wc -l < /etc/current-system-packages)
-    package_manager="nix"
-elif command -v pacman 1> /dev/null 
-then
-    packages=$(pacman -Q | wc -l)
-    package_manager="pacman"
-fi
+        package_data="${package_data} $(pacman -Q | wc -l) (pacman)"
+    fi
+        printf "%s" "$package_data"
 
+}
 
 
 os="$(. /etc/os-release && printf "$PRETTY_NAME")"
-kernel="$(uname -r)"
+alias kernel="uname -r"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
 command -v lspci >/dev/null && {
 		gpu=$(lspci -mm | grep -i 'vga\|display')
@@ -93,7 +101,7 @@ main_color="$(fg_t 158 203 219 )"
 category="$main_color$BOLD"
 
 eye_color="$(fg_c 236)"
-if playerctl metadata > /dev/null 2>&1; then
+if [ -n "$(playerctl metadata title 2>&- )" ]; then
     song=$(playerctl metadata --format "{{title}} - {{artist}}")
 else
     song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
@@ -110,13 +118,13 @@ small () {
     HEIGHT=6
     WIDTH=14
     cat <<EOF
-      ${W_FG}▄▄▄▄▄${NORMAL}            
-     ${W_BG}       ${NORMAL}      
-    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${NORMAL} 
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG}  ,  ,   ${NORMAL}         
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         
+      ${W_FG}▄▄▄▄▄${NORMAL}
+     ${W_BG}       ${NORMAL}
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} ,   , , ${NORMAL}
 EOF
 }
 
@@ -125,20 +133,20 @@ large () {
     WIDTH=15
 down 1
 cat << EOF
-      ${W_FG}▄▄▄▄▄${NORMAL}            
-     ${W_BG}       ${NORMAL}      
+      ${W_FG}▄▄▄▄▄${NORMAL}
+     ${W_BG}       ${NORMAL}
     ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}
     ${W_BG}${B_FG}         ${NORMAL}
     ${W_BG}${B_FG}  ,  ,   ${NORMAL}
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG} ,   , , ${NORMAL}         
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG}   ,   , ${NORMAL}         
-    ${W_BG}${B_FG} |       ${NORMAL}         
-    ${W_BG}${B_FG}  ,  | , ${NORMAL}         
-    ${W_BG}${B_FG} ,  ,    ${NORMAL}         
-    ${W_BG}${B_FG}         ${NORMAL}         
-    ${W_BG}${B_FG}         ${NORMAL}         
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} ,   , , ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}   ,   , ${NORMAL}
+    ${W_BG}${B_FG} |       ${NORMAL}
+    ${W_BG}${B_FG}  ,  | , ${NORMAL}
+    ${W_BG}${B_FG} ,  ,    ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
     ${W_BG}${B_FG} |  |  | ${NORMAL}
 EOF
 down 1
@@ -192,10 +200,10 @@ segment () {
 }
 data () {
     _variable="$1"
-    _variable_value=${2:-" $(eval "printf \"%s\" \"\$$1\"")"}
-    if [[ -n _variable_value ]]
+    _variable_value=${2:-" $(eval "$1")"}
+    if [[ -n "${_variable_value# }" ]]
     then
-    segment "$category$_variable:$NORMAL$_variable_value"
+        segment "$category$_variable:$NORMAL$_variable_value"
     fi
 }
 
@@ -203,24 +211,23 @@ up_c $HEIGHT
 
 segment "$ITALIC$main_color$lyric$NORMAL"
 
-if [ -z ${_small+x} ]; 
+if [ -z ${_small+x} ];
 then
-    data "date"
+    data "date" " $date"
 else
     segment "${category}$time"
 fi
-data "os"
-data "cpu" "$cpu"
+data "os" " $os"
+data "cpu" " $cpu"
 data "mem" " ${memused}MB / ${memtotal}MB"
 if [ -z ${_small+x} ]; then
-    data "packages" " $packages ($package_manager)"
-    data "gpu" "$gpu"
+    data "packages"
+    data "gpu" " $gpu"
     data "kernel"
-    data "wm"
-    data "song"
-    data "uptime"
+    data "wm" " $wm"
+    data "song" " $song"
+    data "uptime" " $uptime"
 fi
-
 
 down $((HEIGHT-line))
 printf "\n"
