@@ -77,8 +77,8 @@ symbol = " "
 
 [nix_shell]
 symbol = " "
-impure_msg = "[impure shell](bold red)"
-pure_msg = "[pure shell](bold green)"
+impure_msg = "[impure](bold red)"
+pure_msg = "[pure](bold green)"
 format = 'via [☃️ $state( \($name\))](bold blue) '
 
 [nodejs]

@@ -36,7 +36,7 @@ colourCurrent = "#f9f9f9"
 --colourVisible = "#5AB1BB"
 colourVisible = "#ffd1dc"
 colourHidden = "#ffeFdc"
-colourHiddenNoWindows = "#343434"
+colourHiddenNoWindows = "#A4A4A4"
 polybarPP defaultIcons =
     let iconCurrent x
             | x `elem` defaultIcons = switchAndMoveF x "\xf111"
@@ -57,7 +57,7 @@ polybarPP defaultIcons =
             , ppTitleSanitize = shorten 70 . ppTitle def
             , ppTitle = polybarColour 'F' "#FFFFFF"
             , ppWsSep = ""
-            , ppSep = polybarColour 'F' "#4D3636" " | "
+            , ppSep = polybarColour 'F' "#6D5656" " | "
             , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws"
             , ppLayout = xmonadPolybarAction 1 "next-layout" . xmonadPolybarAction 3 "default-layout"
             --
