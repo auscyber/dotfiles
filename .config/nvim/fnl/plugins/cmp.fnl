@@ -1,13 +1,17 @@
-(module plugins.nvim_lsp
+(module plugins.cmp
   {require {luasnip luasnip
             cmp_nvim_lsp cmp_nvim_lsp
             _ cmp_buffer
             _ cmp_luasnip
+            lspkind lspkind
             cmp cmp
+            a aniseed.core
             cmp_autopairs nvim-autopairs.completion.cmp}
    require-macros [macros zest.macros]})
-
-
+(set _G.sources [{:name :luasnip}
+                 {:name :buffer}
+                 {:name :path}
+                 {:name :nvim_lua}])
 (cmp.setup {
               :snippet {
                         :expand (fn [args] (luasnip.lsp_expand args.body))}
@@ -24,13 +28,22 @@
                         :<S-Tab> (cmp.mapping.select_prev_item)
                         :<CR> (cmp.mapping.confirm {:behavior  cmp.ConfirmBehavior.Replace :select true})}
               :experimental {
+                             :native_menu false
                              :ghost_text true}
-              :sources (cmp.config.sources [
-                                            {:name :luasnip}]
-                                          [{:name :buffer}])})
-
+              :sources (cmp.config.sources sources)
+              :formatting {:format
+                           (lspkind.cmp_format {
+                                                :with_text :true
+                                                :menu
+                                                  {:buffer "[buf]"
+                                                   :nvim_lsp "[lsp]"
+                                                   :nvim_lua "[api]"
+                                                   :luasnip "[snip]"}})}})
+(cmp.setup.cmdline
+  :/ {
+      :sources [
+                {:name :buffer :keyword_length 5}]})
 (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
 (def-augroup :CmpLua
-  (def-autocmd-fn [:FileType] [:norg] (cmp.setup.buffer {:sources [{:name :neorg} {:name :luasnip} {:name :buffer}]}))
-  (def-autocmd-fn [:FileType] [:lua] (cmp.setup.buffer {:sources [{:name :nvim_lua} {:name :luasnip} {:name :buffer}]}))
-  (def-autocmd-fn [:FileType] [:fennel] (cmp.setup.buffer {:sources [{:name :nvim_lua} {:name :buffer}]})))
+  (def-autocmd-fn [:FileType] [:norg] (cmp.setup.buffer {:sources (a.concat [{:name :neorg}] sources)}))
+  (def-autocmd-fn [:FileType] [:lua] (cmp.setup.buffer {:sources (a.concat sources [{:name :nvim_lua}])})))

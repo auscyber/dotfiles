@@ -22,6 +22,12 @@
                    :playground {
                                 :enable true}
                    :query_linter {:enable true}
+                   :context_commentstring {:enable true}
+                   :refactor {
+;                              :highlight_current_scope {:enable true}}
+                              :highlight_definitions {:enable true}}
+
+
                    :textobjects {
                                  :enable true
                                  :lookahead true

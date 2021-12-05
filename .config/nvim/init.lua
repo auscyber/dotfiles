@@ -10,18 +10,12 @@ function ensure (user, repo)
     if user == "wbthomason" and repo == "packer.nvim" then
         packer_bootstrap = true
     end
---      if user == "wbthomason" && repo == "packer.nvim" then
---          require("packer").sync()
---      end
   end
 end
 
 if fn.has("win32") > 0 then
 	vim.o.shellslash = true
 end
-
-
-
 
 ensure("Olical", "aniseed")
 ensure("lewis6991","impatient.nvim")

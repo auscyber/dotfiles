@@ -1,7 +1,8 @@
 (module plugins.lsp
   {require {
-            _ plugins.cmp}
-   autoload {lsp lspconfig
+            plugins-cmp plugins.cmp}
+   autoload {idris2 idris2
+             lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
              nvim aniseed.nvim
@@ -19,11 +20,10 @@
 ;(vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menu,menuone,noselect")
 
-
 (defn on_attach [client bufnr]
   (cmp.setup.buffer {:formatting
                      {:format (lspkind.cmp_format)}
-                     :sources [{:name :nvim_lsp} {:name :buffer} {:name :luasnip}]})
+                     :sources [{:name :nvim_lsp}]})
   (lsp-status.on_attach client)
   (lspkind.init {})
   (npairs.setup {})
@@ -38,7 +38,8 @@
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
-    (map :<space>a "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    (map :<space>d "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
     (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
 ;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
@@ -60,125 +61,67 @@
 (lsp-status.register_progress)
 (local capabilities (cmp_nvim_lsp.update_capabilities (vim.tbl_extend :keep (vim.lsp.protocol.make_client_capabilities) lsp-status.capabilities)))
 
-(lua "
-     local lspconfig = require('lspconfig')
--- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
-local autostart_semantic_highlightning = true
-lspconfig.idris2_lsp.setup {
-  on_new_config = function(new_config, new_root_dir)
-    new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
-  end,
-  on_attach = function(client,bufnr)
-    if autostart_semantic_highlightning then
-      vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
-        {textDocument = vim.lsp.util.make_text_document_params()}, nil)
-    end
-    -- Example of how to request a single kind of code action with a keymap,
-    -- refer to the table in the README for the appropriate key for each command.
-    vim.cmd [[nnoremap <Leader>cs <Cmd>lua vim.lsp.buf.code_action({diagnostics={},only={'refactor.rewrite.CaseSplit'}})<CR>]]
-    on_attach(client,bufnr)
-  end,
-  autostart = true,
-  capabilities = capabilities,
-  handlers = {
-    ['workspace/semanticTokens/refresh'] = function(err,  params, ctx, config)
-      if autostart_semantic_highlightning then
-        vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
-          { textDocument = vim.lsp.util.make_text_document_params() }, nil)
-      end
-      return vim.NIL
-    end,
-    ['textDocument/semanticTokens/full'] = function(err,  result, ctx, config)
-      -- temporary handler until native support lands
-      local bufnr = ctx.bufnr
-      local client = vim.lsp.get_client_by_id(ctx.client_id)
-      local legend = client.server_capabilities.semanticTokensProvider.legend
-      local token_types = legend.tokenTypes
-      local data = result.data
-
-      local ns = vim.api.nvim_create_namespace('nvim-lsp-semantic')
-      vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-      local tokens = {}
-      local prev_line, prev_start = nil, 0
-      for i = 1, #data, 5 do
-        local delta_line = data[i]
-        prev_line = prev_line and prev_line + delta_line or delta_line
-        local delta_start = data[i + 1]
-        prev_start = delta_line == 0 and prev_start + delta_start or delta_start
-        local token_type = token_types[data[i + 3] + 1]
-        local line = vim.api.nvim_buf_get_lines(bufnr, prev_line, prev_line + 1, false)[1]
-        local byte_start = vim.str_byteindex(line, prev_start)
-        local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
-        vim.api.nvim_buf_add_highlight(bufnr, ns, 'LspSemantic_' .. token_type, prev_line, byte_start, byte_end)
-      end
-    end
-  },
-}
-
--- Set here your preferred colors for semantic values
-vim.cmd [[highlight link LspSemantic_type Include]]   -- Type constructors
-vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
-vim.cmd [[highlight link LspSemantic_enumMember Number]]   -- Data constructors
-vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
-vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
-vim.cmd [[highlight link LspSemantic_namespace Identifier]] -- Explicit namespaces
-vim.cmd [[highlight link LspSemantic_postulate Define]] -- Postulates
-vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
-")
 
 (a.assoc _G :enabled_servers {})
 
+(fn au_ft_once [fts once]
+  (let [_fts (if (= (type fts) :table)
+               (table.concat fts ",")
+               fts)]
+      (vim.cmd (vlua-format (.. "au FileType " _fts " ++once call %s()") (fn [] (once) (vim.cmd ::LspStart))))))
+
+
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
-  (let [merged-opts (a.merge {:on_attach on_attach}
+  (let [merged-opts (a.merge {: on_attach}
                              : capabilities
                             (or ?opts {}))]
     (if (~= merged_opts.fts nil)
-        (let [fts (if (= (type merged_opts.fts) :table)
-                    (table.concat  merged_opts.fts ",") merged_opts.fts)]
+        (let [fts merged_opts.fts]
           (a.assoc merged_opts :fts)
-         (vim.cmd (vlua-format (.. "au FileType " fts " ++once call %s()")
-                               (fn []
-                                 (when (not (. _G.enabled_servers lsp-name))
-                                   ((. lsp lsp-name :setup) merged-opts)
-                                   (vim.cmd ::LspStart)
-                                   (a.assoc _G.enabled_servers lsp-name true))))))
+          (au_ft_once fts
+                          (fn []
+                            (when (not (. _G.enabled_servers lsp-name))
+                              ((. lsp lsp-name :setup) merged-opts)
+                              (a.assoc _G.enabled_servers lsp-name true)))))
+      (a.assoc _G.enabled_servers lsp-name true)
       ((. lsp lsp-name :setup) merged-opts))))
 
 (def-augroup :LspAuGroup
   (init-lsp :tsserver {:fts [:typescript :javascript]})
   (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
-  (def-autocmd-fn [:FileType] [:lua]
-      (let [packer (. (require "packer") :config)
-            system_name
-            (if (= (vim.fn.has "mac") 1) "macOS"
-              (if (= (vim.fn.has "unix") 1) "Linux"
-                (if (= (vim.fn.has "win32") 1) "Windows"
-                  (error "Unsupported system"))))
-            sumneko_root_path (..  packer.package_root "/" packer.plugin_package "/start/lua-language-server")
-            sumneko_binary (.. sumneko_root_path "/bin/" system_name "/lua-language-server")]
-        (init-lsp :sumneko_lua
-                  {:cmd [sumneko_binary "-E" (.. sumneko_root_path "/main.lua")]
-                   :settings {:Lua
-                              {:runtime {:version :LuaJit
-                                         :path (a.concat (vim.split package.path ";") [:lua/?.lua :lua/?/init.lua])}}
-                              :diagnostics {:enable true :globals [:vim]}
-                              :workspace {:library (vim.api.nvim_get_runtime_file "" true)}
-                              :telemtry {:enable false}}})
+  (au_ft_once [:lua]
+      (fn [] (let [packer (. (require "packer") :config)
+                    system_name
+                    (if (= (vim.fn.has "mac") 1) "macOS"
+                      (if (= (vim.fn.has "unix") 1) "Linux"
+                        (if (= (vim.fn.has "win32") 1) "Windows"
+                          (error "Unsupported system"))))
+                    sumneko_root_path (..  packer.package_root "/" packer.plugin_package "/start/lua-language-server")
+                    sumneko_binary (.. sumneko_root_path "/bin/" system_name "/lua-language-server")]
+                  (init-lsp :sumneko_lua
+                            {:cmd [sumneko_binary "-E" (.. sumneko_root_path "/main.lua")]
+                             :settings {:Lua
+                                        {:runtime {:version :LuaJit
+                                                   :path (a.concat (vim.split package.path ";") [:lua/?.lua :lua/?/init.lua])}
+                                          :diagnostics {:enable true
+                                                        :globals [:vim]
+                                                        :disable [:lowercase-global]}
+                                          :workspace {:library (vim.api.nvim_get_runtime_file "" true)}
+                                          :telemtry {:enable false}}}}))))
 
 
-        (vim.cmd ::LspStart)))
 
-  (def-autocmd-fn [:FileType] [:rust]
-      (do (rust-tools.setup {:server {: capabilities
-                                      :settings
-                                      {:rust-analyzer
-                                       {:checkOnSave {:command :clippy}
-                                        :procMacro {:enable true}}}
-                                      :on_attach (fn [client bufnr]
-                                                    (on_attach client bufnr)
-                                                    ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}) (vim.cmd ::LspStart)))
+  (au_ft_once :rust
+      (fn [] (rust-tools.setup {:server {: capabilities
+                                         :settings
+                                         {:rust-analyzer
+                                          {:checkOnSave {:command :clippy}
+                                           :procMacro {:enable true}}}
+                                         :on_attach (fn [client bufnr]
+                                                       (on_attach client bufnr)
+                                                       ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}})))
   (init-lsp :clangd {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
   (init-lsp :ocamllsp {:fts :ocaml})
@@ -186,8 +129,11 @@ vim.cmd [[highlight link LspSemantic_module Identifier]] -- Module identifiers
   (init-lsp :zls {:fts :zig})
   (init-lsp :metals {:fts :scala})
   (init-lsp :dhall_lsp_server)
-  (init-lsp :purescriptls {:fs :purescript})
-  (init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"}))
-;(init-lsp)
-; (init-lsp :idris2_lsp)
+  (init-lsp :purescriptls {:fts :purescript})
+  (init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"})
+  (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
+  (au_ft_once :idris2 (fn []
+                        (idris2.setup {:server {: capabilities : on_attach}}))))
+
+
 
