@@ -20,13 +20,10 @@
        {
         :provider  (fn [] "   ")
         :left_sep ["  " {:str " " :hl {:fg colors.cyan :bg :NONE}}]
-        :hl (fn []
-             (local val {:bg colors.cyan})
-             (set val.name (vi_mode_utils.get_mode_highlight_name))
-             (set val.fg (vi_mode_utils.get_mode_color))
-             (set val.style "bold")
-             val)
-        :right_sep {:str " " :hl {:bg colors.dark_cyan}}}
+        :hl #{:bg :cyan
+              :style :bold
+              :name (vi_mode_utils.get_mode_highlight_name)
+              :fg (vi_mode_utils.get_mode_color)}}
 
 
        {
@@ -36,7 +33,7 @@
              :fg "white"
              :bg colors.dark_cyan
              :style "bold"}
-        :left_sep  [];{:str  " " :hl {:bg colors.dark_cyan}}]
+        :left_sep {:str " " :hl {:bg colors.dark_cyan}}
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
          :right_sep  [{:str " " :hl {:bg :#2f2f2f}}]}
 
@@ -175,7 +172,7 @@
              :bg :black
              :fg  colors.red
              :style  "bold"}
-       :right_sep [{:str " " :hl {:bg :black}} {:str :right_rounded :hl {:fg :black :bg :NONE}}]}])
+       :right_sep [{:str " " :hl {:bg :black}} {:str :right_rounded :hl {:fg :black :bg :NONE}} " "]}])
 
 
 
