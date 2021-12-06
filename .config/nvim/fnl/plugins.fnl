@@ -9,14 +9,13 @@
   ;; libraries
   :nvim-lua/plenary.nvim {:module :plenary}
   :tami5/sqlite.lua {:module :sqlite}
-  :tsbohc/zest.nvim {:config #(let [zest (require :zest)] (zest.setup))}
+  :tsbohc/zest.nvim {};:config #(. (require :zest) :setup)}
   :MunifTanjim/nui.nvim {:module :nui}
 
   ; Startup and typical operation
   :Olical/aniseed {:branch :develop}
   :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
   :wbthomason/packer.nvim {}
-  :chipsenkbeil/distant.nvim {:config #(require "plugins.distant")}
 
 
   ;; gui features
@@ -29,7 +28,7 @@
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
          :keys [:<C-f> :<C-b>]
-         :moduke :telescope
+         :module :telescope
          :requires [:nvim-telescope/telescope-packer.nvim :plenary.nvim  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
   :numToStr/Comment.nvim {:config #(require :plugins.comment)}
@@ -60,20 +59,21 @@
                                               (set vim.g.strip_whitespace_on_save 1))}
 ;  :nathanaelkane/vim-indent-guides {}
   :jghauser/mkdir.nvim {:config  #(require "mkdir")}
-
+  :chipsenkbeil/distant.nvim {:config #(require "plugins.distant")}
   :tweekmonster/startuptime.vim {:cmd :StartupTime}
   :andweeb/presence.nvim {:config #(require :plugins.presence)}; :mod presence}
   :wakatime/vim-wakatime {}
   :tjdevries/train.nvim {:opt true}
 
   ; Completion
+  :github/copilot.vim {:opt true}
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
   :L3mON4D3/luasnip {:module :luasnip}
   :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
   :hrsh7th/cmp-path {}
   :hrsh7th/cmp-cmdline {}
   :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
-  :hrsh7th/nvim-cmp {:module [:plugins.cmp :cmp] :ft [:lua :fennel] :requires [:cmp_luasnip :luasnip :cmp-buffer] :config #(require :plugins.cmp)}
+  :hrsh7th/nvim-cmp {:requires [:cmp_luasnip :luasnip :cmp-buffer] :config #(require :plugins.cmp)}; :module [:plugins.cmp :cmp] :ft [:lua :fennel]
 
 
   ;Language support
@@ -81,7 +81,6 @@
         {:do "TSUpdate"
          :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground  "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
   :folke/twilight.nvim {:cmd :Twilight :requires :nvim-treesitter}
-  :github/copilot.vim {:opt true}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}
   :Olical/conjure {:ft [:fennel :racket :clojure]}
   :wlangstroth/vim-racket {:ft :racket}
@@ -109,10 +108,10 @@
       :after []
       :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java]
       :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
-;                                         {1 :rafaelsq/completion-nvim :branch :changeHandlerSignature :module :completion}
                  {1 :nvim-lua/lsp_extensions.nvim :module :lsp_extensions} {1 :scalameta/nvim-metals :ft :scala :requires :plenary.nvim}
                   {1 :kosayoda/nvim-lightbulb :module :nvim-lightbulb}
                   {1 :onsails/lspkind-nvim :module :lspkind}
+                  {1 :williamboman/nvim-lsp-installer :module :nvim-lsp-installer}
                   :which-key.nvim
                   :nvim-cmp
                   :luasnip
@@ -127,6 +126,5 @@
     :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
 (when _G.packer_bootstrap
-  ((. (require "packer") :sync))
-  (print "hi"))
+  ((. (require "packer") :sync)))
 

@@ -20,7 +20,9 @@ end
 ensure("Olical", "aniseed")
 ensure("lewis6991","impatient.nvim")
 ensure("wbthomason", "packer.nvim")
+ensure("tsbohc","zest.nvim")
 
+require "zest".setup()
 require"impatient"
 
 vim.o.termguicolors = true

@@ -33,7 +33,7 @@
               :sources (cmp.config.sources sources)
               :formatting {:format
                            (lspkind.cmp_format {
-                                                :with_text :true
+                                                :with_text true
                                                 :menu
                                                   {:buffer "[buf]"
                                                    :nvim_lsp "[lsp]"

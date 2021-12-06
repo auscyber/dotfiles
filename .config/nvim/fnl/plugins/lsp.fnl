@@ -2,6 +2,8 @@
   {require {
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
+             lsp_installer nvim-lsp-installer
+             lsp_installer_servers nvim-lsp-installer.servers
              lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
@@ -9,7 +11,6 @@
              cmp cmp
              utils utils
              lspkind lspkind
-             npairs nvim-autopairs
              rust-tools rust-tools
              lsp-status lsp-status
              configs lspconfig.configs}
@@ -21,12 +22,9 @@
 (set nvim.o.completeopt "menu,menuone,noselect")
 
 (defn on_attach [client bufnr]
-  (cmp.setup.buffer {:formatting
-                     {:format (lspkind.cmp_format)}
-                     :sources [{:name :nvim_lsp}]})
+  (cmp.setup.buffer {:sources (a.concat sources [{:name :nvim_lsp}])})
   (lsp-status.on_attach client)
   (lspkind.init {})
-  (npairs.setup {})
   (let [opts {:noremap true :silent true}
         map (fn [key command] (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
@@ -73,55 +71,44 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
-  (let [merged-opts (a.merge {: on_attach}
-                             : capabilities
-                            (or ?opts {}))]
-    (if (~= merged_opts.fts nil)
-        (let [fts merged_opts.fts]
-          (a.assoc merged_opts :fts)
-          (au_ft_once fts
-                          (fn []
-                            (when (not (. _G.enabled_servers lsp-name))
-                              ((. lsp lsp-name :setup) merged-opts)
-                              (a.assoc _G.enabled_servers lsp-name true)))))
-      (a.assoc _G.enabled_servers lsp-name true)
-      ((. lsp lsp-name :setup) merged-opts))))
+  (let [merged-opts (a.merge {: on_attach
+                              : capabilities}
+                            (or ?opts {}))
+        (server_available requested_server) (lsp_installer_servers.get_server lsp-name)
+        launch-f #(when (not (. _G.enabled_servers lsp-name))
+                        (requested_server:setup merged-opts)
+                        (a.assoc _G.enabled_servers lsp-name true))
+        test-server #(if server_available
+                      (do (requested_server:on_ready launch-f)
+                          (if (not (requested_server:is_installed))
+                            (requested_server:install)))
+                      launch-f)]
+      (if merged_opts.fts
+          (let [fts merged_opts.fts]
+            (a.assoc merged_opts :fts)
+            (au_ft_once fts test-server))
+          (test-server))))
+
+
 
 (def-augroup :LspAuGroup
   (init-lsp :tsserver {:fts [:typescript :javascript]})
   (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
-  (au_ft_once [:lua]
-      (fn [] (let [packer (. (require "packer") :config)
-                    system_name
-                    (if (= (vim.fn.has "mac") 1) "macOS"
-                      (if (= (vim.fn.has "unix") 1) "Linux"
-                        (if (= (vim.fn.has "win32") 1) "Windows"
-                          (error "Unsupported system"))))
-                    sumneko_root_path (..  packer.package_root "/" packer.plugin_package "/start/lua-language-server")
-                    sumneko_binary (.. sumneko_root_path "/bin/" system_name "/lua-language-server")]
-                  (init-lsp :sumneko_lua
-                            {:cmd [sumneko_binary "-E" (.. sumneko_root_path "/main.lua")]
-                             :settings {:Lua
-                                        {:runtime {:version :LuaJit
-                                                   :path (a.concat (vim.split package.path ";") [:lua/?.lua :lua/?/init.lua])}
-                                          :diagnostics {:enable true
-                                                        :globals [:vim]
-                                                        :disable [:lowercase-global]}
-                                          :workspace {:library (vim.api.nvim_get_runtime_file "" true)}
-                                          :telemtry {:enable false}}}}))))
-
-
-
+  (init-lsp :sumneko_lua {:fts :lua})
   (au_ft_once :rust
-      (fn [] (rust-tools.setup {:server {: capabilities
-                                         :settings
-                                         {:rust-analyzer
-                                          {:checkOnSave {:command :clippy}
-                                           :procMacro {:enable true}}}
-                                         :on_attach (fn [client bufnr]
-                                                       (on_attach client bufnr)
-                                                       ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}})))
+      (fn [] (let [(server_available requested_server) (lsp_installer_servers.get_server "rust_analyzer")]
+               (when server_available
+                (requested_server:on_ready #(rust-tools.setup {:server {: capabilities
+                                                                        :settings
+                                                                        {:rust-analyzer
+                                                                         {:checkOnSave {:command :clippy}
+                                                                          :procMacro {:enable true}}}
+                                                                        :on_attach (fn [client bufnr]
+                                                                                      (on_attach client bufnr)
+                                                                                      ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}))
+                (when (not (requested_server:is_installed))
+                  (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
   (init-lsp :ocamllsp {:fts :ocaml})
@@ -134,6 +121,4 @@
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))
-
-
-
+(lsp_installer.on_server_ready #(: $1 :setup {: capabilities : on_attach}))
