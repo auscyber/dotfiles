@@ -208,6 +208,11 @@ destination = "/home/auscyber/.emacs.d"
 src = ".emacs.d"
 
 [[links]]
+name = "fonts"
+destination = "$HOME/.local/share/fonts/dots-fonts"
+src = "fonts"
+
+[[links]]
 name = "mkinitcpio arch"
 sudo_required = true
 src = "scripts/mkinitcpio-install"

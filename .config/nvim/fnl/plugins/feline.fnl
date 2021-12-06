@@ -18,7 +18,7 @@
 (tset components.active  1
       [
        {
-        :provider  (fn [] "  ")
+        :provider  (fn [] "   ")
         :left_sep ["  " {:str " " :hl {:fg colors.cyan :bg :NONE}}]
         :hl (fn []
              (local val {:bg colors.cyan})
@@ -36,7 +36,7 @@
              :fg "white"
              :bg colors.dark_cyan
              :style "bold"}
-        :left_sep  [{:str  " " :hl {:bg colors.dark_cyan}}]
+        :left_sep  [];{:str  " " :hl {:bg colors.dark_cyan}}]
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
          :right_sep  [" "]}
 
@@ -241,7 +241,7 @@
                        :VISUAL  colors.blue
                        :BLOCK  colors.blue
                        :REPLACE  colors.red
-                       ["V-REPLACE"]  "violet"
+                       "V-REPLACE"  "violet"
                        :ENTER  "cyan"
                        :MORE  "cyan"
                        :SELECT  "orange"
@@ -252,8 +252,8 @@
 
 
 (feline.setup {
-               :colors colors
-               :separators separators
+               : colors
+               : separators
                :force_inactive {
                                 :filetypes  [
                                               "NvimTree"
@@ -262,9 +262,10 @@
                                               "startify"
                                               "NeogitStatus"
                                               "fugitive"
-                                              "fugitiveblame"]
+                                              "fugitiveblame"
+                                              "telescope"]
                                 :buftypes [ "terminal"]
                                 :bufnames []}
-               :components components
-               :vi_mode_colors vi_mode_colors})
+               : components
+               : vi_mode_colors})
 

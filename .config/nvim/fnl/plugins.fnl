@@ -51,8 +51,7 @@
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
   :lukas-reineke/indent-blankline.nvim
-    {:config
-     #((. (require :indent_blankline) :setup) {:show_current_context true :show_current_context_start true :filetype_exclude [:packer :dashboard :telescope]})}
+    {:config #(require :plugins.indent)}
   :ntpeters/vim-better-whitespace {:config #(do
                                               (set vim.g.better_whitespace_filetypes_blacklist [:dashboard :diff :git :gitcommit :unite :qf :help :markdown :fugitive])
                                               (set vim.g.strip_whitespace_confirm 0)

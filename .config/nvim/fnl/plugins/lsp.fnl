@@ -111,7 +111,7 @@
                   (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
-  (init-lsp :ocamllsp {:fts :ocaml})
+  (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pylsp {:fts :python})
   (init-lsp :zls {:fts :zig})
   (init-lsp :metals {:fts :scala})
