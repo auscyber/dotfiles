@@ -16,6 +16,7 @@
   :Olical/aniseed {:branch :develop}
   :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
   :wbthomason/packer.nvim {}
+  :kyazdani42/nvim-web-devicons {:config #(require :plugins.devicons)}
 
 
   ;; gui features
@@ -33,7 +34,6 @@
          :config #(require :plugins.telescope)}
   :numToStr/Comment.nvim {:config #(require :plugins.comment)}
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
-  :kyazdani42/nvim-web-devicons {}
   :TimUntersberger/neogit {:cmd :Neogit :requires [:plenary.nvim] :config #(require :plugins.neogit)} ;:mod neogit}
   :norcalli/nvim-colorizer.lua {:config
                                         #((. (require "colorizer") :setup))}

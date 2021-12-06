@@ -38,13 +38,14 @@
              :style "bold"}
         :left_sep  [];{:str  " " :hl {:bg colors.dark_cyan}}]
 ;                                             "slant_left_2" {:str  " " :hl  {:bg colors.grey :fg  "NONE"}}]
-         :right_sep  [" "]}
+         :right_sep  [{:str " " :hl {:bg :#2f2f2f}}]}
 
 
 
        {:provider  "file_size"
+         :hl {:bg :black}
          :enabled (fn [] (> (fnn.getfsize (fnn.expand "%:p")) 0))
-         :right_sep  [" " {:str :right_rounded :hl {:fg  :bg :bg  :NONE}}]}])
+         :right_sep  [{:str " " :hl {:bg :black}} {:str :right_rounded :hl {:fg :black :bg  :NONE}}]}])
 
 (tset components.active 2
       [
@@ -66,8 +67,8 @@
 
         :provider  "position"
         :hl {:bg colors.red :fg colors.white :style :bold}
-        :right_sep  [{:str " " :hl {:bg colors.red}} " "]
-        :left_sep  [{:str :left_rounded :hl {:fg colors.red :bg :NONE}}]}
+        :left_sep  [{:str :left_rounded :hl {:fg colors.red :bg :NONE}}]
+        :right_sep  [{:str " " :hl {:bg colors.red}} {:str " " :hl {:bg :black}}]}
 
 
       {
@@ -111,10 +112,10 @@
 
       {
        :provider  "line_percentage"
-       :hl  {
+       :hl  {:bg :black
              :style  "bold"}
-       :left_sep " "
-       :right_sep " "}
+       :left_sep {:str " " :hl {:bg :black}}
+       :right_sep {:str " " :hl {:bg :black}}}
 
 
       {
@@ -137,7 +138,7 @@
       {
                 :provider  "diagnostic_info"
                 :enabled  (fn [] (lsp.diagnostics_exist "Information"))
-                :hl  { :fg  "skyblue"}}
+                :hl  {:fg  "skyblue" :bg :black}}
       {:provider (fn []
                    (local lsp-status (require :lsp-status))
                    (local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
@@ -171,12 +172,11 @@
 
       {:provider  "scroll_bar"
        :hl  {
+             :bg :black
              :fg  colors.red
-             :style  "bold"}}
+             :style  "bold"}
+       :right_sep [{:str " " :hl {:bg :black}} {:str :right_rounded :hl {:fg :black :bg :NONE}}]}])
 
-      {
-       :provider " "
-       :right_sep {:str :right_rounded :hl {:fg :bg :bg :NONE}}}])
 
 
 
@@ -245,7 +245,7 @@
                        :ENTER  "cyan"
                        :MORE  "cyan"
                        :SELECT  "orange"
-                       :COMMAND  colors.cyan
+                       :COMMAND  colors.black
                        :SHELL  "green"
                        :TERM  "green"
                        :NONE  "yellow"})

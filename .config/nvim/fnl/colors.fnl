@@ -10,4 +10,4 @@
 (def grey :#707078)
 (def red :#DB5461)
 (def cyan :#8BB2C1)
-(def black :#1f1f1f)
+(def black :#2f2f2f)
