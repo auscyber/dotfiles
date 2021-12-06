@@ -30,6 +30,11 @@ export HISTFILE=~/.zsh_history
 setopt SHARE_HISTORY
 setopt appendhistory
 
+if ! command -v starship 2>&- 1>&-
+then
+    sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+fi
+
 zinit_install () {
     if [[ ! -e ~/.zinit  ]] then
         mkdir ~/.zinit

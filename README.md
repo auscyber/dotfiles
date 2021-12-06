@@ -1,8 +1,9 @@
-# Auscyber's Dotfiles
+# My Dotfiles
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
+![built with arch](https://img.shields.io/badge/Arch%20Linux-1793D1?logo=arch-linux&logoColor=fff&style=flat-square)
 
 
-### Mine
+### 🔨 My own work
 * [dotfile sync](https://github.com/auscyberman/dotfile-sync) is a program i wrote to manage dotfiles, my configuration is [here](.links.toml)
 * [fetch](fetch)
     
@@ -16,7 +17,7 @@
 * [extensive xmonad configuratio](xmonad)
 
 
-### Not mine
+### 🤝 Other Projects 
 ###### *(Non-extensive list*)
 
 * [xmonad](https://github.com/xmonad/xmonad)
@@ -24,5 +25,6 @@
 * [alacritty](https://github.com/alacritty/alacritty)
 * [neovim](https://github.com/neovim/neovim) 
 * [Polybar](https://github.com/polybar/polybar)
-* [rofi-themes](https://github.com/adi1090x/rofi)
+* [rofi-themes](https://github.com/adi1090x/rofi) 
+* [starship](https://github.com/starship/starship)
 * [*A large amount of vim/neovim plugins*](.config/nvim/fnl/plugins.fnl)
