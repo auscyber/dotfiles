@@ -16,7 +16,7 @@
               (a.assoc block :config `(fn []
                                           (require ,(.. :plugins. (tostring (. block :mod))))
                                           (,(-?> block (. :config))))))
-            (a.assoc block :mod)
+;            (a.assoc block :mod)
 ;            (when (. block :config)
 ;              (a.assoc block :config `(fn []
 ;                                        (let [(ok?# res#) (pcall ,(. block :config) ,name)]

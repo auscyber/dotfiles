@@ -1,11 +1,13 @@
 (module core
-  {require {_ plugins
-            _ packer_compiled}
+  {require {_ plugins}
    autoload {nvim aniseed.nvim
              a aniseed.core
              fennel aniseed.fennel}
 
    require-macros [macros]})
+(let [(res err) (pcall #(require :packer_compiled))] #(do nil))
+;  (if err))
+;    (vim.notify (string.format "Failure loading packer_compiled %s" (tostring err)) vim.log.levels.ERROR)))
 (local bo nvim.bo)
 (local wo nvim.o)
 (local o nvim.o)

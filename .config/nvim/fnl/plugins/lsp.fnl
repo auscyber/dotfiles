@@ -117,7 +117,7 @@
   (init-lsp :metals {:fts :scala})
   (init-lsp :dhall_lsp_server)
   (init-lsp :purescriptls {:fts :purescript})
-  (init-lsp :powershell_es {:bundle_path "~/packages/PowershellEditorServices"})
+  (init-lsp :powershell_es {:fts :ps1 :bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))

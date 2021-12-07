@@ -17,6 +17,7 @@ if fn.has("win32") > 0 then
 	vim.o.shellslash = true
 end
 
+
 ensure("Olical", "aniseed")
 ensure("lewis6991","impatient.nvim")
 ensure("wbthomason", "packer.nvim")

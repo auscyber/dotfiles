@@ -1,6 +1,6 @@
 (module plugins {require {nvim aniseed.nvim
                           a aniseed.core}
-                 require-macros [macros]})
+                 require-macros [macros zest.macros]})
 
 
 ;; Plugins to be managed by packer.
@@ -93,13 +93,13 @@
   :tikhomirov/vim-glsl {:ft :glsl}
   :dag/vim-fish {:ft :fish}
   :purescript-contrib/purescript-vim {:ft :purescript}
-  :ranfdev/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
+  :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
   :elkowar/yuck.vim {:ft :yuck}
   :elkowar/nvim-gehzu {:ft :fnl}
   :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
 
     ; Lsp plugins
-  :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
+;  :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
    :neovim/nvim-lspconfig
@@ -125,5 +125,6 @@
     :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
 (when _G.packer_bootstrap
+  (vim.api.nvim_command "au! User PackerComplete :q! | lua vim.notify(\"Successfully bootstrapped\")")
   ((. (require "packer") :sync)))
 
