@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Config (myConfig, ExtraState) where
@@ -17,7 +16,6 @@ import Data.List (
  )
 import qualified Data.Map as M
 import Data.Maybe
-import DynamicLog (dynamicLogString)
 import Eww
 import ExtraState (ExtraState (dbus_client))
 import Media (next, playPause, previous)
@@ -53,7 +51,9 @@ import XMonad.Hooks.DynamicIcons (
  )
 import XMonad.Hooks.DynamicLog (
     PP (PP, ppOutput, ppRename),
+    dynamicLogString,
     filterOutWsPP,
+    pad,
  )
 import XMonad.Hooks.EwmhDesktops (
     ewmhDesktopsEventHook,
@@ -70,11 +70,13 @@ import XMonad.Hooks.ManageDocks (
 import XMonad.Hooks.ManageHelpers (doFullFloat)
 import XMonad.Hooks.ScreenCorners ()
 import XMonad.Hooks.ServerMode (serverModeEventHookCmd)
+import XMonad.Hooks.WindowSwallowing
 
 --import XMonad.Hooks.WindowSwallowing ()
 import qualified XMonad.Layout.Fullscreen as F
 
 ---import XMonad.Layout.LayoutModifier ()
+
 import XMonad.Layout.MultiToggle ()
 import XMonad.Layout.MultiToggle.Instances ()
 import XMonad.Layout.NoBorders (smartBorders)
@@ -207,7 +209,7 @@ myEventHook =
         , handleEventHook def
         , docksEventHook
         , windowedFullscreenFixEventHook
-        --swallowEventHook (className =? "Alacritty") (return True),
+        , swallowEventHook (className =? "org.wezfurlong.wezterm") (return True)
         --      screenCornerEventHook
         ]
 
@@ -228,10 +230,11 @@ polybarLogHook =
                 >>= fmap (filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
                 >>= \pp ->
                     pure pp
-                        >>= DynamicLog.dynamicLogString . switchMoveWindowsPolybar str
+                        >>= dynamicLogString . switchMoveWindowsPolybar str
                         >>= io . ppOutput pp
                         >> ewmhDesktopsLogHookCustom (filterOutWs [scratchpadWorkspaceTag])
-                        >> writeCurrentState pp "/tmp/xmonad-status-json.log"
+
+-- >> writeCurrentState pp "/tmp/xmonad-status-json.log"
 
 ewwLogHook :: X ()
 ewwLogHook = do
@@ -242,7 +245,7 @@ ewwLogHook = do
                 >>= fmap (filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
                 >>= \pp ->
                     pure pp
-                        >>= DynamicLog.dynamicLogString
+                        >>= dynamicLogString
                         >>= io
                             . ppOutput
                                 pp
@@ -261,9 +264,10 @@ browserQuery = className =? "google-chrome"
 
 icons :: XMonad.Query [String]
 icons =
-    composeAll
-        [ className =? "Discord" --> appIcon "\xfb6e"
-        , className =? "Chromium-browser" --> appIcon "\xf268"
+    foldMap
+        (fmap (fmap pad))
+        [ className =? "discord" --> appIcon "\xfb6e"
+        , className =? "google-chrome" --> appIcon "\xf268"
         , browserQuery --> appIcon "\63288"
         , className =? "Spotify" <||> className =? "spotify" --> appIcon "阮"
         , className =? "jetbrains-idea" --> appIcon "\xe7b5"
@@ -296,10 +300,10 @@ myTerm = "wezterm"
 myBorderWidth = 1
 
 myLayout =
-    conf (tiled ||| tab) ||| smartBorders Full ||| simpleFloat
+    tiled ||| tab ||| smartBorders Full ||| avoidStruts simpleFloat
   where
-    tab = rename "Tabbed" $ tabbed shrinkText theme
-    tiled = rename "Tiled" $ Tall nmaster delta ratio
+    tab = rename "Tabbed" . avoidStruts . gaps $ tabbed shrinkText theme
+    tiled = rename "Tiled" . conf $ Tall nmaster delta ratio
 
     conf = avoidStruts . gaps . smartBorders
     gaps = spacingRaw False (Border 0 10 10 10) True (Border 10 10 10 10) True

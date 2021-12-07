@@ -48,10 +48,11 @@
       [
         {
          :provider :lsp_client_names
-         :hl {:fg colors.white :bg colors.grey}
-         :enabled (fn [] (> (length (vim.lsp.get_active_clients)) 0))
-         :right_sep  [{:str :right_rounded  :hl {:fg colors.grey :bg :NONE}}]
-         :left_sep  [{:str :left_rounded :hl {:fg colors.grey :bg :NONE}}]}])
+         :hl {:fg :white :bg :grey}
+         :enabled #(> (length (vim.lsp.buf_get_clients (vim.fn.bufnr))) 0)
+         :right_sep [{:str :right_rounded  :hl {:fg :grey :bg :NONE}}]
+         :left_sep  [{:str :left_rounded :hl {:fg :grey :bg :NONE}}]}])
+
 (fn nc [...]
   (accumulate [str "" _ v (ipairs [...])]
         (if v

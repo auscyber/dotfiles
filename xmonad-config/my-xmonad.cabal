@@ -6,7 +6,7 @@ cabal-version:      >=1.2
 executable my-xmonad
   main-is:             xmonad.hs
   -- other-modules lists custom modules in my ~/.xmonad/lib/ directory
-  other-modules: WorkspaceSet, DynamicLog, Config,StackSetLens,Polybar, ExtraState, Media, SysDependent, Eww
+  other-modules: WorkspaceSet,  Config,StackSetLens,Polybar, ExtraState, Media, SysDependent, Eww
   build-depends:       base
                      , xmonad >= 0.15
                      , xmonad-contrib >= 0.15
@@ -23,7 +23,7 @@ executable my-xmonad
 executable media-bar
   main-is:  bar.hs
   hs-source-dirs: lib
-  other-modules: Polybar, DynamicLog, ExtraState
+  other-modules: Polybar,  ExtraState
   build-depends: base, X11, dbus, xmonad, xmonad-contrib, containers, process
 executable xmonadctl
   main-is: xmonadctl.hs

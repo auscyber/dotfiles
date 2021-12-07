@@ -39,22 +39,25 @@
     (map :<space>d "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
     (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
-    (map :<leader>a "<cmd>lua require'telescope.builtin'.lsp_code_actions{}<CR>")
 ;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
-
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.formatting()"))
-  (if client.resolved_capabilities.document_highlight (do
-                                                       (utils.highlight "LspReferenceRead"  {:gui "underline"})
-                                                       (utils.highlight "LspReferenceText"  {:gui "underline"})
-                                                       (utils.highlight "LspReferenceWrite" {:gui "underline"})
-                                                       (vim.api.nvim_exec
-                                                          "augroup lsp_document_highlight
+  (when client.resolved_capabilities.hover
+    (def-augroup :lsp_hover))
+;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
+
+
+  (when client.resolved_capabilities.document_highlight
+                                                         (utils.highlight "LspReferenceRead"  {:gui "underline"})
+                                                         (utils.highlight "LspReferenceText"  {:gui "underline"})
+                                                         (utils.highlight "LspReferenceWrite" {:gui "underline"})
+                                                         (vim.api.nvim_exec
+                                                            "augroup lsp_document_highlight
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
            autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
          augroup END"
-                                                         false))))
+                                                           false)))
 
 (lsp-status.register_progress)
 (local capabilities (cmp_nvim_lsp.update_capabilities (vim.tbl_extend :keep (vim.lsp.protocol.make_client_capabilities) lsp-status.capabilities)))
