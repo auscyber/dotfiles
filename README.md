@@ -9,9 +9,11 @@
     
 ![large](screenshots/fetch/large.jpg)
 ![small](screenshots/fetch/small.jpg)
+![image](screenshots/fetch/picture.jpg)
 * [vim theme "pink ocean"](.config/nvim/colors/pink_ocean.vim)  
 ![xmonad](screenshots/theme/xmonad.jpg)  
 ![rust](screenshots/theme/rust.jpg)
+![nvim](screenshots/nvim/full.jpg)
 * [Polybar Theme](.config/polybar/config.ini)  
 ![bar](screenshots/polybar/whole.jpg)
 * [extensive xmonad configuratio](xmonad)
