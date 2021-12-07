@@ -5,10 +5,10 @@ scan_timeout = 10
 [shell]
 disabled = false
 powershell_indicator = "[pwsh](blue)"
-zsh_indicator = "[zsh](green)"
+zsh_indicator = "[zsh](#8BB2C1)"
 
 [character]
-success_symbol = "[λ](bold  195)"
+success_symbol = "[λ](bold 195)"
 error_symbol = "[λ](bold white)"
 
 [hostname]
