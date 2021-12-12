@@ -23,10 +23,6 @@ name = ".config/alacritty.yml"
 destination = "$HOME/.config/alacritty.yml"
 src = ".config/alacritty.yml"
 
-[[links]]
-name = ".config/rofi"
-destination = "$HOME/.config/rofi"
-src = ".config/rofi"
 
 [[links]]
 name = ".config/picom"
