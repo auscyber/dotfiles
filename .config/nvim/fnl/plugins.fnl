@@ -24,7 +24,6 @@
   :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
-  :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)}; :mod bufferline}
   :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
@@ -44,7 +43,7 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:
   ;;; quality of life improvements ;;;
   ;;;:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  :glepnir/dashboard-nvim {:config #(require "plugins.dashboard")}
+;  :glepnir/dashboard-nvim {:config #(require "plugins.dashboard")}
   :folke/persistence.nvim {:event :BufReadPre :module :persistence :config #((. (require "persistence") :setup))}
   :christoomey/vim-tmux-navigator {}
   :folke/which-key.nvim {:config #(require "plugins.whichkey")}
@@ -100,6 +99,7 @@
 
     ; Lsp plugins
 ;  :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
+
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
    :neovim/nvim-lspconfig
@@ -111,6 +111,7 @@
                   {1 :kosayoda/nvim-lightbulb :module :nvim-lightbulb}
                   {1 :onsails/lspkind-nvim :module :lspkind}
                   {1 :williamboman/nvim-lsp-installer :module :nvim-lsp-installer}
+                  {1 :filipdutescu/renamer.nvim :branch :master :module :renamer :requires [:plenary.nvim]}
                   :which-key.nvim
                   :nvim-cmp
                   :luasnip

@@ -24,4 +24,4 @@
 
 
 (utils.keymap :n :<C-f> "<cmd> lua require 'telescope.builtin'.find_files()<CR>")
-(utils.keymap :n :<C-b> "<cmd> lua require'telescope.builtin'.buffers {}<CR>")
+(utils.keymap :n :<C-b> "<cmd> lua require'telescope.builtin'.buffers()<CR>")

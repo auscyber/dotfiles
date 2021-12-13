@@ -2,6 +2,7 @@
   {require {
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
+             renamer renamer
              lsp_installer nvim-lsp-installer
              lsp_installer_servers nvim-lsp-installer.servers
              lsp lspconfig
@@ -22,9 +23,9 @@
 (set nvim.o.completeopt "menu,menuone,noselect")
 
 (defn on_attach [client bufnr]
+  (renamer.setup {})
   (cmp.setup.buffer {:sources (a.concat sources [{:name :nvim_lsp}])})
   (lsp-status.on_attach client)
-  (lspkind.init {})
   (let [opts {:noremap true :silent true}
         map (fn [key command] (nvim.buf_set_keymap bufnr :n key command opts))
         imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
@@ -35,8 +36,8 @@
     (map :K "<Cmd>lua vim.lsp.buf.hover()<CR>")
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
     (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-    (map :<leader>rn "<cmd>lua vim.lsp.buf.rename()<CR>")
-    (map :<space>d "<cmd>lua require 'telescope.builtin'.lsp_workspace_diagnostics {}<CR>")
+    (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>")
+    (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>")
     (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
 ;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))

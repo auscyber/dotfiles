@@ -56,7 +56,8 @@
 (fn nc [...]
   (accumulate [str "" _ v (ipairs [...])]
         (if v
-          (.. str v) str)))
+         (.. str v) str)))
+
 
 (tset components.active 3
     [
@@ -119,24 +120,28 @@
       {
         :provider  "diagnostic_errors"
         :enabled  (fn [] (lsp.diagnostics_exist "Error"))
-        :hl  { :fg  "red"}}
+        :right_sep {:str " " :hl {:bg :black}}
+        :hl {:bg :black :fg "red"}}
 
 
       {
         :provider  "diagnostic_warnings"
         :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
-        :hl  { :fg  "yellow"}}
+        :right_sep {:str " " :hl {:bg :black}}
+        :hl  {:bg :black :fg  "yellow"}}
 
 
       {
         :provider  "diagnostic_hints"
         :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
-        :hl  { :fg  "cyan"}}
+        :right_sep {:str " " :hl {:bg :black}}
+        :hl  {:bg :black :fg  "cyan"}}
 
       {
-                :provider  "diagnostic_info"
-                :enabled  (fn [] (lsp.diagnostics_exist "Information"))
-                :hl  {:fg  "skyblue" :bg :black}}
+        :provider  "diagnostic_info"
+        :enabled  (fn [] (lsp.diagnostics_exist "Information"))
+        :hl  {:fg  "skyblue" :bg :black}}
+
       {:provider (fn []
                    (local lsp-status (require :lsp-status))
                    (local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
@@ -164,9 +169,9 @@
                                     (when msg.percentage
                                       (string.format " (%.0f%%%%)" msg.percentage)))
                                   msg.content)))))
-                   (nc (table.concat msgs " ")))
-       :right_sep " "
-       :enabled #(length (vim.lsp.buf_get_clients))}
+                   (or (table.concat msgs " ") ""))
+       :hl {:bg :black}
+       :enabled #(> (length (vim.lsp.buf_get_clients)) 0)}
 
       {:provider  "scroll_bar"
        :hl  {
