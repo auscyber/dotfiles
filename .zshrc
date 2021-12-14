@@ -1,8 +1,33 @@
 #!/usr/bin/zsh
+#zmodload zpropf
 #source ~/.bashrc
 unset __HM_SESS_VARS_SOURCED
-source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-source ~/.nix-profile/etc/profile.d/nix.sh
+
+
+has () {
+    command -v $1 2>&-
+}
+eval_if_installed () {
+    has $1 && eval "$@"
+}
+
+source_if_exists () {
+    if [[ -e "$1" ]]
+    then
+        if [[ -n "$2" ]]
+        then
+            shift
+            source $@
+        else
+            source "$1"
+        fi
+    fi
+}
+
+source_if_exists ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+source_if_exists ~/.nix-profile/etc/profile.d/nix.sh
+source_if_exists ~/.cargo/env
+
 
 #zmodload zsh/zprof
 #source /etc/profile
@@ -76,9 +101,10 @@ typeset -A ZSH_HIGHLIGHT_STYLES
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 
-eval "$(idris2 --bash-completion-script idris2)"
-eval "$(stack --bash-completion-script stack)"
-eval "$(dots completion --shell bash)"
+eval_if_installed idris2 --bash-completion-script idris2
+eval_if_installed stack --bash-completion-script stack
+eval_if_installed dots completion --shell bash
+eval_if_installed direnv hook zsh
 
 
 function ghc_env(){
@@ -105,7 +131,9 @@ nix-i () {
     nix-env -i $@
 }
 
-alias ls="exa --icons"
+#run_if_installed exa () { alias ls="exa --icons --git"}
+alias ls="exa --icons --git"
+alias ll="ls -la"
 alias t="tmux"
 alias grep="grep --color=auto"
 alias windows="sudo grub-reboot 2 && sudo reboot"
@@ -113,12 +141,10 @@ alias hm="home-manager --flake $NIXFLAKE#$FLAKENAME"
 #alias emacs="emacsclient -t "
 #export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
-export EDITOR="~/.nix-profile/bin/nvim"
+export EDITOR=`which nvim`
 export editor=$EDITOR
 export BROWSER=firefox
-source ~/.cargo/env
 export GTK2_RC_FILES=$HOME/.gtkrc-2.0
-eval "$(direnv hook zsh)"
 #export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 fetch -s
 eval "$(starship init zsh)"
