@@ -25,11 +25,12 @@
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
   :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
+  :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)};
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
          :keys [:<C-f> :<C-b>]
          :module :telescope
-         :requires [:nvim-telescope/telescope-packer.nvim :plenary.nvim  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
+         :requires [:plenary.nvim  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
   :numToStr/Comment.nvim {:config #(require :plugins.comment)}
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
@@ -64,14 +65,15 @@
   :tjdevries/train.nvim {:opt true}
 
   ; Completion
-  :github/copilot.vim {:opt true}
+  :github/copilot.vim {};:opt true}
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
   :L3mON4D3/luasnip {:module :luasnip}
   :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
   :hrsh7th/cmp-path {}
   :hrsh7th/cmp-cmdline {}
   :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
-  :hrsh7th/nvim-cmp {:requires [:cmp_luasnip :luasnip :cmp-buffer] :config #(require :plugins.cmp)}; :module [:plugins.cmp :cmp] :ft [:lua :fennel]
+  :hrsh7th/cmp-copilot {}
+  :hrsh7th/nvim-cmp {:requires [:cmp-copilot :cmp_luasnip :luasnip :cmp-buffer] :config #(require :plugins.cmp)}; :module [:plugins.cmp :cmp] :ft [:lua :fennel]
 
 
   ;Language support
@@ -86,7 +88,7 @@
   :ziglang/zig.vim {:ft [:zig]}
   :edwinb/idris2-vim {:ft [:idris2]}
   :shinKage/idris2-nvim {:ft :idris2 :requires :nui.nvim}
-  :udalov/kotlin-vim {:ft :kotlin}
+  :udalov/kotlin-vim {:ft [:kotlin]}
   :derekelkins/agda-vim {:ft :agda :config #(vim.api.nvim_command "let maplocalleader = \",\"")}
   :LnL7/vim-nix  {:ft :nix}
   :tikhomirov/vim-glsl {:ft :glsl}
@@ -104,8 +106,7 @@
    :simrat39/symbols-outline.nvim {:opt true}
    :neovim/nvim-lspconfig
     {
-      :after []
-      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java]
+      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin]
       :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
                  {1 :nvim-lua/lsp_extensions.nvim :module :lsp_extensions} {1 :scalameta/nvim-metals :ft :scala :requires :plenary.nvim}
                   {1 :kosayoda/nvim-lightbulb :module :nvim-lightbulb}

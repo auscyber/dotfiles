@@ -8,7 +8,8 @@
             a aniseed.core
             cmp_autopairs nvim-autopairs.completion.cmp}
    require-macros [macros zest.macros]})
-(set _G.sources [{:name :luasnip}
+(set _G.sources [{:name :copilot}
+                 {:name :luasnip}
                  {:name :buffer}
                  {:name :path}
                  {:name :nvim_lua}])
@@ -36,7 +37,7 @@
                                        (luasnip.expand_or_jump)
                                        (if (has_words_before)
                                          (cmp.complete)
-                                         (fallback))))) [:i :s])
+                                         (fallback))))))
                         :<S-Tab> (cmp.mapping
                                    (fn [fallback]
                                      (if (cmp.visible)
@@ -56,7 +57,12 @@
                                                   {:buffer "[buf]"
                                                    :nvim_lsp "[lsp]"
                                                    :nvim_lua "[api]"
-                                                   :luasnip "[snip]"}})}})
+                                                   :luasnip "[snip]"
+                                                   :copilot "[copilot]"}})}})
+;(vim.api.nvim_exec "imap <silent><script><expr> <C-J> copilot#Accept(\"\\<CR>\")
+(vim.api.nvim_exec "let g:copilot_no_tab_map = v:true"  false)
+
+(def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")")
 (cmp.setup.cmdline
   :/ {
       :sources [

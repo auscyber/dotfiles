@@ -59,6 +59,17 @@
            autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
          augroup END"
                                                            false)))
+(lspkind.init {
+               :preset :default})
+
+
+(lsp-status.config {
+                    :status_symbol " "
+                    :kind_labels lspkind.symbol_map
+                    :indicator_errors "  "
+                    :indicator_warnings "  "
+                    :indicator_hint "  "
+                    :indicator_info "  "})
 
 (lsp-status.register_progress)
 (local capabilities (cmp_nvim_lsp.update_capabilities (vim.tbl_extend :keep (vim.lsp.protocol.make_client_capabilities) lsp-status.capabilities)))
@@ -113,7 +124,7 @@
                                                                                       ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}))
                 (when (not (requested_server:is_installed))
                   (requested_server:install))))))
-  (init-lsp :clangd {:fts [:cpp :c]})
+  (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
   (init-lsp :rnix {:fts :nix})
   (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pylsp {:fts :python})
@@ -122,6 +133,7 @@
   (init-lsp :dhall_lsp_server)
   (init-lsp :purescriptls {:fts :purescript})
   (init-lsp :powershell_es {:fts :ps1 :bundle_path "~/packages/PowershellEditorServices"})
+  (init-lsp :kotlin_language_server {:fts :kotlin})
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))

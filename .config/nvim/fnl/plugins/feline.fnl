@@ -45,13 +45,13 @@
          :right_sep  [{:str " " :hl {:bg :black}} {:str :right_rounded :hl {:fg :black :bg  :NONE}}]}])
 
 (tset components.active 2
-      [
-        {
-         :provider :lsp_client_names
-         :hl {:fg :white :bg :grey}
-         :enabled #(> (length (vim.lsp.buf_get_clients (vim.fn.bufnr))) 0)
-         :right_sep [{:str :right_rounded  :hl {:fg :grey :bg :NONE}}]
-         :left_sep  [{:str :left_rounded :hl {:fg :grey :bg :NONE}}]}])
+      [{:provider :lsp_client_names
+        :hl {:fg :white :bg :#3f3f3f}
+        :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
+        :right_sep [{:str :right_rounded :hl {:fg :#3f3f3f :bg :NONE}}]
+        :left_sep  [{:str :left_rounded :hl {:fg :#3f3f3f :bg :NONE}}]}])
+
+
 
 (fn nc [...]
   (accumulate [str "" _ v (ipairs [...])]
@@ -71,15 +71,15 @@
 
 
       {
-                        :provider  "git_branch"
-                        :hl  {
-                               :fg  "white"
-                               :bg  "black"
-                               :style  "bold"}
-                        :right_sep  (fn []
-                                     (local val  {:hl  {:fg  "NONE" :bg  "black"}})
-                                     (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
-                                     val)}
+        :provider  "git_branch"
+        :hl  {
+               :fg  "white"
+               :bg  "black"
+               :style  "bold"}
+             :right_sep  (fn []
+                          (local val  {:hl  {:fg  "NONE" :bg  "black"}})
+                          (if b.gitsigns_status_dict (set val.str " ") (set val.str ""))
+                          val)}
 
 
       {
@@ -105,10 +105,6 @@
                     (local val  {:hl  {:fg  "NONE" :bg  "black"}})
                     (if b.gitsigns_status_dict (set val.str  " ") (set val.str  ""))
                     val)}
-
-
-
-
       {
        :provider  "line_percentage"
        :hl  {:bg :black
@@ -116,62 +112,13 @@
        :left_sep {:str " " :hl {:bg :black}}
        :right_sep {:str " " :hl {:bg :black}}}
 
-
       {
-        :provider  "diagnostic_errors"
-        :enabled  (fn [] (lsp.diagnostics_exist "Error"))
-        :right_sep {:str " " :hl {:bg :black}}
-        :hl {:bg :black :fg "red"}}
+       :provider #(let [lsp-status (require :lsp-status)]
+                     (lsp-status.status))
 
-
-      {
-        :provider  "diagnostic_warnings"
-        :enabled  (fn [] (lsp.diagnostics_exist "Warning"))
-        :right_sep {:str " " :hl {:bg :black}}
-        :hl  {:bg :black :fg  "yellow"}}
-
-
-      {
-        :provider  "diagnostic_hints"
-        :enabled  (fn [] (lsp.diagnostics_exist "Hint"))
-        :right_sep {:str " " :hl {:bg :black}}
-        :hl  {:bg :black :fg  "cyan"}}
-
-      {
-        :provider  "diagnostic_info"
-        :enabled  (fn [] (lsp.diagnostics_exist "Information"))
-        :hl  {:fg  "skyblue" :bg :black}}
-
-      {:provider (fn []
-                   (local lsp-status (require :lsp-status))
-                   (local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
-                   (local buf_messages (lsp-status.messages))
-                   (local msgs {})
-                   (each [_ msg (ipairs buf_messages)]
-                     (let [client_name (.. "[" msg.name "]")]
-                          (table.insert
-                            msgs
-                            (nc client_name " "
-                                (if msg.progress
-
-                                  ; add spinner if the spinner exists
-                                  (nc
-                                    (when msg.spinner
-                                      (.. (. spinner_frames (+ 1 (% msg.spinner (length spinner_frames)))) " "))
-
-                                    ; add the title
-                                    msg.title
-
-                                    ; if there is a message add the message
-                                    (nc " " msg.message)
-
-                                    ; add the percentage
-                                    (when msg.percentage
-                                      (string.format " (%.0f%%%%)" msg.percentage)))
-                                  msg.content)))))
-                   (or (table.concat msgs " ") ""))
+       :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
        :hl {:bg :black}
-       :enabled #(> (length (vim.lsp.buf_get_clients)) 0)}
+       :right_sep {:str " " :hl {:bg :black}}}
 
       {:provider  "scroll_bar"
        :hl  {
