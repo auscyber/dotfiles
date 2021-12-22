@@ -112,33 +112,37 @@
   (init-lsp :gopls {:fts :go})
   (init-lsp :sumneko_lua {:fts :lua})
   (au_ft_once :rust
-      (fn [] (let [(server_available requested_server) (lsp_installer_servers.get_server "rust_analyzer")]
-               (when server_available
-                (requested_server:on_ready (fn [server]
-                                             (let [opts {:cmd requested_server.
-                                                                          : capabilities
-                                                                          :settings
-                                                                          {:rust-analyzer
-                                                                           {:checkOnSave {:command :clippy}
-                                                                            :procMacro {:enable true}}}
-                                                                          :on_attach (fn [client bufnr]
-                                                                                        (on_attach client bufnr)
-                                                                                        ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}]
-                                              (rust-tools.setup {:server (vim.tbl_deep_extend :force (server:get_default_options) opts)}))
-                                             (server:attach_buffers)))
-                (when (not (requested_server:is_installed))
-                  (requested_server:install))))))
+      (fn []
+        (let [(server_available requested_server) (lsp_installer_servers.get_server "rust_analyzer")
+              opts {: capabilities
+                    :settings
+                      {:rust-analyzer
+                       {:checkOnSave {:command :clippy}
+                        :procMacro {:enable true}}
+                       :on_attach (fn [client bufnr]
+                                     (on_attach client bufnr)
+                                     ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}]
+          (when server_available
+           (requested_server:on_ready (fn [server]
+                                         (rust-tools.setup {:server (vim.tbl_deep_extend :force (server:get_default_options) opts)})
+                                        (server:attach_buffers)))
+           (when (not (requested_server:is_installed))
+             (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
   (init-lsp :rnix {:fts :nix})
   (init-lsp :ocamlls {:fts :ocaml})
-  (init-lsp :pylsp {:fts :python})
+  (init-lsp :py_ls {:fts :python
+                    :handlers (lsp-status.extensions.pyls_ms.setup)
+                    :settings
+                      {:python {:workspaceSymbols {:enable true}}}})
   (init-lsp :zls {:fts :zig})
   (init-lsp :metals {:fts :scala})
   (init-lsp :dhall_lsp_server)
   (init-lsp :purescriptls {:fts :purescript})
   (init-lsp :powershell_es {:fts :ps1 :bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :kotlin_language_server {:fts :kotlin})
-  (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
+  (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir 
+                    (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))
 ;(lsp_installer.on_server_ready #(: $1 :setup {: capabilities : on_attach}))

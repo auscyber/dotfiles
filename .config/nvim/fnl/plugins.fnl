@@ -24,7 +24,7 @@
   :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
-  :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
+  :famiu/feline.nvim {:branch :develop :config #(require "plugins.feline")} ; :mod feline}
   :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)};
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
