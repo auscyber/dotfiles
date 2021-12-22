@@ -11,9 +11,8 @@
 (opt-set mouse "a")
 (opt-set termguicolors true)
 (if (> (vim.fn.has "win32") 0)
-  (do
-    (opt-set guifont "FiraCode Nerd Font:h13"))
-  (opt-set guifont "FiraCode Nerd Font:h10"))
+    (opt-set guifont "FiraCode Nerd Font:h13")
+ (opt-set guifont "FiraCode Nerd Font:h10"))
 (nvim.command "colorscheme pink_ocean")
 ;(_: colorscheme :pink_ocean)
 (opt-set showmode false)

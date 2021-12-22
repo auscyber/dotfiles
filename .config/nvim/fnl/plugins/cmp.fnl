@@ -6,6 +6,7 @@
             lspkind lspkind
             cmp cmp
             a aniseed.core
+            nvim aniseed.nvim
             cmp_autopairs nvim-autopairs.completion.cmp}
    require-macros [macros zest.macros]})
 (set _G.sources [{:name :copilot}
@@ -62,7 +63,7 @@
 ;(vim.api.nvim_exec "imap <silent><script><expr> <C-J> copilot#Accept(\"\\<CR>\")
 (vim.api.nvim_exec "let g:copilot_no_tab_map = v:true"  false)
 
-(def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")")
+(def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")<CR>")
 (cmp.setup.cmdline
   :/ {
       :sources [
@@ -70,6 +71,8 @@
 (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
 (vim.api.nvim_set_keymap "i" "<C-E>" "<Plug>luasnip-next-choice" {})
 (vim.api.nvim_set_keymap "s" "<C-E>" "<Plug>luasnip-next-choice" {})
-(def-augroup :CmpLua
-  (def-autocmd-fn [:FileType] [:norg] (cmp.setup.buffer {:sources (a.concat [{:name :neorg}] sources)}))
-  (def-autocmd-fn [:FileType] [:lua] (cmp.setup.buffer {:sources (a.concat sources [{:name :nvim_lua}])})))
+(def-autocmd-fn [:BufRead :BufNewFile] ["Cargo.toml"] (do
+                                                        (nvim.buf_set_keymap 0 :n :K ":lua require('crates').show_popup()<CR>" {:silent true :noremap true})
+                                      (cmp.setup.buffer {:sources [{:name :crates}]})))
+(def-autocmd-fn [:FileType] [:norg] (cmp.setup.buffer {:sources [{:name :neorg}]}))
+(def-autocmd-fn [:FileType] [:lua] (cmp.setup.buffer {:sources [{:name :nvim_lua}]}))

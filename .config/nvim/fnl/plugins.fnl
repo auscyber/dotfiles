@@ -73,13 +73,15 @@
   :hrsh7th/cmp-cmdline {}
   :hrsh7th/cmp-nvim-lua {:ft [:lua :fennel]}
   :hrsh7th/cmp-copilot {}
-  :hrsh7th/nvim-cmp {:requires [:cmp-copilot :cmp_luasnip :luasnip :cmp-buffer] :config #(require :plugins.cmp)}; :module [:plugins.cmp :cmp] :ft [:lua :fennel]
+  :Saecki/crates.nvim {:requires :plenary.nvim :ft [:toml] :config #((. (require :crates) :setup))}
+  :hrsh7th/nvim-cmp {:requires [:crates.nvim :cmp-copilot :cmp_luasnip :luasnip :hrsh7th/cmp-buffer] :config #(require :plugins.cmp)}; :module [:plugins.cmp :cmp] :ft [:lua :fennel]
 
 
   ;Language support
   :nvim-treesitter/nvim-treesitter
-        {:do "TSUpdate"
+        {:do :TSUpdate
          :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground  "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
+
   :folke/twilight.nvim {:cmd :Twilight :requires :nvim-treesitter}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}
   :Olical/conjure {:ft [:fennel :racket :clojure]}
