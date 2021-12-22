@@ -114,14 +114,18 @@
   (au_ft_once :rust
       (fn [] (let [(server_available requested_server) (lsp_installer_servers.get_server "rust_analyzer")]
                (when server_available
-                (requested_server:on_ready #(rust-tools.setup {:server {: capabilities
-                                                                        :settings
-                                                                        {:rust-analyzer
-                                                                         {:checkOnSave {:command :clippy}
-                                                                          :procMacro {:enable true}}}
-                                                                        :on_attach (fn [client bufnr]
-                                                                                      (on_attach client bufnr)
-                                                                                      ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}))
+                (requested_server:on_ready (fn [server]
+                                             (let [opts {:cmd requested_server.
+                                                                          : capabilities
+                                                                          :settings
+                                                                          {:rust-analyzer
+                                                                           {:checkOnSave {:command :clippy}
+                                                                            :procMacro {:enable true}}}
+                                                                          :on_attach (fn [client bufnr]
+                                                                                        (on_attach client bufnr)
+                                                                                        ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}]
+                                              (rust-tools.setup {:server (vim.tbl_deep_extend :force (server:get_default_options) opts)}))
+                                             (server:attach_buffers)))
                 (when (not (requested_server:is_installed))
                   (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})

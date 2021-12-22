@@ -14,7 +14,7 @@ function ensure (user, repo)
 end
 
 if fn.has("win32") > 0 then
-	vim.o.shellslash = true
+	--	vim.o.shellslash = true
 end
 
 
