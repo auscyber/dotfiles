@@ -12,7 +12,7 @@
                                "Pink Ocean"
                                (require "pink_ocean")}
               :enable_scroll_bar true ;(~= os "GNU/Linux")
-              :enable_wayland false
+              :enable_wayland true
               :window_padding  {
                                 :left 10
                                ; This will become the scrollbar width if you have enabled the scrollbar!
@@ -21,7 +21,7 @@
                                 :top  5
                                 :bottom  5}
               :window_background_opacity  0.8
-              :font  (wezterm.font "Hasklug Nerd Font")
+              :font  (wezterm.font_with_fallback [ "Hasklug Nerd Font" "codicon"])
               :font_size  11
               :color_scheme "Pink Ocean"})
 ;             :color_scheme  "Guezwhoz"})

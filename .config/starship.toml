@@ -76,10 +76,10 @@ symbol = " "
 symbol = " "
 
 [nix_shell]
-symbol = " "
+symbol = "❄️ "
 impure_msg = "[impure](bold red)"
 pure_msg = "[pure](bold green)"
-format = 'via [☃️ $state( \($name\))](bold blue) '
+format = 'via [$symbol$state( \($name\))](bold blue) '
 
 [nodejs]
 symbol = " "

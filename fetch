@@ -9,26 +9,26 @@ bg_c(){
     tput setab "$1"
 }
 fg_t(){
-    printf  '\033[38;2;%s;%s;%s'"m" "$@"
+    printf  '\e[38;2;%s;%s;%s'"m" "$@"
 }
 bg_t(){
-    printf '\033[48;2;%1;%2;%3'"m" "$@"
+    printf '\e[48;2;%1;%2;%3'"m" "$@"
 }
 
 up () {
-    printf "\033[%dA" "$1"
+    printf "\e[%dA" "$1"
 #    line=$((line-$1))
 }
 down () {
-    printf "\033[%dB" "$1"
+    printf "\e[%dB" "$1"
 #    line=$((line+$1))
 }
 
 left () {
-    printf "\033[%dD" "$1"
+    printf "\e[%dD" "$1"
 }
 right () {
-    printf "\033[%dC" "$1"
+    printf "\e[%dC" "$1"
 }
 
 
@@ -39,7 +39,7 @@ WHITE=15
 
 B_BG=$(bg_c $BLACK)
 B_FG=$(fg_c $BLACK)
-NORMAL="$(printf "\033[m")"
+NORMAL="$(printf "\e[m")"
 W_BG=$(bg_c $WHITE)
 W_FG=$(fg_c $WHITE)
 
@@ -185,8 +185,7 @@ down_c() {
 }
 
 offset () {
-    left "$COLS"
-    right $((WIDTH+7))
+    printf '\e[%dG' "$((WIDTH+7))"
 }
 
 segment () {

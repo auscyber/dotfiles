@@ -75,13 +75,22 @@
 (local capabilities (cmp_nvim_lsp.update_capabilities (vim.tbl_extend :keep (vim.lsp.protocol.make_client_capabilities) lsp-status.capabilities)))
 
 
-(a.assoc _G :enabled_servers {})
+(var lsp_server_count 0)
+(var lsp_server_table [])
 
 (fn au_ft_once [fts once]
   (let [_fts (if (= (type fts) :table)
                (table.concat fts ",")
-               fts)]
-      (vim.cmd (vlua-format (.. "au FileType " _fts " ++once call %s()") (fn [] (once) (vim.cmd ::LspStart))))))
+               fts)
+        index (+ lsp_server_count 0)]
+    (tset lsp_server_table index false)
+    (set lsp_server_count (+ lsp_server_count 1))
+    (vim.cmd (vlua-format (.. "au FileType " _fts " ++once call %s()")
+                          (fn []
+                            (when (not (. lsp_server_table index))
+                              (tset lsp_server_table index true)
+                              (once)
+                              (vim.cmd ::LspStart)))))))
 
 
 (fn init-lsp [lsp-name ?opts]
@@ -90,19 +99,17 @@
                               : capabilities}
                             (or ?opts {}))
         (server_available requested_server) (lsp_installer_servers.get_server lsp-name)
-        launch-f #(when (not (. _G.enabled_servers lsp-name))
-                        (requested_server:setup merged-opts)
-                        (a.assoc _G.enabled_servers lsp-name true))
-        test-server #(if server_available
-                      (do (requested_server:on_ready launch-f)
-                          (if (not (requested_server:is_installed))
-                            (requested_server:install)))
-                      launch-f)]
+        run-server #(if server_available
+                     (do
+                       (requested_server:on_ready #(requested_server:setup merged-opts))
+                       (if (not (requested_server:is_installed))
+                         (requested_server:install)))
+                     ((. lsp lsp-name :setup) merged-opts))]
       (if merged_opts.fts
           (let [fts merged_opts.fts]
             (a.assoc merged_opts :fts)
-            (au_ft_once fts test-server))
-          (test-server))))
+            (au_ft_once fts run-server))
+          (run-server))))
 
 
 
@@ -120,8 +127,8 @@
                        {:checkOnSave {:command :clippy}
                         :procMacro {:enable true}}
                        :on_attach (fn [client bufnr]
-                                     (on_attach client bufnr)
-                                     ((. (require "rust-tools.inlay_hints") :set_inlay_hints)))}}]
+                                     ((. (require "rust-tools.inlay_hints") :set_inlay_hints))
+                                     (on_attach client bufnr))}}]
           (when server_available
            (requested_server:on_ready (fn [server]
                                          (rust-tools.setup {:server (vim.tbl_deep_extend :force (server:get_default_options) opts)})
@@ -137,11 +144,11 @@
                       {:python {:workspaceSymbols {:enable true}}}})
   (init-lsp :zls {:fts :zig})
   (init-lsp :metals {:fts :scala})
-  (init-lsp :dhall_lsp_server)
+  (init-lsp :dhall_lsp_server {:fts :dhall})
   (init-lsp :purescriptls {:fts :purescript})
   (init-lsp :powershell_es {:fts :ps1 :bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :kotlin_language_server {:fts :kotlin})
-  (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir 
+  (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir
                     (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))

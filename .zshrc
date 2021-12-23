@@ -5,10 +5,10 @@ unset __HM_SESS_VARS_SOURCED
 
 
 has () {
-    command -v $1 2>&-
+    command -v $1 2>&- 1>&-
 }
 eval_if_installed () {
-    has $1 && eval "$@"
+    has $1 && eval "$($@)"
 }
 
 source_if_exists () {
@@ -105,6 +105,7 @@ eval_if_installed idris2 --bash-completion-script idris2
 eval_if_installed stack --bash-completion-script stack
 eval_if_installed dots completion --shell bash
 eval_if_installed direnv hook zsh
+#eval_if_installed lorri direnv
 
 
 function ghc_env(){
@@ -132,6 +133,7 @@ nix-i () {
 }
 
 #run_if_installed exa () { alias ls="exa --icons --git"}
+alias ng="nvim -c ':Neogit'"
 alias ls="exa --icons --git"
 alias ll="ls -la"
 alias t="tmux"
