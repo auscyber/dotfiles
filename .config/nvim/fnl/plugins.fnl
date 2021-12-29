@@ -45,7 +45,9 @@
   ;;; quality of life improvements ;;;
   ;;;:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  :glepnir/dashboard-nvim {:config #(require "plugins.dashboard")}
-  :folke/persistence.nvim {:event :BufReadPre :module :persistence :config #((. (require "persistence") :setup))}
+;  :folke/persistence.nvim {:event :BufReadPre :cmd :Load :module :persistence :config #(let [persistence (require "persistence")]
+                                                                                         ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
+          ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
   :folke/which-key.nvim {:config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
@@ -68,6 +70,7 @@
   :github/copilot.vim {};:opt true}
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
   :L3mON4D3/luasnip {:module :luasnip}
+  :uga-rosa/cmp-dictionary {:module :cmp_dictionary}
   :hrsh7th/cmp-buffer {:opt true :module :cmp_buffer}
   :hrsh7th/cmp-path {}
   :hrsh7th/cmp-cmdline {}
@@ -97,12 +100,10 @@
   :dag/vim-fish {:ft :fish}
   :purescript-contrib/purescript-vim {:ft :purescript}
   :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
+;  :gpanders/nvim-parinfer {:ft [:fennel :racket :scheme :lisp]}
   :elkowar/yuck.vim {:ft :yuck}
   :elkowar/nvim-gehzu {:ft :fnl}
   :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
-
-    ; Lsp plugins
-;  :sumneko/lua-language-server {:run (if (> (vim.fn.has "win32") 0) "cd 3rd\\luamake && .\\compile\\install.bat && cd ..\\.. && .\\3rd\\luamake\\luamake rebuild" "cd 3rd/luamake && ./compile/install.sh && cd ../.. && ./3rd/luamake/luamake rebuild")}
 
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
