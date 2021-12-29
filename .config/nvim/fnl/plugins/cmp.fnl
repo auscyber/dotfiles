@@ -8,15 +8,25 @@
             a aniseed.core
             nvim aniseed.nvim
             cmp_autopairs nvim-autopairs.completion.cmp}
+   autoload {cmp_dictionary cmp_dictionary}
    require-macros [macros zest.macros]})
-(set _G.sources [{:name :copilot}
+(set _G.sources [
                  {:name :luasnip}
+                 ;{:name :copilot}
                  {:name :buffer}
                  {:name :path}
                  {:name :nvim_lua}])
+;                 {:name :dictionary :keyword_length 2}])
 (fn has_words_before []
   (let [(line col) (unpack (vim.api.nvim_win_get_cursor 0))]
     (and (~= col 0) (= (: (: (. (vim.api.nvim_buf_get_lines 0 (- line 1) line true) 1) :sub col col) :match "%s") nil))))
+(cmp_dictionary.setup {
+                       :dic
+                            {:* :/usr/share/dict/words}
+                       :exact 2
+                       :async false
+                       :capacity 5
+                       :debug false})
 
 (cmp.setup {
               :snippet {
@@ -61,7 +71,7 @@
                                                    :luasnip "[snip]"
                                                    :copilot "[copilot]"}})}})
 ;(vim.api.nvim_exec "imap <silent><script><expr> <C-J> copilot#Accept(\"\\<CR>\")
-(vim.api.nvim_exec "let g:copilot_no_tab_map = v:true"  false)
+;(vim.api.nvim_exec "let g:copilot_no_tab_map = v:true"  false)
 
 (def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")<CR>")
 (cmp.setup.cmdline

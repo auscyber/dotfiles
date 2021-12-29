@@ -57,3 +57,19 @@ hi GitSignsDiffAdd guifg=#2dde92
 hi GitSignsDiffChange guifg=#ffa0a0
 hi GitSignsDiffDelete guifg=#DB5461
 hi CmpItemMenu guifg=#707078
+" gray
+hi! CmpItemAbbrDeprecated guibg=NONE gui=strikethrough guifg=#808080
+" blue
+hi! CmpItemAbbrMatch guibg=NONE guifg=#738290
+hi! CmpItemAbbrMatchFuzzy guibg=NONE guifg=#738290
+" light blue
+hi! CmpItemKindVariable guibg=NONE guifg=#9CDCFE
+hi! CmpItemKindInterface guibg=NONE guifg=#9CDCFE
+hi! CmpItemKindText guibg=NONE guifg=#8bb2c1
+" pink
+hi! CmpItemKindFunction guibg=NONE guifg=#a04668
+hi! CmpItemKindMethod guibg=NONE guifg=#A04668
+" front
+hi! CmpItemKindKeyword guibg=NONE guifg=#D4D4D4
+hi! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
+hi! CmpItemKindUnit guibg=NONE guifg=#D4D4D4

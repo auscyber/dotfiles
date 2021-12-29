@@ -2,7 +2,8 @@
              {require {feline feline
                        colors colors
                        lsp feline.providers.lsp
-                       vi_mode_utils feline.providers.vi_mode}})
+                       vi_mode_utils feline.providers.vi_mode}
+              autoload {lsp-status lsp-status}})
 
 
 (local b vim.b)
@@ -31,16 +32,28 @@
         (if v
          (.. str v) str)))
 
+(local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
+
+(fn lsp-statusline-short []
+   (local buf_messages (lsp-status.messages))
+   (local outputs {})
+   (each [_ msg (ipairs buf_messages)]
+     (when msg.progress
+      (table.insert outputs (. spinner_frames (+ 1 (% msg.spinner (length spinner_frames)))))))
+   (table.concat outputs " "))
+
+
+
+
+
 (fn lsp-statusline []
-    (local lsp-status (require :lsp-status))
-    (local spinner_frames ["⣾" "⣽" "⣻" "⢿" "⡿" "⣟" "⣯" "⣷"])
     (local buf_messages (lsp-status.messages))
     (local msgs {})
     (each [_ msg (ipairs buf_messages)]
       (let [client_name (.. "[" msg.name "]")]
            (table.insert
              msgs
-             (nc client_name " "
+             (nc " "
                  (if msg.progress
 
                    ; add spinner if the spinner exists
@@ -98,6 +111,7 @@
 (tset components.active 2
       [{:provider :lsp_client_names
         :hl {:fg :white :bg :#3f3f3f}
+;        :enabled (vim.lsp.buf.server_ready)
         :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
         :right_sep [{:str :right_rounded :hl {:fg :#3f3f3f :bg :NONE}}]
         :left_sep  [{:str :left_rounded :hl {:fg :#3f3f3f :bg :NONE}}]}])
@@ -184,7 +198,7 @@
         :hl  {:fg  "skyblue" :bg :black}}
       {
        :provider #(lsp-statusline)
-
+       :short_provider #(lsp-statusline-short)
        :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
        :hl {:bg :black}
        :right_sep {:str " " :hl {:bg :black}}}
