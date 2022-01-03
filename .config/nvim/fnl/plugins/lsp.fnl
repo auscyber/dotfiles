@@ -83,6 +83,7 @@
        :force
         lsp.util.default_config
           {
+           : capabilities
            :handlers {
                       :window/showMessage (fn [err result ctx config]
                                             (let
@@ -108,7 +109,6 @@
     (set lsp_server_count (+ lsp_server_count 1))
     (vim.cmd (vlua-format (.. "au FileType " _fts " ++once call %s()")
                           (fn []
-                            (vim.notify _fts)
                             (when (not (. lsp_server_table index))
                               (tset lsp_server_table index true)
                               (once)
@@ -117,8 +117,8 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
-  (let [merged-opts (a.merge {: on_attach
-                              : capabilities}
+  (let [merged-opts (a.merge {: on_attach}
+;                              : capabilities}
                             (or ?opts {}))
         run-server #(let
                       [(server_available requested_server) (lsp_installer_servers.get_server lsp-name)]
