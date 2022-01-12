@@ -39,7 +39,7 @@ hi Type guifg=#A04668 ctermfg=131
 hi PreProc guifg=#DB5461 ctermfg=167
 hi Special guifg=#ffd1dc ctermfg=224
 hi Error guibg=#DB5461 ctermfg=167
-hi Pmenu  guifg=#FfFfFf guibg=#2f2f2f ctermfg=16 ctermbg=231
+hi Pmenu  guifg=#FfFfFf guibg=#3f3f3f ctermfg=16 ctermbg=231
 hi PmenuSel guifg=#f0f0f0 guibg=#5A5A5A
 "hi PmenuThumb guifg=#3f3f3f
 hi VertSplit guifg=#1f1f1f guibg=#E0E0E0

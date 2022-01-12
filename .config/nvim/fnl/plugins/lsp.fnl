@@ -2,6 +2,7 @@
   {require {
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
+             lsp-signature lsp_signature
              renamer renamer
              lsp_installer nvim-lsp-installer
              lsp_installer_servers nvim-lsp-installer.servers
@@ -9,6 +10,7 @@
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
              nvim aniseed.nvim
+             wk which-key
              cmp cmp
              utils utils
              lspkind lspkind
@@ -25,25 +27,30 @@
 (defn on_attach [client bufnr]
   (renamer.setup {})
   (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp}] sources)})
-  (lsp-status.on_attach client)
+  (lsp-status.on_attach client bufnr)
+  (lsp-signature.on_attach client bufnr)
   (let [opts {:noremap true :silent true}
-        map (fn [key command] (nvim.buf_set_keymap bufnr :n key command opts))
-        imap (fn [key command] (nvim.buf_set_keymap bufnr :i key command {:noremap false :silent false}))
-        inoremap (fn [key command] (nvim.buf_set_keymap bufnr :i key command (a.merge opts {:expr true})))
+        basem (fn [mode key command commen]
+                (nvim.buf_set_keymap bufnr mode key command opts)
+                (wk.register {
+                              key
+                              commen}
+                             (a.merge opts {: mode :buffer bufnr})))
+        map (fn [...] (basem :n ...))
         rangemap (fn [key command] (nvim.buf_set_keymap bufnr :v key command opts))]
 
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
-    (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>")
-    (map :gd "<Cmd>lua vim.lsp.buf.definition()<CR>")
-    (map :K "<Cmd>lua vim.lsp.buf.hover()<CR>")
-    (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>")
-    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-    (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>")
-    (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>")
-    (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>")
-    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>")
-    (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>")
-;    (inoremap :<CR> (vlua-format "%s()"_G.LOL.completion_confirm)))
+    (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>" "Go to declaration")
+    (map :gd "<Cmd>lua vim.lsp.buf.definition()<CR>" "Go to definition")
+    (map :K "<Cmd>lua vim.lsp.buf.signature_help()<CR>" "Signature help")
+    (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>" "Go to implementations")
+    (map :<space>r "<cmd>lua vim.lsp.buf.references()<CR>" "See references")
+;    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>" "")
+    (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>" "Rename symbol under cursor")
+    (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>" "See workspace diagnostics")
+    (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>" "See code actions under cursor")
+    (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
+    (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.formatting_sync()"))
   (when client.resolved_capabilities.hover
     (def-augroup :lsp_hover))
@@ -54,14 +61,18 @@
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})
-    (vim.api.nvim_exec
-       "augroup lsp_document_highlight
+    (vim.api.nvim_exec "augroup lsp_document_highlight
            autocmd! * <buffer>
            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+            augroup END" false))
+  (vim.api.nvim_exec
+     "augroup lsp_references
+           autocmd! * <buffer>
+           autocmd CursorHold <buffer> lua vim.lsp.buf.hover()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-           autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
+           autocmd CursorHold,CursorHoldI <buffer> lua require'nvim-lightbulb'.update_lightbulb()
          augroup END"
-      false)))
+    false))
 (lspkind.init {
                :preset :default})
 
@@ -101,16 +112,23 @@
 (var lsp_server_table [])
 
 (fn au_ft_once [fts once]
+  (var index nil)
   (let [_fts (if (= (type fts) :table)
-               (table.concat fts ",")
-               fts)
-        index (+ lsp_server_count 0)]
-    (tset lsp_server_table index false)
-    (set lsp_server_count (+ lsp_server_count 1))
+               (do
+                (set index lsp_server_count)
+                (set lsp_server_count (+ lsp_server_count 1))
+                (tset lsp_server_table index true)
+                (table.concat fts ","))
+               fts)]
+
     (vim.cmd (vlua-format (.. "au FileType " _fts " ++once call %s()")
-                          (fn []
-                            (when (not (. lsp_server_table index))
-                              (tset lsp_server_table index true)
+                          (if index
+                            (fn []
+                              (when (. lsp_server_table index)
+                                  (tset lsp_server_table index false)
+                                  (once)
+                                  (vim.cmd ::LspStart)))
+                            (fn []
                               (once)
                               (vim.cmd ::LspStart)))))))
 
@@ -135,9 +153,9 @@
           (run-server))))
 
 
-
 (def-augroup :LspAuGroup
-  (init-lsp :tsserver {:fts [:typescript :javascript]})
+  (init-lsp :tsserver {:fts [:typescriptreact :typescript :javascript] :autostart false})
+  (init-lsp :denols {:fts [:typescript] :autostart false})
   (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
   (init-lsp :sumneko_lua {:fts :lua})
@@ -171,6 +189,7 @@
   (init-lsp :purescriptls {:fts :purescript})
   (init-lsp :powershell_es {:fts :ps1}) ;:bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :kotlin_language_server {:fts :kotlin})
+  (init-lsp :omnisharp {:fts :cs})
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir
                     (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []

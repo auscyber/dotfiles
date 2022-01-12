@@ -49,7 +49,8 @@
                                                                                          ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
           ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
-  :folke/which-key.nvim {:config #(require "plugins.whichkey")}
+  ; TODO change to folke when its stabler
+  :zeertzjq/which-key.nvim {:branch :patch-1 :opt false :config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
   :lukas-reineke/indent-blankline.nvim
@@ -107,21 +108,24 @@
 
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
+   :scalameta/nvim-metals {:ft :scala :requires [:plenary.nvim :nvim-lspconfig]}
+   :onsails/lspkind-nvim {:module :lspkind}
    :neovim/nvim-lspconfig
     {
-      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin]
+      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs]
+      :opt true
       :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
-                 {1 :nvim-lua/lsp_extensions.nvim :module :lsp_extensions} {1 :scalameta/nvim-metals :ft :scala :requires :plenary.nvim}
-                  {1 :kosayoda/nvim-lightbulb :module :nvim-lightbulb}
-                  {1 :onsails/lspkind-nvim :module :lspkind}
-                  {1 :williamboman/nvim-lsp-installer :module :nvim-lsp-installer}
-                  {1 :filipdutescu/renamer.nvim :branch :master :module :renamer :requires [:plenary.nvim]}
-                  :which-key.nvim
-                  :nvim-cmp
-                  :luasnip
-                  {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
-                  :symbols-outline.nvim
-                  :idris2-nvim]
+                 :nvim-lua/lsp_extensions.nvim
+                 :kosayoda/nvim-lightbulb
+                 :williamboman/nvim-lsp-installer
+                 {1 :filipdutescu/renamer.nvim :branch :master :module :renamer :requires [:plenary.nvim]}
+                 :which-key.nvim
+                 {1 :ray-x/lsp_signature.nvim :module :lsp_signature}
+                 :nvim-cmp
+                 :luasnip
+                 {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
+                 :symbols-outline.nvim
+                 :idris2-nvim]
 
          :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}

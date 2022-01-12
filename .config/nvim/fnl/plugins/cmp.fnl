@@ -21,8 +21,8 @@
   (let [(line col) (unpack (vim.api.nvim_win_get_cursor 0))]
     (and (~= col 0) (= (: (: (. (vim.api.nvim_buf_get_lines 0 (- line 1) line true) 1) :sub col col) :match "%s") nil))))
 (cmp_dictionary.setup {
-                       :dic
-                            {:* :/usr/share/dict/words}
+                       :dic {}
+                 ;           {:* :/usr/share/dict/words}
                        :exact 2
                        :async false
                        :capacity 5
@@ -32,9 +32,9 @@
               :snippet {
                         :expand (fn [args] (luasnip.lsp_expand args.body))}
               :mapping {
-                        :<C-d> (cmp.mapping (cmp.mapping.scroll_docs -4) [ :i :c])
-                        :<C-f> (cmp.mapping (cmp.mapping.scroll_docs 4) [ :i :c])
-                        :<C-Space> (cmp.mapping (cmp.mapping.complete) [ :i :c])
+                        :<C-d> (cmp.mapping (cmp.mapping.scroll_docs -4) [:i :c])
+                        :<C-f> (cmp.mapping (cmp.mapping.scroll_docs 4) [:i :c])
+                        :<C-Space> (cmp.mapping (cmp.mapping.complete) [:i :c])
                         :<C-e> (cmp.mapping {
                                                 :i (cmp.mapping.abort)
                                                 :c  (cmp.mapping.close)})
@@ -48,7 +48,7 @@
                                        (luasnip.expand_or_jump)
                                        (if (has_words_before)
                                          (cmp.complete)
-                                         (fallback))))))
+                                         (fallback))))) [:i :s])
                         :<S-Tab> (cmp.mapping
                                    (fn [fallback]
                                      (if (cmp.visible)
