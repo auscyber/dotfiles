@@ -21,7 +21,8 @@
               (a.assoc block :config `(fn []
                                         (let [(ok?# res#) (pcall ,(. block :config) ,name)]
                                           (when (not ok?#)
-                                            (vim.notify (.. "Failure loading config for" ,(tostring name) res#)))))))
+                                            (error (.. "Failure loading config for" ,(tostring name) res#))))))
+              )
             (table.insert use-statements block)))
 
     (let [use-sym (gensym)]

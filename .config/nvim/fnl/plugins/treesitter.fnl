@@ -16,7 +16,7 @@
  (tset (. (require "nvim-treesitter.install" )) :compilers [:clang]))
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin]
+                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin :markdown]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}

@@ -149,7 +149,7 @@
                             (or ?opts {}))
         run-server #(let
                       [(server_available requested_server) (lsp_installer_servers.get_server lsp-name)]
-                     (if server_available
+                     (if (and (not ?opts.no-install) server_available)
                       (do
                         (requested_server:on_ready #(requested_server:setup merged-opts))
                         (if (not (requested_server:is_installed))
@@ -165,7 +165,7 @@
 (def-augroup :LspAuGroup
   (init-lsp :tsserver {:fts [:typescriptreact :typescript :javascript] :autostart false})
   (init-lsp :denols {:fts [:typescript] :autostart false})
-  (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
+  (init-lsp :hls {:no-install true :fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
   (init-lsp :sumneko_lua {:fts :lua})
   (au_ft_once :rust
@@ -199,8 +199,9 @@
   (init-lsp :powershell_es {:fts :ps1}) ;:bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :kotlin_language_server {:fts :kotlin})
   (init-lsp :omnisharp {:fts :cs})
+  (init-lsp :als {:fts :ada})
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir
                     (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))
-;(lsp_installer.on_server_ready #(: $1 :setup {: capabilities : on_attach}))
+
