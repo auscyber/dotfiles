@@ -1,32 +1,33 @@
 (module plugins.dap
   {require {dapui dapui
-            dap dap}})
-(set dap.adapters.lldb {
-                        :type "executable"
-                        :command "/usr/bin/lldb-vscode" ; adjust as needed
-                        :name "lldb"})
-(set dap.configurations.rust
-                            {
-                              :name "Launch"
-                              :type "lldb"
-                              :request "launch"
-                              :program (fn []
-                                         (vim.fn.input "Path to executable: " (.. (vim.fn.getcwd) "/") "file"))
-                              :cwd "${workspaceFolder}"
-                              :stopOnEntry false
-                              :args {}
+            dap dap}
+   require-macros [zest.macros]})
 
-                              ;-- if you change `runInTerminal` to true, you might need to change the yama/ptrace_scope setting:
-                              ;--
-                              ;--    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
-                              ;--
-                              ;-- Otherwise you might get the following error:
-                              ;--
-                              ;--    Error on launch: Failed to attach to the target process
-                              ;--
-                              ;-- But you should be aware of the implications:
-                              ;-- https://www.kernel.org/doc/html/latest/admin-guide/LSM/Yama.html
-                              :runInTerminal  false})
+(def-keymap [n]
+  {"<leader>dct"  "<cmd>lua require\"dap\".continue()<CR>"
+   "<leader>dsv" "<cmd>lua require\"dap\".step_over()<CR>"
+   "<leader>dsi"  "<cmd>lua require\"dap\".step_into()<CR>"
+   "<leader>dso"  "<cmd>lua require\"dap\".step_out()<CR>"
+   "<leader>dtb"  "<cmd>lua require\"dap\".toggle_breakpoint()<CR>"
+
+   "<leader>dsc"  "<cmd>lua require\"dap.ui.variables\".scopes()<CR>"
+   "<leader>dhh"  "<cmd>lua require\"dap.ui.variables\".hover()<CR>"})
+
+(def-keymap "<leader>dhv" [v]
+          "<cmd>lua require\"dap.ui.variables\".visual_hover()<CR>")
+
+(def-keymap "<leader>duh" [n] "<cmd>lua require\"dap.ui.widgets\".hover()<CR>")
+(def-keymap "<leader>duf" [n]
+          "<cmd>lua local widgets=require'dap.ui.widgets');widgets.centered_float(widgets.scopes)<CR>")
+
+(def-keymap "<leader>dsbr" [n]
+          "<cmd>lua require\"dap\".set_breakpoint(vim.fn.input(\"Breakpoint condition: \"))<CR>")
+(def-keymap "<leader>dsbm" [n]
+          "<cmd>lua require\"dap\".set_breakpoint(nil nil vim.fn.input(\"Log point message: \"))<CR>")
+(def-keymap "<leader>dro" [n] "<cmd>lua require\"dap\".repl.open()<CR>")
+(def-keymap "<leader>drl" [n] "<cmd>lua require\"dap\".repl.run_last()<CR>")
+
+; (dap-install.config "codelldb" {})
 
 
 (dapui.setup)

@@ -3,6 +3,7 @@
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
              lsp-signature lsp_signature
+             virtualtypes virtualtypes
              renamer renamer
              lsp_installer nvim-lsp-installer
              lsp_installer_servers nvim-lsp-installer.servers
@@ -27,8 +28,16 @@
 (defn on_attach [client bufnr]
   (renamer.setup {})
   (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp}] sources)})
+  (when client.resolved_capabilities.codeLens
+    (virtualtypes.on_attach client bufnr))
   (lsp-status.on_attach client bufnr)
-  (lsp-signature.on_attach client bufnr)
+  (lsp-signature.on_attach
+    {
+     :bind true
+     :handler_opts
+     {
+      :border :rounded}}
+    bufnr)
   (let [opts {:noremap true :silent true}
         basem (fn [mode key command commen]
                 (nvim.buf_set_keymap bufnr mode key command opts)

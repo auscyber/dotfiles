@@ -12,7 +12,8 @@
 (set vim.wo.foldexpr "nvim_treesitter#foldexpr()")
 (set vim.wo.foldlevel 1)
 
-
+(if (> (vim.fn.has :win32) 0)
+ (tset (. (require "nvim-treesitter.install" )) :compilers [:clang]))
 
 (treesitter.setup {
                    :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin]

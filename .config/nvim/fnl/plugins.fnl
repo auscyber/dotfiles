@@ -122,6 +122,7 @@
                  :which-key.nvim
                  {1 :ray-x/lsp_signature.nvim :module :lsp_signature}
                  :nvim-cmp
+                 :jubnzv/virtual-types.nvim
                  :luasnip
                  {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
                  :symbols-outline.nvim
@@ -131,7 +132,7 @@
                               ; :mod nvim_lsp}
 
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
-    :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
+    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui} ]})
 
 (when _G.packer_bootstrap
   (vim.api.nvim_command "au! User PackerComplete :q! | lua vim.notify(\"Successfully bootstrapped\")")
