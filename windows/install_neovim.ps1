@@ -36,4 +36,6 @@ if (!$UserPath.Split(";").Contains($BinFolder))
 {
     Write-Output Updating Path
     [Environment]::SetEnvironmentVariable("Path","$UserPath;$BinFolder",[System.EnvironmentVariableTarget]::User)
-}
+}
+
+
