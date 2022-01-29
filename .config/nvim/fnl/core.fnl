@@ -24,6 +24,7 @@
 (opt-set cursorline true)
 (opt-set cursorlineopt :number)
 (opt-set updatetime 400)
+(opt-set conceallevel 3)
 (opt-local-set rnu true)
 (opt-local-set nu  true)
 

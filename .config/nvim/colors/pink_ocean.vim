@@ -73,3 +73,4 @@ hi! CmpItemKindMethod guibg=NONE guifg=#A04668
 hi! CmpItemKindKeyword guibg=NONE guifg=#D4D4D4
 hi! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
 hi! CmpItemKindUnit guibg=NONE guifg=#D4D4D4
+hi! LspSignatureActiveParameter guifg=#8bb2c1

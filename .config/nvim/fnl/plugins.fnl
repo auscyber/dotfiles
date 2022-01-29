@@ -50,8 +50,7 @@
                                                                                          ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
           ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
-  ; TODO change to folke when its stabler
-  :zeertzjq/which-key.nvim {:branch :patch-1 :opt false :config #(require "plugins.whichkey")}
+  :folke/which-key.nvim {:opt false :config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
   :lukas-reineke/indent-blankline.nvim
@@ -135,7 +134,7 @@
                               ; :mod nvim_lsp}
 
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
-    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui} ]})
+    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
 (when _G.packer_bootstrap
   (vim.api.nvim_command "au! User PackerComplete :q! | lua vim.notify(\"Successfully bootstrapped\")")

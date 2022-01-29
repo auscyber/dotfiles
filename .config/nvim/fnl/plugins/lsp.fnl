@@ -186,6 +186,7 @@
            (when (not (requested_server:is_installed))
              (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
+;  (init-lsp :ccls {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
   (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pyright {:fts :python
