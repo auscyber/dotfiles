@@ -1,7 +1,7 @@
 (module plugins 
   {require {nvim aniseed.nvim
             a aniseed.core}
-  require-macros [macros zest.macros]})
+   require-macros [macros zest.macros]})
 
 
 ;; Plugins to be managed by packer.
@@ -15,6 +15,7 @@
 
   ; Startup and typical operation
   :Olical/aniseed {:branch :develop}
+  :rktjmp/hotpot.nvim {}
   :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
   :wbthomason/packer.nvim {}
   :kyazdani42/nvim-web-devicons {:config #(require :plugins.devicons)}
@@ -113,6 +114,7 @@
    :simrat39/symbols-outline.nvim {:opt true}
    :scalameta/nvim-metals {:ft :scala :requires [:plenary.nvim :nvim-lspconfig]}
    :onsails/lspkind-nvim {:module :lspkind}
+   :folke/lsp-colors.nvim {}
    :neovim/nvim-lspconfig
     {
       :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]

@@ -25,9 +25,10 @@
 (vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menu,menuone,noselect")
 
+
 (defn on_attach [client bufnr]
   (renamer.setup {})
-  (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp}] sources)})
+  (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp :max_item_count 1000}] sources)})
   (when client.resolved_capabilities.codeLens
     (virtualtypes.on_attach client bufnr))
   (lsp-status.on_attach client bufnr)
@@ -35,8 +36,8 @@
     {
      :bind true
      :handler_opts
-     {
-      :border :rounded}}
+       {
+        :border :rounded}}
     bufnr)
   (let [opts {:noremap true :silent true}
         basem (fn [mode key command commen]
@@ -47,7 +48,6 @@
                              (a.merge opts {: mode :buffer bufnr})))
         map (fn [...] (basem :n ...))
         rangemap (fn [key command] (nvim.buf_set_keymap bufnr :v key command opts))]
-
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
     (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>" "Go to declaration")
     (map :gd "<Cmd>lua vim.lsp.buf.definition()<CR>" "Go to definition")

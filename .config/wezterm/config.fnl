@@ -28,7 +28,7 @@
                                 :bottom  5}
               :default_prog (?windows [:powershell :pwsh])
               :window_background_opacity  0.8
-              :font  (?windows (wezterm.font "Hasklug NF") (wezterm.font_with_fallback [ "Hasklug Nerd Font"  "codicon"]))
+              :font  (?windows (wezterm.font "FiraCode NF") (wezterm.font_with_fallback [ "Hasklug Nerd Font"  "codicon"]))
               :font_size  11
               :color_scheme "Pink Ocean"})
 ;             :color_scheme  "Guezwhoz"})
