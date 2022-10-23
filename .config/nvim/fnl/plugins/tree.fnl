@@ -6,7 +6,7 @@
    require-macros [macros]})
 ;(set vim.g.nvim_tree_auto_open 1)
 (tree.setup {
-             :auto_open true
+;             :auto_open true
              :update_cwd true
              :diagnostics {
                            :enable true}})

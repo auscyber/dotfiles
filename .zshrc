@@ -44,6 +44,8 @@ export RUSTC_WRAPPER=`which sccache`
 fpath=(~/.zsh $fpath)
 #promptinit; #prompt gentoo
 export _JAVA_AWT_WM_NONREPARENTING=1
+export WLR_NO_HARDWARE_CURSORS=1
+#exec fish
 ZSH_CUSTOM=$HOME/.zsh-plugins
 #ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ffa0a0,bg=NONE,bold,underline"
 
@@ -105,6 +107,7 @@ eval_if_installed idris2 --bash-completion-script idris2
 eval_if_installed stack --bash-completion-script stack
 eval_if_installed dots completion --shell bash
 eval_if_installed direnv hook zsh
+eval_if_installed op completion zsh
 #eval_if_installed lorri direnv
 
 
@@ -140,10 +143,14 @@ alias t="tmux"
 alias grep="grep --color=auto"
 alias windows="sudo grub-reboot 2 && sudo reboot"
 alias hm="home-manager --flake $NIXFLAKE#$FLAKENAME"
+nvim () {
+ nix run "$NIXFLAKE#nvim" -- $@
+}
+
 #alias emacs="emacsclient -t "
 #export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
-export EDITOR=`which nvim`
+export EDITOR="nvim"
 export editor=$EDITOR
 export BROWSER=firefox
 export GTK2_RC_FILES=$HOME/.gtkrc-2.0

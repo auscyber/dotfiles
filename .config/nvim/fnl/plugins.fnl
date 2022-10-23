@@ -1,4 +1,4 @@
-(module plugins 
+(module plugins
   {require {nvim aniseed.nvim
             a aniseed.core}
    require-macros [macros zest.macros]})
@@ -26,13 +26,13 @@
   :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
-  :famiu/feline.nvim {:branch :develop :config #(require "plugins.feline")} ; :mod feline}
+  :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
   :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)};
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
          :keys [:<C-f> :<C-b>]
          :module :telescope
-         :requires [:plenary.nvim  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
+         :requires [:plenary.nvim  :nvim-telescope/telescope-ui-select.nvim {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
   :numToStr/Comment.nvim {:config #(require :plugins.comment)}
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
@@ -51,6 +51,7 @@
                                                                                          ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
           ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
+   ; TODO change to folke when its stabler
   :folke/which-key.nvim {:opt false :config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
@@ -115,11 +116,14 @@
    :scalameta/nvim-metals {:ft :scala :requires [:plenary.nvim :nvim-lspconfig]}
    :onsails/lspkind-nvim {:module :lspkind}
    :folke/lsp-colors.nvim {}
+   :jamestthompson3/nvim-remote-containers {}
+   :esensar/nvim-dev-container {:config (fn [] ((. (require "devcontainer") :setup) {}))}
    :neovim/nvim-lspconfig
     {
       :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]
       :opt true
-      :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
+      :requires [;FIXME change to use branch
+                 {1 :kunish/rust-tools.nvim :branch :fix-offset-encoding :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
                  :nvim-lua/lsp_extensions.nvim
                  :kosayoda/nvim-lightbulb
                  :williamboman/nvim-lsp-installer

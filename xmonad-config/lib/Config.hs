@@ -119,7 +119,7 @@ onLaunch =
     , "lxpolkit"
     , "dunst"
     , "~/.config/polybar/launch.sh"
-    , "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
+    , "~/.screenlayout/layout.sh"
     , "nitrogen --restore "
     , "xset m 0 0"
     , "xset s on && xset s 300"
@@ -127,6 +127,7 @@ onLaunch =
     , "xss-lock i3lock"
     , "nm-applet"
     , "skype"
+    , "mpris-proxy"
     ]
 
 rclonemounts =
@@ -153,8 +154,13 @@ once = map mountRclone rclonemounts -- ++ ["emacs --daemon"]
 
 myStartupHook = do
     ewmhDesktopsStartup
+    --    spawn
+    --        "op signin"
     mapM_ (\x -> spawn (x ++ " &")) onLaunch
-    mapM_ (\x -> spawnOnce (x ++ " &")) once
+    mapM_
+        (\x -> spawnOnce (x ++ " &"))
+        once
+
     --  addScreenCorner SCLowerRight (spawn "alacritty")
     setDefaultKeyRemap emptyKeyRemap [gameMap, emptyKeyRemap]
     io $ mapM_ (safeSpawn "mkfifo" . (: [])) ["/tmp/.xmonad-workspace-log", "/tmp/xmonad-status-json.log"]
@@ -209,7 +215,7 @@ myEventHook =
         , handleEventHook def
         , docksEventHook
         , windowedFullscreenFixEventHook
-        , swallowEventHook (className =? "org.wezfurlong.wezterm") (return True)
+        , swallowEventHook (className =? "org.wezfurlong.wezterm") (not <$> (className =? "org.wezfurlong.wezterm"))
         --      screenCornerEventHook
         ]
 

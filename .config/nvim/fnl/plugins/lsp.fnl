@@ -57,16 +57,16 @@
 ;    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>" "")
     (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>" "Rename symbol under cursor")
     (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>" "See workspace diagnostics")
-    (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>" "See code actions under cursor")
+    (map :<space>a "<cmd>lua vim.lsp.buf.code_action ()<CR>" "See code actions under cursor")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
-    (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.formatting_sync()"))
-  (when client.resolved_capabilities.hover
-    (def-augroup :lsp_hover))
-;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
+    (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
+  (when client.server_capabilities.hover
+    (def-augroup :lsp_hover
+      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
 
 
-  (when client.resolved_capabilities.document_highlight
+  (when client.server_capabilities.document_highlight
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})
@@ -77,7 +77,6 @@
   (vim.api.nvim_exec
      "augroup lsp_references
            autocmd! * <buffer>
-           autocmd CursorHold <buffer> lua vim.lsp.buf.hover()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
            autocmd CursorHold,CursorHoldI <buffer> lua require'nvim-lightbulb'.update_lightbulb()
          augroup END"
@@ -96,7 +95,7 @@
 
 (lsp-status.register_progress)
 
-(local capabilities (cmp_nvim_lsp.update_capabilities lsp-status.capabilities))
+(local capabilities (cmp_nvim_lsp.default_capabilities lsp-status.capabilities))
 
 (set lsp.util.default_config
      (vim.tbl_extend

@@ -1,4 +1,4 @@
-format = """$hostname$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character"""
+format = """$username$hostname$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel$character"""
 
 scan_timeout = 10
 
@@ -19,10 +19,10 @@ ssh_only = true
 
 [username]
 style_user = "white"
-style_root = "black bold"
+style_root = "red bold"
 format = "[$user]($style) "
 disabled = false
-show_always = true
+show_always = false
 
 
 # Wait 10 milliseconds for starship to check files under the current directory.

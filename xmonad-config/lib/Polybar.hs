@@ -39,7 +39,7 @@ xmonadPolybarAction but x = polyBarAction but ("xmonadctl " ++ x)
 polybarColour :: Char -> Colour -> String -> String
 polybarColour area color text
     | area `notElem` validAreas = error "Invalid Text Area"
-    | otherwise = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area : "--}"
+    | otherwise = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area : "-}"
   where
     validAreas = "FBRuoT"
 

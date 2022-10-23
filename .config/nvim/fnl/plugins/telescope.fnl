@@ -18,9 +18,11 @@
 
 
 (telescope.setup
-  {:defaults {:mappings {:i {:<esc> actions.close}}}})
+  {:defaults {:mappings {:i {:<esc> actions.close}}}
+   :extensions {:ui-select [((. (require "telescope.themes") :get_dropdown) {})]}})
 (telescope.load_extension "frecency")
 (telescope.load_extension "notify")
+(telescope.load_extension "ui-select")
 
 
 (utils.keymap :n :<C-f> "<cmd> lua require 'telescope.builtin'.find_files()<CR>")

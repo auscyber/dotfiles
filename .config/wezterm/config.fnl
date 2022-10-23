@@ -29,7 +29,7 @@
               :default_prog (?windows [:powershell :pwsh])
               :window_background_opacity  0.8
               :font  (?windows (wezterm.font "FiraCode NF") (wezterm.font_with_fallback [ "Hasklug Nerd Font"  "codicon"]))
-              :font_size  11
+              :font_size  15
               :color_scheme "Pink Ocean"})
 ;             :color_scheme  "Guezwhoz"})
 (util.merge_files base :tab_bar)
