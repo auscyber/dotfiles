@@ -1,4 +1,10 @@
 {
+ :lsp-cap
+ (fn [name ...]
+   `(when (. client.server_capabilities ,(tostring name))
+     ,...))
+
+
  :packer-use
  (fn [...]
    "use packer plugins

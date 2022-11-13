@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+chattr -i /sys/firmware/efi/efivars/PreviousBoot-36d08fa7-cf0b-42f5-8f14-68df73ed3740
+echo -ne "\x07\x00Microsoft\x20\x00" | iconv -f UTF-8 -t UTF-16LE > /sys/firmware/efi/efivars/PreviousBoot-36d08fa7-cf0b-42f5-8f14-68df73ed3740
+systemctl reboot

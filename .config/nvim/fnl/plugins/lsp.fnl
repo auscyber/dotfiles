@@ -29,7 +29,7 @@
 (defn on_attach [client bufnr]
   (renamer.setup {})
   (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp :max_item_count 1000}] sources)})
-  (when client.resolved_capabilities.codeLens
+  (lsp-cap codeLens
     (virtualtypes.on_attach client bufnr))
   (lsp-status.on_attach client bufnr)
   (lsp-signature.on_attach
@@ -51,7 +51,8 @@
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
     (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>" "Go to declaration")
     (map :gd "<Cmd>lua vim.lsp.buf.definition()<CR>" "Go to definition")
-    (map :K "<Cmd>lua vim.lsp.buf.signature_help()<CR>" "Signature help")
+    (lsp-cap signature_help
+      (map :K "<Cmd>lua vim.lsp.buf.signature_help()<CR>" "Signature help"))
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>" "Go to implementations")
     (map :<space>r "<cmd>lua vim.lsp.buf.references()<CR>" "See references")
 ;    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>" "")
@@ -61,12 +62,12 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
-  (when client.server_capabilities.hover
+  (lsp-cap hover
     (def-augroup :lsp_hover
       (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
 
 
-  (when client.server_capabilities.document_highlight
+  (lsp-cap document_highlight
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})

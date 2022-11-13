@@ -46,6 +46,7 @@ import XMonad.Hooks.DynamicIcons (
     appIcon,
     dynamicIconsPP,
     iconsFmtReplace,
+    iconsGetAll,
     iconsGetFocus,
     wrapUnwords,
  )
@@ -54,6 +55,7 @@ import XMonad.Hooks.DynamicLog (
     dynamicLogString,
     filterOutWsPP,
     pad,
+    trim,
  )
 import XMonad.Hooks.EwmhDesktops (
     ewmhDesktopsEventHook,
@@ -222,9 +224,9 @@ myEventHook =
 myIconConfig :: IconConfig
 myIconConfig =
     def
-        { iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]")
+        { iconConfigFmt = iconsFmtReplace (\xs -> if length xs > 1 then wrapUnwords "[" "]" . map trim $ xs else mconcat xs)
         , iconConfigIcons = icons
-        , iconConfigFilter = iconsGetFocus
+        , iconConfigFilter = iconsGetAll
         }
 
 polybarLogHook :: X ()
