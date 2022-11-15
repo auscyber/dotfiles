@@ -1,12 +1,26 @@
-module SysDependent (sysDependent) where
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE StrictData #-}
+
+module SysDependent where
 
 import XMonad
 
-hook = do
-    spawn "polychromatic-tray-applet"
+import qualified Data.Map as M
+import Data.Typeable (cast)
 
-sysDependent :: XConfig l -> XConfig l
-sysDependent conf =
-    conf
-        { logHook = logHook conf >> hook
-        }
+import qualified XMonad.Util.ExtensibleConf as XC
+
+handleModeF :: [(String, ExtraConfig)] -> [String] -> XConfig Layout -> IO (XConfig Layout)
+handleModeF confs ("--system" : system : xs) conf =
+    pure $ maybe conf (`XC.add` conf) (lookup system confs)
+handleModeF _ _ conf = pure conf
+
+data ExtraConfig = ExtraConfig
+    { titleLength :: !Int
+    , launchApps :: ![String]
+    , onceApps :: ![String]
+    }
+    deriving (Typeable)
+
+instance Semigroup ExtraConfig where
+    (<>) a b = b
