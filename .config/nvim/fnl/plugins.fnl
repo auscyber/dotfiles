@@ -24,7 +24,7 @@
   :rktjmp/lush.nvim {}
   :camspiers/animate.vim {:module :animate}
   :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)}; :keys :<C-n>} ;:mod tree}
-  :famiu/feline.nvim {:branch :develop :config #(require "plugins.feline")} ; :mod feline}
+  :famiu/feline.nvim {:config #(require "plugins.feline")} ; :mod feline}
   :akinsho/nvim-bufferline.lua {:config #(require :plugins.bufferline)};
   :nvim-telescope/telescope.nvim
         {:cmd :Telescope
@@ -49,8 +49,7 @@
                                                                                          ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
           ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
-  ; TODO change to folke when its stabler
-  :zeertzjq/which-key.nvim {:branch :patch-1 :opt false :config #(require "plugins.whichkey")}
+  :folke/which-key.nvim {:opt false :config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
   :lukas-reineke/indent-blankline.nvim

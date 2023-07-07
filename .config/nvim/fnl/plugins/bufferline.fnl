@@ -4,7 +4,8 @@
    require-macros [macros]})
 
 (bufferline.setup {
-                   :diagnostics  "nvim_lsp"
+                   :options {
+                             :diagnostics  "nvim_lsp"}
                    :highlights {
                                 :indicator_selected {
                                                      :guifg :#8BB2C1}}})
