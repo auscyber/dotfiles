@@ -4,6 +4,7 @@
   targets.genericLinux.enable = true;
   home.packages = with pkgs; [
     discord
+    prismlauncher
     #    rnix-lsp
     (polybar.override {
       pulseSupport = true;

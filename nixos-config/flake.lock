@@ -595,16 +595,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1637981064,
-        "narHash": "sha256-KNDxKlIx7mL6XSqX6JzXBcW/8k1W5WTrktu6EQCkseY=",
-        "owner": "auscyberman",
+        "lastModified": 1689495092,
+        "narHash": "sha256-yZu2j5FpLZEPhJQQutMCPTxa1VMigLPabLYvLTq6ASM=",
+        "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "8187ea1c4f434db643afaac7a5141b33db053381",
+        "rev": "2f84579a70b8c74e5ebb37299a0c3ba279f09382",
         "type": "github"
       },
       "original": {
-        "owner": "auscyberman",
-        "ref": "neovim-use-plugin",
+        "owner": "nix-community",
         "repo": "home-manager",
         "type": "github"
       }

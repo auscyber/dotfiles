@@ -14,7 +14,7 @@
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
     local-nixpkgs.url = "github:auscyberman/nixpkgs";
     home-manager = {
-      url = "github:auscyberman/home-manager/neovim-use-plugin";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -22,7 +22,6 @@
     idris2.url = "github:idris-lang/Idris2";
     rnix.url = "github:nix-community/rnix-lsp";
     neovim = {
-      #      inputs.nixpkgs.follows = "local-nixpkgs";
       url = "github:neovim/neovim?dir=contrib";
     };
 
@@ -99,10 +98,7 @@
             })
         ];
 
-        base-home = name: system: {
-          inherit system name;
-          home = "/home/${name}";
-        };
+
         #    ++ (importNixFiles ./overlays);
 
 
@@ -128,56 +124,35 @@
           };
 
         };
-        homeConfigurations = builtins.mapAttrs
-          (name: cfg:
-            let pkgs = import nixpkgs {
-              config.allowUnfree = true;
-              system = cfg.system;
-              inherit overlays;
-            };
-            in
-            home-manager.lib.homeManagerConfiguration (cfg // {
-              inherit pkgs;
-              configuration = { config, lib, pkgs, ... }: {
-                imports = [ cfg.configuration ./hm/. nix-doom-emacs.hmModule ];
+        homeConfigurations.arch =
+          let pkgs = import nixpkgs {
+            config.allowUnfree = true;
+            system = "x86_64-linux";
+            inherit overlays;
+          };
+          in
+          home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              ./hm/arch.nix
+              ./hm/modules/agda.nix
+              #                  ./hm/modules/emacs.nix
+              ./hm/modules/neovim.nix
+              ./hm/modules/kakoune.nix
+              ./hm/modules/idris2.nix
+              ./hm/.
+              nix-doom-emacs.hmModule
+              {
+                home.username = "auscyber";
+                home.homeDirectory = "/home/auscyber";
                 home.sessionVariables = {
-                  FLAKENAME = "${name}";
+                  FLAKENAME = "auscyber";
                   NIXFLAKE = "$HOME/dotfiles/nixos-config";
                 };
-                nixpkgs.overlays = overlays;
-              };
-            }))
-          {
-            #            wsl = {
-            #              system = "x86_64-linux";
-            #              homeDirectory = "/home/auscyber";
-            #              username = "auscyber";
-            #            };
-            manjaro = base-home "auscyber" "x86_64-linux";
-            nixos = {
-              system = "x86_64-linux";
-              homeDirectory = "/home/auscyber";
-              username = "auscyber";
-              configuration = {
-                imports = [ ./hm/nixos.nix ./hm/agda.nix ./hm/emacs.nix ];
-              };
-            };
-            arch = {
-              system = "x86_64-linux";
-              homeDirectory = "/home/auscyber";
-              username = "auscyber";
-              configuration = {
-                imports = [
-                  ./hm/arch.nix
-                  ./hm/modules/agda.nix
-                  #                  ./hm/modules/emacs.nix
-                  ./hm/modules/neovim.nix
-                  ./hm/modules/kakoune.nix
-                  ./hm/modules/idris2.nix
-                ];
-              };
-            };
+              }
+            ];
           };
+
       };
 }
 
