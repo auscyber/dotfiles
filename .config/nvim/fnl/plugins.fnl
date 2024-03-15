@@ -83,7 +83,7 @@
   ;Language support
   :nvim-treesitter/nvim-treesitter
         {:do :TSUpdate
-         :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground  "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
+         :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground ] :config #(require "plugins.treesitter")} ; :mod treesitter}
 
   :folke/twilight.nvim {:cmd :Twilight :requires :nvim-treesitter}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}

@@ -23,9 +23,8 @@
 (cmp_dictionary.setup {
                        :dic {}
                  ;           {:* :/usr/share/dict/words}
-                       :exact 2
+                       :exact_length 2
                        :async false
-                       :capacity 5
                        :debug false})
 
 (cmp.setup {

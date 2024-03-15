@@ -1,7 +1,5 @@
 (module plugins.distant
-  {require {distant distant}
-   autoload {distant-settings distant.settings}})
+  {require {distant distant}})
 
-(distant.setup {
-                :* (distant-settings.chip_default)})
+(distant:setup)
 

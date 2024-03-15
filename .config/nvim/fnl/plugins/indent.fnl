@@ -1,11 +1,10 @@
 (module plugins.indent
-  {require {indent_blankline indent_blankline}})
+  {require {ibl ibl}})
 
 (set vim.opt.list true)
 ;(vim.opt.listchars:append "space:⋅")
 (vim.opt.listchars:append "eol:↴")
-(indent_blankline.setup
-  {:show_end_of_line false
-   :show_current_context true
-   :show_current_context_start true
-   :filetype_exclude [:packer :dashboard :telescope]})
+(ibl.setup {
+             :scope {:enabled true
+                     :show_end false
+                     :exclude {:language [:packer :dashboard :telescope]}}})

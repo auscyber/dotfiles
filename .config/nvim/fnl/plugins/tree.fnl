@@ -1,8 +1,7 @@
 (module plugins.tree
   {require {nvim aniseed.nvim
             a aniseed.core
-            tree nvim-tree
-            tree_config nvim-tree.config}
+            tree nvim-tree}
    require-macros [macros]})
 ;(set vim.g.nvim_tree_auto_open 1)
 (tree.setup {
