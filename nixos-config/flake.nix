@@ -77,18 +77,18 @@
               picom = (prev.picom.overrideAttrs (attrs: { src = picom; }));
               #            idris2 = idris2.packages."${system}".idris2;
               #            wezterm = (masterp {inherit system;}).wezterm;
-              discord = (import master { inherit system config; }).discord;
-              wezterm = prev.wezterm.overrideAttrs (attrs: {
-                src = inputs.wezterm;
-                cargoDeps = attrs.cargoDeps.overrideAttrs (cattrs: {
-                  src = inputs.wezterm;
-                  outputHash =
-                    "sha256-iNv9JEu1aQBxhwlugrl2GdoSvF9cYgM6TXBqamrPjFo=";
-                });
-              });
+              #              discord = (import master { inherit system config; }).discord;
+              #wezterm = prev.wezterm.overrideAttrs (attrs: {
+              #  src = inputs.wezterm;
+              #  cargoDeps = attrs.cargoDeps.overrideAttrs (cattrs: {
+              #    src = inputs.wezterm;
+              #    outputHash =
+              #      "sha256-iNv9JEu1aQBxhwlugrl2GdoSvF9cYgM6TXBqamrPjFo=";
+              #  });
+              #});
               neovim-nightly = neovim.packages."${system}".neovim.overrideAttrs (drv: {
                 #                link-lstdcpp = true;
-                propagatedBuildInputs = [ prev.gcc12Stdenv.cc.cc.lib ];
+                #                propagatedBuildInputs = [ prev.gcc12Stdenv.cc.cc.lib ];
               });
 
               idris2 = final.idris2Pkgs.idris2;
@@ -117,17 +117,19 @@
       })) // {
         nixosConfigurations = {
           auspc = import ./systems/auspc {
-            inherit nixpkgs config overlays inputs agenix;
+            home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ];
+            inherit nixpkgs config overlays inputs agenix home-manager;
           };
           secondpc = import ./systems/secondpc {
-	    home-manager-modules = [
-#./hm/arch.nix
-#              ./hm/modules/agda.nix
+            home-manager-modules = [
+              #./hm/arch.nix
+              #              ./hm/modules/agda.nix
               #                  ./hm/modules/emacs.nix
               ./hm/modules/neovim.nix
-#              ./hm/modules/kakoune.nix
-#              ./hm/modules/idris2.nix
-              ./hm/.];
+              #              ./hm/modules/kakoune.nix
+              #              ./hm/modules/idris2.nix
+              ./hm/.
+            ];
             inherit nixpkgs config overlays inputs nixos-mailserver home-manager;
           };
 
@@ -143,17 +145,17 @@
             inherit pkgs;
             modules = [
               ./hm/arch.nix
-           #   ./hm/modules/agda.nix
+              #   ./hm/modules/agda.nix
               #                  ./hm/modules/emacs.nix
               ./hm/modules/neovim.nix
-           #   ./hm/modules/kakoune.nix
-            #  ./hm/modules/idris2.nix
+              #   ./hm/modules/kakoune.nix
+              #  ./hm/modules/idris2.nix
               ./hm/.
               nix-doom-emacs.hmModule
               {
                 home.username = "auscyber";
                 home.homeDirectory = "/home/auscyber";
-                              }
+              }
             ];
           };
 

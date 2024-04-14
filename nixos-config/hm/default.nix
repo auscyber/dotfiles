@@ -45,7 +45,7 @@
     };
     home.packages = with pkgs; [
       rnix-lsp
-      nixfmt
+      nixfmt-rfc-style
       starship
       eza
     ];
