@@ -5,25 +5,45 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.br0.accept_ra" = 2;
+  };
 
   fileSystems."/" =
-    { device = "/dev/sda2";
+    {
+      device = "/dev/sda2";
       fsType = "ext4";
     };
 
 
   fileSystems."/boot" =
-    { device = "/dev/sda1";
+    {
+      device = "/dev/sda1";
       fsType = "vfat";
     };
 
   swapDevices = [ ];
 
+  environment.systemPackages = [ pkgs.cifs-utils ];
+
+  fileSystems."/mnt/downloads" = {
+    device = "//192.168.1.77/downloads";
+    fsType = "cifs";
+    options =
+      let
+        # this line prevents hanging on network split
+        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+      in
+      [ "${automount_opts},credentials=/etc/nixos/smb-secrets" ];
+  };
 }

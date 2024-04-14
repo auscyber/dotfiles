@@ -4,7 +4,7 @@
     home.stateVersion = "23.11";
     nix =
       {
-        package = pkgs.nixUnstable;
+        #        package = pkgs.nixUnstable;
         settings =
           let
             cachixes-to-pairs = inp: builtins.map ({ name, sha256 }: { url = "${name}.cachix.org"; inherit sha256; }) inp ++ [{ url = "cache.nixos.org"; sha256 = "6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="; }];
@@ -46,6 +46,8 @@
     home.packages = with pkgs; [
       rnix-lsp
       nixfmt
+      starship
+      eza
     ];
 
     xdg.configFile."

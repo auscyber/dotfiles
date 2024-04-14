@@ -120,7 +120,15 @@
             inherit nixpkgs config overlays inputs agenix;
           };
           secondpc = import ./systems/secondpc {
-            inherit nixpkgs config overlays inputs nixos-mailserver;
+	    home-manager-modules = [
+#./hm/arch.nix
+#              ./hm/modules/agda.nix
+              #                  ./hm/modules/emacs.nix
+              ./hm/modules/neovim.nix
+#              ./hm/modules/kakoune.nix
+#              ./hm/modules/idris2.nix
+              ./hm/.];
+            inherit nixpkgs config overlays inputs nixos-mailserver home-manager;
           };
 
         };
@@ -135,21 +143,17 @@
             inherit pkgs;
             modules = [
               ./hm/arch.nix
-              ./hm/modules/agda.nix
+           #   ./hm/modules/agda.nix
               #                  ./hm/modules/emacs.nix
               ./hm/modules/neovim.nix
-              ./hm/modules/kakoune.nix
-              ./hm/modules/idris2.nix
+           #   ./hm/modules/kakoune.nix
+            #  ./hm/modules/idris2.nix
               ./hm/.
               nix-doom-emacs.hmModule
               {
                 home.username = "auscyber";
                 home.homeDirectory = "/home/auscyber";
-                home.sessionVariables = {
-                  FLAKENAME = "auscyber";
-                  NIXFLAKE = "$HOME/dotfiles/nixos-config";
-                };
-              }
+                              }
             ];
           };
 

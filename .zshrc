@@ -25,6 +25,7 @@ source_if_exists () {
 }
 
 source_if_exists ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+source_if_exists ~/.config/op/plugins.sh
 source_if_exists ~/.nix-profile/etc/profile.d/nix.sh
 source_if_exists ~/.cargo/env
 
