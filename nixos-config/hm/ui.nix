@@ -6,7 +6,6 @@
     discord
     wezterm
     kalendar
-    prismlauncher
     #    rnix-lsp
     (polybar.override {
       pulseSupport = true;
@@ -15,6 +14,6 @@
     })
     gnome.gnome-mines
     google-chrome
-
+    
   ];
 }

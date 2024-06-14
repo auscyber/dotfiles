@@ -109,7 +109,7 @@ fi
 wm=$DESKTOP_SESSION
 time=$(date "+%I:%M %p")
 date=$(date "+%a %d %b %G")
-uptime=$(uptime -p)
+uptime=$(uptime -p 2>&-)
 
 
 

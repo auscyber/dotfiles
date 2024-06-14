@@ -13,6 +13,7 @@
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
     local-nixpkgs.url = "github:auscyberman/nixpkgs";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,9 +22,8 @@
     #idris2-pkgs.url = "github:claymager/idris2-pkgs";
     idris2.url = "github:idris-lang/Idris2";
     rnix.url = "github:nix-community/rnix-lsp";
-    neovim = {
-      url = "github:neovim/neovim?dir=contrib";
-    };
+    neovim.url = "github:nix-community/neovim-nightly-overlay";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
     emacs.url = "github:/nix-community/emacs-overlay";
@@ -86,16 +86,13 @@
               #      "sha256-iNv9JEu1aQBxhwlugrl2GdoSvF9cYgM6TXBqamrPjFo=";
               #  });
               #});
-              neovim-nightly = neovim.packages."${system}".neovim.overrideAttrs (drv: {
-                #                link-lstdcpp = true;
-                #                propagatedBuildInputs = [ prev.gcc12Stdenv.cc.cc.lib ];
-              });
-
+              
               idris2 = final.idris2Pkgs.idris2;
               idris2Pkgs = idris2-pkgs.packages."${system}";
               minecraft-server =
                 (import master { inherit system config; }).minecraft-server;
             })
+		neovim.overlays.default
         ];
 
 
@@ -117,10 +114,18 @@
       })) // {
         nixosConfigurations = {
           auspc = import ./systems/auspc {
+	    modules = [./modules/common.nix];
             home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ];
             inherit nixpkgs config overlays inputs agenix home-manager;
           };
+	  surfacelaptop = import ./systems/surfacelaptop {
+            home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ./hm/laptop.nix ];
+            modules = [inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd home-manager.nixosModules.home-manager ./modules/1password.nix ./modules/common.nix];
+            inherit nixpkgs config overlays inputs agenix;
+          };
+
           secondpc = import ./systems/secondpc {
+	    modules = [./modules/common.nix];
             home-manager-modules = [
               #./hm/arch.nix
               #              ./hm/modules/agda.nix
