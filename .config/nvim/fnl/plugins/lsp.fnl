@@ -52,12 +52,12 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
-  (when client.resolved_capabilities.hover
+  (when client.server_capabilities.hover
     (def-augroup :lsp_hover))
 ;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
 
 
-  (when client.resolved_capabilities.document_highlight
+  (when client.server_capabilities.document_highlight
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})

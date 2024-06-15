@@ -20,7 +20,7 @@
 
                                 :top  5
                                 :bottom  5}
-              :window_background_opacity  0.8
+              :window_background_opacity  0.99
               :font  (wezterm.font_with_fallback [ "Hasklug Nerd Font" "codicon"])
               :font_size  11
               :color_scheme "Pink Ocean"})

@@ -41,7 +41,10 @@ export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin
 
 test -r /home/auscyber/.opam/opam-init/init.zsh && . /home/auscyber/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$IDRIS_PREFIX/lib
-export RUSTC_WRAPPER=`which sccache`
+if  has sccache ;
+    then
+        RUSTC_WRAPPER=`which sccache`
+fi
 fpath=(~/.zsh $fpath)
 #promptinit; #prompt gentoo
 export _JAVA_AWT_WM_NONREPARENTING=1

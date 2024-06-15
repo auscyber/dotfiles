@@ -99,7 +99,7 @@
   :tikhomirov/vim-glsl {:ft :glsl}
   :dag/vim-fish {:ft :fish}
   :purescript-contrib/purescript-vim {:ft :purescript}
-  :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
+;  :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
 ;  :gpanders/nvim-parinfer {:ft [:fennel :racket :scheme :lisp]}
   :elkowar/yuck.vim {:ft :yuck}
   :elkowar/nvim-gehzu {:ft :fnl}
