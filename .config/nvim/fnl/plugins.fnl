@@ -114,7 +114,6 @@
    :simrat39/symbols-outline.nvim {:opt true}
    :scalameta/nvim-metals {:ft :scala :requires [:plenary.nvim :nvim-lspconfig]}
    :onsails/lspkind-nvim {:module :lspkind}
-   :folke/lsp-colors.nvim {}
    :jamestthompson3/nvim-remote-containers {}
    :esensar/nvim-dev-container {:config (fn [] ((. (require "devcontainer") :setup) {}))}
    :neovim/nvim-lspconfig

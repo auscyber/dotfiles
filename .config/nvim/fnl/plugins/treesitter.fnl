@@ -27,10 +27,6 @@
                    :playground {
                                 :enable true}
                    :query_linter {:enable true}
-<<<<<<< HEAD
-=======
-;                   :context_commentstring {:enable true}
->>>>>>> a84e8958cebf67744454622f6a4dd04cb99edf12
                    :refactor {
 ;                              :highlight_current_scope {:enable true}}
                               :highlight_definitions {:enable true}}

@@ -1,7 +1,7 @@
-{ nixpkgs, config, overlays, inputs, home-manager, home-manager-modules, ... }:
+{ nixpkgs, config, overlays, inputs, home-manager, home-manager-modules, modules, ... }:
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
-  modules = [
+  modules = modules ++ [
     ./configuration.nix
     ./hardware-configuration.nix
     #./../../modules/system/grub.nix

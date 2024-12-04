@@ -33,12 +33,9 @@
       starship
       eza
     ];
-
-    xdg.configFile."
-          nvim/lua/compiler.lua
-          ".text = ''
-      			return "${pkgs.stdenv.cc}/bin/cc
-          "
+    home.file."lol".text = "hi";
+    xdg.configFile."nvim/lua/compiler.lua".text = ''
+      			return "${pkgs.stdenv.cc}/bin/cc"
             	'';
 
   };

@@ -28,12 +28,6 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  fonts.packages = with pkgs;
-    [
-      (nerdfonts.override {
-        fonts = [ "FiraCode" "Inconsolata" "Hasklig" "RobotoMono" ];
-      })
-    ];
   hardware.bluetooth =
     {
       enable = true;
@@ -69,7 +63,6 @@
   services.printing.enable = true;
 
   # Enable sound.
-  sound.enable = true;
   #   hardware.pulseaudio.enable = true;
 
   programs.dconf.enable = true;
@@ -82,11 +75,9 @@
       # package = pkgs.pulseaudioFull;
     };
   };
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [ mesa ];
-    driSupport32Bit = true;
-    driSupport = true;
   };
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -131,6 +122,10 @@
   services.openssh.enable = true;
 
   services.displayManager.defaultSession = "none+xmonad";
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "auscyber";
+  };
   services.xserver = {
     xkb.layout = "us";
     enable = true;
@@ -153,10 +148,7 @@
     #   videoDrivers = [ "nouveau" ];
     desktopManager.plasma5.enable = true;
     displayManager.startx.enable = true;
-    displayManager.autoLogin = {
-      enable = true;
-      user = "auscyber";
-    };
+
     windowManager.awesome = {
       enable = true;
       luaModules = with pkgs.luaPackages; [ luarocks ];

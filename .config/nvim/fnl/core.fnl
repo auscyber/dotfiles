@@ -1,7 +1,6 @@
 (module core
   {require {_ plugins}
    autoload {nvim aniseed.nvim
-             lsp-colors lsp-colors
              a aniseed.core
              fennel aniseed.fennel}
 
@@ -28,12 +27,6 @@
 (opt-set conceallevel 3)
 (opt-local-set rnu true)
 (opt-local-set nu  true)
-(lsp-colors.setup {
-                   :Error  "#db4b4b"
-                   :Warning "#e0af68"
-                   :Information  "#0db9d7"
-                   :Hint "#10B981"})
-
 
 
 (def-keymap :<F11> [nvi] "<cmd>let g:neovide_fullscreen=!g:neovide_fullscreen<cr>")

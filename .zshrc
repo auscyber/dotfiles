@@ -147,9 +147,9 @@ alias t="tmux"
 alias grep="grep --color=auto"
 alias windows="sudo grub-reboot 2 && sudo reboot"
 alias hm="home-manager --flake $NIXFLAKE#$FLAKENAME"
-nvim () {
- nix run "$NIXFLAKE#nvim" -- $@
-}
+#nvim () {
+# nix run "$NIXFLAKE#nvim" -- $@
+#}
 
 #alias emacs="emacsclient -t "
 #export MANPAGER="sh -c 'col -bx | bat -l man -p'"

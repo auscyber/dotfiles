@@ -1,7 +1,7 @@
-{ nixpkgs, config, overlays, inputs, home-manager, darwin, home-manager-modules, ... }:
+{ nixpkgs, config, overlays, inputs, home-manager, darwin, home-manager-modules, modules }:
 darwin.lib.darwinSystem {
   system = "aarch64-darwin";
-  modules = [
+  modules = modules ++ [
     ./configuration.nix
     home-manager.darwinModules.home-manager
     {

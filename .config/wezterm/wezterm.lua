@@ -8,4 +8,7 @@ fennel.path = (wezterm.config_dir .. "/?.fnl;" .. fennel.path)
 table.insert(package.loaders or package.searchers, fennel.searcher)
 
 
-return require('config')
+local config = require('config')
+print(config)
+
+return config

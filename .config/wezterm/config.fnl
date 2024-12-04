@@ -6,14 +6,17 @@
   (local target_triples (lume.split wezterm.target_triple "-"))
   (local acos (. target_triples 3))
 
-  (fn ?windows [...]
+  (fn ?windows [a b]
       (if (= acos "windows")
-        (do ...)))
+        a)
+      b)
 
   (local base {
-                  :color_schemes  {
-                                   "Pink Ocean"
-                                   (require "pink_ocean")}
+                :color_schemes  {
+                                 "Pink Ocean"
+                                 (require "pink_ocean")}
+                :front_end  "WebGpu"
+                :webgpu_power_preference   "HighPerformance"
                   :enable_scroll_bar true ;(~= os "GNU/Linux")
                   :enable_wayland true
                   :window_padding  {
@@ -25,9 +28,9 @@
                                     :bottom  5}
                   :default_prog (?windows [:powershell :pwsh])
                   :window_background_opacity  0.8
-                  :font  (?windows (wezterm.font "FiraCode NF") (wezterm.font_with_fallback [ "Hasklug Nerd Font"  "codicon"]))
+                  :font  (?windows (wezterm.font "FiraCode NF") (wezterm.font_with_fallback [ "Hasklug Nerd Font Mono"  "codicon"]))
                   :font_size  15
                   :color_scheme "Pink Ocean"})
 ;             :color_scheme  "Guezwhoz"})
-  (util.merge_files base :tab_bar)
+(util.merge_files base :tab_bar)
 ;base
