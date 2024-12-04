@@ -8,6 +8,8 @@
 
     #flakes
     agenix.url = "github:ryantm/agenix";
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "unstable";
     eww.url = "github:elkowar/eww";
     rust-overlay.url = "github:oxalica/rust-overlay";
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
@@ -51,6 +53,7 @@
     , nixos-mailserver
     , agenix
     , nix-doom-emacs
+    , darwin
     , idris2-pkgs
     , ...
     }:
@@ -99,7 +102,12 @@
         #    ++ (importNixFiles ./overlays);
 
 
-      in
+      in {
+            darwinConfigurations."Ivys-MacBook" = import ./systems/macbook {
+              home-manager-modules = [./hm/modules/neovim.nix ./hm/.];
+              inherit nixpkgs config overlays inputs darwin home-manager;
+            };
+      } //
       (flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
