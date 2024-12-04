@@ -22,7 +22,7 @@
     idris2.url = "github:idris-lang/Idris2";
     rnix.url = "github:nix-community/rnix-lsp";
     neovim = {
-      url = "github:neovim/neovim?dir=contrib";
+      url = "github:nix-community/neovim-nightly-overlay";
     };
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
@@ -120,14 +120,15 @@
             inherit nixpkgs config overlays inputs agenix;
           };
           secondpc = import ./systems/secondpc {
-	    home-manager-modules = [
-#./hm/arch.nix
-#              ./hm/modules/agda.nix
+            home-manager-modules = [
+              #./hm/arch.nix
+              #              ./hm/modules/agda.nix
               #                  ./hm/modules/emacs.nix
               ./hm/modules/neovim.nix
-#              ./hm/modules/kakoune.nix
-#              ./hm/modules/idris2.nix
-              ./hm/.];
+              #              ./hm/modules/kakoune.nix
+              #              ./hm/modules/idris2.nix
+              ./hm/.
+            ];
             inherit nixpkgs config overlays inputs nixos-mailserver home-manager;
           };
 
@@ -143,17 +144,17 @@
             inherit pkgs;
             modules = [
               ./hm/arch.nix
-           #   ./hm/modules/agda.nix
+              #   ./hm/modules/agda.nix
               #                  ./hm/modules/emacs.nix
               ./hm/modules/neovim.nix
-           #   ./hm/modules/kakoune.nix
-            #  ./hm/modules/idris2.nix
+              #   ./hm/modules/kakoune.nix
+              #  ./hm/modules/idris2.nix
               ./hm/.
               nix-doom-emacs.hmModule
               {
                 home.username = "auscyber";
                 home.homeDirectory = "/home/auscyber";
-                              }
+              }
             ];
           };
 

@@ -28,6 +28,11 @@
   # replicates the default behaviour.
   hardware.openrazer.enable = true;
   networking.useDHCP = false;
+  networking.enableIPv6 = true;
+  networking.defaultGateway6 = {
+  address = "fe80::1";
+  interface = "br0";
+};
   networking.bridges = {
     "br0" = {
       interfaces = [ "enp2s0" ];

@@ -4,7 +4,7 @@ nixpkgs.lib.nixosSystem {
   modules = [
     ./configuration.nix
     ./hardware-configuration.nix
-    ./../../modules/system/grub.nix
+    #    ./../../modules/system/grub.nix
     ./boot.nix
     nixos-mailserver.nixosModule
     #    ./mailserver.nix
