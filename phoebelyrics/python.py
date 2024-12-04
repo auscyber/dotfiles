@@ -6,8 +6,11 @@ genius = lyricsgenius.Genius(
     "UztaqqrO-cKarYne1d4HGvoDn7S7Nt-y0xdmA6JLwiOjHzk1wObF7jR4rUVRsmCh")
 
 artist = genius.search_artist(
-    "Phoebe Bridgers", sort='popularity')
+    "Phoebe Bridgers", sort='popularity', include_features=True)
+if artist is None:
+    exit()
 
+print(artist.id)
 songs = []
 for song in artist.songs:
     print(song)
