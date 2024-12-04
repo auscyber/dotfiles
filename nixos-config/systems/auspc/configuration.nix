@@ -41,9 +41,10 @@
     };
   services.blueman.enable = true;
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
     open = false;
+    powerManagement.enable = true;
     nvidiaSettings = true;
   };
 
@@ -85,6 +86,7 @@
     enable = true;
     extraPackages = with pkgs; [ mesa ];
     driSupport32Bit = true;
+    driSupport = true;
   };
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
