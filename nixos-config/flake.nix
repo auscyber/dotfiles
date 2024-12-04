@@ -105,6 +105,7 @@
       in
       {
         darwinConfigurations."Ivys-MacBook" = import ./systems/macbook {
+          modules = [ ./modules/common.nix ];
           home-manager-modules = [ ./hm/modules/neovim.nix ./hm/. ];
           inherit nixpkgs config overlays inputs darwin home-manager;
         };

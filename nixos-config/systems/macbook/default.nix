@@ -1,4 +1,4 @@
-{ nixpkgs, config, overlays, inputs, home-manager, darwin, home-manager-modules, modules }:
+{ nixpkgs, config, overlays, inputs, home-manager, darwin, home-manager-modules, modules, ... }:
 darwin.lib.darwinSystem {
   system = "aarch64-darwin";
   modules = modules ++ [
@@ -9,12 +9,7 @@ darwin.lib.darwinSystem {
       home-manager.useUserPackages = true;
       home-manager.users.ivypierlot = {
         imports = home-manager-modules;
-        home.username = "auscyber";
-        home.sessionVariables = {
-          FLAKENAME = "auscyber";
-          NIXFLAKE = "$HOME/dotfiles/nixos-config";
-        };
-
+        home.username = "ivypierlot";
       };
       nixpkgs = { inherit config overlays; };
       # Optionally, use home-manager.extraSpecialArgs to pass
