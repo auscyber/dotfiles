@@ -22,10 +22,9 @@
     (and (~= col 0) (= (: (: (. (vim.api.nvim_buf_get_lines 0 (- line 1) line true) 1) :sub col col) :match "%s") nil))))
 (cmp_dictionary.setup {
                        :dic {}
-                 ;           {:* :/usr/share/dict/words} hello i am Typing words
-                       :exact 2
+                 ;           {:* :/usr/share/dict/words}
+                       :exact_length 2
                        :async false
-                       :capacity 5
                        :debug false})
 
 (cmp.setup {

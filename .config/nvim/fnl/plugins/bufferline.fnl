@@ -5,7 +5,7 @@
 
 (bufferline.setup {
                    :options {
-                              :diagnostics  "nvim_lsp"}
+                             :diagnostics  "nvim_lsp"}
                    :highlights {
                                 :indicator_selected {
                                                      :fg :#8BB2C1}}})

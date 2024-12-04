@@ -43,25 +43,28 @@ NORMAL="$(printf "\e[m")"
 W_BG=$(bg_c $WHITE)
 W_FG=$(fg_c $WHITE)
 
-
 get_packages () {
     if command -v apt 1> /dev/null
         then
-            package_data="${package_data}$(apt list --installed 2>&- | wc -l) (apt)"
+            package_data="${package_data}$(apt list --installed 2>&- | wc -l) (apt) "
     fi
     if command -v nix 1> /dev/null
         then
             _package_count=0
             if command -v home-manager 1>/dev/null
             then
-                _package_count="$((_package_count+$(cat ~/.nix-profile/etc/packagecount)))"
+                _package_count="$((_package_count+$(nix-store -q -R ~/.local/state/home-manager/gcroots/current-home | wc -l)))"
             fi
-            package_data="${package_data} $_package_count (nix)"
+            if command -v nixos-rebuild 1> /dev/null
+            then
+                _package_count="$((_package_count+$(nix-store -q -R /run/current-system/sw | wc -l)))"
+            fi
+            package_data="${package_data}$_package_count (nix) "
     #        package_data="${packages+ }$(wc -l < /etc/current-system-packages) (nix)"
     fi
     if command -v pacman 1> /dev/null
     then
-        package_data="${package_data} $(pacman -Q | wc -l) (pacman)"
+        package_data="${package_data}$(pacman -Q | wc -l) (pacman) "
     fi
         printf "%s" "$package_data"
 
@@ -71,6 +74,7 @@ get_packages () {
 os="$(. /etc/os-release && printf "%s" "$PRETTY_NAME")"
 alias get_kernel="uname -r"
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
+cpu="${cpu#"${cpu%%[![:space:]]*}"}"
 command -v lspci >/dev/null && {
 		gpu=$(lspci -mm | grep -i 'vga\|display')
 		gpu=${gpu##*Corporation\"}
@@ -105,7 +109,7 @@ fi
 wm=$DESKTOP_SESSION
 time=$(date "+%I:%M %p")
 date=$(date "+%a %d %b %G")
-uptime=$(uptime -p)
+uptime=$(uptime -p 2>&-)
 
 
 

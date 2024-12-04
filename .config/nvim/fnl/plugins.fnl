@@ -51,7 +51,6 @@
                                                                                          ;(vim.api.nvim_command "command! -nargs=0 Load :lua require('persistence').load()")
           ;                                                                               (persistence.setup))}
   :christoomey/vim-tmux-navigator {}
-   ; TODO change to folke when its stabler
   :folke/which-key.nvim {:opt false :config #(require "plugins.whichkey")}
   :windwp/nvim-autopairs {:config #(require "plugins.autopairs")} ; :mod autopairs}
 ;  :Yggdroot/indentLine {} ;; disable in favour of below plugin
@@ -86,7 +85,7 @@
   ;Language support
   :nvim-treesitter/nvim-treesitter
         {:do :TSUpdate
-         :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground  "~/code/nvim-treesitter-textobjects"] :config #(require "plugins.treesitter")} ; :mod treesitter}
+         :requires [:JoosepAlviste/nvim-ts-context-commentstring :nvim-treesitter/nvim-treesitter-refactor :nvim-treesitter/playground ] :config #(require "plugins.treesitter")} ; :mod treesitter}
 
   :folke/twilight.nvim {:cmd :Twilight :requires :nvim-treesitter}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}

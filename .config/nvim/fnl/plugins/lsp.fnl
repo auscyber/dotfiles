@@ -62,12 +62,12 @@
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
-  (lsp-cap hover
-    (def-augroup :lsp_hover
-      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
+  (when client.server_capabilities.hover
+    (def-augroup :lsp_hover))
+;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
 
 
-  (lsp-cap document_highlight
+  (when client.server_capabilities.document_highlight
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})
@@ -96,7 +96,7 @@
 
 (lsp-status.register_progress)
 
-(local capabilities (cmp_nvim_lsp.default_capabilities lsp-status.capabilities))
+(local capabilities (vim.tbl_extend "keep" (cmp_nvim_lsp.default_capabilities) lsp-status.capabilities))
 
 (set lsp.util.default_config
      (vim.tbl_extend
@@ -144,8 +144,8 @@
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
-  (let [merged-opts (a.merge {: on_attach}
-;                              : capabilities}
+  (let [merged-opts (a.merge {: on_attach
+                              : capabilities}
                             (or ?opts {}))
         run-server #(let
                       [(server_available requested_server) (lsp_installer_servers.get_server lsp-name)]
@@ -188,11 +188,14 @@
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
 ;  (init-lsp :ccls {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
+  (au_ft_once :nix (fn []
+                    ((. lsp :rnix :setup) {: on_attach : capabilities})))
   (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pyright {:fts :python
                       :handlers (lsp-status.extensions.pyls_ms.setup)
                       :settings
                         {:python {:workspaceSymbols {:enable true}}}})
+  (init-lsp :docker_compose_language_service {:fts :yaml})
   (init-lsp :zls {:fts :zig})
   (init-lsp :metals {:fts :scala})
   (init-lsp :dhall_lsp_server {:fts :dhall})
