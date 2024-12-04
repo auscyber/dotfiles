@@ -37,6 +37,10 @@ packages:
 # forks / in-progress versions pinned to a git hash. For example:
 #
 extra-deps:
+  - cairo-0.13.8.2@sha256:ef1709c3c4d2c6d68a9a51d9f220dccc0745f6468d2d0868c15a7ecdf8f325a1,4078
+  - pango-0.13.8.2@sha256:d4057ebddade4cde3e25d7755b5e030e7a7e56fe7365afd37916a7bba46d3fd9,3917
+  - glib-0.13.8.2@sha256:f44b829e741b3c3244d523f60b058701dfc067ff64c2ba61d43be4cccfc2663d,3156
+  - gtk2hs-buildtools-0.13.8.3@sha256:207229eee7abff12aba2740b32131522086275e46f2e72a0f5bbc3cb781e9d4d,5304
   - X11-1.10@sha256:ed01fba28081d6922462c2727a9a2e71f8ec3d962ed18963eee0c770558817d9,3703
   - /home/auscyber/packages/xmonad-contrib
   - netlink-1.1.1.0
@@ -78,5 +82,5 @@ flags:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
-ghc-options: 
+ghc-options:
   "my-xmonad": -dynamic

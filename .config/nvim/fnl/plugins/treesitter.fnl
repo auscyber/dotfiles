@@ -1,6 +1,7 @@
 (module plugins.treesitter
   {require {treesitter nvim-treesitter.configs
-            parsers nvim-treesitter.parsers}})
+            parsers nvim-treesitter.parsers
+            install nvim-treesitter.install}})
 
 ;(tset (parsers.get_parser_configs) :agda {
 ;                                          :install_info {:url "~/packages/tree-sitter-agda"
@@ -12,16 +13,24 @@
 (set vim.wo.foldexpr "nvim_treesitter#foldexpr()")
 (set vim.wo.foldlevel 1)
 
+;(if (> (vim.fn.has :win32) 0))
+;  (tset (. install :compilers) [:clang])
 
+(tset install :compilers [(let [(status res) (pcall (fn [] (require "compiler")))]
+                            (if status res))])
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin]
+                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin :markdown :jsonc]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}
                    :playground {
                                 :enable true}
                    :query_linter {:enable true}
+<<<<<<< HEAD
+=======
+;                   :context_commentstring {:enable true}
+>>>>>>> a84e8958cebf67744454622f6a4dd04cb99edf12
                    :refactor {
 ;                              :highlight_current_scope {:enable true}}
                               :highlight_definitions {:enable true}}

@@ -1,4 +1,10 @@
 {
+ :lsp-cap
+ (fn [name ...]
+   `(when (. client.server_capabilities ,(tostring name))
+     ,...))
+
+
  :packer-use
  (fn [...]
    "use packer plugins
@@ -12,16 +18,16 @@
           (let [name (. args i)
                 block (. args (+ i 1))]
             (a.assoc block 1 name)
-            (when (. block :mod)
-              (a.assoc block :config `(fn []
-                                          (require ,(.. :plugins. (tostring (. block :mod))))
-                                          (,(-?> block (. :config))))))
+           ; (when (. block :mod)
+           ;   (a.assoc block :config `(fn []
+           ;                               (require ,(.. :plugins. (tostring (. block :mod))))
+           ;                               (,(-?> block (. :config))))))
 ;            (a.assoc block :mod)
             (when (. block :config)
               (a.assoc block :config `(fn []
                                         (let [(ok?# res#) (pcall ,(. block :config) ,name)]
                                           (when (not ok?#)
-                                            (vim.notify (.. "Failure loading config for" ,(tostring name) res#)))))))
+                                            (vim.notify (string.format "Failure loading config for %s: %s" ,(tostring name) res#)))))))
             (table.insert use-statements block)))
 
     (let [use-sym (gensym)]

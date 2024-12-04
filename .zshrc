@@ -41,10 +41,15 @@ export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:/home/auscyber/.local/bin
 
 test -r /home/auscyber/.opam/opam-init/init.zsh && . /home/auscyber/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$IDRIS_PREFIX/lib
-export RUSTC_WRAPPER=`which sccache`
+if  has sccache ;
+    then
+        RUSTC_WRAPPER=`which sccache`
+fi
 fpath=(~/.zsh $fpath)
 #promptinit; #prompt gentoo
 export _JAVA_AWT_WM_NONREPARENTING=1
+export WLR_NO_HARDWARE_CURSORS=1
+#exec fish
 ZSH_CUSTOM=$HOME/.zsh-plugins
 #ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ffa0a0,bg=NONE,bold,underline"
 
@@ -106,6 +111,7 @@ eval_if_installed idris2 --bash-completion-script idris2
 eval_if_installed stack --bash-completion-script stack
 eval_if_installed dots completion --shell bash
 eval_if_installed direnv hook zsh
+eval_if_installed op completion zsh
 #eval_if_installed lorri direnv
 
 
@@ -141,10 +147,14 @@ alias t="tmux"
 alias grep="grep --color=auto"
 alias windows="sudo grub-reboot 2 && sudo reboot"
 alias hm="home-manager --flake $NIXFLAKE#$FLAKENAME"
+nvim () {
+ nix run "$NIXFLAKE#nvim" -- $@
+}
+
 #alias emacs="emacsclient -t "
 #export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
-export EDITOR=`which nvim`
+export EDITOR="nvim"
 export editor=$EDITOR
 export BROWSER=firefox
 export GTK2_RC_FILES=$HOME/.gtkrc-2.0

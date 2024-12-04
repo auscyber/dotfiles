@@ -265,7 +265,7 @@
                    :right_rounded_thin  ""
                    :circle  "●"})
 
-
+;(feline.winbar.setup)
 
 (feline.setup {
                : colors

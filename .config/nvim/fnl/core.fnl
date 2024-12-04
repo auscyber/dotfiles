@@ -1,6 +1,7 @@
 (module core
   {require {_ plugins}
    autoload {nvim aniseed.nvim
+             lsp-colors lsp-colors
              a aniseed.core
              fennel aniseed.fennel}
 
@@ -16,9 +17,6 @@
 (nvim.command "colorscheme pink_ocean")
 ;(_: colorscheme :pink_ocean)
 (opt-set showmode false)
-(opt-local-set tabstop 4)
-(opt-local-set shiftwidth 4)
-(opt-local-set expandtab  true)
 (opt-set tabstop 4)
 (opt-set shiftwidth 4)
 (opt-set hidden  true)
@@ -27,8 +25,14 @@
 (opt-set cursorline true)
 (opt-set cursorlineopt :number)
 (opt-set updatetime 400)
+(opt-set conceallevel 3)
 (opt-local-set rnu true)
 (opt-local-set nu  true)
+(lsp-colors.setup {
+                   :Error  "#db4b4b"
+                   :Warning "#e0af68"
+                   :Information  "#0db9d7"
+                   :Hint "#10B981"})
 
 
 

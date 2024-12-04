@@ -9,7 +9,11 @@ import qualified Data.Map as M
 import XMonad
 import XMonad.Hooks.DynamicIcons
 
-data ExtraState = ExtraState {dbus_client :: X Client, workspaceNames :: M.Map String String} deriving (Typeable)
+data ExtraState = ExtraState
+    { dbus_client :: X Client
+    , workspaceNames :: M.Map String String
+    }
+    deriving (Typeable)
 
 instance ExtensionClass ExtraState where
     initialValue =

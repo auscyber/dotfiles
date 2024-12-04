@@ -3,6 +3,7 @@
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
              lsp-signature lsp_signature
+             virtualtypes virtualtypes
              renamer renamer
              lsp_installer nvim-lsp-installer
              lsp_installer_servers nvim-lsp-installer.servers
@@ -24,11 +25,20 @@
 (vim.lsp.set_log_level "debug")
 (set nvim.o.completeopt "menu,menuone,noselect")
 
+
 (defn on_attach [client bufnr]
   (renamer.setup {})
-  (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp}] sources)})
+  (cmp.setup.buffer {:sources (a.concat [{:name :nvim_lsp :max_item_count 1000}] sources)})
+  (lsp-cap codeLens
+    (virtualtypes.on_attach client bufnr))
   (lsp-status.on_attach client bufnr)
-  (lsp-signature.on_attach client bufnr)
+  (lsp-signature.on_attach
+    {
+     :bind true
+     :handler_opts
+       {
+        :border :rounded}}
+    bufnr)
   (let [opts {:noremap true :silent true}
         basem (fn [mode key command commen]
                 (nvim.buf_set_keymap bufnr mode key command opts)
@@ -38,26 +48,26 @@
                              (a.merge opts {: mode :buffer bufnr})))
         map (fn [...] (basem :n ...))
         rangemap (fn [key command] (nvim.buf_set_keymap bufnr :v key command opts))]
-
     (nvim.buf_set_option bufnr :omnifunc :v:lua.vim.lsp.omnifunc)
     (map :gD "<Cmd>lua vim.lsp.buf.declaration()<CR>" "Go to declaration")
     (map :gd "<Cmd>lua vim.lsp.buf.definition()<CR>" "Go to definition")
-    (map :K "<Cmd>lua vim.lsp.buf.signature_help()<CR>" "Signature help")
+    (lsp-cap signature_help
+      (map :K "<Cmd>lua vim.lsp.buf.signature_help()<CR>" "Signature help"))
     (map :gi "<cmd>lua vim.lsp.buf.implementation()<CR>" "Go to implementations")
     (map :<space>r "<cmd>lua vim.lsp.buf.references()<CR>" "See references")
 ;    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>" "")
     (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>" "Rename symbol under cursor")
     (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>" "See workspace diagnostics")
-    (map :<space>a "<cmd>lua require'telescope.builtin'.lsp_code_actions {}<CR>" "See code actions under cursor")
+    (map :<space>a "<cmd>lua vim.lsp.buf.code_action ()<CR>" "See code actions under cursor")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
-  (when client.resolved_capabilities.hover
+  (when client.server_capabilities.hover
     (def-augroup :lsp_hover))
 ;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
 
 
-  (when client.resolved_capabilities.document_highlight
+  (when client.server_capabilities.document_highlight
     (utils.highlight "LspReferenceRead"  {:gui "underline"})
     (utils.highlight "LspReferenceText"  {:gui "underline"})
     (utils.highlight "LspReferenceWrite" {:gui "underline"})
@@ -68,7 +78,6 @@
   (vim.api.nvim_exec
      "augroup lsp_references
            autocmd! * <buffer>
-           autocmd CursorHold <buffer> lua vim.lsp.buf.hover()
            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
            autocmd CursorHold,CursorHoldI <buffer> lua require'nvim-lightbulb'.update_lightbulb()
          augroup END"
@@ -140,7 +149,7 @@
                             (or ?opts {}))
         run-server #(let
                       [(server_available requested_server) (lsp_installer_servers.get_server lsp-name)]
-                     (if server_available
+                     (if (and (not ?opts.no-install) server_available)
                       (do
                         (requested_server:on_ready #(requested_server:setup merged-opts))
                         (if (not (requested_server:is_installed))
@@ -156,7 +165,7 @@
 (def-augroup :LspAuGroup
   (init-lsp :tsserver {:fts [:typescriptreact :typescript :javascript] :autostart false})
   (init-lsp :denols {:fts [:typescript] :autostart false})
-  (init-lsp :hls {:fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
+  (init-lsp :hls {:no-install true :fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
   (init-lsp :sumneko_lua {:fts :lua})
   (au_ft_once :rust
@@ -177,6 +186,7 @@
            (when (not (requested_server:is_installed))
              (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
+;  (init-lsp :ccls {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})
   (au_ft_once :nix (fn []
                     ((. lsp :rnix :setup) {: on_attach : capabilities})))
@@ -193,8 +203,9 @@
   (init-lsp :powershell_es {:fts :ps1}) ;:bundle_path "~/packages/PowershellEditorServices"})
   (init-lsp :kotlin_language_server {:fts :kotlin})
   (init-lsp :omnisharp {:fts :cs})
+  (init-lsp :als {:fts :ada})
   (init-lsp :jdtls {:fts :java :cmd [:jdtls] :root_dir
                     (fn [fname] (or (((. (require :lspconfig) :util :root_pattern) "pom.xml" "gradle.build" ".git") fname) (vim.fn.getcwd)))})
   (au_ft_once :idris2 (fn []
                         (idris2.setup {:server {: capabilities : on_attach}}))))
-;(lsp_installer.on_server_ready #(: $1 :setup {: capabilities : on_attach}))
+

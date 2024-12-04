@@ -1,10 +1,11 @@
-local wezterm = require'wezterm'
-local fennel = require'fennel'
---watch_path = wezterm.config_dir .. "config.fnl"
-local value = wezterm.config_dir .. "/config.fnl"
---print("string" .. value)
-wezterm.add_to_config_reload_watch_list(value)
+local wezterm = require 'wezterm'
+
+local fennel = require 'fennel'
+local main_config = wezterm.config_dir .. "/config.fnl"
+wezterm.add_to_config_reload_watch_list(main_config)
 fennel.path = (wezterm.config_dir .. "/?.fnl;" .. fennel.path)
 --package.path = (wezterm.config_dir .. "/?.lua;" .. package.path)
 table.insert(package.loaders or package.searchers, fennel.searcher)
+
+
 return require('config')

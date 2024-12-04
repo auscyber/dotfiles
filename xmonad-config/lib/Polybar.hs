@@ -13,11 +13,13 @@ import Data.List
 import qualified Data.Map as M
 import Data.Maybe
 import ExtraState
+import qualified SysDependent
 import System.IO.Unsafe
 import XMonad
 import XMonad.Hooks.DynamicIcons
 import XMonad.Hooks.DynamicLog
 import qualified XMonad.StackSet as S
+import qualified XMonad.Util.ExtensibleConf as XC
 import qualified XMonad.Util.ExtensibleState as XS
 
 --Process Colours
@@ -39,7 +41,7 @@ xmonadPolybarAction but x = polyBarAction but ("xmonadctl " ++ x)
 polybarColour :: Char -> Colour -> String -> String
 polybarColour area color text
     | area `notElem` validAreas = error "Invalid Text Area"
-    | otherwise = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area : "--}"
+    | otherwise = "%{" ++ [area] ++ color ++ "}" ++ text ++ "%{" ++ area : "-}"
   where
     validAreas = "FBRuoT"
 
@@ -49,16 +51,18 @@ colourCurrent = "#f9f9f9"
 colourVisible = "#ffd1dc"
 colourHidden = "#ffeFdc"
 colourHiddenNoWindows = "#A4A4A4"
-polybarPP defaultIcons =
+polybarPP :: [String] -> X PP
+polybarPP defaultIcons = do
+    titleLength <- fmap SysDependent.titleLength <$> XC.ask
     let iconCurrent x
             | x `elem` defaultIcons = switchAndMoveF x (pad "\xf111")
             | otherwise = x
-
-        iconHidden x
+    let iconHidden x
             | x `elem` defaultIcons = switchAndMoveF x (pad "\xf10c")
             | otherwise = x
-        highlightEnds = polybarColour 'T' "2" . polybarColour 'F' "#3f3f3f" . polybarColour 'B' "#FF000000"
-     in def
+    let highlightEnds = polybarColour 'T' "2" . polybarColour 'F' "#3f3f3f" . polybarColour 'B' "#FF000000"
+    pure $
+        def
             { {-ppCurrent = polybarWorkspace (polybarUnderlineWithColor "#FFCFD1" . polybarColour 'F' "#FFDB9E" ) ws False
               , ppHidden = polybarWorkspace (polybarColour 'F' "#E88B84") ws True
               , ppVisible = polybarWorkspace (polybarColour 'F' "#FFC9AB"  . wrap "[" "]") ws True
@@ -68,7 +72,7 @@ polybarPP defaultIcons =
             , ppVisible = polybarUnderlineWithColor colourVisible . iconCurrent
             , ppHiddenNoWindows = polybarColour 'F' colourHiddenNoWindows . iconHidden
             , ppTitleSanitize = shorten 70 . ppTitle def
-            , ppTitle = polybarColour 'F' "#FFFFFF"
+            , ppTitle = polybarColour 'F' "#FFFFFF" . take (fromMaybe 100 titleLength)
             , ppWsSep = ""
             , ppSep = polybarColour 'F' "#6D5656" " | "
             , ppOutput = io . appendFile "/tmp/.xmonad-workspace-log" . flip (++) "\n" . xmonadPolybarAction 4 "nextws" . xmonadPolybarAction 5 "prevws"

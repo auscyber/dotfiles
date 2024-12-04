@@ -28,6 +28,13 @@
                        :debug false})
 
 (cmp.setup {
+;              :enabled (fn []
+;                         (let [context (require "cmp.config.context")]
+;                           (if (= (. (vim.api.nvim_get_mode) :mode) :c)
+;                             true
+;                             (and (not (context.in_treesitter_capture "comment")) (not (context.in_syntax_group "Comment"))
+;                             )
+;                             )))
               :snippet {
                         :expand (fn [args] (luasnip.lsp_expand args.body))}
               :mapping {
@@ -71,15 +78,14 @@
                                                    :copilot "[copilot]"}})}})
 ;(vim.api.nvim_exec "imap <silent><script><expr> <C-J> copilot#Accept(\"\\<CR>\")
 ;(vim.api.nvim_exec "let g:copilot_no_tab_map = v:true"  false)
-
-(def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")<CR>")
+;(def-keymap :<C-Tab> [i] "<expr> copilot#Accept(\"\\<CR>\")<CR>")
 (cmp.setup.cmdline
   :/ {
       :sources [
                 {:name :buffer :keyword_length 5}]})
 (cmp.event:on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}}))
-(vim.api.nvim_set_keymap "i" "<C-E>" "<Plug>luasnip-next-choice" {})
-(vim.api.nvim_set_keymap "s" "<C-E>" "<Plug>luasnip-next-choice" {})
+(def-keymap "<C-k>" [si]  "<Plug>luasnip-expand-or-jump")
+(def-keymap "<C-K>" [si] "<Plug>luasnip-jump-prev")
 (def-autocmd-fn [:BufRead :BufNewFile] ["Cargo.toml"] (do
                                                         (nvim.buf_set_keymap 0 :n :K ":lua require('crates').show_popup()<CR>" {:silent true :noremap true})
                                       (cmp.setup.buffer {:sources [{:name :crates}]})))

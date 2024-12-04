@@ -1,6 +1,7 @@
-(module plugins {require {nvim aniseed.nvim
-                          a aniseed.core}
-                 require-macros [macros zest.macros]})
+(module plugins
+  {require {nvim aniseed.nvim
+            a aniseed.core}
+   require-macros [macros zest.macros]})
 
 
 ;; Plugins to be managed by packer.
@@ -14,6 +15,7 @@
 
   ; Startup and typical operation
   :Olical/aniseed {:branch :develop}
+  :rktjmp/hotpot.nvim {}
   :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
   :wbthomason/packer.nvim {}
   :kyazdani42/nvim-web-devicons {:config #(require :plugins.devicons)}
@@ -30,7 +32,7 @@
         {:cmd :Telescope
          :keys [:<C-f> :<C-b>]
          :module :telescope
-         :requires [:plenary.nvim  {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
+         :requires [:plenary.nvim  :nvim-telescope/telescope-ui-select.nvim {1 :nvim-telescope/telescope-frecency.nvim :requires :sqlite.lua}]
          :config #(require :plugins.telescope)}
   :numToStr/Comment.nvim {:config #(require :plugins.comment)}
   :lewis6991/gitsigns.nvim {:requires [:plenary.nvim] :config #(require :plugins.gitsigns)} ;:mod gitsigns}
@@ -67,7 +69,7 @@
   :tjdevries/train.nvim {:opt true}
 
   ; Completion
-  :github/copilot.vim {};:opt true}
+;  :github/copilot.vim {};:opt true}
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
   :L3mON4D3/luasnip {:module :luasnip}
   :uga-rosa/cmp-dictionary {:module :cmp_dictionary}
@@ -87,33 +89,40 @@
 
   :folke/twilight.nvim {:cmd :Twilight :requires :nvim-treesitter}
   :iamcco/markdown-preview.nvim {:ft :markdown :run "cd app && yarn install"}
-  :Olical/conjure {:ft [:fennel :racket :clojure]}
-  :wlangstroth/vim-racket {:ft :racket}
-  :vmchale/dhall-vim {:ft :dhall}
-  :ziglang/zig.vim {:ft [:zig]}
-  :edwinb/idris2-vim {:ft [:idris2]}
+;  :plasticboy/vim-markdown {:ft :markdown :config #(vim.cmd "
+;                                              let g:vim_markdown_fenced_languages = ['bash=sh','nix=nix']
+;                                              ")}
+  :Olical/conjure {:ft [:fennel :racket :cl]}
+  :wlangstroth/vim-racket {:opt true}
+  :vmchale/dhall-vim {:opt true}
+  :ziglang/zig.vim {:opt true}
+  :edwinb/idris2-vim {:opt true}
   :shinKage/idris2-nvim {:ft :idris2 :requires :nui.nvim}
-  :udalov/kotlin-vim {:ft [:kotlin]}
+  :udalov/kotlin-vim {:opt true}
   :derekelkins/agda-vim {:ft :agda :config #(vim.api.nvim_command "let maplocalleader = \",\"")}
-  :LnL7/vim-nix  {:ft :nix}
+  :LnL7/vim-nix  {:opt true}
   :tikhomirov/vim-glsl {:ft :glsl}
   :dag/vim-fish {:ft :fish}
   :purescript-contrib/purescript-vim {:ft :purescript}
-  :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run "cargo build --release"}
+  :eraserhd/parinfer-rust {:ft [:fennel :racket :scheme :lisp] :run (if (> (vim.fn.exists "/etc/nixos") 0) "nix-shell --run 'cargo build --release'" "cargo build --release")}
 ;  :gpanders/nvim-parinfer {:ft [:fennel :racket :scheme :lisp]}
   :elkowar/yuck.vim {:ft :yuck}
-  :elkowar/nvim-gehzu {:ft :fnl}
+;  :elkowar/nvim-gehzu {:ft :fnl}
   :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
 
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
    :scalameta/nvim-metals {:ft :scala :requires [:plenary.nvim :nvim-lspconfig]}
    :onsails/lspkind-nvim {:module :lspkind}
+   :folke/lsp-colors.nvim {}
+   :jamestthompson3/nvim-remote-containers {}
+   :esensar/nvim-dev-container {:config (fn [] ((. (require "devcontainer") :setup) {}))}
    :neovim/nvim-lspconfig
     {
-      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs]
+      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]
       :opt true
-      :requires [{1 :simrat39/rust-tools.nvim :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
+      :requires [;FIXME change to use branch
+                 {1 :kunish/rust-tools.nvim :branch :fix-offset-encoding :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
                  :nvim-lua/lsp_extensions.nvim
                  :kosayoda/nvim-lightbulb
                  :williamboman/nvim-lsp-installer
@@ -121,16 +130,16 @@
                  :which-key.nvim
                  {1 :ray-x/lsp_signature.nvim :module :lsp_signature}
                  :nvim-cmp
+                 :jubnzv/virtual-types.nvim
                  :luasnip
                  {1 :hrsh7th/cmp-nvim-lsp :module :cmp_nvim_lsp}
                  :symbols-outline.nvim
                  :idris2-nvim]
-
          :config #(require "plugins.lsp")}
                               ; :mod nvim_lsp}
 
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
-    :mfussenegger/nvim-dap {:ft [:rust] :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
+    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
 
 (when _G.packer_bootstrap
   (vim.api.nvim_command "au! User PackerComplete :q! | lua vim.notify(\"Successfully bootstrapped\")")

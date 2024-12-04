@@ -31,8 +31,8 @@ hi Folded guifg=#A04668 guibg=#282828
 " hi CursorLine ctermfg=224 guifg=#ffd1dc term=bold gui=bold
 hi CursorLineNr gui=bold term=bold guifg=#ffd1dc
 hi LineNr guifg=#ffd1dc ctermfg=224
-hi Statement guifg=#8BB2C1 ctermfg=109 gui=bold
-hi Identifier guifg=#738290 ctermfg=246 gui=italic
+hi Statement guifg=#8BB2C1 ctermfg=109 gui=bold,italic
+hi Identifier guifg=#738290 ctermfg=246
 hi Title guifg=#738290 ctermfg=246
 hi Comment guifg=#707078 ctermfg=60
 hi Type guifg=#A04668 ctermfg=131
@@ -73,3 +73,5 @@ hi! CmpItemKindMethod guibg=NONE guifg=#A04668
 hi! CmpItemKindKeyword guibg=NONE guifg=#D4D4D4
 hi! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
 hi! CmpItemKindUnit guibg=NONE guifg=#D4D4D4
+hi! LspSignatureActiveParameter guifg=#8bb2c1
+

@@ -46,6 +46,7 @@ import XMonad.Hooks.DynamicIcons (
     appIcon,
     dynamicIconsPP,
     iconsFmtReplace,
+    iconsGetAll,
     iconsGetFocus,
     wrapUnwords,
  )
@@ -54,8 +55,11 @@ import XMonad.Hooks.DynamicLog (
     dynamicLogString,
     filterOutWsPP,
     pad,
+    trim,
  )
 import XMonad.Hooks.EwmhDesktops (
+    addEwmhWorkspaceSort,
+    ewmh,
     ewmhDesktopsEventHook,
     ewmhDesktopsLogHookCustom,
     ewmhDesktopsStartup,
@@ -64,19 +68,24 @@ import XMonad.Hooks.EwmhDesktops (
  )
 import XMonad.Hooks.ManageDocks (
     avoidStruts,
-    docksEventHook,
+    docks,
     manageDocks,
  )
 import XMonad.Hooks.ManageHelpers (doFullFloat)
 import XMonad.Hooks.ScreenCorners ()
 import XMonad.Hooks.ServerMode (serverModeEventHookCmd)
 import XMonad.Hooks.WindowSwallowing
+import qualified XMonad.Util.ExtensibleConf as XC
 
 --import XMonad.Hooks.WindowSwallowing ()
 import qualified XMonad.Layout.Fullscreen as F
 
 ---import XMonad.Layout.LayoutModifier ()
 
+import qualified Laptop
+import qualified Laptop as Desktop
+import SysDependent (ExtraConfig (launchApps, onceApps), handleModeF)
+import Text.Read (readMaybe)
 import XMonad.Layout.MultiToggle ()
 import XMonad.Layout.MultiToggle.Instances ()
 import XMonad.Layout.NoBorders (smartBorders)
@@ -114,27 +123,26 @@ import XMonad.Util.Run (safeSpawn)
 import XMonad.Util.SpawnOnce (spawnOnce)
 import XMonad.Util.WorkspaceCompare (filterOutWs)
 
+extraConfigs =
+    [ ("laptop", Laptop.dependentConf)
+    , ("desktop", Desktop.dependentConf)
+    ]
+
 onLaunch =
     [ "picom --experimental-backends --daemon --dbus --config ~/.config/picom/picom2.conf"
     , "lxpolkit"
     , "dunst"
     , "~/.config/polybar/launch.sh"
-    , "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DP-2 --off --output DP-3 --off --output DP-4 --off --output DP-5 --mode 1920x1080 --pos 0x0 --rotate normal --output USB-C-0 --off"
+    , "~/.screenlayout/layout.sh"
     , "nitrogen --restore "
     , "xset m 0 0"
     , "xset s on && xset s 300"
     , "1password --silent"
     , "xss-lock i3lock"
     , "nm-applet"
+    , "blueman-applet"
     , "skype"
-    ]
-
-rclonemounts =
-    [ ("driveschool", "~/school_drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"])
-    , --  [ ("cache", "~/school_drive", []),
-      ("drivepersonal", "~/drive", ["--vfs-cache-mode full", "--vfs-cache-max-age 10m"])
-    , ("photos", "~/Pictures", [])
-    , ("onedrive_school", "~/onedrive_school", [])
+    , "mpris-proxy"
     ]
 
 gameMap :: KeymapTable
@@ -149,12 +157,18 @@ gameMap =
 mountRclone :: (String, String, [String]) -> String
 mountRclone (name, location, extra_args) = concat ["rclone mount ", name, ": ", location, " ", unwords extra_args, " --daemon"]
 
-once = map mountRclone rclonemounts -- ++ ["emacs --daemon"]
+once = []
 
 myStartupHook = do
-    ewmhDesktopsStartup
-    mapM_ (\x -> spawn (x ++ " &")) onLaunch
-    mapM_ (\x -> spawnOnce (x ++ " &")) once
+    --    spawn
+    --        "op signin"
+    extra <- fmap SysDependent.launchApps <$> XC.ask
+    mapM_ (\x -> spawn (x ++ " &")) $ onLaunch ++ fromMaybe [] extra
+    extraOnce <- fmap SysDependent.onceApps <$> XC.ask
+    mapM_
+        (\x -> spawnOnce (x ++ " &"))
+        $ once ++ fromMaybe [] extraOnce
+
     --  addScreenCorner SCLowerRight (spawn "alacritty")
     setDefaultKeyRemap emptyKeyRemap [gameMap, emptyKeyRemap]
     io $ mapM_ (safeSpawn "mkfifo" . (: [])) ["/tmp/.xmonad-workspace-log", "/tmp/xmonad-status-json.log"]
@@ -165,10 +179,7 @@ dbusAction :: (Client -> IO ()) -> X ()
 dbusAction action = XS.gets dbus_client >>= (id >=> io . action)
 
 getWorkspaceText :: M.Map Int String -> String -> String
-getWorkspaceText xs n =
-    case M.lookup (read n) xs of
-        Just x -> x
-        _ -> n
+getWorkspaceText xs n = fromMaybe n $ readMaybe n >>= flip M.lookup xs
 
 myWorkspaces = map show [1 .. 9]
 
@@ -182,6 +193,9 @@ myConfig =
         flip additionalKeysP myKeys
         . flip removeKeysP removedKeys
         . ewmhFullscreen
+        . docks
+        . ewmh
+        . addEwmhWorkspaceSort (pure $ filterOutWs [scratchpadWorkspaceTag])
         $ def
             { terminal = myTerm
             , borderWidth = myBorderWidth
@@ -199,58 +213,43 @@ myConfig =
             , manageHook = myManageHook
             , layoutHook = myLayout
             , handleEventHook = myEventHook
+            , handleExtraArgs = handleModeF extraConfigs
             }
 
 myEventHook =
     mconcat
-        [ ewmhDesktopsEventHook
-        , fullscreenEventHook
-        , serverModeEventHookCmd
+        [ serverModeEventHookCmd
         , handleEventHook def
-        , docksEventHook
         , windowedFullscreenFixEventHook
-        , swallowEventHook (className =? "org.wezfurlong.wezterm") (return True)
+        , swallowEventHook (className =? "org.wezfurlong.wezterm") (not <$> (className =? "org.wezfurlong.wezterm"))
         --      screenCornerEventHook
         ]
 
 myIconConfig :: IconConfig
 myIconConfig =
     def
-        { iconConfigFmt = iconsFmtReplace (wrapUnwords "[" "]")
+        { iconConfigFmt = iconsFmtReplace (\xs -> if length xs > 1 then wrapUnwords "[" "]" . map trim $ xs else mconcat xs)
         , iconConfigIcons = icons
-        , iconConfigFilter = iconsGetFocus
+        , iconConfigFilter = iconsGetAll
         }
 
 polybarLogHook :: X ()
-polybarLogHook =
-    gets
-        (map W.tag . W.workspaces . windowset)
-        >>= \str ->
-            dynamicIconsPP myIconConfig (polybarPP myWorkspaces)
-                >>= fmap (filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
-                >>= \pp ->
-                    pure pp
-                        >>= dynamicLogString . switchMoveWindowsPolybar str
-                        >>= io . ppOutput pp
-                        >> ewmhDesktopsLogHookCustom (filterOutWs [scratchpadWorkspaceTag])
+polybarLogHook = do
+    str <- gets (map W.tag . W.workspaces . windowset)
+    pp <-
+        polybarPP myWorkspaces >>= dynamicIconsPP myIconConfig
+            >>= fmap (switchMoveWindowsPolybar str . filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
+    io . ppOutput pp =<< dynamicLogString pp
 
 -- >> writeCurrentState pp "/tmp/xmonad-status-json.log"
 
 ewwLogHook :: X ()
 ewwLogHook = do
-    gets
-        (map W.tag . W.workspaces . windowset)
-        >>= \str ->
-            dynamicIconsPP myIconConfig (ewwPP myWorkspaces)
-                >>= fmap (filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
-                >>= \pp ->
-                    pure pp
-                        >>= dynamicLogString
-                        >>= io
-                            . ppOutput
-                                pp
-                            >> ewmhDesktopsLogHookCustom
-                                (filterOutWs [scratchpadWorkspaceTag])
+    str <- gets (map W.tag . W.workspaces . windowset)
+    pp <-
+        dynamicIconsPP myIconConfig (ewwPP myWorkspaces)
+            >>= fmap (filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
+    io . ppOutput pp =<< dynamicLogString pp
 
 --                        >> writeCurrentState pp "/tmp/xmonad-status-json.log"
 
@@ -379,7 +378,7 @@ appKeys =
         , --Start emacs
           ("M-d", "emacsclient -c", doc "Start emacs client")
         , -- start nvim
-          ("M-S-n", "wezterm start -- nvim", doc $ "Launch neovim with neovim")
+          ("M-S-n", "wezterm start -- nvim", doc "Launch neovim with neovim")
         ]
 
 myKeys = map (\(x, y, _) -> (x, y)) keyCombination
