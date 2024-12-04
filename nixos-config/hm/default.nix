@@ -28,6 +28,7 @@
       enable = false;
     };
     home.packages = with pkgs; [
+      ripgrep
       rnix-lsp
       nixfmt-rfc-style
       starship

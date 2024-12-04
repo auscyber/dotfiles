@@ -125,7 +125,7 @@
         nixosConfigurations = {
           auspc = import ./systems/auspc {
             modules = [ ./modules/common.nix ];
-            home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ];
+            home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ./hm/modules/zsh.nix ];
             inherit nixpkgs config overlays inputs agenix home-manager;
           };
           surfacelaptop = import ./systems/surfacelaptop {
