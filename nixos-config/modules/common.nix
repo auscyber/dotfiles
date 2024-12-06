@@ -5,7 +5,7 @@
   fonts.packages = with pkgs;
     (map (x: nerd-fonts.${x}) [ "fira-code" "inconsolata" "hasklug" "roboto-mono" ]);
 
-
+  environment.systemPackages = with pkgs; [ git vim ];
 
   programs.zsh.enable = true;
   nix = {
