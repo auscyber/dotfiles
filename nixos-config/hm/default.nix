@@ -28,11 +28,11 @@
       enable = false;
     };
     home.packages = with pkgs; [
+      shellify
       ripgrep
       rnix-lsp
       nixfmt-rfc-style
       starship
-      eza
     ];
     home.file."lol".text = "hi";
     xdg.configFile."nvim/lua/compiler.lua".text = ''

@@ -4,10 +4,12 @@
 
 {
   # List packages installed in system profile. To search by name, run:
+  documentation.enable = true;
   security.pam.enableSudoTouchIdAuth = true;
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [ vim vscode wezterm ];
+  environment.systemPackages = with pkgs; [ vim nodejs vscode wezterm zotero gnupg ];
 
+  nix.channel.enable = false;
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
@@ -26,7 +28,14 @@
   # The platform the configuration will be used on.
   nixpkgs.hostPlatform = "aarch64-darwin";
   homebrew.enable = true;
-  homebrew.casks = [ "arc" "zotero" "beeper" "steam" "notion" "google-drive" "spotify" "discord" "affinity-designer" "affinity-publisher" "grammarly-desktop" "1password" "nitro-pdf-pro" ];
+  homebrew.onActivation = {
+    autoUpdate = true; # Fetch the newest stable branch of Homebrew's git repo
+    upgrade = true; # Upgrade outdated casks, formulae, and App Store apps
+    # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
+    cleanup = "zap";
+  };
+
+  homebrew.casks = [ "beeper" "steam" "notion" "google-drive" "spotify" "arc" "discord" "affinity-designer" "affinity-publisher" "grammarly-desktop" "nitro-pdf-pro" "amethyst" "1password" "plover" "postman" ];
   homebrew.masApps = {
     "1Password for Safari" = 1569813296;
     "Microsoft 365" = 1450038993;
@@ -37,6 +46,8 @@
   users.users.ivypierlot = {
     name = "ivypierlot";
     home = "/Users/ivypierlot";
+    shell = pkgs.zsh;
   };
 }
+
 

@@ -17,9 +17,10 @@ in
       githubSupport = true;
     })
     google-chrome
-  
+
   ];
-programs.ssh = {
+  programs._1password.enable = true;
+  programs.ssh = {
     enable = true;
     extraConfig = ''
       Host *

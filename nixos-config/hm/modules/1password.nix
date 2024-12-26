@@ -1,10 +1,11 @@
 { config, pkgs, ... }:
 {
-  programs._1password.enable = true;
-  programs._1password-gui = {
+  programs._1password-shell-plugins = {
+    # enable 1Password shell plugins for bash, zsh, and fish shell
     enable = true;
-    #    extraConfig = ''
-    #      let g:sqlite_clib_path = "${pkgs.sqlite.out}/lib/libsqlite3.so"
-    #    '';
+    # the specified packages as well as 1Password CLI will be
+    # automatically installed and configured to use shell plugins
+    plugins = with pkgs; [ gh nodePackages.vercel ];
   };
+
 }

@@ -121,10 +121,11 @@
       :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]
       :opt true
       :requires [;FIXME change to use branch
-                 {1 :kunish/rust-tools.nvim :branch :fix-offset-encoding :requires [:plenary.nvim :nvim-lua/popup.nvim :nvim-dap] :module :rust-tools}
+                 {1 :mrcjkb/rustaceanvim :requires [:nvim-dap]}
                  :nvim-lua/lsp_extensions.nvim
                  :kosayoda/nvim-lightbulb
-                 :williamboman/nvim-lsp-installer
+                 {1 :williamboman/mason.nvim :module :mason}
+                 {1 :williamboman/mason-lspconfig.nvim :module :mason-lspconfig}
                  {1 :filipdutescu/renamer.nvim :branch :master :module :renamer :requires [:plenary.nvim]}
                  :which-key.nvim
                  {1 :ray-x/lsp_signature.nvim :module :lsp_signature}
@@ -138,7 +139,7 @@
                               ; :mod nvim_lsp}
 
 ;      :karb94/neoscroll.nvim {:config #(. (require "neoscroll") :setup) }
-    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui}]})
+    :mfussenegger/nvim-dap {:ft [:rust :c :cpp] :opt true :config #(require :plugins.dap) :requires [{1 :rcarriga/nvim-dap-ui :module :dapui :requires [:nvim-neotest/nvim-nio]}]})
 
 (when _G.packer_bootstrap
   (vim.api.nvim_command "au! User PackerComplete :q! | lua vim.notify(\"Successfully bootstrapped\")")

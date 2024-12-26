@@ -1,12 +1,12 @@
 (module plugins.lsp
   {require {
+            mason mason
+            mason-lspconfig mason-lspconfig
             plugins-cmp plugins.cmp}
    autoload {idris2 idris2
              lsp-signature lsp_signature
              virtualtypes virtualtypes
              renamer renamer
-             lsp_installer nvim-lsp-installer
-             lsp_installer_servers nvim-lsp-installer.servers
              lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
@@ -15,7 +15,6 @@
              cmp cmp
              utils utils
              lspkind lspkind
-             rust-tools rust-tools
              lsp-status lsp-status
              configs lspconfig.configs}
      require-macros [macros zest.macros]})
@@ -141,20 +140,14 @@
                               (once)
                               (vim.cmd ::LspStart)))))))
 
+(var lsp_server_table_name [])
 
 (fn init-lsp [lsp-name ?opts]
   "initialise a language server with defaults"
   (let [merged-opts (a.merge {: on_attach
                               : capabilities}
                             (or ?opts {}))
-        run-server #(let
-                      [(server_available requested_server) (lsp_installer_servers.get_server lsp-name)]
-                     (if (and (not ?opts.no-install) server_available)
-                      (do
-                        (requested_server:on_ready #(requested_server:setup merged-opts))
-                        (if (not (requested_server:is_installed))
-                          (requested_server:install)))
-                      ((. lsp lsp-name :setup) merged-opts)))]
+        run-server #((. lsp lsp-name :setup) merged-opts)]
       (if merged_opts.fts
           (let [fts merged_opts.fts]
             (a.assoc merged_opts :fts)
@@ -162,29 +155,23 @@
           (run-server))))
 
 
+(set vim.g.rustaceanvim {
+                          :server {
+                                   : capabilities
+                                   :on_attach on_attach
+                                   :default_settings {
+                                                      :rust-analyzer {
+                                                                        :checkOnSave {:command :clippy}
+                                                                        :procMacro {:enable true}}}}})
+(mason.setup)
+(mason-lspconfig.setup)
+
 (def-augroup :LspAuGroup
-  (init-lsp :tsserver {:fts [:typescriptreact :typescript :javascript] :autostart false})
+  (init-lsp :ts_ls {:fts [:typescriptreact :typescript :javascript] :autostart false})
   (init-lsp :denols {:fts [:typescript] :autostart false})
   (init-lsp :hls {:no-install true :fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})
   (init-lsp :gopls {:fts :go})
   (init-lsp :sumneko_lua {:fts :lua})
-  (au_ft_once :rust
-      (fn []
-        (let [(server_available requested_server) (lsp_installer_servers.get_server "rust_analyzer")
-              opts {: capabilities
-                    :settings
-                      {:rust-analyzer
-                       {:checkOnSave {:command :clippy}
-                        :procMacro {:enable true}}}
-                    :on_attach (fn [client bufnr]
-                                  ((. (require "rust-tools.inlay_hints") :set_inlay_hints))
-                                  (on_attach client bufnr))}]
-          (when server_available
-           (requested_server:on_ready (fn [server]
-                                         (rust-tools.setup {:server (vim.tbl_deep_extend :force (server:get_default_options) opts)})
-                                        (server:attach_buffers)))
-           (when (not (requested_server:is_installed))
-             (requested_server:install))))))
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
 ;  (init-lsp :ccls {:fts [:cpp :c]})
   (init-lsp :rnix {:fts :nix})

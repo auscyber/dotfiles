@@ -11,6 +11,7 @@
     darwin.url = "github:LnL7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "unstable";
     eww.url = "github:elkowar/eww";
+    _1password-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
@@ -103,10 +104,10 @@
 
 
       in
-      {
+      ({
         darwinConfigurations."Ivys-MacBook-Pro" = import ./systems/macbook {
           modules = [ ./modules/common.nix ];
-          home-manager-modules = [ ./hm/modules/zsh.nix ./hm/modules/neovim.nix ./hm/. ];
+          home-manager-modules = [ inputs._1password-shell-plugins.hmModules.default ./hm/modules/zsh.nix ./hm/modules/neovim.nix ./hm/. ./hm/mac.nix ./hm/modules/1password.nix ];
           inherit nixpkgs config overlays inputs darwin home-manager;
         };
       } //
@@ -119,7 +120,7 @@
       {
         apps.nvim = flake-utils.lib.mkApp {
           name = "nvim";
-          drv = pkgs.neovim-nightly;
+          drv = pkgs.neovim;
         };
       })) // {
         nixosConfigurations = {
@@ -130,7 +131,7 @@
           };
           surfacelaptop = import ./systems/surfacelaptop {
             home-manager-modules = [ ./hm/. ./hm/modules/neovim.nix ./hm/ui.nix ./hm/laptop.nix ];
-            modules = [ inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd home-manager.nixosModules.home-manager ./modules/1password.nix ./modules/common.nix ];
+            modules = [ inputs._1password-shell-plugins.hmModules.default inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd home-manager.nixosModules.home-manager ./modules/1password.nix ./modules/common.nix ];
             inherit nixpkgs config overlays inputs agenix;
           };
 
@@ -174,6 +175,6 @@
             ];
           };
 
-      };
+      });
 }
 

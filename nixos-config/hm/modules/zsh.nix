@@ -1,6 +1,6 @@
 { config, pkgs, system, lib, modulesPath, ... }:
 {
-  programs.exa.enable = true;
+  programs.eza.enable = true;
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -20,20 +20,13 @@
       WLR_NO_HARDWARE_CURSORS = 1;
 
     };
-    zplug = {
-      enable = true;
-      plugins = [
-        {
-          name = "zsh-users/zsh-autosuggestions";
-        }
-        { name = "spwhitt/nix-zsh-completions"; }
-        { name = "zsh-users/zsh-completions"; }
-        { name = "chisui/zsh-nix-shell"; }
-        { name = "zsh-users/zsh-syntax-highlighting"; }
-
-
-      ];
-    };
+      plugins = (builtins.map (package: { name = package.pname; src = package.src;}) (with pkgs; [
+        zsh-autosuggestions
+        nix-zsh-completions
+        zsh-completions
+        zsh-nix-shell
+        zsh-syntax-highlighting
+      ]));
     shellAliases = {
       ghc = "stack exec -- ghc";
       fzf = "fzf --reverse --height 40%";
