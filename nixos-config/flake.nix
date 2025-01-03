@@ -34,8 +34,6 @@
     emacs.url = "github:/nix-community/emacs-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     #nixpkgs
-    master.url = "github:nixos/nixpkgs/master";
-    stable.url = "github:nixos/nixpkgs/nixos-21.05";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     nixpkgs.follows = "unstable";
@@ -44,7 +42,6 @@
   outputs =
     inputs@{
       self,
-      master,
       flake-utils,
       nixpkgs,
       home-manager,
@@ -106,7 +103,7 @@
 
             idris2 = final.idris2Pkgs.idris2;
             idris2Pkgs = idris2-pkgs.packages."${system}";
-            minecraft-server = (import master { inherit system config; }).minecraft-server;
+#            minecraft-server = (import master { inherit system config; }).minecraft-server;
           }
         )
         neovim.overlays.default

@@ -70,7 +70,18 @@
     "Microsoft Teams" = 1113153706;
     "Microsoft Outlook" = 985367838;
   };
-  system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
+  system.defaults.NSGlobalDomain = {
+    AppleInterfaceStyle = "Dark";  # dark mode
+    AppleShowAllFiles = true;
+    ApplePressAndHoldEnabled = false; # enable press and hold
+
+    # If you press and hold certain keyboard keys when in a text area, the key’s character begins to repeat.
+    # This is very useful for vim users, they use `hjkl` to move cursor.
+    # sets how long it takes before it starts repeating.
+    InitialKeyRepeat = 10; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
+    # sets how fast it repeats once it starts.
+    KeyRepeat = 3; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
+  };
   system.defaults.dock = {
     persistent-apps = [
       "/Applications/Arc.app"

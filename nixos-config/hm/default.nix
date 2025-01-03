@@ -43,6 +43,12 @@
       userName = "Ivy Pierlot";
       userEmail = "ivyp@outlook.com.au";
     };
+    programs.eza = {
+      enable = true;
+      git = true;
+      icons = true;
+      enableZshIntegration = true;
+    };
     home.packages = with pkgs; [
       shellify
       ripgrep
