@@ -2,7 +2,13 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
 
   nix = {
     package = pkgs.nixUnstable;
@@ -30,9 +36,9 @@
   networking.useDHCP = false;
   networking.enableIPv6 = true;
   networking.defaultGateway6 = {
-  address = "fe80::1";
-  interface = "br0";
-};
+    address = "fe80::1";
+    interface = "br0";
+  };
   networking.bridges = {
     "br0" = {
       interfaces = [ "enp2s0" ];
@@ -40,18 +46,44 @@
   };
   #
   networking.interfaces.br0.useDHCP = false;
-  networking.interfaces.br0.ipv4.addresses = [{
-    address = "192.168.0.26";
-    prefixLength = 24;
-  }];
+  networking.interfaces.br0.ipv4.addresses = [
+    {
+      address = "192.168.0.26";
+      prefixLength = 24;
+    }
+  ];
   networking.defaultGateway = "192.168.0.1";
   networking.nameservers = [ "1.1.1.1" ];
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 25565 8080 21115 21118 21119 21116 21117 80 53 443 1080 8096 853 8081 ];
-  networking.firewall.allowedUDPPorts = [ 51820 21116 53 67 1900 7359 853 69 68 ];
+  networking.firewall.allowedTCPPorts = [
+    25565
+    8080
+    21115
+    21118
+    21119
+    21116
+    21117
+    80
+    53
+    443
+    1080
+    8096
+    853
+    8081
+  ];
+  networking.firewall.allowedUDPPorts = [
+    51820
+    21116
+    53
+    67
+    1900
+    7359
+    853
+    69
+    68
+  ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
-
 
   #  networking.interfaces.wlo1.useDHCP = true;
   networking.wireless.userControlled.enable = false;
@@ -249,4 +281,3 @@
     in
     formatted;
 }
-

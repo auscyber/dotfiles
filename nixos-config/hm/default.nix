@@ -1,19 +1,25 @@
-{ config, pkgs, system, lib, modulesPath, ... }:
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  modulesPath,
+  ...
+}:
 {
   config = {
     home.stateVersion = "23.11";
-    nix =
-      {
-        #        package = pkgs.nixUnstable;
-        settings =
-          {
-            experimental-features = [
-              "nix-command"
-              "flakes"
-            ];
-          };
+    nix = {
+      #        package = pkgs.nixUnstable;
+      settings = {
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
       };
+    };
     manual.manpages.enable = false;
+    programs.zsh.enable = true;
     programs = {
       command-not-found.enable = true;
       direnv = {
@@ -23,30 +29,63 @@
         };
       };
       home-manager.enable = true;
+
+    };
+    services.gpg-agent = {
+      enable = true;
+      enableSshSupport = true;
     };
     services.lorri = {
       enable = false;
     };
+    programs.git = {
+      enable = true;
+      userName = "Ivy Pierlot";
+      userEmail = "ivyp@outlook.com.au";
+    };
     home.packages = with pkgs; [
       shellify
       ripgrep
+      nil
       rnix-lsp
       nixfmt-rfc-style
       starship
+      treefmt
     ];
-    home.file."lol".text = "hi";
+    home.file = {
+      ".local/bin/fetch" = {
+        source = ../../fetch;
+      };
+      ".config/nvim" = {
+        source = ../../.config/nvim;
+        recursive = true;
+      };
+      ".config/wezterm" = {
+        source = ../../.config/nvim;
+        recursive = true;
+      };
+      ".config/wezterm/lume.lua" = {
+        source = ../../libs/lume.lua;
+      };
+      ".config/wezterm/fennel.lua" = {
+        source = ../../libs/fennel.lua;
+      };
+      ".config/starship.toml" = {
+        source = ../../.config/starship.toml;
+      };
+
+    };
     xdg.configFile."nvim/lua/compiler.lua".text = ''
       			return "${pkgs.stdenv.cc}/bin/cc"
             	'';
 
   };
-  options = with lib;{
-    packagenames = mkOption
-      {
-        type = types.str;
-        default = "
+  options = with lib; {
+    packagenames = mkOption {
+      type = types.str;
+      default = "
           ";
-      };
+    };
     packagecount = mkOption {
       type = types.int;
       default = 0;
@@ -58,5 +97,3 @@
   };
 
 }
-
-

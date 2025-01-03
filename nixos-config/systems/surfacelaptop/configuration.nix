@@ -2,20 +2,25 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "ivyslaptop"; # Define your hostname.
-#  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  #  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -26,13 +31,11 @@
 
   # Set your time zone.
   time.timeZone = "Australia/Melbourne";
-  hardware.bluetooth =
-    {
-      enable = true;
-      powerOnBoot = true;
-    };
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
   services.blueman.enable = true;
-
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_AU.UTF-8";
@@ -89,7 +92,10 @@
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "Ivy Pierlot";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
 
   # Install firefox.
@@ -101,10 +107,10 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  gnome.gnome-tweaks
-   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  git
-  wget
+    gnome.gnome-tweaks
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    git
+    wget
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

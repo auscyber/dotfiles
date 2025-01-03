@@ -6,7 +6,10 @@
     experimentalBackends = true;
     fade = false;
     shadow = false;
-    shadowOffsets = [ (-30) (-30) ];
+    shadowOffsets = [
+      (-30)
+      (-30)
+    ];
     shadowOpacity = "0.25";
     shadowExclude = [ "name = 'xmonad'" ];
     blur = true;

@@ -2,14 +2,18 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   boot.kernelModules = [ "kvm-intel" ];
   # Use the systemd-boot EFI boot loader.
@@ -28,11 +32,10 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  hardware.bluetooth =
-    {
-      enable = true;
-      powerOnBoot = true;
-    };
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
   services.blueman.enable = true;
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.stable;
@@ -50,8 +53,6 @@
   #
   # Enable the X11 windowing system.
   #  services.xserver.enable = true;
-
-
 
   #  networking.interfaces.enp6s0.useDHCP = true;
 
@@ -138,7 +139,7 @@
                   Option "AccelerationScheme" "none"
                   Option "AccelSpeed" "-1"
       EndSection
-         '';
+    '';
     #displayManager.lightdm = {
     #        enable = true;
     #        greeter.enable = true;
@@ -155,8 +156,8 @@
     };
     windowManager.xmonad = {
       enable = true;
-      extraPackages = haskellPackages:
-        with haskellPackages; [
+      extraPackages =
+        haskellPackages: with haskellPackages; [
           xmonad-contrib
           xmonad
         ];
@@ -199,4 +200,3 @@
   system.stateVersion = "23.11"; # Did you read the comment?
 
 }
-

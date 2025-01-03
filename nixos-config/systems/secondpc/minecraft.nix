@@ -1,12 +1,16 @@
-{config, pkgs, lib, ...}:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   minecraft-server = pkgs.minecraft-server.overrideAttrs (attrs: {
     src = pkgs.fetchurl {
       url = "https://launcher.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar";
-    # sha1 because that comes from mojang via api
-    sha1 = "a16d67e5807f57fc4e550299cf20226194497dc2";
-  };
-
+      # sha1 because that comes from mojang via api
+      sha1 = "a16d67e5807f57fc4e550299cf20226194497dc2";
+    };
 
   });
 in

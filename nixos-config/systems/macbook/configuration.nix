@@ -7,7 +7,14 @@
   documentation.enable = true;
   security.pam.enableSudoTouchIdAuth = true;
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [ vim nodejs vscode wezterm zotero gnupg ];
+  environment.systemPackages = with pkgs; [
+    vim
+    nodejs
+    vscode
+    wezterm
+    zotero
+    gnupg
+  ];
 
   nix.channel.enable = false;
   # Auto upgrade nix package and the daemon service.
@@ -35,12 +42,39 @@
     cleanup = "zap";
   };
 
-  homebrew.casks = [ "beeper" "steam" "notion" "google-drive" "spotify" "arc" "discord" "affinity-designer" "affinity-publisher" "grammarly-desktop" "nitro-pdf-pro" "amethyst" "1password" "plover" "postman" ];
+  homebrew.casks = [
+    "beeper"
+    "steam"
+    "notion"
+    "google-drive"
+    "spotify"
+    "arc"
+    "docker-desktop"
+    "discord"
+    "affinity-designer"
+    "affinity-publisher"
+    "grammarly-desktop"
+    "visual-studio-code"
+    "nitro-pdf-pro"
+    "amethyst"
+    "1password"
+    "plover"
+    "postman"
+    "bartender"
+    "onedrive"
+  ];
   homebrew.masApps = {
     "1Password for Safari" = 1569813296;
     "Microsoft 365" = 1450038993;
     Fantastical = 975937182;
     "Microsoft Teams" = 1113153706;
+    "Microsoft Outlook" = 985367838;
+  };
+  system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
+  system.defaults.dock = {
+    persistent-apps = [
+      "/Applications/Arc.app"
+    ];
   };
 
   users.users.ivypierlot = {
@@ -49,5 +83,3 @@
     shell = pkgs.zsh;
   };
 }
-
-

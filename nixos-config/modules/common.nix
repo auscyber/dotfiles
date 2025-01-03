@@ -1,11 +1,29 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
 
-  fonts.packages = with pkgs;
-    (map (x: nerd-fonts.${x}) [ "fira-code" "inconsolata" "hasklug" "roboto-mono" ]);
+  fonts.packages =
+    with pkgs;
+    (map (x: nerd-fonts.${x}) [
+      "fira-code"
+      "inconsolata"
+      "hasklug"
+      "roboto-mono"
+    ]);
 
-  environment.systemPackages = with pkgs; [ git vim ];
+  environment.systemPackages = with pkgs; [
+    git
+    vim
+    neovim
+    wget
+    htop
+    curl
+  ];
 
   programs.zsh.enable = true;
   nix = {
@@ -17,11 +35,17 @@
     settings.substituters = [
       "https://iohk.cachix.org"
       "https://nix-community.cachix.org"
+      "https://cache.nixos.org"
     ];
     package = pkgs.nixVersions.latest;
+
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 30d";
+    };
   };
 
   nixpkgs.config.allowUnfree = true;

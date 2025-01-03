@@ -1,4 +1,10 @@
-{ config, pkgs, system, lib, ... }:
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  ...
+}:
 {
   programs.emacs = {
     enable = true;

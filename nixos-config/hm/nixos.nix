@@ -1,5 +1,12 @@
-conf@{ config, pkgs, system, lib, ... }:
-let impConf = fil: import fil conf;
+conf@{
+  config,
+  pkgs,
+  system,
+  lib,
+  ...
+}:
+let
+  impConf = fil: import fil conf;
 
 in
 rec {
@@ -14,8 +21,13 @@ rec {
     };
     vim = {
       enable = true;
-      plugins = with pkgs.vimPlugins; [ vim-airline vim-addon-nix ];
-      settings = { ignorecase = true; };
+      plugins = with pkgs.vimPlugins; [
+        vim-airline
+        vim-addon-nix
+      ];
+      settings = {
+        ignorecase = true;
+      };
       extraConfig = ''
         set mouse=a
       '';
@@ -27,7 +39,6 @@ rec {
   #  xdg.configFile."nvim/parser/rust.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-rust}/parser";
   #  xdg.configFile."nvim/parser/python.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-python}/parser";
   #  xdg.configFile."nvim/parser/nix.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-nix}/parser";
-
 
   # xdg.configFile."nvim/fnl/plugins/sqlite.fnl".text = ''
   # (module plugins.sqlite)
@@ -48,13 +59,13 @@ rec {
   };
   programs.gpg.enable = true;
 
-  home.packages = with pkgs;
+  home.packages =
+    with pkgs;
     [
       st
-      (
-        (pkgs.gradleGen.override {
-          java = jdk8;
-        }).gradle_latest
+      ((pkgs.gradleGen.override {
+        java = jdk8;
+      }).gradle_latest
       )
       rclone
       neovim-nightly
@@ -97,7 +108,9 @@ rec {
       nodejs-14_x
       nixfmt
       lua
-      (spotify.overrideAttrs (attrs: { nativeInputs = [ gnutls ]; }))
+      (spotify.overrideAttrs (attrs: {
+        nativeInputs = [ gnutls ];
+      }))
       unzip
       scala
       rnix-lsp
@@ -121,14 +134,16 @@ rec {
       pinentry
       thunderbird
     ]
-    ++ (with pkgs.lua51Packages; [ luarocks ]) ++ (with pkgs.haskellPackages; [
+    ++ (with pkgs.lua51Packages; [ luarocks ])
+    ++ (with pkgs.haskellPackages; [
       fourmolu
       taffybar
       #my-xmonad
       haskell-language-server
-    ]) ++ ([
-      (pkgs.haskellPackages.ghcWithPackages (pk:
-        with pk; [
+    ])
+    ++ ([
+      (pkgs.haskellPackages.ghcWithPackages (
+        pk: with pk; [
           microlens-th
           microlens
           dbus
@@ -136,14 +151,22 @@ rec {
           cabal-install
           X11
           xmonad
-        ]))
-    ]) ++ (with nodePackages; [
+        ]
+      ))
+    ])
+    ++ (with nodePackages; [
       p3x-onenote
       yarn
       typescript-language-server
       typescript
       purescript-language-server
     ])
-    ++ (with ocamlPackages; [ utop dune ocaml opam merlin ]);
+    ++ (with ocamlPackages; [
+      utop
+      dune
+      ocaml
+      opam
+      merlin
+    ]);
   #  home.stateVersion = "21.11";
 }

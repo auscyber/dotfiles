@@ -1,4 +1,13 @@
-{ nixpkgs, config, overlays, inputs, nixos-mailserver, home-manager, home-manager-modules, modules, }:
+{
+  nixpkgs,
+  config,
+  overlays,
+  inputs,
+  nixos-mailserver,
+  home-manager,
+  home-manager-modules,
+  modules,
+}:
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   modules = modules ++ [
@@ -22,7 +31,6 @@ nixpkgs.lib.nixosSystem {
             NIXFLAKE = "$HOME/dotfiles/nixos-config";
           };
 
-
         };
       };
       nixpkgs = { inherit config overlays; };
@@ -31,4 +39,3 @@ nixpkgs.lib.nixosSystem {
   ];
 
 }
-

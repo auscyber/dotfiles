@@ -1,4 +1,11 @@
-{ config, pkgs, system, lib, modulesPath, ... }:
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  modulesPath,
+  ...
+}:
 {
   programs.eza.enable = true;
   programs.zsh = {
@@ -20,13 +27,23 @@
       WLR_NO_HARDWARE_CURSORS = 1;
 
     };
-      plugins = (builtins.map (package: { name = package.pname; src = package.src;}) (with pkgs; [
-        zsh-autosuggestions
-        nix-zsh-completions
-        zsh-completions
-        zsh-nix-shell
-        zsh-syntax-highlighting
-      ]));
+    plugins = (
+      builtins.map
+        (package: {
+          name = package.pname;
+          src = package.src;
+        })
+        (
+          with pkgs;
+          [
+            zsh-autosuggestions
+            nix-zsh-completions
+            zsh-completions
+            zsh-nix-shell
+            zsh-syntax-highlighting
+          ]
+        )
+    );
     shellAliases = {
       ghc = "stack exec -- ghc";
       fzf = "fzf --reverse --height 40%";
@@ -48,5 +65,3 @@
                   	'';
   };
 }
-
-

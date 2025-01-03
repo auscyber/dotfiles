@@ -1,1 +1,0 @@
-/nix/store/i57n9bdc0lf1h02cdcc4h5pa4g7l0cmp-home-manager-files/.config/nvim/fnl/plugins/sqlite.fnl
