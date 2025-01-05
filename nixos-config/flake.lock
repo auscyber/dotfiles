@@ -1022,22 +1022,6 @@
         "type": "github"
       }
     },
-    "master": {
-      "locked": {
-        "lastModified": 1735904748,
-        "narHash": "sha256-VDO85IOBUnUdKPG+5+XQYtxdCahNL3Gu4cWf9uh/XrQ=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "01463b17bc667ddb8c2b2126838309e8fd2eee0c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "master",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "naersk": {
       "inputs": {
         "nixpkgs": [
@@ -1670,7 +1654,6 @@
         "idris2": "idris2",
         "idris2-pkgs": "idris2-pkgs",
         "local-nixpkgs": "local-nixpkgs",
-        "master": "master",
         "neovim": "neovim",
         "nix-doom-emacs": "nix-doom-emacs",
         "nixos-hardware": "nixos-hardware",
@@ -1682,7 +1665,6 @@
         "picom": "picom",
         "rnix": "rnix",
         "rust-overlay": "rust-overlay_2",
-        "stable": "stable",
         "unstable": "unstable"
       }
     },
@@ -1770,22 +1752,6 @@
       "original": {
         "owner": "stefan-hoeck",
         "repo": "idris2-sop",
-        "type": "github"
-      }
-    },
-    "stable": {
-      "locked": {
-        "lastModified": 1659914493,
-        "narHash": "sha256-lkA5X3VNMKirvA+SUzvEhfA7XquWLci+CGi505YFAIs=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "022caabb5f2265ad4006c1fa5b1ebe69fb0c3faf",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-21.05",
-        "repo": "nixpkgs",
         "type": "github"
       }
     },

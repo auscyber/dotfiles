@@ -12,7 +12,6 @@
     nodejs
     vscode
     wezterm
-    zotero
     gnupg
   ];
 
@@ -25,6 +24,10 @@
   nix.settings.experimental-features = "nix-command flakes";
 
   # Create /etc/zshrc that loads the nix-darwin environment.
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
   programs.zsh.enable = true; # default shell on catalina
   # programs.fish.enable = true;
 
@@ -43,35 +46,12 @@
   };
 
   homebrew.casks = [
-    "beeper"
-    "steam"
-    "notion"
-    "google-drive"
-    "spotify"
-    "arc"
-    "docker-desktop"
-    "discord"
-    "affinity-designer"
-    "affinity-publisher"
-    "grammarly-desktop"
     "visual-studio-code"
-    "nitro-pdf-pro"
-    "amethyst"
-    "1password"
-    "plover"
     "postman"
     "bartender"
-    "onedrive"
   ];
-  homebrew.masApps = {
-    "1Password for Safari" = 1569813296;
-    "Microsoft 365" = 1450038993;
-    Fantastical = 975937182;
-    "Microsoft Teams" = 1113153706;
-    "Microsoft Outlook" = 985367838;
-  };
   system.defaults.NSGlobalDomain = {
-    AppleInterfaceStyle = "Dark";  # dark mode
+    AppleInterfaceStyle = "Dark"; # dark mode
     AppleShowAllFiles = true;
     ApplePressAndHoldEnabled = false; # enable press and hold
 
@@ -85,8 +65,7 @@
   system.defaults.dock = {
     persistent-apps = [
       "/Applications/Arc.app"
-
-      "/Applications/Wezterm.app"
+      "/Applications/Nix Apps/WezTerm.app"
     ];
   };
 

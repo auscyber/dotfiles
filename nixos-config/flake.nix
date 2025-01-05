@@ -114,7 +114,22 @@
     in
     (
       {
-        darwinConfigurations."Ivys-MacBook-Pro" = import ./systems/macbook {
+        darwinConfigurations = {
+"Chriss-Mac-mini" = import ./systems/macmini {
+	modules = [./modules/common.nix ];
+	home-manager-modules = [
+            inputs._1password-shell-plugins.hmModules.default
+            ./hm/modules/zsh.nix
+            ./hm/modules/neovim.nix
+            ./hm/.
+            ./hm/mac.nix
+            ./hm/modules/1password.nix
+          ];
+inherit nixpkgs config overlays inputs darwin home-manager;
+
+};
+
+"Ivys-MacBook-Pro" = import ./systems/macbook {
           modules = [ ./modules/common.nix ];
           home-manager-modules = [
             inputs._1password-shell-plugins.hmModules.default
@@ -133,6 +148,7 @@
             home-manager
             ;
         };
+};
       }
       // (flake-utils.lib.eachDefaultSystem (
         system:

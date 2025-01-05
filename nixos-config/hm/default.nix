@@ -1,10 +1,9 @@
-{
-  config,
-  pkgs,
-  system,
-  lib,
-  modulesPath,
-  ...
+{ config
+, pkgs
+, system
+, lib
+, modulesPath
+, ...
 }:
 {
   config = {
@@ -31,10 +30,7 @@
       home-manager.enable = true;
 
     };
-    services.gpg-agent = {
-      enable = true;
-      enableSshSupport = true;
-    };
+
     services.lorri = {
       enable = false;
     };
@@ -67,7 +63,7 @@
         recursive = true;
       };
       ".config/wezterm" = {
-        source = ../../.config/nvim;
+        source = ../../.config/wezterm;
         recursive = true;
       };
       ".config/wezterm/lume.lua" = {
