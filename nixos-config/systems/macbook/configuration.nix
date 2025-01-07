@@ -14,6 +14,7 @@
     wezterm
     zotero
     gnupg
+    prismlauncher
   ];
 
   nix.channel.enable = false;
@@ -44,12 +45,12 @@
 
   homebrew.casks = [
     "beeper"
+    "amethyst"
     "steam"
     "notion"
     "google-drive"
     "spotify"
     "arc"
-    "docker-desktop"
     "discord"
     "affinity-designer"
     "affinity-publisher"
@@ -71,7 +72,7 @@
     "Microsoft Outlook" = 985367838;
   };
   system.defaults.NSGlobalDomain = {
-    AppleInterfaceStyle = "Dark";  # dark mode
+    AppleInterfaceStyle = "Dark"; # dark mode
     AppleShowAllFiles = true;
     ApplePressAndHoldEnabled = false; # enable press and hold
 
@@ -82,11 +83,39 @@
     # sets how fast it repeats once it starts.
     KeyRepeat = 3; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
   };
+  services.yabai = {
+    enable = false;
+    enableScriptingAddition = true;
+    config = {
+      focus_follows_mouse = "autoraise";
+      mouse_follows_focus = "off";
+      window_placement = "second_child";
+      window_opacity = "off";
+      top_padding = 36;
+      bottom_padding = 10;
+      left_padding = 10;
+      right_padding = 10;
+      window_gap = 10;
+    };
+
+  };
   system.defaults.dock = {
     persistent-apps = [
+      "/System/Applications/Launchpad.app"
       "/Applications/Arc.app"
-
-      "/Applications/Wezterm.app"
+      "/Applications/Spotify.app"
+      "/Applications/Notion.app"
+      "/Applications/Microsoft Outlook.app"
+      "/Applications/Fantastical.app"
+      "/System/Applications/App Store.app/"
+      "/System/Applications/Messages.app"
+      "/Applications/Beeper.app"
+      "/Applications/1Password.app"
+      "/System/Applications/System Settings.app"
+      "/System/Applications/Home.app"
+      "${pkgs.vscode}/Applications/Visual Studio Code.App"
+      "${pkgs.wezterm}/Applications/Wezterm.App"
+      "${pkgs.zotero}/Applications/Zotero.app"
     ];
   };
 

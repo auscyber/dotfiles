@@ -53,6 +53,7 @@
       nixfmt-rfc-style
       starship
       treefmt
+      coreutils
     ];
     home.file = {
       ".local/bin/fetch" = {

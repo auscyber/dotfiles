@@ -55,7 +55,7 @@ get_packages () {
             then
                 _package_count="$((_package_count+$(nix-store -q -R ~/.local/state/home-manager/gcroots/current-home | wc -l)))"
             fi
-            if command -v nixos-rebuild 1> /dev/null
+            if command -v nixos-rebuild 1> /dev/null || command -v darwin-rebuild 1> /dev/null
             then
                 _package_count="$((_package_count+$(nix-store -q -R /run/current-system/sw | wc -l)))"
             fi
@@ -66,15 +66,32 @@ get_packages () {
     then
         package_data="${package_data}$(pacman -Q | wc -l) (pacman) "
     fi
+	if command -v brew 1> /dev/null
+	then
+		package_data="${package_data}$(brew list | wc -l) (brew) "
+	fi
         printf "%s" "$package_data"
+
 
 }
 
+if [[ $OSTYPE == "darwin"* ]]
+then
+	os="$(sw_vers | grep "ProductVersion" | awk -F ":" '{print $2}' | uniq)"
 
+	os="${os#"${os%%[![:space:]]*}"}"
+	case $os in
+		15*)
+			os="Sequoia $os"
+			;;
+	esac
+	os="macOS $os"
+	cpu="$(system_profiler SPHardwareDataType | grep Chip | awk -F ":" '{print $2}' )"
+else
 os="$(. /etc/os-release && printf "%s" "$PRETTY_NAME")"
-alias get_kernel="uname -r"
+
+
 cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
-cpu="${cpu#"${cpu%%[![:space:]]*}"}"
 command -v lspci >/dev/null && {
 		gpu=$(lspci -mm | grep -i 'vga\|display')
 		gpu=${gpu##*Corporation\"}
@@ -89,13 +106,34 @@ command -v lspci >/dev/null && {
 #			*) gpu=" $*";;
 #		esac
 }
+fi
 
+get_kernel () {
+	case $OSTYPE in
+		darwin*)
+			echo ""
+			;;
+		linux*)
+			uname -r
+			;;
+	esac
+}
+cpu="${cpu#"${cpu%%[![:space:]]*}"}"
 lyric="$( shuf -n 1 < ~/Music/phoebe/lyricslist 2>&- )"
 lyric=${lyric:-"phoebe bridgers"}
 
+case $OSTYPE in
+	darwin*)
+		memused="$(top -l 1 -s 0 | awk '/PhysMem/ {print $2}')"
+		memfree="$(top -l 1 -s 0 | awk '/PhysMem/ {print $8}')"
 
+
+		;;
+		linux*)
 memused="$(free -m | awk '/Mem/ {print $3}')"
 memtotal="$(free -m | awk '/Mem/ {print $2}')"
+;;
+esac
 #main_color="$(fg_t 255 216 158)"
 main_color="$(fg_t 158 203 219 )"
 category="$main_color$BOLD"
@@ -109,7 +147,7 @@ fi
 wm=$DESKTOP_SESSION
 time=$(date "+%I:%M %p")
 date=$(date "+%a %d %b %G")
-uptime=$(uptime -p 2>&-)
+uptime="$(uptime | awk -F ',' '{print $1}' | awk -F 'up' '{print $2}')"
 
 
 

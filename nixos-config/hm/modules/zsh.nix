@@ -7,6 +7,9 @@
 }:
 {
   programs.eza.enable = true;
+  home.file."Music/Phoebe/lyricslist" = {
+    source = ../../../phoebelyrics/lyricslist;
+  };
   programs.zsh = {
     enable = true;
     enableCompletion = true;
