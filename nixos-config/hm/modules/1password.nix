@@ -8,6 +8,7 @@
     plugins = with pkgs; [
       gh
       nodePackages.vercel
+      pkgs.awscli2
     ];
   };
 

@@ -52,36 +52,7 @@
       prefixLength = 24;
     }
   ];
-  networking.defaultGateway = "192.168.0.1";
-  networking.nameservers = [ "1.1.1.1" ];
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    25565
-    8080
-    21115
-    21118
-    21119
-    21116
-    21117
-    80
-    53
-    443
-    1080
-    8096
-    853
-    8081
-  ];
-  networking.firewall.allowedUDPPorts = [
-    51820
-    21116
-    53
-    67
-    1900
-    7359
-    853
-    69
-    68
-  ];
+  
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
@@ -100,7 +71,6 @@
 
   # Configure keymap in X11
   # services.xserver.xkbOptions = "eurosign:e";
-  services.espanso.enable = false;
   #fonts.fonts = with pkgs;
   #  [
   #    (nerdfonts.override {
@@ -132,7 +102,6 @@
   #		enable = true;
   #	};
   #  };
-  hardware.bluetooth.enable = false;
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -151,9 +120,7 @@
     ];
     shell = pkgs.zsh;
   };
-  programs.sway = {
-    enable = false;
-  };
+
   security.sudo = {
     enable = true;
     #	extraRules = {

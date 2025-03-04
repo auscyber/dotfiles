@@ -141,6 +141,8 @@ category="$main_color$BOLD"
 eye_color="$(fg_c 236)"
 if [ -n "$(playerctl metadata title 2>&- )" ]; then
     song=$(playerctl metadata --format "{{title}} - {{artist}}")
+elif [ -n "$(nowplaying-cli get-raw 2>&- )" ]; then
+	song=$(nowplaying-cli get title artist | awk '{ printf("%s - ", $0) }' | sed 's/ - $/\n/g')
 else
     song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
 fi
@@ -199,7 +201,12 @@ print_phoebe () {
 #    HEIGHT=50
 #    wezterm imgcat --width $WIDTH ~/backgrounds/phoeb.png
     HEIGHT=14
+	if [ -n "$(nowplaying-cli get artworkData 2>&-)" ]
+	then
+		nowplaying-cli get artworkData | base64 -d | wezterm imgcat --width $WIDTH
+	else
     wezterm imgcat --width $WIDTH ~/backgrounds/sadbridgers.png
+	fi
 #    wezterm imgcat --height $HEIGHT ~/backgrounds/sadbridgers.png
 
 

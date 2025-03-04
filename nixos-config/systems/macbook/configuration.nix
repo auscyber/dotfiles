@@ -15,6 +15,7 @@
     zotero
     gnupg
     prismlauncher
+    virt-manager
   ];
 
   nix.channel.enable = false;
@@ -23,8 +24,19 @@
   # nix.package = pkgs.nix;
 
   # Necessary for using flakes on this system.
-  nix.settings.experimental-features = "nix-command flakes";
+  nix.distributedBuilds = true;
+  nix.buildMachines = [{
+    hostName = "192.168.0.26";
+    system = "x86_64-linux";
+    protocol = "ssh";
+    supportedFeatures = [ ];
+  }];
 
+  nix.settings = {
+
+    experimental-features = "nix-command flakes";
+
+  };
   # Create /etc/zshrc that loads the nix-darwin environment.
   programs.zsh.enable = true; # default shell on catalina
   # programs.fish.enable = true;
@@ -42,7 +54,7 @@
     # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
     cleanup = "zap";
   };
-
+  homebrew.brews = [ "nowplaying-cli" ];
   homebrew.casks = [
     "beeper"
     "amethyst"
@@ -51,6 +63,7 @@
     "google-drive"
     "spotify"
     "arc"
+    "zen-browser"
     "discord"
     "affinity-designer"
     "affinity-publisher"
@@ -64,6 +77,7 @@
     "bartender"
     "onedrive"
     "skype"
+    "zoom"
   ];
   homebrew.masApps = {
     "1Password for Safari" = 1569813296;
