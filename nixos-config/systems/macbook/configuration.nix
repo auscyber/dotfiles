@@ -5,13 +5,15 @@
 {
   # List packages installed in system profile. To search by name, run:
   documentation.enable = true;
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     vim
     nodejs
     vscode
-    wezterm
+    pandoc
+    texliveFull
+    #    wezterm
     zotero
     gnupg
     prismlauncher
@@ -20,7 +22,6 @@
 
   nix.channel.enable = false;
   # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
 
   # Necessary for using flakes on this system.
@@ -44,7 +45,7 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = 5;
-
+  nix.enable = true;
   # The platform the configuration will be used on.
   nixpkgs.hostPlatform = "aarch64-darwin";
   homebrew.enable = true;
@@ -77,6 +78,7 @@
     "bartender"
     "onedrive"
     "skype"
+    "wezterm@nightly"
     "zoom"
   ];
   homebrew.masApps = {
@@ -122,14 +124,17 @@
       "/Applications/Notion.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
-      "/System/Applications/App Store.app/"
+      #      "/System/Applications/App Store.app/"
+      "/Applications/Microsoft Teams.app"
+      "/Applications/Microsoft Word.app"
       "/System/Applications/Messages.app"
-      "/Applications/Beeper.app"
+      "/Applications/Beeper Desktop.app"
       "/Applications/1Password.app"
       "/System/Applications/System Settings.app"
       "/System/Applications/Home.app"
       "${pkgs.vscode}/Applications/Visual Studio Code.App"
-      "${pkgs.wezterm}/Applications/Wezterm.App"
+      "/Applications/Wezterm.app"
+      #      "${pkgs.wezterm}/Applications/Wezterm.app"
       "${pkgs.zotero}/Applications/Zotero.app"
     ];
   };

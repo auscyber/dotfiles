@@ -81,7 +81,7 @@
 (tset components.active  1
       [
        {
-        :provider "   "
+        :provider " 󰊠  "
         :left_sep ["  " {:str " " :hl {:fg colors.cyan :bg :NONE}}]
         :hl #{:bg colors.cyan
                :style :bold

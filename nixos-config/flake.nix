@@ -6,7 +6,10 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
-
+    wezterm = {
+      url = "github:wezterm/wezterm?submodules=1";
+    flake = false;
+    };
     #flakes
     agenix.url = "github:ryantm/agenix";
     darwin.url = "github:LnL7/nix-darwin";
@@ -25,7 +28,7 @@
     };
     arion.url = "github:hercules-ci/arion";
 
-    #idris2-pkgs.url = "github:claymager/idris2-pkgs";
+    #idris2-pkgs.url = " github:claymager/idris2-pkgs ";
     idris2.url = "github:idris-lang/Idris2";
     rnix.url = "github:nix-community/rnix-lsp";
     neovim.url = "github:nix-community/neovim-nightly-overlay";
@@ -66,7 +69,9 @@
           allowBroken = true;
           allowUnfree = true;
         };
-        filterNixFiles = k: v: v == "regular" && hasSuffix ".nix" k;
+        filterNixFiles = k: v: v == "
+      regular
+      " && hasSuffix ".nix " k;
         importNixFiles =
           path:
           (lists.forEach (
@@ -93,10 +98,10 @@
                 #            idris2 = idris2.packages."${system}".idris2;
                 #            wezterm = (masterp {inherit system;}).wezterm;
                 #              discord = (import master { inherit system config; }).discord;
-                #wezterm = prev.wezterm.overrideAttrs (attrs: {
+                #wezterm = prev.wezterm.overrideAttrs (attrs: rec {
                 #  src = inputs.wezterm;
                 #  cargoDeps = attrs.cargoDeps.overrideAttrs (cattrs: {
-                #    src = inputs.wezterm;
+                #    inherit src;
                 #    outputHash =
                 #      "sha256-iNv9JEu1aQBxhwlugrl2GdoSvF9cYgM6TXBqamrPjFo=";
                 #  });
@@ -251,32 +256,35 @@
             };
 
           };
-          homeConfigurations.arch =
-            let
-              pkgs = import nixpkgs {
-                config.allowUnfree = true;
-                system = "x86_64-linux";
-                inherit overlays;
+          homeConfigurations = {
+            arch =
+              let
+                pkgs = import nixpkgs {
+                  config.allowUnfree = true;
+                  system = "x86_64-linux";
+                  inherit overlays;
+                };
+              in
+              home-manager.lib.homeManagerConfiguration {
+                inherit pkgs;
+                modules = [
+                  ./hm/arch.nix
+                  #   ./hm/modules/agda.nix
+                  #                  ./hm/modules/emacs.nix
+                  ./hm/modules/neovim.nix
+                  #   ./hm/modules/kakoune.nix
+                  #  ./hm/modules/idris2.nix
+                  ./hm/.
+                  nix-doom-emacs.hmModule
+                  {
+                    home.username = "auscyber";
+                    home.homeDirectory = "/home/auscyber";
+                  }
+                ];
               };
-            in
-            home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              modules = [
-                ./hm/arch.nix
-                #   ./hm/modules/agda.nix
-                #                  ./hm/modules/emacs.nix
-                ./hm/modules/neovim.nix
-                #   ./hm/modules/kakoune.nix
-                #  ./hm/modules/idris2.nix
-                ./hm/.
-                nix-doom-emacs.hmModule
-                {
-                  home.username = "auscyber";
-                  home.homeDirectory = "/home/auscyber";
-                }
-              ];
-            };
+          };
 
         }
       );
 }
+
