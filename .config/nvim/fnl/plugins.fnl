@@ -108,7 +108,7 @@
 ;  :gpanders/nvim-parinfer {:ft [:fennel :racket :scheme :lisp]}
   :elkowar/yuck.vim {:ft :yuck}
 ;  :elkowar/nvim-gehzu {:ft :fnl}
-  :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
+  ; :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}
 
    :nvim-lua/lsp-status.nvim {:module :lsp-status}
    :simrat39/symbols-outline.nvim {:opt true}
