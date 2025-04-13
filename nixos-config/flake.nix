@@ -8,7 +8,7 @@
     };
     wezterm = {
       url = "github:wezterm/wezterm?submodules=1";
-    flake = false;
+      flake = false;
     };
     #flakes
     agenix.url = "github:ryantm/agenix";
@@ -17,6 +17,11 @@
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.4.2";
+      inputs.nixpkgs.follows = "nixpkgs";
+
+    };
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
     local-nixpkgs.url = "github:auscyberman/nixpkgs";
@@ -194,11 +199,12 @@
 
             };
             auspc = import ./systems/auspc {
-              modules = [ ./modules/common.nix ];
+              modules = [ ./modules/common.nix inputs.lanzaboote.nixosModules.lanzaboote ];
               home-manager-modules = [
                 ./hm/.
                 ./hm/modules/neovim.nix
                 ./hm/ui.nix
+                ./hm/modules/desktop.nix
                 ./hm/modules/zsh.nix
               ];
               inherit

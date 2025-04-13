@@ -9,15 +9,6 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     vim
-    nodejs
-    vscode
-    pandoc
-    texliveFull
-    #    wezterm
-    zotero
-    gnupg
-    prismlauncher
-    virt-manager
   ];
 
   nix.channel.enable = false;

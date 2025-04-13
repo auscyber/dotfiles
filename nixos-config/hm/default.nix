@@ -42,13 +42,15 @@
     programs.eza = {
       enable = true;
       git = true;
-      icons = true;
+      icons = "auto";
       enableZshIntegration = true;
     };
     home.packages = with pkgs; [
       shellify
       ripgrep
       nil
+      vim
+      neovim
       rnix-lsp
       nixfmt-rfc-style
       starship

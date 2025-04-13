@@ -2,11 +2,10 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 
 {
@@ -14,17 +13,47 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  services.tailscale.enable = true;
+  boot.supportedFilesystems = [ "ntfs" ];
+
+  fileSystems."/mnt/hdd" = {
+    device = "/dev/disk/by-label/hdd";
+    fsType = "lowntfs-3g";
+    options = [ "uid=1000" "gid=100" "rw" "user" "exec" "umask=000" ];
+  };
+  fileSystems."/mnt/ssd2" = {
+    device = "/dev/disk/by-uuid/704821B848217DCA";
+    fsType = "lowntfs-3g";
+    options = [ "uid=1000" "gid=100" "rw" "user" "exec" "umask=000" ];
+  };
+  programs.virt-manager.enable = true;
+
+  users.groups.libvirtd.members = [ "auscyber" ];
+
+  virtualisation.libvirtd.enable = true;
+
+  virtualisation.spiceUSBRedirection.enable = true;
 
   boot.kernelModules = [ "kvm-intel" ];
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  #boot.loader.systemd-boot.enable = true;
+
+
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
+  };
+  boot.loader.efi = {
+    canTouchEfiVariables = true;
+    efiSysMountPoint = "/boot";
+  };
 
   networking.hostName = "auspc"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
-
+  programs.hyprland.enable = true;
   # Set your time zone.
   time.timeZone = "Australia/Melbourne";
 
@@ -37,13 +66,7 @@
     powerOnBoot = true;
   };
   services.blueman.enable = true;
-  hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    modesetting.enable = true;
-    open = false;
-    powerManagement.enable = true;
-    nvidiaSettings = true;
-  };
+
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_AU.UTF-8";
@@ -76,10 +99,7 @@
       # package = pkgs.pulseaudioFull;
     };
   };
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [ mesa ];
-  };
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
   #  security.wrappers = {
@@ -103,6 +123,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    sbctl
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
@@ -122,7 +143,7 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  services.displayManager.defaultSession = "none+xmonad";
+  services.displayManager.defaultSession = "plasma";
   services.displayManager.autoLogin = {
     enable = true;
     user = "auscyber";
@@ -147,15 +168,15 @@
 
     videoDrivers = [ "nvidia" ];
     #   videoDrivers = [ "nouveau" ];
-    desktopManager.plasma5.enable = true;
+    desktopManager.plasma6.enable = true;
     displayManager.startx.enable = true;
 
     windowManager.awesome = {
-      enable = true;
+      enable = false;
       luaModules = with pkgs.luaPackages; [ luarocks ];
     };
     windowManager.xmonad = {
-      enable = true;
+      enable = false;
       extraPackages =
         haskellPackages: with haskellPackages; [
           xmonad-contrib
@@ -171,10 +192,10 @@
   };
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 24800 ];
+  #   networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = true;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
