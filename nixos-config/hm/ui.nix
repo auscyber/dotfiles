@@ -4,22 +4,18 @@ let
   onePassPath = "~/.1password/agent.sock";
 in
 {
-  nixpkgs.config.allowUnfree = true;
   targets.genericLinux.enable = true;
   home.packages = with pkgs; [
+    input-leap
     discord
     wezterm
     spotify
     #    rnix-lsp
-    (polybar.override {
-      pulseSupport = true;
-      iwSupport = true;
-      githubSupport = true;
-    })
+    beeper
     google-chrome
-
+    thunderbird
   ];
-  programs._1password.enable = true;
+  #  programs._1password.enable = true;
   programs.ssh = {
     enable = true;
     extraConfig = ''
