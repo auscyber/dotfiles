@@ -1,0 +1,87 @@
+#!/usr/bin/env sh
+
+PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
+
+# Colors
+source "$HOME/.config/sketchybar/colors.sh"
+
+# Bar Properties
+sketchybar --bar height=40 \
+                 position=top \
+                 padding_left=10 \
+                 padding_right=10 \
+                 color=$BLACK \
+                 border_width=0 \
+                 corner_radius=0 \
+                 margin=0 \
+                 blur_radius=0 \
+                 notch_width=0
+
+# Set default values
+sketchybar --default updates=when_shown \
+                     drawing=on \
+                     icon.font="RobotoMono Nerd Font:Bold:15.0" \
+                     icon.color=$WHITE \
+                     label.font="RobotoMono Nerd Font:Medium:15.0" \
+                     label.color=$WHITE \
+                     padding_left=5 \
+                     padding_right=5
+
+# Left items (workspaces)
+sketchybar --add item workspaces left \
+           --set workspaces script="$PLUGIN_DIR/workspaces.sh" \
+                             update_freq=2 \
+                             background.color=$BLACK \
+                             background.border_width=0 \
+                             background.padding_left=10
+
+# Center items (time)
+sketchybar --add item time center \
+           --set time update_freq=10 \
+                      script="$PLUGIN_DIR/time.sh" \
+                      background.color=$BLACK \
+                      background.height=30 \
+                      background.padding_right=10 \
+                      background.padding_left=10
+
+# Right items
+sketchybar --add item song right \
+           --set song update_freq=5 \
+                      script="$PLUGIN_DIR/media.sh" \
+                      background.color=$BLACK \
+                      background.padding_right=10 \
+                      label.color=$GRAY
+
+sketchybar --add item volume right \
+           --set volume update_freq=2 \
+                        script="$PLUGIN_DIR/volume.sh" \
+                        background.color=$BLACK
+
+sketchybar --add item uptime right \
+           --set uptime update_freq=30 \
+                        script="$PLUGIN_DIR/uptime.sh" \
+                        background.color=$BLACK
+
+sketchybar --add item date right \
+           --set date update_freq=60 \
+                      script="$PLUGIN_DIR/date.sh" \
+                      background.color=$BLACK \
+                      label.color=$PINK
+
+sketchybar --add item power right \
+           --set power icon="襤" \
+                       icon.color=$PINK \
+                       background.color=$BLACK \
+                       click_script="$PLUGIN_DIR/power.sh" \
+                       label=""
+
+# Add battery item for laptops
+if system_profiler SPPowerDataType 2>/dev/null | grep -q "Battery"; then
+  sketchybar --add item battery right \
+             --set battery update_freq=120 \
+                          script="$PLUGIN_DIR/battery.sh" \
+                          background.color=$BLACK
+fi
+
+# Start sketchybar
+sketchybar --update
