@@ -24,6 +24,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
 
     };
+    french-accents = {
+      url = "github:ottopiramuthu/espanso-package-example";
+      flake = false;
+    };
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
     local-nixpkgs.url = "github:auscyberman/nixpkgs";
