@@ -1,15 +1,19 @@
-conf@{
-  config,
-  pkgs,
-  system,
-  lib,
-  ...
+conf@{ config
+, pkgs
+, system
+, lib
+, ...
 }:
 let
   impConf = fil: import fil conf;
 
 in
 rec {
+  stylix = {
+    enable = true;
+    targets.kde.enable = true;
+    image = ../../backgrounds/boygenius.jpg;
+  };
   #  imports = [ ./picom.nix ];
   programs = {
     git = {
@@ -63,9 +67,10 @@ rec {
     with pkgs;
     [
       st
-      ((pkgs.gradleGen.override {
-        java = jdk8;
-      }).gradle_latest
+      (
+        (pkgs.gradleGen.override {
+          java = jdk8;
+        }).gradle_latest
       )
       rclone
       neovim-nightly
@@ -126,7 +131,7 @@ rec {
       gnome.gnome-keyring
       gnome.nautilus
       eww
-      wezterm
+      #wezterm
       zoom-us
       file
       mitscheme

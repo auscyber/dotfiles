@@ -6,14 +6,14 @@ in
 {
   targets.genericLinux.enable = true;
   home.packages = with pkgs; [
-    input-leap
+    #input-leap
     discord
-    wezterm
+    #    wezterm
     spotify
     #    rnix-lsp
     beeper
     google-chrome
-    thunderbird
+    #    thunderbird
   ];
   #  programs._1password.enable = true;
   programs.ssh = {
