@@ -7,14 +7,14 @@ spaces=$(yabai -m query --spaces | jq -r '.[] | select(."is-visible" == true).in
 active=$(yabai -m query --spaces | jq -r '.[] | select(."has-focus" == true).index')
 
 workspace_list=""
-for i in {1..5}; do
+for i in {1..7}; do
   if [ "$i" = "$active" ]; then
-    workspace_list+=" "
+    workspace_list+="[$i]"
   elif echo "$spaces" | grep -q "$i"; then
-    workspace_list+=" $i"
+    workspace_list+=" $i "
   else
-    workspace_list+=" $i"
+    workspace_list+=" $i "
   fi
 done
 
-sketchybar --set $NAME label="$workspace_list"
+sketchybar --set $NAME label="$workspace_list" --width dynamic
