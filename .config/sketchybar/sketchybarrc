@@ -36,7 +36,7 @@ sketchybar --add item workspaces left \
                              background.padding_left=10
 
 # Center items (time)
-sketchybar --add item time center \
+sketchybar --add item time right \
            --set time update_freq=10 \
                       script="$PLUGIN_DIR/time.sh" \
                       background.color=$BLACK \

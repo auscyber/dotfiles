@@ -3,4 +3,4 @@
 date=$(date +"%a %d %b")
 
 sketchybar --set $NAME label=" $date" \
-                      icon=""
+                      icon=""

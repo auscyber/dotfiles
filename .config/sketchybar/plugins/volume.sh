@@ -9,11 +9,11 @@ if [ "$muted" = "true" ]; then
   label="muted"
 else
   if [ "$volume" -gt 66 ]; then
-    icon="墳"
+    icon=""
   elif [ "$volume" -gt 33 ]; then
-    icon="墳"
+    icon="󰖀"
   else
-    icon="奄"
+    icon=""
   fi
   label="$volume%"
 fi
