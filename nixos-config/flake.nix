@@ -6,6 +6,8 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
+    stylix.url = "github:danth/stylix";
+    stylix.inputs.nixpkgs.follows = "nixpkgs";
     wezterm = {
       url = "github:wezterm/wezterm?submodules=1";
       flake = false;
@@ -13,7 +15,7 @@
     #flakes
     agenix.url = "github:ryantm/agenix";
     darwin.url = "github:LnL7/nix-darwin";
-    darwin.inputs.nixpkgs.follows = "unstable";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
@@ -59,6 +61,7 @@
     , idris2
     , rust-overlay
     , eww
+    , stylix
     , nixos-mailserver
     , agenix
     , nix-doom-emacs
@@ -143,7 +146,9 @@
             "Ivys-MacBook-Pro" = import ./systems/macbook {
               modules = [ ./modules/common.nix ];
               home-manager-modules = [
+                stylix.homeManagerModules.stylix
                 inputs._1password-shell-plugins.hmModules.default
+                ./hm/term.nix
                 ./hm/modules/zsh.nix
                 ./hm/modules/neovim.nix
                 ./hm/.
@@ -201,7 +206,9 @@
             auspc = import ./systems/auspc {
               modules = [ ./modules/common.nix inputs.lanzaboote.nixosModules.lanzaboote ];
               home-manager-modules = [
+                stylix.homeManagerModules.stylix
                 ./hm/.
+                ./hm/term.nix
                 ./hm/modules/neovim.nix
                 ./hm/ui.nix
                 ./hm/modules/desktop.nix

@@ -76,7 +76,7 @@
     "onedrive"
     "skype"
     "1password"
-    "wezterm@nightly"
+    #    "wezterm@nightly"
     "zoom"
   ];
   homebrew.masApps = {
@@ -132,7 +132,7 @@
       "/System/Applications/System Settings.app"
       "/System/Applications/Home.app"
       "${pkgs.vscode}/Applications/Visual Studio Code.App"
-      "/Applications/Wezterm.app"
+      "/Applications/Nix Apps/Ghostty.app"
       #      "${pkgs.wezterm}/Applications/Wezterm.app"
       "${pkgs.zotero}/Applications/Zotero.app"
     ];

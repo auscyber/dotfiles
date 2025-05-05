@@ -15,6 +15,9 @@
   ];
   services.tailscale.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+  #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
+
 
   fileSystems."/mnt/hdd" = {
     device = "/dev/disk/by-label/hdd";
@@ -35,6 +38,7 @@
   virtualisation.spiceUSBRedirection.enable = true;
 
   boot.kernelModules = [ "kvm-intel" ];
+  #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = lib.mkForce false;
   #boot.loader.systemd-boot.enable = true;
@@ -76,6 +80,10 @@
   #
   # Enable the X11 windowing system.
   #  services.xserver.enable = true;
+  networking.interfaces.enp6s0.wakeOnLan = {
+    policy = [ "magic" "broadcast" "multicast" ];
+    enable = true;
+  };
 
   #  networking.interfaces.enp6s0.useDHCP = true;
 
@@ -123,6 +131,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    vscode
     sbctl
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
