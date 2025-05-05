@@ -9,19 +9,29 @@
 , ...
 }:
 darwin.lib.darwinSystem {
+  specialArgs = { inherit inputs; };
   system = "aarch64-darwin";
   modules = modules ++ [
     ./configuration.nix
     home-manager.darwinModules.home-manager
     {
-      home-manager.useGlobalPkgs = true;
-      home-manager.useUserPackages = true;
-      home-manager.extraSpecialArgs = { inherit inputs; };
       home-manager.users.ivypierlot = {
         imports = home-manager-modules;
         home.username = "ivypierlot";
       };
-      nixpkgs = { inherit config overlays; };
+      nixpkgs = {
+
+        overlays = overlays ++ [
+          (prev: this:
+            {
+
+              ghostty = prev.ghostty-mac;
+            }
+
+          )
+        ];
+        inherit config;
+      };
       # Optionally, use home-manager.extraSpecialArgs to pass
       # arguments to home.nix
     }

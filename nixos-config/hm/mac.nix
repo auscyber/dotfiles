@@ -33,25 +33,27 @@
   # (pkgs.writeShellScriptBin "my-hello" ''
   #   echo "Hello, ${config.home.username}!"
   # '')
+  #  programs.ghostty.package = pkgs.nur.repos.DimitarNestorov.ghostty;
 
-  home.packages = with pkgs; [
-    nodejs
-    vscode
-    pandoc
-    discord
-    spotify
-    texliveFull
-    #    wezterm
-    zotero
-    gnupg
-    prismlauncher
-    virt-manager
-    mupdf
-    (agda.withPackages
-      (p: [
-        p.standard-library
-      ]))
-  ];
+  home.packages = with pkgs;
+    [
+      nodejs
+      vscode
+      pandoc
+      discord
+      spotify
+      texliveFull
+      #    wezterm
+      zotero
+      gnupg
+      prismlauncher
+      virt-manager
+      mupdf
+      (agda.withPackages
+        (p: [
+          p.standard-library
+        ]))
+    ];
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {

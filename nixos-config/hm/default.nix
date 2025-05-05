@@ -17,7 +17,7 @@
         ];
       };
     };
-    manual.manpages.enable = false;
+    manual.manpages.enable = true;
     programs.zsh.enable = true;
     programs = {
       command-not-found.enable = true;

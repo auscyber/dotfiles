@@ -7,6 +7,7 @@
 }:
 {
   programs.eza.enable = true;
+  home.packages = with pkgs; [ bat] ;
   home.file."Music/Phoebe/lyricslist" = {
     source = ../../../phoebelyrics/lyricslist;
   };
@@ -50,6 +51,7 @@
       ghc = "stack exec -- ghc";
       fzf = "fzf --reverse --height 40%";
       vim = "nvim";
+	  cat = "bat";
       e = "vim";
       #alias ng="nvim -c ':Neogit'"
       ls = "exa --icons --git";
