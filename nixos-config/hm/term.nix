@@ -40,6 +40,7 @@
 
     };
     settings = {
+      macos-icon = "paper";
       theme = "pink_ocean";
       background-opacity = 0.8;
       font-size = 15;

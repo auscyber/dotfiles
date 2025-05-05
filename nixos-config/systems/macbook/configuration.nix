@@ -131,7 +131,7 @@
       "/System/Applications/System Settings.app"
       "/System/Applications/Home.app"
       "${pkgs.vscode}/Applications/Visual Studio Code.App"
-      "/Applications/Nix Apps/Ghostty.app"
+      "${pkgs.ghostty}/Applications/Ghostty.app"
       #      "${pkgs.wezterm}/Applications/Wezterm.app"
       "${pkgs.zotero}/Applications/Zotero.app"
     ];

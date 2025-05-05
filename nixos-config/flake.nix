@@ -12,6 +12,10 @@
       url = "github:wezterm/wezterm?submodules=1";
       flake = false;
     };
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     #flakes
     agenix.url = "github:ryantm/agenix";
     darwin.url = "github:LnL7/nix-darwin";
@@ -91,6 +95,7 @@
           ))
             import;
         overlays = [
+          inputs.nur.overlays.default
           inputs.emacs.overlays.default
           rust-overlay.overlays.default
           (
@@ -102,6 +107,7 @@
 
                 eww = eww.packages.${system}.eww;
                 rnix-lsp = rnix.packages."${system}".rnix-lsp;
+                ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
                 picom = (
                   prev.picom.overrideAttrs (attrs: {
                     src = picom;
@@ -148,14 +154,13 @@
             };
 
             "Ivys-MacBook-Pro" = import ./systems/macbook {
-              modules = [ ./modules/common.nix ];
+              modules = [ ./modules/common.nix ./modules/hm.nix];
               home-manager-modules = [
                 stylix.homeManagerModules.stylix
                 inputs._1password-shell-plugins.hmModules.default
                 ./hm/term.nix
                 ./hm/modules/zsh.nix
                 ./hm/modules/neovim.nix
-                ./hm/.
                 ./hm/modules/zotero.nix
                 ./hm/mac.nix
                 ./hm/modules/1password.nix
@@ -191,6 +196,7 @@
               modules = [
                 nixos-wsl.nixosModules.default
                 home-manager.nixosModules.home-manager
+                ./modules/hm.nix
                 ./modules/common.nix
               ];
               home-manager-modules = [
@@ -208,10 +214,9 @@
 
             };
             auspc = import ./systems/auspc {
-              modules = [ ./modules/common.nix inputs.lanzaboote.nixosModules.lanzaboote ];
+              modules = [ ./modules/hm.nix ./modules/common.nix inputs.lanzaboote.nixosModules.lanzaboote ];
               home-manager-modules = [
                 stylix.homeManagerModules.stylix
-                ./hm/.
                 ./hm/term.nix
                 ./hm/modules/neovim.nix
                 ./hm/ui.nix
@@ -251,7 +256,7 @@
             };
 
             secondpc = import ./systems/secondpc {
-              modules = [ ./modules/common.nix arion.nixosModules.arion ];
+              modules = [ ./modules/common.nix ./modules/hm.nix arion.nixosModules.arion ];
               home-manager-modules = [
                 #./hm/arch.nix
                 #              ./hm/modules/agda.nix

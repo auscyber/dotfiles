@@ -8,6 +8,7 @@
 , ...
 }:
 nixpkgs.lib.nixosSystem {
+  specialArgs = { inherit inputs; };
   system = "x86_64-linux";
   modules = modules ++ [
     ./configuration.nix
@@ -20,10 +21,7 @@ nixpkgs.lib.nixosSystem {
     #    ./minecraft.nix
     home-manager.nixosModules.home-manager
     {
-      home-manager = {
-        useGlobalPkgs = true;
-        useUserPackages = true;
-        users.auscyber = {
+      home-manager.users.auscyber = {
           imports = home-manager-modules;
           home.username = "auscyber";
           home.sessionVariables = {
@@ -31,7 +29,6 @@ nixpkgs.lib.nixosSystem {
             NIXFLAKE = "$HOME/dotfiles/nixos-config";
           };
 
-        };
       };
       nixpkgs = { inherit config overlays; };
 
