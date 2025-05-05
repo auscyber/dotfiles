@@ -1,6 +1,6 @@
 # home.nix
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
 
@@ -38,6 +38,8 @@
     nodejs
     vscode
     pandoc
+    discord
+    spotify
     texliveFull
     #    wezterm
     zotero
@@ -45,8 +47,11 @@
     prismlauncher
     virt-manager
     mupdf
+    (agda.withPackages
+      (p: [
+        p.standard-library
+      ]))
   ];
-  home.packages = with pkgs; [ mupdf ];
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -63,6 +68,175 @@
   };
 
   # You can also manage environment variables but you will have to manually
+  services.espanso = {
+    enable = true;
+    matches = {
+      french = {
+        matches = [
+
+          {
+            trigger = "e'";
+            replace = "é";
+          }
+
+          {
+            trigger = "e`";
+            replace = "è";
+          }
+
+          {
+            trigger = "e^";
+            replace = "ê";
+          }
+
+          {
+            trigger = "e:";
+            replace = "ë";
+          }
+
+          {
+            trigger = "o^";
+            replace = "ô";
+          }
+
+          {
+            trigger = "a`";
+            replace = "à";
+          }
+
+          {
+            trigger = "a^";
+            replace = "â";
+          }
+
+          {
+            trigger = "i^";
+            replace = "î";
+          }
+
+          {
+            trigger = "i:";
+            replace = "ï";
+          }
+
+          {
+            trigger = "u`";
+            replace = "ù";
+          }
+
+          {
+            trigger = "u^";
+            replace = "û";
+          }
+
+          {
+            trigger = "u:";
+            replace = "ü";
+          }
+
+          {
+            trigger = "oe";
+            replace = "œ";
+          }
+
+          {
+            trigger = "ae";
+            replace = "æ";
+          }
+
+          {
+            trigger = "y:";
+            replace = "ÿ";
+          }
+
+          {
+            trigger = "c,";
+            replace = "ç";
+          }
+
+          {
+            trigger = "E'";
+            replace = "É";
+          }
+
+          {
+            trigger = "E`";
+            replace = "È";
+          }
+
+          {
+            trigger = "E^";
+            replace = "Ê";
+          }
+
+          {
+            trigger = "E:";
+            replace = "Ë";
+          }
+
+          {
+            trigger = "O^";
+            replace = "Ô";
+          }
+
+          {
+            trigger = "A`";
+            replace = "À";
+          }
+
+          {
+            trigger = "A^";
+            replace = "Â";
+          }
+
+          {
+            trigger = "I^";
+            replace = "Î";
+          }
+
+          {
+            trigger = "I:";
+            replace = "Ï";
+          }
+
+          {
+            trigger = "U`";
+            replace = "Ù";
+          }
+
+          {
+            trigger = "U^";
+            replace = "Û";
+          }
+
+          {
+            trigger = "U:";
+            replace = "Ü";
+          }
+
+          {
+            trigger = "OE";
+            replace = "Œ";
+          }
+
+          {
+            trigger = "AE";
+            replace = "Æ";
+          }
+
+          {
+            trigger = "Y:";
+            replace = "Ÿ";
+          }
+
+          {
+            trigger = "C,";
+            replace = "Ç";
+          }
+        ];
+      };
+    };
+  };
   # source
   #
   #  ~/.nix-profile/etc/profile.d/hm-session-vars.sh

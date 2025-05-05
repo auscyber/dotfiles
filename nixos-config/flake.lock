@@ -818,6 +818,22 @@
         "type": "github"
       }
     },
+    "french-accents": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1580585250,
+        "narHash": "sha256-o3JqqlPai42wr3kQNab0ROOa+SMpCKY5OuGshMC9/3U=",
+        "owner": "ottopiramuthu",
+        "repo": "espanso-package-example",
+        "rev": "911180066b79e5a8eb1649b326b5f623183bc2e1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ottopiramuthu",
+        "repo": "espanso-package-example",
+        "type": "github"
+      }
+    },
     "frex": {
       "flake": false,
       "locked": {
@@ -2110,6 +2126,7 @@
         "emacs": "emacs",
         "eww": "eww",
         "flake-utils": "flake-utils_2",
+        "french-accents": "french-accents",
         "home-manager": "home-manager_2",
         "idris2": "idris2",
         "idris2-pkgs": "idris2-pkgs",

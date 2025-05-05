@@ -55,20 +55,19 @@
   };
   homebrew.brews = [ "nowplaying-cli" ];
   homebrew.casks = [
+
     "beeper"
     "amethyst"
     "steam"
     "notion"
     "google-drive"
-    "spotify"
     "arc"
     "zen-browser"
-    "discord"
     "affinity-designer"
     "affinity-publisher"
     "grammarly-desktop"
-    "visual-studio-code"
     "nitro-pdf-pro"
+    "wezterm@nightly"
     "amethyst"
     "plover"
     "postman"
@@ -80,7 +79,7 @@
     "zoom"
   ];
   homebrew.masApps = {
-    "1Password for Safari" = 1569813296;
+    #    "1Password for Safari" = 1569813296;
     "Microsoft 365" = 1450038993;
     Fantastical = 975937182;
     "Microsoft Teams" = 1113153706;
@@ -107,7 +106,7 @@
       window_placement = "second_child";
       window_opacity = "off";
       layout = "bsp";
-      top_padding = 36;
+      top_padding = 10;
       bottom_padding = 10;
       left_padding = 10;
       right_padding = 10;
@@ -119,7 +118,7 @@
     persistent-apps = [
       "/System/Applications/Launchpad.app"
       "/Applications/Arc.app"
-      "/Applications/Spotify.app"
+      "${pkgs.spotify}/Applications/Spotify.app"
       "/Applications/Notion.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
@@ -210,7 +209,7 @@
       	'';
 
   };
-  services.sketchybar.enable = false;
+  services.sketchybar.enable = true;
   services.sketchybar.extraPackages = with pkgs; [ jq yabai ];
 
   users.users.ivypierlot = {

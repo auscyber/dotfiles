@@ -1,13 +1,12 @@
-{
-  nixpkgs,
-  config,
-  overlays,
-  inputs,
-  home-manager,
-  darwin,
-  home-manager-modules,
-  modules,
-  ...
+{ nixpkgs
+, config
+, overlays
+, inputs
+, home-manager
+, darwin
+, home-manager-modules
+, modules
+, ...
 }:
 darwin.lib.darwinSystem {
   system = "aarch64-darwin";
@@ -17,6 +16,7 @@ darwin.lib.darwinSystem {
     {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
+      home-manager.extraSpecialArgs = { inherit inputs; };
       home-manager.users.ivypierlot = {
         imports = home-manager-modules;
         home.username = "ivypierlot";
