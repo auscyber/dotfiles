@@ -9,7 +9,7 @@
   config = {
     home.stateVersion = "23.11";
     nix = {
-      #        package = pkgs.nixUnstable;
+      #              package = pkgs.nixVersions.latest;
       settings = {
         experimental-features = [
           "nix-command"
