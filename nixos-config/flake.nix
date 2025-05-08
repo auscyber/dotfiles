@@ -6,6 +6,8 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
+    nixvim.url = "github:nix-community/nixvim";
+    nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:danth/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     wezterm = {
@@ -166,6 +168,7 @@
                 ./modules/hm.nix
               ];
               home-manager-modules = [
+                inputs.nixvim.homeManagerModules.nixvim
                 stylix.homeManagerModules.stylix
                 inputs._1password-shell-plugins.hmModules.default
                 ./hm/term.nix

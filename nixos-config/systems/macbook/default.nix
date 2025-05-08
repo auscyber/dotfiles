@@ -18,6 +18,9 @@ darwin.lib.darwinSystem {
       home-manager.users.ivypierlot = {
         imports = home-manager-modules;
         home.username = "ivypierlot";
+        home.sessionVariables = {
+          NH_FLAKE = builtins.toString ./../..;
+        };
       };
       nixpkgs = {
 
