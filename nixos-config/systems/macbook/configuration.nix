@@ -112,6 +112,10 @@
       right_padding = 10;
       window_gap = 10;
     };
+    extraConfig = ''
+      yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
+      yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+      	'';
 
   };
   system.defaults.dock = {

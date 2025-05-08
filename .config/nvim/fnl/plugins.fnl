@@ -69,7 +69,7 @@
   :tjdevries/train.nvim {:opt true}
 
   ; Completion
-;  :github/copilot.vim {};:opt true}
+  :github/copilot.vim {};:opt true}
   :saadparwaiz1/cmp_luasnip {:opt true :requires :luasnip :module :cmp_luasnip}
   :L3mON4D3/luasnip {:module :luasnip}
   :uga-rosa/cmp-dictionary {:module :cmp_dictionary}

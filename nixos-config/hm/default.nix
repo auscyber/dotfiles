@@ -49,6 +49,7 @@
       shellify
       ripgrep
       nil
+      nh
       vim
       neovim
       rnix-lsp
