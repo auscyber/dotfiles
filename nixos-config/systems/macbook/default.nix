@@ -19,7 +19,7 @@ darwin.lib.darwinSystem {
         imports = home-manager-modules;
         home.username = "ivypierlot";
         home.sessionVariables = {
-          NH_FLAKE = builtins.toString ./../..;
+          NH_FLAKE = "/Users/ivypierlot/dotfiles/nixos-config";
         };
       };
       nixpkgs = {

@@ -46,6 +46,7 @@
       enableZshIntegration = true;
     };
     home.packages = with pkgs; [
+      agenix
       shellify
       ripgrep
       nil

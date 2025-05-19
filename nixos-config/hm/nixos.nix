@@ -10,9 +10,7 @@ let
 in
 rec {
   stylix = {
-    enable = true;
     targets.kde.enable = true;
-    image = ../../backgrounds/boygenius.jpg;
   };
   #  imports = [ ./picom.nix ];
   programs = {
