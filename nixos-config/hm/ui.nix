@@ -4,20 +4,24 @@ let
   onePassPath = "~/.1password/agent.sock";
 in
 {
-  targets.genericLinux.enable = true;
+  #  targets.genericLinux.enable = true;
   home.packages = with pkgs; [
     #input-leap
     discord
     #    wezterm
     spotify
     #    rnix-lsp
-    beeper
-    google-chrome
+    #    beeper
+    #    google-chrome
     #    thunderbird
   ];
+  stylix = {
+    enable = true;
+    image = ../../backgrounds/boygenius-performs-gq.jpg;
+  };
   #  programs._1password.enable = true;
   programs.ssh = {
-    enable = true;
+    enable = false;
     extraConfig = ''
       Host *
           IdentityAgent ${onePassPath}

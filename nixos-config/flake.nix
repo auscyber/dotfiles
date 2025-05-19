@@ -2,6 +2,7 @@
   description = "AusCyber nix flake config";
   inputs = {
     #Non flakes
+    nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     picom = {
       url = "github:ibhagwan/picom";
       flake = false;
@@ -100,6 +101,8 @@
           inputs.nur.overlays.default
           inputs.emacs.overlays.default
           rust-overlay.overlays.default
+
+          neovim.overlays.default
           (
             final: prev:
               let
@@ -107,6 +110,9 @@
               in
               {
 
+
+                nixos-conf-editor = inputs.nixos-conf-editor.packages."${system}".nixos-conf-editor;
+                agenix = inputs.agenix.packages."${system}".default;
                 eww = eww.packages.${system}.eww;
                 rnix-lsp = rnix.packages."${system}".rnix-lsp;
                 ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
@@ -132,7 +138,6 @@
                 #            minecraft-server = (import master { inherit system config; }).minecraft-server;
               }
           )
-          neovim.overlays.default
         ];
 
         #    ++ (importNixFiles ./overlays);
@@ -164,6 +169,7 @@
 
             "Ivys-MacBook-Pro" = import ./systems/macbook {
               modules = [
+                inputs.agenix.darwinModules.default
                 ./modules/common.nix
                 ./modules/hm.nix
               ];
@@ -171,6 +177,7 @@
                 inputs.nixvim.homeManagerModules.nixvim
                 stylix.homeManagerModules.stylix
                 inputs._1password-shell-plugins.hmModules.default
+                ./hm/ui.nix
                 ./hm/term.nix
                 ./hm/modules/zsh.nix
                 ./hm/modules/neovim.nix
