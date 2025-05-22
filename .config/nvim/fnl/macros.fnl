@@ -31,16 +31,12 @@
             (table.insert use-statements block)))
 
     (let [use-sym (gensym)]
-      `(let [packer# (require "packer")]
-         (packer#.startup {1
-                              (fn [,use-sym]
-                                ,(unpack
-                                  (icollect [_# v# (ipairs use-statements)]
-                                      `(,use-sym ,v#))))
-                              :config {:compile_path (.. (vim.fn.stdpath "config") ,sep "lua" ,sep "packer_compiled.lua")
-                                       :display {:open_fn (fn [] (let [(b# win# buf#) ((. (require "packer.util") :float) {:border :rounded})]
-                                                                   (vim.api.nvim_win_set_option win# :winhighlight "PmenuThumb:Normal,FloatBorder:Normal,Normal:Normal,StatusLine:Normal")
-                                                                   (vim.api.nvim_buf_set_name buf# :Packer)
-                                                                   (values b# win# buf#)))}}})))))}
+      `(let [lazy# (require "lazy")]
+         (lazy#.setup {:spec
+                            [,(unpack
+                              (icollect [_# v# (ipairs use-statements)]
+                                v#))]
+                                              })))))}
+
 
 

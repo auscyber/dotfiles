@@ -1,4 +1,14 @@
 {
+  nixConfig = {
+    extra-substituters = [
+      "https://nix-community.cachix.org"
+      "https://iohk.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
+    ];
+  };
   description = "AusCyber nix flake config";
   inputs = {
     #Non flakes
@@ -15,6 +25,8 @@
       url = "github:wezterm/wezterm?submodules=1";
       flake = false;
     };
+	nh.url = "github:nix-community/nh";
+	nh.inputs.nixpkgs.follows = "nixpkgs";
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -106,21 +118,20 @@
           (
             final: prev:
               let
-                system = final.stdenv.hostPlatform.system;
+                inherit (final.stdenv.hostPlatform) system;
               in
               {
 
 
-                nixos-conf-editor = inputs.nixos-conf-editor.packages."${system}".nixos-conf-editor;
+                inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
+				nh = inputs.nh.packages."${system}".default;
                 agenix = inputs.agenix.packages."${system}".default;
-                eww = eww.packages.${system}.eww;
-                rnix-lsp = rnix.packages."${system}".rnix-lsp;
+                inherit (eww.packages.${system}) eww;
+                inherit (rnix.packages."${system}") rnix-lsp;
                 ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
-                picom = (
-                  prev.picom.overrideAttrs (attrs: {
-                    src = picom;
-                  })
-                );
+                picom = prev.picom.overrideAttrs (attrs: {
+                  src = picom;
+                });
                 #            idris2 = idris2.packages."${system}".idris2;
                 #            wezterm = (masterp {inherit system;}).wezterm;
                 #              discord = (import master { inherit system config; }).discord;
@@ -133,7 +144,7 @@
                 #  });
                 #});
 
-                idris2 = final.idris2Pkgs.idris2;
+                inherit (final.idris2Pkgs) idris2;
                 idris2Pkgs = idris2-pkgs.packages."${system}";
                 #            minecraft-server = (import master { inherit system config; }).minecraft-server;
               }
@@ -143,226 +154,224 @@
         #    ++ (importNixFiles ./overlays);
 
       in
-      (
+      {
+        darwinConfigurations = {
+          "Chriss-Mac-mini" = import ./systems/macmini {
+            modules = [ ./modules/common.nix ];
+            home-manager-modules = [
+              inputs._1password-shell-plugins.hmModules.default
+              ./hm/modules/zsh.nix
+              ./hm/modules/neovim.nix
+              ./hm/.
+              ./hm/mac.nix
+              ./hm/modules/1password.nix
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              darwin
+              home-manager
+              ;
+
+          };
+
+          "Ivys-MacBook-Pro" = import ./systems/macbook {
+            modules = [
+              inputs.agenix.darwinModules.default
+              ./modules/common.nix
+              ./modules/hm.nix
+              inputs.stylix.darwinModules.stylix
+            ];
+            home-manager-modules = [
+              inputs.nixvim.homeManagerModules.nixvim
+              inputs._1password-shell-plugins.hmModules.default
+              ./hm/ui.nix
+              ./hm/term.nix
+              ./hm/modules/zsh.nix
+              ./hm/modules/neovim.nix
+              ./hm/modules/zotero.nix
+              ./hm/mac.nix
+              ./hm/modules/1password.nix
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              darwin
+              home-manager
+              ;
+          };
+        };
+      }
+      // (flake-utils.lib.eachDefaultSystem (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system overlays;
+          };
+        in
         {
-          darwinConfigurations = {
-            "Chriss-Mac-mini" = import ./systems/macmini {
-              modules = [ ./modules/common.nix ];
-              home-manager-modules = [
-                inputs._1password-shell-plugins.hmModules.default
-                ./hm/modules/zsh.nix
-                ./hm/modules/neovim.nix
-                ./hm/.
-                ./hm/mac.nix
-                ./hm/modules/1password.nix
-              ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                darwin
-                home-manager
-                ;
-
-            };
-
-            "Ivys-MacBook-Pro" = import ./systems/macbook {
-              modules = [
-                inputs.agenix.darwinModules.default
-                ./modules/common.nix
-                ./modules/hm.nix
-              ];
-              home-manager-modules = [
-                inputs.nixvim.homeManagerModules.nixvim
-                stylix.homeManagerModules.stylix
-                inputs._1password-shell-plugins.hmModules.default
-                ./hm/ui.nix
-                ./hm/term.nix
-                ./hm/modules/zsh.nix
-                ./hm/modules/neovim.nix
-                ./hm/modules/zotero.nix
-                ./hm/mac.nix
-                ./hm/modules/1password.nix
-              ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                darwin
-                home-manager
-                ;
-            };
+          apps.nvim = flake-utils.lib.mkApp {
+            name = "nvim";
+            drv = pkgs.neovim;
           };
         }
-        // (flake-utils.lib.eachDefaultSystem (
-          system:
-          let
-            pkgs = import nixpkgs {
-              inherit system overlays;
-            };
-          in
-          {
-            apps.nvim = flake-utils.lib.mkApp {
-              name = "nvim";
-              drv = pkgs.neovim;
-            };
-          }
-        ))
-        // {
-          nixosConfigurations = {
-            wsl-nixos = import ./systems/wsl-nixos {
-              modules = [
-                nixos-wsl.nixosModules.default
-                home-manager.nixosModules.home-manager
-                ./modules/hm.nix
-                ./modules/common.nix
-              ];
-              home-manager-modules = [
-                ./hm/.
-                ./hm/modules/neovim.nix
-                ./hm/modules/zsh.nix
-              ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                home-manager
-                ;
+      ))
+      // {
+        nixosConfigurations = {
+          wsl-nixos = import ./systems/wsl-nixos {
+            modules = [
+              nixos-wsl.nixosModules.default
+              home-manager.nixosModules.home-manager
+              ./modules/hm.nix
+              ./modules/common.nix
+            ];
+            home-manager-modules = [
+              ./hm/.
+              ./hm/modules/neovim.nix
+              ./hm/modules/zsh.nix
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              home-manager
+              ;
 
-            };
-            auspc = import ./systems/auspc {
-              modules = [
-                ./modules/hm.nix
-                ./modules/common.nix
-                inputs.lanzaboote.nixosModules.lanzaboote
-              ];
-              home-manager-modules = [
-                stylix.homeManagerModules.stylix
-                ./hm/term.nix
-                ./hm/modules/neovim.nix
-                ./hm/ui.nix
-                ./hm/modules/desktop.nix
-                ./hm/modules/zsh.nix
-              ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                agenix
-                home-manager
-                ;
-            };
-            surfacelaptop = import ./systems/surfacelaptop {
-              home-manager-modules = [
-                ./hm/.
-                ./hm/modules/neovim.nix
-                ./hm/ui.nix
-                ./hm/laptop.nix
-              ];
-              modules = [
-                inputs._1password-shell-plugins.hmModules.default
-                inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd
-                home-manager.nixosModules.home-manager
-                ./modules/1password.nix
-                ./modules/common.nix
-              ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                agenix
-                ;
-            };
+          };
+          auspc = import ./systems/auspc {
+            modules = [
+              ./modules/hm.nix
+              ./modules/common.nix
+              inputs.lanzaboote.nixosModules.lanzaboote
+            ];
+            home-manager-modules = [
+              stylix.homeManagerModules.stylix
+              ./hm/term.nix
+              ./hm/modules/neovim.nix
+              ./hm/ui.nix
+              ./hm/modules/desktop.nix
+              ./hm/modules/zsh.nix
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              agenix
+              home-manager
+              ;
+          };
+          surfacelaptop = import ./systems/surfacelaptop {
+            home-manager-modules = [
+              ./hm/.
+              ./hm/modules/neovim.nix
+              ./hm/ui.nix
+              ./hm/laptop.nix
+            ];
+            modules = [
+              inputs._1password-shell-plugins.hmModules.default
+              inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd
+              home-manager.nixosModules.home-manager
+              ./modules/1password.nix
+              ./modules/common.nix
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              agenix
+              ;
+          };
 
-            secondpc = import ./systems/secondpc {
+          secondpc = import ./systems/secondpc {
+            modules = [
+              ./modules/common.nix
+              ./modules/hm.nix
+              arion.nixosModules.arion
+            ];
+            home-manager-modules = [
+              #./hm/arch.nix
+              #              ./hm/modules/agda.nix
+              #                  ./hm/modules/emacs.nix
+              ./hm/modules/neovim.nix
+              ./hm/modules/zsh.nix
+              #              ./hm/modules/kakoune.nix
+              #              ./hm/modules/idris2.nix
+              ./hm/.
+            ];
+            inherit
+              nixpkgs
+              config
+              overlays
+              inputs
+              nixos-mailserver
+              home-manager
+              ;
+          };
+
+        };
+        homeConfigurations = {
+          ivy =
+            let
+              pkgs = import nixpkgs {
+                config.allowUnfree = true;
+                system = "x86_64-linux";
+                inherit overlays;
+              };
+            in
+            home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
               modules = [
-                ./modules/common.nix
-                ./modules/hm.nix
-                arion.nixosModules.arion
-              ];
-              home-manager-modules = [
                 #./hm/arch.nix
-                #              ./hm/modules/agda.nix
+                #   ./hm/modules/agda.nix
                 #                  ./hm/modules/emacs.nix
                 ./hm/modules/neovim.nix
+                ./hm/standalone.nix
+                #   ./hm/modules/kakoune.nix
+                #  ./hm/modules/idris2.nix
                 ./hm/modules/zsh.nix
-                #              ./hm/modules/kakoune.nix
-                #              ./hm/modules/idris2.nix
                 ./hm/.
+                #nix-doom-emacs.hmModule
+                {
+                  home.username = "ivy";
+                  home.homeDirectory = "/home/ivy";
+                }
               ];
-              inherit
-                nixpkgs
-                config
-                overlays
-                inputs
-                nixos-mailserver
-                home-manager
-                ;
             };
 
-          };
-          homeConfigurations = {
-            ivy =
-              let
-                pkgs = import nixpkgs {
-                  config.allowUnfree = true;
-                  system = "x86_64-linux";
-                  inherit overlays;
-                };
-              in
-              home-manager.lib.homeManagerConfiguration {
-                inherit pkgs;
-                modules = [
-                  #./hm/arch.nix
-                  #   ./hm/modules/agda.nix
-                  #                  ./hm/modules/emacs.nix
-                  ./hm/modules/neovim.nix
-                  ./hm/standalone.nix
-                  #   ./hm/modules/kakoune.nix
-                  #  ./hm/modules/idris2.nix
-                  ./hm/modules/zsh.nix
-                  ./hm/.
-                  #nix-doom-emacs.hmModule
-                  {
-                    home.username = "ivy";
-                    home.homeDirectory = "/home/ivy";
-                  }
-                ];
+          arch =
+            let
+              pkgs = import nixpkgs {
+                config.allowUnfree = true;
+                system = "x86_64-linux";
+                inherit overlays;
               };
+            in
+            home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                ./hm/arch.nix
+                ./hm/standalone.nix
+                #   ./hm/modules/agda.nix
+                #                  ./hm/modules/emacs.nix
+                ./hm/modules/neovim.nix
+                #   ./hm/modules/kakoune.nix
+                #  ./hm/modules/idris2.nix
+                ./hm/.
+                nix-doom-emacs.hmModule
+                {
+                  home.username = "auscyber";
+                  home.homeDirectory = "/home/auscyber";
+                }
+              ];
+            };
+        };
 
-            arch =
-              let
-                pkgs = import nixpkgs {
-                  config.allowUnfree = true;
-                  system = "x86_64-linux";
-                  inherit overlays;
-                };
-              in
-              home-manager.lib.homeManagerConfiguration {
-                inherit pkgs;
-                modules = [
-                  ./hm/arch.nix
-                  ./hm/standalone.nix
-                  #   ./hm/modules/agda.nix
-                  #                  ./hm/modules/emacs.nix
-                  ./hm/modules/neovim.nix
-                  #   ./hm/modules/kakoune.nix
-                  #  ./hm/modules/idris2.nix
-                  ./hm/.
-                  nix-doom-emacs.hmModule
-                  {
-                    home.username = "auscyber";
-                    home.homeDirectory = "/home/auscyber";
-                  }
-                ];
-              };
-          };
-
-        }
-      );
+      };
 }

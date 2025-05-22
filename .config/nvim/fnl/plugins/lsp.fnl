@@ -6,8 +6,7 @@
    autoload {idris2 idris2
              lsp-signature lsp_signature
              virtualtypes virtualtypes
-             renamer renamer
-             lsp lspconfig
+             renamer renamer lsp lspconfig
              cmp_nvim_lsp cmp_nvim_lsp
              a aniseed.core
              nvim aniseed.nvim
@@ -147,7 +146,8 @@
   (let [merged-opts (a.merge {: on_attach
                               : capabilities}
                             (or ?opts {}))
-        run-server #((. lsp lsp-name :setup) merged-opts)]
+        run-server #(vim.lsp.enable lsp-name)]
+      (vim.lsp.config lsp-name merged_opts)
       (if merged_opts.fts
           (let [fts merged_opts.fts]
             (a.assoc merged_opts :fts)
@@ -174,9 +174,7 @@
   (init-lsp :sumneko_lua {:fts :lua})
   (init-lsp :clangd {:fts [:cpp :c] :init_options {:clangdFileStatus true} :handlers (lsp-status.extensions.clangd.setup)})
 ;  (init-lsp :ccls {:fts [:cpp :c]})
-  (init-lsp :rnix {:fts :nix})
-  (au_ft_once :nix (fn []
-                    ((. lsp :rnix :setup) {: on_attach : capabilities})))
+  (init-lsp :nil_ls {:fts nil_ls})
   (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pyright {:fts :python
                       :handlers (lsp-status.extensions.pyls_ms.setup)

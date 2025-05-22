@@ -1,31 +1,43 @@
-local execute = vim.api.nvim_command
-local fn = vim.fn
-local pack_path = fn.stdpath("data") .. "/site/pack"
-local fmt = string.format
-function ensure (user, repo)
-  local install_path = fmt("%s/packer/start/%s", pack_path, repo, repo)
-  if fn.empty(fn.glob(install_path)) > 0 then
-    execute(fmt("!git clone https://github.com/%s/%s %s", user, repo, install_path))
-    if user == "wbthomason" and repo == "packer.nvim" then
-        packer_bootstrap = true
-    end
+local packages_path = vim.fn.stdpath("data") .. "/lazy"
+
+local function install_package(name, alias)
+  ---@type unknown, unknown, string, string
+  local _, _, owner, repo = name:find("(.+)/(.+)")
+  local path = ("%s/%s"):format(packages_path, alias or repo)
+
+  if not vim.uv.fs_stat(path) then
+    vim.notify(("Installing %s/%s..."):format(owner, repo), vim.log.levels.INFO)
+
+    vim
+      .system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "--single-branch",
+        ("https://github.com/%s/%s.git"):format(owner, repo),
+        path,
+      })
+      :wait()
   end
+
+  vim.opt.runtimepath:prepend(path)
 end
+install_package("folke/lazy.nvim")
+install_package("Olical/aniseed")
+install_package("tsbohc/zest.nvim")
 
-if fn.has("win32") > 0 then
-	--	vim.o.shellslash = true
-end
 
 
-ensure("wbthomason", "packer.nvim")
-ensure("Olical", "aniseed")
-ensure("lewis6991","impatient.nvim")
-ensure("tsbohc","zest.nvim")
---ensure("rktjmp","hotpot.nvim")
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+
+
+vim.loader.enable()
+-- ensure("rktjmp","hotpot.nvim")
 --
 --
 --require ("hotpot")
-require "impatient"
 require "zest".setup()
 
 vim.o.termguicolors = true

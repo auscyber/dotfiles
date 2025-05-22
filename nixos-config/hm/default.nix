@@ -52,8 +52,8 @@
       nil
       nh
       vim
+      nil
       neovim
-      rnix-lsp
       nixfmt-rfc-style
       starship
       treefmt
