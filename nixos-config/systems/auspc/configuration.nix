@@ -122,6 +122,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.auscyber = {
     isNormalUser = true;
+	description = "Ivy";
     shell = pkgs.zsh;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
@@ -131,7 +132,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    input-leap
+  google-chrome
+    #input-leap
     vscode
     sbctl
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
