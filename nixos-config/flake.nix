@@ -30,6 +30,10 @@
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
+      };
+    input-leap = {
+      url = "github:input-leap/input-leap?submodules=1";
+      flake = false;
     };
     #flakes
     agenix.url = "github:ryantm/agenix";
@@ -121,6 +125,13 @@
                 inherit (final.stdenv.hostPlatform) system;
               in
               {
+                input-leap = prev.input-leap.overrideAttrs
+                  (attrs:
+                    {
+                      # patches = [ ];
+                      src = inputs.input-leap;
+                    }
+                  );
 
 
                 inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
