@@ -30,11 +30,10 @@
       WLR_NO_HARDWARE_CURSORS = 1;
 
     };
-    plugins = (
-      builtins.map
+    plugins = builtins.map
         (package: {
           name = package.pname;
-          src = package.src;
+          inherit (package) src;
         })
         (
           with pkgs;
@@ -45,8 +44,7 @@
             zsh-nix-shell
             zsh-syntax-highlighting
           ]
-        )
-    );
+        );
     shellAliases = {
       ghc = "stack exec -- ghc";
       fzf = "fzf --reverse --height 40%";

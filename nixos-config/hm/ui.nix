@@ -15,10 +15,7 @@ in
     #    google-chrome
     #    thunderbird
   ];
-  stylix = {
-    enable = true;
-    image = ../../backgrounds/boygenius-performs-gq.jpg;
-  };
+
   #  programs._1password.enable = true;
   programs.ssh = {
     enable = false;

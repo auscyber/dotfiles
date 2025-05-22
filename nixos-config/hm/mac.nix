@@ -49,10 +49,10 @@
       prismlauncher
       virt-manager
       mupdf
-      (agda.withPackages
-        (p: [
-          p.standard-library
-        ]))
+#      (agda.withPackages
+#        (p: [
+#          p.standard-library
+#        ]))
     ];
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -238,6 +238,18 @@
         ];
       };
     };
+  };
+targets.darwin.defaults.NSGlobalDomain = {
+    AppleInterfaceStyle = "Dark"; # dark mode
+    AppleShowAllFiles = true;
+    ApplePressAndHoldEnabled = false; # enable press and hold
+
+    # If you press and hold certain keyboard keys when in a text area, the key’s character begins to repeat.
+    # This is very useful for vim users, they use `hjkl` to move cursor.
+    # sets how long it takes before it starts repeating.
+    InitialKeyRepeat = 10; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
+    # sets how fast it repeats once it starts.
+    KeyRepeat = 3; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
   };
   # source
   #

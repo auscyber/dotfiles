@@ -6,8 +6,9 @@
   # List packages installed in system profile. To search by name, run:
   documentation.enable = true;
   security.pam.services.sudo_local.touchIdAuth = true;
-  fonts.packages = with pkgs; ([ ] ++ (with nerd-fonts; [ hack roboto-mono ]));
+  fonts.packages = with pkgs; (with nerd-fonts; [ hack roboto-mono ]);
   # $ nix-env -qaP | grep wget
+  system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
     vim
     nodejs
@@ -17,11 +18,17 @@
     texliveFull
     #    wezterm
     zotero
+    qemu
+    utm
     gnupg
     prismlauncher
     virt-manager
     #    nixos-conf-editor
   ];
+  stylix = {
+    enable = false;
+    image = ../../boygenius-performs-gq.jpg;
+  };
 
   nix.channel.enable = false;
   nix.gc.automatic = true;
@@ -68,7 +75,7 @@
     "affinity-publisher"
     "grammarly-desktop"
     "nitro-pdf-pro"
-    "wezterm@nightly"
+    #  "wezterm@nightly"
     "amethyst"
     "plover"
     "postman"
@@ -86,18 +93,7 @@
     "Microsoft Teams" = 1113153706;
     "Microsoft Outlook" = 985367838;
   };
-  system.defaults.NSGlobalDomain = {
-    AppleInterfaceStyle = "Dark"; # dark mode
-    AppleShowAllFiles = true;
-    ApplePressAndHoldEnabled = false; # enable press and hold
 
-    # If you press and hold certain keyboard keys when in a text area, the key’s character begins to repeat.
-    # This is very useful for vim users, they use `hjkl` to move cursor.
-    # sets how long it takes before it starts repeating.
-    InitialKeyRepeat = 10; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
-    # sets how fast it repeats once it starts.
-    KeyRepeat = 3; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
-  };
   services.yabai = {
     enable = true;
     enableScriptingAddition = true;

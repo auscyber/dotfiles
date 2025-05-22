@@ -65,11 +65,9 @@ rec {
     with pkgs;
     [
       st
-      (
-        (pkgs.gradleGen.override {
+      (pkgs.gradleGen.override {
           java = jdk8;
         }).gradle_latest
-      )
       rclone
       neovim-nightly
       firefox
@@ -144,7 +142,7 @@ rec {
       #my-xmonad
       haskell-language-server
     ])
-    ++ ([
+    ++ [
       (pkgs.haskellPackages.ghcWithPackages (
         pk: with pk; [
           microlens-th
@@ -156,7 +154,7 @@ rec {
           xmonad
         ]
       ))
-    ])
+    ]
     ++ (with nodePackages; [
       p3x-onenote
       yarn
