@@ -1463,6 +1463,22 @@
         "type": "github"
       }
     },
+    "input-leap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746524759,
+        "narHash": "sha256-BIcepQ7m/jAK6d6VyE5X3zlXmM1L3hU3I7U4527q/1c=",
+        "owner": "input-leap",
+        "repo": "input-leap",
+        "rev": "7c84407d895fb6350fb7ee87350e3a9b0efd305d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "input-leap",
+        "repo": "input-leap",
+        "type": "github"
+      }
+    },
     "ipkg-to-json": {
       "flake": false,
       "locked": {
@@ -2440,6 +2456,7 @@
         "home-manager": "home-manager_2",
         "idris2": "idris2",
         "idris2-pkgs": "idris2-pkgs",
+        "input-leap": "input-leap",
         "lanzaboote": "lanzaboote",
         "local-nixpkgs": "local-nixpkgs",
         "neovim": "neovim",
