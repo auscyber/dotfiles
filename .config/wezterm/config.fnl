@@ -16,6 +16,7 @@
                                  "Pink Ocean"
                                  (require "pink_ocean")}
                 :front_end  "WebGpu"
+                :webgpu_preferred_adapter (. (wezterm.gui.enumerate_gpus) 1)
                 :max_fps 120
                 :webgpu_power_preference   "HighPerformance"
                   :enable_scroll_bar true ;(~= os "GNU/Linux")
