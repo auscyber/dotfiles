@@ -1,14 +1,5 @@
 {
-  nixConfig = {
-    extra-substituters = [
-      "https://nix-community.cachix.org"
-      "https://iohk.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
-    ];
-  };
+
   description = "AusCyber nix flake config";
   inputs = {
     #Non flakes
@@ -25,6 +16,7 @@
       url = "github:wezterm/wezterm?submodules=1";
       flake = false;
     };
+	opnix.url = "github:brizzbuzz/opnix";
 	nh.url = "github:nix-community/nh";
 	nh.inputs.nixpkgs.follows = "nixpkgs";
     nur = {
@@ -198,6 +190,8 @@
             home-manager-modules = [
               inputs.nixvim.homeManagerModules.nixvim
               inputs._1password-shell-plugins.hmModules.default
+#			  inputs.opnix.hmModules.default
+			  ./hm/yabai.nix
               ./hm/ui.nix
               ./hm/term.nix
               ./hm/modules/zsh.nix
@@ -205,6 +199,7 @@
               ./hm/modules/zotero.nix
               ./hm/mac.nix
               ./hm/modules/1password.nix
+
             ];
             inherit
               nixpkgs
@@ -262,6 +257,7 @@
             ];
             home-manager-modules = [
               stylix.homeManagerModules.stylix
+			  ./hm/hyprland.nix
               ./hm/term.nix
               ./hm/modules/neovim.nix
               ./hm/ui.nix

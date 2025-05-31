@@ -17,6 +17,7 @@
         ];
       };
     };
+	home.shell.enableZshIntegration = true;
     manual.manpages.enable = true;
     programs.zsh.enable = true;
     programs = {
@@ -46,6 +47,7 @@
       enableZshIntegration = true;
     };
     home.packages = with pkgs; [
+	devenv
       agenix
       shellify
       ripgrep
