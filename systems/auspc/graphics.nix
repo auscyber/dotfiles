@@ -8,7 +8,7 @@
     #    fullCompositionPipeline = true;
     modesetting.enable = true;
     open = false;
-    powerManagement.enable = true;
+    powerManagement.enable = false;
     powerManagement.finegrained = false;
     nvidiaSettings = true;
     gsp.enable = true;

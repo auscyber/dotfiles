@@ -251,6 +251,7 @@
           };
           auspc = import ./systems/auspc {
             modules = [
+			inputs.stylix.nixosModules.stylix
               ./modules/hm.nix
               ./modules/common.nix
               inputs.lanzaboote.nixosModules.lanzaboote
@@ -258,6 +259,7 @@
             home-manager-modules = [
               stylix.homeManagerModules.stylix
 			  ./hm/hyprland.nix
+			./hm/nixos2.nix
               ./hm/term.nix
               ./hm/modules/neovim.nix
               ./hm/ui.nix

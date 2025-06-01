@@ -13,6 +13,11 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  stylix = {
+  enable = true;
+  image = ../../boygenius-performs-gq.jpg;
+  base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
+  };
   services.tailscale.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
   boot.kernelPackages = pkgs.linuxPackages_zen;
