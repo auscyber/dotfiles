@@ -20,7 +20,7 @@
                             (if status res))])
 
 (treesitter.setup {
-                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :norg :kotlin :markdown :jsonc]
+                   :ensure_installed [:rust :haskell :javascript :c :fennel :go :zig  :nix :cpp :bash :glsl :python :lua :toml :typescript :yaml :css :kotlin :markdown :jsonc]
                    :highlight {
                                :enable true}
                    :autopairs {:enable true}
