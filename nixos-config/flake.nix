@@ -125,7 +125,7 @@
                     }
                   );
 
-
+				desktoppr = prev.callPackage ./desktoppr.nix {};
                 inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
 				nh = inputs.nh.packages."${system}".default;
                 agenix = inputs.agenix.packages."${system}".default;
