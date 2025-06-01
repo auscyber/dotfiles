@@ -5,7 +5,7 @@
              fennel aniseed.fennel}
 
    require-macros [macros zest.macros]})
-(let [(res err) (pcall #(require :packer_compiled))] #(do nil))
+; (let [(res err) (pcall #(require :packer_compiled))] #(do nil))
 ;  (if err))
 ;    (vim.notify (string.format "Failure loading packer_compiled %s" (tostring err)) vim.log.levels.ERROR)))
 (opt-set mouse "a")
