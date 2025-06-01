@@ -117,7 +117,9 @@ in
     # TODO: [@cmacrae] Handle removal of yabai scripting additions
     (mkIf (cfg.enableScriptingAddition) {
       launchd.agents.yabai-sa = {
-        script = "${cfg.package}/bin/yabai --load-sa";
+	config.UserName = "root";
+        config.ProgramArguments = ["${cfg.package}/bin/yabai" "--load-sa"];
+		config.EnvironmentVariables.Path = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
         config.RunAtLoad = true;
         config.KeepAlive.SuccessfulExit = false;
       };
