@@ -1,7 +1,10 @@
 {
-config, pkgs,...
-}: {
+  config,
+  pkgs,
+  ...
+}:
+{
 
-stylix.targets.kde.enable = true;
+  stylix.targets.kde.enable = true;
 
 }

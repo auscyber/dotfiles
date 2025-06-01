@@ -1,8 +1,9 @@
-conf@{ config
-, pkgs
-, system
-, lib
-, ...
+conf@{
+  config,
+  pkgs,
+  system,
+  lib,
+  ...
 }:
 let
   impConf = fil: import fil conf;
@@ -66,8 +67,8 @@ rec {
     [
       st
       (pkgs.gradleGen.override {
-          java = jdk8;
-        }).gradle_latest
+        java = jdk8;
+      }).gradle_latest
       rclone
       neovim-nightly
       firefox

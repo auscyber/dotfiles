@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, fetchpatch, kernel }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  kernel,
+}:
 
 stdenv.mkDerivation rec {
   pname = "alx-wol-dkms";
@@ -74,7 +80,3 @@ stdenv.mkDerivation rec {
     platforms = platforms.linux;
   };
 }
-
-
-
-

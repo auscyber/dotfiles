@@ -1,11 +1,12 @@
-{ nixpkgs
-, config
-, overlays
-, inputs
-, home-manager
-, home-manager-modules
-, modules
-, ...
+{
+  nixpkgs,
+  config,
+  overlays,
+  inputs,
+  home-manager,
+  home-manager-modules,
+  modules,
+  ...
 }:
 nixpkgs.lib.nixosSystem {
   specialArgs = { inherit inputs; };
@@ -22,12 +23,12 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
     {
       home-manager.users.auscyber = {
-          imports = home-manager-modules;
-          home.username = "auscyber";
-          home.sessionVariables = {
-            FLAKENAME = "auscyber";
-            NIXFLAKE = "$HOME/dotfiles/nixos-config";
-          };
+        imports = home-manager-modules;
+        home.username = "auscyber";
+        home.sessionVariables = {
+          FLAKENAME = "auscyber";
+          NIXFLAKE = "$HOME/dotfiles/nixos-config";
+        };
 
       };
       nixpkgs = { inherit config overlays; };

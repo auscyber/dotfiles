@@ -1,13 +1,14 @@
-{ config
-, pkgs
-, system
-, lib
-, modulesPath
-, ...
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  modulesPath,
+  ...
 }:
 {
   programs.eza.enable = true;
-  home.packages = with pkgs; [ bat] ;
+  home.packages = with pkgs; [ bat ];
   home.file."Music/Phoebe/lyricslist" = {
     source = ../../phoebelyrics/lyricslist;
   };
@@ -30,7 +31,8 @@
       WLR_NO_HARDWARE_CURSORS = 1;
 
     };
-    plugins = builtins.map
+    plugins =
+      builtins.map
         (package: {
           name = package.pname;
           inherit (package) src;
@@ -49,7 +51,7 @@
       ghc = "stack exec -- ghc";
       fzf = "fzf --reverse --height 40%";
       vim = "nvim";
-	  cat = "bat";
+      cat = "bat";
       e = "vim";
       #alias ng="nvim -c ':Neogit'"
       ls = "exa --icons --git";

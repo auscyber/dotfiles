@@ -1,9 +1,10 @@
-{ config
-, pkgs
-, system
-, lib
-, modulesPath
-, ...
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  modulesPath,
+  ...
 }:
 {
   config = {
@@ -17,7 +18,7 @@
         ];
       };
     };
-	home.shell.enableZshIntegration = true;
+    home.shell.enableZshIntegration = true;
     manual.manpages.enable = true;
     programs.zsh.enable = true;
     programs = {
@@ -47,7 +48,7 @@
       enableZshIntegration = true;
     };
     home.packages = with pkgs; [
-	devenv
+      devenv
       agenix
       shellify
       ripgrep

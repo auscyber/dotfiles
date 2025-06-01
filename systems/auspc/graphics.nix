@@ -1,8 +1,10 @@
-{ config
-, lib
-, pkgs
-, ...
-}: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     #    fullCompositionPipeline = true;
@@ -32,8 +34,6 @@
     "nvidia-drm.modeset=1"
     "nvidia.NVreg_UsePageAttributeTable=1"
 
-
   ];
-
 
 }

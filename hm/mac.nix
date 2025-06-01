@@ -1,6 +1,11 @@
 # home.nix
 
-{ config, pkgs, inputs,  ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
 
@@ -35,26 +40,25 @@
   # '')
   #  programs.ghostty.package = pkgs.nur.repos.DimitarNestorov.ghostty;
 
-  home.packages = with pkgs;
-    [
-      nodejs
-	  desktoppr
-      vscode
-      pandoc
-      discord
-      spotify
-      texliveFull
-      #    wezterm
-      zotero
-      gnupg
-      prismlauncher
-      virt-manager
-      mupdf
-#      (agda.withPackages
-#        (p: [
-#          p.standard-library
-#        ]))
-    ];
+  home.packages = with pkgs; [
+    nodejs
+    desktoppr
+    vscode
+    pandoc
+    discord
+    spotify
+    texliveFull
+    #    wezterm
+    zotero
+    gnupg
+    prismlauncher
+    virt-manager
+    mupdf
+    #      (agda.withPackages
+    #        (p: [
+    #          p.standard-library
+    #        ]))
+  ];
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -240,14 +244,14 @@
       };
     };
   };
-services.skhd = {
+  services.skhd = {
     enable = true;
 
     config =
       let
         input = {
-		 "cmd + alt - s " =  "yabai -m window --toggle spotify || open  -a Spotify ";
-"cmd + alt - d " = " yabai -m window --toggle discord || open -a Discord";
+          "cmd + alt - s " = "yabai -m window --toggle spotify || open  -a Spotify ";
+          "cmd + alt - d " = " yabai -m window --toggle discord || open -a Discord";
           # focus window
           "alt - h" = " yabai -m window --focus west";
 
@@ -267,11 +271,12 @@ services.skhd = {
           "shift + alt - left   " = "yabai -m window --grid 1:2:0:0:1:1";
 
           # create desktop, move window and follow focus - uses jq for parsing json (brew install jq)
-          "shift + cmd - n" = ''yabai -m space --create && \
-                         index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
-                         yabai -m window --space "''${index}" && \
-                         yabai -m space --focus "''${index}"
-						 '';
+          "shift + cmd - n" = ''
+            yabai -m space --create && \
+                                     index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
+                                     yabai -m window --space "''${index}" && \
+                                     yabai -m space --focus "''${index}"
+            						 '';
 
           # fast focus desktop
           "cmd + alt - x " = " yabai -m space --focus recent";
@@ -324,9 +329,9 @@ services.skhd = {
 
   };
   services.yabai = {
-enableScriptingAddition = true;
-  enable = true;
-config = {
+    enableScriptingAddition = true;
+    enable = true;
+    config = {
       focus_follows_mouse = "off";
       mouse_follows_focus = "off";
       window_placement = "second_child";
@@ -338,7 +343,7 @@ config = {
       right_padding = 10;
       window_gap = 10;
     };
-	extraConfig = ''
+    extraConfig = ''
       yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
       yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
       yabai -m rule --add app="^Spotify$" scratchpad=spotify grid=11:11:1:1:9:9
@@ -346,7 +351,7 @@ config = {
       	'';
 
   };
-targets.darwin.defaults.NSGlobalDomain = {
+  targets.darwin.defaults.NSGlobalDomain = {
     AppleInterfaceStyle = "Dark"; # dark mode
     AppleShowAllFiles = true;
     ApplePressAndHoldEnabled = false; # enable press and hold

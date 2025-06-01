@@ -22,16 +22,15 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
     {
 
-      home-manager.
-        users.auscyber = {
-          imports = home-manager-modules;
-          home.username = "auscyber";
-          home.sessionVariables = {
-            FLAKENAME = "auscyber";
-            NIXFLAKE = "$HOME/dotfiles/nixos-config";
-          };
-
+      home-manager.users.auscyber = {
+        imports = home-manager-modules;
+        home.username = "auscyber";
+        home.sessionVariables = {
+          FLAKENAME = "auscyber";
+          NIXFLAKE = "$HOME/dotfiles/nixos-config";
         };
+
+      };
       nixpkgs = { inherit config overlays; };
 
     }
