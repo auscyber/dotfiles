@@ -38,6 +38,7 @@
   home.packages = with pkgs;
     [
       nodejs
+	  desktoppr
       vscode
       pandoc
       discord
@@ -241,6 +242,7 @@
   };
 services.skhd = {
     enable = true;
+
     config =
       let
         input = {
@@ -322,7 +324,7 @@ services.skhd = {
 
   };
   services.yabai = {
-enableScriptingAddition = false;
+enableScriptingAddition = true;
   enable = true;
 config = {
       focus_follows_mouse = "off";
@@ -367,7 +369,7 @@ targets.darwin.defaults.NSGlobalDomain = {
   # if you don't want to manage your shell through Home Manager.
   home.activation = {
 	background = ''
-		run /usr/local/bin/desktoppr ${config.stylix.image}
+		run ${pkgs.desktoppr}/bin/desktoppr ${config.stylix.image}
 	'';
 
   };

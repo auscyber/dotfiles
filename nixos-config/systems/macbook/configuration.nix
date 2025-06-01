@@ -64,7 +64,6 @@
   homebrew.brews = [ "nowplaying-cli"  ];
   homebrew.casks = [
 	"ollama"
-"desktoppr"
     "beeper"
     "amethyst"
     "steam"
