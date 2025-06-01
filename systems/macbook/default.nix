@@ -1,12 +1,13 @@
-{ nixpkgs
-, config
-, overlays
-, inputs
-, home-manager
-, darwin
-, home-manager-modules
-, modules
-, ...
+{
+  nixpkgs,
+  config,
+  overlays,
+  inputs,
+  home-manager,
+  darwin,
+  home-manager-modules,
+  modules,
+  ...
 }:
 darwin.lib.darwinSystem {
   specialArgs = { inherit inputs; };
@@ -25,11 +26,10 @@ darwin.lib.darwinSystem {
       nixpkgs = {
 
         overlays = overlays ++ [
-          (prev: this:
-            {
+          (prev: this: {
 
-              ghostty = prev.ghostty-mac;
-            }
+            ghostty = prev.ghostty-mac;
+          }
 
           )
         ];

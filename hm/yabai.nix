@@ -1,21 +1,24 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
 let
   cfg = config.services.yabai;
 
-  toYabaiConfig = opts:
-    concatStringsSep "\n" (mapAttrsToList
-      (p: v: "yabai -m config ${p} ${toString v}")
-      opts);
+  toYabaiConfig =
+    opts: concatStringsSep "\n" (mapAttrsToList (p: v: "yabai -m config ${p} ${toString v}") opts);
 
-  configFile = mkIf (cfg.config != { } || cfg.extraConfig != "")
-    "${pkgs.writeScript "yabairc" (
-      (if (cfg.config != {})
-       then "${toYabaiConfig cfg.config}"
-       else "")
-      + optionalString (cfg.extraConfig != "") ("\n" + cfg.extraConfig + "\n"))}";
+  configFile =
+    mkIf (cfg.config != { } || cfg.extraConfig != "")
+      "${pkgs.writeScript "yabairc" (
+        (if (cfg.config != { }) then "${toYabaiConfig cfg.config}" else "")
+        + optionalString (cfg.extraConfig != "") ("\n" + cfg.extraConfig + "\n")
+      )}";
 in
 
 {
@@ -40,7 +43,7 @@ in
         SIP must be disabled for this to work.
       '';
     };
-	  services.yabai.errorLogFile = lib.mkOption {
+    services.yabai.errorLogFile = lib.mkOption {
       type = with lib.types; nullOr (either path str);
       defaultText = lib.literalExpression "\${config.home.homeDirectory}/Library/Logs/yabai/err.log";
       example = "/Users/khaneliman/Library/Logs/yabai.log";
@@ -87,43 +90,48 @@ in
 
   config = lib.mkMerge [
     (mkIf (cfg.enable) {
-	assertions = [
-      (lib.hm.assertions.assertPlatform "services.yabai" pkgs lib.platforms.darwin)
-    ];
+      assertions = [
+        (lib.hm.assertions.assertPlatform "services.yabai" pkgs lib.platforms.darwin)
+      ];
       home.packages = [ cfg.package ];
 
       launchd.agents.yabai = {
-	    enable = true;
+        enable = true;
         config = {
-		 ProcessType = "Interactive";
-		ProgramArguments = [ "${cfg.package}/bin/yabai" ]
-          ++ optionals (cfg.config != { } || cfg.serviceConfig.extraConfig != "") [ "-c" configFile ];
-		EnvironmentVariables.PATH = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-        KeepAlive = true;
-        RunAtLoad = true;
-		StandardErrorPath = cfg.errorLogFile;
-        StandardOutPath = cfg.outLogFile;
+          ProcessType = "Interactive";
+          ProgramArguments =
+            [ "${cfg.package}/bin/yabai" ]
+            ++ optionals (cfg.config != { } || cfg.serviceConfig.extraConfig != "") [
+              "-c"
+              configFile
+            ];
+          EnvironmentVariables.PATH = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          KeepAlive = true;
+          RunAtLoad = true;
+          StandardErrorPath = cfg.errorLogFile;
+          StandardOutPath = cfg.outLogFile;
 
-		};
+        };
 
       };
-	 services.yabai = {
-      errorLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.err.log";
-      outLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.out.log";
-    };
+      services.yabai = {
+        errorLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.err.log";
+        outLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.out.log";
+      };
     })
-
 
     # TODO: [@cmacrae] Handle removal of yabai scripting additions
     (mkIf (cfg.enableScriptingAddition) {
       launchd.agents.yabai-sa = {
-	config.UserName = "root";
-        config.ProgramArguments = ["${cfg.package}/bin/yabai" "--load-sa"];
-		config.EnvironmentVariables.Path = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+        config.UserName = "root";
+        config.ProgramArguments = [
+          "${cfg.package}/bin/yabai"
+          "--load-sa"
+        ];
+        config.EnvironmentVariables.Path = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
         config.RunAtLoad = true;
         config.KeepAlive.SuccessfulExit = false;
       };
-
 
     })
   ];

@@ -1,8 +1,9 @@
-{ config
-, pkgs
-, system
-, lib
-, ...
+{
+  config,
+  pkgs,
+  system,
+  lib,
+  ...
 }:
 {
   targets.genericLinux.enable = true;

@@ -1,7 +1,9 @@
-{ config
-, nixpkgs
-, ...
-}: {
+{
+  config,
+  nixpkgs,
+  ...
+}:
+{
 
   programs.ghostty = {
 
@@ -34,9 +36,6 @@
         background = "202020";
 
       };
-
-
-
 
     };
     settings = {

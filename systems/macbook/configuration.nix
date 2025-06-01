@@ -6,7 +6,12 @@
   # List packages installed in system profile. To search by name, run:
   documentation.enable = true;
   security.pam.services.sudo_local.touchIdAuth = true;
-  fonts.packages = with pkgs; (with nerd-fonts; [ hack roboto-mono ]);
+  fonts.packages =
+    with pkgs;
+    (with nerd-fonts; [
+      hack
+      roboto-mono
+    ]);
   # $ nix-env -qaP | grep wget
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
@@ -61,10 +66,11 @@
     # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
     cleanup = "zap";
   };
-  homebrew.brews = [ "nowplaying-cli"  ];
+  homebrew.brews = [ "nowplaying-cli" ];
   homebrew.casks = [
   "calibre"
 	"ollama"
+    "ollama"
     "beeper"
     "amethyst"
     "steam"
@@ -72,7 +78,7 @@
     "google-drive"
 	"zen@twilight"
     "arc"
-   # "zen-browser"
+    # "zen-browser"
     "affinity-designer"
     "affinity-publisher"
     "grammarly-desktop"
@@ -140,7 +146,10 @@
   };
 
   services.sketchybar.enable = true;
-  services.sketchybar.extraPackages = with pkgs; [ jq yabai ];
+  services.sketchybar.extraPackages = with pkgs; [
+    jq
+    yabai
+  ];
 
   users.users.ivypierlot = {
     name = "ivypierlot";
