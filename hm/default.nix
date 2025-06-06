@@ -63,24 +63,24 @@
     ];
     home.file = {
       ".local/bin/fetch" = {
-        source = ../../fetch;
+        source = ../fetch;
       };
       ".config/nvim" = {
-        source = ../../.config/nvim;
+        source = ../.config/nvim;
         recursive = true;
       };
       ".config/wezterm" = {
-        source = ../../.config/wezterm;
+        source = ../.config/wezterm;
         recursive = true;
       };
       ".config/wezterm/lume.lua" = {
-        source = ../../libs/lume.lua;
+        source = ../libs/lume.lua;
       };
       ".config/wezterm/fennel.lua" = {
-        source = ../../libs/fennel.lua;
+        source = ../libs/fennel.lua;
       };
       ".config/starship.toml" = {
-        source = ../../.config/starship.toml;
+        source = ../.config/starship.toml;
       };
 
     };
