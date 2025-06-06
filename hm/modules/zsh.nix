@@ -9,7 +9,7 @@
   programs.eza.enable = true;
   home.packages = with pkgs; [ bat] ;
   home.file."Music/Phoebe/lyricslist" = {
-    source = ../../../phoebelyrics/lyricslist;
+    source = ../../phoebelyrics/lyricslist;
   };
   programs.zsh = {
     enable = true;
