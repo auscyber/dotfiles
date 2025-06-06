@@ -369,7 +369,7 @@ targets.darwin.defaults.NSGlobalDomain = {
   # if you don't want to manage your shell through Home Manager.
   home.activation = {
 	background = ''
-		run ${pkgs.desktoppr}/bin/desktoppr ${config.stylix.image}
+		run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
 	'';
 
   };
