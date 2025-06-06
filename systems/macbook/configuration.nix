@@ -27,7 +27,7 @@
   ];
   stylix = {
     enable = false;
-    image = ../../boygenius-performs-gq.jpg;
+    image = ../../backgrounds/phoebebridgers-2.jpg;
   };
 
   nix.channel.enable = false;
@@ -63,12 +63,14 @@
   };
   homebrew.brews = [ "nowplaying-cli"  ];
   homebrew.casks = [
+  "calibre"
 	"ollama"
     "beeper"
     "amethyst"
     "steam"
     "notion"
     "google-drive"
+	"zen@twilight"
     "arc"
    # "zen-browser"
     "affinity-designer"
