@@ -15,7 +15,6 @@ nixpkgs.lib.nixosSystem {
     ./configuration.nix
     ./hardware-configuration.nix
     #    ./../../modules/system/grub.nix
-    ./boot.nix
     nixos-mailserver.nixosModule
     #    ./mailserver.nix
     #    ./minecraft.nix

@@ -2,18 +2,32 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 {
 
+  nix = {
+    settings.trusted-users = [ "auscyber" ];
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
+  services.jellyfin.enable = false;
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.conf.all.accept_ra" = 2;
+    "net.ipv6.conf.all.accept_redirects" = 1;
+    "net.ipv6.conf.all.accept_source_route" = 1;
+  };
+
   # Use the systemd-boot EFI boot loader.
-  # boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = true;
   # boot.loader.efi.canTouchEfiVariables = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.efi.efiSysMountPoint = "/boot";
+  #boot.loader.grub.devices = "/dev/sda";
   # boot.loader.grub.useOSProber = true;
   networking.hostName = "secondpc"; # Define your hostname.
   #  networking.wireless = { enable = true;  # Enables wireless support via wpa_supplicant.
@@ -29,12 +43,14 @@
   networking.useDHCP = false;
   networking.enableIPv6 = true;
   networking.defaultGateway6 = {
-    address = "fe80::1";
+    address = "2403:5813:cd5c:0:120c:6bff:fe12:9ab5";
     interface = "br0";
   };
   networking.bridges = {
     "br0" = {
       interfaces = [ "enp2s0" ];
+
+      rstp = true;
     };
   };
   #
@@ -45,7 +61,37 @@
       prefixLength = 24;
     }
   ];
-
+  networking.defaultGateway = "192.168.0.1";
+  networking.nameservers = [ "1.1.1.1" ];
+  # Open ports in the firewall.
+  networking.firewall.allowedTCPPorts = [
+    25565
+    8080
+    21115
+    21118
+    21119
+    21116
+    21117
+    80
+    53
+    443
+    1080
+    8096
+    853
+    8081
+  ];
+  networking.firewall.allowedUDPPorts = [
+    19132
+    51820
+    21116
+    53
+    67
+    1900
+    7359
+    853
+    69
+    68
+  ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
@@ -64,6 +110,11 @@
 
   # Configure keymap in X11
   # services.xserver.xkbOptions = "eurosign:e";
+  services.espanso.enable = false;
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "both";
+  };
   #fonts.fonts = with pkgs;
   #  [
   #    (nerdfonts.override {
@@ -79,14 +130,6 @@
   # services.printing.enable = true;
   #services.blueman.enable = true;
   # Enable sound.
-  sound.enable = false;
-  hardware.pulseaudio = {
-    enable = false;
-
-    # NixOS allows either a lightweight build (default) or full build of PulseAudio to be installed.
-    # Only the full build has Bluetooth support, so it must be selected here.
-    package = pkgs.pulseaudioFull;
-  };
   #  services.jack = {
   #	jackd.enable = true;
   #
@@ -103,17 +146,42 @@
   users.users.auscyber = {
     isNormalUser = true;
     extraGroups = [
-      "jackaudio"
-      "audio"
-      "libvirtd"
-      "plugdev"
       "wheel"
+      "libvirtd"
       "docker"
-      "video"
     ];
     shell = pkgs.zsh;
   };
 
+  programs.sway = {
+    enable = false;
+  };
+
+  environment.etc."rclone-mnt.conf".text = ''
+    [owncloud]
+    type = webdav
+    url = https://owncloud.imflo.pet/remote.php/webdav
+    vendor = owncloud
+    bearer_token_command = /run/current-system/sw/bin/oidc-token my-client
+  '';
+
+  environment.extraInit = ''
+    eval `oidc-keychain --accounts my-client`
+  '';
+
+
+  #fileSystems."/mnt/plexmedia" = {
+  #  device = "owncloud:/Plexmedia";
+  #  fsType = "rclone";
+  #  options = [
+  #    "nodev"
+  #    "nofail"
+  #    "allow_other"
+  #    "args2env"
+  #    "config=/etc/rclone-mnt.conf"
+  #  ];
+  #};
+  services.logrotate.checkConfig = false;
   security.sudo = {
     enable = true;
     #	extraRules = {
@@ -125,9 +193,21 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    pkgs.jellyfin
+    pkgs.jellyfin-web
+    pkgs.jellyfin-ffmpeg
+    jq
+    (oidc-agent.overrideAttrs (attrs: {
+      postFixup = ''
+        # Override with patched binary to be used by help2man
+        sed -i -E 's/=\/bin\/(\w+)/="\$(which \1)"/g' $out/bin/oidc-agent-service
+        cp -r $out/bin/* bin
+        make install_man PREFIX=$out MAN_PATH=$out/share/man PROMPT_MAN_PATH=$out/share/man
+      '';
+    }))
+    rclone
     vscode-fhs
     wget
-    wireshark
     bind
     ripgrep
     vim
@@ -201,8 +281,14 @@
   };
   virtualisation.libvirtd = {
     qemu = {
-      ovmf.enable = true;
-      runAsRoot = false;
+      ovmf = {
+        enable = true;
+        packages = [
+          (pkgs.OVMF.override { }).fd
+        ];
+      };
+      swtpm.enable = true;
+      runAsRoot = true;
     };
     allowedBridges = [ "br0" ];
     enable = true;
@@ -232,7 +318,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "21.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
   environment.etc."current-system-packages".text =
     let
       packages = builtins.map (p: "${p.name}") config.environment.systemPackages;
