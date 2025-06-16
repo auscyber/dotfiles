@@ -30,6 +30,7 @@
         };
       };
       home-manager.enable = true;
+	  gpg.enable = true;
 
     };
 
@@ -85,7 +86,7 @@
       };
 
     };
-    xdg.configFile."nvim/lua/compiler.lua".text = ''
+    xdg.configFile."nvim/lua/treesitter_compiler.lua".text = ''
       			return "${pkgs.stdenv.cc}/bin/cc"
             	'';
 

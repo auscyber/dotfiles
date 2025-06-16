@@ -206,7 +206,6 @@
           home-manager-modules = [
 		  inputs.zen-browser.homeModules.twilight
             inputs.nixvim.homeManagerModules.nixvim
-            inputs._1password-shell-plugins.hmModules.default
             #			  inputs.opnix.hmModules.default
 			./hm/modules/zen.nix
             ./hm/yabai.nix
@@ -242,6 +241,10 @@
           name = "nvim";
           drv = pkgs.neovim;
         };
+		apps.desktoppr = flake-utils.lib.mkApp {
+			name = "desktoppr";
+			drv = pkgs.callPackage ./desktoppr.nix {};
+		};
       }
     ))
     // {
@@ -286,6 +289,7 @@
             ./hm/ui.nix
             ./hm/modules/desktop.nix
             ./hm/modules/zsh.nix
+            ./hm/modules/1password.nix
           ];
           inherit
             nixpkgs
