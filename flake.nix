@@ -147,10 +147,8 @@
             inherit (eww.packages.${system}) eww;
             inherit (rnix.packages."${system}") rnix-lsp;
             ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
-			inherit zen-browser;
-            picom = prev.picom.overrideAttrs (attrs: {
-              src = picom;
-            });
+			zen-browser = zen-browser."${system}";
+			picom = prev.picom.overrideAttrs (attrs: { src = picom; });
             #            idris2 = idris2.packages."${system}".idris2;
             #            wezterm = (masterp {inherit system;}).wezterm;
             #              discord = (import master { inherit system config; }).discord;
@@ -275,6 +273,7 @@
             inputs.stylix.nixosModules.stylix
             ./modules/hm.nix
             ./modules/common.nix
+			./modules/1password.nix
             inputs.lanzaboote.nixosModules.lanzaboote
           ];
           home-manager-modules = [

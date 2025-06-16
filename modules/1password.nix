@@ -12,4 +12,12 @@
     # require enabling PolKit integration on some desktop environments (e.g. Plasma).
     polkitPolicyOwners = [ "auscyber" ];
   };
+  environment.etc = {
+  "1password/custom_allowed_browsers" = {
+    text = ''
+	zen
+    ''; # or just "zen" if you use unwrapped package
+    mode = "0755";
+  };
+};
 }
