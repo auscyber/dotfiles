@@ -5,6 +5,7 @@
   ...
 }:
 {
+home.packages = with pkgs; [ hyprpolkitagent];
   #home.packages = with pkgs; [ wezterm];
   programs.wofi.enable = true;
   programs.kitty.enable = true; # required for the default Hyprland config
@@ -104,6 +105,10 @@ general {
             ) 9
           )
         );
+	exec-once = ["1password"
+    # "waybar"
+    "systemctl --user start hyprpolkitagent"
+  ];
     };
   };
 
