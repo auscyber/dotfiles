@@ -2057,6 +2057,26 @@
         "type": "github"
       }
     },
+    "my-nur": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1750076360,
+        "narHash": "sha256-EefPAILJXr7YWE4yPKzaugYeXKDNi+/YACgqmBTLeGw=",
+        "owner": "auscyber",
+        "repo": "nur-packages",
+        "rev": "7893e851cac84d4de0e77d69b0d59fa7e66a5621",
+        "type": "github"
+      },
+      "original": {
+        "owner": "auscyber",
+        "repo": "nur-packages",
+        "type": "github"
+      }
+    },
     "naersk": {
       "inputs": {
         "nixpkgs": [
@@ -2981,6 +3001,7 @@
         "input-leap": "input-leap",
         "lanzaboote": "lanzaboote",
         "local-nixpkgs": "local-nixpkgs",
+        "my-nur": "my-nur",
         "neovim": "neovim",
         "nh": "nh",
         "nix-doom-emacs": "nix-doom-emacs",

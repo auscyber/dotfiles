@@ -7,7 +7,7 @@ programs.zen-browser = {
     enable = true;
 	package = pkgs.lib.mkForce (
       if pkgs.stdenv.hostPlatform.isDarwin then
-	  null
+	  pkgs.zen-browser
       else
         pkgs.zen-browser
     );
