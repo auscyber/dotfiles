@@ -68,9 +68,10 @@
   };
   homebrew.brews = [ "nowplaying-cli" ];
   homebrew.casks = [
+  "vivaldi"
   "calibre"
 	"ollama"
-    "ollama"
+#    "ollama"
     "beeper"
     "amethyst"
     "steam"
@@ -89,7 +90,7 @@
     "postman"
     "bartender"
     "onedrive"
-    "skype"
+#    "skype"
     "1password"
     #    "wezterm@nightly"
     "zoom"
@@ -126,7 +127,7 @@
   system.defaults.dock = {
     persistent-apps = [
       "/System/Applications/Launchpad.app"
-      "/Applications/Arc.app"
+      "/Applications/Twilight.app"
       "${pkgs.spotify}/Applications/Spotify.app"
       "/Applications/Notion.app"
       "/Applications/Microsoft Outlook.app"
