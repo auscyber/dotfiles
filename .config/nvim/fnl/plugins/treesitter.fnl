@@ -16,7 +16,7 @@
 ;(if (> (vim.fn.has :win32) 0))
 ;  (tset (. install :compilers) [:clang])
 
-(tset install :compilers [(let [(status res) (pcall (fn [] (require "compiler")))]
+(tset install :compilers [(let [(status res) (pcall (fn [] (require "treesitter_compiler")))]
                             (if status res))])
 
 (treesitter.setup {

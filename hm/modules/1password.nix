@@ -1,5 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 {
+imports = [
+
+            inputs._1password-shell-plugins.hmModules.default
+
+];
   programs._1password-shell-plugins = {
     # enable 1Password shell plugins for bash, zsh, and fish shell
     enable = true;

@@ -16,7 +16,7 @@
   ];
   stylix = {
     enable = true;
-    image = ../../boygenius-performs-gq.jpg;
+    image = ../../backgrounds/phoebebridgers-2.jpg;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
   services.tailscale.enable = true;
@@ -120,6 +120,7 @@
 
   programs.dconf.enable = true;
   programs.zsh.enable = true;
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -175,12 +176,15 @@
   # List services that you want to enable:
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  services.openssh.settings.X11Forwarding = true;
 
-  services.displayManager.defaultSession = "plasma";
+  services.displayManager.defaultSession = "hyprland";
   services.displayManager.autoLogin = {
     enable = true;
     user = "auscyber";
   };
+services.desktopManager.plasma6.enable = true;
+
   services.xserver = {
     xkb.layout = "us";
     enable = true;
@@ -199,10 +203,9 @@
     #        greeter.enable = true;
     #      };
 
+    displayManager.startx.enable = true;
     videoDrivers = [ "nvidia" ];
     #   videoDrivers = [ "nouveau" ];
-    desktopManager.plasma6.enable = true;
-    displayManager.startx.enable = true;
 
     windowManager.awesome = {
       enable = false;

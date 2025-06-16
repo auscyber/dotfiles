@@ -6,6 +6,7 @@
 }:
 {
   #home.packages = with pkgs; [ wezterm];
+  programs.wofi.enable = true;
   programs.kitty.enable = true; # required for the default Hyprland config
   wayland.windowManager.hyprland = {
 
@@ -85,7 +86,7 @@ general {
           "$mod, B, exec, google-chrome-stable"
           "$mod, F, exec, dolphin"
           "$mod, C, killactive"
-
+		   "$mod, space, exec, wofi --width=400 --height=260 --hide-scroll --show=\"run\""
         ]
         ++ (
           # workspaces
