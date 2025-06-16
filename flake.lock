@@ -2999,7 +2999,8 @@
         "rust-overlay": "rust-overlay_3",
         "stylix": "stylix",
         "unstable": "unstable",
-        "wezterm": "wezterm"
+        "wezterm": "wezterm",
+        "zen-browser": "zen-browser"
       }
     },
     "rotate-text": {
@@ -3582,6 +3583,29 @@
       "original": {
         "owner": "madman-bob",
         "repo": "idris2-xml",
+        "type": "github"
+      }
+    },
+    "zen-browser": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1750051300,
+        "narHash": "sha256-5ZKc3cZfaY4/IOf1nnoLjaHofh0dFsXlWoG9K0/rvC4=",
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
+        "rev": "84093f11c79c370d0219e231a0bc83076992feab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
         "type": "github"
       }
     }

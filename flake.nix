@@ -7,6 +7,9 @@
     hyprpanel.url = "github:jas-singhfsu/hyprpanel";
     hyprpanel.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+	zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+	zen-browser.inputs.home-manager.follows="home-manager";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
@@ -124,6 +127,11 @@
           final: prev:
           let
             inherit (final.stdenv.hostPlatform) system;
+
+			zen-browser = {
+				aarch64-darwin = prev.nur.repos.natsukium.zen-browser;
+				x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
+			};
           in
           {
             input-leap = prev.input-leap.overrideAttrs (attrs: {
@@ -132,13 +140,14 @@
             });
 
             inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
-            desktoppr = prev.callPackage ./desktoppr.nix { };
+            desktoppr = prev.callPackage ./packages/desktoppr.nix { };
             inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
             nh = inputs.nh.packages."${system}".default;
             agenix = inputs.agenix.packages."${system}".default;
             inherit (eww.packages.${system}) eww;
             inherit (rnix.packages."${system}") rnix-lsp;
             ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
+			inherit zen-browser;
             picom = prev.picom.overrideAttrs (attrs: {
               src = picom;
             });
@@ -195,9 +204,11 @@
             inputs.stylix.darwinModules.stylix
           ];
           home-manager-modules = [
+		  inputs.zen-browser.homeModules.twilight
             inputs.nixvim.homeManagerModules.nixvim
             inputs._1password-shell-plugins.hmModules.default
             #			  inputs.opnix.hmModules.default
+			./hm/modules/zen.nix
             ./hm/yabai.nix
             ./hm/ui.nix
             ./hm/term.nix
@@ -264,8 +275,10 @@
             inputs.lanzaboote.nixosModules.lanzaboote
           ];
           home-manager-modules = [
+		  inputs.zen-browser.homeModules.twilight
             inputs.hyprpanel.homeManagerModules.hyprpanel
             #              stylix.homeManagerModules.stylix
+			./hm/modules/zen.nix
             ./hm/hyprland.nix
             ./hm/nixos2.nix
             ./hm/term.nix
