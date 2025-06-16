@@ -33,6 +33,10 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+	my-nur = {
+		url = "github:auscyber/nur-packages";
+		inputs.nixpkgs.follows = "nixpkgs";
+	};
     input-leap = {
       url = "github:input-leap/input-leap?submodules=1";
       flake = false;
@@ -129,7 +133,7 @@
             inherit (final.stdenv.hostPlatform) system;
 
 			zen-browser = {
-				aarch64-darwin = prev.nur.repos.natsukium.zen-browser;
+				aarch64-darwin = inputs.my-nur.packages.aarch64-darwin.zen-browser-twilight;
 				x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
 			};
           in
