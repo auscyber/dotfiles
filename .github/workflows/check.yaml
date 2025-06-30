@@ -1,0 +1,28 @@
+{
+  "jobs": {
+    "check": {
+      "runs-on": "ubuntu-latest",
+      "steps": [
+        {
+          "uses": "actions/checkout@v4"
+        },
+        {
+          "uses": "DeterminateSystems/nix-installer-action@main",
+          "with": {
+            "extra-conf": "extra-experimental-features = recursive-nix\nextra-system-features = recursive-nix\n"
+          }
+        },
+        {
+          "uses": "DeterminateSystems/magic-nix-cache-action@main"
+        },
+        {
+          "run": "nix flake --accept-flake-config check ./dev --print-build-logs"
+        }
+      ]
+    }
+  },
+  "on": {
+    "push": {},
+    "workflow_call": {}
+  }
+}
