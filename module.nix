@@ -3,7 +3,6 @@
   lib,
   flake-parts-lib,
   config,
-  self,
   ...
 }:
 let
@@ -143,7 +142,7 @@ in
               }
               ```
 
-              ${lib.readFile (self + "/push-limits-snippet.md")}
+              ${lib.readFile ./push-limits-snippet.md}
               > Pushing is the last action this command takes,
               > so if that fails you can try pushing in chunks.
             '';
