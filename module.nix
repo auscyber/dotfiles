@@ -9,7 +9,8 @@ let
   cfg = config.input-branches;
   # This can probably be wrong in some cases
   remoteName = "origin";
-  cmdPrefix = "input-branch";
+  cmdBase = "input-branch";
+  cmdPrefix = lib.genAttrs [ "init" "rebase" "push-force" ] (n: "${cmdBase}-${n}");
 in
 {
   options = {
@@ -54,10 +55,12 @@ in
                   type = lib.types.str;
                   readOnly = true;
                   description = ''
-                    Name of input. Inherited from parent attribute.
+                    Name of input.
                     A flake input by this name must exist.
                   '';
                   example = lib.literalExpression ''"flake-parts"'';
+                  default = name;
+                  defaultText = lib.literalMD "`<name>`";
                 };
 
                 upstream = {
@@ -90,6 +93,8 @@ in
                   description = ''
                     path of submodule relative to Git top-level
                   '';
+                  default = "${cfg.baseDir}/${name}";
+                  defaultText = lib.literalMD "`${cfg.baseDir}/<name>`";
                 };
                 branch = lib.mkOption {
                   type = lib.types.str;
@@ -97,34 +102,28 @@ in
                   description = ''
                     input branch name
                   '';
+                  default = "inputs/${name}";
+                  defaultText = lib.literalMD "`inputs/<name>`";
                 };
-              };
-              # TODO can these be implemented as default values instead in order to improve documentation?
-              config = {
-                inherit name;
-                path_ = "${cfg.baseDir}/${name}";
-                branch = "inputs/${name}";
               };
             }
           )
         );
       };
     };
-    # TODO use correct term "superproject"
     perSystem = flake-parts-lib.mkPerSystemOption {
       options.input-branches = {
         commands = {
           init = lib.mkOption {
             type = lib.types.listOf lib.types.package;
             readOnly = true;
-            # TODO explain "current revision"
             description = ''
-              `${cmdPrefix}-init-<INPUT>`
-
-              Initializes `INPUT`. For example:
+              A list of `${cmdPrefix.init}-<INPUT>` commands
+              that attempt to initialize `INPUT`.
+              For example:
 
               ```
-              $ ${cmdPrefix}-init-nixpkgs
+              $ ${cmdPrefix.init}-nixpkgs
               ```
 
               And you end up with a git submodule at the configured path.
@@ -133,40 +132,37 @@ in
               it's commonly but not always `origin`.
               It has an upstream remote according to configuration.
               The configured branch is checked out
-              and its HEAD set to the rev the corresponding flake input is locked to.
+              and its HEAD set to the rev that the corresponding flake input is locked to.
               The input url can be set to use it:
 
               ```nix
               {
-                inputs.flake-parts.url = "./<CONFIGURED-PATH>";
+                inputs.flake-parts.url = "./${cfg.baseDir}/nixpkgs";
               }
               ```
 
-              ${lib.readFile ./push-limits-snippet.md}
-              > Pushing is the last action this command takes,
-              > so if that fails you can try pushing in chunks.
+              __With some repositories one might hit push limits such as
+              [GitHub's](https://docs.github.com/en/get-started/using-git/troubleshooting-the-2-gb-push-limit)__.
+              That is the case with a recent Nixpkgs.
+              Pushing is the last action this command takes,
+              so if that fails you can
+              step into the directory and try pushing in chunks.
             '';
           };
           rebase = lib.mkOption {
             type = lib.types.listOf lib.types.package;
             readOnly = true;
             description = ''
-              `${cmdPrefix}-<INPUT>`
-
-              Attempt to rebase `INPUT`. For example:
-
-              ```
-              $ ${cmdPrefix}-nixpkgs
-              ```
+              a list of `${cmdPrefix.rebase}-<INPUT>` commands
+              that attempt to rebase `INPUT`
             '';
           };
-          push = lib.mkOption {
+          push-force = lib.mkOption {
             type = lib.types.listOf lib.types.package;
             readOnly = true;
             description = ''
-              `${cmdPrefix}-push-force-<INPUT>`
-
-              Push with `--force` configured branch of `INPUT`.
+              a list of `${cmdPrefix.push-force}-<INPUT>` commands
+              that push with `--force` the configured branch of `INPUT`
             '';
           };
 
@@ -174,7 +170,7 @@ in
             type = lib.types.listOf lib.types.package;
             readOnly = true;
             description = ''
-              all of the commands, for convenience
+              a list of all of the commands, for convenience
             '';
           };
         };
@@ -210,7 +206,7 @@ in
               init =
                 if (inputs.${name} ? rev) then
                   (pkgs.writeShellApplication {
-                    name = "${cmdPrefix}-init-${name}";
+                    name = "${cmdPrefix.init}-${name}";
                     runtimeInputs = [ pkgs.git ];
                     text = ''
                       set -o xtrace
@@ -227,7 +223,7 @@ in
                   null;
 
               rebase = pkgs.writeShellApplication {
-                name = "${cmdPrefix}-rebase-${name}";
+                name = "${cmdPrefix.rebase}-${name}";
                 runtimeInputs = [ pkgs.git ];
                 text = ''
                   set -o xtrace
@@ -241,8 +237,8 @@ in
                 '';
               };
 
-              push = pkgs.writeShellApplication {
-                name = "${cmdPrefix}-push-${name}";
+              push-force = pkgs.writeShellApplication {
+                name = "${cmdPrefix.push-force}-${name}";
                 runtimeInputs = [ pkgs.git ];
                 text = ''
                   set -o xtrace
@@ -258,17 +254,17 @@ in
           (lib.fold (cur: acc: {
             init = acc.init ++ (if cur.init != null then [ cur.init ] else [ ]);
             rebase = acc.rebase ++ [ cur.rebase ];
-            push = acc.push ++ [ cur.push ];
-          }) (lib.genAttrs [ "init" "rebase" "push" ] (_: [ ])))
+            push-force = acc.push-force ++ [ cur.push-force ];
+          }) (lib.genAttrs [ "init" "rebase" "push-force" ] (_: [ ])))
 
           (commands: {
-            inherit (commands) init rebase push;
+            inherit (commands) init rebase push-force;
             all = lib.concatLists (
               with commands;
               [
                 init
                 rebase
-                push
+                push-force
               ]
             );
           })

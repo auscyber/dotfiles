@@ -52,7 +52,11 @@ let
       For example, if the upstream branch is Nixpkgs' `nixpkgs-unstable`
       then we can import it as `${baseDir}/nixpkgs` in our repository.
 
-      ${lib.readFile (inputs.${projectName} + "/push-limits-snippet.md")}
+      > [!NOTE]
+      > With some repositories one might hit push limits such as
+      > [GitHub's](https://docs.github.com/en/get-started/using-git/troubleshooting-the-2-gb-push-limit).
+      > That is the case with a recent Nixpkgs.
+
       Now our project spans across one branch more.
 
       The Nix CLI's `--override-inputs` flag
@@ -83,7 +87,7 @@ let
       and execute Nix flake commands without `--override-input`.
 
       > [!IMPORTANT]
-      > If the toplevel repository state is clean,
+      > If the superproject state is clean,
       > submodules will be fetched instead of used by path.
       > Workaround: `$ touch dirt; git add -N dirt`
       > This was reported as [issue 13324](https://github.com/NixOS/nix/issues/13324)

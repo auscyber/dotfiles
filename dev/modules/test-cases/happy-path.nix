@@ -32,12 +32,11 @@
                     packages = {
                       init = lib.head psCfg.commands.init;
                       rebase = lib.head psCfg.commands.rebase;
-                      push = lib.head psCfg.commands.push;
+                      push = lib.head psCfg.commands.push-force;
                     };
                   };
 
                 flake.dummy = lib.readFile (inputs.dummy + "/content");
-
               }
             '';
 
