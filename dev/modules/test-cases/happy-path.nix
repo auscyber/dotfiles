@@ -59,6 +59,23 @@
                 exit 1
             fi
 
+            actual_refs=$( (
+              cd ${baseDir}/${inputName}
+              git show-ref --abbrev=4 | cut -d' ' -f2
+            ))
+            expected_refs="\
+            refs/heads/inputs/dummy
+            refs/heads/main
+            refs/remotes/origin/HEAD
+            refs/remotes/origin/inputs/dummy
+            refs/remotes/origin/main"
+
+            if [ "$actual_refs" != "$expected_refs" ]; then
+              declare -p actual_refs
+              declare -p expected_refs
+              exit 1
+            fi
+
             actual_fetch_refspec=$( (
               cd ${baseDir}/${inputName}
               git config --get remote.origin.fetch
