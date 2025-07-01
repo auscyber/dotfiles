@@ -116,16 +116,16 @@
               exit 1
             fi
 
-            flake_locked_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
+            expected_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
-            submodule_rev=$( (
+            actual_submodule_rev=$( (
               cd ${baseDir}/${inputName}
               git rev-parse HEAD
             ))
 
-            if [ "$flake_locked_rev" != "$submodule_rev" ]; then
-              declare -p flake_locked_rev
-              declare -p submodule_rev
+            if [ "$actual_submodule_rev" != "$expected_submodule_rev" ]; then
+              declare -p actual_submodule_rev
+              declare -p expected_submodule_rev
               exit 1
             fi
 
