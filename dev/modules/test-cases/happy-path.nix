@@ -64,8 +64,8 @@
               git remote --verbose
             ))
             expect_remotes="\
-            origin''\t/build/./origin/. (fetch)
-            origin''\t/build/./origin/. (push)
+            origin''\t/build/./origin (fetch)
+            origin''\t/build/./origin (push)
             upstream''\t/build/dummy-input (fetch)
             upstream''\t/build/dummy-input (push)"
 
@@ -81,10 +81,7 @@
             ))
             expect_refs="\
             refs/heads/inputs/dummy
-            refs/heads/main
-            refs/remotes/origin/HEAD
-            refs/remotes/origin/inputs/dummy
-            refs/remotes/origin/main"
+            refs/remotes/origin/inputs/dummy"
 
             if [ "$actual_refs" != "$expect_refs" ]; then
               declare -p actual_refs

@@ -127,9 +127,7 @@ in
               ```
 
               And you end up with a git submodule at the configured path.
-              Refer to `git submodule add` documentation
-              for what _the default remote_ ends up being;
-              it's commonly but not always `origin`.
+              It inherited the remote of the remote tracking branch of the current branch.
               It has an upstream remote according to configuration.
               The configured branch is checked out
               and its HEAD set to the rev that the corresponding flake input is locked to.
@@ -211,12 +209,20 @@ in
                     text = ''
                       set -o xtrace
                       ${cdToplevel}
+
+                      mkdir -p "${path_}"
+                      current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
+                      current_branch_remote_url=$(git remote get-url "$current_branch_remote_name")
+                      (
+                        cd "${path_}"
+                        git init
+                        git remote add "$current_branch_remote_name" "$current_branch_remote_url"
+                        ${ensure-upstream}
+                        git fetch ${upstream.name} "${inputs.${name}.rev}"
+                        git switch -c "${branch}" "${inputs.${name}.rev}"
+                        git push --set-upstream ${remoteName} "${branch}"
+                      )
                       git submodule add "./." "${path_}"
-                      cd "${path_}"
-                      ${ensure-upstream}
-                      git fetch ${upstream.name} "${inputs.${name}.rev}"
-                      git switch -c "${branch}" "${inputs.${name}.rev}"
-                      git push --set-upstream ${remoteName} "${branch}"
                     '';
                   })
                 else
