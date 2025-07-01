@@ -230,7 +230,7 @@ in
                   ${cdToplevel}
                   cd "${path_}"
                   ${ensure-upstream}
-                  git fetch ${remoteName}
+                  git fetch ${remoteName} "${branch}"
                   git switch "${branch}"
                   git fetch ${upstream.name} "${upstream.ref}"
                   git rebase "${upstream.name}/${upstream.ref}"
