@@ -90,7 +90,7 @@ let
       > If the superproject state is clean,
       > submodules will be fetched instead of used by path.
       > Workaround: `$ touch dirt; git add -N dirt`
-      > This was reported as [issue 13324](https://github.com/NixOS/nix/issues/13324)
+      > This was reported as [issue 13324](https://github.com/NixOS/nix/issues/13324).
 
       When our flake is fetched remotely,
       Nix detects the submodule and fetches its HEAD.
