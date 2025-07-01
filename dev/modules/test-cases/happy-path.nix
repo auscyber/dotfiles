@@ -59,6 +59,18 @@
                 exit 1
             fi
 
+            actual_fetch_refspec=$( (
+              cd ${baseDir}/${inputName}
+              git config --get remote.origin.fetch
+            ))
+            expected_fetch_refspec='+refs/heads/*:refs/remotes/origin/*'
+
+            if [ "$actual_fetch_refspec" != "$expected_fetch_refspec" ]; then
+              declare -p actual_fetch_refspec
+              declare -p expected_fetch_refspec
+              exit 1
+            fi
+
             flake_locked_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
             submodule_rev=$( (
