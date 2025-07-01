@@ -44,10 +44,10 @@
           runtimeInputs = [ pkgs.jq ];
           text = ''
             actual_content=$(nix eval --raw .#dummy)
-            expected_content="original"
-            if [ "$actual_content" != "$expected_content" ]; then
+            expect_content="original"
+            if [ "$actual_content" != "$expect_content" ]; then
               declare -p actual_content
-              declare -p expected_content
+              declare -p expect_content
               exit 1
             fi
 
@@ -63,15 +63,15 @@
               cd ${baseDir}/${inputName}
               git remote --verbose
             ))
-            expected_remotes="\
+            expect_remotes="\
             origin''\t/build/./origin/. (fetch)
             origin''\t/build/./origin/. (push)
             upstream''\t/build/dummy-input (fetch)
             upstream''\t/build/dummy-input (push)"
 
-            if [ "$actual_remotes" != "$expected_remotes" ]; then
+            if [ "$actual_remotes" != "$expect_remotes" ]; then
               declare -p actual_remotes
-              declare -p expected_remotes
+              declare -p expect_remotes
               exit 1
             fi
 
@@ -79,16 +79,16 @@
               cd ${baseDir}/${inputName}
               git show-ref --abbrev=4 | cut -d' ' -f2
             ))
-            expected_refs="\
+            expect_refs="\
             refs/heads/inputs/dummy
             refs/heads/main
             refs/remotes/origin/HEAD
             refs/remotes/origin/inputs/dummy
             refs/remotes/origin/main"
 
-            if [ "$actual_refs" != "$expected_refs" ]; then
+            if [ "$actual_refs" != "$expect_refs" ]; then
               declare -p actual_refs
-              declare -p expected_refs
+              declare -p expect_refs
               exit 1
             fi
 
@@ -96,11 +96,11 @@
               cd ${baseDir}/${inputName}
               git config --get remote.origin.fetch
             ))
-            expected_fetch_refspec='+refs/heads/*:refs/remotes/origin/*'
+            expect_fetch_refspec='+refs/heads/*:refs/remotes/origin/*'
 
-            if [ "$actual_fetch_refspec" != "$expected_fetch_refspec" ]; then
+            if [ "$actual_fetch_refspec" != "$expect_fetch_refspec" ]; then
               declare -p actual_fetch_refspec
-              declare -p expected_fetch_refspec
+              declare -p expect_fetch_refspec
               exit 1
             fi
 
@@ -108,24 +108,24 @@
               cd ${baseDir}/${inputName}
               git branch --show-current
             ))
-            expected_checked_out_branch="inputs/dummy"
+            expect_checked_out_branch="inputs/dummy"
 
-            if [ "$actual_checked_out_branch" != "$expected_checked_out_branch" ]; then
+            if [ "$actual_checked_out_branch" != "$expect_checked_out_branch" ]; then
               declare -p actual_checked_out_branch
-              declare -p expected_checked_out_branch
+              declare -p expect_checked_out_branch
               exit 1
             fi
 
-            expected_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
+            expect_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
             actual_submodule_rev=$( (
               cd ${baseDir}/${inputName}
               git rev-parse HEAD
             ))
 
-            if [ "$actual_submodule_rev" != "$expected_submodule_rev" ]; then
+            if [ "$actual_submodule_rev" != "$expect_submodule_rev" ]; then
               declare -p actual_submodule_rev
-              declare -p expected_submodule_rev
+              declare -p expect_submodule_rev
               exit 1
             fi
 
