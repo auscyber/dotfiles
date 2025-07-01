@@ -59,6 +59,22 @@
                 exit 1
             fi
 
+            actual_remotes=$( (
+              cd ${baseDir}/${inputName}
+              git remote --verbose
+            ))
+            expected_remotes="\
+            origin''\t/build/./origin/. (fetch)
+            origin''\t/build/./origin/. (push)
+            upstream''\t/build/dummy-input (fetch)
+            upstream''\t/build/dummy-input (push)"
+
+            if [ "$actual_remotes" != "$expected_remotes" ]; then
+              declare -p actual_remotes
+              declare -p expected_remotes
+              exit 1
+            fi
+
             actual_refs=$( (
               cd ${baseDir}/${inputName}
               git show-ref --abbrev=4 | cut -d' ' -f2
