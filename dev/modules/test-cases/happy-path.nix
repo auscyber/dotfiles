@@ -71,6 +71,18 @@
               exit 1
             fi
 
+            actual_checked_out_branch=$( (
+              cd ${baseDir}/${inputName}
+              git branch --show-current
+            ))
+            expected_checked_out_branch="inputs/dummy"
+
+            if [ "$actual_checked_out_branch" != "$expected_checked_out_branch" ]; then
+              declare -p actual_checked_out_branch
+              declare -p expected_checked_out_branch
+              exit 1
+            fi
+
             flake_locked_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
             submodule_rev=$( (
