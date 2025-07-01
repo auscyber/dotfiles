@@ -29,10 +29,9 @@
                     psCfg = psArgs.config.input-branches;
                   in
                   {
-                    packages = {
-                      init = lib.head psCfg.commands.init;
-                      rebase = lib.head psCfg.commands.rebase;
-                      push = lib.head psCfg.commands.push-force;
+                    packages.default = pkgs.symlinkJoin {
+                      name = "commands";
+                      paths = psCfg.commands.all;
                     };
                   };
 
@@ -52,7 +51,8 @@
               exit 1
             fi
 
-            nix run .#init
+            nix build
+            ./result/bin/input-branch-init-dummy
 
             if ! diff_output=$(diff --unified ${expectedGitmodules} .gitmodules); then
                 echo "$diff_output"
@@ -100,7 +100,8 @@
               git rev-parse HEAD
             ))
 
-            nix run .#rebase
+            nix build
+            ./result/bin/input-branch-rebase-dummy
 
             submodule_parent_rev=$( (
               cd ${baseDir}/${inputName}
@@ -118,7 +119,8 @@
               git rev-parse HEAD
             ))
 
-            nix run .#push
+            nix build
+            ./result/bin/input-branch-push-force-dummy
 
             git fetch origin
             new_origin_rev=$(git rev-parse origin/inputs/${inputName})
