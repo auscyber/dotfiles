@@ -43,10 +43,10 @@
           name = "script";
           runtimeInputs = [ pkgs.jq ];
           text = ''
-            content=$(nix eval --raw .#dummy)
+            actual_content=$(nix eval --raw .#dummy)
             expected_content="original"
-            if [ "$content" != "$expected_content" ]; then
-              declare -p content
+            if [ "$actual_content" != "$expected_content" ]; then
+              declare -p actual_content
               declare -p expected_content
               exit 1
             fi
