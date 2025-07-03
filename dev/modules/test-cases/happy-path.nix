@@ -89,15 +89,27 @@
               exit 1
             fi
 
-            actual_fetch_refspec=$( (
+            actual_origin_fetch_refspec=$( (
               cd ${baseDir}/${inputName}
               git config --get remote.origin.fetch
             ))
-            expect_fetch_refspec='+refs/heads/*:refs/remotes/origin/*'
+            expect_origin_fetch_refspec='+refs/heads/*:refs/remotes/origin/*'
 
-            if [ "$actual_fetch_refspec" != "$expect_fetch_refspec" ]; then
-              declare -p actual_fetch_refspec
-              declare -p expect_fetch_refspec
+            if [ "$actual_origin_fetch_refspec" != "$expect_origin_fetch_refspec" ]; then
+              declare -p actual_origin_fetch_refspec
+              declare -p expect_origin_fetch_refspec
+              exit 1
+            fi
+
+            actual_upstream_fetch_refspec=$( (
+              cd ${baseDir}/${inputName}
+              git config --get remote.upstream.fetch
+            ))
+            expect_upstream_fetch_refspec='+refs/heads/*:refs/remotes/upstream/*'
+
+            if [ "$actual_upstream_fetch_refspec" != "$expect_upstream_fetch_refspec" ]; then
+              declare -p actual_upstream_fetch_refspec
+              declare -p expect_upstream_fetch_refspec
               exit 1
             fi
 
