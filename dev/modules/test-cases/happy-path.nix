@@ -55,8 +55,8 @@
 
             expect_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
-            nix build
-            ./result/bin/input-branch-init-dummy
+            result=$(nix build --no-link --print-out-paths)
+            "$result/bin/input-branch-init-dummy"
 
             git add .
             git commit -m'input-branch'
@@ -172,8 +172,8 @@
               git rev-parse HEAD
             ))
 
-            nix build
-            ./result/bin/input-branch-rebase-dummy
+            result=$(nix build --no-link --print-out-paths)
+            "$result/bin/input-branch-rebase-dummy"
 
             submodule_parent_rev=$( (
               cd ${baseDir}/${inputName}
@@ -191,8 +191,8 @@
               git rev-parse HEAD
             ))
 
-            nix build
-            ./result/bin/input-branch-push-force-dummy
+            result=$(nix build --no-link --print-out-paths)
+            "$result/bin/input-branch-push-force-dummy"
 
             git fetch origin
             new_origin_rev=$(git rev-parse origin/inputs/${inputName})
