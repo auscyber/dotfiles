@@ -69,7 +69,13 @@
                 pkgs.runCommand name
                   {
                     nativeBuildInputs = [
-                      pkgs.nix
+                      (lib.pipe pkgs.nixVersions [
+                        lib.attrNames
+                        (lib.filter (lib.hasPrefix "nix_"))
+                        lib.naturalSort
+                        lib.last
+                        (lib.flip lib.getAttr pkgs.nixVersions)
+                      ])
                       pkgs.git
                     ];
                     requiredSystemFeatures = [ "recursive-nix" ];
