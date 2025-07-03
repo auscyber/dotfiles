@@ -51,6 +51,8 @@
               exit 1
             fi
 
+            expect_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
+
             nix build
             ./result/bin/input-branch-init-dummy
 
@@ -128,8 +130,6 @@
               declare -p expect_checked_out_branch
               exit 1
             fi
-
-            expect_submodule_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
 
             actual_submodule_rev=$( (
               cd ${baseDir}/${inputName}
