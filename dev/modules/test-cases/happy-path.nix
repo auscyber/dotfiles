@@ -157,10 +157,11 @@
             git add --intent-to-add dirt
 
             actual_submodule_content=$(nix eval --raw .#dummy --override-input ${inputName} ./${baseDir}/${inputName})
+            expect_submodule_content="$new_submodule_content"
 
-            if [ "$actual_submodule_content" != "$new_submodule_content" ]; then
+            if [ "$actual_submodule_content" != "$expect_submodule_content" ]; then
               declare -p actual_submodule_content
-              declare -p new_submodule_content
+              declare -p expect_submodule_content
               exit 1
             fi
 
