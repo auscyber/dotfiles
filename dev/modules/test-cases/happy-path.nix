@@ -151,7 +151,6 @@
               echo -n "$new_submodule_content" > content
               git add content
               git commit --quiet --message "change"
-              git rev-parse HEAD
             )
 
             # https://github.com/NixOS/nix/issues/13324
