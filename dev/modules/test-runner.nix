@@ -104,6 +104,7 @@
                       git init .
                       git add .
                       git commit --message "initial commit"
+                      git checkout --detach HEAD
                     )
                     git clone ./origin ./test-case
                     cd test-case

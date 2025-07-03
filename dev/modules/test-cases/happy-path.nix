@@ -54,6 +54,10 @@
             nix build
             ./result/bin/input-branch-init-dummy
 
+            git add .
+            git commit -m'input-branch'
+            git push
+
             if ! diff_output=$(diff --unified ${expectedGitmodules} .gitmodules); then
                 echo "$diff_output"
                 exit 1
