@@ -43,6 +43,8 @@
           name = "script";
           runtimeInputs = [ pkgs.jq ];
           text = ''
+            set -o xtrace
+
             actual_content=$(nix eval --raw .#dummy)
             expect_content="original"
             if [ "$actual_content" != "$expect_content" ]; then

@@ -21,6 +21,8 @@
         script = pkgs.writeShellApplication {
           name = "script";
           text = ''
+            set -o xtrace
+
             nix build
             declare out
             touch "$out" 

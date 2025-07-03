@@ -21,6 +21,8 @@
         script = pkgs.writeShellApplication {
           name = "script";
           text = ''
+            set -o xtrace
+
             log=$(nix eval '.#commands.${system}' --print-build-logs 2>&1 || true)
             substring="error: attribute 'bogus' missing"
             if [[ "$log" != *"$substring"* ]]; then
