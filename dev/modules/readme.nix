@@ -12,10 +12,6 @@ let
   text =
     # markdown
     ''
-      > [!CAUTION]
-      > Mistakes [were made](https://github.com/mightyiam/input-branches/issues/2).
-      > I'm sorry. Please don't use this yet.
-
       While we wait for (or contribute towards)
       a Nix feature of seamless application of pathces to a flake input,
       this project defines a worflow
@@ -91,6 +87,7 @@ let
       and execute Nix flake commands without `--override-input`.
 
       > [!IMPORTANT]
+      > The superproject must be a worktree.
       > If the superproject state is clean,
       > submodules will be fetched instead of used by path.
       > Workaround: `$ touch dirt; git add -N dirt`

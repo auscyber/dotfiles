@@ -91,7 +91,10 @@
             ))
             expect_refs="\
             refs/heads/inputs/dummy
-            refs/remotes/origin/inputs/dummy"
+            refs/heads/main
+            refs/remotes/origin/HEAD
+            refs/remotes/origin/inputs/dummy
+            refs/remotes/origin/main"
 
             if [ "$actual_refs" != "$expect_refs" ]; then
               declare -p actual_refs

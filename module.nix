@@ -210,19 +210,17 @@ in
                       set -o xtrace
                       ${cdToplevel}
 
-                      mkdir -p "${path_}"
                       current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
                       current_branch_remote_url=$(git remote get-url "$current_branch_remote_name")
+                      git submodule add "$current_branch_remote_url" "${path_}"
                       (
                         cd "${path_}"
-                        git init
-                        git remote add "$current_branch_remote_name" "$current_branch_remote_url"
                         ${ensure-upstream}
                         git fetch ${upstream.name} "${inputs.${name}.rev}"
                         git switch -c "${branch}" "${inputs.${name}.rev}"
-                        git push --set-upstream ${remoteName} "${branch}"
+                        git push --set-upstream "$current_branch_remote_name" "${branch}"
                       )
-                      git submodule add "./." "${path_}"
+                      git config --file .gitmodules submodule.${path_}.url "./."
                     '';
                   })
                 else

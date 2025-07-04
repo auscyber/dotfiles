@@ -114,7 +114,12 @@
                       git checkout --detach HEAD
                     )
                     git daemon --verbose --informative-errors --base-path=. --export-all --enable=receive-pack &
-                    git clone git://localhost/origin ./test-case
+                    git clone git://localhost/origin ./clone
+                    (
+                      cd clone
+                      git checkout --detach HEAD
+                      git worktree add ../test-case main
+                    )
                     cd test-case
                     ${lib.getExe script}
                   '';
