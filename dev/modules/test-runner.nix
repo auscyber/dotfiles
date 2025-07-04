@@ -47,7 +47,7 @@
                         nixpkgs.url = "${inputs.nixpkgs}";
                         systems.url = "${inputs.systems}";
                         dummy = {
-                          url = "git+file:///build/dummy-input";
+                          url = "git://localhost/dummy-input";
                           flake = false;
                         };
                       };
