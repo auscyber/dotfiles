@@ -10,6 +10,8 @@
         ''\tpath = ${baseDir}/${inputName}
         ''\turl = ./.
       '';
+
+      dummyInputUrl = "git://localhost/dummy-input";
     in
     {
       testCases.happy-path = {
@@ -20,7 +22,7 @@
               { lib, inputs, ... }:
               {
                 input-branches.inputs.dummy.upstream = {
-                  url = "git://localhost/dummy-input";
+                  url = "${dummyInputUrl}";
                   ref = "master";
                 };
                 perSystem =
@@ -74,8 +76,8 @@
             expect_remotes="\
             origin''\tgit://localhost/origin (fetch)
             origin''\tgit://localhost/origin (push)
-            upstream''\tgit://localhost/dummy-input (fetch)
-            upstream''\tgit://localhost/dummy-input (push)"
+            upstream''\t${dummyInputUrl} (fetch)
+            upstream''\t${dummyInputUrl} (push)"
 
             if [ "$actual_remotes" != "$expect_remotes" ]; then
               declare -p actual_remotes
