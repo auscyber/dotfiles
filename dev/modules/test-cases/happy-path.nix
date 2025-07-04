@@ -20,7 +20,7 @@
               { lib, inputs, ... }:
               {
                 input-branches.inputs.dummy.upstream = {
-                  url = "/build/dummy-input";
+                  url = "git://localhost/dummy-input";
                   ref = "master";
                 };
                 perSystem =
@@ -72,10 +72,10 @@
               git remote --verbose
             ))
             expect_remotes="\
-            origin''\t/build/./origin (fetch)
-            origin''\t/build/./origin (push)
-            upstream''\t/build/dummy-input (fetch)
-            upstream''\t/build/dummy-input (push)"
+            origin''\tgit://localhost/origin (fetch)
+            origin''\tgit://localhost/origin (push)
+            upstream''\tgit://localhost/dummy-input (fetch)
+            upstream''\tgit://localhost/dummy-input (push)"
 
             if [ "$actual_remotes" != "$expect_remotes" ]; then
               declare -p actual_remotes

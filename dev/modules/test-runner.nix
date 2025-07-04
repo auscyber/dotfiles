@@ -112,7 +112,8 @@
                       git commit --message "initial commit"
                       git checkout --detach HEAD
                     )
-                    git clone ./origin ./test-case
+                    git daemon --verbose --informative-errors --base-path=. --export-all --enable=receive-pack &
+                    git clone git://localhost/origin ./test-case
                     cd test-case
                     ${lib.getExe script}
                   '';
