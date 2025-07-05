@@ -1,5 +1,5 @@
 While we wait for (or contribute towards)
-a Nix feature of seamless application of pathces to a flake input,
+a Nix feature of seamless application of patches to a flake input,
 this project defines a worflow
 for application of patches to an imported git branch
 and provides commands that support this workflow
