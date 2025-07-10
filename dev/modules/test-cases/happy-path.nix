@@ -11,7 +11,7 @@
         ''\turl = ./.
       '';
 
-      dummyInputUrl = "git://localhost/dummy-input";
+      dummyInputUrl = "/build/dummy-input";
     in
     {
       testCases.happy-path = {
@@ -74,8 +74,8 @@
               git remote --verbose
             ))
             expect_remotes="\
-            origin''\tgit://localhost/origin (fetch)
-            origin''\tgit://localhost/origin (push)
+            origin''\t/build/./origin (fetch)
+            origin''\t/build/./origin (push)
             upstream''\t${dummyInputUrl} (fetch)
             upstream''\t${dummyInputUrl} (push)"
 

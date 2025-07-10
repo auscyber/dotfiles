@@ -47,7 +47,7 @@
                         nixpkgs.url = "${inputs.nixpkgs}";
                         systems.url = "${inputs.systems}";
                         dummy = {
-                          url = "git://localhost/dummy-input";
+                          url = "git+file:///build/dummy-input";
                           flake = false;
                         };
                       };
@@ -113,8 +113,7 @@
                       git commit --message "initial commit"
                       git checkout --detach HEAD
                     )
-                    git daemon --verbose --informative-errors --base-path=. --export-all --enable=receive-pack &
-                    git clone git://localhost/origin ./clone
+                    git clone ./origin ./clone
                     (
                       cd clone
                       git checkout --detach HEAD
