@@ -27,111 +27,109 @@
     perSystem =
       psArgs@{ pkgs, ... }:
       {
-        checks =
-          psArgs.config.testCases
-          |> lib.mapAttrs' (
-            name:
-            { module, script }:
-            let
-              input-branches-src = lib.fileset.toSource {
-                root = ../..;
-                fileset = lib.fileset.unions [
-                  ../../flake.nix
-                  ../../module.nix
-                ];
-              };
+        checks = lib.flip lib.mapAttrs' psArgs.config.testCases (
+          name:
+          { module, script }:
+          let
+            input-branches-src = lib.fileset.toSource {
+              root = ../..;
+              fileset = lib.fileset.unions [
+                ../../flake.nix
+                ../../module.nix
+              ];
+            };
 
-              flake =
-                pkgs.writeText "test-case-${name}-flake.nix"
-                  # nix
-                  ''
-                    {
-                      inputs = {
-                        input-branches.url = "${input-branches-src}";
-                        flake-parts = {
-                          url = "${inputs.flake-parts}";
-                          inputs.nixpkgs-lib.follows = "nixpkgs";
-                        };
-                        nixpkgs.url = "${inputs.nixpkgs}";
-                        systems.url = "${inputs.systems}";
-                        dummy = {
-                          url = "git+file:///build/dummy-input";
-                          flake = false;
-                        };
-                      };
-                      outputs =
-                        inputs:
-                        inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-                          systems = import inputs.systems;
-                          imports = [
-                            inputs.input-branches.flakeModules.default
-                            ./module.nix
-                          ];
-                        };
-                    }
-                  '';
-            in
-            {
-              name = "integration/${name}";
-              value =
-                pkgs.runCommand name
+            flake =
+              pkgs.writeText "test-case-${name}-flake.nix"
+                # nix
+                ''
                   {
-                    nativeBuildInputs = [
-                      (lib.pipe pkgs.nixVersions [
-                        lib.attrNames
-                        (lib.filter (lib.hasPrefix "nix_"))
-                        lib.naturalSort
-                        lib.last
-                        (lib.flip lib.getAttr pkgs.nixVersions)
-                      ])
-                      pkgs.git
-                    ];
-                    requiredSystemFeatures = [ "recursive-nix" ];
-                    env.NIX_CONFIG = ''
-                      extra-experimental-features = nix-command flakes
-                    '';
+                    inputs = {
+                      input-branches.url = "${input-branches-src}";
+                      flake-parts = {
+                        url = "${inputs.flake-parts}";
+                        inputs.nixpkgs-lib.follows = "nixpkgs";
+                      };
+                      nixpkgs.url = "${inputs.nixpkgs}";
+                      systems.url = "${inputs.systems}";
+                      dummy = {
+                        url = "git+file:///build/dummy-input";
+                        flake = false;
+                      };
+                    };
+                    outputs =
+                      inputs:
+                      inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+                        systems = import inputs.systems;
+                        imports = [
+                          inputs.input-branches.flakeModules.default
+                          ./module.nix
+                        ];
+                      };
                   }
-                  ''
-                    set -o errexit
-                    set -o nounset
-                    set -o pipefail
-                    set -o xtrace
-
-                    export HOME="$(pwd)"
-
-                    git config --global user.name "test runner"
-                    git config --global user.email "test@example.com"
-                    git config --global protocol.file.allow always
-                    git config --global init.defaultBranch main
-                    (
-                      mkdir dummy-input
-                      cd dummy-input
-                      git init --initial-branch=master
-                      echo -n original > content
-                      git add content
-                      git commit --message "initial commit"
-                    )
-                    (
-                      mkdir origin
-                      cd origin
-                      cp ${flake} flake.nix
-                      cp ${module} module.nix
-                      git init .
-                      git add .
-                      git commit --message "initial commit"
-                      git checkout --detach HEAD
-                    )
-                    git clone ./origin ./clone
-                    (
-                      cd clone
-                      git checkout --detach HEAD
-                      git worktree add ../test-case main
-                    )
-                    cd test-case
-                    ${lib.getExe script}
+                '';
+          in
+          {
+            name = "integration/${name}";
+            value =
+              pkgs.runCommand name
+                {
+                  nativeBuildInputs = [
+                    (lib.pipe pkgs.nixVersions [
+                      lib.attrNames
+                      (lib.filter (lib.hasPrefix "nix_"))
+                      lib.naturalSort
+                      lib.last
+                      (lib.flip lib.getAttr pkgs.nixVersions)
+                    ])
+                    pkgs.git
+                  ];
+                  requiredSystemFeatures = [ "recursive-nix" ];
+                  env.NIX_CONFIG = ''
+                    extra-experimental-features = nix-command flakes
                   '';
-            }
-          );
+                }
+                ''
+                  set -o errexit
+                  set -o nounset
+                  set -o pipefail
+                  set -o xtrace
+
+                  export HOME="$(pwd)"
+
+                  git config --global user.name "test runner"
+                  git config --global user.email "test@example.com"
+                  git config --global protocol.file.allow always
+                  git config --global init.defaultBranch main
+                  (
+                    mkdir dummy-input
+                    cd dummy-input
+                    git init --initial-branch=master
+                    echo -n original > content
+                    git add content
+                    git commit --message "initial commit"
+                  )
+                  (
+                    mkdir origin
+                    cd origin
+                    cp ${flake} flake.nix
+                    cp ${module} module.nix
+                    git init .
+                    git add .
+                    git commit --message "initial commit"
+                    git checkout --detach HEAD
+                  )
+                  git clone ./origin ./clone
+                  (
+                    cd clone
+                    git checkout --detach HEAD
+                    git worktree add ../test-case main
+                  )
+                  cd test-case
+                  ${lib.getExe script}
+                '';
+          }
+        );
       };
   };
 }
