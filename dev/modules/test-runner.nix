@@ -39,7 +39,7 @@
                   ''
                     {
                       inputs = {
-                        input-branches.url = "${inputs.input-branches}";
+                        input-branches.url = "${../..}";
                         flake-parts = {
                           url = "${inputs.flake-parts}";
                           inputs.nixpkgs-lib.follows = "nixpkgs";
