@@ -2,7 +2,7 @@
 {
   imports = [ inputs.files.flakeModules.default ];
   perSystem = psArgs: {
-    files.gitToplevel = inputs.input-branches;
+    files.gitToplevel = ../..;
     make-shells.default.packages = [ psArgs.config.files.writer.drv ];
   };
 }
