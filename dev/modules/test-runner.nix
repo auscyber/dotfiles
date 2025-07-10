@@ -33,13 +33,21 @@
             name:
             { module, script }:
             let
+              input-branches-src = lib.fileset.toSource {
+                root = ../..;
+                fileset = lib.fileset.unions [
+                  ../../flake.nix
+                  ../../module.nix
+                ];
+              };
+
               flake =
                 pkgs.writeText "test-case-${name}-flake.nix"
                   # nix
                   ''
                     {
                       inputs = {
-                        input-branches.url = "${../..}";
+                        input-branches.url = "${input-branches-src}";
                         flake-parts = {
                           url = "${inputs.flake-parts}";
                           inputs.nixpkgs-lib.follows = "nixpkgs";
