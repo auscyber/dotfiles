@@ -74,17 +74,6 @@
         "type": "github"
       }
     },
-    "input-branches": {
-      "locked": {
-        "path": "..",
-        "type": "path"
-      },
-      "original": {
-        "path": "..",
-        "type": "path"
-      },
-      "parent": []
-    },
     "gitignore": {
       "inputs": {
         "nixpkgs": [
@@ -163,7 +152,6 @@
         "files": "files",
         "flake-parts": "flake-parts",
         "git-hooks": "git-hooks",
-        "input-branches": "input-branches",
         "import-tree": "import-tree",
         "make-shell": "make-shell",
         "nixpkgs": "nixpkgs",

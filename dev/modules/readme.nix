@@ -1,11 +1,5 @@
-{ lib, inputs, ... }:
 let
-  projectName =
-    let
-      name = "input-branches";
-    in
-    assert lib.hasAttr name inputs;
-    name;
+  projectName = "input-branches";
   baseDir = "inputs";
   branchPrefix = "inputs/";
   path_ = "README.md";

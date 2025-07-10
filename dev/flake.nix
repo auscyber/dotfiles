@@ -21,8 +21,6 @@
       };
     };
 
-    input-branches.url = "..";
-
     import-tree.url = "github:vic/import-tree";
 
     make-shell = {
