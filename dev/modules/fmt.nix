@@ -5,6 +5,7 @@
     { self', ... }:
     {
       treefmt = {
+        projectRoot = ../..;
         programs = {
           nixfmt.enable = true;
           nixf-diagnose.enable = true;
