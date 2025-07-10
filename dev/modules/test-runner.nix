@@ -34,8 +34,9 @@
             input-branches-src = lib.fileset.toSource {
               root = ../..;
               fileset = lib.fileset.unions [
+                ../../flake.lock
                 ../../flake.nix
-                ../../module.nix
+                ../../modules
               ];
             };
 
@@ -45,7 +46,10 @@
                 ''
                   {
                     inputs = {
-                      input-branches.url = "${input-branches-src}";
+                      input-branches = {
+                        url = "${input-branches-src}";
+                        inputs.flake-parts.follows = "flake-parts";
+                      };
                       flake-parts = {
                         url = "${inputs.flake-parts}";
                         inputs.nixpkgs-lib.follows = "nixpkgs";

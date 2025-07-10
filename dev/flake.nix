@@ -1,9 +1,4 @@
 {
-  nixConfig = {
-    abort-on-warn = true;
-    allow-import-from-derivation = false;
-  };
-
   inputs = {
     files.url = "github:mightyiam/files";
 
@@ -42,5 +37,5 @@
     dedupe_flake-compat.url = "github:edolstra/flake-compat";
   };
 
-  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
+  outputs = _: { };
 }

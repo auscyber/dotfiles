@@ -1,9 +1,9 @@
 { inputs, ... }:
 {
   imports = [ inputs.treefmt-nix.flakeModule ];
+
   perSystem = {
     treefmt = {
-      projectRoot = ../..;
       programs = {
         nixfmt.enable = true;
         nixf-diagnose.enable = true;
