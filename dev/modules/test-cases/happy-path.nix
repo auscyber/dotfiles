@@ -60,6 +60,8 @@
             result=$(nix build --no-link --print-out-paths)
             "$result/bin/input-branch-init-dummy"
 
+            sed --in-place 's#"git+file:///build/dummy-input"#"./${baseDir}/${inputName}"#' flake.nix
+
             git add .
             git commit -m'input-branch'
             git push
@@ -162,7 +164,7 @@
             touch dirt
             git add --intent-to-add dirt
 
-            actual_submodule_content=$(nix eval --raw .#dummy --override-input ${inputName} ./${baseDir}/${inputName})
+            actual_submodule_content=$(nix eval --raw .#dummy)
             expect_submodule_content="$new_submodule_content"
 
             if [ "$actual_submodule_content" != "$expect_submodule_content" ]; then

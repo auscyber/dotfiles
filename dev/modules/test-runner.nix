@@ -46,6 +46,8 @@
                 ''
                   {
                     inputs = {
+                      self.submodules = true;
+
                       input-branches = {
                         url = "${input-branches-src}";
                         inputs.flake-parts.follows = "flake-parts";
@@ -56,10 +58,7 @@
                       };
                       nixpkgs.url = "${inputs.nixpkgs}";
                       systems.url = "${inputs.systems}";
-                      dummy = {
-                        url = "git+file:///build/dummy-input";
-                        flake = false;
-                      };
+                      dummy.url = "git+file:///build/dummy-input";
                     };
                     outputs =
                       inputs:
@@ -109,8 +108,9 @@
                     mkdir dummy-input
                     cd dummy-input
                     git init --initial-branch=master
+                    echo '{outputs=_:{};}' > flake.nix
                     echo -n original > content
-                    git add content
+                    git add .
                     git commit --message "initial commit"
                   )
                   (

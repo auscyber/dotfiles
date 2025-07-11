@@ -82,6 +82,7 @@ let
 
       > [!IMPORTANT]
       > The superproject must be a worktree.
+      > The input must be `flake = true` (the default).
       > If the superproject state is clean,
       > submodules will be fetched instead of used by path.
       > Workaround: `$ touch dirt; git add -N dirt`
