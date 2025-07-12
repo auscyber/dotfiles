@@ -28,7 +28,7 @@
       psArgs@{ pkgs, ... }:
       {
         checks = lib.flip lib.mapAttrs' psArgs.config.testCases (
-          name:
+          title:
           { module, script }:
           let
             input-branches-src = lib.fileset.toSource {
@@ -41,7 +41,7 @@
             };
 
             flake =
-              pkgs.writeText "test-case-${name}-flake.nix"
+              pkgs.writeText "test-case-${title}-flake.nix"
                 # nix
                 ''
                   {
@@ -73,9 +73,9 @@
                 '';
           in
           {
-            name = "integration/${name}";
+            name = "integration/${title}";
             value =
-              pkgs.runCommand name
+              pkgs.runCommand title
                 {
                   nativeBuildInputs = [
                     (lib.pipe pkgs.nixVersions [
