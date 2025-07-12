@@ -74,6 +74,7 @@ and execute Nix flake commands without `--override-input`.
 
 > [!IMPORTANT]
 > Minimal Nix version 2.27.
+> The superproject flake must have `inputs.self.submodules = true;`.
 > The input must be `flake = true` (the default).
 > If the superproject state is clean,
 > submodules will be fetched instead of used by path.
