@@ -7,9 +7,12 @@
 {
   options.perSystem = flake-parts-lib.mkPerSystemOption {
     options.testCases = lib.mkOption {
-      type = lib.types.lazyAttrsOf (
+      type = lib.types.listOf (
         lib.types.submodule {
           options = {
+            title = lib.mkOption {
+              type = lib.types.singleLineStr;
+            };
             module = lib.mkOption {
               type = lib.types.package;
             };
@@ -27,108 +30,114 @@
     perSystem =
       psArgs@{ pkgs, ... }:
       {
-        checks = lib.flip lib.mapAttrs' psArgs.config.testCases (
-          title:
-          { module, script }:
-          let
-            input-branches-src = lib.fileset.toSource {
-              root = ../..;
-              fileset = lib.fileset.unions [
-                ../../flake.lock
-                ../../flake.nix
-                ../../modules
-              ];
-            };
+        checks = lib.pipe psArgs.config.testCases [
+          (lib.map (
+            {
+              title,
+              module,
+              script,
+            }:
+            let
+              input-branches-src = lib.fileset.toSource {
+                root = ../..;
+                fileset = lib.fileset.unions [
+                  ../../flake.lock
+                  ../../flake.nix
+                  ../../modules
+                ];
+              };
 
-            flake =
-              pkgs.writeText "test-case-${title}-flake.nix"
-                # nix
-                ''
-                  {
-                    inputs = {
-                      self.submodules = true;
+              flake =
+                pkgs.writeText "test-case-${title}-flake.nix"
+                  # nix
+                  ''
+                    {
+                      inputs = {
+                        self.submodules = true;
 
-                      input-branches = {
-                        url = "${input-branches-src}";
-                        inputs.flake-parts.follows = "flake-parts";
+                        input-branches = {
+                          url = "${input-branches-src}";
+                          inputs.flake-parts.follows = "flake-parts";
+                        };
+                        flake-parts = {
+                          url = "${inputs.flake-parts}";
+                          inputs.nixpkgs-lib.follows = "nixpkgs";
+                        };
+                        nixpkgs.url = "${inputs.nixpkgs}";
+                        systems.url = "${inputs.systems}";
+                        dummy.url = "git+file:///build/dummy-input";
                       };
-                      flake-parts = {
-                        url = "${inputs.flake-parts}";
-                        inputs.nixpkgs-lib.follows = "nixpkgs";
-                      };
-                      nixpkgs.url = "${inputs.nixpkgs}";
-                      systems.url = "${inputs.systems}";
-                      dummy.url = "git+file:///build/dummy-input";
-                    };
-                    outputs =
-                      inputs:
-                      inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-                        systems = import inputs.systems;
-                        imports = [
-                          inputs.input-branches.flakeModules.default
-                          ./module.nix
-                        ];
-                      };
-                  }
-                '';
-          in
-          {
-            name = "integration/${title}";
-            value =
-              pkgs.runCommand title
-                {
-                  nativeBuildInputs = [
-                    (lib.pipe pkgs.nixVersions [
-                      lib.attrNames
-                      (lib.filter (lib.hasPrefix "nix_"))
-                      lib.naturalSort
-                      lib.last
-                      (lib.flip lib.getAttr pkgs.nixVersions)
-                    ])
-                    pkgs.git
-                  ];
-                  requiredSystemFeatures = [ "recursive-nix" ];
-                  env.NIX_CONFIG = ''
-                    extra-experimental-features = nix-command flakes
+                      outputs =
+                        inputs:
+                        inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+                          systems = import inputs.systems;
+                          imports = [
+                            inputs.input-branches.flakeModules.default
+                            ./module.nix
+                          ];
+                        };
+                    }
                   '';
-                }
-                ''
-                  set -o errexit
-                  set -o nounset
-                  set -o pipefail
-                  set -o xtrace
+            in
+            {
+              name = "integration/${title}";
+              value =
+                pkgs.runCommand title
+                  {
+                    nativeBuildInputs = [
+                      (lib.pipe pkgs.nixVersions [
+                        lib.attrNames
+                        (lib.filter (lib.hasPrefix "nix_"))
+                        lib.naturalSort
+                        lib.last
+                        (lib.flip lib.getAttr pkgs.nixVersions)
+                      ])
+                      pkgs.git
+                    ];
+                    requiredSystemFeatures = [ "recursive-nix" ];
+                    env.NIX_CONFIG = ''
+                      extra-experimental-features = nix-command flakes
+                    '';
+                  }
+                  ''
+                    set -o errexit
+                    set -o nounset
+                    set -o pipefail
+                    set -o xtrace
 
-                  export HOME="$(pwd)"
+                    export HOME="$(pwd)"
 
-                  git config --global user.name "test runner"
-                  git config --global user.email "test@example.com"
-                  git config --global protocol.file.allow always
-                  git config --global init.defaultBranch main
-                  (
-                    mkdir dummy-input
-                    cd dummy-input
-                    git init --initial-branch=master
-                    echo '{outputs=_:{};}' > flake.nix
-                    echo -n original > content
-                    git add .
-                    git commit --message "initial commit"
-                  )
-                  (
-                    mkdir origin
-                    cd origin
-                    cp ${flake} flake.nix
-                    cp ${module} module.nix
-                    git init .
-                    git add .
-                    git commit --message "initial commit"
-                    git checkout --detach HEAD
-                  )
-                  git clone ./origin ./test-case
-                  cd test-case
-                  ${lib.getExe script}
-                '';
-          }
-        );
+                    git config --global user.name "test runner"
+                    git config --global user.email "test@example.com"
+                    git config --global protocol.file.allow always
+                    git config --global init.defaultBranch main
+                    (
+                      mkdir dummy-input
+                      cd dummy-input
+                      git init --initial-branch=master
+                      echo '{outputs=_:{};}' > flake.nix
+                      echo -n original > content
+                      git add .
+                      git commit --message "initial commit"
+                    )
+                    (
+                      mkdir origin
+                      cd origin
+                      cp ${flake} flake.nix
+                      cp ${module} module.nix
+                      git init .
+                      git add .
+                      git commit --message "initial commit"
+                      git checkout --detach HEAD
+                    )
+                    git clone ./origin ./test-case
+                    cd test-case
+                    ${lib.getExe script}
+                  '';
+            }
+          ))
+          lib.listToAttrs
+        ];
       };
   };
 }
