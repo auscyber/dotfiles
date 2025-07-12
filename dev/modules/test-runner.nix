@@ -2,6 +2,7 @@
   lib,
   inputs,
   flake-parts-lib,
+  minimalNixVersion,
   ...
 }:
 {
@@ -25,7 +26,10 @@
     };
   };
   config = {
-    _module.args.baseDir = "inputs";
+    _module.args = {
+      baseDir = "inputs";
+      minimalNixVersion = "2.27";
+    };
 
     perSystem =
       psArgs@{ pkgs, ... }:
@@ -41,7 +45,7 @@
                 (lib.filter (nix: (builtins.tryEval nix).success))
                 # Support for `inputs.self.submodules` added in 2.27.0
                 # https://nix.dev/manual/nix/2.27/release-notes/rl-2.27.html
-                (lib.filter (nix: lib.versionAtLeast nix.version "2.27"))
+                (lib.filter (nix: lib.versionAtLeast nix.version minimalNixVersion))
               ];
             }
             [
