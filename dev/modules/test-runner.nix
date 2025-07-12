@@ -123,12 +123,7 @@
                     git commit --message "initial commit"
                     git checkout --detach HEAD
                   )
-                  git clone ./origin ./clone
-                  (
-                    cd clone
-                    git checkout --detach HEAD
-                    git worktree add ../test-case main
-                  )
+                  git clone ./origin ./test-case
                   cd test-case
                   ${lib.getExe script}
                 '';
