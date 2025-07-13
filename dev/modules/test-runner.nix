@@ -140,6 +140,7 @@
                           cd origin
                           cp ${flake} flake.nix
                           cp ${module} module.nix
+                          nix flake lock
                           git init .
                           git add .
                           git commit --message "initial commit"
