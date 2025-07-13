@@ -48,7 +48,7 @@
               fi
 
               declare out
-              touch "$out" 
+              touch "$out"
             '';
           };
         }
