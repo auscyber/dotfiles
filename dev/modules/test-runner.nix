@@ -83,7 +83,10 @@
                             };
                             nixpkgs.url = "${inputs.nixpkgs}";
                             systems.url = "${inputs.systems}";
-                            dummy.url = "git+file:///build/dummy-input";
+                            dummy = {
+                              url = "git+file:///build/dummy-input";
+                              flake = true;
+                            };
                           };
                           outputs =
                             inputs:
