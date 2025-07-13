@@ -18,13 +18,10 @@
                   };
                   perSystem =
                     psArgs@{ pkgs, ... }:
-                    let
-                      psCfg = psArgs.config.input-branches;
-                    in
                     {
                       packages.default = pkgs.symlinkJoin {
                         name = "commands";
-                        paths = psCfg.commands.all;
+                        paths = psArgs.config.input-branches.commands.all;
                       };
                     };
 
