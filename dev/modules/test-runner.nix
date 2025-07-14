@@ -28,7 +28,7 @@
   config = {
     _module.args = {
       baseDir = "inputs";
-      minimalNixVersion = "2.27";
+      minimalNixVersion = "2.27.0";
     };
 
     perSystem =

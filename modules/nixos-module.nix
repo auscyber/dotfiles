@@ -1,9 +1,15 @@
+{ nixosModuleAttr, noGitMetadataPlaceholder, ... }:
 {
-  flake.modules.nixos.no-git-metadata = {
+  _module.args = {
+    nixosModuleAttr = "no-git-metadata";
+    noGitMetadataPlaceholder = "no_git_metadata";
+  };
+
+  flake.modules.nixos.${nixosModuleAttr} = {
     system = {
       nixos = {
-        label = "no_git_metadata";
-        version = "no_git_metadata";
+        label = noGitMetadataPlaceholder;
+        version = noGitMetadataPlaceholder;
       };
       tools.nixos-version.enable = false;
     };
