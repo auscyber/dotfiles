@@ -50,7 +50,8 @@ Commands that support this workflow are provided via
 
 ### Minimal Nix version 🔖
 
-`v2.27.0`
+The minimal Nix version is `2.27.0`
+because [that is the version that introduced `inputs.self.submodules`](https://nix.dev/manual/nix/2.27/release-notes/rl-2.27.html).
 
 ### Git fetching only 🐢
 

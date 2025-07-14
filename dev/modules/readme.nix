@@ -1,6 +1,7 @@
 {
+  lib,
   noGitMetadataPlaceholder,
-  minimalNixVersion,
+  minimalNixVersionDocSnippet,
   nixosModuleAttr,
   ...
 }:
@@ -64,7 +65,7 @@ let
 
       ### Minimal Nix version 🔖
 
-      `v${minimalNixVersion}`
+      ${lib.trim minimalNixVersionDocSnippet}
 
       ### Git fetching only 🐢
 
