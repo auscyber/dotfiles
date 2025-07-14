@@ -113,4 +113,4 @@ and results in unexpected change to NixOS derivations.
 
 A NixOS module provided by this flake disables these impurities
 at the cost of the absence of some version information.
-It is available as `#modules.nixos.pure`.
+It is available as `#modules.nixos.no-git-metadata`.
