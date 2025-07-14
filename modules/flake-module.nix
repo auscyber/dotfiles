@@ -235,6 +235,9 @@
                       set -o xtrace
                       ${cdToplevel}
                       cd "${path_}"
+                      if [ -n "$(git status --porcelain)" ]; then
+                        exit 70
+                      fi
                       ${ensure-upstream}
                       git fetch ${remoteName} "${branch}"
                       git switch "${branch}"
