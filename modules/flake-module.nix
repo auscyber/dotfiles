@@ -154,12 +154,9 @@
                   }
                   ```
 
-                  __With some repositories one might hit push limits such as
-                  [GitHub's](https://docs.github.com/en/get-started/using-git/troubleshooting-the-2-gb-push-limit)__.
-                  That is the case with a recent Nixpkgs.
                   Pushing is the last action this command takes,
-                  so if that fails you can
-                  step into the directory and try pushing in chunks.
+                  so if that fails you can step into the directory
+                  and attempt to resolve the matter.
                 '';
               };
               rebase = lib.mkOption {
