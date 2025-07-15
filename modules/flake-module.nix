@@ -273,15 +273,24 @@
                       ''
                       + (
                         if shallow then
-                          ''
-                            git switch --orphan _input-branches-temp
-                            git checkout "${upstream.name}/${upstream.ref}" .
-                            git add .
-                            git commit --message "${shallowCommitMessage}"
-                            git switch "${branch}"
-                            git rebase _input-branches-temp
-                            git branch --delete --force _input-branches-temp
-                          ''
+                          lib.concatLines [
+                            ''
+                              git switch --orphan _input-branches-temp
+                              git checkout "${upstream.name}/${upstream.ref}" .
+                              git add .
+                              git commit --message "${shallowCommitMessage}"
+                              git switch "${branch}"
+                            ''
+                            # If this is replaced with a naive `git rebase _input-branches-temp`,
+                            # tests might still pass, but in actual usage a failure has been observed,
+                            # which I have failed to reproduce in tests.
+                            ''
+                              git rebase --onto=_input-branches-temp "$(git rev-list --max-parents=0 HEAD)" HEAD
+                              git branch --force "${branch}" HEAD
+                              git switch "${branch}"
+                              git branch --delete --force _input-branches-temp
+                            ''
+                          ]
                         else
                           ''
                             git switch "${branch}"
