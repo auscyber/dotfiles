@@ -12,7 +12,12 @@
       # This can probably be wrong in some cases
       remoteName = "origin";
       cmdBase = "input-branch";
-      cmdPrefix = lib.genAttrs [ "init" "rebase" "push-force" ] (n: "${cmdBase}-${n}");
+      cmdClasses = [
+        "init"
+        "rebase"
+        "push-force"
+      ];
+      cmdPrefix = lib.genAttrs cmdClasses (n: "${cmdBase}-${n}");
       shallowCommitMessage = "shallow input branch";
     in
     {
@@ -314,7 +319,7 @@
                 init = acc.init ++ (if cur.init != null then [ cur.init ] else [ ]);
                 rebase = acc.rebase ++ [ cur.rebase ];
                 push-force = acc.push-force ++ [ cur.push-force ];
-              }) (lib.genAttrs [ "init" "rebase" "push-force" ] (_: [ ])))
+              }) (lib.genAttrs cmdClasses (_: [ ])))
 
               (commands: {
                 inherit (commands) init rebase push-force;
