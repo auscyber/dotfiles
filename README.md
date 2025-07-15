@@ -9,7 +9,7 @@ This project defines a workflow for applying changes to an input
 by importing its branch into our repository
 and referring to that branch via path that points to a Git submodule.
 Commands that support this workflow are provided via
-[via flake-parts options](https://flake.parts/options/input-branches).
+[via flake-parts options](https://flake.parts/options/input-branches.html).
 
 ## Benefits
 
