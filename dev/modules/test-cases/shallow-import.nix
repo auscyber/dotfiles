@@ -191,12 +191,6 @@
                 exit 1
               fi
 
-              new_upstream_rev=$( (
-                cd ../dummy-input
-                git commit --quiet --allow-empty --message "empty"
-                git rev-parse HEAD
-              ))
-
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-rebase-dummy"
 
@@ -231,8 +225,8 @@
               new_origin_rev=$(git rev-parse origin/inputs/${inputName})
 
               if [ "$new_submodule_rev" != "$new_origin_rev" ]; then
-                declare -p new_upstream_rev
                 declare -p new_submodule_rev
+                declare -p new_origin_rev
                 exit 1
               fi
 
