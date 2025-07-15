@@ -12,12 +12,14 @@
       # This can probably be wrong in some cases
       remoteName = "origin";
       cmdBase = "input-branch";
+      pluralCmdBase = "input-branches";
       cmdClasses = [
         "init"
         "rebase"
         "push-force"
       ];
       cmdPrefix = lib.genAttrs cmdClasses (n: "${cmdBase}-${n}");
+      pluralCmd = lib.genAttrs cmdClasses (n: "${pluralCmdBase}-${n}");
       shallowCommitMessage = "shallow input branch";
     in
     {
@@ -162,6 +164,8 @@
                   Pushing is the last action this command takes,
                   so if that fails you can step into the directory
                   and attempt to resolve the matter.
+
+                  An additional command `${pluralCmd.init}` invokes all of these in sequence.
                 '';
               };
               rebase = lib.mkOption {
@@ -170,6 +174,8 @@
                 description = ''
                   a list of `${cmdPrefix.rebase}-<INPUT>` commands
                   that attempt to rebase `INPUT`
+
+                  An additional command `${pluralCmd.rebase}` invokes all of these in sequence.
                 '';
               };
               push-force = lib.mkOption {
@@ -178,6 +184,8 @@
                 description = ''
                   a list of `${cmdPrefix.push-force}-<INPUT>` commands
                   that push with `--force` the configured branch of `INPUT`
+
+                  An additional command `${pluralCmd.push-force}` invokes all of these in sequence.
                 '';
               };
 
@@ -320,6 +328,20 @@
                 rebase = acc.rebase ++ [ cur.rebase ];
                 push-force = acc.push-force ++ [ cur.push-force ];
               }) (lib.genAttrs cmdClasses (_: [ ])))
+
+              (lib.mapAttrs (
+                cmdClass: classCommands:
+                classCommands
+                ++ lib.optional (classCommands != [ ]) (
+                  pkgs.writeShellApplication {
+                    name = pluralCmd.${cmdClass};
+                    text = lib.pipe classCommands [
+                      (map lib.getExe)
+                      lib.concatLines
+                    ];
+                  }
+                )
+              ))
 
               (commands: {
                 inherit (commands) init rebase push-force;
