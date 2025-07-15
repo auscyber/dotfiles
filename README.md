@@ -101,19 +101,38 @@ we also push the input branch.
 Since we now have input code under `./inputs`,
 we must consider this path in the usage of tools such as linters and formatters.
 
-### Git metadata in NiXOS 🏷️
+### NixOS issues and workarounds
+
+> [!IMPORTANT]
+> This workflow causes/surfaces the following issues with NixOS.
+> A NixOS module that mitigates these issues is provided
+> as `#modules.nixos.default`.
+
+#### Git metadata in NixOS derivations 🏷️
 
 By default NixOS uses git metadata in some derivations.
 This may be useful under normal circumstances,
-but when Nixpkgs is referred to by path,
+but when Nixpkgs is a Git submodule that is referred to by path,
 then the git metadata is no longer of the Nixpkgs repository, but of the superproject.
 This unintended consequence also results in more frequent/noisy NixOS derivation change.
 
-A NixOS module provided by this flake configures NixOS to not use Git metadata.
+The provided NixOS module disables the use of Git metadata;
 It removes the `nixos-version` command
 and replaces the Nixpkgs revision that is by default included in boot entry labels
 with `no_git_metadata`.
-It is available as `#modules.nixos.no-git-metadata`.
+
+#### `nixpkgs.flake.source`
+
+By default the NixOS option `nixpkgs.flake.source` is set to `self.outPath`.
+This may be useful under normal circumstances,
+but when Nixpkgs is a Git submodule that is referred to by path,
+it results in the supreproject being part of the NixOS derivation,
+which is unacceptable because _any edit_ would result in a NixOS system change.
+The provided NixOS module sets this option to `null`,
+which results in the removal of Nixkpgs from the system flake registry.
+If you want Nixpkgs in the system flake registry
+you may override this option to a path of your Nixpkgs submodule path
+(possibly `lib.mkForce ../inputs/nixpkgs` or similar).
 
 ### Increase in repository size 🦛
 
