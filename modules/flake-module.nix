@@ -13,6 +13,7 @@
       remoteName = "origin";
       cmdBase = "input-branch";
       cmdPrefix = lib.genAttrs [ "init" "rebase" "push-force" ] (n: "${cmdBase}-${n}");
+      shallowCommitMessage = "shallow input branch";
     in
     {
       options = {
@@ -63,6 +64,18 @@
                       example = lib.literalExpression ''"flake-parts"'';
                       default = name;
                       defaultText = lib.literalMD "`<name>`";
+                    };
+
+                    shallow = lib.mkOption {
+                      type = lib.types.bool;
+                      default = false;
+                      example = true;
+                      description = ''
+                        Useful for an input with huge history, such as Nixpkgs.
+                        Fetching occurs with `--depth 1`.
+                        The input branch is initialized with a single, artificial, initial commit.
+                        Prior to rebasing such a commit is recreated.
+                      '';
                     };
 
                     upstream = {
@@ -190,6 +203,7 @@
                   upstream,
                   path_,
                   branch,
+                  shallow,
                 }:
                 let
                   cdToplevel = ''
@@ -208,21 +222,36 @@
                       (pkgs.writeShellApplication {
                         name = "${cmdPrefix.init}-${name}";
                         runtimeInputs = [ pkgs.git ];
-                        text = ''
-                          set -o xtrace
-                          ${cdToplevel}
+                        text =
+                          ''
+                            set -o xtrace
+                            ${cdToplevel}
 
-                          current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
-                          git submodule add ./. "${path_}"
-                          (
-                            cd "${path_}"
-                            ${ensure-upstream}
-                            git fetch ${upstream.name} "${inputs.${name}.rev}"
-                            git switch -c "${branch}" "${inputs.${name}.rev}"
-                            git push --set-upstream "$current_branch_remote_name" "${branch}"
+                            current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
+                            git submodule add ./. "${path_}"
+                            (
+                              cd "${path_}"
+                              ${ensure-upstream}
+                              git fetch ${lib.optionalString shallow "--depth 1"} ${upstream.name} "${inputs.${name}.rev}"
+                          ''
+                          + (
+                            if shallow then
+                              ''
+                                git switch --orphan "${branch}"
+                                git checkout "${inputs.${name}.rev}" .
+                                git add .
+                                git commit --message "${shallowCommitMessage}"
+                              ''
+                            else
+                              ''
+                                git switch --create "${branch}" "${inputs.${name}.rev}"
+                              ''
                           )
-                          git config --file .gitmodules submodule.${path_}.url "./."
-                        '';
+                          + ''
+                              git push --set-upstream "$current_branch_remote_name" "${branch}"
+                            )
+                            git config --file .gitmodules submodule.${path_}.url "./."
+                          '';
                       })
                     else
                       null;
@@ -230,19 +259,35 @@
                   rebase = pkgs.writeShellApplication {
                     name = "${cmdPrefix.rebase}-${name}";
                     runtimeInputs = [ pkgs.git ];
-                    text = ''
-                      set -o xtrace
-                      ${cdToplevel}
-                      cd "${path_}"
-                      if [ -n "$(git status --porcelain)" ]; then
-                        exit 70
-                      fi
-                      ${ensure-upstream}
-                      git fetch ${remoteName} "${branch}"
-                      git switch "${branch}"
-                      git fetch ${upstream.name} "${upstream.ref}"
-                      git rebase "${upstream.name}/${upstream.ref}"
-                    '';
+                    text =
+                      ''
+                        set -o xtrace
+                        ${cdToplevel}
+                        cd "${path_}"
+                        if [ -n "$(git status --porcelain)" ]; then
+                          exit 70
+                        fi
+                        ${ensure-upstream}
+                        git fetch ${lib.optionalString shallow "--depth 1"} ${upstream.name} "${upstream.ref}"
+                        git fetch ${remoteName} "${branch}"
+                      ''
+                      + (
+                        if shallow then
+                          ''
+                            git switch --orphan _input-branches-temp
+                            git checkout "${upstream.name}/${upstream.ref}" .
+                            git add .
+                            git commit --message "${shallowCommitMessage}"
+                            git switch "${branch}"
+                            git rebase _input-branches-temp
+                            git branch --delete --force _input-branches-temp
+                          ''
+                        else
+                          ''
+                            git switch "${branch}"
+                            git rebase "${upstream.name}/${upstream.ref}"
+                          ''
+                      );
                   };
 
                   push-force = pkgs.writeShellApplication {

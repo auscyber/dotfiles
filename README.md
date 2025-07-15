@@ -21,10 +21,14 @@ Commands that support this workflow are provided via
 
 - ⚡ provided scripts save time and improve consistency
 
+- 🧚‍♀️ optional shallow import extra useful for inputs with huge history such as Nixpkgs
+
 ## The setup
 
 1. ⬇️ _import the upstream branch_ into our project's own repository.
    For example, we can import the upstream `nixpkgs-unstable` branch as `inputs/nixpkgs` in our repository.
+   Repositories with huge histories such as Nixpkgs should be fetched shallowly
+   and imported into a single artificial commit.
 
 2. add our repository at that branch as a Git submodule to our repository 💡.
    For example, at the path `inputs/nixpkgs`. Our `.gitmodules` will include:
@@ -85,10 +89,10 @@ This was reported as [issue 13324](https://github.com/NixOS/nix/issues/13324).
 
 ### Forge push limits 🚫
 
-With some repositories one might hit forge push limits such as
+Inputs with huge histories should be handled shallowly.
+Otherwise, one might (with Nixpkgs will) hit forge push limits such as
 [GitHub's](https://docs.github.com/en/get-started/using-git/troubleshooting-the-2-gb-push-limit).
-That is the case with Nixpkgs.
-These can typically be worked around.
+But if you insist, this can typically be worked around by chunking.
 
 ### Input branches must be pushed 🫸
 
@@ -138,3 +142,4 @@ you may override this option to a path of your Nixpkgs submodule path
 
 Importing of foreign branches results in storage of foreign objects,
 increasing repository size.
+This can be mitigated by importing shallowly.
