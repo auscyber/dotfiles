@@ -75,8 +75,8 @@
                 git remote --verbose
               ))
               expect_remotes="\
-              origin''\t/build/./origin (fetch)
-              origin''\t/build/./origin (push)
+              origin''\t/build/./origin/. (fetch)
+              origin''\t/build/./origin/. (push)
               upstream''\t${dummyInputUrl} (fetch)
               upstream''\t${dummyInputUrl} (push)"
 

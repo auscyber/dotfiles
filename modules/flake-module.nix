@@ -213,8 +213,7 @@
                           ${cdToplevel}
 
                           current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
-                          current_branch_remote_url=$(git remote get-url "$current_branch_remote_name")
-                          git submodule add "$current_branch_remote_url" "${path_}"
+                          git submodule add ./. "${path_}"
                           (
                             cd "${path_}"
                             ${ensure-upstream}
