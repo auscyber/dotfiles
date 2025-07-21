@@ -205,8 +205,8 @@
               new_origin_rev=$(git rev-parse origin/inputs/main/${inputName})
 
               if [ "$new_submodule_rev" != "$new_origin_rev" ]; then
-                declare -p new_upstream_rev
                 declare -p new_submodule_rev
+                declare -p new_origin_rev
                 exit 1
               fi
 
