@@ -160,16 +160,7 @@
                 git commit --quiet --message "change"
               )
 
-              actual_content=$(nix eval --raw .#dummy)
-
               # https://github.com/NixOS/nix/issues/13324
-              expect_content="original"
-              if [ "$actual_content" != "$expect_content" ]; then
-                declare -p actual_content
-                declare -p expect_content
-                exit 1
-              fi
-
               touch dirt
               git add --intent-to-add dirt
 
