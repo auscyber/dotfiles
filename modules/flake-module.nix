@@ -316,7 +316,6 @@
                       set -o xtrace
                       ${cdToplevel}
                       cd "${path_}"
-                      ${ensure-upstream}
                       git push -f ${remoteName} "${branch}:${branch}"
                     '';
                   };
