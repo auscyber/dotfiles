@@ -20,7 +20,6 @@
       ];
       cmdPrefix = lib.genAttrs cmdClasses (n: "${cmdBase}-${n}");
       pluralCmd = lib.genAttrs cmdClasses (n: "${pluralCmdBase}-${n}");
-      shallowCommitMessage = "shallow input branch";
     in
     {
       options = {
@@ -81,6 +80,7 @@
                         Useful for an input with huge history, such as Nixpkgs.
                         Fetching occurs with `--depth 1`.
                         The input branch is initialized with a single, artificial, initial commit.
+                        The commit message includes the original upstream rev.
                         Prior to rebasing such a commit is recreated.
                       '';
                     };
@@ -247,7 +247,7 @@
                                 git switch --orphan "$branch"
                                 git checkout "${inputs.${name}.rev}" .
                                 git add .
-                                git commit --message "${shallowCommitMessage}"
+                                git commit --message "squashed upstream ${inputs.${name}.rev}"
                               ''
                             else
                               ''
@@ -288,7 +288,7 @@
                               git switch --orphan _input-branches-temp
                               git checkout "${upstream.name}/${upstream.ref}" .
                               git add .
-                              git commit --message "${shallowCommitMessage}"
+                              git commit --message "squashed upstream $(git rev-parse "${upstream.name}/${upstream.ref}")"
                               git switch "$branch"
                             ''
                             # If this is replaced with a naive `git rebase _input-branches-temp`,

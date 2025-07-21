@@ -67,6 +67,20 @@
 
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-init-dummy"
+
+              expect_commit_message="squashed upstream $upstream_rev"
+
+              actual_commit_message="$( (
+                cd ${baseDir}/${inputName}
+                git log -1 --pretty=%B
+              ))"
+
+              if [ "$actual_commit_message" != "$expect_commit_message" ]; then
+                declare -p actual_commit_message
+                declare -p expect_commit_message
+                exit 1
+              fi
+
               "$result/bin/input-branch-push-force-dummy"
 
               sed --in-place 's#"git+file:///build/dummy-input"#"./${baseDir}/${inputName}"#' flake.nix
@@ -203,6 +217,19 @@
 
               if [ "$submodule_commit_count" -ne 2 ]; then
                 declare -p submodule_commit_count
+                exit 1
+              fi
+
+              expect_first_commit_message="squashed upstream $upstream_rev"
+
+              actual_first_commit_message="$( (
+                cd ${baseDir}/${inputName}
+                git log HEAD~ -1 --pretty=%B
+              ))"
+
+              if [ "$actual_first_commit_message" != "$expect_first_commit_message" ]; then
+                declare -p actual_first_commit_message
+                declare -p expect_first_commit_message
                 exit 1
               fi
 
