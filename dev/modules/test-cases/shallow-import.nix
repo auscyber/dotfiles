@@ -57,12 +57,11 @@
                 exit 1
               fi
 
-              upstream_rev=$(nix flake metadata --json | jq --raw-output .locks.nodes.${inputName}.locked.rev)
-
-              (
+              upstream_rev=$( (
                 cd ../dummy-input
                 git commit --quiet --allow-empty --message "additional"
-              )
+                git rev-parse HEAD
+              ))
 
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-init-dummy"
