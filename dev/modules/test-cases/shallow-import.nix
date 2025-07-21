@@ -63,6 +63,8 @@
                 git rev-parse HEAD
               ))
 
+              nix flake update ${inputName}
+
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-init-dummy"
               "$result/bin/input-branch-push-force-dummy"
