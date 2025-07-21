@@ -161,10 +161,6 @@
                   }
                   ```
 
-                  Pushing is the last action this command takes,
-                  so if that fails you can step into the directory
-                  and attempt to resolve the matter.
-
                   An additional command `${pluralCmd.init}` invokes all of these in sequence.
                 '';
               };
@@ -237,7 +233,6 @@
                             set -o xtrace
                             ${cdToplevel}
 
-                            current_branch_remote_name=$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" | cut -d'/' -f1)
                             git submodule add ./. "${path_}"
                             (
                               cd "${path_}"
@@ -258,7 +253,6 @@
                               ''
                           )
                           + ''
-                              git push --set-upstream "$current_branch_remote_name" "${branch}"
                             )
                             git config --file .gitmodules submodule.${path_}.url "./."
                           '';
