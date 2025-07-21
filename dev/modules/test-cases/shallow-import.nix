@@ -192,8 +192,6 @@
                 git commit --quiet --message "change"
               )
 
-              actual_content=$(nix eval --raw .#dummy)
-
               # https://github.com/NixOS/nix/issues/13324
               touch dirt
               git add --intent-to-add dirt
