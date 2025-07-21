@@ -8,7 +8,6 @@
 let
   projectName = "input-branches";
   baseDir = "inputs";
-  branchPrefix = "inputs/";
   path_ = "README.md";
   text =
     # markdown
@@ -41,7 +40,7 @@ let
       ## The setup
 
       1. ⬇️ _import the upstream branch_ into our project's own repository.
-         For example, we can import the upstream `nixpkgs-unstable` branch as `${branchPrefix}nixpkgs` in our repository.
+         For example, we can import the upstream `nixpkgs-unstable` branch as `inputs/main/nixpkgs` in our repository.
          Repositories with huge histories such as Nixpkgs should be fetched shallowly
          and imported into a single artificial commit.
 

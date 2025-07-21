@@ -100,10 +100,10 @@
                 git show-ref --abbrev=4 | cut -d' ' -f2
               ))
               expect_refs="\
-              refs/heads/inputs/dummy
+              refs/heads/inputs/main/dummy
               refs/heads/main
               refs/remotes/origin/HEAD
-              refs/remotes/origin/inputs/dummy
+              refs/remotes/origin/inputs/main/dummy
               refs/remotes/origin/main"
 
               if [ "$actual_refs" != "$expect_refs" ]; then
@@ -140,7 +140,7 @@
                 cd ${baseDir}/${inputName}
                 git branch --show-current
               ))
-              expect_checked_out_branch="inputs/dummy"
+              expect_checked_out_branch="inputs/main/dummy"
 
               if [ "$actual_checked_out_branch" != "$expect_checked_out_branch" ]; then
                 declare -p actual_checked_out_branch
@@ -223,7 +223,7 @@
               "$result/bin/input-branch-push-force-dummy"
 
               git fetch origin
-              new_origin_rev=$(git rev-parse origin/inputs/${inputName})
+              new_origin_rev=$(git rev-parse origin/inputs/main/${inputName})
 
               if [ "$new_submodule_rev" != "$new_origin_rev" ]; then
                 declare -p new_submodule_rev

@@ -118,15 +118,6 @@
                       default = "${cfg.baseDir}/${name}";
                       defaultText = lib.literalMD "`${cfg.baseDir}/<name>`";
                     };
-                    branch = lib.mkOption {
-                      type = lib.types.str;
-                      readOnly = true;
-                      description = ''
-                        input branch name
-                      '';
-                      default = "inputs/${name}";
-                      defaultText = lib.literalMD "`inputs/<name>`";
-                    };
                   };
                 }
               )
@@ -208,7 +199,6 @@
                   name,
                   upstream,
                   path_,
-                  branch,
                   shallow,
                 }:
                 let
@@ -221,19 +211,31 @@
                       git remote add ${upstream.name} "${upstream.url}"
                     fi
                   '';
+
+                  get-input-branch = pkgs.writeShellApplication {
+                    name = "get-input-branch";
+                    runtimeInputs = [ pkgs.git ];
+                    text = ''
+                      echo "inputs/$(git branch --show-current)/${name}"
+                    '';
+                  };
                 in
                 {
                   init =
                     if (inputs.${name} ? rev) then
                       (pkgs.writeShellApplication {
                         name = "${cmdPrefix.init}-${name}";
-                        runtimeInputs = [ pkgs.git ];
+                        runtimeInputs = [
+                          pkgs.git
+                          get-input-branch
+                        ];
                         text =
                           ''
                             set -o xtrace
                             ${cdToplevel}
 
                             git submodule add ./. "${path_}"
+                            branch="$(get-input-branch)"
                             (
                               cd "${path_}"
                               ${ensure-upstream}
@@ -242,14 +244,14 @@
                           + (
                             if shallow then
                               ''
-                                git switch --orphan "${branch}"
+                                git switch --orphan "$branch"
                                 git checkout "${inputs.${name}.rev}" .
                                 git add .
                                 git commit --message "${shallowCommitMessage}"
                               ''
                             else
                               ''
-                                git switch --create "${branch}" "${inputs.${name}.rev}"
+                                git switch --create "$branch" "${inputs.${name}.rev}"
                               ''
                           )
                           + ''
@@ -262,18 +264,22 @@
 
                   rebase = pkgs.writeShellApplication {
                     name = "${cmdPrefix.rebase}-${name}";
-                    runtimeInputs = [ pkgs.git ];
+                    runtimeInputs = [
+                      pkgs.git
+                      get-input-branch
+                    ];
                     text =
                       ''
                         set -o xtrace
                         ${cdToplevel}
+                        branch="$(get-input-branch)"
                         cd "${path_}"
                         if [ -n "$(git status --porcelain)" ]; then
                           exit 70
                         fi
                         ${ensure-upstream}
                         git fetch ${lib.optionalString shallow "--depth 1"} ${upstream.name} "${upstream.ref}"
-                        git fetch ${remoteName} "${branch}"
+                        git fetch ${remoteName} "$branch"
                       ''
                       + (
                         if shallow then
@@ -283,21 +289,21 @@
                               git checkout "${upstream.name}/${upstream.ref}" .
                               git add .
                               git commit --message "${shallowCommitMessage}"
-                              git switch "${branch}"
+                              git switch "$branch"
                             ''
                             # If this is replaced with a naive `git rebase _input-branches-temp`,
                             # tests might still pass, but in actual usage a failure has been observed,
                             # which I have failed to reproduce in tests.
                             ''
                               git rebase --onto=_input-branches-temp "$(git rev-list --max-parents=0 HEAD)" HEAD
-                              git branch --force "${branch}" HEAD
-                              git switch "${branch}"
+                              git branch --force "$branch" HEAD
+                              git switch "$branch"
                               git branch --delete --force _input-branches-temp
                             ''
                           ]
                         else
                           ''
-                            git switch "${branch}"
+                            git switch "$branch"
                             git rebase "${upstream.name}/${upstream.ref}"
                           ''
                       );
@@ -305,12 +311,16 @@
 
                   push-force = pkgs.writeShellApplication {
                     name = "${cmdPrefix.push-force}-${name}";
-                    runtimeInputs = [ pkgs.git ];
+                    runtimeInputs = [
+                      pkgs.git
+                      get-input-branch
+                    ];
                     text = ''
                       set -o xtrace
                       ${cdToplevel}
+                      branch="$(get-input-branch)"
                       cd "${path_}"
-                      git push -f ${remoteName} "${branch}:${branch}"
+                      git push -f ${remoteName} "$branch:$branch"
                     '';
                   };
                 }
