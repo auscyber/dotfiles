@@ -81,12 +81,11 @@
                 exit 1
               fi
 
-              "$result/bin/input-branch-push-force-dummy"
-
               sed --in-place 's#"git+file:///build/dummy-input"#"./${baseDir}/${inputName}"#' flake.nix
 
               git add .
               git commit -m'input-branch'
+              "$result/bin/input-branch-push-force-dummy"
               git push
 
               if ! diff_output=$(diff --unified ${expectedGitmodules} .gitmodules); then

@@ -35,12 +35,12 @@
 
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-init-dummy"
-              "$result/bin/input-branch-push-force-dummy"
 
               sed --in-place 's#"git+file:///build/dummy-input"#"./${baseDir}/dummy"#' flake.nix
 
               git add .
               git commit -m'input-branch'
+              "$result/bin/input-branch-push-force-dummy"
               git push
 
               (
