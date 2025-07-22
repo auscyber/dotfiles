@@ -181,6 +181,10 @@
 
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-rebase-dummy"
+              git add .
+              git commit --message "rebased input branch"
+              "$result/bin/input-branch-push-force-dummy"
+              git push
 
               submodule_parent_rev=$( (
                 cd ${baseDir}/${inputName}
