@@ -133,7 +133,7 @@ but when Nixpkgs is a Git submodule that is referred to by path,
 it results in the supreproject being part of the NixOS derivation,
 which is unacceptable because _any edit_ would result in a NixOS system change.
 The provided NixOS module sets this option to `null`,
-which results in the removal of Nixkpgs from the system flake registry.
+which results in the removal of Nixpkgs from the system flake registry.
 If you want Nixpkgs in the system flake registry
 you may override this option to a path of your Nixpkgs submodule path
 (possibly `lib.mkForce ../inputs/nixpkgs` or similar).
