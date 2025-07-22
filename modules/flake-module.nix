@@ -318,6 +318,7 @@
                     text = ''
                       set -o xtrace
                       ${cdToplevel}
+                      rev=$(git rev-parse HEAD:${cfg.baseDir}/${name})
                       branch="$(get-input-branch)"
                       tracked_rev=$(git rev-parse :"${path_}")
                       cd "${path_}"
@@ -331,6 +332,7 @@
                         echo "${path_} is dirty" >&2
                         exit 70
                       fi
+                      git update-ref "refs/heads/$branch" "$rev"
                       git push -f ${remoteName} "$branch:$branch"
                     '';
                   };
