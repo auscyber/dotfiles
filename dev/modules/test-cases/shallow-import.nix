@@ -191,9 +191,10 @@
                 git commit --quiet --message "change"
               )
 
-              # https://github.com/NixOS/nix/issues/13324
-              touch dirt
-              git add --intent-to-add dirt
+              git add .
+              git commit --message "inputs/dummy change"
+              "$result/bin/input-branch-push-force-dummy"
+              git push
 
               actual_submodule_content=$(nix eval --raw .#dummy)
               expect_submodule_content="$new_submodule_content"
@@ -206,6 +207,10 @@
 
               result=$(nix build --no-link --print-out-paths)
               "$result/bin/input-branch-rebase-dummy"
+              git add inputs/dummy
+              git commit --message "inputs/dummy rebase"
+              "$result/bin/input-branch-push-force-dummy"
+              git push
 
               submodule_commit_count=$( (
                 cd ${baseDir}/${inputName}
@@ -243,9 +248,6 @@
                 cd ${baseDir}/${inputName}
                 git rev-parse HEAD
               ))
-
-              result=$(nix build --no-link --print-out-paths)
-              "$result/bin/input-branch-push-force-dummy"
 
               git fetch origin
               new_origin_rev=$(git rev-parse origin/inputs/main/${inputName})

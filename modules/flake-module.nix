@@ -319,7 +319,18 @@
                       set -o xtrace
                       ${cdToplevel}
                       branch="$(get-input-branch)"
+                      tracked_rev=$(git rev-parse :"${path_}")
                       cd "${path_}"
+                      current_head=$(git rev-parse HEAD)
+                      if [ "$current_head" != "$tracked_rev" ]; then
+                        echo "${path_} is not at tracked commit (HEAD: $current_head, Tracked: $tracked_rev)" >&2
+                        exit 70
+                      fi
+
+                      if [ -n "$(git status --porcelain)" ]; then
+                        echo "${path_} is dirty" >&2
+                        exit 70
+                      fi
                       git push -f ${remoteName} "$branch:$branch"
                     '';
                   };
