@@ -9,7 +9,7 @@ in
     #input-leap
     discord
     #    wezterm
-    spotify
+    #    spotify
     #    rnix-lsp
     #    beeper
     #    google-chrome

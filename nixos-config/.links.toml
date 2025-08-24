@@ -1,7 +1,0 @@
-name = "nixos"
-id = "15218362135278254458"
-systems = ["desktop"]
-[[links]]
-name = "home"
-src = "users/auscyber"
-destination = "/home/auscyber/.config/nixpkgs"

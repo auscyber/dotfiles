@@ -3,11 +3,38 @@
   pkgs,
   system,
   lib,
+  inputs,
   modulesPath,
   ...
 }:
 {
+  imports = [
+    inputs.nix-index-database.homeModules.nix-index
+    #    ../keybind_program
+  ];
+
   config = {
+    #  services.keybindControl = {
+    #    enable = true;
+    #    applications = {
+    #      "skhd" = {
+    #        transformer = import ../keybind_program/transformers/skhd.nix;
+    #        keybinds = [
+    #          {
+    #            Key = "ta";
+    #            modifiers = [ "Ctrl" "Alt" ];
+    #            action =
+    #               "open -a Terminal";
+    #            description = "Open Terminal with Ctrl + Alt + T";
+    #            group = "utilities";
+    #          }
+    #        ];
+    #        name = "Terminal Keybinds";
+    #        description = "Keybinds for opening Terminal applications.";
+    #      };
+    #
+    #    };
+    #  };
     home.stateVersion = "23.11";
     nix = {
       #              package = pkgs.nixVersions.latest;
@@ -18,11 +45,11 @@
         ];
       };
     };
-    home.shell.enableZshIntegration = true;
+    home.shell.enableFishIntegration = true;
     manual.manpages.enable = true;
-    programs.zsh.enable = true;
+    programs.fish.enable = true;
     programs = {
-      command-not-found.enable = true;
+      #      command-not-found.enable = true;
       direnv = {
         enable = true;
         nix-direnv = {
@@ -30,7 +57,7 @@
         };
       };
       home-manager.enable = true;
-	  gpg.enable = true;
+      gpg.enable = true;
 
     };
 
@@ -46,9 +73,9 @@
       enable = true;
       git = true;
       icons = "auto";
-      enableZshIntegration = true;
     };
     home.packages = with pkgs; [
+      ivy-fetch
       devenv
       agenix
       shellify
@@ -64,9 +91,6 @@
       coreutils
     ];
     home.file = {
-      ".local/bin/fetch" = {
-        source = ../fetch;
-      };
       ".config/nvim" = {
         source = ../.config/nvim;
         recursive = true;
@@ -89,6 +113,14 @@
     xdg.configFile."nvim/lua/treesitter_compiler.lua".text = ''
       			return "${pkgs.stdenv.cc}/bin/cc"
             	'';
+    home.sessionVariables = {
+      EDITOR = "nvim";
+      editor = "$EDITOR";
+      #      BROWSER = "firefox";
+      _JAVA_AWT_WM_NONREPARENTING = 1;
+      WLR_NO_HARDWARE_CURSORS = 1;
+
+    };
 
   };
   options = with lib; {

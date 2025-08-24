@@ -46,7 +46,6 @@
     vscode
     pandoc
     discord
-    spotify
     texliveFull
     #    wezterm
     zotero
@@ -245,12 +244,12 @@
     };
   };
   services.skhd = {
-    enable = true;
+    enable = false;
 
     config =
       let
         input = {
-          "cmd + alt - s " = "yabai -m window --toggle spotify || open  -a Spotify ";
+          #          "cmd + alt - s " = "yabai -m window --toggle spotify || open  -a Spotify ";
           "cmd + alt - d " = " yabai -m window --toggle discord || open -a Discord";
           # focus window
           "alt - h" = " yabai -m window --focus west";
@@ -329,8 +328,8 @@
 
   };
   services.yabai = {
-    enableScriptingAddition = true;
-    enable = true;
+    enableScriptingAddition = false;
+    enable = false;
     config = {
       focus_follows_mouse = "off";
       mouse_follows_focus = "off";
@@ -352,6 +351,7 @@
 
   };
   targets.darwin.defaults.NSGlobalDomain = {
+    AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";
     AppleInterfaceStyle = "Dark"; # dark mode
     AppleShowAllFiles = true;
     ApplePressAndHoldEnabled = false; # enable press and hold
@@ -373,9 +373,9 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.activation = {
-	background = ''
-		run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
-	'';
+    background = ''
+      		run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
+      	'';
 
   };
   home.sessionVariables = {

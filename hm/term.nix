@@ -1,9 +1,12 @@
 {
   config,
   nixpkgs,
+  inputs,
   ...
 }:
 {
+  home.file.".config/ghostty/shaders/cursor_shader.glsl".source =
+    "${inputs.cursor_shader}/cursor_synesthaxia(tweened).glsl";
 
   programs.ghostty = {
 
@@ -39,9 +42,14 @@
 
     };
     settings = {
-      macos-icon = "paper";
+      custom-shader = [
+        "./shaders/cursor_shader.glsl"
+        #        "${inputs.ghostty-shaders}/cursor_blaze.glsl"
+      ];
+      cursor-style = "block";
+      #      macos-icon = "paper";
       theme = "pink_ocean";
-      background-opacity = 0.8;
+      #      background-opacity = 0.8;
       font-size = 15;
       font-family = "Hasklug Nerd Font";
     };
