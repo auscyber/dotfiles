@@ -14,4 +14,19 @@ in
     auspc
     mac
   ];
+  "password.age".publicKeys = [
+    auspc
+    mac
+    auscyber
+  ];
+  "pia_vpn.age".publicKeys = [
+    auspc
+    mac
+    auscyber
+  ];
+  "pia_privatekey.age".publicKeys = [
+    auspc
+    mac
+    auscyber
+  ];
 }

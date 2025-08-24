@@ -24,6 +24,16 @@
   boot.kernelPackages = pkgs.linuxPackages_zen;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
 
+
+
+  services.udev.packages = [ pkgs.yubikey-personalization ];
+
+security.pam.services = {
+  login.u2fAuth = true;
+  sudo.u2fAuth = true;
+};
+
+services.pcscd.enable = true;
   home-manager.backupFileExtension = ".bak";
   fileSystems."/mnt/hdd" = {
     device = "/dev/disk/by-label/hdd";

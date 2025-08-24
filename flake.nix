@@ -2,14 +2,34 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+    cursor_shader = {
+      url = "github:Crackerfracks/synesthaxia.glsl";
+      flake = false;
+    };
+    ghostty-shaders = {
+      url = "github:hackr-sh/ghostty-shaders";
+      flake = false;
+    };
+    nix-colors.url = "github:misterio77/nix-colors";
     #Non flakes
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     hyprpanel.url = "github:jas-singhfsu/hyprpanel";
     hyprpanel.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+
+    # Optional: Declarative tap management
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-	zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-	zen-browser.inputs.home-manager.follows="home-manager";
+    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    zen-browser.inputs.home-manager.follows = "home-manager";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
@@ -33,10 +53,7 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-	my-nur = {
-		url = "github:auscyber/nur-packages";
-		inputs.nixpkgs.follows = "nixpkgs";
-	};
+
     input-leap = {
       url = "github:input-leap/input-leap?submodules=1";
       flake = false;
@@ -48,6 +65,8 @@
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,7 +82,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager?ref=pull/7074/merge";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arion.url = "github:hercules-ci/arion";
@@ -121,7 +140,7 @@
         ))
           import;
       overlays = [
-        inputs.hyprpanel.overlay
+        #        inputs.hyprpanel.overlay
         inputs.nur.overlays.default
         inputs.emacs.overlays.default
         rust-overlay.overlays.default
@@ -132,10 +151,14 @@
           let
             inherit (final.stdenv.hostPlatform) system;
 
-			zen-browser = {
-				aarch64-darwin = inputs.my-nur.packages.aarch64-darwin.zen-browser-twilight;
-				x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
-			};
+            zen-browser = {
+              aarch64-darwin = prev.nur.repos.AusCyber.zen-browser;
+              x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
+            };
+            ghostty = {
+              aarch64-darwin = prev.ghostty-bin;
+              x86_64-linux = prev.ghostty;
+            };
           in
           {
             input-leap = prev.input-leap.overrideAttrs (attrs: {
@@ -144,15 +167,19 @@
             });
 
             inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
+            ivy-fetch = prev.callPackage ./packages/fetch.nix { };
+            hln = prev.callPackage ./packages/hardlink.nix { };
             desktoppr = prev.callPackage ./packages/desktoppr.nix { };
             inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
             nh = inputs.nh.packages."${system}".default;
             agenix = inputs.agenix.packages."${system}".default;
             inherit (eww.packages.${system}) eww;
             inherit (rnix.packages."${system}") rnix-lsp;
-            ghostty-mac = prev.nur.repos.DimitarNestorov.ghostty;
-			zen-browser = zen-browser."${system}";
-			picom = prev.picom.overrideAttrs (attrs: { src = picom; });
+            ghostty = ghostty."${system}";
+            zen-browser = zen-browser."${system}";
+            picom = prev.picom.overrideAttrs (attrs: {
+              src = picom;
+            });
             #            idris2 = idris2.packages."${system}".idris2;
             #            wezterm = (masterp {inherit system;}).wezterm;
             #              discord = (import master { inherit system config; }).discord;
@@ -198,28 +225,40 @@
 
         };
 
-        "Ivys-MacBook-Pro" = import ./systems/macbook {
+        "Ivys-MacBook-Pro" = import ./systems {
+          system = "aarch64-darwin";
+          builder = darwin.lib.darwinSystem;
           modules = [
+            ./systems/macbook
+            inputs.nix-homebrew.darwinModules.nix-homebrew
             inputs.agenix.darwinModules.default
             ./modules/common.nix
+            ./modules/secrets.nix
             ./modules/hm.nix
+            ./modules/pia.nix
             inputs.stylix.darwinModules.stylix
+            inputs.home-manager.darwinModules.default
           ];
-          home-manager-modules = [
-		  inputs.zen-browser.homeModules.twilight
-            inputs.nixvim.homeManagerModules.nixvim
-            #			  inputs.opnix.hmModules.default
-			./hm/modules/zen.nix
-            ./hm/yabai.nix
-            ./hm/ui.nix
-            ./hm/term.nix
-            ./hm/modules/zsh.nix
-            ./hm/modules/neovim.nix
-            ./hm/modules/zotero.nix
-            ./hm/mac.nix
-            ./hm/modules/1password.nix
+          users.ivypierlot = {
+            home.sessionVariables = {
+              NH_FLAKE = "/Users/ivypierlot/dotfiles";
+            };
+            imports = [
+              inputs.zen-browser.homeModules.twilight
+              inputs.nixvim.homeManagerModules.nixvim
+              #			  inputs.opnix.hmModules.default
+              ./hm/modules/zen.nix
+              ./hm/yabai.nix
+              ./hm/modules/fish.nix
+              ./hm/ui.nix
+              ./hm/term.nix
+              ./hm/modules/neovim.nix
+              ./hm/modules/zotero.nix
+              ./hm/mac.nix
+              ./hm/modules/1password.nix
 
-          ];
+            ];
+          };
           inherit
             nixpkgs
             config
@@ -243,14 +282,39 @@
           name = "nvim";
           drv = pkgs.neovim;
         };
-		apps.desktoppr = flake-utils.lib.mkApp {
-			name = "desktoppr";
-			drv = pkgs.callPackage ./desktoppr.nix {};
-		};
+        apps.desktoppr = flake-utils.lib.mkApp {
+          name = "desktoppr";
+          drv = pkgs.callPackage ./desktoppr.nix { };
+        };
       }
     ))
     // {
       nixosConfigurations = {
+        "pentest-vm-aarch64" = import ./systems {
+          system = "aarch64-linux";
+          builder = nixpkgs.lib.nixosSystem;
+          inherit
+            nixpkgs
+            config
+            overlays
+            inputs
+            home-manager
+            ;
+          modules = [
+            home-manager.nixosModules.default
+            ./modules/common.nix
+            ./modules/hm.nix
+            ./systems/pentestvm
+          ];
+          users.admin = {
+            imports = [
+              ./hm/.
+              ./hm/modules/zsh.nix
+              ./hm/modules/neovim.nix
+            ];
+          };
+        };
+
         wsl-nixos = import ./systems/wsl-nixos {
           modules = [
             nixos-wsl.nixosModules.default
@@ -272,34 +336,40 @@
             ;
 
         };
-        auspc = import ./systems/auspc {
+        auspc = import ./systems {
+          system = "x86_64-linux";
+          builder = nixpkgs.lib.nixosSystem;
           modules = [
+            agenix.nixosModules.default
             inputs.stylix.nixosModules.stylix
             ./modules/hm.nix
             ./modules/common.nix
-			./modules/1password.nix
+            ./modules/1password.nix
             inputs.lanzaboote.nixosModules.lanzaboote
+            ./systems/auspc
+            home-manager.nixosModules.home-manager
           ];
-          home-manager-modules = [
-		  inputs.zen-browser.homeModules.twilight
-            inputs.hyprpanel.homeManagerModules.hyprpanel
-            #              stylix.homeManagerModules.stylix
-			./hm/modules/zen.nix
-            ./hm/hyprland.nix
-            ./hm/nixos2.nix
-            ./hm/term.nix
-            ./hm/modules/neovim.nix
-            ./hm/ui.nix
-            ./hm/modules/desktop.nix
-            ./hm/modules/zsh.nix
-            ./hm/modules/1password.nix
-          ];
+          users.auscyber = {
+            imports = [
+              inputs.zen-browser.homeModules.twilight
+              inputs.hyprpanel.homeManagerModules.hyprpanel
+              #              stylix.homeManagerModules.stylix
+              ./hm/modules/zen.nix
+              ./hm/hyprland.nix
+              ./hm/nixos2.nix
+              ./hm/term.nix
+              ./hm/modules/neovim.nix
+              ./hm/ui.nix
+              ./hm/modules/desktop.nix
+              ./hm/modules/zsh.nix
+              ./hm/modules/1password.nix
+            ];
+          };
           inherit
             nixpkgs
             config
             overlays
             inputs
-            agenix
             home-manager
             ;
         };
