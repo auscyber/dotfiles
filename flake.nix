@@ -40,15 +40,15 @@
     };
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
-    stylix.url = "github:danth/stylix";
+    stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     wezterm = {
       url = "github:wezterm/wezterm?submodules=1";
       flake = false;
     };
     opnix.url = "github:brizzbuzz/opnix";
-    nh.url = "github:nix-community/nh";
-    nh.inputs.nixpkgs.follows = "nixpkgs";
+    #    nh.url = "github:nix-community/nh";
+    #    nh.inputs.nixpkgs.follows = "nixpkgs";
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -60,7 +60,7 @@
     };
     #flakes
     agenix.url = "github:ryantm/agenix";
-    darwin.url = "github:LnL7/nix-darwin";
+    darwin.url = "github:nix-darwin/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
@@ -156,7 +156,7 @@
               x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
             };
             ghostty = {
-              aarch64-darwin = prev.ghostty-bin;
+              aarch64-darwin = prev.nur.repos.AusCyber.ghostty-nightly;
               x86_64-linux = prev.ghostty;
             };
           in
@@ -171,7 +171,7 @@
             hln = prev.callPackage ./packages/hardlink.nix { };
             desktoppr = prev.callPackage ./packages/desktoppr.nix { };
             inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
-            nh = inputs.nh.packages."${system}".default;
+            #            nh = inputs.nh.packages."${system}".default;
             agenix = inputs.agenix.packages."${system}".default;
             inherit (eww.packages.${system}) eww;
             inherit (rnix.packages."${system}") rnix-lsp;
