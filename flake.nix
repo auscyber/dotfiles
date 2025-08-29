@@ -82,7 +82,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "github:nix-community/home-manager?ref=pull/7074/merge";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arion.url = "github:hercules-ci/arion";
@@ -246,6 +246,8 @@
             imports = [
               inputs.zen-browser.homeModules.twilight
               inputs.nixvim.homeManagerModules.nixvim
+              inputs.agenix.homeManagerModules.default
+              ./hm/secrets.nix
               #			  inputs.opnix.hmModules.default
               ./hm/modules/zen.nix
               ./hm/yabai.nix
