@@ -24,6 +24,11 @@ in
     mac
     auscyber
   ];
+  "access-tokens.age".publicKeys = [
+    auspc
+    mac
+    auscyber
+  ];
   "pia_privatekey.age".publicKeys = [
     auspc
     mac
