@@ -63,13 +63,10 @@
 
     };
     initExtra = ''
-      	export GPG_TTY="$(tty)"
-        gpg-connect-agent updatestartuptty /bye &>/dev/null
-        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 
-        export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:~/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:$DENO_INSTALL/bin:/opt/jdk8u292-b10:$IDRIS_PREFIX/bin
-        fetch -s
-        eval "$(starship init zsh)"
-                    	'';
+      export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.emacs.d/bin:~/.local/bin:~/.dotnet/tools:/usr/sbin:/snap/bin:$NPM_PACKAGES/bin:~/.luarocks/bin:/usr/local/go/bin:$DENO_INSTALL/bin:/opt/jdk8u292-b10:$IDRIS_PREFIX/bin
+      fetch -s
+      eval "$(starship init zsh)"
+                  	'';
   };
 }

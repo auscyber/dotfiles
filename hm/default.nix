@@ -47,6 +47,7 @@
     };
     home.shell.enableFishIntegration = true;
     manual.manpages.enable = true;
+    manual.html.enable = true;
     programs.fish.enable = true;
     programs = {
       #      command-not-found.enable = true;
