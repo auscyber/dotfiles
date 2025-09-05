@@ -2,12 +2,13 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
 {
 
-
+  imports = [ inputs.lix-module.nixosModules.default ];
   fonts.packages =
     with pkgs;
     (map (x: nerd-fonts.${x}) [
@@ -50,7 +51,7 @@
       ];
     };
 
-    package = pkgs.lixPackageSets.stable.lix;
+    #    package = pkgs.lixPackageSets.latest.lix;
 
     extraOptions = ''
       experimental-features = nix-command flakes
