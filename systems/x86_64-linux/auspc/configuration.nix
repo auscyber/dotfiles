@@ -28,6 +28,8 @@
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
 
   services.udev.packages = [ pkgs.yubikey-personalization ];
+  services.ollama = {
+    enable = true;
 
   security.pam.services = {
     login.u2fAuth = true;
