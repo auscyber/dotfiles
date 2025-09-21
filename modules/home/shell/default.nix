@@ -33,6 +33,7 @@ in
       };
 
     };
+    programs.nh.enable = true;
     programs = {
       direnv = {
         enable = true;
