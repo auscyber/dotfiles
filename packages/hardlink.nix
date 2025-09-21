@@ -31,4 +31,11 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  meta = with lib; {
+    description = "Create hard links instead of copying files";
+    homepage = "https://github.com/selkhateeb/hardlink";
+    maintainers = with maintainers; [ auscyber ];
+    license = licenses.mit;
+    platforms = platforms.darwin;
+  };
 }

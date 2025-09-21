@@ -5,9 +5,9 @@
   unzip,
 }:
 stdenv.mkDerivation {
-  name = "hln";
+  name = "desktopp";
   version = "0.5-218";
-  pname = "hln";
+  pname = "desktoppr";
   src = fetchurl {
     url = "https://github.com/scriptingosx/desktoppr/releases/download/v0.5/desktoppr-0.5-218.zip";
     hash = "sha256-Oa9gAQjOaJHYyT5JBUiFCxL1sQP1dqlFBm+GdmLHNNM=";
@@ -33,5 +33,13 @@ stdenv.mkDerivation {
 
     runHook postInstall
   '';
+
+  meta = with lib; {
+    description = "Set the desktop picture on macOS from the command line";
+    homepage = "https://github.com/scriptingosx/desktoppr";
+    maintainers = with maintainers; [ auscyber ];  
+  license = licenses.mit;
+  platforms = platforms.darwin;
+};
 
 }
