@@ -1477,11 +1477,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1757396232,
-        "narHash": "sha256-CHvs1pmRGISDw7ftOQXQMhZHjZq5z5cGlqg8JbtrNOM=",
+        "lastModified": 1757417712,
+        "narHash": "sha256-LuPPrWsFz59/WRg1YRdRldi1JvRj+maQbdfpj54MtLM=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "16f35e0d86ed06a55ff9af2f28ecd117fad7f335",
+        "rev": "74be9f22ab5f557f4ba96c487078e9abf5234282",
         "type": "github"
       },
       "original": {
@@ -1493,11 +1493,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1757398060,
-        "narHash": "sha256-gA2S458kD0fQZwu800bPU3oQZXdn/GldC+wBz79uUl0=",
+        "lastModified": 1757421572,
+        "narHash": "sha256-stBh23WvHxXgfkwpG6oquYQ11IuKTfKfNNYNV1K+Ros=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "c0ef2f9d677d44606a6054e7c75962e00a56df4f",
+        "rev": "bbbe5487e7cd915732b52b8441d6cbed7d772248",
         "type": "github"
       },
       "original": {
@@ -1580,11 +1580,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1757359491,
-        "narHash": "sha256-C/JfN8iva77IMq5NDG0MVOZb5yUfIORmGRuDj8dGHfA=",
+        "lastModified": 1757418993,
+        "narHash": "sha256-GduccAqUGor2PzPdM07TCeTBOxSCQP/7tDSCEkvoTwk=",
         "ref": "refs/heads/main",
-        "rev": "1e3a06560fa6b2d906f8ecc9ec41b50e9b034cef",
-        "revCount": 6414,
+        "rev": "ecc9e4d8cd7a86f5f7d7541bee9b092122d2fa83",
+        "revCount": 6415,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/hyprwm/Hyprland"
@@ -2352,11 +2352,11 @@
         "nixpkgs": "nixpkgs_9"
       },
       "locked": {
-        "lastModified": 1757380804,
-        "narHash": "sha256-CqS1TBvmtryJRq2z3fS+5p8zeoyZOf76Wo85h2SaBy0=",
+        "lastModified": 1757405972,
+        "narHash": "sha256-Ub8Nw7sHRcTi7TqP1OVV6AKioNbg2Q3/bPgfGUkxVtk=",
         "owner": "kaylorben",
         "repo": "nixcord",
-        "rev": "96c048fdd2a2a5586423bd0ab45325fb833641fb",
+        "rev": "b474a91212cf0128fa4a7d0750ad9571c632b4ae",
         "type": "github"
       },
       "original": {
@@ -2517,6 +2517,22 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixpkgs-master": {
+      "locked": {
+        "lastModified": 1757421982,
+        "narHash": "sha256-ULqeu8VVbdXIazqx/fJ6iFG/vOqICD+JLfNqUC+hoUs=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "c679675b7277ea60267b4495334a36e334d5a945",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "master",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -2768,11 +2784,11 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1757343218,
-        "narHash": "sha256-GqyytaTh5JFJVraOQefSnxuQNVVSFFGwsJPT/M6St84=",
+        "lastModified": 1757420686,
+        "narHash": "sha256-RORT+Wy11nb8eJRAIdhOY3ramMZk/P+wr1gWqh3j49Y=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "d38eb947272dd4e6d138648b1b49360301db6859",
+        "rev": "e3faa69c0d094b94249225d4d98c29d73d26b87e",
         "type": "github"
       },
       "original": {
@@ -2805,11 +2821,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1757397457,
-        "narHash": "sha256-bBP0+DJLA/ce5uabJjZ04AiGtLgcfXiKH4HTfbe1XuE=",
+        "lastModified": 1757413569,
+        "narHash": "sha256-XORw3KEQfa40MRcp5bMatTZ98nXUMMFZe+Yo4WlB74w=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "a41e365dbf1db17c04171e23ac17f3be5618930b",
+        "rev": "4f5000d7fed2bc4574552ce27bb22b7c97f53039",
         "type": "github"
       },
       "original": {
@@ -3186,6 +3202,7 @@
         "nixpkgs": [
           "unstable"
         ],
+        "nixpkgs-master": "nixpkgs-master",
         "nixvim": "nixvim",
         "nur": "nur",
         "opnix": "opnix",

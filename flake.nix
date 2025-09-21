@@ -25,17 +25,18 @@
       flake = false;
     };
     nix-colors.url = "github:misterio77/nix-colors";
-    nix-colors.inputs.nixpkgs.follows = "nixpkgs";
     #Non flakes
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     hyprpanel.url = "github:jas-singhfsu/hyprpanel";
     hyprpanel.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs-master = {
+      url = "github:nixos/nixpkgs/master";
+    };
     hyprland = {
       url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
 
     };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";
 
     # Optional: Declarative tap management
     homebrew-core = {

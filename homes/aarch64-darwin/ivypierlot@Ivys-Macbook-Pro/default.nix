@@ -4,6 +4,7 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
@@ -388,9 +389,9 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.activation = {
-    background = ''
-      		run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
-      	'';
+    background = lib.mkIf config.stylix.enable ''
+      run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
+    '';
 
   };
   home.stateVersion = "24.05"; # Did you read the comment?

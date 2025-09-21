@@ -5,7 +5,7 @@
   unzip,
 }:
 stdenv.mkDerivation {
-  name = "desktopp";
+  name = "desktoppr";
   version = "0.5-218";
   pname = "desktoppr";
   src = fetchurl {
@@ -37,9 +37,9 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Set the desktop picture on macOS from the command line";
     homepage = "https://github.com/scriptingosx/desktoppr";
-    maintainers = with maintainers; [ auscyber ];  
-  license = licenses.mit;
-  platforms = platforms.darwin;
-};
+    maintainers = with maintainers; [ auscyber ];
+    license = licenses.mit;
+    platforms = platforms.darwin;
+  };
 
 }

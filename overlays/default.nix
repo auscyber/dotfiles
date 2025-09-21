@@ -32,6 +32,11 @@
           };
         in
         {
+
+          ttfautohint =
+            (import inputs.nixpkgs-master {
+              inherit system;
+            }).ttfautohint;
           input-leap = prev.input-leap.overrideAttrs (attrs: {
             # patches = [ ];
             src = inputs.input-leap;
