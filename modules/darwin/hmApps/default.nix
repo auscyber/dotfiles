@@ -53,29 +53,6 @@ in
         }
       );
     })
-    (lib.mkIf libraryPaths {
-      system.activationScripts.postActivation.text = ''
-        echo "Setting up library paths for apps" >&2
-         targetFolder='/Library/Application Support'
-         # delete folders that are just below target folder and in the source folder
-          find "$targetFolder" -maxdepth 1 -type d -exec bash -c \
-            'folderName=$(basename "$0"); \
-             if [ -d "${config.system.build.applications}/Library/Application Support/$folderName" ] && [ "$folderName" != "Application Support" ]; then \
-               rm -rf "$0"; \
-             fi \
-            ' {} \;
-        echo "Copying library paths to $targetFolder" >&2
 
-
-         rsyncFlags=(
-           --checksum
-           --archive
-           --copy-unsafe-links
-            --chmod=-w
-          )
-          ${lib.getExe pkgs.rsync} "''${rsyncFlags[@]}" "${config.system.build.applications}/Library/Application Support/" "$targetFolder"
-
-      '';
-    })
   ];
 }

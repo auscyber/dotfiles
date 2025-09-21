@@ -50,7 +50,14 @@ in
       serviceConfig.Label = "org.nixos.start-karabiner-dk";
       serviceConfig.RunAtLoad = true;
     };
-
+    launchd.user.agents.activate_karabiner_system_ext = {
+      serviceConfig.ProgramArguments = [
+        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
+        "activate"
+      ];
+      serviceConfig.RunAtLoad = true;
+      managedBy = "auscybernix.keybinds.karabiner-driver-kit.enable";
+    };
     security.sudo.extraConfig =
       lib.mkIf config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.enable
         (
