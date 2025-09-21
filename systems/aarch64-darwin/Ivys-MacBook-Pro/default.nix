@@ -94,6 +94,7 @@
   system.stateVersion = 5;
   nix.enable = true;
   # The platform the configuration will be used on.
+  services.karabiner-elements.enable = false;
   auscybernix = {
     keybinds.karabiner-driver-kit.enable = true;
 

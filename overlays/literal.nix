@@ -22,13 +22,31 @@ in
 {
 
   kmonad = inputs.kmonad.packages."${system}".default;
-  karabiner-dk = pkgs.karabiner-dk.overrideAttrs (attrs: {
-    version = "5.0.0";
-    src = pkgs.fetchurl {
-      url = "https://github.com/pqrs-org/Karabiner-DriverKit-VirtualHIDDevice/releases/download/v5.0.0/Karabiner-DriverKit-VirtualHIDDevice-5.0.0.pkg";
-      hash = "sha256-hKi2gmIdtjl/ZaS7RPpkpSjb+7eT0259sbUUbrn5mMc=";
+  kanata = pkgs.kanata.overrideAttrs (attrs: {
+    cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+      inherit (attrs)
+        src
+        postUnpack
+
+        ;
+      copyLockfile = false;
+      patches = [ ./kanata-patch ];
+      hash = "sha256-1pcDVk817svG+YU7LBmYiXfmPrqMWZrViPn3HhYkz/8=";
     };
+    patches = [
+      ./kanata-patch
+    ];
   });
+  karabiner-dk = pkgs.karabiner-dk
+  #.overrideAttrs
+  # (attrs: {
+  #   version = "5.0.0";
+  #   src = pkgs.fetchurl {
+  #     url = "https://github.com/pqrs-org/Karabiner-DriverKit-VirtualHIDDevice/releases/download/v5.0.0/Karabiner-DriverKit-VirtualHIDDevice-5.0.0.pkg";
+  #     hash = "sha256-hKi2gmIdtjl/ZaS7RPpkpSjb+7eT0259sbUUbrn5mMc=";
+  #   };
+  # })
+  ;
   yabai = pkgs.yabai.overrideAttrs (attrs: {
     src = inputs.yabai;
   });

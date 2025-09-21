@@ -102,7 +102,7 @@
     #flakes
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
-    darwin.url = "github:nix-darwin/nix-darwin";
+    darwin.url = "github:auscyber/nix-darwin/karabiner";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
@@ -125,7 +125,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "github:auscyber/home-manager";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arion.url = "github:hercules-ci/arion";

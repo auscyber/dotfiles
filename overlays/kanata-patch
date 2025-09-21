@@ -1,0 +1,27 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index c22da98..c1ccfab 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -853,8 +853,7 @@ dependencies = [
+ [[package]]
+ name = "karabiner-driverkit"
+ version = "0.1.5"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "000dc9189dc126ed5ec1ba477b3f524d88f1527260b423dbc79d23356c82165f"
++source = "git+https://github.com/auscyber/driverkit.git#f0d6e917070f59a160b296d1c88a2701a7d7f949"
+ dependencies = [
+  "cc",
+  "os_info",
+diff --git a/Cargo.toml b/Cargo.toml
+index 85cf960..a2d66e5 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -62,7 +62,7 @@ kanata-tcp-protocol = { path = "tcp_protocol", version = "0.1100.0" }
+ arboard = "3.4"
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]
+-karabiner-driverkit = "0.1.5"
++karabiner-driverkit = { git = "https://github.com/auscyber/driverkit.git"}
+ objc = "0.2.7"
+ core-graphics = "0.24.0"
+ open = { version = "5", optional = true }

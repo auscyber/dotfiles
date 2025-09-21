@@ -24,6 +24,15 @@ in
         source = ../../../.config/starship.toml;
       };
     };
+    programs.gh = {
+      enable = true;
+      package = pkgs.hello;
+      settings = {
+
+        git_protocol = "ssh";
+      };
+
+    };
     programs = {
       direnv = {
         enable = true;

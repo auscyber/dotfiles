@@ -6,14 +6,10 @@
 }:
 let
   hmApps = config.auscybernix.hmApps;
-  libraryPaths = config.auscybernix.libraryPaths;
 in
 {
   options.auscybernix = {
-    libraryPaths = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-    };
+
     hmApps = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -23,12 +19,6 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf hmApps {
-      environment.systemPackages = with pkgs; [
-        (runCommand "hm-apps" { } ''
-          mkdir -p "$out/Library/Application Support"
-          echo hi > "$out/Library/Application Support/.placeholder"
-        '')
-      ];
 
       home-manager.sharedModules = [
         (
