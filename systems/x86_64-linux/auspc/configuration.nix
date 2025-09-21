@@ -28,8 +28,12 @@
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
 
   services.udev.packages = [ pkgs.yubikey-personalization ];
+
   services.ollama = {
+    host = "0.0.0.0";
     enable = true;
+    openFirewall = true;
+    acceleration = "cuda";
 
   security.pam.services = {
     login.u2fAuth = true;
