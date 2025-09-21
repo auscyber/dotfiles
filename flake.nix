@@ -21,12 +21,17 @@
       flake = false;
     };
     nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors.inputs.nixpkgs.follows = "nixpkgs";
     #Non flakes
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     hyprpanel.url = "github:jas-singhfsu/hyprpanel";
     hyprpanel.inputs.nixpkgs.follows = "nixpkgs";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    hyprland = {
+      url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+
+    };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";
 
     # Optional: Declarative tap management
     homebrew-core = {
@@ -53,7 +58,7 @@
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     wezterm = {
-      url = "github:wezterm/wezterm?submodules=1";
+      url = "git+https://github.com/wezterm/wezterm?submodules=1";
       flake = false;
     };
     opnix.url = "github:brizzbuzz/opnix";
@@ -65,16 +70,18 @@
     };
 
     input-leap = {
-      url = "github:input-leap/input-leap?submodules=1";
+      url = "git+https://github.com/input-leap/input-leap?submodules=1";
       flake = false;
     };
     #flakes
     agenix.url = "github:ryantm/agenix";
+    agenix.inputs.nixpkgs.follows = "nixpkgs";
     darwin.url = "github:nix-darwin/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote = {
