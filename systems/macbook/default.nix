@@ -32,11 +32,8 @@
     ]);
   programs.zsh = {
     enable = true;
-    shellInit = ''
-      if [[ $(ps -o command= -p "$PPID" | awk '{print $1}') != 'fish' ]]
-      then
-          exec fish -l
-      fi
+    loginShellInit = ''
+      	  . /etc/zprofile
     '';
   };
 
@@ -58,11 +55,14 @@
   # $ nix-env -qaP | grep wget
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
-    obsidian
+    zen-browser
+    ghostty
     #neovide
+    obsidian
     hln
     vim
     nodejs
+    discord
     vscode
     pandoc
     # _1password
@@ -127,7 +127,7 @@
       #    "notion"
       "google-drive"
       #    "arc"
-      "zen@twilight"
+      #      "zen@twilight"
       "affinity-designer"
       "affinity-publisher"
       #    "grammarly-desktop"
@@ -138,7 +138,7 @@
       #    "postman"
       "bartender"
       #    "skype"
-      "1password"
+      #      "1password"
       "tidal"
       #    "wezterm@nightly"
       "zoom"
@@ -173,25 +173,29 @@
       	'';
 
   };
+  programs._1password-gui = {
+    enable = true;
+    package = pkgs._1password-gui-beta;
+  };
   system.defaults.dock = {
     persistent-apps = [
       "/System/Applications/Apps.app"
-      "/Applications/Twilight.app"
+      "/Applications/Nix Apps/Zen.app"
       "/Applications/TIDAL.app"
-      "${pkgs.obsidian}/Applications/Obsidian.app"
+      "/Applications/Nix Apps/Obsidian.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
-      "/System/Applications/App Store.app/"
+      #      "/System/Applications/App Store.app/"
       "/Applications/Microsoft Teams.app"
       "/Applications/Microsoft Word.app"
       "/System/Applications/Messages.app"
       "/Applications/Beeper Desktop.app"
       "/Applications/1Password.app"
       "/System/Applications/System Settings.app"
-      "/System/Applications/Home.app"
-      "${pkgs.vscode}/Applications/Visual Studio Code.App"
-      "${pkgs.ghostty}/Applications/Ghostty.app"
-      "${pkgs.zotero}/Applications/Zotero.app"
+      #      "/System/Applications/Home.app"
+      "/Applications/Nix Apps/Visual Studio Code.App"
+      "/Applications/Nix Apps/Ghostty.app"
+      "/Applications/Nix Apps/Zotero.app"
       "/Applications/Todoist.app"
     ];
   };
@@ -202,6 +206,11 @@
     yabai
   ];
 
+  environment.shells = [
+    pkgs.bash
+    pkgs.zsh
+    pkgs.fish
+  ];
   users.users.ivypierlot = {
     name = "ivypierlot";
     home = "/Users/ivypierlot";
