@@ -11,7 +11,7 @@ let
     x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
   };
   ghostty = {
-    aarch64-darwin = pkgs.nur.repos.AusCyber.ghostty;
+    aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.ghostty;
   };
   pinentry = {
@@ -57,7 +57,7 @@ in
     src = inputs.input-leap;
   });
 
-  inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
+  #  inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
   ivy-fetch = pkgs.callPackage ../packages/ivy-fetch { };
   hln = pkgs.callPackage ../packages/hardlink.nix { };
   pinentry = pinentry."${system}";

@@ -6,10 +6,10 @@
   ...
 }:
 let
-  cfg = config.auscybernix.wm.hyprland;
+  cfg = config.auscybernix.wms.hyprland;
 in
 {
-  options.auscybernix.wm.hyprland = {
+  options.auscybernix.wms.hyprland = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -23,8 +23,8 @@ in
     #    programs.kitty.enable = true; # required for the default Hyprland config
     wayland.windowManager.hyprland = {
 
-      package = pkgs.hyprland;
-      portalPackage = pkgs.xdg-desktop-portal-hyprland;
+      package = null;
+      portalPackage = null;
       enable = true; # enable Hyprland
       xwayland.enable = true; # enable Hyprland
       plugins = [

@@ -29,7 +29,7 @@ rec {
     keybinds.kanata = {
       enable = true;
       extraPackages = with pkgs; [
-        hyprctl
+        hyprland
         ghostty
         wofi
       ];
@@ -66,7 +66,7 @@ rec {
     dunst.enable = false;
     gpg-agent = {
       enable = true;
-      pinentryFlavor = "qt";
+      pinentryPackage = pkgs.pinentry-qt;
       enableSshSupport = true;
       extraConfig = ''
         allow-loopback-pinentry
@@ -79,12 +79,10 @@ rec {
     with pkgs;
     [
       st
-      (pkgs.gradleGen.override {
-        java = jdk8;
-      }).gradle_latest
+
       rclone
       #      neovim-nightly
-      firefox
+      #      firefox
       tmux
       wineWowPackages.stable
       emacsGcc
@@ -94,7 +92,6 @@ rec {
       openjdk8
       xorg.xmodmap
       xorg.xmessage
-      skypeforlinux
       rofi
       arandr
       steam
@@ -112,11 +109,9 @@ rec {
       fish
       nitrogen
       maim
-      teams
+      #      teams
       gcc
       dunst
-      procps-ng
-      nodejs-14_x
       nixfmt
       lua
       (spotify.overrideAttrs (attrs: {
@@ -131,10 +126,10 @@ rec {
       #      stdenv.cc.cc.lib
       grub2_efi
       (python3.withPackages (p: with p; [ pynvim ]))
-      metals
+      #      metals
       _1password
-      gnome.gnome-keyring
-      gnome.nautilus
+      gnome-keyring
+      nautilus
       eww
       #wezterm
       zoom-us
@@ -146,5 +141,5 @@ rec {
     ]
     ++ (with pkgs.lua51Packages; [ luarocks ]);
 
-  #  home.stateVersion = "21.11";
+  home.stateVersion = "21.11";
 }

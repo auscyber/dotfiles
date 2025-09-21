@@ -2388,11 +2388,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1758425634,
-        "narHash": "sha256-/884/9BG6xb+EflX97oRiKC6smzNK/HhaKg9pKYRZHI=",
+        "lastModified": 1758453786,
+        "narHash": "sha256-JdOSVkMvFuxZjLPtbLHe8sJiz+MHkNBdjxhUgrw5zR0=",
         "owner": "auscyber",
         "repo": "nur-packages",
-        "rev": "a3fe2f70270d75f0d6b93f7cbf9b524e677ba962",
+        "rev": "c44a0c6c501eff29ceb68589886fcaa84cc577d4",
         "type": "github"
       },
       "original": {

@@ -12,6 +12,23 @@ let
 
   flake = inputs.self;
   extendedLib = common.mkExtendedLib flake inputs.nixpkgs;
+  matchingHomes = common.mkHomeConfigs {
+    inherit
+      flake
+      system
+      hostname
+      ;
+  };
+  homeManagerConfig = common.mkHomeManagerConfig {
+    inherit
+      extendedLib
+      inputs
+      system
+      matchingHomes
+      ;
+    isNixOS = true;
+  };
+
 in
 inputs.nixpkgs.lib.nixosSystem {
   inherit system;
@@ -45,6 +62,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../../modules/common/nix
     ../../modules/common/hm
     ../../modules/common/common
+    homeManagerConfig
   ]
   ++ (extendedLib.importModulesRecursive ../../modules/nixos)
   ++ [

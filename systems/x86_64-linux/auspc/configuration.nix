@@ -19,7 +19,7 @@
   };
   stylix = {
     enable = true;
-    image = ../../backgrounds/phoebebridgers-2.jpg;
+    image = ../../../backgrounds/phoebebridgers-2.jpg;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
   services.tailscale.enable = true;
@@ -34,6 +34,7 @@
     enable = true;
     openFirewall = true;
     acceleration = "cuda";
+  };
 
   security.pam.services = {
     login.u2fAuth = true;
