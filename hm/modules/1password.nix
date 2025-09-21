@@ -1,10 +1,15 @@
-{ config, pkgs, inputs, ... }:
 {
-imports = [
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
+{
+  imports = [
 
-            inputs._1password-shell-plugins.hmModules.default
+    inputs._1password-shell-plugins.hmModules.default
 
-];
+  ];
   programs._1password-shell-plugins = {
     # enable 1Password shell plugins for bash, zsh, and fish shell
     enable = true;
@@ -12,7 +17,11 @@ imports = [
     # automatically installed and configured to use shell plugins
     plugins = with pkgs; [
       gh
-      nodePackages.vercel
+      (nodePackages.vercel.overrideAttrs (res: {
+        meta = res.meta // {
+          mainProgram = "vercel";
+        };
+      }))
       pkgs.awscli2
     ];
   };

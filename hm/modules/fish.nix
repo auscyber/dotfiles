@@ -25,7 +25,7 @@
       ll = "ls -la";
       t = "tmux";
       grep = "grep --color=auto";
-      hm = "home-manager --flake $NIXFLAKE#$FLAKENAME";
+      hm = "home-manager ";
 
     };
     interactiveShellInit = ''

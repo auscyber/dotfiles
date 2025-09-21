@@ -91,13 +91,14 @@
     idris2.url = "github:idris-lang/Idris2";
     rnix.url = "github:nix-community/rnix-lsp";
     neovim.url = "github:nix-community/neovim-nightly-overlay";
+    neovim.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
     emacs.url = "github:/nix-community/emacs-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     #nixpkgs
-    unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     nixpkgs.follows = "unstable";
 
@@ -156,8 +157,12 @@
               x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
             };
             ghostty = {
-              aarch64-darwin = prev.nur.repos.AusCyber.ghostty-nightly;
+              aarch64-darwin = prev.nur.repos.AusCyber.ghostty;
               x86_64-linux = prev.ghostty;
+            };
+            pinentry = {
+              aarch64-darwin = prev.pinentry_mac;
+              x86_64-linux = prev.pinentry;
             };
           in
           {
@@ -167,8 +172,10 @@
             });
 
             inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
+            bartender = prev.nur.repos.AusCyber.bartender-alpha;
             ivy-fetch = prev.callPackage ./packages/fetch.nix { };
             hln = prev.callPackage ./packages/hardlink.nix { };
+            pinentry = pinentry."${system}";
             desktoppr = prev.callPackage ./packages/desktoppr.nix { };
             inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
             #            nh = inputs.nh.packages."${system}".default;
@@ -230,12 +237,13 @@
           builder = darwin.lib.darwinSystem;
           modules = [
             ./systems/macbook
+            ./modules/darwin.nix
             inputs.nix-homebrew.darwinModules.nix-homebrew
             inputs.agenix.darwinModules.default
             ./modules/common.nix
             ./modules/secrets.nix
             ./modules/hm.nix
-            ./modules/pia.nix
+            #            ./modules/pia.nix
             inputs.stylix.darwinModules.stylix
             inputs.home-manager.darwinModules.default
           ];

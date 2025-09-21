@@ -37,16 +37,10 @@
     '';
   };
 
-  services.pia-vpn = {
-    enable = true;
-    environmentFile = config.age.secrets.pia_password.path;
-    privateKeyFile = config.age.secrets.pia_privateKey.path;
-    region = "france";
-    maxLatency = 1.0;
-    certificateFile = ../../ca.crt;
-    user = "root";
-    group = "wheel";
-  };
+  #  services.pia-wireguard = {
+  #    enable = true;
+  #    tokenFile = config.age.secrets.pia_password.path;
+  #  };
 
   services.jankyborders = {
     enable = true;
@@ -55,6 +49,7 @@
   # $ nix-env -qaP | grep wget
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
+    bartender
     zen-browser
     ghostty
     #neovide
@@ -133,10 +128,10 @@
       #    "grammarly-desktop"
       "nitro-pdf-pro"
       #  "wezterm@nightly"
-      "amethyst"
+      #      "amethyst"
       "plover"
       "postman"
-      "bartender"
+      #      "bartender"
       #    "skype"
       #      "1password"
       "tidal"

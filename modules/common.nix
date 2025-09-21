@@ -7,6 +7,7 @@
 
 {
 
+
   fonts.packages =
     with pkgs;
     (map (x: nerd-fonts.${x}) [
@@ -17,11 +18,13 @@
     ]);
 
   environment.systemPackages = with pkgs; [
+    home-manager
     git
     vim
     neovim
     wget
     htop
+    pinentry
     curl
   ];
 
@@ -47,7 +50,7 @@
       ];
     };
 
-    #    package = pkgs.nixVersions.latest;
+    package = pkgs.lixPackageSets.stable.lix;
 
     extraOptions = ''
       experimental-features = nix-command flakes

@@ -1,392 +1,382 @@
-{
-  config,
-  lib,
-  pkgs,
-  options,
-  ...
-}:
-with lib;
+{ config, pkgs, lib, ... }:
 let
-  cfg = config.services.pia-vpn;
-  isDarwin = lib.attrsets.hasAttrByPath [ "environment" "darwinConfig" ] options;
+  inherit (lib) mkIf mkOption types optionalString toLower;
 
-  # Darwin-specific configuration
-  darwinConfig = {
-    workingDir = "/var/lib/pia-vpn";
-    cacheDir = "/var/cache/pia-vpn";
-    runtimeDir = "/var/run";
-  };
+  cfg = config.services.pia-wireguard;
 
-  # NixOS-specific configuration
-  linuxConfig = {
-    workingDir = "/var/lib/pia-vpn";
-    cacheDir = "/var/cache/pia-vpn";
-    runtimeDir = "/run";
-  };
+  # Pinned server list (evaluated at build time) for deterministic server selection.
+  serverListJSON =
+    if cfg.serverSelection.enable then
+      builtins.readFile (pkgs.fetchurl {
+        url = cfg.serverSelection.serverListURL;
+        sha256 = cfg.serverSelection.serverListHash;
+      })
+    else
+      null;
 
-  # Use appropriate config based on system
-  systemConfig = if isDarwin then darwinConfig else linuxConfig;
+  parsedServerList =
+    if cfg.serverSelection.enable then
+      builtins.fromJSON serverListJSON
+    else
+      {};
 
-  # Common script for both platforms
-  commonScript = pkgs.writeShellScript "shell.sh" ''
-    set -e
-    printServerLatency() {
-      serverIP="$1"
-      regionID="$2"
-      regionName="$(echo ''${@:3} |
-        sed 's/ false//' | sed 's/true/(geo)/')"
-      time=$(LC_NUMERIC=en_US.utf8 curl -o /dev/null -s \
-        --connect-timeout ${toString cfg.maxLatency} \
-        --write-out "%{time_connect}" \
-        http://$serverIP:443)
-      if [ $? -eq 0 ]; then
-        >&2 echo Got latency ''${time}s for region: $regionName
-        echo $time $regionID $serverIP
-      fi
+  # Simple region/server chooser (first region matching location substring).
+  chosenServer =
+    let
+      loc = lib.toLower (cfg.serverSelection.location or "");
+      regions = (parsedServerList.regions or []);
+      filtered =
+        if cfg.serverSelection.location == null || cfg.serverSelection.location == ""
+        then regions
+        else lib.filter
+          (r:
+            let id = toLower (r.id or "");
+                name = toLower (r.name or "");
+            in lib.strings.contains loc id || lib.strings.contains loc name)
+          regions;
+      # Optional port-forwarding filter if requested (at selection time — only influences picking, not runtime).
+      pfFiltered =
+        if cfg.portForwarding.requireAtSelection
+        then lib.filter (r: (r.port_forward or false) == true) filtered
+        else filtered;
+      firstRegion = lib.head (pfFiltered or []);
+      wgServers = if firstRegion == null then [] else (firstRegion.servers.wireguard or []);
+      server = lib.head wgServers;
+    in
+      if server == null then null else {
+        regionId = firstRegion.id;
+        regionName = firstRegion.name;
+        ip = server.ip;
+        cn = server.cn;
+      };
+
+  serverIPFinal =
+    if cfg.serverIP != null then cfg.serverIP
+    else if chosenServer != null then chosenServer.ip
+    else null;
+
+  serverHostFinal =
+    if cfg.serverHostname != null then cfg.serverHostname
+    else if chosenServer != null then chosenServer.cn
+    else null;
+
+  # Sanity assertion if selection requested but nothing found.
+  assertions = lib.optionals cfg.serverSelection.enable [
+    {
+      assertion = serverIPFinal != null && serverHostFinal != null;
+      message = "PIA wireguard: server selection failed (no matching region/server). Supply serverIP/serverHostname manually or adjust selection criteria.";
     }
+  ];
 
-    source "${cfg.environmentFile}"
-    export -f printServerLatency
+  runtimeDir = "/var/run/pia-wireguard";
+  stateDir = "/var/lib/pia-wireguard"; # for persistent key if we auto-generate
+  interfaceName = cfg.interfaceName;
 
-    echo Fetching regions...
-    serverlist='https://serverlist.piaservers.net/vpninfo/servers/v4'
-    allregions=$((curl --no-progress-meter -m 5 "$serverlist" || true) | head -1)
-
-    region="$(echo $allregions |
-                jq --arg REGION_ID "${cfg.region}" -r '.regions[] | select(.id==$REGION_ID)')"
-    if [ -z "''${region}" ]; then
-      echo Determining region...
-      filtered="$(echo $allregions | jq -r '.regions[]
-                | .servers.meta[0].ip+" "+.id+" "+.name+" "+(.geo|tostring)')"
-      best="$(echo "$filtered" | xargs -I{} bash -c 'printServerLatency {}' |
-              sort | head -1 | awk '{ print $2 }')"
-      if [ -z "$best" ]; then
-        >&2 echo "No region found with latency under ${toString cfg.maxLatency} s. Stopping."
-        exit 1
-      fi
-      region="$(echo $allregions |
-                jq --arg REGION_ID "$best" -r '.regions[] | select(.id==$REGION_ID)')"
-    fi
-    echo Using region $(echo $region | jq -r '.id')
-
-    meta_ip="$(echo $region | jq -r '.servers.meta[0].ip')"
-    meta_hostname="$(echo $region | jq -r '.servers.meta[0].cn')"
-    wg_ip="$(echo $region | jq -r '.servers.wg[0].ip')"
-    wg_hostname="$(echo $region | jq -r '.servers.wg[0].cn')"
-    echo "$region" > ${systemConfig.workingDir}/region.json
-
-    echo Fetching token from $meta_ip...
-    tokenResponse="$(curl --no-progress-meter -m 5 \
-      -u "$PIA_USER:$PIA_PASS" \
-      --connect-to "$meta_hostname::$meta_ip" \
-      --cacert "${cfg.certificateFile}" \
-      "https://$meta_hostname/authv3/generateToken" || true)"
-    if [ "$(echo "$tokenResponse" | jq -r '.status' || true)" != "OK" ]; then
-      >&2 echo "Failed to generate token. Stopping."
-      exit 1
-    fi
-    token="$(echo "$tokenResponse" | jq -r '.token')"
-
-    echo Connecting to the PIA WireGuard API on $wg_ip...
-    publicKey="$(wg pubkey < ${cfg.privateKeyFile})"
-    json="$(curl --no-progress-meter -m 5 -G \
-      --connect-to "$wg_hostname::$wg_ip:" \
-      --cacert "${cfg.certificateFile}" \
-      --data-urlencode "pt=''${token}" \
-      --data-urlencode "pubkey=$publicKey" \
-      "https://''${wg_hostname}:1337/addKey" || true)"
-    status="$(echo "$json" | jq -r '.status' || true)"
-    if [ "$status" != "OK" ]; then
-      >&2 echo "Server did not return OK. Stopping."
-      >&2 echo "$json"
-      exit 1
-    fi
-
-
-    echo Creating network interface ${cfg.interface}.
-    echo "$json" > ${systemConfig.workingDir}/wireguard.json
-
-    gateway="$(echo "$json" | jq -r '.server_ip')"
-    servervip="$(echo "$json" | jq -r '.server_vip')"
-    peerip=$(echo "$json" | jq -r '.peer_ip')
-
-    # Create WireGuard configuration file with secure permissions
-    umask 077
-    config_file="${systemConfig.runtimeDir}/wireguard-${cfg.interface}.conf"
-    cat > $config_file << EOF
+  # Build-time static wg config (dummy peer until runtime mutation).
+  # We do NOT include PrivateKey content here to avoid leaking secrets into store;
+  # instead we read from privateKeyFile during the runtime patch step.
+  staticConfig = pkgs.writeText "pia-static-${interfaceName}.conf" ''
     [Interface]
-    Address = $peerip/32
-    DNS = 8.8.8.8
-    PostUp = wg set %i private-key ${cfg.privateKeyFile}
+    # PrivateKey will be injected runtime (wg set) from ${cfg.privateKeyFile or "${stateDir}/private.key"}
+    # Temporary dummy address; real /32 set after API call.
+    Address = 169.254.254.1/32
+    # (Optional) DNS entries inserted directly if you want static DNS
+    ${lib.concatMapStrings (d: "DNS = ${d}\n") (if cfg.dns.enable && !cfg.dns.useFromApi then cfg.dns.servers else [])}
 
     [Peer]
-    PublicKey = $(echo "$json" | jq -r '.server_key')
-    AllowedIPs = 0.0.0.0/0
-    Endpoint = ''${wg_ip}:$(echo "$json" | jq -r '.server_port')
+    # Placeholder peer; will be replaced by wg set with real public key & endpoint.
+    PublicKey = 0000000000000000000000000000000000000000000=
+    AllowedIPs = ${lib.concatStringsSep "," cfg.allowedIPs}
+    Endpoint = 127.0.0.1:1
     PersistentKeepalive = 25
-
-    EOF
-    echo $config_file
-
-    chmod 640 $config_file
-
-    ${cfg.preUp}
-    networksetup -listallnetworkservices | tail -n +2 | xargs -I{} networksetup -setv6off "{}"
-
-    # Start WireGuard interface
-    wg-quick up $config_file
-
-
-    echo Started
-    ${cfg.postUp}
   '';
 
-  # Common stop script
-  commonStopScript = ''
-    ${cfg.preDown}
+  serviceScript = pkgs.writeShellScript "pia-wireguard-launch.sh" ''
+    set -euo pipefail
+    PATH=${lib.makeBinPath [ cfg.wireguardPackage pkgs.curl pkgs.jq pkgs.coreutils pkgs.gnugrep pkgs.iproute2 ]}
 
-    wg-quick down ${systemConfig.runtimeDir}/wireguard-${cfg.interface}.conf
-    rm ${systemConfig.runtimeDir}/wireguard-${cfg.interface}.conf
+    IFACE="${interfaceName}"
+    RUNTIME_DIR="${runtimeDir}"
+    STATE_DIR="${stateDir}"
+    TOKEN_FILE="${cfg.tokenFile}"
+    SERVER_IP="${serverIPFinal or ""}"
+    SERVER_HOST="${serverHostFinal or ""}"
+    CA_CERT=${pkgs.fetchurl {
+      url = cfg.caCertURL;
+      sha256 = cfg.caCertHash;
+    }}
+    PORT_FWD=${if cfg.portForwarding.enable then "true" else "false"}
+    PORT_SCRIPT=${
+      if cfg.portForwarding.enable then
+        pkgs.fetchurl {
+          url = cfg.portForwarding.scriptURL;
+          sha256 = cfg.portForwarding.scriptHash;
+        }
+      else
+        "/dev/null"
+    }
+    USE_API_DNS=${if cfg.dns.enable && cfg.dns.useFromApi then "true" else "false"}
+    ALLOWED_IPS="${lib.concatStringsSep "," cfg.allowedIPs}"
+    PRIVATE_KEY_FILE="${cfg.privateKeyFile or "${stateDir}/private.key"}"
 
-    # networksetup -listallnetworkservices | tail -n +2 | xargs -I{} networksetup -setv6automatic "{}"
+    mkdir -p "$RUNTIME_DIR" "$STATE_DIR"
+    chmod 700 "$RUNTIME_DIR" "$STATE_DIR"
 
-    ${cfg.postDown}
+    log() {
+      echo "[pia-wireguard] $(date -u +'%Y-%m-%dT%H:%M:%SZ') $*"
+    }
+
+    if [ ! -r "$TOKEN_FILE" ]; then
+      log "Token file $TOKEN_FILE missing/unreadable"
+      exit 1
+    fi
+
+    if [ ! -f "$PRIVATE_KEY_FILE" ]; then
+      ${lib.optionalString (cfg.privateKeyFile == null) ''
+        log "Generating persistent private key at $PRIVATE_KEY_FILE"
+        umask 077
+        ${cfg.wireguardPackage}/bin/wg genkey > "$PRIVATE_KEY_FILE"
+      ''}
+    fi
+    chmod 600 "$PRIVATE_KEY_FILE"
+
+    PRIVATE_KEY=$(cat "$PRIVATE_KEY_FILE")
+    PUB_KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
+
+    if [ -z "$SERVER_IP" ] || [ -z "$SERVER_HOST" ]; then
+      log "Server IP/Host not set (build-time selection failed?)."
+      exit 1
+    fi
+
+    # Bring interface up with static config if not already
+    if ! wg show "$IFACE" >/dev/null 2>&1; then
+      log "Bringing up interface with static config"
+      WG_QUICK_USERSPACE_IMPLEMENTATION= \
+        WG_QUICK_CONFIG_FILE="${staticConfig}" \
+        wg-quick up ${staticConfig}
+    else
+      log "Interface already up; proceeding to dynamic patch"
+    fi
+
+    TOKEN=$(cat "$TOKEN_FILE")
+    log "Calling PIA addKey API via ${SERVER_HOST} (${SERVER_IP})"
+    WG_JSON=$(curl -s -G \
+        --connect-to "${SERVER_HOST}::${SERVER_IP}:" \
+        --cacert "$CA_CERT" \
+        --data-urlencode "pt=$TOKEN" \
+        --data-urlencode "pubkey=$PUB_KEY" \
+        "https://${SERVER_HOST}:1337/addKey" || true)
+
+    STATUS=$(echo "$WG_JSON" | jq -r '.status // empty')
+    if [ "$STATUS" != "OK" ]; then
+      log "API status not OK; got: $WG_JSON"
+      exit 2
+    fi
+
+    PEER_IP=$(echo "$WG_JSON" | jq -r '.peer_ip')
+    SERVER_KEY=$(echo "$WG_JSON" | jq -r '.server_key')
+    SERVER_PORT=$(echo "$WG_JSON" | jq -r '.server_port')
+    API_DNS=$(echo "$WG_JSON" | jq -r '.dns_servers[0] // empty')
+
+    if [ -z "$PEER_IP" ] || [ -z "$SERVER_KEY" ] || [ -z "$SERVER_PORT" ]; then
+      log "Incomplete API response."
+      exit 3
+    fi
+
+    # Apply private key & peer info
+    log "Applying live WireGuard parameters"
+    wg set "$IFACE" private-key <(echo "$PRIVATE_KEY")
+    wg set "$IFACE" peer "$SERVER_KEY" endpoint "${SERVER_IP}:$SERVER_PORT" persistent-keepalive 25 allowed-ips "$ALLOWED_IPS"
+
+    # Adjust interface address (macOS: rely on ifconfig via wg-quick? On Darwin, wg-quick gave us a utun; we can replace address.)
+    # Remove existing v4 /32 (best-effort) then add new one
+    # Use ifconfig for Darwin
+    currentAddr=$(ifconfig "$IFACE" 2>/dev/null | grep 'inet ' | awk '{print $2}' || true)
+    if [ -n "$currentAddr" ] && [ "$currentAddr" != "${PEER_IP%/*}" ]; then
+      log "Replacing interface address $currentAddr with $PEER_IP"
+      ifconfig "$IFACE" inet "${PEER_IP%/*}" "${PEER_IP%/*}" netmask 255.255.255.255
+    else
+      log "Setting interface address $PEER_IP"
+      ifconfig "$IFACE" inet "${PEER_IP%/*}" "${PEER_IP%/*}" netmask 255.255.255.255
+    fi
+
+    if [ "$USE_API_DNS" = "true" ] && [ -n "$API_DNS" ]; then
+      log "Setting resolver to API DNS $API_DNS (scutil)"
+      # macOS-specific resolver domain override (basic). Users may prefer a proper DNS profile or networksetup.
+      scutil <<EOF
+open
+d.init
+d.add ServerAddresses * $API_DNS
+set State:/Network/Service/${IFACE}/DNS
+quit
+EOF
+    fi
+
+    if [ "$PORT_FWD" = "true" ]; then
+      if [ -x "$PORT_SCRIPT" ]; then
+        log "Running port forwarding script"
+        PIA_TOKEN="$TOKEN" PF_GATEWAY="$SERVER_IP" PF_HOSTNAME="$SERVER_HOST" "$PORT_SCRIPT" || log "Port forwarding failed."
+      else
+        log "Port forwarding enabled but script missing"
+      fi
+    fi
+
+    log "Interface up with live parameters. (Static build-time config file unchanged.)"
+    # Daemon just idles; no periodic renewal since you required immutability.
+    # WARNING: This will stop working after the addKey registration expires (~24h).
+    while sleep 3600; do :; done
   '';
-
 in
 {
-  options.services.pia-vpn = {
-    enable = mkEnableOption "Private Internet Access VPN service.";
-
-    certificateFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to the CA certificate for Private Internet Access servers.
-
-        This is provided as <filename>ca.rsa.4096.crt</filename>.
-      '';
+  options.services.pia-wireguard = {
+    enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable PIA WireGuard (static build-time config + runtime patch).";
     };
 
-    environmentFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to an environment file with the following contents:
+    interfaceName = mkOption {
+      type = types.str;
+      default = "pia";
+      description = "WireGuard interface name.";
+    };
 
-        <programlisting>
-        PIA_USER=''${username}
-        PIA_PASS=''${password}
-        </programlisting>
-      '';
+    tokenFile = mkOption {
+      type = types.path;
+      description = "Path to PIA token file (outside Nix store).";
     };
 
     privateKeyFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to the file containing the WireGuard private key.
-        If the file doesn't exist, it will be generated.
-        The file must be readable only by the service user.
-      '';
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to persistent WireGuard private key outside the store. If null, a key is generated once in /var/lib/pia-wireguard/private.key.";
     };
 
-    interface = mkOption {
+    serverIP = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Explicit server IP (overrides build-time selection).";
+    };
+
+    serverHostname = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Explicit server hostname (CN) (overrides selection).";
+    };
+
+    allowedIPs = mkOption {
+      type = types.listOf types.str;
+      default = [ "0.0.0.0/0" ];
+      description = "AllowedIPs for peer.";
+    };
+
+    dns = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable DNS handling.";
+      };
+      useFromApi = mkOption {
+        type = types.bool;
+        default = true;
+        description = "If true, set DNS from API response; else use static dns.servers list at build-time.";
+      };
+      servers = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        description = "Static DNS servers when useFromApi=false.";
+      };
+    };
+
+    portForwarding = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Run upstream port_forwarding.sh after connection.";
+      };
+      requireAtSelection = mkOption {
+        type = types.bool;
+        default = true;
+        description = "When selecting server at build time, restrict to PF-capable regions.";
+      };
+      scriptURL = mkOption {
+        type = types.str;
+        default = "https://raw.githubusercontent.com/pia-foss/manual-connections/e956c57849a38f912e654e0357f5ae456dfd1742/port_forwarding.sh";
+        description = "Pinned URL for port_forwarding.sh.";
+      };
+      scriptHash = mkOption {
+        type = types.str;
+        default = "sha256-Dm1c0dZ48koxuR6aqX6N2yPxS4poZcxAYP5ifjTp3e0=";
+        description = "SHA256 for port_forwarding.sh.";
+      };
+    };
+
+    serverSelection = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable build-time server selection from pinned server list.";
+      };
+      location = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Location substring for region (case-insensitive).";
+      };
+      serverListURL = mkOption {
+        type = types.str;
+        default = "https://serverlist.piaservers.net/vpninfo/servers/v6";
+        description = "Server list URL (must keep hash updated).";
+      };
+      serverListHash = mkOption {
+        type = types.str;
+        default = "<REPLACE_WITH_HASH>";
+        description = "SHA256 for the server list JSON (must be supplied).";
+      };
+    };
+
+    caCertURL = mkOption {
       type = types.str;
-      default = "wg0";
-      description = ''
-        WireGuard interface to create for the VPN connection.
-      '';
+      default = "https://raw.githubusercontent.com/pia-foss/manual-connections/e956c57849a38f912e654e0357f5ae456dfd1742/ca.rsa.4096.crt";
+      description = "PIA CA certificate URL.";
     };
-
-    region = mkOption {
+    caCertHash = mkOption {
       type = types.str;
-      default = "";
-      description = ''
-        Name of the region to connect to.
-        See https://serverlist.piaservers.net/vpninfo/servers/v4
-      '';
+      default = "sha256-E5ljUVr6t6N7GaxzwoMPmxjSPdZRhqUWLWyd4InENnE=";
+      description = "SHA256 of CA cert.";
     };
 
-    maxLatency = mkOption {
-      type = types.float;
-      default = 0.1;
-      description = ''
-        Maximum latency to allow for auto-selection of VPN server,
-        in seconds. Does nothing if region is specified.
-      '';
-    };
-
-    user = mkOption {
-      type = types.str;
-      default = "pia-vpn";
-      description = ''
-        User under which the VPN service will run.
-      '';
-    };
-
-    group = mkOption {
-      type = types.str;
-      default = "pia-vpn";
-      description = ''
-        Group under which the VPN service will run.
-      '';
-    };
-
-    preUp = mkOption {
-      type = types.lines;
-      default = "";
-      description = ''
-        Commands called at the start of the interface setup.
-      '';
-    };
-
-    postUp = mkOption {
-      type = types.lines;
-      default = "";
-      description = ''
-        Commands called at the end of the interface setup.
-      '';
-    };
-
-    preDown = mkOption {
-      type = types.lines;
-      default = "";
-      description = ''
-        Commands called before the interface is taken down.
-      '';
-    };
-
-    postDown = mkOption {
-      type = types.lines;
-      default = "";
-      description = ''
-        Commands called after the interface is taken down.
-      '';
+    wireguardPackage = mkOption {
+      type = types.package;
+      default = pkgs.wireguard-tools;
+      description = "wireguard-tools package.";
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
+  config = mkIf cfg.enable {
+    assertions = assertions;
 
-    (optionalAttrs isDarwin {
-      # Darwin-specific configuration
-      launchd.daemons.pia-vpn = {
-        serviceConfig = {
-          Label = "com.privateinternetaccess.vpn";
-          ProgramArguments = [
-            "${pkgs.bash}/bin/bash"
-            "${commonScript}"
-          ];
-          KeepAlive = {
-            #            SuccessfulExit = false;
-            NetworkState = true;
-          };
-          RunAtLoad = true;
-          StandardOutPath = "/var/log/pia-vpn.log";
-          StandardErrorPath = "/var/log/pia-vpn.error.log";
-          UserName = cfg.user;
-          GroupName = cfg.group;
-          EnvironmentVariables = {
-            PATH = "/usr/sbin:/bin:/usr/bin:/sbin:${
-              lib.makeBinPath (
-                with pkgs;
-                [
-                  gnused
-                  findutils
-                  coreutils
-                  bash
-                  curl
-                  gawk
-                  jq
-                  wireguard-tools
-                  wireguard-go
-                ]
-              )
-            }";
-          };
-        };
+    environment.systemPackages = [
+      cfg.wireguardPackage
+    ];
+
+    # Place the static config in /etc (build-time, immutable until rebuild).
+    environment.etc."wireguard/${interfaceName}.conf".source = staticConfig;
+
+    # LaunchDaemon that uses the static config but patches live interface state.
+    launchd.daemons."pia-wireguard" = {
+      script = serviceScript;
+      serviceConfig = {
+        RunAtLoad = true;
+        KeepAlive = true;
+        ProcessType = "Background";
+        StandardOutPath = "/var/log/pia-wireguard.log";
+        StandardErrorPath = "/var/log/pia-wireguard.log";
       };
-      environment.systemPackages = with pkgs; [
-        wireguard-tools
-        wireguard-go
-      ];
+    };
 
-      # Ensure required directories exist with proper permissions
-      system.activationScripts.preActivation.text = ''
-        mkdir -p ${systemConfig.workingDir}
-        mkdir -p ${systemConfig.cacheDir}
-        chown ${cfg.user}:${cfg.group} ${systemConfig.workingDir}
-        chown ${cfg.user}:${cfg.group} ${systemConfig.cacheDir}
-        chmod 750 ${systemConfig.workingDir}
-        chmod 750 ${systemConfig.cacheDir}
-      '';
-    })
-
-    (optionalAttrs (!isDarwin) {
-
-      # Common configuration for both platforms
-      users.users.${cfg.user} = {
-        description = "Private Internet Access VPN service user";
-        isSystemUser = true;
-        group = cfg.group;
-        home = systemConfig.workingDir;
-        createHome = true;
-      };
-
-      users.groups.${cfg.group} = { };
-
-      # NixOS-specific configuration
-      boot.kernelModules = builtins.trace isDarwin [ "wireguard" ];
-
-      systemd.services.pia-vpn = {
-        description = "Connect to Private Internet Access on ${cfg.interface}";
-        path = with pkgs; [
-          bash
-          curl
-          gawk
-          jq
-          wireguard-tools
-        ];
-        requires = [ "network-online.target" ];
-        after = [
-          "network.target"
-          "network-online.target"
-        ];
-        wantedBy = [ "multi-user.target" ];
-
-        unitConfig = {
-          ConditionFileNotEmpty = [
-            cfg.certificateFile
-            cfg.environmentFile
-            cfg.privateKeyFile
-          ];
-        };
-
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          Restart = "on-failure";
-          User = cfg.user;
-          Group = cfg.group;
-          EnvironmentFile = cfg.environmentFile;
-          CacheDirectory = "pia-vpn";
-          StateDirectory = "pia-vpn";
-          UMask = "0077";
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          PrivateTmp = true;
-          ReadOnlyPaths = [
-            cfg.certificateFile
-            cfg.environmentFile
-            cfg.privateKeyFile
-          ];
-          ReadWritePaths = [
-            systemConfig.workingDir
-            systemConfig.cacheDir
-            systemConfig.runtimeDir
-          ];
-        };
-
-        script = commonScript;
-        preStop = commonStopScript;
-      };
-    })
-  ]);
+    system.activationScripts.piaWireguard = ''
+      mkdir -p ${runtimeDir} ${stateDir}
+      chmod 700 ${runtimeDir} ${stateDir}
+    '';
+  };
 }

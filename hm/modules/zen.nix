@@ -16,6 +16,7 @@ in
   stylix.targets.zen-browser.profileNames = [ "ivy (Default)" ];
   programs.zen-browser = {
     enable = true;
+    darwinDefaultsId = "app.zen-browser.zen";
     package = lib.mkForce (if stdenv.isDarwin then pkgs.zen-browser else pkgs.zen-browser);
     inherit policies;
     profiles."ivy (Default)" = {
@@ -49,12 +50,7 @@ in
 
     };
   };
-  targets.darwin.defaults = {
-    "app.zen-browser.zen" = {
-      EnterprisePoliciesEnabled = true;
-    }
-    // policies;
-  };
+
   home.activation = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
     zen-browser =
       let

@@ -15,6 +15,12 @@ in
     #    google-chrome
     #    thunderbird
   ];
+  services.gpg-agent = {
+    enable = true;
+    enableSshSupport = true;
+    pinentry.package = pkgs.pinentry;
+    pinentry.program = "pinentry-mac";
+  };
 
   #  programs._1password.enable = true;
   programs.ssh = {
