@@ -9,7 +9,7 @@ let
 in
 {
 
-  options.auscybernix.nixos.games = lib.mkOption {
+  options.auscybernix.nixos.games = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;

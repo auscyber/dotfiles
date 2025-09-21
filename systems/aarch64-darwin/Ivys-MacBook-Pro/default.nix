@@ -32,9 +32,10 @@
 
   services.jankyborders = {
     enable = true;
-    active_color = "0x80${config.stylix.base16Scheme.base03}";
-    inactive_color = "0x80${config.stylix.base16Scheme.base0D}";
+    active_color = "0xff${config.stylix.base16Scheme.base03}";
+    inactive_color = "0xff${config.stylix.base16Scheme.base0D}";
     style = "round";
+    blur_radius = 5.0;
     width = 6.0;
     ax_focus = true;
   };
@@ -105,8 +106,9 @@
         "anytype@alpha"
         #    "vivaldi"
         "calibre"
+        "zoom"
         #    "ollama"
-        "todoist"
+        "todoist-app"
 
         "beeper"
         "amethyst"
@@ -134,6 +136,7 @@
       masApps = {
         #    "1Password for Safari" = 1569813296;
         #    "Microsoft 365" = 1450038993;
+        "Microsoft Word" = 462054704;
         Fantastical = 975937182;
         "Microsoft Outlook" = 985367838;
       };
@@ -157,17 +160,19 @@
       window_gap = 10;
     };
     extraConfig = ''
-      yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-      sudo yabai --load-sa
-                        yabai -m rule --add app="^System Preferences$" manage=off
-                        yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
-                        yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
-                        yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-                        yabai -m rule --apply app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-                        yabai -m rule --add app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
-                        yabai -m rule --apply app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
-            			
-                                	'';
+            yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+            sudo yabai --load-sa
+                              yabai -m rule --add app="^System Preferences$" manage=off
+                              yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
+                              yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+      						yabai -m rule --add app="^1Password$"  scratchpad=1password grid=11:11:1:1:9:9
+                              yabai -m rule --apply app="^1Password$"  scratchpad=1password grid=11:11:1:1:9:9
+                              yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
+                              yabai -m rule --apply app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
+                              yabai -m rule --add app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
+                              yabai -m rule --apply app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
+
+                                      	'';
 
   };
   programs._1password-gui = {

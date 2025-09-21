@@ -49,6 +49,11 @@
         pkgs.jq
         pkgs.yabai
       ];
+      appBundleIds = [
+        "app.zen-browser.zen"
+        "com.1password.1password"
+        "com.1password.1password-launcher"
+      ];
       config = builtins.toString ../../../kanata.kbd;
     };
     keybinds.skhd = {
@@ -369,29 +374,6 @@
     };
   };
 
-  services.yabai = {
-    enableScriptingAddition = false;
-    enable = false;
-    config = {
-      focus_follows_mouse = "off";
-      mouse_follows_focus = "off";
-      window_placement = "second_child";
-      window_opacity = "off";
-      layout = "bsp";
-      top_padding = 10;
-      bottom_padding = 10;
-      left_padding = 10;
-      right_padding = 10;
-      window_gap = 10;
-    };
-    extraConfig = ''
-      yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
-      yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
-      yabai -m rule --add app="^Spotify$" scratchpad=spotify grid=11:11:1:1:9:9
-      yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-      	'';
-
-  };
   targets.darwin.defaults.NSGlobalDomain = {
     AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";
     AppleInterfaceStyle = "Dark"; # dark mode

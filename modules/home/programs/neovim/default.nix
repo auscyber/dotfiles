@@ -21,10 +21,10 @@ in
   config = lib.mkIf cfg.enable {
 
     home.file = {
-      #      ".config/nvim" = {
-      #        source = ../../../../.config/nvim;
-      #        recursive = true;
-      #      };
+      ".config/nvim" = {
+        source = config.lib.file.linkLocalPath ../../../../.config/nvim;
+        #    recursive = true;
+      };
     };
     home.packages = with pkgs; [ neovim ];
 
@@ -33,8 +33,9 @@ in
       EDITOR = "nvim";
       editor = "$EDITOR";
     };
-    xdg.configFile."nvim/lua/treesitter_compiler.lua".text = ''
-      			return "${pkgs.stdenv.cc}/bin/cc"
-            	'';
+    home.file."${config.auscybernix.flakeConfig.flakeFolder}/.config/nvim/lua/treesitter_compiler.lua".text =
+      ''
+        			return "${pkgs.stdenv.cc}/bin/cc"
+              	'';
   };
 }

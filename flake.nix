@@ -6,6 +6,12 @@
       url = "github:kaylorben/nixcord";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-compat = {
+      url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
+      # Optional:
+      flake = false;
+    };
+    devenv.url = "github:cachix/devenv";
     cursor_shader = {
       url = "github:Crackerfracks/synesthaxia.glsl";
       flake = false;

@@ -23,9 +23,18 @@
   lsft z    x    c    v    b    n    m    ,    .    /    rsft up
   @fn_toggle   lctl @space_manip lmeta            spc            rmet ralt left down rght
 ))
+(platform (macos) (defvirtualkeys
+  app.zen-browser.zen nop0
+  com.1password.1password nop0
+  com.1password.1password-launcher nop0
+
+))
 
 (deflayermap (fn)
- f1  f1   f2 f2   f3  f3  f4 f4  f5 f5   f6 f6   f7  f7  f8 f8  f9 f9   f10 f10 f11 f11   f12 f12
+ f1  f1   
+ f2 f2   
+ f3  f3  
+ f4 f4  f5 f5   f6 f6   f7  f7  f8 f8  f9 f9   f10 f10 f11 f11   f12 f12
 
 )
 
@@ -46,11 +55,14 @@
   8  (fork @8s @8m (lshift))
   9  (fork @9s @9m (lshift))
   0  (fork @10s @10m (lshift))
+  tab (fork @switch-focus @reverse-switch-focus (lshift))
   enter @terminal_app
   spc (fork @launcher_app @search_windows (lshift))
   c @kill-focus
+  m @minimise
   d (fork _ @toggle_discord_scratchpad (lshift))
   b (fork _ @toggle_beeper_scratchpad (lshift))
+  p (fork _ @toggle_1password_scratchpad (lshift))
   )
 
 
@@ -61,8 +73,8 @@
 (platform (linux)
   (defalias
 	terminal_app (cmd "ghostty")
-    launcher_app (cmd "rofi" -show drun)
-  kill-focus (cmd "hyprctl" "dispatch" "closewindow")
+    launcher_app (cmd "wofi" -show drun)
+  kill-focus (cmd "hyprctl" "dispatch" "killactive")
   1s (cmd "hyprctl" "dispatch" "workspace" "1")
   2s (cmd "hyprctl" "dispatch" "workspace" "2")
   3s (cmd "hyprctl" "dispatch" "workspace" "3")
@@ -90,9 +102,13 @@
 (platform (macos) (defalias
 toggle_discord_scratchpad (template-expand runasuser "yabai -m window --toggle discord || open -a Discord")
 toggle_beeper_scratchpad (template-expand runasuser "yabai -m window --toggle beeper || open -a 'Beeper\ Desktop'")
+minimise (template-expand runasuser "yabai -m window --minimize")
+toggle_1password_scratchpad (template-expand runasuser "yabai -m window --toggle 1password || open -a '1Password'")
 terminal_app (cmd "open" -a "Ghostty.app")
 launcher_app (cmd "open" -a "Raycast.app")
 search_windows (cmd "open" -a "Raycast.app" -u "raycast://extensions/krzysztoff1/yabai/search-windows")
+switch-focus (template-expand runasuser "yabai -m window --focus next")
+reverse-switch-focus (template-expand runasuser "yabai -m window --focus prev")
 kill-focus (template-expand runasuser "yabai -m window --close")
   1s (template-expand runasuser "yabai -m space --focus 1")
   2s (template-expand runasuser "yabai -m space --focus 2")

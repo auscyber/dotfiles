@@ -22,6 +22,7 @@ esac
 
 if [[ "$CHARGING" != "" ]]; then
   ICON=""
+	sketchybar --set "$NAME" label.drawing=on
 fi
 
 if [[ $SENDER == "mouse.entered" ]]; then

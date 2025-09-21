@@ -24,7 +24,7 @@ in
       yq
       jq
     ];
-    home.file.".config/sketchybar/colors.sh" = {
+    home.file."${config.auscybernix.flakeConfig.flakeFolder}/.config/sketchybar/colors.sh" = {
       text =
         let
           colors = config.stylix.base16Scheme;
@@ -49,6 +49,10 @@ in
           export COLOR_MAGENTA='${colors.base0E}'
           export COLOR_BROWN='${colors.base0F}'
         '';
+    };
+    home.file.".config/sketchybar" = {
+      source = config.lib.file.linkLocalPath ../../../../.config/sketchybar;
+      #    recursive = true;
     };
     programs.sketchybar = {
       service.enable = true;

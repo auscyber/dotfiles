@@ -20,7 +20,7 @@ in
     home.packages = with pkgs; [ hyprpolkitagent ];
     #home.packages = with pkgs; [ wezterm];
     programs.wofi.enable = true;
-    programs.kitty.enable = true; # required for the default Hyprland config
+    #    programs.kitty.enable = true; # required for the default Hyprland config
     wayland.windowManager.hyprland = {
 
       package = pkgs.hyprland;
@@ -94,11 +94,10 @@ in
           "ELECTRON_OZONE_PLATFORM_HINT,auto"
         ];
         bind = [
-          "$mod, T, exec, ghostty"
-          "$mod, B, exec, google-chrome-stable"
-          "$mod, F, exec, dolphin"
-          "$mod, C, killactive"
-          "$mod, space, exec, wofi --width=400 --height=260 --hide-scroll --show=\"run\""
+          #          "$mod, T, exec, ghostty"
+          #          "$mod, B, exec, google-chrome-stable"
+          #          "$mod, F, exec, dolphin"
+          #          "$mod, space, exec, wofi --width=400 --height=260 --hide-scroll --show=\"run\""
         ]
         ++ (
           # workspaces

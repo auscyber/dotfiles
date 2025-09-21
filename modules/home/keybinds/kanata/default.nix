@@ -20,6 +20,14 @@ in
       default = [ ];
       description = "Extra packages to install when kanata is enabled";
     };
+    kanataPort = lib.mkOption {
+      type = lib.types.int;
+      default = 5829;
+    };
+    appBundleIds = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+    };
     package = lib.mkOption {
       type = lib.types.package;
       default = pkgs.kanata-with-cmd;
@@ -51,6 +59,28 @@ in
       })
       (lib.mkIf isDarwin {
         # enable karabiner driver
+        launchd.agents.kanata-vk-agent = {
+          enable = true;
+          config = {
+            Label = "org.nixos.kanata-vk-agent";
+            ProgramArguments = [
+              "${pkgs.kanata-vk-agent}/bin/kanata-vk-agent"
+              "-p"
+              "${builtins.toString cfg.kanataPort}"
+              "-b"
+              "${builtins.concatStringsSep "," cfg.appBundleIds}"
+            ];
+            RunAtLoad = true;
+            KeepAlive = {
+              Crashed = true;
+              SuccessfulExit = false;
+            };
+            StandardErrorPath = "/tmp/kanata-vk-agent.err";
+            StandardOutPath = "/tmp/kanata-vk-agent.out";
+
+          };
+
+        };
 
         launchd.agents.kanata = {
           enable = true;
@@ -59,6 +89,8 @@ in
               "/usr/bin/sudo"
               "-E"
               "${cfg.package}/bin/kanata"
+              "-p"
+              "${builtins.toString cfg.kanataPort}"
               "-c"
               cfg.config
             ];

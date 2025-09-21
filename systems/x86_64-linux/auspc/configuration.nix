@@ -14,6 +14,9 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  auscybernix = {
+    nixos.games.enable = true;
+  };
   stylix = {
     enable = true;
     image = ../../backgrounds/phoebebridgers-2.jpg;

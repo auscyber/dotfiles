@@ -100,10 +100,8 @@ sketchybar --add alias "Control Centre,FocusModes" right \
            --add item volume right \
            --set volume script="$PLUGIN_DIR/volume.sh" click_script="sketchybar -m --set \$NAME popup.drawing=toggle" popup.background.color=0x40ffffff \
            --subscribe volume volume_change \
-		   --add event power_state IOPowerStateChangeNotification \
 		   --add item power right \
-		   --set power script="$PLUGIN_DIR/power.sh" \
-		   --subscribe power power_state \
+		   --set power update_freq=30 script="$PLUGIN_DIR/power.sh" \
 		   --subscribe power power_source_change \
            --add item battery right \
            --add alias "Control Centre,Fantastical" right \

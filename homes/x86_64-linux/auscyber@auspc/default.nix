@@ -22,20 +22,32 @@ rec {
         signByDefault = true;
       };
     };
-    vim = {
-      enable = true;
-      plugins = with pkgs.vimPlugins; [
-        vim-airline
-        vim-addon-nix
-      ];
-      settings = {
-        ignorecase = true;
-      };
-      extraConfig = ''
-        set mouse=a
-      '';
-    };
+
     home-manager.enable = true;
+  };
+  auscybernix = {
+    keybinds.kanata = {
+      enable = true;
+      extraPackages = [
+        pkgs.hyprctl
+        pkgs.yabai
+      ];
+
+      config = builtins.toString ../../../kanata.kbd;
+    };
+    programs.zotero.enable = true;
+    browsers.zen-browser.enable = true;
+    programs._1password-cli.enable = true;
+    terms.ghostty.enable = true;
+    wms.hyprland.enable = true;
+    shell = {
+      enable = true;
+      fish = {
+        enable = true;
+      };
+    };
+    programs.neovim.enable = true;
+
   };
   #  xdg.configFile."nvim/parser/c.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-c}/parser";
   #  xdg.configFile."nvim/parser/lua.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-lua}/parser";
@@ -73,17 +85,14 @@ rec {
       neovim-nightly
       firefox
       tmux
-      rust-analyzer
       wineWowPackages.stable
       emacsGcc
-      kotlin
       pcmanfm
       fzf
       vscode
       openjdk8
       xorg.xmodmap
       xorg.xmessage
-      multimc
       skypeforlinux
       rofi
       arandr
@@ -136,39 +145,7 @@ rec {
       pinentry
       thunderbird
     ]
-    ++ (with pkgs.lua51Packages; [ luarocks ])
-    ++ (with pkgs.haskellPackages; [
-      fourmolu
-      taffybar
-      #my-xmonad
-      haskell-language-server
-    ])
-    ++ [
-      (pkgs.haskellPackages.ghcWithPackages (
-        pk: with pk; [
-          microlens-th
-          microlens
-          dbus
-          xmonad-contrib
-          cabal-install
-          X11
-          xmonad
-        ]
-      ))
-    ]
-    ++ (with nodePackages; [
-      p3x-onenote
-      yarn
-      typescript-language-server
-      typescript
-      purescript-language-server
-    ])
-    ++ (with ocamlPackages; [
-      utop
-      dune
-      ocaml
-      opam
-      merlin
-    ]);
+    ++ (with pkgs.lua51Packages; [ luarocks ]);
+
   #  home.stateVersion = "21.11";
 }

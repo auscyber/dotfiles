@@ -11,6 +11,8 @@
     ../docs
     ../overlays
     ./homes.nix
+    ./shells.nix
+    ./packages.nix
     inputs.flake-parts.flakeModules.partitions
   ];
   flake = {
