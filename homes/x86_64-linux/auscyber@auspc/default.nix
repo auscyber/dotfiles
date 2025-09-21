@@ -28,9 +28,10 @@ rec {
   auscybernix = {
     keybinds.kanata = {
       enable = true;
-      extraPackages = [
-        pkgs.hyprctl
-        pkgs.yabai
+      extraPackages = with pkgs; [
+        hyprctl
+        ghostty
+        wofi
       ];
 
       config = builtins.toString ../../../kanata.kbd;
@@ -82,7 +83,7 @@ rec {
         java = jdk8;
       }).gradle_latest
       rclone
-      neovim-nightly
+      #      neovim-nightly
       firefox
       tmux
       wineWowPackages.stable
@@ -96,9 +97,8 @@ rec {
       skypeforlinux
       rofi
       arandr
-      ccls
       steam
-      jetbrains.idea-ultimate
+      #      jetbrains.idea-ultimate
       libnotify
       stack
       xclip
@@ -123,13 +123,12 @@ rec {
         nativeInputs = [ gnutls ];
       }))
       unzip
-      scala
-      rnix-lsp
+      #scala
       #  starship ardour
       slack
       #  luaPackages.lua-lsp
       #idris2
-      stdenv.cc.cc.lib
+      #      stdenv.cc.cc.lib
       grub2_efi
       (python3.withPackages (p: with p; [ pynvim ]))
       metals

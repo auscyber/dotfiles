@@ -93,28 +93,7 @@ in
           "__GLX_VENDOR_LIBRARY_NAME,nvidia"
           "ELECTRON_OZONE_PLATFORM_HINT,auto"
         ];
-        bind = [
-          #          "$mod, T, exec, ghostty"
-          #          "$mod, B, exec, google-chrome-stable"
-          #          "$mod, F, exec, dolphin"
-          #          "$mod, space, exec, wofi --width=400 --height=260 --hide-scroll --show=\"run\""
-        ]
-        ++ (
-          # workspaces
-          # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
-          builtins.concatLists (
-            builtins.genList (
-              i:
-              let
-                ws = i + 1;
-              in
-              [
-                "$mod, code:1${toString i}, workspace, ${toString ws}"
-                "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
-              ]
-            ) 9
-          )
-        );
+
         exec-once = [
           "1password"
           # "waybar"
