@@ -21,20 +21,15 @@ in
   config = lib.mkIf cfg.enable {
 
     home.file = {
-      ".config/nvim" = {
-        source = ../../../../.config/nvim;
-        recursive = true;
-      };
+      #      ".config/nvim" = {
+      #        source = ../../../../.config/nvim;
+      #        recursive = true;
+      #      };
     };
-    programs.neovim = {
-      enable = true;
-      vimAlias = true;
-      #    package = pkgs.neovim-nightly;
-      #    extraConfig = ''
-      #      let g:sqlite_clib_path = "${pkgs.sqlite.out}/lib/libsqlite3.so"
-      #    '';
-    };
+    home.packages = with pkgs; [ neovim ];
+
     home.sessionVariables = {
+      vim = "nvim";
       EDITOR = "nvim";
       editor = "$EDITOR";
     };

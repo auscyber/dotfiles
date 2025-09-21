@@ -109,8 +109,8 @@ sketchybar --add alias "Control Centre,FocusModes" right \
            --add alias "Control Centre,Fantastical" right \
            --set "Control Centre,Fantastical"  alias.color=0xff$COLOR_FOREGROUND padding_right=-14  \
 		   		  click_script="open -a 'Fantastical'" \
-           --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
-           --subscribe battery system_woke power_source_change \
+           --set battery update_freq=120 label.drawing=off script="$PLUGIN_DIR/battery.sh" \
+           --subscribe battery system_woke power_source_change  mouse.entered mouse.exited \
 
 sketchybar --add slider volume_options popup.volume 100 \
 		   --set volume_options slider.highlight_color=0xff$COLOR_YELLOW   slider.background.height=6 script='test -z "$PERCENTAGE" || osascript -e "set Volume "$(echo "scale=10; $PERCENTAGE / 10.0" | bc )""' \

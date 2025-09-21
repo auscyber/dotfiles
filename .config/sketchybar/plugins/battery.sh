@@ -7,6 +7,7 @@ if [ "$PERCENTAGE" = "" ]; then
   exit 0
 fi
 
+
 case "${PERCENTAGE}" in
   9[0-9]|100) ICON=""
   ;;
@@ -22,6 +23,13 @@ esac
 if [[ "$CHARGING" != "" ]]; then
   ICON=""
 fi
+
+if [[ $SENDER == "mouse.entered" ]]; then
+	sketchybar --set "$NAME" label.drawing=on
+elif [[ $SENDER == "mouse.exited" ]]; then
+	sketchybar --set "$NAME" label.drawing=off
+fi
+
 
 # The item invoking this script (name $NAME) will get its icon and label
 # updated with the current battery status

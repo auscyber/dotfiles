@@ -10,6 +10,9 @@
       url = "github:Crackerfracks/synesthaxia.glsl";
       flake = false;
     };
+    kmonad = {
+      url = "git+https://github.com/kmonad/kmonad?submodules=1&dir=nix";
+    };
     lix = {
       url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
       flake = false;

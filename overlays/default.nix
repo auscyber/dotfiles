@@ -44,23 +44,14 @@
         in
         {
 
-          ttfautohint =
-            (import inputs.nixpkgs-master {
-              inherit system;
-            }).ttfautohint.override
-              {
-                inherit (prev)
-                  stdenv
-                  lib
-                  fetchurl
-                  pkg-config
-                  perl
-                  freetype
-                  harfbuzz
-                  libsForQt5
-                  autoreconfHook
-                  ;
-              };
+          kmonad = inputs.kmonad.packages."${system}".default;
+          karabiner-dk = prev.karabiner-dk.overrideAttrs (attrs: {
+            version = "5.0.0";
+            src = prev.fetchurl {
+              url = "https://github.com/pqrs-org/Karabiner-DriverKit-VirtualHIDDevice/releases/download/v5.0.0/Karabiner-DriverKit-VirtualHIDDevice-5.0.0.pkg";
+              hash = "sha256-hKi2gmIdtjl/ZaS7RPpkpSjb+7eT0259sbUUbrn5mMc=";
+            };
+          });
           yabai = prev.yabai.overrideAttrs (attrs: {
             src = inputs.yabai;
           });
@@ -73,7 +64,6 @@
           });
 
           inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
-          bartender = prev.bartender-alpha;
           ivy-fetch = prev.callPackage ../packages/ivy-fetch { };
           hln = prev.callPackage ../packages/hardlink.nix { };
           pinentry = pinentry."${system}";

@@ -1,0 +1,118 @@
+(defcfg
+ danger-enable-cmd yes
+ process-unmapped-keys  yes
+ macos-dev-names-include ("Apple Internal Keyboard / Trackpad")
+)
+
+(platform (macos) (defsrc
+  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft up
+  fn   lctl lalt lmet           spc            rmet ralt left down rght
+)
+
+)
+(defalias fn_toggle (layer-toggle fn))
+(platform (macos) (deflayer (default)
+  esc  brdown   brup   f3   f4   f5   f6   f7   f8   f9   mute  vold  volu
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft up
+  @fn_toggle   lctl @space_manip lmeta            spc            rmet ralt left down rght
+))
+
+(deflayermap (fn)
+ f1  f1   f2 f2   f3  f3  f4 f4  f5 f5   f6 f6   f7  f7  f8 f8  f9 f9   f10 f10 f11 f11   f12 f12
+
+)
+
+
+
+
+
+
+(defalias space_manip (layer-toggle space_manip))
+(deflayermap (space_manip)
+  1 (fork @1s @1m (lshift))
+  2  (fork @2s @2m (lshift))
+  3  (fork @3s @3m (lshift))
+  4  (fork @4s @4m (lshift))
+  5  (fork @5s @5m (lshift))
+  6  (fork @6s @6m (lshift))
+  7  (fork @7s @7m (lshift))
+  8  (fork @8s @8m (lshift))
+  9  (fork @9s @9m (lshift))
+  0  (fork @10s @10m (lshift))
+  enter @terminal_app
+  spc (fork @launcher_app @search_windows (lshift))
+  c @kill-focus
+  d (fork _ @toggle_discord_scratchpad (lshift))
+  b (fork _ @toggle_beeper_scratchpad (lshift))
+  )
+
+
+(deftemplate runasuser (command)
+  (cmd "sudo" "-u" "ivypierlot" sh -c $command) )
+
+
+(platform (linux)
+  (defalias
+	terminal_app (cmd "ghostty")
+    launcher_app (cmd "rofi" -show drun)
+  kill-focus (cmd "hyprctl" "dispatch" "closewindow")
+  1s (cmd "hyprctl" "dispatch" "workspace" "1")
+  2s (cmd "hyprctl" "dispatch" "workspace" "2")
+  3s (cmd "hyprctl" "dispatch" "workspace" "3")
+  4s (cmd "hyprctl" "dispatch" "workspace" "4")
+  5s (cmd "hyprctl" "dispatch" "workspace" "5")
+  6s (cmd "hyprctl" "dispatch" "workspace" "6")
+  7s (cmd "hyprctl" "dispatch" "workspace" "7")
+  8s (cmd "hyprctl" "dispatch" "workspace" "8")
+  9s (cmd "hyprctl" "dispatch" "workspace" "9")
+  10s (cmd "hyprctl" "dispatch" "workspace" "10")
+
+  1m (cmd "hyprctl" "dispatch" "movetoworkspace" "1")
+  2m (cmd "hyprctl" "dispatch" "movetoworkspace" "2")
+  3m (cmd "hyprctl" "dispatch" "movetoworkspace" "3")
+  4m (cmd "hyprctl" "dispatch" "movetoworkspace" "4")
+  5m (cmd "hyprctl" "dispatch" "movetoworkspace" "5")
+  6m (cmd "hyprctl" "dispatch" "movetoworkspace" "6")
+  7m (cmd "hyprctl" "dispatch" "movetoworkspace" "7")
+  8m (cmd "hyprctl" "dispatch" "movetoworkspace" "8")
+  9m (cmd "hyprctl" "dispatch" "movetoworkspace" "9")
+  10m (cmd "hyprctl" "dispatch" "movetoworkspace" "10")
+  )
+)
+
+(platform (macos) (defalias
+toggle_discord_scratchpad (template-expand runasuser "yabai -m window --toggle discord || open -a Discord")
+toggle_beeper_scratchpad (template-expand runasuser "yabai -m window --toggle beeper || open -a 'Beeper\ Desktop'")
+terminal_app (cmd "open" -a "Ghostty.app")
+launcher_app (cmd "open" -a "Raycast.app")
+search_windows (cmd "open" -a "Raycast.app" -u "raycast://extensions/krzysztoff1/yabai/search-windows")
+kill-focus (template-expand runasuser "yabai -m window --close")
+  1s (template-expand runasuser "yabai -m space --focus 1")
+  2s (template-expand runasuser "yabai -m space --focus 2")
+  3s (template-expand runasuser "yabai -m space --focus 3")
+  4s (template-expand runasuser "yabai -m space --focus 4")
+  5s (template-expand runasuser "yabai -m space --focus 5")
+  6s (template-expand runasuser "yabai -m space --focus 6")
+  7s (template-expand runasuser "yabai -m space --focus 7")
+  8s (template-expand runasuser "yabai -m space --focus 8")
+  9s (template-expand runasuser "yabai -m space --focus 9")
+  10s (template-expand runasuser "yabai -m space --focus 10")
+
+  1m (template-expand runasuser "yabai -m window --space 1")
+  2m (template-expand runasuser "yabai -m window --space 2")
+  3m (template-expand runasuser "yabai -m window --space 3")
+  4m (template-expand runasuser "yabai -m window --space 4")
+  5m (template-expand runasuser "yabai -m window --space 5")
+  6m (template-expand runasuser "yabai -m window --space 6")
+  7m (template-expand runasuser "yabai -m window --space 7")
+  8m (template-expand runasuser "yabai -m window --space 8")
+  9m (template-expand runasuser "yabai -m window --space 9")
+  10m (template-expand runasuser "yabai -m window --space 10")
+))

@@ -59,6 +59,7 @@ inputs.darwin.lib.darwinSystem {
     ../../modules/common/secrets.nix
     ../../modules/common/hm
     ../../modules/common/common
+    ../../modules/common/kmonad
     homeManagerConfig
 
   ]

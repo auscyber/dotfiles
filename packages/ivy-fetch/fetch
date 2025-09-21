@@ -154,7 +154,29 @@ elif [ -n "$(nowplaying-cli get-raw 2>&- )" ]; then
 else
     song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
 fi
+if [[ $OSTYPE == "darwin"* ]]
+then
+ps_line=$(ps -e | grep -o \
+                       -e "[S]pectacle" \
+                       -e "[A]methyst" \
+                       -e "[k]wm" \
+                       -e "[c]hun[k]wm" \
+                       -e "[y]abai" \
+                       -e "[R]ectangle")
+
+case $ps_line in
+                       *chunkwm*)   wm=chunkwm ;;
+                       *kwm*)       wm=Kwm ;;
+                       *yabai*)     wm=yabai ;;
+                       *Amethyst*)  wm=Amethyst ;;
+                       *Spectacle*) wm=Spectacle ;;
+                       *Rectangle*) wm=Rectangle ;;
+                       *)           wm="Quartz Compositor" ;;
+esac
+else
+
 wm=$DESKTOP_SESSION
+fi
 time=$(date "+%I:%M %p")
 date=$(date "+%a %d %b %G")
 uptime="$(uptime | awk -F ',' '{print $1}' | awk -F 'up' '{print $2}')"
@@ -211,13 +233,11 @@ print_phoebe () {
     HEIGHT=14
 	if [ -n "$(nowplaying-cli get artworkData 2>&-)" ]
 	then
-		nowplaying-cli get artworkData | base64 -d | wezterm imgcat --width $WIDTH
+		nowplaying-cli get artworkData | base64 -d | viu --width $WIDTH
 	else
-    wezterm imgcat --width $WIDTH ~/backgrounds/sadbridgers.png
+	    viu --width $WIDTH ~/backgrounds/sadbridgers.png
 	fi
 #    wezterm imgcat --height $HEIGHT ~/backgrounds/sadbridgers.png
-
-
 
 }
 

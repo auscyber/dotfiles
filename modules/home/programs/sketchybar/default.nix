@@ -20,6 +20,10 @@ in
   config = lib.mkIf cfg.enable {
 
     # generate colors file from stylix config
+    home.packages = with pkgs; [
+      yq
+      jq
+    ];
     home.file.".config/sketchybar/colors.sh" = {
       text =
         let
@@ -51,6 +55,7 @@ in
       enable = true;
       extraPackages = with pkgs; [
         jq
+        yq
         yabai
         nowplaying-cli
       ];

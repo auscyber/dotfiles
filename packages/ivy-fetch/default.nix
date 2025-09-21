@@ -1,7 +1,8 @@
-{ writeTextFile }:
-writeTextFile {
+{ writeShellApplication, viu }:
+writeShellApplication {
   name = "fetch";
-  executable = true;
-  destination = "/bin/fetch";
+  checkPhase = '''';
+  bashOptions = [ ];
+  runtimeInputs = [ viu ];
   text = builtins.readFile ./fetch;
 }

@@ -43,8 +43,16 @@
   imports = [ ./ui.nix ];
   auscybernix = {
     programs.sketchybar.enable = true;
-    keybinds.skhd = {
+    keybinds.kanata = {
       enable = true;
+      extraPackages = [
+        pkgs.jq
+        pkgs.yabai
+      ];
+      config = builtins.toString ../../../kanata.kbd;
+    };
+    keybinds.skhd = {
+      enable = false;
 
       binds =
         (lib.attrsets.mapAttrs'

@@ -94,15 +94,20 @@
   nix.enable = true;
   # The platform the configuration will be used on.
   auscybernix = {
+    keybinds.karabiner-driver-kit.enable = true;
 
     homebrew = {
       enable = true;
 
       brews = [ "nowplaying-cli" ];
       casks = [
+        "raycast"
+        "anytype@alpha"
         #    "vivaldi"
         "calibre"
         #    "ollama"
+        "todoist"
+
         "beeper"
         "amethyst"
         "steam"
@@ -124,12 +129,12 @@
         "tidal"
         #    "wezterm@nightly"
         "zoom"
+        "microsoft-teams"
       ];
       masApps = {
         #    "1Password for Safari" = 1569813296;
         #    "Microsoft 365" = 1450038993;
         Fantastical = 975937182;
-        #    "Microsoft Teams" = 1113153706;
         "Microsoft Outlook" = 985367838;
       };
     };
@@ -152,15 +157,17 @@
       window_gap = 10;
     };
     extraConfig = ''
-                  yabai -m rule --add app="^System Preferences$" manage=off
-                  yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
-                  yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
-                  yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-                  yabai -m rule --apply app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-      			yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+      yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
       sudo yabai --load-sa
-            	  sudo yabai --load-sa
-                          	'';
+                        yabai -m rule --add app="^System Preferences$" manage=off
+                        yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
+                        yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+                        yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
+                        yabai -m rule --apply app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
+                        yabai -m rule --add app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
+                        yabai -m rule --apply app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
+            			
+                                	'';
 
   };
   programs._1password-gui = {
