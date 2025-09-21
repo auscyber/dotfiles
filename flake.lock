@@ -351,11 +351,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1758357126,
-        "narHash": "sha256-dErJbW87LeLYNiG1L+yWg9PLw6rEUWa9jBj66V8wbcc=",
+        "lastModified": 1758447824,
+        "narHash": "sha256-qiU32tjEm8gWBbG8oZh2KxUWPcOsz3BXiAaNRM55N3c=",
         "owner": "auscyber",
         "repo": "nix-darwin",
-        "rev": "eb544bdc72aef188b16284e0e581ae3827fbde4b",
+        "rev": "eb1292da4fd0b74b88c5ac41d67ecc76f5494ae9",
         "type": "github"
       },
       "original": {
@@ -2233,6 +2233,22 @@
         "type": "github"
       }
     },
+    "kanata": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1758417820,
+        "narHash": "sha256-zLRH9FRcjlYG+OAISSNLv+SKI078MVEG/KrXRMNz0dE=",
+        "owner": "jtroo",
+        "repo": "kanata",
+        "rev": "17e9baaa7a2d172f4134bd0986f9fd51411e22dd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jtroo",
+        "repo": "kanata",
+        "type": "github"
+      }
+    },
     "katla": {
       "flake": false,
       "locked": {
@@ -3473,6 +3489,7 @@
         "idris2-pkgs": "idris2-pkgs",
         "input-leap": "input-leap",
         "jankyborders": "jankyborders",
+        "kanata": "kanata",
         "kmonad": "kmonad",
         "lanzaboote": "lanzaboote",
         "lix": "lix",

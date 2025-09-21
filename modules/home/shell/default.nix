@@ -48,6 +48,7 @@ in
         enable = true;
         userName = "Ivy Pierlot";
         userEmail = "ivyp@outlook.com.au";
+
       };
       eza = {
         enable = true;

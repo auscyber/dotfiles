@@ -25,37 +25,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [
-      cfg.karabinerDriverPackage
-    ];
-
-    launchd.daemons.Karabiner-DriverKit-VirtualHIDDeviceClient = {
-      serviceConfig.ProgramArguments = [
-        "/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-VirtualHIDDevice-Daemon.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Daemon"
-      ];
-      serviceConfig.ProcessType = "Interactive";
-      serviceConfig.Label = "org.pqrs.Karabiner-DriverKit-VirtualHIDDevice-Daemon";
-      serviceConfig.RunAtLoad = true;
-      serviceConfig.KeepAlive = true;
+    services.karabiner-dk = {
+      enable = true;
+      package = cfg.karabinerDriverPackage;
     };
-    launchd.daemons.start-karabiner-dk = {
-      script = ''
-        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager" activate
-      '';
-      serviceConfig.Label = "org.nixos.start-karabiner-dk";
-      serviceConfig.RunAtLoad = true;
-    };
-    launchd.user.agents.activate_karabiner_system_ext = {
-      serviceConfig.ProgramArguments = [
-        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
-        "activate"
-      ];
-      serviceConfig.RunAtLoad = true;
-      managedBy = "auscybernix.keybinds.karabiner-driver-kit.enable";
-    };
-    system.activationScripts.postActivation.text = ''
-      		launchctl kickstart -k system/org.pqrs.Karabiner-DriverKit-VirtualHIDDevice-Daemon
-      	'';
     security.sudo.extraConfig =
       lib.mkIf config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.enable
         (

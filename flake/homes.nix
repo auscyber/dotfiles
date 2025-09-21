@@ -44,4 +44,20 @@ in
     # Dynamically generated home configurations
     homeConfigurations = lib.mapAttrs' generateHomeConfiguration allHomes;
   };
+  perSystem =
+    {
+      config,
+      system,
+      pkgs,
+      ...
+    }:
+    {
+      packages.build-homes = pkgs.stdenv.mkDerivation {
+        name = "home-build";
+        buildInputs = lib.mapAttrsToList (
+          name: value: (generateHomeConfiguration name value).activationPackage
+        ) (lib.filterAttrs (_: value: value.system == system) allHomes);
+      };
+
+    };
 }

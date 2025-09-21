@@ -41,6 +41,13 @@
   # '')
   #  programs.ghostty.package = pkgs.nur.repos.DimitarNestorov.ghostty;
   imports = [ ./ui.nix ];
+  programs.git.signing = {
+    format = "ssh";
+    signByDefault = true;
+    key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
+    signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+
+  };
   auscybernix = {
     programs.sketchybar.enable = true;
     keybinds.kanata = {

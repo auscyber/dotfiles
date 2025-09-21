@@ -23,19 +23,18 @@ in
 
   kmonad = inputs.kmonad.packages."${system}".default;
   kanata = pkgs.kanata.overrideAttrs (attrs: {
+    src = inputs.kanata;
+    doInstallCheck = false;
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit (attrs)
-        src
         postUnpack
 
         ;
+      src = inputs.kanata;
       copyLockfile = false;
-      patches = [ ./kanata-patch ];
-      hash = "sha256-1pcDVk817svG+YU7LBmYiXfmPrqMWZrViPn3HhYkz/8=";
+      hash = "sha256-HrEwD6jknATyNH1cw8wzM2l5wjs/XFDXFf1q0apGN5E=";
     };
-    patches = [
-      ./kanata-patch
-    ];
+
   });
   karabiner-dk = pkgs.karabiner-dk
   #.overrideAttrs

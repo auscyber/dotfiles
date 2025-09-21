@@ -5,6 +5,10 @@
     nixcord = {
       url = "github:kaylorben/nixcord";
     };
+    kanata = {
+      url = "github:jtroo/kanata";
+      flake = false;
+    };
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat = {
       url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
