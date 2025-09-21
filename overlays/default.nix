@@ -11,7 +11,7 @@
       inputs.nur.overlays.default
       inputs.emacs.overlays.default
       inputs.rust-overlay.overlays.default
-
+      inputs.lix-module.overlays.default
       inputs.neovim.overlays.default
       (
         final: prev:

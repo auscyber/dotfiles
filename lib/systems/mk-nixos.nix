@@ -31,6 +31,7 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.stylix.nixosModules.stylix
     inputs.lanzaboote.nixosModules.lanzaboote
     inputs.home-manager.nixosModules.home-manager
+
     {
       nixpkgs = {
         inherit system;
@@ -42,6 +43,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../../modules/common/secrets.nix
     ../../modules/common/nix
     ../../modules/common/hm
+    ../../modules/common/common
   ]
   ++ (extendedLib.importModulesRecursive ../../modules/nixos)
   ++ [

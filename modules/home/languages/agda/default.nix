@@ -6,11 +6,11 @@
 }:
 
 let
-  cfg = config.auscybernix.programs.agda;
+  cfg = config.auscybernix.languages.agda;
 in
 
 {
-  options.auscybernix.programs.agda = {
+  options.auscybernix.languages.agda = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;

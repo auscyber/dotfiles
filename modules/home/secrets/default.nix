@@ -10,7 +10,7 @@
     secretsMountPoint = "${config.home.homeDirectory}/.config/agenix.d";
     secrets = {
       access-tokens = {
-        file = ../secrets/access-tokens.age;
+        file = ../../secrets/access-tokens.age;
       };
     };
   };

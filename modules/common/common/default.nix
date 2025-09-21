@@ -8,7 +8,7 @@
 
 {
 
-  imports = [ inputs.lix-module.nixosModules.default ];
+  imports = [ ];
   fonts.packages =
     with pkgs;
     (map (x: nerd-fonts.${x}) [

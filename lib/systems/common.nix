@@ -79,6 +79,8 @@ in
               [ ]
           )
           ++ [
+            ../../modules/common/secrets.nix
+
           ]
           ++ externalHmModules
           ++ (extendedLib.importModulesRecursive ../../modules/home);
