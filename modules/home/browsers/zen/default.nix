@@ -58,6 +58,7 @@ in
           };
         };
         extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
+          auto-tab-discard
           libkey-nomad
           onepassword-password-manager
           zotero-connector

@@ -14,6 +14,14 @@
       url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
       flake = false;
     };
+    yabai = {
+      url = "github:koekeishiya/yabai?ref=pull/2644/head";
+      flake = false;
+    };
+    jankyborders = {
+      url = "github:FelixKratz/JankyBorders";
+      flake = false;
+    };
 
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
@@ -71,6 +79,10 @@
     #    nh.inputs.nixpkgs.follows = "nixpkgs";
     nur = {
       url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    my-nur = {
+      url = "github:auscyber/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

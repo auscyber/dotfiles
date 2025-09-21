@@ -8,7 +8,18 @@
   flake.overlays = {
     default = lib.composeManyExtensions [
       #        inputs.hyprpanel.overlay
+
       inputs.nur.overlays.default
+      inputs.my-nur.overlays.default
+      #      (final: prev: {
+      #        nur = prev.nur // {
+      #          repos = prev.nur.repos // {
+      #            AusCyber = inputs.my-nur.packages."${prev.stdenv.hostPlatform.system}";
+      #          };
+      #        };
+      #
+      #      })
+
       inputs.emacs.overlays.default
       inputs.rust-overlay.overlays.default
       inputs.lix-module.overlays.default
@@ -36,14 +47,33 @@
           ttfautohint =
             (import inputs.nixpkgs-master {
               inherit system;
-            }).ttfautohint;
+            }).ttfautohint.override
+              {
+                inherit (prev)
+                  stdenv
+                  lib
+                  fetchurl
+                  pkg-config
+                  perl
+                  freetype
+                  harfbuzz
+                  libsForQt5
+                  autoreconfHook
+                  ;
+              };
+          yabai = prev.yabai.overrideAttrs (attrs: {
+            src = inputs.yabai;
+          });
+          jankyborders = prev.jankyborders.overrideAttrs (attrs: {
+            src = inputs.jankyborders;
+          });
           input-leap = prev.input-leap.overrideAttrs (attrs: {
             # patches = [ ];
             src = inputs.input-leap;
           });
 
           inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
-          bartender = prev.nur.repos.AusCyber.bartender-alpha;
+          bartender = prev.bartender-alpha;
           ivy-fetch = prev.callPackage ../packages/ivy-fetch { };
           hln = prev.callPackage ../packages/hardlink.nix { };
           pinentry = pinentry."${system}";

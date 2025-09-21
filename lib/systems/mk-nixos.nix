@@ -31,6 +31,7 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.stylix.nixosModules.stylix
     inputs.lanzaboote.nixosModules.lanzaboote
     inputs.home-manager.nixosModules.home-manager
+    inputs.nixos-wsl.nixosModules.default
 
     {
       nixpkgs = {
