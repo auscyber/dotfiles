@@ -25,12 +25,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    environment.systemPackages = [
+      cfg.karabinerDriverPackage
+    ];
 
     system.activationScripts.preActivation.text = ''
-            mkdir -p ${parentAppDir}
-            # Kernel extensions must reside inside of /Applications, they cannot be symlinks
-            cp -R ${cfg.karabinerDriverPackage}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
-      	  cp -R "${cfg.karabinerDriverPackage}/Library/Application Support/org.pqrs" "/Library/Application Support/"
+      mkdir -p ${parentAppDir}
+      # Kernel extensions must reside inside of /Applications, they cannot be symlinks
+      cp -R ${cfg.karabinerDriverPackage}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
     '';
     launchd.daemons.Karabiner-DriverKit-VirtualHIDDeviceClient = {
       serviceConfig.ProgramArguments = [
@@ -48,14 +50,7 @@ in
       serviceConfig.Label = "org.nixos.start-karabiner-dk";
       serviceConfig.RunAtLoad = true;
     };
-    launchd.user.agents.activate_karabiner_system_ext = {
-      serviceConfig.ProgramArguments = [
-        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
-        "activate"
-      ];
-      serviceConfig.RunAtLoad = true;
-      managedBy = "auscybernix.keybinds.karabiner-driver-kit.enable";
-    };
+
     security.sudo.extraConfig =
       lib.mkIf config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.enable
         (

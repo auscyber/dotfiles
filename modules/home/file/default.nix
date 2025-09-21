@@ -17,12 +17,12 @@ in
   };
   config = {
 
-    lib.file.linkLocalPath =
+    lib.file.getLocalPath =
       path:
-      config.lib.file.mkOutOfStoreSymlink (
-        cfg.flakeFolder
+      cfg.flakeFolder
 
-        + (lib.strings.removePrefix (builtins.toString ../../..) (builtins.toString path))
-      );
+      + (lib.strings.removePrefix (builtins.toString ../../..) (builtins.toString path));
+    lib.file.linkLocalPath =
+      path: config.lib.file.mkOutOfStoreSymlink (config.lib.file.getLocalPath path);
   };
 }

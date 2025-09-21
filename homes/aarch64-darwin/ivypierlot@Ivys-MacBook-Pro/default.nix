@@ -54,7 +54,7 @@
         "com.1password.1password"
         "com.1password.1password-launcher"
       ];
-      config = builtins.toString ../../../kanata.kbd;
+      config = config.lib.file.getLocalPath ../../../kanata.kbd;
     };
     keybinds.skhd = {
       enable = false;

@@ -43,7 +43,7 @@
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
     ollama
-    bartender
+    #    bartender
     zen-browser
     ghostty
     #neovide
