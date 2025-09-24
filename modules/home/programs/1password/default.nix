@@ -20,6 +20,16 @@ in
 
   };
   config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [ nixpkgs-review ];
+
+    programs.fish.interactiveShellInit = ''
+      function nixpkgs-review --wraps nixpkgs-review --description "1Password Shell Plugin for nixpkgs-review"
+              export GITHUB_TOKEN="op://Employee/7m4u7tcwjwqcuyojvwsmee2mdi/Security/token"
+              op run -- nixpkgs-review $argv
+          end
+
+      	'';
+
     programs._1password-shell-plugins = {
       # enable 1Password shell plugins for bash, zsh, and fish shell
       enable = true;

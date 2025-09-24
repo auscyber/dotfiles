@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 let
-  # onePassPath = "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
-  onePassPath = "~/.1password/agent.sock";
+  onePassPath = "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+  #  onePassPath = "~/.1password/agent.sock";
 in
 {
   #  targets.genericLinux.enable = true;
@@ -24,10 +24,10 @@ in
 
   #  programs._1password.enable = true;
   programs.ssh = {
-    enable = false;
-    extraConfig = ''
-      Host *
-          IdentityAgent ${onePassPath}
-    '';
+    matchBlocks = {
+      "*" = {
+        identityAgent = "${onePassPath}";
+      };
+    };
   };
 }

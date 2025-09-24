@@ -49,6 +49,7 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.lanzaboote.nixosModules.lanzaboote
     inputs.home-manager.nixosModules.home-manager
     inputs.nixos-wsl.nixosModules.default
+    inputs.sops-nix.nixosModules.sops
 
     {
       nixpkgs = {

@@ -35,6 +35,17 @@ in
     };
     programs.nh.enable = true;
     programs = {
+      ssh = {
+
+        enable = true;
+        enableDefaultConfig = true;
+        matchBlocks = {
+          "imflo.pet" = {
+            forwardAgent = true;
+          };
+        };
+
+      };
       direnv = {
         enable = true;
         nix-direnv = {

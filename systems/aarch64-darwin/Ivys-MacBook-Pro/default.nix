@@ -79,7 +79,14 @@
   # Necessary for using flakes on this system.
   nix.distributedBuilds = true;
 
-  #  nix.linux-builder.enable = true;
+  nix.linux-builder = {
+    enable = false;
+    systems = with inputs.flake-utils.lib.system; [
+      aarch64-linux
+      x86_64-linux
+    ];
+    config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+  };
   nix.settings = {
 
     experimental-features = "nix-command flakes";
