@@ -31,7 +31,7 @@
 
   programs.gnupg.agent = {
     enable = true;
-    enableSSHSupport = true;
+    enableSSHSupport = false;
   };
 
   programs.zsh.enable = true;
