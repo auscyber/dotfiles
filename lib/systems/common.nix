@@ -7,6 +7,7 @@ let
     inputs.nixvim.homeModules.default
     inputs.agenix.homeManagerModules.default
     inputs.nix-index-database.homeModules.nix-index
+    inputs.sops-nix.homeManagerModules.sops
   ];
 in
 {
@@ -39,10 +40,10 @@ in
       flake,
       system,
       hostname,
+      homesPath ? ../../homes,
     }:
     let
       inherit (flake.lib.file) parseHomeConfigurations;
-      homesPath = ../../homes;
       allHomes = parseHomeConfigurations homesPath;
     in
     filterAttrs (

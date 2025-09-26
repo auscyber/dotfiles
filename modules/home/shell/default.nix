@@ -38,10 +38,14 @@ in
       ssh = {
 
         enable = true;
-        enableDefaultConfig = true;
+        enableDefaultConfig = false;
         matchBlocks = {
           "imflo.pet" = {
             forwardAgent = true;
+            #            remoteForwards = [{
+
+            #			address = "/home/ivy/"
+            #			config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName
           };
         };
 
@@ -59,7 +63,6 @@ in
         enable = true;
         userName = "Ivy Pierlot";
         userEmail = "ivyp@outlook.com.au";
-
       };
       eza = {
         enable = true;

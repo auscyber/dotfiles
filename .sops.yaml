@@ -1,0 +1,11 @@
+keys:
+  - &server_imflo age1yuapchjs3ucvhftlv75t26m5vfyjdjjtrpmknvnk7cdy9n7jmf5sgvht94
+  - &mac age1dkwz3c2jprv8kz9e4r2yj5ugfsgx8hvmxc466k96d38c9hnuxp0s2u4qpa
+  - &admin_ivy age1wl25zsmys6cdzacrx4xh2fe89jk8enx4dalc52075kg9rdnuxf9qe2yw7p
+creation_rules:
+    - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+      key_groups:
+      - age:
+        - *admin_ivy
+        - *mac
+        - *server_imflo

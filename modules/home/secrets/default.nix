@@ -1,17 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  sops.templates."extraNix.conf".content = ''
+    	access-tokens = github.com=${config.sops.placeholder.github_token}
+  '';
   nix.extraOptions = ''
-    !include ${config.age.secrets.access-tokens.path}
+    !include ${config.sops.templates."extraNix.conf".path}
         		'';
-  age = {
-    identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
-    secretsDir = "${config.home.homeDirectory}/.config/agenix";
-    secretsMountPoint = "${config.home.homeDirectory}/.config/agenix.d";
-    secrets = {
-      access-tokens = {
-        file = ../../../secrets/access-tokens.age;
-      };
-    };
-  };
 }

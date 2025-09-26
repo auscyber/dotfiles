@@ -20,6 +20,7 @@ in
     enableSshSupport = true;
     pinentry.package = pkgs.pinentry;
     pinentry.program = "pinentry-mac";
+    enableExtraSocket = true;
   };
 
   #  programs._1password.enable = true;

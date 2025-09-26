@@ -11,6 +11,7 @@
   # List packages installed in system profile. To search by name, run:
 
   documentation.enable = true;
+  stylix.targets.jankyborders.enable = false;
   security.pam.services.sudo_local.touchIdAuth = true;
   fonts.packages =
     with pkgs;

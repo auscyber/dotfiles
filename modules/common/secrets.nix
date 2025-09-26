@@ -1,5 +1,6 @@
 {
-  age.secrets.ivy_password.file = ../../secrets/password.age;
-  age.secrets.pia_password.file = ../../secrets/pia_vpn.age;
-  age.secrets.pia_privateKey.file = ../../secrets/pia_privatekey.age;
+  sops.defaultSopsFile = ../../secrets/default.yaml;
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  sops.secrets.github_token = { };
+  sops.secrets.password = { };
 }

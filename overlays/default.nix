@@ -5,6 +5,19 @@
   ...
 }:
 {
+  perSystem =
+    { system, ... }:
+    {
+      _module.args.pkgs = import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          inputs.sops-nix.overlays.default
+          inputs.agenix.overlays.default
+          self.overlays.default
+
+        ];
+      };
+    };
   flake.overlays = {
     default = lib.composeManyExtensions [
       #        inputs.hyprpanel.overlay
