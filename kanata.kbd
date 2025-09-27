@@ -37,8 +37,7 @@
 
 
 (platform (linux)
-	(deflayermap (default) lalt @space_manip
-				 		   lmeta @metarebind
+	(deflayermap (default) lmeta @space_manip
 				 ))
 
 (deflayermap (metarebind))

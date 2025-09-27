@@ -1,3 +1,4 @@
 *.o
 *.stack-work
 *.DS_Store
+.direnv

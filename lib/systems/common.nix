@@ -3,7 +3,7 @@ let
   inherit (inputs.nixpkgs.lib) filterAttrs mapAttrs';
   externalHmModules = [
     inputs._1password-shell-plugins.hmModules.default
-    inputs.zen-browser.homeModules.twilight
+    inputs.zen-browser.homeModules.default
     inputs.nixvim.homeModules.default
     inputs.agenix.homeManagerModules.default
     inputs.nix-index-database.homeModules.nix-index

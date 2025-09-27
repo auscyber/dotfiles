@@ -8,7 +8,7 @@ let
 
   zen-browser = {
     aarch64-darwin = pkgs.nur.repos.AusCyber.zen-browser;
-    x86_64-linux = inputs.zen-browser.packages.x86_64-linux.twilight;
+    x86_64-linux = inputs.zen-browser.packages.x86_64-linux.beta-unwrapped;
   };
   ghostty = {
     aarch64-darwin = pkgs.ghostty-bin;

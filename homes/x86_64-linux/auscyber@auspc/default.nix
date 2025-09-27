@@ -88,6 +88,8 @@ rec {
   home.packages =
     with pkgs;
     [
+      element-desktop
+      tidal-hifi
       st
 
       rclone

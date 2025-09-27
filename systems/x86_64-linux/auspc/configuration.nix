@@ -38,6 +38,10 @@
     SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="02", KERNEL=="ttyACM*", SYMLINK+="m1n1-sec"
     LABEL="not_m1n1"
   '';
+  environment.etc."1password/custom_allowed_browsers" = {
+    text = "zen";
+    mode = "0755";
+  };
 
   services.ollama = {
     host = "0.0.0.0";
@@ -257,6 +261,7 @@
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
+    package = pkgs._1password-gui-beta;
     polkitPolicyOwners = [ "auscyber" ];
   };
 

@@ -32,8 +32,23 @@ in
     stylix.targets.zen-browser.profileNames = [ cfg.profileName ];
     programs.zen-browser = {
       enable = true;
+      nativeMessagingHosts = [ pkgs._1password-gui-beta ];
+
       darwinDefaultsId = "app.zen-browser.zen";
-      package = lib.mkForce (if stdenv.isDarwin then null else pkgs.zen-browser);
+      package = lib.mkForce (
+        if stdenv.isDarwin then
+          null
+        else
+          pkgs.wrapFirefox
+            (pkgs.zen-browser.override {
+              inherit policies;
+            })
+            {
+              extraPrefs = config.programs.zen-browser.extraPrefs;
+              extraPrefsFiles = config.programs.zen-browser.extraPrefsFiles;
+              nativeMessagingHosts = config.programs.zen-browser.nativeMessagingHosts;
+            }
+      );
       inherit policies;
       profiles."${cfg.profileName}" = {
         isDefault = true;
@@ -79,13 +94,13 @@ in
               "${config.home.homeDirectory}/Library/\"Application Support\"/zen/profiles.ini";
         in
         inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-                  rm ${profiles-ini}.backup
-                  mv ${profiles-ini} ${profiles-ini}.generate
-          		cat ${profiles-ini}.generate > ${profiles-ini}
-                  echo ZenAvatarPath=chrome://browser/content/zen-avatars/avatar-01.svg >> ${profiles-ini}
+          			rm ${profiles-ini}.backup
+          			mv ${profiles-ini} ${profiles-ini}.generate
+          			cat ${profiles-ini}.generate > ${profiles-ini}
+          		echo ZenAvatarPath=chrome://browser/content/zen-avatars/avatar-01.svg >> ${profiles-ini}
 
 
-        '';
+          	'';
     };
   };
 }
