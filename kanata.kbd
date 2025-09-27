@@ -4,6 +4,15 @@
  macos-dev-names-include ("Apple Internal Keyboard / Trackpad")
 )
 
+(platform (linux)
+(defsrc
+	esc f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 prtsc scrlck pause              nlck kp/ kp* kp-
+	grv 1  2  3  4  5  6  7  8  9  0 - = bspc   ins home pgup                  kp7   kp8 kp9 kp+
+	tab q w e r t y u i o p [ ] \               del end pgdn                   kp4 kp5   kp6
+	caps a s d f g h j k l ; ' ret                                             kp1 kp2 kp3 kprt
+	lshift z x c v b n m , . / rshift                               up          kp0 kp.
+	lctl lmeta lalt         spc ralt    rmeta rctl             left down right))
+
 (platform (macos) (defsrc
   esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
   grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
@@ -14,7 +23,8 @@
 )
 
 )
-(defalias fn_toggle (layer-toggle fn))
+(defalias fn_toggle (layer-toggle fn)
+			metarebind (layer-toggle metarebind))
 (platform (macos) (deflayer (default)
   esc  brdown   brup   f3   f4   f5   f6   f7   f8   f9   mute  vold  volu
   grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
@@ -23,6 +33,15 @@
   lsft z    x    c    v    b    n    m    ,    .    /    rsft up
   @fn_toggle   lctl @space_manip lmeta            spc            rmet ralt left down rght
 ))
+
+
+
+(platform (linux)
+	(deflayermap (default) lalt @space_manip
+				 		   lmeta @metarebind
+				 ))
+
+(deflayermap (metarebind))
 (platform (macos) (defvirtualkeys
   app.zen-browser.zen nop0
   com.1password.1password nop0
@@ -55,11 +74,11 @@
   8  (fork @8s @8m (lshift))
   9  (fork @9s @9m (lshift))
   0  (fork @10s @10m (lshift))
+  r   lrld
   tab (fork @switch-focus @reverse-switch-focus (lshift))
   enter @terminal_app
   spc (fork @launcher_app @search_windows (lshift))
   c @kill-focus
-  m @minimise
   d (fork _ @toggle_discord_scratchpad (lshift))
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
@@ -73,8 +92,15 @@
 (platform (linux)
   (defalias
 	terminal_app (cmd "ghostty")
-    launcher_app (cmd "wofi" -show drun)
+    launcher_app (cmd "rofi" -show drun)
+	toggle_beeper_scratchpad (cmd "hyprctl" "dispatch" "togglespecialworkspace" beeper)
+	toggle_discord_scratchpad (cmd hyprctl dispatch togglespecialworkspace discord)
+	toggle_1password_scratchpad (cmd hyprctl dispatch togglespecialworkspace 1password)
+  minimise (cmd "hyprctl" "dispatch" "minimise")
   kill-focus (cmd "hyprctl" "dispatch" "killactive")
+  switch-focus (cmd "hyprctl" "dispatch" "movefocus" "b")
+  reverse-switch-focus (cmd "hyprctl" "dispatch" "movefocus" "d")
+  search_windows (cmd "rofi" -show window)
   1s (cmd "hyprctl" "dispatch" "workspace" "1")
   2s (cmd "hyprctl" "dispatch" "workspace" "2")
   3s (cmd "hyprctl" "dispatch" "workspace" "3")

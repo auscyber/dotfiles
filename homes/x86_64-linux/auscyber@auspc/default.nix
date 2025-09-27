@@ -15,10 +15,19 @@ rec {
   };
   #  imports = [ ./picom.nix ];
   programs = {
+    ssh = {
+      enable = true;
+      matchBlocks = {
+        "*" = {
+          identityAgent = "~/.1password/agent.sock";
+        };
+      };
+
+    };
     git = {
       enable = true;
       signing = {
-        key = "0xC3F28549AD3115E8";
+        key = "0xDC87498CF2EF7D8D";
         signByDefault = true;
       };
     };
@@ -31,16 +40,17 @@ rec {
       extraPackages = with pkgs; [
         hyprland
         ghostty
-        wofi
+        rofi
       ];
 
-      config = builtins.toString ../../../kanata.kbd;
+      config = config.lib.file.getLocalPath ../../../kanata.kbd;
     };
     programs.zotero.enable = true;
     browsers.zen-browser.enable = true;
     programs._1password-cli.enable = true;
     terms.ghostty.enable = true;
     wms.hyprland.enable = true;
+
     shell = {
       enable = true;
       fish = {

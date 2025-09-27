@@ -14,13 +14,15 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  programs.fish.enable = true;
   auscybernix = {
     nixos.games.enable = true;
   };
   stylix = {
     enable = true;
     image = ../../../backgrounds/phoebebridgers-2.jpg;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
+    polarity = "dark";
+    #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
   services.tailscale.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
@@ -28,6 +30,14 @@
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
 
   services.udev.packages = [ pkgs.yubikey-personalization ];
+  services.udev.extraRules = ''
+    SUBSYSTEM=="tty", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="316d", GOTO="m1n1"
+    GOTO="not_m1n1"
+    LABEL="m1n1"
+    SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="00", KERNEL=="ttyACM*", SYMLINK+="m1n1"
+    SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="02", KERNEL=="ttyACM*", SYMLINK+="m1n1-sec"
+    LABEL="not_m1n1"
+  '';
 
   services.ollama = {
     host = "0.0.0.0";
@@ -42,7 +52,7 @@
   };
 
   services.pcscd.enable = true;
-  home-manager.backupFileExtension = ".bak";
+  #  home-manager.backupFileExtension = ".bak";
   fileSystems."/mnt/hdd" = {
     device = "/dev/disk/by-label/hdd";
     fsType = "lowntfs-3g";
@@ -163,8 +173,13 @@
   users.users.auscyber = {
     isNormalUser = true;
     description = "Ivy";
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    shell = pkgs.fish;
+    extraGroups = [
+      "wheel"
+      "input"
+      "tty"
+      "dialout"
+    ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
     ];
   };

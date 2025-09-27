@@ -31,15 +31,6 @@
   #    tokenFile = config.age.secrets.pia_password.path;
   #  };
 
-  services.jankyborders = {
-    enable = true;
-    active_color = "0xff${config.stylix.base16Scheme.base03}";
-    inactive_color = "0xff${config.stylix.base16Scheme.base0D}";
-    style = "round";
-    blur_radius = 5.0;
-    width = 6.0;
-    ax_focus = true;
-  };
   # $ nix-env -qaP | grep wget
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
@@ -152,38 +143,6 @@
     };
   };
 
-  services.yabai = {
-    enable = true;
-    enableScriptingAddition = true;
-    config = {
-      focus_follows_mouse = "off";
-      mouse_follows_focus = "off";
-      window_placement = "second_child";
-      window_opacity = "off";
-      external_bar = "all:40:0";
-      layout = "bsp";
-      top_padding = 10;
-      bottom_padding = 6;
-      left_padding = 10;
-      right_padding = 10;
-      window_gap = 10;
-    };
-    extraConfig = ''
-            yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-            sudo yabai --load-sa
-                              yabai -m rule --add app="^System Preferences$" manage=off
-                              yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
-                              yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
-      						yabai -m rule --add app="^1Password$"  scratchpad=1password grid=11:11:1:1:9:9
-                              yabai -m rule --apply app="^1Password$"  scratchpad=1password grid=11:11:1:1:9:9
-                              yabai -m rule --add app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-                              yabai -m rule --apply app="^Discord$" title!="^Discord Updater$" scratchpad=discord grid=11:11:1:1:9:9
-                              yabai -m rule --add app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
-                              yabai -m rule --apply app="^Beeper$" title!="^Beeper Updater$" scratchpad=beeper grid=11:11:1:1:9:9
-
-                                      	'';
-
-  };
   programs._1password-gui = {
     enable = true;
     package = pkgs._1password-gui-beta;

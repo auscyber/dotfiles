@@ -26,7 +26,17 @@ in
         #    recursive = true;
       };
     };
-    home.packages = with pkgs; [ neovim ];
+    home.packages = with pkgs; [
+      (wrapNeovimUnstable neovim {
+        wrapRc = false;
+        vimAlias = true;
+        withNodeJs = true;
+      })
+      #      (neovim.override {
+      #        vimAlias = true;
+      #        withNodeJs = true;
+      #      })
+    ];
 
     home.sessionVariables = {
       vim = "nvim";

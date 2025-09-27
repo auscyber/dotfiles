@@ -15,6 +15,30 @@ in
       default = false;
       description = "Enable Hyprland as the Wayland compositor.";
     };
+    scratchpads = lib.mkOption {
+      default = { };
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            command = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+              description = "The command to run the scratchpad.";
+            };
+            windowClass = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+              description = "The window class of the scratchpad.";
+            };
+            extraRules = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Additional Hyprland rules to apply.";
+            };
+          };
+        }
+      );
+    };
   };
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [ hyprpolkitagent ];
@@ -27,79 +51,98 @@ in
       portalPackage = null;
       enable = true; # enable Hyprland
       xwayland.enable = true; # enable Hyprland
-      plugins = [
-        inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
+      plugins = with pkgs.hyprlandPlugins; [
+        hyprbars
       ];
       extraConfig = ''
-              # change monitor to high resolution, the last argument is the scale factor
-              monitor = , highres, auto, 1
+                      monitor = , highres, auto, 1.5
 
-              # unscale XWayland
-              xwayland {
-                force_zero_scaling = true
-              }
+                      # unscale XWayland
+                      xwayland {
+                        force_zero_scaling = true
+                      }
 
-              # toolkit-specific scale
-              env = GDK_SCALE,2
-              env = XCURSOR_SIZE,32
-              decoration {
-                  rounding = 10
-                  rounding_power = 2
+                      # toolkit-specific scale
+                      env = GDK_SCALE,2
+                      env = XCURSOR_SIZE,32
+                      decoration {
+                          rounding = 10
+                          rounding_power = 2
 
-                  # Change transparency of focused and unfocused windows
-                  active_opacity = 1.0
-                  inactive_opacity = 1.0
+                          # Change transparency of focused and unfocused windows
+                          active_opacity = 1.0
+                          inactive_opacity = 1.0
 
-                  shadow {
-                      enabled = true
-                      range = 4
-                      render_power = 3
-                      color = rgba(1a1a1aee)
-                  }
+                          shadow {
+                              enabled = true
+                              range = 4
+                              render_power = 3
+                              color = rgba(1a1a1aee)
+                          }
 
-                  # https://wiki.hyprland.org/Configuring/Variables/#blur
-                  blur {
-                      enabled = true
-                      size = 3
-                      passes = 1
+                          # https://wiki.hyprland.org/Configuring/Variables/#blur
+                          blur {
+                              enabled = true
+                              size = 3
+                              passes = 1
 
-                      vibrancy = 0.1696
-                  }
-              }
-        general {
-            gaps_in = 5
-            gaps_out = 20
+                              vibrancy = 0.1696
+                          }
+                      }
+                general {
+                    gaps_in = 5
+                    gaps_out = 20
 
-            border_size = 2
+                    border_size = 2
 
-            # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
-            col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-            col.inactive_border = rgba(595959aa)
+                    # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
+        #            col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+        #            col.inactive_border = rgba(595959aa)
 
-            # Set to true enable resizing windows by clicking and dragging on borders and gaps
-            resize_on_border = false
+                    # Set to true enable resizing windows by clicking and dragging on borders and gaps
+                    resize_on_border = false
 
-            # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
-            allow_tearing = false
+                    # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
+                    allow_tearing = false
 
-            layout = dwindle
-        }
+                    layout = dwindle
+                }
 
       '';
-      settings = {
-        "$mod" = "SUPER";
-        env = [
-          "LIBVA_DRIVER_NAME,nvidia"
-          "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-          "ELECTRON_OZONE_PLATFORM_HINT,auto"
-        ];
+      settings =
 
-        exec-once = [
-          "1password"
-          # "waybar"
-          "systemctl --user start hyprpolkitagent"
-        ];
-      };
+        # what does this
+
+        lib.foldAttrs (item: acc: if builtins.isList item then acc ++ item else item)
+          [ ]
+          [
+            (lib.foldAttrs (item: acc: acc ++ item) [ ] (
+              lib.attrsets.mapAttrsToList (name: config: {
+                windowrule = [
+                  "workspace special:${name}, class:${config.windowClass}"
+                  "float, class:${config.windowClass}"
+                ]
+                ++ builtins.map (rule: "${rule}, class:${config.windowClass}") config.extraRules;
+                exec-once = [ ("[workspace special:${name}]" + config.command) ];
+              }) cfg.scratchpads
+            ))
+
+            {
+              "$mod" = "SUPER";
+
+              env = [
+                "LIBVA_DRIVER_NAME,nvidia"
+                "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+                "ELECTRON_OZONE_PLATFORM_HINT,auto"
+              ];
+
+              exec-once = [
+                "1password"
+                # "waybar"
+                "systemctl --user start hyprpolkitagent"
+              ];
+            }
+          ];
     };
 
     programs.hyprpanel = {

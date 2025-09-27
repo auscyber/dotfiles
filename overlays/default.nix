@@ -32,7 +32,7 @@
       #        };
       #
       #      })
-
+      inputs.hyprland-plugins.overlays.default
       inputs.emacs.overlays.default
       inputs.rust-overlay.overlays.default
       inputs.lix-module.overlays.default

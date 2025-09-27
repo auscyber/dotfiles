@@ -1,139 +1,93 @@
 {
   config,
-  lib,
   pkgs,
+  lib,
   ...
 }:
-
-with lib;
-
 let
-  cfg = config.services.yabai;
-
-  toYabaiConfig =
-    opts: concatStringsSep "\n" (mapAttrsToList (p: v: "yabai -m config ${p} ${toString v}") opts);
-
-  configFile =
-    mkIf (cfg.config != { } || cfg.extraConfig != "")
-      "${pkgs.writeScript "yabairc" (
-        (if (cfg.config != { }) then "${toYabaiConfig cfg.config}" else "")
-        + optionalString (cfg.extraConfig != "") ("\n" + cfg.extraConfig + "\n")
-      )}";
+  cfg = config.auscybernix.wms.yabai;
 in
-
 {
-  options = with types; {
-    services.yabai.enable = mkOption {
-      type = bool;
-      default = false;
-      description = "Whether to enable the yabai window manager.";
-    };
 
-    services.yabai.package = mkOption {
-      type = path;
-      default = pkgs.yabai;
-      description = "The yabai package to use.";
-    };
-
-    services.yabai.enableScriptingAddition = mkOption {
-      type = bool;
-      default = false;
-      description = ''
-        Whether to enable yabai's scripting-addition.
-        SIP must be disabled for this to work.
-      '';
-    };
-    services.yabai.errorLogFile = lib.mkOption {
-      type = with lib.types; nullOr (either path str);
-      defaultText = lib.literalExpression "\${config.home.homeDirectory}/Library/Logs/yabai/err.log";
-      example = "/Users/khaneliman/Library/Logs/yabai.log";
-      description = "Absolute path to log all stderr output.";
-    };
-
-    services.yabai.outLogFile = lib.mkOption {
-      type = with lib.types; nullOr (either path str);
-      defaultText = lib.literalExpression "\${config.home.homeDirectory}/Library/Logs/yabai/out.log";
-      example = "/Users/khaneliman/Library/Logs/yabai.log";
-      description = "Absolute path to log all stdout output.";
-    };
-
-    services.yabai.config = mkOption {
-      type = attrs;
-      default = { };
-      example = literalExpression ''
-        {
-          focus_follows_mouse = "autoraise";
-          mouse_follows_focus = "off";
-          window_placement    = "second_child";
-          window_opacity      = "off";
-          top_padding         = 36;
-          bottom_padding      = 10;
-          left_padding        = 10;
-          right_padding       = 10;
-          window_gap          = 10;
-        }
-      '';
-      description = ''
-        Key/Value pairs to pass to yabai's 'config' domain, via the configuration file.
-      '';
-    };
-
-    services.yabai.extraConfig = mkOption {
-      type = lines;
-      default = "";
-      example = literalExpression ''
-        yabai -m rule --add app='System Preferences' manage=off
-      '';
-      description = "Extra arbitrary configuration to append to the configuration file";
+  options.auscybernix.wms.yabai = {
+    enable = lib.mkEnableOption "Enable yabai window manager";
+    scratchpads = lib.mkOption {
+      description = "List of scratchpads to configure.";
+      type =
+        with lib.types;
+        attrsOf (submodule {
+          options = {
+            command = mkOption {
+              type = str;
+              default = "";
+              description = "The command to run the scratchpad.";
+            };
+            detectionRules = mkOption {
+              type = attrsOf str;
+              default = [ ];
+              description = "yabai detection rules to apply.";
+            };
+            rules = mkOption {
+              type = listOf str;
+              default = [ ];
+              description = "Additional yabai rules to apply.";
+            };
+          };
+        });
     };
   };
-
-  config = lib.mkMerge [
-    (mkIf (cfg.enable) {
-      assertions = [
-        (lib.hm.assertions.assertPlatform "services.yabai" pkgs lib.platforms.darwin)
-      ];
-      home.packages = [ cfg.package ];
-
-      launchd.agents.yabai = {
-        enable = true;
-        config = {
-          ProcessType = "Interactive";
-          ProgramArguments = [
-            "${cfg.package}/bin/yabai"
-          ]
-          ++ optionals (cfg.config != { } || cfg.serviceConfig.extraConfig != "") [
-            "-c"
-            configFile
-          ];
-          EnvironmentVariables.PATH = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-          KeepAlive = true;
-          RunAtLoad = true;
-          StandardErrorPath = cfg.errorLogFile;
-          StandardOutPath = cfg.outLogFile;
-
-        };
-
+  config = lib.mkIf cfg.enable {
+    services.jankyborders = {
+      enable = true;
+      settings = {
+        active_color = "0xff${config.stylix.base16Scheme.base03}";
+        inactive_color = "0xff${config.stylix.base16Scheme.base0D}";
+        style = "round";
+        blur_radius = 5.0;
+        width = 6.0;
+        ax_focus = true;
       };
-      services.yabai = {
-        errorLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.err.log";
-        outLogFile = lib.mkOptionDefault "${config.home.homeDirectory}/Library/Logs/yabai/yabai.out.log";
+    };
+    services.yabai = {
+      enable = true;
+      enableScriptingAddition = true;
+      config = {
+        focus_follows_mouse = "off";
+        mouse_follows_focus = "off";
+        window_placement = "second_child";
+        window_opacity = "off";
+        external_bar = "all:40:0";
+        layout = "bsp";
+        top_padding = 10;
+        bottom_padding = 6;
+        left_padding = 10;
+        right_padding = 10;
+        window_gap = 10;
       };
-    })
+      extraConfig =
+        (lib.concatMapAttrsStringSep "\n" (
+          name: sp:
+          let
+            rules = lib.concatStringsSep " " sp.rules;
+            value = "${
+              lib.concatMapAttrsStringSep " " (k: v: "${k}=${v}") sp.detectionRules
+            } manage=off sticky=on  follow=off  scratchpad=${name} ${rules}";
 
-    # TODO: [@cmacrae] Handle removal of yabai scripting additions
-    (mkIf (cfg.enableScriptingAddition) {
-      launchd.agents.yabai-sa = {
-        config.UserName = "root";
-        config.ProgramArguments = [
-          "${cfg.package}/bin/yabai"
-          "--load-sa"
-        ];
-        config.EnvironmentVariables.Path = "${cfg.package}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-        config.RunAtLoad = true;
-        config.KeepAlive.SuccessfulExit = false;
-      };
+          in
+          ''
+            # Scratchpad: ${name}
+            yabai -m rule --add  ${value}
+            yabai -m rule --apply ${value}
+          ''
+        ) cfg.scratchpads)
+        ++ ''
+                yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+                sudo yabai --load-sa
+                                  yabai -m rule --add app="^System Preferences$" manage=off
+                                  yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
+                                  yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+          						                                      	'';
 
-    })
-  ];
+    };
+  };
 }

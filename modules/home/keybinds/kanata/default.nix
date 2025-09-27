@@ -9,34 +9,39 @@ let
   inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
 in
 {
-  options.auscybernix.keybinds.kanata = {
+  options.auscybernix.keybinds.kanata = with lib.types; {
     enable = lib.mkOption {
-      type = lib.types.bool;
+      type = types.bool;
       default = false;
       description = "Enable kanata service";
     };
     extraPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
+      type = listOf package;
       default = [ ];
       description = "Extra packages to install when kanata is enabled";
     };
     kanataPort = lib.mkOption {
-      type = lib.types.int;
+      type = int;
       default = 5829;
     };
     appBundleIds = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = listOf str;
       default = [ ];
     };
     package = lib.mkOption {
-      type = lib.types.package;
+      type = package;
       default = pkgs.kanata-with-cmd;
       description = "kanata package to use";
     };
     config = lib.mkOption {
-      type = lib.types.str;
+      type = str;
       default = "${pkgs.kanata}/share/kanata/kanata.kbd";
       description = "kanata config file content";
+    };
+    kanataCommand = lib.mkOption {
+      type = listOf str;
+      default = "";
+      description = "kanata command to run";
     };
   };
   config = lib.mkIf cfg.enable (
@@ -46,19 +51,32 @@ in
           Unit = {
             Description = "Kanata keyboard remapper";
             After = [ "graphical-session.target" ];
+            PartOf = [ "graphical-session.target" ];
 
           };
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
+          };
           Service = {
-            ExecStart = "${cfg.package}/bin/kanata -c '${cfg.config}'";
+            ExecStart = "${cfg.package}/bin/kanata -c '${cfg.config}' -p ${builtins.toString cfg.kanataPort}";
             Restart = "on-failure";
             RestartSec = 5;
-            Environment = "PATH=${lib.makeBinPath (with pkgs; [ cfg.package ] ++ cfg.extraPackages)}";
+            #            Environment = "PATH=${lib.makeBinPath ([ cfg.package ] ++ cfg.extraPackages)}";
           };
         };
         home.packages = with pkgs; [ cfg.package ] ++ cfg.extraPackages;
       })
       (lib.mkIf isDarwin {
         # enable karabiner driver
+        auscybernix.keybinds.kanata.kanataCommand = lib.mkDefault [
+
+          "${cfg.package}/bin/kanata"
+          "-p"
+          "${builtins.toString cfg.kanataPort}"
+          "-c"
+          cfg.config
+        ];
+
         launchd.agents.kanata-vk-agent = {
           enable = true;
           config = {
@@ -88,12 +106,8 @@ in
             ProgramArguments = [
               "/usr/bin/sudo"
               "-E"
-              "${cfg.package}/bin/kanata"
-              "-p"
-              "${builtins.toString cfg.kanataPort}"
-              "-c"
-              cfg.config
-            ];
+            ]
+            ++ cfg.kanataCommand;
             StandardErrorPath = "/tmp/kanata.err";
             StandardOutPath = "/tmp/kanata.out";
             RunAtLoad = true;

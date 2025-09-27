@@ -5,6 +5,7 @@
     nixcord = {
       url = "github:kaylorben/nixcord";
     };
+    qanata.url = "github:veyxov/qanata";
     kanata = {
       url = "github:jtroo/kanata";
       flake = false;
