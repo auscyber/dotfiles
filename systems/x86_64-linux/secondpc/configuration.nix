@@ -214,7 +214,7 @@
     docker-compose
     python3
     #Virtualisation
-    breeze-grub
+    kdePackages.breeze-grub
     qemu
     OVMF
     virt-manager
