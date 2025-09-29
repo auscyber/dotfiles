@@ -50,7 +50,6 @@
   };
   auscybernix = {
     wms.yabai.enable = true;
-    wms.enable = true;
     programs.sketchybar.enable = true;
     keybinds.kanata = {
       enable = true;

@@ -17,17 +17,17 @@ in
         with lib.types;
         attrsOf (submodule {
           options = {
-            command = mkOption {
+            command = lib.mkOption {
               type = str;
               default = "";
               description = "The command to run the scratchpad.";
             };
-            detectionRules = mkOption {
+            detectionRules = lib.mkOption {
               type = attrsOf str;
               default = [ ];
               description = "yabai detection rules to apply.";
             };
-            rules = mkOption {
+            rules = lib.mkOption {
               type = listOf str;
               default = [ ];
               description = "Additional yabai rules to apply.";
@@ -70,8 +70,8 @@ in
           let
             rules = lib.concatStringsSep " " sp.rules;
             value = "${
-              lib.concatMapAttrsStringSep " " (k: v: "${k}=${v}") sp.detectionRules
-            } manage=off sticky=on  follow=off  scratchpad=${name} ${rules}";
+              lib.concatMapAttrsStringSep " " (k: v: "${k}=\"${v}\"") sp.detectionRules
+            } manage=off sticky=on   scratchpad=${name} ${rules}";
 
           in
           ''
@@ -80,7 +80,7 @@ in
             yabai -m rule --apply ${value}
           ''
         ) cfg.scratchpads)
-        ++ ''
+        + ''
                 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
                 sudo yabai --load-sa
                                   yabai -m rule --add app="^System Preferences$" manage=off

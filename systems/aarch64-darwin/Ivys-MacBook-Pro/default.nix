@@ -95,6 +95,7 @@
   # The platform the configuration will be used on.
   services.karabiner-elements.enable = false;
   auscybernix = {
+    sudo.agents.enable = true;
     keybinds.karabiner-driver-kit.enable = true;
 
     homebrew = {
