@@ -57,7 +57,7 @@ in
     src = inputs.input-leap;
   });
 
-  #  inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
+  inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
   ivy-fetch = pkgs.callPackage ../packages/ivy-fetch { };
   hln = pkgs.callPackage ../packages/hardlink.nix { };
   pinentry = pinentry."${system}";

@@ -1,38 +1,17 @@
 {
-  nixpkgs,
-  config,
-  overlays,
   inputs,
-  nixos-mailserver,
-  home-manager,
-  home-manager-modules,
-  modules,
+  ...
 }:
-nixpkgs.lib.nixosSystem {
-  system = "x86_64-linux";
-  specialArgs = { inherit inputs; };
-  modules = modules ++ [
+{
+  imports = [
     ./configuration.nix
+    #   ./minecraft.nix
     ./hardware-configuration.nix
     #    ./../../modules/system/grub.nix
-    nixos-mailserver.nixosModule
     #    ./mailserver.nix
     #    ./minecraft.nix
-    home-manager.nixosModules.home-manager
-    {
+    inputs.nixos-mailserver.nixosModule
 
-      home-manager.users.auscyber = {
-        imports = home-manager-modules;
-        home.username = "auscyber";
-        home.sessionVariables = {
-          FLAKENAME = "auscyber";
-          NIXFLAKE = "$HOME/dotfiles/nixos-config";
-        };
-
-      };
-      nixpkgs = { inherit config overlays; };
-
-    }
   ];
 
 }

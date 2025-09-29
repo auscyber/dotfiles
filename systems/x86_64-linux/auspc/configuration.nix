@@ -18,16 +18,26 @@
   auscybernix = {
     nixos.games.enable = true;
   };
+  nix.settings.trusted-users = [
+    "root"
+    "auscyber"
+  ];
   stylix = {
     enable = true;
     image = ../../../backgrounds/phoebebridgers-2.jpg;
     polarity = "dark";
     #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
-  services.tailscale.enable = true;
+  #  services.tailscale.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
   boot.kernelPackages = pkgs.linuxPackages_zen;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
+  #  environment.persistence."/persistent" = {
+  #    enable = true; # NB: Defaults to true, not needed
+  #    hideMounts = true;
+  #    files = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  #
+  #  };
 
   services.udev.packages = [ pkgs.yubikey-personalization ];
   services.udev.extraRules = ''
@@ -179,6 +189,7 @@
     description = "Ivy";
     shell = pkgs.fish;
     extraGroups = [
+      "video"
       "wheel"
       "input"
       "tty"
@@ -209,17 +220,20 @@
   #   enableSSHSupport = true;
   # };
 
-  services.displayManager.sddm.enable = true;
+  services.displayManager.ly.enable = true;
+  #  services.displayManager.sddm.enable = true;
+  #  services.displayManager.sddm.wayland.enable = true;
+  #  services.displayManager.sddm.enableHidpi = true;
   # List services that you want to enable:
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   services.openssh.settings.X11Forwarding = true;
 
   services.displayManager.defaultSession = "hyprland";
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "auscyber";
-  };
+  #services.displayManager.autoLogin = {
+  #  enable = true;
+  #  user = "auscyber";
+  #};
   services.desktopManager.plasma6.enable = true;
 
   services.xserver = {

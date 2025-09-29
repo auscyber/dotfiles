@@ -50,18 +50,22 @@ in
         systemd.user.services.kanata = {
           Unit = {
             Description = "Kanata keyboard remapper";
-            After = [ "graphical-session.target" ];
-            PartOf = [ "graphical-session.target" ];
 
+            PartOf = [ config.wayland.systemd.target ];
+            After = [
+              "network.target"
+              "dbus.service"
+              config.wayland.systemd.target
+            ];
           };
           Install = {
-            WantedBy = [ "graphical-session.target" ];
+            WantedBy = [ config.wayland.systemd.target ];
           };
+
           Service = {
             ExecStart = "${cfg.package}/bin/kanata -c '${cfg.config}' -p ${builtins.toString cfg.kanataPort}";
-            Restart = "on-failure";
-            RestartSec = 5;
-            #            Environment = "PATH=${lib.makeBinPath ([ cfg.package ] ++ cfg.extraPackages)}";
+            Restart = "no";
+            #            Environment = "PATH=$PATH:${lib.makeBinPath ([ cfg.package ] ++ cfg.extraPackages)}";
           };
         };
         home.packages = with pkgs; [ cfg.package ] ++ cfg.extraPackages;

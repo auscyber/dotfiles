@@ -17,7 +17,7 @@
     };
   };
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.latest;
     #    fullCompositionPipeline = true;
     modesetting.enable = true;
     open = true;
@@ -55,7 +55,7 @@
 
   boot.kernelParams = [
     "nvidia-drm.modeset=1"
-    "nvidia.NVreg_UsePageAttributeTable=1"
+    #    "nvidia.NVreg_UsePageAttributeTable=1"
 
   ];
 

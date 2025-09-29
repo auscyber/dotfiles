@@ -2,6 +2,7 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+    impermanence.url = "github:nix-community/impermanence";
     nixcord = {
       url = "github:kaylorben/nixcord";
     };
@@ -10,6 +11,7 @@
       url = "github:jtroo/kanata";
       flake = false;
     };
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat = {
       url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
@@ -193,4 +195,12 @@
           };
       }
     );
+  nixConfig = {
+    extra-substituters = [
+      "https://nixos-raspberrypi.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
 }

@@ -47,6 +47,7 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.agenix.nixosModules.default
     inputs.stylix.nixosModules.stylix
     inputs.lanzaboote.nixosModules.lanzaboote
+    inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
     inputs.nixos-wsl.nixosModules.default
     inputs.sops-nix.nixosModules.sops

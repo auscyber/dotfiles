@@ -34,6 +34,10 @@ rec {
 
     home-manager.enable = true;
   };
+  wayland.windowManager.hyprland.settings.exec-once = [
+    "${pkgs.kdePackages.kwallet-pam}/libexec/pam_kwallet_init"
+  ];
+  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   auscybernix = {
     keybinds.kanata = {
       enable = true;
@@ -76,7 +80,7 @@ rec {
     dunst.enable = false;
     gpg-agent = {
       enable = true;
-      pinentryPackage = pkgs.pinentry-qt;
+      pinentry.program = pkgs.pinentry-qt;
       enableSshSupport = true;
       extraConfig = ''
         allow-loopback-pinentry
@@ -140,7 +144,6 @@ rec {
       (python3.withPackages (p: with p; [ pynvim ]))
       #      metals
       _1password
-      gnome-keyring
       nautilus
       eww
       #wezterm
