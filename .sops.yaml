@@ -3,6 +3,7 @@ keys:
   - &mac age1dkwz3c2jprv8kz9e4r2yj5ugfsgx8hvmxc466k96d38c9hnuxp0s2u4qpa
   - &admin_ivy age1wl25zsmys6cdzacrx4xh2fe89jk8enx4dalc52075kg9rdnuxf9qe2yw7p
   - &desktop_ivy age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm
+  - &server_ivy age1n6ufle4xhy0fe6nkwp7yzfv7mxqdm06wtp2uj0dwzrtfv4rtzpfsmslgjn
 creation_rules:
     - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
       key_groups:
@@ -11,3 +12,4 @@ creation_rules:
         - *mac
         - *server_imflo
         - *desktop_ivy
+        - *server_ivy
