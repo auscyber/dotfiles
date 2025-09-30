@@ -9,14 +9,17 @@ let
   zen-browser = {
     aarch64-darwin = pkgs.nur.repos.AusCyber.zen-browser;
     x86_64-linux = inputs.zen-browser.packages.x86_64-linux.beta-unwrapped;
+    aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
   };
   ghostty = {
     aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.ghostty;
+    aarch64-linux = pkgs.ghostty;
   };
   pinentry = {
     aarch64-darwin = pkgs.pinentry_mac;
     x86_64-linux = pkgs.pinentry;
+    aarch64-linux = pkgs.pinentry;
   };
 in
 {
@@ -64,7 +67,6 @@ in
   desktoppr = pkgs.callPackage ../packages/desktoppr.nix { };
   inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
   #            nh = inputs.nh.packages."${system}".default;
-  agenix = inputs.agenix.packages."${system}".default;
   inherit (inputs.eww.packages.${system}) eww;
   inherit (inputs.rnix.packages."${system}") rnix-lsp;
   ghostty = ghostty."${system}";

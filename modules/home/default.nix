@@ -57,7 +57,6 @@
     home.packages = with pkgs; [
       ivy-fetch
       devenv
-      agenix
       shellify
       ripgrep
       nil

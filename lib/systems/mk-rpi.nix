@@ -39,6 +39,17 @@ let
     // {
       nixos-raspberrypi = inputs.nixos-raspberrypi;
     };
+  stylixConfig = {
+    home-manager.sharedModules = [
+      {
+        imports = [ inputs.stylix.homeModules.stylix ];
+        disabledModules = [
+          "${inputs.stylix}/modules/qt/hm.nix"
+        ];
+      }
+    ];
+
+  };
 
 in
 {
@@ -47,6 +58,7 @@ in
     modules = [
       { _module.args.lib = extendedLib; }
       inputs.nixos-images.nixosModules.sdimage-installer
+      stylixConfig
       (
         {
           config,
@@ -73,6 +85,9 @@ in
       inputs.home-manager.nixosModules.home-manager
       inputs.sops-nix.nixosModules.sops
 
+      ../../modules/common/secrets.nix
+      ../../modules/common/nix
+      ../../modules/common/common
       {
         nixpkgs = {
           inherit system;
@@ -95,6 +110,7 @@ in
 
     modules = [
       { _module.args.lib = extendedLib; }
+      stylixConfig
       inputs.stylix.nixosModules.stylix
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager

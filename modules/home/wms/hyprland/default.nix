@@ -138,6 +138,7 @@ in
               ];
 
               exec-once = [
+                "systemctl --user stop graphical-session.target && systemctl --user start hyprland-session.target"
                 "1password"
                 # "waybar"
                 "systemctl --user start hyprpolkitagent"

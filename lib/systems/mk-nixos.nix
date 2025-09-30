@@ -44,7 +44,6 @@ inputs.nixpkgs.lib.nixosSystem {
   modules = [
     { _module.args.lib = extendedLib; }
 
-    inputs.agenix.nixosModules.default
     inputs.stylix.nixosModules.stylix
     inputs.lanzaboote.nixosModules.lanzaboote
     inputs.impermanence.nixosModules.impermanence
