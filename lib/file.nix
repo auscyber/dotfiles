@@ -9,6 +9,7 @@ let
     genAttrs
     filterAttrs
     hasPrefix
+    hasSuffix
     foldl'
     ;
 in
@@ -82,6 +83,8 @@ in
     filterAttrs (
       _name: { system, ... }: hasPrefix "x86_64-linux" system || hasPrefix "aarch64-linux" system
     ) systems;
+
+  filterRpiSystems = systems: filterAttrs (_name: { system, ... }: hasSuffix "rpi" system) systems;
 
   # Filter systems for Darwin (macOS)
   filterDarwinSystems =

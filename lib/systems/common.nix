@@ -5,7 +5,6 @@ let
     inputs._1password-shell-plugins.hmModules.default
     inputs.zen-browser.homeModules.default
     inputs.nixvim.homeModules.default
-    inputs.agenix.homeManagerModules.default
     inputs.nix-index-database.homeModules.nix-index
     inputs.sops-nix.homeManagerModules.sops
   ];

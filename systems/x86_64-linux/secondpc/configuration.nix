@@ -16,6 +16,7 @@
       experimental-features = nix-command flakes
     '';
   };
+  boot.binfmt.emulatedSystems = [ "aarch64-system" ];
   services.jellyfin.enable = false;
   boot.kernel.sysctl = {
     "net.ipv6.conf.all.forwarding" = 1;

@@ -33,7 +33,6 @@
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               sops
-              inputs.agenix.packages."${system}".agenix
               age
               ssh-to-age
             ];

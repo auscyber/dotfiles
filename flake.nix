@@ -2,6 +2,14 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
+    nixos-images = {
+      # url = "github:nix-community/nixos-images";
+      url = "github:nvmd/nixos-images/sdimage-installer";
+      # url = "git+file:../nixos-images?shallow=1";
+      inputs.nixos-stable.follows = "nixpkgs-nvmd";
+      inputs.nixos-unstable.follows = "nixpkgs-nvmd";
+    };
     impermanence.url = "github:nix-community/impermanence";
     nixcord = {
       url = "github:kaylorben/nixcord";
@@ -107,8 +115,6 @@
       flake = false;
     };
     #flakes
-    agenix.url = "github:ryantm/agenix";
-    agenix.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     darwin.url = "github:auscyber/nix-darwin/karabiner";

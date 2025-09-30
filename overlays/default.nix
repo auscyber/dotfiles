@@ -12,7 +12,6 @@
         inherit system;
         overlays = [
           inputs.sops-nix.overlays.default
-          inputs.agenix.overlays.default
           self.overlays.default
 
         ];
