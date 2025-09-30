@@ -12,7 +12,7 @@
   services.accounts-daemon.enable = true;
   networking.hostName = "lora-pi";
   services.openssh.enable = true;
-  secury.sudo = {
+  security.sudo = {
     enable = true;
     wheelNeedsPassword = false;
   };
