@@ -51,6 +51,7 @@
     #    wezterm
     zotero
     qemu
+    cinny-desktop
     gnupg
     prismlauncher
     virt-manager
@@ -72,17 +73,19 @@
   nix.distributedBuilds = true;
 
   nix.linux-builder = {
-    enable = false;
+    enable = true;
     systems = with inputs.flake-utils.lib.system; [
       aarch64-linux
-      x86_64-linux
     ];
     config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
   };
+
   nix.settings = {
-
+    trusted-users = [
+      "ivypierlot"
+      "root"
+    ];
     experimental-features = "nix-command flakes";
-
   };
   # Create /etc/zshrc that loads the nix-darwin environment.
   #  programs.zsh.enable = true; # default shell on catalina
@@ -103,11 +106,10 @@
 
       brews = [ "nowplaying-cli" ];
       casks = [
+        "craft"
         "raycast"
-        "anytype@alpha"
         #    "vivaldi"
         "calibre"
-        "zoom"
         #    "ollama"
         "todoist-app"
 
@@ -158,6 +160,7 @@
       "/Applications/Fantastical.app"
       #      "/System/Applications/App Store.app/"
       "/Applications/Microsoft Teams.app"
+      "/Applications/Craft.app"
       "/Applications/Microsoft Word.app"
       "/System/Applications/Messages.app"
       "/Applications/Beeper Desktop.app"
