@@ -1,9 +1,24 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib,... }:
+let cfg = config.auscybernix.nix;
+in
 {
+
+options.auscybernix.nix = {
+	enable = lib.mkOption {
+	type = lib.types.bool;
+	default = true;
+	};
+	caches = lib.mkOption {
+	type = lib.types.bool;
+	default = true;
+	};
+
+};
+config = lib.mkIf cfg.enable {
 
   nix = {
     # Binary Cache for Haskell.nix
-    settings = {
+    settings = lib.mkIf cfg.caches {
       substituters = [
         "https://nix-community.cachix.org"
         "https://iohk.cachix.org"
@@ -31,4 +46,5 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  };
 }

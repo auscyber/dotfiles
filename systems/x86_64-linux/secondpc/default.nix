@@ -10,7 +10,7 @@
     #    ./../../modules/system/grub.nix
     #    ./mailserver.nix
     #    ./minecraft.nix
-    inputs.nixos-mailserver.nixosModule
+#    inputs.nixos-mailserver.nixosModule
 
   ];
 

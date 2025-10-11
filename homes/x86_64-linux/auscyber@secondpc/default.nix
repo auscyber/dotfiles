@@ -8,8 +8,8 @@
   programs.home-manager.enable = true;
 
   programs.gpg.enable = true;
-
-  auscbernix = {
+  sops.age.sshKeyPaths = ["/home/auscyber/.ssh/id_ed25519"];
+  auscybernix = {
     shell = {
       enable = true;
       fish = {

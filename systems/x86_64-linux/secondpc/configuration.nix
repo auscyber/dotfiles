@@ -10,11 +10,27 @@
 }:
 {
 
+  auscybernix.nix.caches = false;
   nix = {
-    settings.trusted-users = [ "auscyber" ];
+    settings = {
+    	trusted-users = [ "auscyber" ];
+	substituters = [ "https://cache.nixos.org"  "http://secondpc:8501" ];
+	trusted-public-keys = [
+	"secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+	"cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+	];
+
+
+    };
+
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+  };
+  stylix = {
+  	enable = true;
+	image = ../../../backgrounds/phoebebridgers-2.jpg;
+	polarity = "dark";
   };
   services.jellyfin.enable = false;
   boot.kernel.sysctl = {
@@ -66,6 +82,7 @@
   networking.nameservers = [ "1.1.1.1" ];
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
+  8501
     25565
     8080
     21115
@@ -151,24 +168,24 @@
       "libvirtd"
       "docker"
     ];
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
   };
 
   programs.sway = {
     enable = false;
   };
 
-  environment.etc."rclone-mnt.conf".text = ''
-    [owncloud]
-    type = webdav
-    url = https://owncloud.imflo.pet/remote.php/webdav
-    vendor = owncloud
-    bearer_token_command = /run/current-system/sw/bin/oidc-token my-client
-  '';
-
-  environment.extraInit = ''
-    eval `oidc-keychain --accounts my-client`
-  '';
+#  environment.etc."rclone-mnt.conf".text = ''
+#    [owncloud]
+#    type = webdav
+#    url = https://owncloud.imflo.pet/remote.php/webdav
+#    vendor = owncloud
+#    bearer_token_command = /run/current-system/sw/bin/oidc-token my-client
+#  '';
+#
+#  environment.extraInit = ''
+#    eval `oidc-keychain --accounts my-client`
+#  '';
 
   #fileSystems."/mnt/plexmedia" = {
   #  device = "owncloud:/Plexmedia";
@@ -188,8 +205,11 @@
 
     #	};
   };
-  programs.zsh.enable = true;
-  hardware.opengl.enable = true;
+  programs.fish.enable = true;
+  hardware.opengl = {
+  enable = true;
+  extraPackages = with pkgs; [ intel-ocl];
+  };
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -197,14 +217,7 @@
     pkgs.jellyfin-web
     pkgs.jellyfin-ffmpeg
     jq
-    (oidc-agent.overrideAttrs (attrs: {
-      postFixup = ''
-        # Override with patched binary to be used by help2man
-        sed -i -E 's/=\/bin\/(\w+)/="\$(which \1)"/g' $out/bin/oidc-agent-service
-        cp -r $out/bin/* bin
-        make install_man PREFIX=$out MAN_PATH=$out/share/man PROMPT_MAN_PATH=$out/share/man
-      '';
-    }))
+	#oidc-agent
     rclone
     vscode-fhs
     wget
@@ -218,13 +231,11 @@
     qemu
     OVMF
     virt-manager
-    dconf
 
     #Required for vscode
     #nodejs-14_x
   ];
   programs.nix-ld.enable = true;
-  programs.dconf.enable = false;
 
   #  services.xserver = {
   #    layout = "us";
@@ -281,12 +292,7 @@
   };
   virtualisation.libvirtd = {
     qemu = {
-      ovmf = {
-        enable = true;
-        packages = [
-          (pkgs.OVMF.override { }).fd
-        ];
-      };
+
       swtpm.enable = true;
       runAsRoot = true;
     };
@@ -309,10 +315,39 @@
   services.openssh = {
     enable = true;
     forwardX11 = true;
-    allowAgentForwarding = true;
+	settings = {
+
+    AllowAgentForwarding = true;
+	};
 
   };
   #services.espanso.enable = true;
+  services.ncps = {
+    enable = true;
+    cache = {
+      hostName = "secondpc";
+      dataPath = "/mnt/hdd/ncps";
+      maxSize = "200G";
+      lru.schedule = "0 2 * * *"; # Clean up daily at 2 AM
+      allowPutVerb = true;
+      allowDeleteVerb = true;
+    };
+    server.addr = "0.0.0.0:8501";
+    upstream = {
+	caches = [
+        "https://nix-community.cachix.org"
+        "https://iohk.cachix.org"
+        "https://cache.nixos.org"
+        "https://devenv.cachix.org"
+      ];
+      publicKeys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
+        "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      ];
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
