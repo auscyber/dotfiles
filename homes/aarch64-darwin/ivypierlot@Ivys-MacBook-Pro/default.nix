@@ -10,6 +10,7 @@
 
 {
 
+  sops.age.keyFile = "/users/ivypierlot/Library/Application Support/sops/age/keys.txt";
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
 
@@ -49,6 +50,7 @@
 
   };
   auscybernix = {
+    services.mopidy.enable = false;
     wms.yabai.enable = true;
     programs.sketchybar.enable = true;
     keybinds.kanata = {
@@ -88,8 +90,7 @@
     #    wezterm
     zotero
     gnupg
-    prismlauncher
-    virt-manager
+    #    prismlauncher
     mupdf
     #      (agda.withPackages
     #        (p: [

@@ -25,7 +25,6 @@
     neovim
     wget
     htop
-    pinentry
     curl
   ];
 

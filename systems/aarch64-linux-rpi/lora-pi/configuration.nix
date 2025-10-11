@@ -12,7 +12,14 @@
     "${inputs.stylix}/modules/qt/hm.nix"
   ];
   config = {
-
+    # Use iwd instead of wpa_supplicant. It has a user friendly CLI
+    networking.wireless.iwd.enable = lib.mkForce false;
+    networking.wireless = {
+      enable = lib.mkForce true;
+      networks."Ivy's iPhone".psk = "12345678";
+      extraConfig = "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel";
+      # output ends up in /run/wpa_supplicant/wpa_supplicant.conf
+    };
     stylix = {
       image = ../../../backgrounds/phoebebridgers-2.jpg;
       polarity = "dark";

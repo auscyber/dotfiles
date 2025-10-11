@@ -27,6 +27,7 @@
 (opt-set conceallevel 3)
 (opt-local-set rnu true)
 (opt-local-set nu  true)
+(opt-set mapleader "\\")
 
 
 (def-keymap :<F11> [nvi] "<cmd>let g:neovide_fullscreen=!g:neovide_fullscreen<cr>")

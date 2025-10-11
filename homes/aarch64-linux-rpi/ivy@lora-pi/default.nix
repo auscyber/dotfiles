@@ -2,23 +2,35 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
+let
+  secretConfig = config.auscybernix.secrets;
+in
 {
-  programs.home-manager.enable = true;
+  config = lib.mkMerge [
 
-  programs.gpg.enable = true;
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    (lib.mkIf secretConfig {
+      sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    })
+    {
 
-  auscybernix = {
-    shell = {
-      enable = true;
-      fish = {
-        enable = true;
+      programs.home-manager.enable = true;
+
+      programs.gpg.enable = true;
+
+      auscybernix = {
+        shell = {
+          enable = true;
+          fish = {
+            enable = true;
+          };
+        };
       };
-    };
-  };
-  programs.neovim.enable = true;
-  home.stateVersion = "25.05";
+      programs.neovim.enable = true;
+      home.stateVersion = "25.05";
+    }
+  ];
 
 }

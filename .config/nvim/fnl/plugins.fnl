@@ -118,14 +118,14 @@
    :esensar/nvim-dev-container {:config (fn [] ((. (require "devcontainer") :setup) {}))}
    :neovim/nvim-lspconfig
     {
-      :ft [:haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]
+      :ft [:scss :htmldjango :html :css :haskell :rust :typescript :javascript :lua :zig :go :c :cpp :typescriptreact :scala :nix :purescript :ocaml :idris2 :ps1 :java :python :kotlin :cs :ada]
       :lazy true
       :dependencies [;FIXME change to use branch
                      {1 :mrcjkb/rustaceanvim :dependencies [:nvim-dap]}
                      :nvim-lua/lsp_extensions.nvim
                      :kosayoda/nvim-lightbulb
-                     {1 :williamboman/mason.nvim :module :mason}
-                     {1 :williamboman/mason-lspconfig.nvim :module :mason-lspconfig}
+                     {1 :mason-org/mason.nvim :module :mason}
+                     {1 :mason-org/mason-lspconfig.nvim :module :mason-lspconfig}
                      {1 :filipdutescu/renamer.nvim :branch :master :module :renamer :dependencies [:plenary.nvim]}
                      :which-key.nvim
                      {1 :ray-x/lsp_signature.nvim :module :lsp_signature}

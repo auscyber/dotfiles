@@ -55,6 +55,7 @@ in
       system,
       matchingHomes,
       isNixOS ? true,
+      isInstaller ? false,
     }:
     if matchingHomes != { } then
       {
@@ -79,9 +80,12 @@ in
               [ ]
           )
           ++ [
-            ../../modules/common/secrets.nix
 
+            ../../modules/common/secrets.nix
           ]
+          ++ (extendedLib.optional (!isInstaller) {
+            auscybernix.secrets.enable = true;
+          })
           ++ externalHmModules
           ++ (extendedLib.importModulesRecursive ../../modules/home);
           users = mapAttrs' (_name: homeConfig: {

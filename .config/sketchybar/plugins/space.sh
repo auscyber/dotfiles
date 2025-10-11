@@ -19,9 +19,9 @@ for APP_NAME in $APP_NAMES; do
         "Finder") APP_ICON_LIST+="󰀶 " ;;
         "Fantastical") APP_ICON_LIST+="󰃰 " ;;
         "Beeper" | "Messages" ) APP_ICON_LIST+="󰭹 " ;;
-        "Zen") APP_ICON_LIST+="󰖟 " ;;
+        "Zen") APP_ICON_LIST+="􀎬 " ;;
         "Slack") APP_ICON_LIST+="󰒱 " ;;
-        
+
         *) APP_ICON_LIST+="" ;;
     esac
 done

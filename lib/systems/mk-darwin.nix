@@ -42,7 +42,6 @@ inputs.darwin.lib.darwinSystem {
   modules = [
     { _module.args.lib = extendedLib; }
 
-    inputs.agenix.darwinModules.default
     inputs.stylix.darwinModules.stylix
     inputs.nix-homebrew.darwinModules.nix-homebrew
     inputs.home-manager.darwinModules.home-manager
@@ -54,6 +53,8 @@ inputs.darwin.lib.darwinSystem {
 
       }
       // common.mkNixpkgsConfig flake;
+
+      auscybernix.secrets.enable = true;
     }
 
     ../../modules/common/nix

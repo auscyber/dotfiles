@@ -126,6 +126,7 @@ in
       launchd.agents.yabai-sa = {
         config.ProgramArguments = [
           "sudo"
+          "-E"
           "${cfg.package}/bin/yabai"
           "--load-sa"
         ];

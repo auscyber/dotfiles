@@ -56,7 +56,7 @@
 ;    (map :<C-K> "<cmd>lua vim.lsp.buf.signature_help()<CR>" "")
     (map :<leader>rn "<cmd>lua require(\"renamer\").rename()<cr>" "Rename symbol under cursor")
     (map :<space>d "<cmd>lua require 'telescope.builtin'.diagnostics {}<CR>" "See workspace diagnostics")
-    (map :<space>a "<cmd>lua vim.lsp.buf.code_action ()<CR>" "See code actions under cursor")
+    (map :<leader>qf "<cmd>lua vim.lsp.buf.code_action ()<CR>" "See code actions under cursor")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>" "format selected")
     (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
@@ -164,9 +164,12 @@
                                                                         :checkOnSave {:command :clippy}
                                                                         :procMacro {:enable true}}}}})
 (mason.setup)
-(mason-lspconfig.setup)
+(mason-lspconfig.setup
+  {:ensure_installed
+   [:tailwindcss]})
 
 (def-augroup :LspAuGroup
+  (init-lsp :tailwindcss {:fts [:html :scss :htmldjango :css :typescriptreact :javascriptreact :javascript :typescript :svelte :vue]})
   (init-lsp :ts_ls {:fts [:typescriptreact :typescript :javascript] :autostart false})
   (init-lsp :denols {:fts [:typescript] :autostart false})
   (init-lsp :hls {:no-install true :fts [:haskell] :settings {:haskell {:formattingProvider :fourmolu}}})

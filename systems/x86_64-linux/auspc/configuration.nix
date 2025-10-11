@@ -17,12 +17,14 @@
   programs.fish.enable = true;
   auscybernix = {
     nixos.games.enable = true;
+    bootlogo.enable = true;
   };
   nix.settings.trusted-users = [
     "root"
     "auscyber"
   ];
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   stylix = {
     enable = true;
     image = ../../../backgrounds/phoebebridgers-2.jpg;

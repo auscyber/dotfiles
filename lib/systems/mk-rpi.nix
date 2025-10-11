@@ -18,15 +18,18 @@ let
       hostname
       ;
   };
-  homeManagerConfig = common.mkHomeManagerConfig {
-    inherit
-      extendedLib
-      inputs
-      system
-      matchingHomes
-      ;
-    isNixOS = true;
-  };
+  homeManagerConfig =
+    isInstaller:
+    common.mkHomeManagerConfig {
+      inherit
+        extendedLib
+        inputs
+        system
+        matchingHomes
+        ;
+      isNixOS = true;
+      inherit isInstaller;
+    };
   specialArgs =
     common.mkSpecialArgs {
       inherit
@@ -86,6 +89,7 @@ in
       inputs.sops-nix.nixosModules.sops
 
       ../../modules/common/secrets.nix
+
       ../../modules/common/nix
       ../../modules/common/common
       {
@@ -94,8 +98,9 @@ in
 
         }
         // common.mkNixpkgsConfig flake;
+        auscybernix.secrets.enable = false;
       }
-      homeManagerConfig
+      (homeManagerConfig true)
     ]
 
     ++ (extendedLib.importModulesRecursive ../../modules/nixos)
@@ -122,8 +127,9 @@ in
 
         }
         // common.mkNixpkgsConfig flake;
+        auscybernix.secrets.enable = true;
       }
-      homeManagerConfig
+      (homeManagerConfig false)
     ]
 
     ++ (extendedLib.importModulesRecursive ../../modules/nixos)
