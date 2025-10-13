@@ -1,5 +1,5 @@
 [package]
-name = "rage-plugin-gpg"
+name = "age-plugin-gpg"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -15,9 +15,12 @@ futures-util = "0.3.31"
 hex = "0.4.3"
 nom = "8.0.0"
 rand = "=0.8.5"
+secrecy = "0.10.3"
 sequoia-gpg-agent = "0.6.1"
 sequoia-ipc = "0.36.0"
 sequoia-openpgp = { version = "2.0.0", features = ["crypto-nettle"], default-features = false }
 sha2 = "0.10.9"
 tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 x25519-dalek = "2.0.1"
