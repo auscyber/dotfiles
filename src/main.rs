@@ -10,16 +10,22 @@ use age_plugin::identity::IdentityPluginV1;
 use age_plugin::recipient::RecipientPluginV1;
 use age_plugin::{PluginHandler, run_state_machine};
 use clap::{Parser, ValueEnum};
+use futures_util::StreamExt as _;
 use nom::bytes::{tag, take, take_while, take_while1};
 use nom::combinator::{cond, map, map_res};
 use nom::multi::many_till;
 use nom::sequence::{delimited, preceded, terminated};
-use nom::{IResult, Parser as _};
+use nom::{AsBytes, IResult, Parser as _};
 use rand::rngs::OsRng;
 use rand::thread_rng;
-use rsa::signature::digest::Digest as _;
-use rsa::{BigUint, Pkcs1v15Encrypt};
-use x25519_dalek::{EphemeralSecret, PublicKey};
+use sequoia_gpg_agent::Agent;
+use sequoia_gpg_agent::assuan::Response;
+use sequoia_openpgp::crypto::SessionKey;
+use sequoia_openpgp::crypto::mpi::PublicKey;
+use sequoia_openpgp::packet::Key;
+use sequoia_openpgp::packet::key::{Key6, KeyParts, KeyRole, PublicParts, UnspecifiedRole};
+use sequoia_openpgp::parse::Parse;
+use sequoia_openpgp::types::{Curve, HashAlgorithm, SymmetricAlgorithm, Timestamp};
 
 use std::os::unix::ffi::OsStringExt;
 
@@ -355,7 +361,7 @@ fn sexpr_or_atom(input: &[u8]) -> IResult<&[u8], SexprOrAtom<'_>> {
 	}
 }
 
-fn sexpr(input: &[u8]) -> IResult<&[u8], Expr<'_>> {
+fn sexpr<'i>(input: &'i [u8]) -> IResult<&'i [u8], Expr<'i>> {
 	map(
 		preceded(tag("("), (atom, many_till(sexpr_or_atom, tag(")")))),
 		|(start, (children, _))| Expr { start, children },
@@ -363,81 +369,7 @@ fn sexpr(input: &[u8]) -> IResult<&[u8], Expr<'_>> {
 	.parse(input)
 }
 
-#[derive(Debug)]
-enum GpgPublicKey {
-	Rsa(rsa::RsaPublicKey),
-	Ed25519(x25519_dalek::PublicKey),
-}
-impl GpgPublicKey {
-	fn encrypt(&self, data: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
-		match self {
-			GpgPublicKey::Rsa(rsa_public_key) => Ok((
-				rsa_public_key.encrypt(&mut thread_rng(), Pkcs1v15Encrypt, data)?,
-				vec![],
-			)),
-			GpgPublicKey::Ed25519(public_key) => {
-				let ephemeral_secret = EphemeralSecret::random_from_rng(&mut thread_rng());
-				let ephemeral_public = PublicKey::from(&ephemeral_secret);
-				let shared_secret = ephemeral_secret.diffie_hellman(&public_key);
-
-				let mut kdf_input = Vec::new();
-				kdf_input.extend_from_slice(&[0, 0, 0, 1]); // counter
-				kdf_input.extend_from_slice(shared_secret.as_bytes());
-
-				// KDF parameters
-				let curve25519_oid = &[0x2B, 0x06, 0x01, 0x04, 0x01, 0x97, 0x55, 0x01, 0x05, 0x01];
-
-				let fingerprint =
-					hex::decode("F0862BFF207658C7C745D221510D5907AE242EE1").expect("fp"); // 20 bytes
-				assert_eq!(fingerprint.len(), 20);
-
-				// Build Param (without Param_len yet)
-				let mut param = Vec::new();
-				param.push(curve25519_oid.len() as u8); // OID length
-				param.extend_from_slice(curve25519_oid); // OID
-				param.push(0x12); // ECDH algorithm
-				param.push(0x03); // Reserved
-				param.push(0x01); // Reserved
-				param.push(0x08); // SHA256
-				param.push(0x07); // AES-128 (must match key's ECDH params!)
-				param.extend_from_slice(&fingerprint); // 20 bytes
-
-				kdf_input.push(param.len() as u8);
-				kdf_input.extend_from_slice(&param);
-
-				let wrapping_key = sha2::Sha256::digest(&kdf_input);
-
-				let kek = KekAes128::try_from(&wrapping_key[..16]).expect("valid wrapping");
-				dbg!(data.len());
-
-				// Ephemeral public key as raw bytes (GPG-agent may add 0x40 prefix internally)
-				let extra = ephemeral_public.to_bytes().to_vec();
-
-				println!("ex: {}", hex::encode(&data));
-
-				// Build OpenPGP ECDH packet: algo_byte || data || checksum || padding
-				let mut packet = Vec::new();
-				packet.push(0x07); // AES-128 algorithm byte (must match!)
-				packet.extend_from_slice(data);
-
-				// Checksum is simple sum of data bytes mod 65536
-				let checksum: u16 = data.iter().map(|&b| b as u16).sum();
-				packet.extend_from_slice(&checksum.to_be_bytes());
-
-				// Add PKCS#5 padding to make packet length a multiple of 8
-				let pad_len = 8 - (packet.len() % 8);
-				packet.extend(vec![pad_len as u8; pad_len]);
-
-				let wrapped = kek.wrap_vec(&packet)?;
-				println!("Wrapped len: {}", wrapped.len());
-				println!("Wrapped hex: {}", hex::encode(&wrapped));
-				Ok((wrapped, extra))
-			}
-		}
-	}
-}
-
-fn parse_public_key(e: Expr) -> Result<GpgPublicKey> {
+fn parse_public_key(e: Expr) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	let e = e.unwrap_single_expr("public-key")?;
 	if e.start.0 == b"rsa" {
 		let e = e.unwrap("rsa")?;
@@ -453,8 +385,7 @@ fn parse_public_key(e: Expr) -> Result<GpgPublicKey> {
 			.expect("e")
 			.unwrap_expr()?
 			.unwrap_single_atom("e")?;
-		let k = rsa::RsaPublicKey::new(BigUint::from_bytes_be(n.0), BigUint::from_bytes_be(e.0))?;
-		Ok(GpgPublicKey::Rsa(k))
+		Ok(Key::V6(Key6::import_public_rsa(e.0, n.0, None)?))
 	} else if e.start.0 == b"ecc" {
 		let e = e.unwrap("ecc")?;
 		ensure!(e.len() == 3, "ecc should have three children");
@@ -474,11 +405,19 @@ fn parse_public_key(e: Expr) -> Result<GpgPublicKey> {
 			.expect("q")
 			.unwrap_expr()?
 			.unwrap_single_atom("q")?;
+		dbg!(flags);
 		ensure!(curve.0 == b"Curve25519", "unsupported curve: {:?}", curve);
-		ensure!(q.0[0] == 0x40, "invalid gpg q prefix");
-		let q: [u8; 32] = q.0[1..].try_into().expect("is 32 bytes");
-		let k = x25519_dalek::PublicKey::from(q);
-		Ok(GpgPublicKey::Ed25519(k))
+		Ok(Key::V6(Key6::new(
+			Timestamp::now(),
+			sequoia_openpgp::types::PublicKeyAlgorithm::ECDH,
+			PublicKey::ECDH {
+				curve: Curve::Cv25519,
+				q: q.0.to_vec().into(),
+				// TODO: Get that data from gpg somehow?..
+				hash: HashAlgorithm::SHA256,
+				sym: SymmetricAlgorithm::AES128,
+			},
+		)?))
 	} else {
 		todo!()
 	}
@@ -497,11 +436,6 @@ fn read_sexpr<'i, T: 'static>(
 	parse(value)
 }
 
-fn readkey<S: Read + Write>(s: &mut S, keygrip: &str) -> Result<GpgPublicKey> {
-	eprintln!("READKEY {keygrip}");
-	s.write_all(format!("READKEY {keygrip}\n").as_bytes())?;
-	read_sexpr(s, parse_public_key)
-}
 fn setkey<S: Read + Write>(s: &mut S, keygrip: &str) -> Result<()> {
 	eprintln!("SETKEY {keygrip}");
 	s.write_all(format!("SETKEY {keygrip}\n").as_bytes())?;
@@ -530,19 +464,45 @@ fn pkdecrypt<S: Read + Write>(s: &mut S, v: &[u8], extra: &[u8]) -> Result<Vec<u
 	Ok(res)
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
+	let mut agent = Agent::connect_to_default()
+		.await
+		.context("gpg agent connection failed")?;
+
+	let keys = agent.list_keys().await.context("failed to list keys")?;
+
+	let keygrip = "E968AB03A34F6F291B800C6121F350FCFCE8DE4C";
+	// let key =
+	// let kg = keys.lookup(keygrip).expect("kg");
+	// let kg = kg.keygrip();
+	let key = agent.send_simple(format!("READKEY {keygrip}")).await?;
+	let (_res, key) = sexpr(&key).map_err(|e| anyhow!("failed to parse key sexpr: {e}"))?;
+	assert!(_res.is_empty(), "unexpected data after key expr");
+	let key = parse_public_key(key)?;
+
+	let encrypted = key.encrypt(&SessionKey::from("Hello, world!!!!".as_bytes().to_vec()))?;
+
+	agent.send_simple(format!("SETKEY {keygrip}")).await?;
+
+	ensure!(agent.has_key(&key).await.context("has key check")?);
+	let mut keypair = agent.keypair(&key)?;
+
+	let decrypted = keypair.decrypt_async(&encrypted, None).await?;
+
+	dbg!(String::from_utf8_lossy(decrypted.as_bytes()));
+	// dbg!(kek.as_bytes());
+
 	let aussan = find_socket()?;
 
 	let mut stream = UnixStream::connect(aussan)?;
 	read_simple_result(&mut stream)?;
 
-	let keygrip = "E968AB03A34F6F291B800C6121F350FCFCE8DE4C";
-
-	let key = readkey(&mut stream, keygrip)?;
-	let (data, extra) = key.encrypt(b"Hello, world!!!!")?;
-
-	setkey(&mut stream, keygrip)?;
-	let v = pkdecrypt(&mut stream, &data, &extra)?;
+	// let key = readkey(&mut stream, keygrip)?;
+	// let (data, extra) = key.encrypt(b"Hello, world!!!!")?;
+	//
+	// setkey(&mut stream, keygrip)?;
+	// let v = pkdecrypt(&mut stream, &data, &extra)?;
 
 	eprintln!("DONE");
 
