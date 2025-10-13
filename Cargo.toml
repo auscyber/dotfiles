@@ -9,6 +9,7 @@ age.workspace = true
 age-core = { version = "0.11.0", features = ["plugin"] }
 age-plugin = "0.6.0"
 anyhow.workspace = true
+bech32 = "0.9.1"
 clap.workspace = true
 futures-util = "0.3.31"
 hex = "0.4.3"
@@ -17,6 +18,7 @@ secrecy = "0.10.3"
 sequoia-gpg-agent = "0.6.1"
 sequoia-ipc = "0.36.0"
 sequoia-openpgp = { version = "2.0.0", features = ["crypto-nettle"], default-features = false }
+thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
