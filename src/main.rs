@@ -6,23 +6,18 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::{fmt, io};
 
-use aes_kw::{KekAes128, KekAes256};
 use age_core::format::{FILE_KEY_BYTES, FileKey, Stanza};
 use age_plugin::identity::IdentityPluginV1;
 use age_plugin::recipient::RecipientPluginV1;
 use age_plugin::{PluginHandler, print_new_identity, run_state_machine};
 use clap::{Parser, ValueEnum};
 use futures_util::StreamExt as _;
-use nom::bytes::{tag, take, take_while, take_while1};
-use nom::combinator::{cond, map, map_res};
-use nom::multi::many_till;
-use nom::sequence::{delimited, preceded, terminated};
-use nom::{AsBytes, IResult, Parser as _};
 use rand::rngs::OsRng;
 use rand::thread_rng;
 use sequoia_gpg_agent::Agent;
 use sequoia_gpg_agent::assuan::Response;
 use sequoia_ipc::Keygrip;
+use sequoia_ipc::sexp::{Sexp, String_};
 use sequoia_openpgp::crypto::SessionKey;
 use sequoia_openpgp::crypto::mpi::{Ciphertext, PublicKey};
 use sequoia_openpgp::packet::Key;
@@ -47,156 +42,52 @@ struct Opts {
 	age_plugin: String,
 }
 
-fn find_socket() -> Result<PathBuf> {
-	let mut cmd = Command::new("gpgconf");
-	cmd.arg("--list-dirs").arg("agent-socket");
-	cmd.stdout(Stdio::piped());
-	let child = cmd.spawn()?;
-	let mut out = child.wait_with_output()?;
-	if !out.status.success() {
-		bail!("failed to find agent socket");
+fn key(s: &Sexp) -> &[u8] {
+	if let Sexp::List(alist) = s {
+		if let Some(Sexp::String(key)) = alist.get(0) {
+			return key;
+		}
 	}
-	assert!(out.stdout.ends_with(b"\n"));
-	out.stdout.remove(out.stdout.len() - 1);
-	Ok(OsString::from_vec(out.stdout).into())
+	panic!("malformed alist");
+}
+fn value(s: &Sexp) -> &[Sexp] {
+	if let Sexp::List(alist) = s {
+		if let Some(Sexp::String(_key)) = alist.get(0) {
+			return &alist[1..];
+		}
+	}
+
+	panic!("malformed alist");
+}
+fn get<'e>(s: &'e Sexp, k: &[u8]) -> Option<&'e [Sexp]> {
+	if key(s) == k { Some(value(s)) } else { None }
 }
 
-struct Atom<'i>(&'i [u8]);
-impl fmt::Debug for Atom<'_> {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let t = String::from_utf8_lossy(&self.0);
-		write!(f, "{t:?}")
-	}
-}
-
-fn dec_num(input: &[u8]) -> IResult<&[u8], u32> {
-	let digit1 = take_while(|c: u8| c.is_ascii_digit());
-
-	map_res(digit1, |digits| {
-		let digits = std::str::from_utf8(digits).expect("digits are valid utf8");
-		digits.parse()
+fn find_string(v: &[Sexp], k: &[u8]) -> Option<String_> {
+	v.iter().find_map(|p| {
+		get(p, k)
+			.unwrap_or_default()
+			.get(0)
+			.and_then(Sexp::string)
+			.cloned()
 	})
-	.parse(input)
 }
 
-fn atom(input: &[u8]) -> IResult<&[u8], Atom<'_>> {
-	let (input, len) = terminated(dec_num, tag(":")).parse(input)?;
-	map(take(len as usize), Atom).parse(input)
-}
+fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
+	let e = get(&e, b"public-key")
+		.expect("todo: not a public key")
+		.into_iter()
+		.next()
+		.expect("todo: not a public key");
 
-#[derive(Debug)]
-struct Expr<'i> {
-	start: Atom<'i>,
-	children: Vec<SexprOrAtom<'i>>,
-}
-impl Expr<'_> {
-	fn unwrap<'t>(self, v: &str) -> Result<Vec<SexprOrAtom<'t>>>
-	where
-		Self: 't,
-	{
-		ensure!(
-			self.start.0 == v.as_bytes(),
-			"expected wrapper for {v}, got {self:?}",
-		);
-		Ok(self.children)
-	}
-	fn unwrap_single<'t>(self, v: &str) -> Result<SexprOrAtom<'t>>
-	where
-		Self: 't,
-	{
-		let r = self.unwrap(v)?;
-		ensure!(r.len() == 1, "unexpected number of children for {v}");
-		Ok(r.into_iter().next().expect("exactly one"))
-	}
-	fn unwrap_single_expr<'t>(self, v: &str) -> Result<Expr<'t>>
-	where
-		Self: 't,
-	{
-		let r = self.unwrap_single(v)?;
-		match r {
-			SexprOrAtom::Expr(expr) => Ok(expr),
-			SexprOrAtom::Atom(_) => bail!("unexpected atom wrapping for {v}"),
-		}
-	}
-	fn unwrap_single_atom<'t>(self, v: &str) -> Result<Atom<'t>>
-	where
-		Self: 't,
-	{
-		let r = self.unwrap_single(v)?;
-		match r {
-			SexprOrAtom::Atom(expr) => Ok(expr),
-			SexprOrAtom::Expr(_) => bail!("unexpected expr wrapping for {v}"),
-		}
-	}
-}
-
-#[derive(Debug)]
-enum SexprOrAtom<'i> {
-	Expr(Expr<'i>),
-	Atom(Atom<'i>),
-}
-impl<'i> SexprOrAtom<'i> {
-	fn unwrap_expr(self) -> Result<Expr<'i>> {
-		match self {
-			SexprOrAtom::Expr(expr) => Ok(expr),
-			SexprOrAtom::Atom(atom) => bail!("expected expr"),
-		}
-	}
-}
-
-fn sexpr_or_atom(input: &[u8]) -> IResult<&[u8], SexprOrAtom<'_>> {
-	if matches!(input.first(), Some(b'(')) {
-		map(sexpr, SexprOrAtom::Expr).parse(input)
-	} else {
-		map(atom, SexprOrAtom::Atom).parse(input)
-	}
-}
-
-fn sexpr<'i>(input: &'i [u8]) -> IResult<&'i [u8], Expr<'i>> {
-	map(
-		preceded(tag("("), (atom, many_till(sexpr_or_atom, tag(")")))),
-		|(start, (children, _))| Expr { start, children },
-	)
-	.parse(input)
-}
-
-fn parse_public_key(e: Expr) -> Result<Key<PublicParts, UnspecifiedRole>> {
-	let e = e.unwrap_single_expr("public-key")?;
-	if e.start.0 == b"rsa" {
-		let e = e.unwrap("rsa")?;
-		ensure!(e.len() == 2, "rsa should have two children");
-		let mut e = e.into_iter();
-		let n = e
-			.next()
-			.expect("n")
-			.unwrap_expr()?
-			.unwrap_single_atom("n")?;
-		let e = e
-			.next()
-			.expect("e")
-			.unwrap_expr()?
-			.unwrap_single_atom("e")?;
-		Ok(Key::V6(Key6::import_public_rsa(e.0, n.0, None)?))
-	} else if e.start.0 == b"ecc" {
-		let e = e.unwrap("ecc")?;
-		ensure!(e.len() == 3, "ecc should have three children");
-		let mut e = e.into_iter();
-		let curve = e
-			.next()
-			.expect("curve")
-			.unwrap_expr()?
-			.unwrap_single_atom("curve")?;
-		let flags = e
-			.next()
-			.expect("flags")
-			.unwrap_expr()?
-			.unwrap_single_atom("flags")?;
-		let q = e
-			.next()
-			.expect("q")
-			.unwrap_expr()?
-			.unwrap_single_atom("q")?;
-		ensure!(curve.0 == b"Curve25519", "unsupported curve: {:?}", curve);
+	if let Some(e) = get(e, b"rsa") {
+		let n = find_string(e, b"n").expect("todo: not a public key");
+		let e = find_string(e, b"e").expect("todo: not a public key");
+		Ok(Key::V6(Key6::import_public_rsa(&e, &n, None)?))
+	} else if let Some(e) = get(e, b"ecc") {
+		let curve = find_string(e, b"curve").expect("todo: not a public key");
+		let q = find_string(e, b"q").expect("todo: not a public key");
+		ensure!(&*curve == b"Curve25519", "unsupported curve: {:?}", curve);
 
 		let hash = HashAlgorithm::SHA256;
 		let sym = SymmetricAlgorithm::AES128;
@@ -209,7 +100,7 @@ fn parse_public_key(e: Expr) -> Result<Key<PublicParts, UnspecifiedRole>> {
 			sequoia_openpgp::types::PublicKeyAlgorithm::ECDH,
 			PublicKey::ECDH {
 				curve: Curve::Cv25519,
-				q: q.0.to_vec().into(),
+				q: q.to_vec().into(),
 				// TODO: Get that data from gpg somehow?..
 				hash,
 				sym,
@@ -292,7 +183,7 @@ impl IdentityPluginV1 for IdentityV1 {
 				out.insert(
 					file_idx,
 					Ok(FileKey::init_with_mut(|data| {
-						data.copy_from_slice(session_key.as_bytes())
+						data.copy_from_slice(&*session_key)
 					})),
 				);
 			}
@@ -423,8 +314,9 @@ async fn fetch_key(
 	keygrip: Keygrip,
 ) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	let key = agent.send_simple(format!("READKEY {keygrip}")).await?;
-	let (_res, key) = sexpr(&key).map_err(|e| anyhow!("failed to parse key sexpr: {e}"))?;
-	assert!(_res.is_empty(), "unexpected data after key expr");
+
+	let key = sequoia_ipc::sexp::Sexp::from_bytes(&key)
+		.map_err(|e| anyhow!("failed to parse key sexp: {e}"))?;
 	let key = parse_public_key(key)?;
 
 	agent.has_key(&key).await?;
