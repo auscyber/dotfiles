@@ -1,0 +1,3 @@
+= age-plugin-gpg
+
+Age plugin which uses recipients/identities from gpg-agent, making it possible to use gpg smartcards
