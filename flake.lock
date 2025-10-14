@@ -1,0 +1,96 @@
+{
+  "nodes": {
+    "crane": {
+      "locked": {
+        "lastModified": 1759893430,
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "1979a2524cb8c801520bd94c38bb3d5692419d93",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1759362264,
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "758cf7296bee11f1706a574c77d072b8a7baa881",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1760392495,
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "4c0426efac242de67c7ae62b463df08f7d12a462",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "release-25.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "crane": "crane",
+        "flake-parts": "flake-parts",
+        "nixpkgs": "nixpkgs",
+        "rust-overlay": "rust-overlay",
+        "shelly": "shelly"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760323082,
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "c73e6874fe8dce0bab82c0387b510875f1eff9f8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "shelly": {
+      "locked": {
+        "lastModified": 1756323923,
+        "owner": "CertainLach",
+        "repo": "shelly",
+        "rev": "b5dd29a500db04f54a9f1c2bf81cdd84df8b0cd7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CertainLach",
+        "repo": "shelly",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

@@ -1,40 +1,27 @@
 use std::collections::{HashMap, HashSet};
-use std::ffi::OsString;
-use std::io::{Cursor, Read, Write, stdin};
-use std::os::unix::net::UnixStream;
-use std::path::PathBuf;
-use std::{fmt, io};
+use std::io;
 
 use age_core::format::{FILE_KEY_BYTES, FileKey, Stanza};
 use age_plugin::identity::Error as IdentityError;
 use age_plugin::identity::IdentityPluginV1;
 use age_plugin::recipient::Error as RecipientError;
 use age_plugin::recipient::RecipientPluginV1;
-use age_plugin::{PluginHandler, print_new_identity, run_state_machine};
+use age_plugin::{PluginHandler, run_state_machine};
 use bech32::Variant;
-use clap::{CommandFactory, Parser, ValueEnum};
-use futures_util::StreamExt as _;
-use rand::rngs::OsRng;
-use rand::thread_rng;
-use sequoia_gpg_agent::assuan::Response;
+use clap::{CommandFactory, Parser};
 use sequoia_gpg_agent::{Agent, KeyPair};
 use sequoia_ipc::Keygrip;
 use sequoia_ipc::sexp::{Sexp, String_};
 use sequoia_openpgp::crypto::SessionKey;
-use sequoia_openpgp::crypto::mpi::{Ciphertext, PublicKey};
+use sequoia_openpgp::crypto::mpi::PublicKey;
 use sequoia_openpgp::packet::Key;
-use sequoia_openpgp::packet::key::{Key6, KeyParts, KeyRole, PublicParts, UnspecifiedRole};
-use sequoia_openpgp::parse::Parse;
-use sequoia_openpgp::serialize::MarshalInto as _;
+use sequoia_openpgp::packet::key::{Key6, PublicParts, UnspecifiedRole};
 use sequoia_openpgp::types::{
-	Curve, HashAlgorithm, PublicKeyAlgorithm, SymmetricAlgorithm, Timestamp,
+	Curve, HashAlgorithm, SymmetricAlgorithm, Timestamp,
 };
 use std::io::Result as IoResult;
 
 use tokio::runtime::{Handle, Runtime};
-use tracing::info;
-
-use std::os::unix::ffi::OsStringExt;
 
 use anyhow::{Context, Result, anyhow, bail, ensure};
 
@@ -108,7 +95,7 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 		let q = find_string(e, b"q").expect("todo: not a public key");
 
 		if let Some(flags) = find_string(e, b"flags") {
-			if &*flags != "djb-tweak" {
+			if &*flags != b"djb-tweak" {
 				bail!("unsupported flags: {flags:?}");
 			}
 		}
@@ -122,7 +109,7 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 		// I'm not sure when this might happen
 		if let Some(kdfp) = find_string(e, b"kdf-params") {
 			bail!(
-				"custom kdf params not supported: {kdfp}. Please report how did you get that error, because I'm not sure how it should be possible to customize kdf params in gpg"
+				"custom kdf params not supported: {kdfp:?}. Please report how did you get that error, because I'm not sure how it should be possible to customize kdf params in gpg"
 			)
 		}
 
@@ -241,7 +228,7 @@ impl RecipientPluginV1 for RecipientV1 {
 		index: usize,
 		plugin_name: &str,
 		bytes: &[u8],
-	) -> std::result::Result<(), age_plugin::recipient::Error> {
+	) -> std::result::Result<(), RecipientError> {
 		if plugin_name != "gpg" {
 			return Ok(());
 		}
@@ -268,9 +255,15 @@ impl RecipientPluginV1 for RecipientV1 {
 		&mut self,
 		index: usize,
 		plugin_name: &str,
-		bytes: &[u8],
-	) -> std::result::Result<(), age_plugin::recipient::Error> {
-		todo!()
+		_bytes: &[u8],
+	) -> std::result::Result<(), RecipientError> {
+		if plugin_name != "gpg" {
+			return Ok(());
+		}
+		return Err(RecipientError::Identity {
+			index,
+			message: format!("gpg plugin doesn't use age own identity management"),
+		})
 	}
 
 	fn labels(&mut self) -> std::collections::HashSet<String> {
@@ -360,6 +353,7 @@ async fn fetch_keypair(agent: &mut Agent, keygrip: Keygrip) -> Result<KeyPair> {
 
 fn main() -> Result<()> {
 	tracing_subscriber::fmt().with_writer(io::stderr).init();
+	let opts = Opts::parse();
 
 	let runtime = Runtime::new()?;
 	let _runtime = runtime.enter();
@@ -367,20 +361,6 @@ fn main() -> Result<()> {
 	let mut agent = Handle::current()
 		.block_on(Agent::connect_to_default())
 		.context("gpg agent connection failed")?;
-
-	// print_new_identity("gpg", &keygripbytes, &keygripbytes);
-
-	// let encrypted = key.encrypt(&SessionKey::from("Hello, world!!!!".as_bytes().to_vec()))?;
-	//
-	// ensure!(agent.has_key(&key).await.context("has key check")?);
-	// let mut keypair = agent.keypair(&key)?;
-	//
-	// let decrypted = keypair.decrypt_async(&encrypted, None).await?;
-
-	// dbg!(String::from_utf8_lossy(decrypted.as_bytes()));
-	// dbg!(kek.as_bytes());
-
-	let opts = Opts::parse();
 
 	if let Some(age_plugin) = opts.age_plugin {
 		run_state_machine(&age_plugin, Plugin { agent })?;

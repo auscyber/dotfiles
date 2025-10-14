@@ -1,16 +1,15 @@
 [package]
 name = "age-plugin-gpg"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
+version = "0.1.0"
+edition = "2024"
 
 [dependencies]
-age.workspace = true
+age = "0.11.1"
 age-core = { version = "0.11.0", features = ["plugin"] }
 age-plugin = "0.6.0"
-anyhow.workspace = true
+anyhow = "1.0.100"
 bech32 = "0.9.1"
-clap.workspace = true
+clap = { version = "4.5.49", features = ["derive"] }
 futures-util = "0.3.31"
 hex = "0.4.3"
 rand = "=0.8.5"
@@ -18,7 +17,7 @@ secrecy = "0.10.3"
 sequoia-gpg-agent = "0.6.1"
 sequoia-ipc = "0.36.0"
 sequoia-openpgp = { version = "2.0.0", features = ["crypto-nettle"], default-features = false }
-thiserror.workspace = true
-tokio.workspace = true
-tracing.workspace = true
-tracing-subscriber.workspace = true
+thiserror = "2.0.17"
+tokio = "1.47.1"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.20"
