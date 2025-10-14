@@ -64,7 +64,8 @@ impl TryFrom<Stanza> for GpgStanza {
 
 		Ok(Self {
 			keygrip,
-			ciphertext: Ciphertext::parse(pk_algo, Cursor::new(&value.body)).map_err(Error::Ciphertext)?,
+			ciphertext: Ciphertext::parse(pk_algo, Cursor::new(&value.body))
+				.map_err(Error::Ciphertext)?,
 		})
 	}
 }

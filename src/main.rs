@@ -106,21 +106,33 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	} else if let Some(e) = get(e, b"ecc") {
 		let curve = find_string(e, b"curve").expect("todo: not a public key");
 		let q = find_string(e, b"q").expect("todo: not a public key");
+
+		if let Some(flags) = find_string(e, b"flags") {
+			if &*flags != "djb-tweak" {
+				bail!("unsupported flags: {flags:?}");
+			}
+		}
 		ensure!(&*curve == b"Curve25519", "unsupported curve: {:?}", curve);
 
+		// Those parameters should depend on curve: https://datatracker.ietf.org/doc/html/rfc6637
+		// Those are for Cv25519
 		let hash = HashAlgorithm::SHA256;
 		let sym = SymmetricAlgorithm::AES128;
 
-		// There might be a
+		// I'm not sure when this might happen
+		if let Some(kdfp) = find_string(e, b"kdf-params") {
+			bail!(
+				"custom kdf params not supported: {kdfp}. Please report how did you get that error, because I'm not sure how it should be possible to customize kdf params in gpg"
+			)
+		}
 
 		Ok(Key::V6(Key6::new(
-			// TS should match between encryption and decryption
+			// TS should match between encryption and decryption.
 			Timestamp::from(0u32),
 			sequoia_openpgp::types::PublicKeyAlgorithm::ECDH,
 			PublicKey::ECDH {
 				curve: Curve::Cv25519,
 				q: q.to_vec().into(),
-				// TODO: Get that data from gpg somehow?..
 				hash,
 				sym,
 			},
