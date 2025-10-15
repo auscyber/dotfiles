@@ -33,7 +33,7 @@ jobs:
       with:
         # use lix main
         source-url: https://install.lix.systems/lix/lix-installer-x86_64-linux
-        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
+#        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
         extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
