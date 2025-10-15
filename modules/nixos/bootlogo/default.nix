@@ -10,7 +10,7 @@ let
 in
 {
 
-  options.auscybernix.auscybernix.bootlogo = {
+  options.auscybernix.bootlogo = {
     enable = lib.mkEnableOption "Enable AusCyberNix boot logo";
   };
 
