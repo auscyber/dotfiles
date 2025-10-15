@@ -46,7 +46,7 @@ jobs:
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Build nix packages
-      run: nix shell -f '<nixpkgs>' nix-fast--build -c nix-fast-build
+      run: nix shell -f '<nixpkgs>' nix-fast-build -c nix-fast-build
     - name: update README
       run: nix shell -f '<nixpkgs>' nur-update-readme -c nur-update-readme
     - name: Commit updated README
@@ -58,4 +58,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    
+
