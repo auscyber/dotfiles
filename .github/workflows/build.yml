@@ -31,7 +31,8 @@ jobs:
     - name: Install nix
       uses: DeterminateSystems/nix-installer-action@main
       with:
-        nix_package_url: "${{ matrix.nixPath }}"
+        # use lix main
+        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
         extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
