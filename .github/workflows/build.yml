@@ -17,14 +17,14 @@ jobs:
       matrix:
 
         system:
-          - macos-latest
-          - ubuntu-latest
+          - [macos-latest,aarch64-darwin]
+          - [ubuntu-latest,x86_64-linux]
         cachixName:
           - auscyber
         nixPath:
           - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
           - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
-    runs-on:  ${{ matrix.system }}
+    runs-on:  ${{ matrix.system.0 }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
       uses: DeterminateSystems/nix-installer-action@main
       with:
         # use lix main
-        source-url: https://install.lix.systems/lix/lix-installer-x86_64-linux
+        source-url: https://install.lix.systems/lix/lix-installer-${{ matrix.system.1 }}
 #        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
         extra-conf: |
           experimental-features = nix-command flakes
