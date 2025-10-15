@@ -29,10 +29,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     - name: Install nix
-      uses: samueldr/lix-gha-installer-action@v2025-02-26.prerelease
+      uses: DeterminateSystems/nix-installer-action@main
       with:
-        nix_path: "${{ matrix.nixPath }}"
-        nix_config: |
+        nix_package_url: "${{ matrix.nixPath }}"
+        extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - name: Show nixpkgs version
