@@ -33,6 +33,12 @@ in
       };
 
     };
+    programs.zoxide.enable = true;
+    programs.fzf.enable = true;
+    programs.nix-your-shell = {
+      enable = true;
+      nix-output-monitor.enable = true;
+    };
     programs.nh.enable = true;
     programs = {
       ssh = {

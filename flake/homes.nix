@@ -25,10 +25,10 @@ let
       value = self.lib.system.mkHome {
         inherit
           inputs
-          system
           hostname
           username
           ;
+        system = lib.strings.removeSuffix "-rpi" system; # Strip -rpi suffix for rpi homes
         modules = [ path ];
       };
     };
@@ -52,12 +52,6 @@ in
       ...
     }:
     {
-      packages.build-homes = pkgs.stdenv.mkDerivation {
-        name = "home-build";
-        buildInputs = lib.mapAttrsToList (
-          name: value: (generateHomeConfiguration name value).activationPackage
-        ) (lib.filterAttrs (_: value: value.system == system) allHomes);
-      };
 
     };
 }

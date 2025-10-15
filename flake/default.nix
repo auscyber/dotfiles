@@ -12,6 +12,7 @@
     ../overlays
     ./homes.nix
     ./shells.nix
+    ../ci
     ./packages.nix
     inputs.flake-parts.flakeModules.partitions
   ];

@@ -12,7 +12,7 @@ let
     aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
   };
   ghostty = {
-    aarch64-darwin = pkgs.ghostty-bin;
+    aarch64-darwin = inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
     x86_64-linux = pkgs.ghostty;
     aarch64-linux = pkgs.ghostty;
   };
@@ -27,7 +27,6 @@ in
 
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
-    karabiner-dk = pkgs.karabiner-dk
     #.overrideAttrs
     # (attrs: {
     #   version = "5.0.0";
@@ -36,7 +35,7 @@ in
     #     hash = "sha256-hKi2gmIdtjl/ZaS7RPpkpSjb+7eT0259sbUUbrn5mMc=";
     #   };
     # })
-    ;
+
     yabai = pkgs.yabai.overrideAttrs (attrs: {
       src = inputs.yabai;
     });

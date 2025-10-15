@@ -51,6 +51,7 @@ in
       );
       inherit policies;
       profiles."${cfg.profileName}" = {
+        search.default = "https://unduck.link?q=%s";
         isDefault = true;
         settings = {
           "extensions.autoDisableScopes" = 0;

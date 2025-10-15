@@ -55,6 +55,7 @@
     };
 
     home.packages = with pkgs; [
+      cachix
       ivy-fetch
       devenv
       shellify
