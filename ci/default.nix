@@ -35,11 +35,10 @@
           );
           systemBuilds = lib.mapAttrsToList (_: v: v.config.environment.systemPackages) systemConfigurations;
           nixShells = lib.attrValues self.devShells."${pkgs.stdenv.system}";
-          homes = lib.attrValues (
-            lib.filterAttrs (_: v: v.system == system) (
-              builtins.mapAttrs (_: v: v.config.home.packages) self.homeConfigurations
-            )
+          homes = lib.mapAttrsToList (_: v: v.config.home.packages) (
+            lib.filterAttrs (_: v: v.activationPackage.system == system) self.homeConfigurations
           );
+
           packages = builtins.filter (v: isBuildable v && isCacheable v && isDerivation v) (
             lib.attrValues (lib.filterAttrs (name: _: name != "ci") self.packages."${pkgs.stdenv.system}")
           );
