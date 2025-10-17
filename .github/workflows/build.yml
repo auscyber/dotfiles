@@ -15,15 +15,11 @@ jobs:
   tests:
     strategy:
       matrix:
-
         system:
           - macos-latest
           - ubuntu-latest
         cachixName:
           - auscyber
-        nixPath:
-          - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
-          - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
     runs-on:  ${{ matrix.system }}
     steps:
     - name: Checkout repository
