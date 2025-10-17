@@ -25,7 +25,6 @@
   # Create /etc/zshrc that loads the nix-darwin environment.
   programs.gnupg.agent = {
     enable = true;
-    enableSSHSupport = true;
   };
   programs.zsh.enable = true; # default shell on catalina
   # programs.fish.enable = true;
