@@ -17,16 +17,19 @@ in
     };
     casks = lib.mkOption {
       type = lib.types.listOf lib.types.str;
+      default = [ ];
 
       description = "List of Homebrew casks to install.";
     };
     brews = lib.mkOption {
       type = lib.types.listOf lib.types.str;
+      default = [ ];
 
       description = "List of Homebrew formulae to install.";
     };
     masApps = lib.mkOption {
       type = lib.types.attrsOf lib.types.int;
+      default = [ ];
 
       description = "List of Mac App Store apps to install (requires mas-cli).";
     };
