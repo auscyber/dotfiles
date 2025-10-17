@@ -49,7 +49,7 @@
           ];
           outputsOf = p: map (o: p.${o}) p.outputs;
           outputPkgs = lib.concatLists [
-            systemPackages
+            (lib.concatLists systemPackages)
             packages
             nixShells
           ];
