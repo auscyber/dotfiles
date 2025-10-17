@@ -26,6 +26,9 @@ in
   {
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
+    lix = pkgs.lix.overrideAttrs (attrs: {
+      doCheck = false;
+    });
     #.overrideAttrs
     # (attrs: {
     #   version = "5.0.0";
