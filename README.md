@@ -1,14 +1,39 @@
-# driverkit
+# My Dotfiles
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
-driverkit is a minimal wrapper around [Karabiner-DriverKit-VirtualHIDDevice (dext)](https://github.com/pqrs-org/Karabiner-DriverKit-VirtualHIDDevice) and [Karabiner-VirtualHIDDevice (kext)](https://github.com/pqrs-org/Karabiner-VirtualHIDDevice) intended for kanata
-macos support.
 
-## Installation
+### 🔨 My own work
+* [fetch](fetch)
+![large](screenshots/fetch/large.jpg)
+![small](screenshots/fetch/small.jpg)
+![image](screenshots/fetch/picture.jpg)
+* [vim theme "pink ocean"](.config/nvim/colors/pink_ocean.vim)
+![xmonad](screenshots/theme/xmonad.jpg)
+![rust](screenshots/theme/rust.jpg)
+![nvim](screenshots/nvim/full.jpg)
+![bar](screenshots/polybar/whole.jpg)
 
-Update the submodules first
+| System name  |  system |
+|:------------:|:--------|
+| Ivys-MacBook-Pro |  aarch64-darwin |
+| auspc |  x86_64-linux |
+| lora-pi |  aarch64-linux-rpi |
+| macmini |  aarch64-darwin |
+| pentestvm |  x86_64-linux |
+| secondpc |  x86_64-linux |
+| surfacelaptop |  x86_64-linux |
+| wsl-nixos |  x86_64-linux |
 
-    git submodule update --init --recursive
 
-then
+### 🤝 Other Projects
+###### *(Non-extensive list*)
 
-    cargo build
+* [xmonad](https://github.com/xmonad/xmonad)
+* [xmonad-contrib](https://github.com/xmonad/xmonad-contrib)
+* [alacritty](https://github.com/alacritty/alacritty)
+* [ghostty](https://github.com/ghostty-org/ghostty)
+* [neovim](https://github.com/neovim/neovim)
+* [Polybar](https://github.com/polybar/polybar)
+* [rofi-themes](https://github.com/adi1090x/rofi)
+* [starship](https://github.com/starship/starship)
+* [*A large amount of vim/neovim plugins*](.config/nvim/fnl/plugins.fnl)

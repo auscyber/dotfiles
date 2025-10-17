@@ -1,4 +1,5 @@
 *.o
+**/result*
 *.stack-work
 *.DS_Store
 .direnv
