@@ -29,7 +29,7 @@ in
     };
     masApps = lib.mkOption {
       type = lib.types.attrsOf lib.types.int;
-      default = [ ];
+      default = { };
 
       description = "List of Mac App Store apps to install (requires mas-cli).";
     };
