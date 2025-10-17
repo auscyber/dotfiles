@@ -16,7 +16,7 @@
       iwSupport = true;
       githubSupport = true;
     })
-    gnome.gnome-mines
+    gnome-mines
     #google-chrome
 
   ];
