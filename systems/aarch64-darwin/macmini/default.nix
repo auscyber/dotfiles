@@ -34,13 +34,6 @@
   system.stateVersion = 5;
 
   # The platform the configuration will be used on.
-  homebrew.enable = true;
-  homebrew.onActivation = {
-    autoUpdate = true; # Fetch the newest stable branch of Homebrew's git repo
-    upgrade = true; # Upgrade outdated casks, formulae, and App Store apps
-    # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
-    cleanup = "zap";
-  };
 
   homebrew.casks = [
     "visual-studio-code"
