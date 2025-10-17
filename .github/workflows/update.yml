@@ -1,5 +1,4 @@
-
-name: "Build and populate cache"
+name: "update"
 on:
   schedule:
     # rebuild everyday at 2:51
@@ -18,7 +17,7 @@ jobs:
        if: ${{ matrix.system == 'macos-latest' }}
        with:
          # use lix main
-         source-url: "https://install.lix.systems/lix/lix-installer-x86_64-linux
+         source-url: "https://install.lix.systems/lix/lix-installer-x86_64-linux"
          extra-conf: |
            experimental-features = nix-command flakes
            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
