@@ -27,6 +27,29 @@
       experimental-features = nix-command flakes
     '';
   };
+     services.netatalk = {
+        enable = true;
+        settings = {
+          Homes = {  # Homes are optional - don't need them for Time Machine
+            "basedir regex" = "/home";
+            path = "netatalk";
+          };
+          time-machine = {
+             path = "/timemachine";
+	         "valid users" = "auscyber";
+             "time machine" = true;
+         };
+        };
+      };
+          services.avahi = {
+        enable = true;
+        nssmdns = true;
+        publish = {
+          enable = true;
+          userServices = true;
+        };
+      };
+
   stylix = {
   	enable = true;
 	image = ../../../backgrounds/phoebebridgers-2.jpg;
