@@ -57,7 +57,7 @@ jobs:
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Build nix packages
-      run: nix run .#ci -- --cachix-cache auscyber
+      run: nix run .#ci -- --cachix-cache auscyber --skip-cached --flake ".#checks.$(nix eval --raw --impure --expr builtins.currentSystem)"
       env:
         CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - name: update readnme
