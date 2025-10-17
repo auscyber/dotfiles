@@ -78,6 +78,7 @@
       };
     };
     programs.neovim.enable = true;
+    editors.zed.enable = true;
 
   };
   home.packages = with pkgs; [
