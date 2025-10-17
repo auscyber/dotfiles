@@ -33,20 +33,23 @@
           systemConfigurations = lib.filterAttrs (_: v: v.config.system.build.toplevel.system == system) (
             if pkgs.stdenv.isDarwin then self.darwinConfigurations else self.nixosConfigurations
           );
-          systemBuilds = lib.mapAttrsToList (_: v: v.config.system.build.toplevel) systemConfigurations;
+          systemBuilds = lib.mapAttrsToList (_: v: v.config.environment.systemPackages) systemConfigurations;
           nixShells = lib.attrValues self.devShells."${pkgs.stdenv.system}";
           homes = lib.attrValues (
             lib.filterAttrs (_: v: v.system == system) (
-              builtins.mapAttrs (_: v: v.activationPackage) self.homeConfigurations
+              builtins.mapAttrs (_: v: v.config.home.packages) self.homeConfigurations
             )
           );
           packages = builtins.filter (v: isBuildable v && isCacheable v && isDerivation v) (
             lib.attrValues (lib.filterAttrs (name: _: name != "ci") self.packages."${pkgs.stdenv.system}")
           );
-          outputsOf = p: map (o: p.${o}) p.outputs;
-          outputPkgs = lib.concatLists [
+          systemPackages = lib.concatLists [
             homes
             systemBuilds
+          ];
+          outputsOf = p: map (o: p.${o}) p.outputs;
+          outputPkgs = lib.concatLists [
+            systemPackages
             packages
             nixShells
           ];
@@ -60,7 +63,6 @@
         pkgs.stdenv.mkDerivation {
           name = "ci-checks-${system}";
           buildInputs = outputPkgs;
-
         }
       #		  ))
       ;
