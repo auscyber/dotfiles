@@ -120,6 +120,10 @@ in
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager
       inputs.sops-nix.nixosModules.sops
+      ../../modules/common/secrets.nix
+
+      ../../modules/common/nix
+      ../../modules/common/common
 
       {
         nixpkgs = {

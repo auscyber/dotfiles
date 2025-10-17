@@ -8,10 +8,8 @@ let
   cfg = config.auscybernix.secrets;
 in
 {
-  options = {
-    auscybernix.secrets = {
-      enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
-    };
+  options.auscybernix.secrets = {
+    enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
   };
   config = lib.mkIf cfg.enable {
     sops.defaultSopsFile = ../../secrets/default.yaml;

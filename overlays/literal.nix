@@ -24,7 +24,6 @@ let
 in
 (
   {
-
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     #.overrideAttrs

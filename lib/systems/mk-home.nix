@@ -34,6 +34,8 @@ inputs.home-manager.lib.homeManagerConfiguration {
     ../../modules/common/secrets.nix
     ../../modules/common/nix
     inputs.stylix.homeModules.stylix
+    {
+    }
   ]
   ++ common.externalHmModules
   ++ (extendedLib.importModulesRecursive ../../modules/home)
@@ -49,6 +51,12 @@ inputs.home-manager.lib.homeManagerConfiguration {
             "/home/${username}";
       };
     }
+    (
+      { config, lib, ... }:
+      {
+        auscybernix.standalone.enable = true;
+      }
+    )
   ]
   ++ modules;
 

@@ -14,6 +14,7 @@
     { pkgs, system, ... }:
     {
 
+      packages.ci = pkgs.nix-fast-build;
       checks.ci =
         with builtins;
         let
@@ -29,10 +30,10 @@
             && builtins.any (platform: platform == system) p.meta.platforms;
           isCacheable = p: !(p.preferLocalBuild or false);
           # get all systems and exposed packages and shells from this repo
-          systemConfigurations = lib.filterAttrs (_: v: v.system.system == system) (
+          systemConfigurations = lib.filterAttrs (_: v: v.config.system.build.toplevel.system == system) (
             if pkgs.stdenv.isDarwin then self.darwinConfigurations else self.nixosConfigurations
           );
-          systemBuilds = lib.mapAttrsToList (_: v: v.system) systemConfigurations;
+          systemBuilds = lib.mapAttrsToList (_: v: v.config.system.build.toplevel) systemConfigurations;
           nixShells = lib.attrValues self.devShells."${pkgs.stdenv.system}";
           homes = lib.attrValues (
             lib.filterAttrs (_: v: v.system == system) (
@@ -51,7 +52,18 @@
           ];
 
         in
-        concatMap outputsOf outputPkgs;
+        #        builtins.listToAttrs (
+        #          builtins.map (drv: {
+        #            name = drv.name;
+        #            value = drv;
+        #}) (
+        pkgs.stdenv.mkDerivation {
+          name = "ci-checks-${system}";
+          buildInputs = outputPkgs;
+
+        }
+      #		  ))
+      ;
 
     };
 
