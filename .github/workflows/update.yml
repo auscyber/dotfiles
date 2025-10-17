@@ -1,0 +1,39 @@
+
+name: "Build and populate cache"
+on:
+  schedule:
+    # rebuild everyday at 2:51
+    # TIP: Choose a random time here so not all repositories are build at once:
+    # https://www.random.org/clock-times/?num=1&earliest=01%3A00&latest=08%3A00&interval=5&format=html&rnd=new
+    - cron:  '51 2 * * 0,5'
+jobs:
+  tests:
+    strategy:
+    runs-on:  ubuntu-latest
+    steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
+     - name: Install nix
+       uses: DeterminateSystems/nix-installer-action@main
+       if: ${{ matrix.system == 'macos-latest' }}
+       with:
+         # use lix main
+         source-url: "https://install.lix.systems/lix/lix-installer-x86_64-linux
+         extra-conf: |
+           experimental-features = nix-command flakes
+           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+     - name: Create Pull Request
+       id: cpr
+       uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+       with:
+        token: ${{ steps.app-token.outputs.token }}
+        commit-message: "chore(deps): update flake inputs"
+        title: "chore(deps): update flake inputs"
+        branch: update-flake
+        sign-commits: true
+     - name: Enable auto-merge
+       if: steps.cpr.outputs.pull-request-number
+       run: |
+        gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
+       env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
