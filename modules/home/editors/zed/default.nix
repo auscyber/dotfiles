@@ -19,12 +19,15 @@ in
   };
 
   config = mkIf cfg.enable {
-
+    sops.secrets."wakatime_config" = {
+      path = "${config.home.homeDirectory}/.wakatime.cfg";
+    };
     programs.zed-editor = {
       enable = true;
 
       ## This populates the userSettings "auto_install_extensions"
       extensions = [
+        "wakatime"
         "nix"
         "toml"
         "lua"
@@ -90,12 +93,12 @@ in
             TERM = "alacritty";
           };
           font_family = "FiraCode Nerd Font";
-          font_features = null;
           font_size = null;
           line_height = "comfortable";
           option_as_meta = false;
           button = false;
           shell = "system";
+          inlay_hints.enabled = true;
           #{
           #                    program = "zsh";
           #};
@@ -106,6 +109,7 @@ in
         };
 
         lsp = {
+
           rust-analyzer = {
 
             binary = {

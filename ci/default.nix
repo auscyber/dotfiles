@@ -30,11 +30,11 @@
             && builtins.any (platform: platform == system) p.meta.platforms;
           isCacheable = p: !(p.preferLocalBuild or false);
           # get all systems and exposed packages and shells from this repo
-          systemConfigurations = lib.filterAttrs (_: v: v.config.system.build.toplevel.system == system) (
+          systemConfigurations = lib.filterAttrs (_: v: v.config.nixpkgs.system == system) (
             if pkgs.stdenv.isDarwin then self.darwinConfigurations else self.nixosConfigurations
           );
           systemBuilds = lib.mapAttrsToList (_: v: v.config.environment.systemPackages) systemConfigurations;
-          nixShells = lib.attrValues self.devShells."${pkgs.stdenv.system}";
+          nixShells = lib.attrValues self.devShells."${system}";
           homes = lib.mapAttrsToList (_: v: v.config.home.packages) (
             lib.filterAttrs (_: v: v.activationPackage.system == system) self.homeConfigurations
           );
