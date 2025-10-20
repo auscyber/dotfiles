@@ -38,9 +38,7 @@ in
     #   };
     # })
 
-    yabai = pkgs.yabai.overrideAttrs (attrs: {
-      src = inputs.yabai;
-    });
+    yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
       src = inputs.jankyborders;
     });
