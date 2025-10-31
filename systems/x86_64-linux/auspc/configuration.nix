@@ -18,6 +18,7 @@
   auscybernix = {
     nixos.games.enable = true;
     bootlogo.enable = true;
+    secrets.enable = true;
   };
   nix.settings.trusted-users = [
     "root"
@@ -42,14 +43,19 @@
   #
   #  };
 
-  services.udev.packages = [ pkgs.yubikey-personalization ];
+  services.udev.packages = with pkgs; [
+    yubikey-personalization
+    game-devices-udev-rules
+  ];
+
   services.udev.extraRules = ''
-    SUBSYSTEM=="tty", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="316d", GOTO="m1n1"
-    GOTO="not_m1n1"
-    LABEL="m1n1"
-    SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="00", KERNEL=="ttyACM*", SYMLINK+="m1n1"
-    SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="02", KERNEL=="ttyACM*", SYMLINK+="m1n1-sec"
-    LABEL="not_m1n1"
+        SUBSYSTEM=="tty", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="316d", GOTO="m1n1"
+        GOTO="not_m1n1"
+        LABEL="m1n1"
+        SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="00", KERNEL=="ttyACM*", SYMLINK+="m1n1"
+        SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="02", KERNEL=="ttyACM*", SYMLINK+="m1n1-sec"
+        LABEL="not_m1n1"
+    	SUBSYSTEM=="usb", ATTR{idVendor}=="057e", ATTR{idProduct}=="2069", MODE="0666"
   '';
   environment.etc."1password/custom_allowed_browsers" = {
     text = "zen";
@@ -60,7 +66,7 @@
     host = "0.0.0.0";
     enable = true;
     openFirewall = true;
-    acceleration = "cuda";
+    #    acceleration = "cuda";
   };
 
   security.pam.services = {
@@ -71,16 +77,16 @@
   services.pcscd.enable = true;
   #  home-manager.backupFileExtension = ".bak";
   fileSystems."/mnt/hdd" = {
-    device = "/dev/disk/by-label/hdd";
-    fsType = "lowntfs-3g";
-    options = [
-      "uid=1000"
-      "gid=100"
-      "rw"
-      "user"
-      "exec"
-      "umask=000"
-    ];
+    device = "/dev/sda3";
+    fsType = "ext4";
+    #    options = [
+    #      "uid=1000"
+    #      "gid=100"
+    #      "rw"
+    #      "user"
+    #      "exec"
+    #      "umask=000"
+    #    ];
   };
   fileSystems."/mnt/ssd2" = {
     device = "/dev/disk/by-uuid/704821B848217DCA";
@@ -94,13 +100,13 @@
       "umask=000"
     ];
   };
-  programs.virt-manager.enable = true;
+  #  programs.virt-manager.enable = true;
 
-  users.groups.libvirtd.members = [ "auscyber" ];
+  #  users.groups.libvirtd.members = [ "auscyber" ];
 
-  virtualisation.libvirtd.enable = true;
+  #  virtualisation.libvirtd.enable = true;
 
-  virtualisation.spiceUSBRedirection.enable = true;
+  #  virtualisation.spiceUSBRedirection.enable = true;
 
   boot.kernelModules = [ "kvm-intel" ];
   #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
@@ -232,7 +238,7 @@
   services.openssh.enable = true;
   services.openssh.settings.X11Forwarding = true;
 
-  services.displayManager.defaultSession = "hyprland";
+  #  services.displayManager.defaultSession = "hyprland";
   #services.displayManager.autoLogin = {
   #  enable = true;
   #  user = "auscyber";
@@ -288,7 +294,7 @@
   # Or disable the firewall altogether.
   networking.firewall.enable = true;
 
-  programs.hyprland.enable = true;
+  #  programs.hyprland.enable = true;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you

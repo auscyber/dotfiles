@@ -40,7 +40,7 @@ rec {
   sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   auscybernix = {
     keybinds.kanata = {
-      enable = true;
+      enable = false;
       extraPackages = with pkgs; [
         hyprland
         ghostty
@@ -53,7 +53,7 @@ rec {
     browsers.zen-browser.enable = true;
     programs._1password-cli.enable = true;
     terms.ghostty.enable = true;
-    wms.hyprland.enable = true;
+    wms.hyprland.enable = false;
 
     shell = {
       enable = true;
@@ -92,7 +92,8 @@ rec {
   home.packages =
     with pkgs;
     [
-      element-desktop
+      shadps4
+      #      element-desktop
       tidal-hifi
       st
 
@@ -120,7 +121,7 @@ rec {
       polybarFull
       playerctl
       htop
-      eclipses.eclipse-java
+      #      eclipses.eclipse-java
       starship
       fish
       nitrogen
@@ -143,7 +144,7 @@ rec {
       grub2_efi
       (python3.withPackages (p: with p; [ pynvim ]))
       #      metals
-      _1password
+      _1password-cli
       nautilus
       eww
       #wezterm
@@ -151,7 +152,6 @@ rec {
       file
       mitscheme
       libreoffice
-      pinentry
       thunderbird
     ]
     ++ (with pkgs.lua51Packages; [ luarocks ]);

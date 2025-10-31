@@ -55,7 +55,7 @@ in
     inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
     #            nh = inputs.nh.packages."${system}".default;
     inherit (inputs.eww.packages.${system}) eww;
-    inherit (inputs.rnix.packages."${system}") rnix-lsp;
+    #    inherit (inputs.rnix.packages."${system}") rnix-lsp;
     ghostty = ghostty."${system}";
     zen-browser = zen-browser."${system}";
     picom = pkgs.picom.overrideAttrs (attrs: {
@@ -64,6 +64,9 @@ in
     mopidy-tidal = pkgs.mopidy-tidal.overrideAttrs (_: {
       doCheck = false;
     });
+
+  }
+  // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
     gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
       patches = attrs.patches ++ [
         (pkgs.fetchpatch {
@@ -72,11 +75,7 @@ in
         })
       ];
     });
-    gst_all_1 = pkgs.gst_all_1 // {
-      gst-plugins-rs = pkgs.gst_all_1.gst-plugins-rs.overrideAttrs (attrs: {
-        doCheck = false;
-      });
-    };
+
     zotero-extensions = {
       zotero-better-bibtex = pkgs.fetchFirefoxAddon {
         name = "zotero-better-bibtex";
@@ -94,17 +93,21 @@ in
         platforms = lib.platforms.unix;
       };
     });
+    game-devices-udev-rules = pkgs.game-devices-udev-rules.overrideAttrs (attrs: {
+
+      src = inputs.game-devices-udev-rules;
+    });
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
 
-    ipython = pkgs.ipython.overrideAttrs (attrs: {
-
-      doCheck = false;
-    });
-
-    libsecret = pkgs.libsecret.overrideAttrs (attrs: {
-      doCheck = false;
-    });
+    #    ipython = pkgs.ipython.overrideAttrs (attrs: {
+    #
+    #      doCheck = false;
+    #    });
+    #
+    #    libsecret = pkgs.libsecret.overrideAttrs (attrs: {
+    #      doCheck = false;
+    #    });
 
   })
 )

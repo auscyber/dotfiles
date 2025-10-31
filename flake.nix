@@ -2,6 +2,11 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+    game-devices-udev-rules = {
+      url = "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.tar.gz";
+      flake = false;
+
+    };
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
     nixos-images = {
       # url = "github:nix-community/nixos-images";
@@ -132,12 +137,13 @@
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
 
     };
 
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
-    local-nixpkgs.url = "github:auscyberman/nixpkgs";
+    #local-nixpkgs.url = "github:auscyberman/nixpkgs";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
