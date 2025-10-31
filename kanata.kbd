@@ -22,16 +22,14 @@
   fn   lctl lalt lmet           spc            rmet ralt left down rght
 )
 
+
 )
+
 (defalias fn_toggle (layer-toggle fn)
 			metarebind (layer-toggle metarebind))
-(platform (macos) (deflayer (default)
-  esc  brdown   brup   f3   f4   f5   f6   f7   f8   f9   mute  vold  volu
-  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-  caps a    s    d    f    g    h    j    k    l    ;    '    ret
-  lsft z    x    c    v    b    n    m    ,    .    /    rsft up
-  @fn_toggle   lctl @space_manip lmeta            spc            rmet ralt left down rght
+(platform (macos) (deflayermap (default)
+  fn @fn_toggle lalt @space_manip ` @grave
+
 ))
 
 
@@ -55,13 +53,13 @@
  f4 f4  f5 f5   f6 f6   f7  f7  f8 f8  f9 f9   f10 f10 f11 f11   f12 f12
 
 )
+(deflayermap (lol)
+ ` @grave)
 
 
 
 
-
-
-(defalias space_manip (layer-toggle space_manip))
+(defalias space_manip (multi lalt (layer-while-held space_manip)))
 (deflayermap (space_manip)
   1 (fork @1s @1m (lshift))
   2  (fork @2s @2m (lshift))
@@ -82,6 +80,13 @@
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
   )
+(defalias grave
+(switch 
+    ((key-history a 1)) (macro  bspc A-` a ) break
+    ((key-history e 1)) (macro bspc A-` e) break
+    () use-defsrc fallthrough)
+)
+
 
 
 (deftemplate runasuser (command)

@@ -16,11 +16,21 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
+    programs.zotero = {
+      enable = false;
+      profiles."bla" = {
+        extensions.packages = with pkgs.zotero-extensions; [
+          zotero-attanger
+          zotero-better-bibtex
+        ];
+      };
+
+    };
 
     home.packages = with pkgs; [
       zotero
       tesseract
-      poppler_utils
+      poppler-utils
     ];
   };
 }

@@ -14,6 +14,10 @@
     nixcord = {
       url = "github:kaylorben/nixcord";
     };
+    qwerty-fr = {
+      url = "github:qwerty-fr/qwerty-fr";
+      flake = false;
+    };
     qanata.url = "github:veyxov/qanata";
     kanata = {
       url = "github:jtroo/kanata";
@@ -130,10 +134,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
 
     };
-    french-accents = {
-      url = "github:ottopiramuthu/espanso-package-example";
-      flake = false;
-    };
+
     nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
     idris2-pkgs.url = "github:claymager/idris2-pkgs";
     local-nixpkgs.url = "github:auscyberman/nixpkgs";

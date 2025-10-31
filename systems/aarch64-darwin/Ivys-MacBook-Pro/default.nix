@@ -57,6 +57,7 @@
     vscode
     pandoc
     # _1password
+    thunderbird-latest-bin-unwrapped
     texliveFull
     #    wezterm
     zotero
@@ -155,9 +156,9 @@
       masApps = {
         #    "1Password for Safari" = 1569813296;
         #    "Microsoft 365" = 1450038993;
-        "Microsoft Word" = 462054704;
+        #  "Microsoft Word" = 462054704;
         Fantastical = 975937182;
-        "Microsoft Outlook" = 985367838;
+        # "Microsoft Outlook" = 985367838;
       };
     };
   };

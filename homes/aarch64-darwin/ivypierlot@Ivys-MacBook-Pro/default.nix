@@ -49,6 +49,13 @@
     signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
 
   };
+  services.ollama = {
+    enable = true;
+    environmentVariables = {
+      "OLLAMA_ORIGINS" = "moz-extension://*";
+    };
+
+  };
   auscybernix = {
     services.mopidy.enable = false;
     wms.yabai.enable = true;
@@ -65,6 +72,77 @@
         "com.1password.1password-launcher"
       ];
       config = config.lib.file.getLocalPath ../../../kanata.kbd;
+      extraConfigPaths = [
+        #        (
+        #          let
+        #            splitStuff =
+        #              splitted:
+        #              builtins.filter (line: line != "") (
+        #                lib.splitString "\n" (
+        #                  builtins.readFile (
+        #                    pkgs.runCommand "toJSON"
+        #                      {
+        #                        buildInputs = [
+        #                          pkgs.perlPackages.JSON
+        #                          pkgs.perl
+        #                        ];
+        #                      }
+        #                      ''
+        #                        echo '${
+        #                          lib.replaceString " " "" splitted
+        #                        }' | perl -CSD -0777 -ne 'use utf8; @m = /\X/gu; print join("\n",  @m);' | sed '/^[[:space:]]*$/d' > $out
+        #                      ''
+        #                  )
+        #                )
+        #              );
+        #
+        #            qwerty-fr = builtins.fromJSON (
+        #              builtins.readFile (
+        #                pkgs.runCommand "toJson" { } ''cat ${../../../qwerty-fr.yaml} | ${lib.getExe pkgs.yq} > $out''
+        #              )
+        #            );
+        #            deadkeys = qwerty-fr.deadkeys;
+        #
+        #            layerMaps = builtins.map (
+        #              layer:
+        #              let
+        #                base = splitStuff layer.base;
+        #                alt = splitStuff layer.alt;
+        #                zipped = lib.zipListsWith (
+        #                  a: b: "((key-history ${a} 1)) ((unicode \"${b}\") (sequence-noerase 1)) break"
+        #                ) base alt;
+        #
+        #              in
+        #              {
+        #                name = layer.name;
+        #                char = builtins.elemAt (splitStuff layer.char) 1;
+        #                output = ''
+        #                  (switch
+        #                  ${lib.concatStringsSep "\n" zipped}
+        #                  _ (use-defsrc) break
+        #                  )
+        #                '';
+        #              }
+        #            ) deadkeys;
+        #
+        #          in
+        #          "${pkgs.writeText "qwerty-fr.kbd" ''
+        #            (defzippy
+        #            ${../../../zippy.txt}
+        #
+        #              output-character--mappings  (
+        #              ${lib.concatStringsSep "\n" (
+        #                map (layer: ''
+        #                  "${layer.char}" ${layer.output}
+        #                '') layerMaps
+        #              )}
+        #            )
+        #            )
+        #
+        #          ''}"
+        #        )
+
+      ];
     };
     programs.zotero.enable = true;
     browsers.zen-browser.enable = true;
@@ -114,175 +192,6 @@
   };
 
   # You can also manage environment variables but you will have to manually
-  services.espanso = {
-    enable = true;
-    matches = {
-      french = {
-        matches = [
-
-          {
-            trigger = "e'";
-            replace = "é";
-          }
-
-          {
-            trigger = "e`";
-            replace = "è";
-          }
-
-          {
-            trigger = "e^";
-            replace = "ê";
-          }
-
-          {
-            trigger = "e:";
-            replace = "ë";
-          }
-
-          {
-            trigger = "o^";
-            replace = "ô";
-          }
-
-          {
-            trigger = "a`";
-            replace = "à";
-          }
-
-          {
-            trigger = "a^";
-            replace = "â";
-          }
-
-          {
-            trigger = "i^";
-            replace = "î";
-          }
-
-          {
-            trigger = "i:";
-            replace = "ï";
-          }
-
-          {
-            trigger = "u`";
-            replace = "ù";
-          }
-
-          {
-            trigger = "u^";
-            replace = "û";
-          }
-
-          {
-            trigger = "u:";
-            replace = "ü";
-          }
-
-          {
-            trigger = "oe";
-            replace = "œ";
-          }
-
-          {
-            trigger = "ae";
-            replace = "æ";
-          }
-
-          {
-            trigger = "y:";
-            replace = "ÿ";
-          }
-
-          {
-            trigger = "c,";
-            replace = "ç";
-          }
-
-          {
-            trigger = "E'";
-            replace = "É";
-          }
-
-          {
-            trigger = "E`";
-            replace = "È";
-          }
-
-          {
-            trigger = "E^";
-            replace = "Ê";
-          }
-
-          {
-            trigger = "E:";
-            replace = "Ë";
-          }
-
-          {
-            trigger = "O^";
-            replace = "Ô";
-          }
-
-          {
-            trigger = "A`";
-            replace = "À";
-          }
-
-          {
-            trigger = "A^";
-            replace = "Â";
-          }
-
-          {
-            trigger = "I^";
-            replace = "Î";
-          }
-
-          {
-            trigger = "I:";
-            replace = "Ï";
-          }
-
-          {
-            trigger = "U`";
-            replace = "Ù";
-          }
-
-          {
-            trigger = "U^";
-            replace = "Û";
-          }
-
-          {
-            trigger = "U:";
-            replace = "Ü";
-          }
-
-          {
-            trigger = "OE";
-            replace = "Œ";
-          }
-
-          {
-            trigger = "AE";
-            replace = "Æ";
-          }
-
-          {
-            trigger = "Y:";
-            replace = "Ÿ";
-          }
-
-          {
-            trigger = "C,";
-            replace = "Ç";
-          }
-        ];
-      };
-    };
-  };
 
   targets.darwin.defaults.NSGlobalDomain = {
     AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";

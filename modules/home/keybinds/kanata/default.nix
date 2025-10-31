@@ -7,6 +7,10 @@
 let
   cfg = config.auscybernix.keybinds.kanata;
   inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
+  outputFile = pkgs.writeText "kanata-config.kbd" ''
+    (include ${cfg.config})
+    ${lib.concatStringsSep "\n" (map (path: "(include " + path + ")") cfg.extraConfigPaths)}
+  '';
 in
 {
   options.auscybernix.keybinds.kanata = with lib.types; {
@@ -38,6 +42,12 @@ in
       default = "${pkgs.kanata}/share/kanata/kanata.kbd";
       description = "kanata config file content";
     };
+    extraConfigPaths = lib.mkOption {
+      type = listOf str;
+      default = [ ];
+      description = "Extra config file paths to include";
+    };
+
     kanataCommand = lib.mkOption {
       type = listOf str;
       default = "";
@@ -78,7 +88,7 @@ in
           "-p"
           "${builtins.toString cfg.kanataPort}"
           "-c"
-          cfg.config
+          "${outputFile}"
         ];
 
         launchd.agents.kanata-vk-agent = {

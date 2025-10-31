@@ -64,11 +64,36 @@ in
     mopidy-tidal = pkgs.mopidy-tidal.overrideAttrs (_: {
       doCheck = false;
     });
+    gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
+      patches = attrs.patches ++ [
+        (pkgs.fetchpatch {
+          url = "https://raw.githubusercontent.com/NixOS/nixpkgs/refs/heads/staging/pkgs/development/libraries/gtk/patches/3.0-mr5531-backport.patch";
+          hash = "sha256-vP0xmeKQazr93bTV+2kIwsNA+rZPmNd9iaUfpYOpD0M=";
+        })
+      ];
+    });
     gst_all_1 = pkgs.gst_all_1 // {
       gst-plugins-rs = pkgs.gst_all_1.gst-plugins-rs.overrideAttrs (attrs: {
         doCheck = false;
       });
     };
+    zotero-extensions = {
+      zotero-better-bibtex = pkgs.fetchFirefoxAddon {
+        name = "zotero-better-bibtex";
+        url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v7.0.59/zotero-better-bibtex-7.0.59.xpi";
+        hash = "sha256-4p6Twni+kGKQPjmFmjCHJMypu8WSGweTiZINfPjy9i8=";
+      };
+      zotero-attanger = pkgs.fetchFirefoxAddon {
+        name = "zotero-attanger";
+        url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.3.9/zotero-attanger.xpi";
+        hash = "sha256-C8YC473o1gthq5gpi5FEdbIcTX4MsA7hGcC1oLyJotw=";
+      };
+    };
+    pam_rssh = pkgs.pam_rssh.overrideAttrs (attrs: {
+      meta = attrs.meta // {
+        platforms = lib.platforms.unix;
+      };
+    });
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
 

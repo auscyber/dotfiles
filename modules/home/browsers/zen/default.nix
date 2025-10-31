@@ -51,7 +51,82 @@ in
       );
       inherit policies;
       profiles."${cfg.profileName}" = {
-        search.default = "https://unduck.link?q=%s";
+        search = {
+          force = true;
+          engines = {
+            nix-packages = {
+              name = "Nix Packages";
+              urls = [
+                {
+                  template = "https://search.nixos.org/packages";
+                  params = [
+                    {
+                      name = "type";
+                      value = "packages";
+                    }
+                    {
+                      name = "query";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+              ];
+
+              icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+              definedAliases = [ "@np" ];
+            };
+            unduck = {
+              name = "UnDuck";
+              urls = [
+                {
+                  template = "https://unduck.link";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+              ];
+            };
+            scholar = {
+              name = "Google Scholar";
+              urls = [
+                {
+                  template = "https://scholar.google.com/scholar";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+              ];
+              definedAliases = [ "@sch" ];
+            };
+            "Home-Manager-Options" = {
+              urls = [
+                {
+                  template = "https://home-manager-options.extranix.com";
+                  params = [
+                    {
+                      name = "query";
+                      value = "{searchTerms}";
+                    }
+                    {
+                      name = "release";
+                      value = "master";
+                    }
+                  ];
+                }
+              ];
+              definedAliases = [ "@hm" ];
+            };
+          };
+          default = "unduck";
+          privateDefault = "unduck";
+        };
+
         isDefault = true;
         settings = {
           "extensions.autoDisableScopes" = 0;
