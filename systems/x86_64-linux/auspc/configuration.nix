@@ -70,6 +70,7 @@
   };
 
   security.pam.services = {
+    login.kwallet.enable = true;
     login.u2fAuth = true;
     sudo.u2fAuth = true;
   };

@@ -34,7 +34,7 @@
 
 # File to search for to find the tree root (if tree-root is not set)
 # Env $TREEFMT_TREE_ROOT_FILE
-# tree-root-file = ".git/config"
+tree-root-file = ".git/config"
 
 # Set the verbosity of logs
 # 0 = warn, 1 = info, 2 = debug

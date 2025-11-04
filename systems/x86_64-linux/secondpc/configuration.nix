@@ -13,13 +13,15 @@
   auscybernix.nix.caches = false;
   nix = {
     settings = {
-    	trusted-users = [ "auscyber" ];
-	substituters = [ "https://cache.nixos.org"  "http://secondpc:8501" ];
-	trusted-public-keys = [
-	"secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
-	"cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-	];
-
+      trusted-users = [ "auscyber" ];
+      substituters = [
+        "https://cache.nixos.org"
+        "http://secondpc:8501"
+      ];
+      trusted-public-keys = [
+        "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      ];
 
     };
 
@@ -27,33 +29,34 @@
       experimental-features = nix-command flakes
     '';
   };
-     services.netatalk = {
-        enable = true;
-        settings = {
-          Homes = {  # Homes are optional - don't need them for Time Machine
-            "basedir regex" = "/home";
-            path = "netatalk";
-          };
-          time-machine = {
-             path = "/timemachine";
-	         "valid users" = "auscyber";
-             "time machine" = true;
-         };
-        };
+  services.netatalk = {
+    enable = true;
+    settings = {
+      Homes = {
+        # Homes are optional - don't need them for Time Machine
+        "basedir regex" = "/home";
+        path = "netatalk";
       };
-          services.avahi = {
-        enable = true;
-        nssmdns = true;
-        publish = {
-          enable = true;
-          userServices = true;
-        };
+      time-machine = {
+        path = "/timemachine";
+        "valid users" = "auscyber";
+        "time machine" = true;
       };
+    };
+  };
+  services.avahi = {
+    enable = true;
+    nssmdns = true;
+    publish = {
+      enable = true;
+      userServices = true;
+    };
+  };
 
   stylix = {
-  	enable = true;
-	image = ../../../backgrounds/phoebebridgers-2.jpg;
-	polarity = "dark";
+    enable = true;
+    image = ../../../backgrounds/phoebebridgers-2.jpg;
+    polarity = "dark";
   };
   services.jellyfin.enable = false;
   boot.kernel.sysctl = {
@@ -105,7 +108,7 @@
   networking.nameservers = [ "1.1.1.1" ];
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
-  8501
+    8501
     25565
     8080
     21115
@@ -198,17 +201,17 @@
     enable = false;
   };
 
-#  environment.etc."rclone-mnt.conf".text = ''
-#    [owncloud]
-#    type = webdav
-#    url = https://owncloud.imflo.pet/remote.php/webdav
-#    vendor = owncloud
-#    bearer_token_command = /run/current-system/sw/bin/oidc-token my-client
-#  '';
-#
-#  environment.extraInit = ''
-#    eval `oidc-keychain --accounts my-client`
-#  '';
+  #  environment.etc."rclone-mnt.conf".text = ''
+  #    [owncloud]
+  #    type = webdav
+  #    url = https://owncloud.imflo.pet/remote.php/webdav
+  #    vendor = owncloud
+  #    bearer_token_command = /run/current-system/sw/bin/oidc-token my-client
+  #  '';
+  #
+  #  environment.extraInit = ''
+  #    eval `oidc-keychain --accounts my-client`
+  #  '';
 
   #fileSystems."/mnt/plexmedia" = {
   #  device = "owncloud:/Plexmedia";
@@ -230,8 +233,8 @@
   };
   programs.fish.enable = true;
   hardware.opengl = {
-  enable = true;
-  extraPackages = with pkgs; [ intel-ocl];
+    enable = true;
+    extraPackages = with pkgs; [ intel-ocl ];
   };
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -240,7 +243,7 @@
     pkgs.jellyfin-web
     pkgs.jellyfin-ffmpeg
     jq
-	#oidc-agent
+    #oidc-agent
     rclone
     vscode-fhs
     wget
@@ -338,10 +341,10 @@
   services.openssh = {
     enable = true;
     forwardX11 = true;
-	settings = {
+    settings = {
 
-    AllowAgentForwarding = true;
-	};
+      AllowAgentForwarding = true;
+    };
 
   };
   #services.espanso.enable = true;
@@ -357,16 +360,16 @@
     };
     server.addr = "0.0.0.0:8501";
     upstream = {
-	caches = [
+      caches = [
         "https://nix-community.cachix.org"
         "https://iohk.cachix.org"
         "https://cache.nixos.org"
         "https://devenv.cachix.org"
-	"https://auscyber.cachix.org"
+        "https://auscyber.cachix.org"
       ];
       publicKeys = [
-      "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c="
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c="
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
