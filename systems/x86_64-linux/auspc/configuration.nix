@@ -69,9 +69,16 @@
     #    acceleration = "cuda";
   };
 
+  security.pam.u2f = {
+    enable = true;
+    settings.authfile = ./u2f_mappings;
+  };
   security.pam.services = {
     login.kwallet.enable = true;
     login.u2fAuth = true;
+    ly.u2fAuth = true;
+    ly.kwallet.enable = true;
+    polkit-1.u2fAuth = true;
     sudo.u2fAuth = true;
   };
 
@@ -281,6 +288,25 @@
         ];
 
     };
+  };
+
+  auscybernix.nix.caches = false;
+  nix = {
+    settings = {
+      substituters = [
+        "https://cache.nixos.org"
+        "http://192.168.0.26:8501"
+      ];
+      trusted-public-keys = [
+        "192.168.0.26:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      ];
+
+    };
+
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
   };
   programs._1password.enable = true;
   programs._1password-gui = {

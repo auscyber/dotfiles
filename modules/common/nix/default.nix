@@ -41,16 +41,19 @@ in
       #    package = pkgs.lixPackageSets.latest.lix;
 
       extraOptions = ''
-        experimental-features = nix-command flakes
+        experimental-features = nix-command flakes ca-derivations
       '';
       gc = {
         automatic = true;
         options = "--delete-older-than 30d";
       };
 
-      package = pkgs.nixVersions.stable;
+      package = pkgs.nixVersions.latest;
     };
 
-    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config = {
+      #      contentAddressedByDefault = true;
+      allowUnfree = true;
+    };
   };
 }

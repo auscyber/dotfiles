@@ -43,6 +43,7 @@
         experimental-features = [
           "nix-command"
           "flakes"
+          "ca-derivations"
         ];
       };
     };
