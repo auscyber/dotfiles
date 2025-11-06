@@ -231,6 +231,12 @@
 
     #	};
   };
+  security.services.pam.sudo = {
+  	rssh = true;
+	};
+   environment.etc."ssh/authorized_keys.d/auscyber".text = ''
+   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1
+   '';
   programs.fish.enable = true;
   hardware.opengl = {
     enable = true;
