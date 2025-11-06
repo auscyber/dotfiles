@@ -3753,7 +3753,9 @@
         "rnix": "rnix",
         "rust-overlay": "rust-overlay_3",
         "sops-nix": "sops-nix",
+        "staging-next": "staging-next",
         "stylix": "stylix",
+        "treefmt-nix": "treefmt-nix",
         "unstable": "unstable",
         "wezterm": "wezterm",
         "yabai": "yabai",
@@ -3927,6 +3929,22 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "staging-next": {
+      "locked": {
+        "lastModified": 1762301853,
+        "narHash": "sha256-kCMgsYICDjDN3ozICMeN38N7coK1ZLK030PqPuKk088=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "4434bd951111441afae65891fdd8e9838af0ea1e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "staging-next",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -4256,6 +4274,26 @@
         "type": "github"
       }
     },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762305549,
+        "narHash": "sha256-iHxl8YwQsCX9QyB0ImEvmr+C3FuZP0BR/9vMmjbaITA=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "144d1e80d642c50c71846c0cb674e86c956e9a24",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
     "unstable": {
       "locked": {
         "lastModified": 1762156382,
@@ -4365,16 +4403,15 @@
     "yabai": {
       "flake": false,
       "locked": {
-        "lastModified": 1757007463,
-        "narHash": "sha256-hpZJFz7bP9nKcYEj+zOMHolIQWOFG1mblc3iuEOTOKE=",
+        "lastModified": 1759843636,
+        "narHash": "sha256-WXvM0ub4kJ3rKXynTxmr2Mx+LzJOgmm02CcEx2nsy/A=",
         "owner": "koekeishiya",
         "repo": "yabai",
-        "rev": "66690749e820d06a7a0c8ba152b3872640163dd3",
+        "rev": "9868ae3fc5348d0fcb54ce71fbd6dd39c87cb61d",
         "type": "github"
       },
       "original": {
         "owner": "koekeishiya",
-        "ref": "pull/2644/head",
         "repo": "yabai",
         "type": "github"
       }

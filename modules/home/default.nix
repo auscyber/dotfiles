@@ -40,10 +40,9 @@
     nix = {
       #              package = pkgs.nixVersions.latest;
       settings = {
-        experimental-features = [
+        extra-experimental-features = [
           "nix-command"
           "flakes"
-          "ca-derivations"
         ];
       };
     };

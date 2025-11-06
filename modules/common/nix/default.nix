@@ -41,14 +41,14 @@ in
       #    package = pkgs.lixPackageSets.latest.lix;
 
       extraOptions = ''
-        experimental-features = nix-command flakes ca-derivations
+        experimental-features = nix-command flakes
       '';
       gc = {
         automatic = true;
         options = "--delete-older-than 30d";
       };
 
-      package = pkgs.nixVersions.latest;
+      #      package = pkgs.nixVersions.latest;
     };
 
     nixpkgs.config = {

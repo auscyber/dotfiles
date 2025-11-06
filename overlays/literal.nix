@@ -24,6 +24,7 @@ let
 in
 (
   {
+
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     lix = pkgs.lix.overrideAttrs (attrs: {
@@ -51,12 +52,16 @@ in
     ivy-fetch = pkgs.callPackage ../packages/ivy-fetch { };
     hln = pkgs.callPackage ../packages/hardlink.nix { };
     pinentry = pinentry."${system}";
-    desktoppr = pkgs.callPackage ../packages/desktoppr.nix { };
+    kanata-vk-agent = inputs.my-nur.packages."${system}".kanata-vk-agent;
+    #desktoppr = pkgs.callPackage ../packages/desktoppr.nix { };
     inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
     #            nh = inputs.nh.packages."${system}".default;
     inherit (inputs.eww.packages.${system}) eww;
     #    inherit (inputs.rnix.packages."${system}") rnix-lsp;
     ghostty = ghostty."${system}";
+    buildEnvExtra =
+      lib.extra.overrideDerivation inputs.staging-next.legacyPackages."${system}".buildEnv
+        pkgs;
     zen-browser = zen-browser."${system}";
     picom = pkgs.picom.overrideAttrs (attrs: {
       src = inputs.picom;

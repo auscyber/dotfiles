@@ -24,13 +24,12 @@ in
 
   config = lib.mkIf cfg.enable ({
 
-    security.pam.services.sudo_local.text = lib.concatLines [
+    security.pam.services.sudo_local.text = lib.concatLines (
       (lib.optional cfg.touchIdAuth "auth       sufficient     pam_tid.so")
-      (lib.optional cfg.sshAgentAuth.enable ''
+      ++ (lib.optional cfg.sshAgentAuth.enable ''
         auth       sufficient     ${pkgs.pam_rssh}/lib/libpam_rssh.dylib auth_key_file=${cfg.sshAgentAuth.authorisedKeys}
       '')
-
-    ];
+    );
 
   });
 

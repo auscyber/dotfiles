@@ -28,9 +28,15 @@
 (defalias fn_toggle (layer-toggle fn)
 			metarebind (layer-toggle metarebind))
 (platform (macos) (deflayermap (default)
-  fn @fn_toggle lalt @space_manip ` @grave
+  fn @fn_toggle lalt @space_manip
+  f1 brdown   f2 brup
+  f10  mute  f11 vold  f12 volu
 
 ))
+
+(deflayermap (frenchkeys)
+` @grave ' @quote , @comma 6 @hat
+)
 
 
 
@@ -43,6 +49,7 @@
   app.zen-browser.zen nop0
   com.1password.1password nop0
   com.1password.1password-launcher nop0
+  com.microsoft.Word.Language.french (layer-while-held frenchkeys)
 
 ))
 
@@ -53,8 +60,7 @@
  f4 f4  f5 f5   f6 f6   f7  f7  f8 f8  f9 f9   f10 f10 f11 f11   f12 f12
 
 )
-(deflayermap (lol)
- ` @grave)
+
 
 
 
@@ -75,17 +81,39 @@
   tab (fork @switch-focus @reverse-switch-focus (lshift))
   enter @terminal_app
   spc (fork @launcher_app @search_windows (lshift))
-  c @kill-focus
+  c (fork _ @kill-focus (lshift))
   d (fork _ @toggle_discord_scratchpad (lshift))
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
   )
+(defalias quote
+(switch
+    ((key-history a 1)) (macro  bspc A-e a ) break
+    ((key-history e 1)) (macro bspc A-e e) break
+    () use-defsrc fallthrough)
+)
+
+(defalias hat
+(switch
+    ((key-history a 1)) (macro  bspc A-i a ) break
+    ((key-history e 1)) (macro bspc A-i e) break
+    () use-defsrc fallthrough)
+)
+
+
 (defalias grave
-(switch 
+(switch
     ((key-history a 1)) (macro  bspc A-` a ) break
     ((key-history e 1)) (macro bspc A-` e) break
     () use-defsrc fallthrough)
 )
+
+(defalias comma
+ (switch
+ ((key-history c 1)) (macro bspc A-c) break
+ () use-defsrc fallthrough))
+
+
 
 
 

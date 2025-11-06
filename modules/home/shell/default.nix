@@ -67,8 +67,12 @@ in
 
       git = {
         enable = true;
-        userName = "Ivy Pierlot";
-        userEmail = "ivyp@outlook.com.au";
+        settings = {
+          user = {
+            name = "Ivy Pierlot";
+            email = "ivyp@outlook.com.au";
+          };
+        };
       };
       eza = {
         enable = true;

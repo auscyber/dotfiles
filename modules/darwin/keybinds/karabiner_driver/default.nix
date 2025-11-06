@@ -17,7 +17,7 @@ in
       type = lib.types.bool;
       default = false;
     };
-    karabinerDriverPackage = lib.mkOption {
+    package = lib.mkOption {
       type = lib.types.package;
       default = pkgs.karabiner-dk;
     };
@@ -27,7 +27,7 @@ in
   config = lib.mkIf cfg.enable {
     services.karabiner-dk = {
       enable = true;
-      package = cfg.karabinerDriverPackage;
+      package = cfg.package;
     };
   };
 }

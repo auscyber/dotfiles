@@ -31,11 +31,11 @@ in
       ];
 
       system.build.applications = lib.mkForce (
-        pkgs.buildEnv {
+        pkgs.buildEnvExtra {
           name = "system-applications";
           pathsToLink = [
             "/Applications"
-            "/Library"
+            "/Library/Application Support"
           ];
           paths =
             config.environment.systemPackages

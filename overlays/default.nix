@@ -19,10 +19,13 @@
     };
   flake.overlays = {
     default = lib.composeManyExtensions [
-      #        inputs.hyprpanel.overlay
 
+      #        inputs.hyprpanel.overlay
+      (final: prev: {
+        lib = prev.lib.extend self.lib.overlay;
+      })
       inputs.nur.overlays.default
-      inputs.my-nur.overlays.default
+      #      inputs.my-nur.overlays.default
       #      (final: prev: {
       #        nur = prev.nur // {
       #          repos = prev.nur.repos // {

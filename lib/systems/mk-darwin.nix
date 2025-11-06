@@ -62,6 +62,7 @@ inputs.darwin.lib.darwinSystem {
     ../../modules/common/hm
     ../../modules/common/common
     ../../modules/common/kmonad
+    ../../modules/common/ssh-keys.nix
     homeManagerConfig
 
   ]

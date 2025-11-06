@@ -63,6 +63,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../../modules/common/nix
     ../../modules/common/hm
     ../../modules/common/common
+    ../../modules/common/ssh-keys.nix
     homeManagerConfig
   ]
   ++ (extendedLib.importModulesRecursive ../../modules/nixos)

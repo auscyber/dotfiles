@@ -22,7 +22,6 @@
 
   documentation.enable = true;
   stylix.targets.jankyborders.enable = false;
-  security.pam.services.sudo_local.touchIdAuth = true;
   fonts.packages =
     with pkgs;
     (with nerd-fonts; [
@@ -112,8 +111,16 @@
   # The platform the configuration will be used on.
   services.karabiner-elements.enable = false;
   auscybernix = {
+    sudo.pam = {
+      enable = true;
+      touchIdAuth = true;
+
+    };
     sudo.agents.enable = true;
-    keybinds.karabiner-driver-kit.enable = true;
+    keybinds.karabiner-driver-kit = {
+      enable = true;
+      package = pkgs.kanata.darwinDriver;
+    };
 
     homebrew = {
       enable = true;

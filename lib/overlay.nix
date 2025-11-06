@@ -15,7 +15,7 @@ in
     importModulesRecursive
     ;
 
-  inherit (auscyberLib.flake.lib) system file;
+  inherit (auscyberLib.flake.lib) system file extra;
 
   inherit (inputs.home-manager.lib) hm;
 

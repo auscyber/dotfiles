@@ -25,6 +25,9 @@ in
       bat
       starship
     ];
+    home.sessionVariables = {
+      BROWSER = "zen";
+    };
 
     programs.fish = {
       enable = true;

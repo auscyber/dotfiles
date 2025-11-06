@@ -53,6 +53,11 @@ in
       default = "";
       description = "kanata command to run";
     };
+    extraCommandPiping = lib.mkOption {
+      type = nullOr path;
+      default = null;
+      description = "Extra virtual command keys";
+    };
   };
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
@@ -101,7 +106,11 @@ in
               "${builtins.toString cfg.kanataPort}"
               "-b"
               "${builtins.concatStringsSep "," cfg.appBundleIds}"
-            ];
+            ]
+            ++ (lib.optionals (cfg.extraCommandPiping != null) [
+              "-e"
+              (builtins.toString cfg.extraCommandPiping)
+            ]);
             RunAtLoad = true;
             KeepAlive = {
               Crashed = true;

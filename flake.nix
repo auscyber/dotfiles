@@ -2,6 +2,8 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     game-devices-udev-rules = {
       url = "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.tar.gz";
       flake = false;
@@ -48,7 +50,7 @@
       flake = false;
     };
     yabai = {
-      url = "github:koekeishiya/yabai?ref=pull/2644/head";
+      url = "github:koekeishiya/yabai";
       flake = false;
     };
     jankyborders = {
@@ -126,6 +128,7 @@
     #flakes
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    staging-next.url = "github:nixos/nixpkgs/staging-next";
     darwin.url = "github:auscyber/nix-darwin/karabiner";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
@@ -187,9 +190,6 @@
           # inputs.foo.flakeModules.default
           ./flake
         ];
-        flake = {
-          # Put your original flake attributes here.
-        };
         systems = [
           # systems for which you want to build the `perSystem` attributes
           "aarch64-darwin"
@@ -197,16 +197,7 @@
           "aarch64-linux"
           # ...
         ];
-        perSystem =
-          { config, pkgs, ... }:
-          {
-            # Recommended: move all package definitions here.
-            # e.g. (assuming you have a nixpkgs input)
-            # packages.foo = pkgs.callPackage ./foo/package.nix { };
-            # packages.bar = pkgs.callPackage ./bar/package.nix {
-            #   foo = config.packages.foo;
-            # };
-          };
+
       }
     );
   nixConfig = {
