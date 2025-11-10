@@ -5,12 +5,6 @@ let
 in
 {
 
-  maintainers = prev.maintainers // {
-    auscyber = {
-      name = "Ivy Pierlot";
-      email = "ivyp@outlook.com.au";
-    };
-  };
   inherit (auscyberLib.flake.lib.file)
     importModulesRecursive
     ;

@@ -20,10 +20,7 @@
     bootlogo.enable = true;
     secrets.enable = true;
   };
-  nix.settings.trusted-users = [
-    "root"
-    "auscyber"
-  ];
+
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   stylix = {
@@ -293,6 +290,10 @@
   auscybernix.nix.caches = false;
   nix = {
     settings = {
+      trusted-users = [
+        "root"
+        "auscyber"
+      ];
       substituters = [
         "https://cache.nixos.org"
         "http://192.168.0.26:8501"
