@@ -29,6 +29,10 @@
       experimental-features = nix-command flakes
     '';
   };
+  fileSystems."/mnt/hdd" = {
+    device = "/dev/sdb";
+    fsType = "ext4";
+  };
   services.netatalk = {
     enable = true;
     settings = {
@@ -58,7 +62,6 @@
     image = ../../../backgrounds/phoebebridgers-2.jpg;
     polarity = "dark";
   };
-  services.jellyfin.enable = false;
   boot.kernel.sysctl = {
     "net.ipv6.conf.all.forwarding" = 1;
     "net.ipv6.conf.all.accept_ra" = 2;
@@ -232,17 +235,17 @@
     #	};
   };
   security.pam.services.sudo = {
-  	rssh = true;
-	};
-   security.pam.rssh.enable = true;
-   environment.etc."ssh/authorized_keys.d/auscyber".text = ''
-   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H
-   '';
-  programs.fish.enable = true;
-  hardware.opengl = {
-    enable = true;
-    extraPackages = with pkgs; [ intel-ocl ];
+    rssh = true;
   };
+  security.pam.rssh = {
+
+    enable = true;
+    settings.cue = true;
+    settings.cue_prompt = "please touch";
+  };
+
+  programs.fish.enable = true;
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -354,6 +357,7 @@
     };
 
   };
+
   #services.espanso.enable = true;
   services.ncps = {
     enable = true;
@@ -382,6 +386,7 @@
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       ];
     };
+    prometheus.enable = true;
   };
 
   # This value determines the NixOS release from which the default
