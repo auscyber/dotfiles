@@ -15,13 +15,10 @@
     ../ci
     ./packages.nix
     inputs.flake-parts.flakeModules.partitions
+    ./formatter.nix
   ];
   flake = {
 
   };
-  perSystem =
-    { config, pkgs, ... }:
-    {
-      formatter = pkgs.treefmt;
-    };
+
 }

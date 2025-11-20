@@ -40,6 +40,7 @@
 
 
 
+
 (platform (linux)
 	(deflayermap (default) lmeta @space_manip
 				 ))
@@ -86,25 +87,32 @@
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
   )
+(deftemplate accented (key mod)
+	((and (key-history $key 1) (input-history real lsft 3))) (macro bspc 10 $mod S-($key)) break
+	((key-history $key 1)) (macro bspc 10 $mod $key) break
+)
 (defalias quote
 (switch
-    ((key-history a 1)) (macro  bspc A-e a ) break
-    ((key-history e 1)) (macro bspc A-e e) break
+	(t! accented a A-e)
+	(t! accented e A-e)
     () use-defsrc fallthrough)
 )
 
 (defalias hat
 (switch
-    ((key-history a 1)) (macro  bspc A-i a ) break
-    ((key-history e 1)) (macro bspc A-i e) break
+	(t! accented a A-i)
+	(t! accented o A-i)
+	(t! accented e A-i)
+	(t! accented u A-i)
     () use-defsrc fallthrough)
 )
 
 
 (defalias grave
 (switch
-    ((key-history a 1)) (macro  bspc A-` a ) break
-    ((key-history e 1)) (macro bspc A-` e) break
+	(t! accented a A-`)
+	(t! accented e A-`)
+	(t! accented u A-`)
     () use-defsrc fallthrough)
 )
 
@@ -119,6 +127,8 @@
 
 (deftemplate runasuser (command)
   (cmd "sudo" "-u" "ivypierlot" sh -c $command) )
+
+
 
 
 (platform (linux)

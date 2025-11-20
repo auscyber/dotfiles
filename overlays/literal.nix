@@ -12,7 +12,7 @@ let
     aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
   };
   ghostty = {
-    aarch64-darwin = inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
+    aarch64-darwin = pkgs.ghostty-bin; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
     x86_64-linux = pkgs.ghostty;
     aarch64-linux = pkgs.ghostty;
   };
@@ -27,6 +27,7 @@ in
 
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
+    kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
     lix = pkgs.lix.overrideAttrs (attrs: {
       doCheck = false;
     });

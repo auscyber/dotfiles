@@ -53,6 +53,21 @@ in
       default = "";
       description = "kanata command to run";
     };
+    tray = {
+      package = lib.mkPackageOption pkgs "kanata-tray" { };
+      command = lib.mkOption {
+        type = listOf str;
+        default = "";
+        description = "kanata tray command to run";
+      };
+      configFile = lib.mkOption {
+        type = str;
+        default = "";
+        description = "kanata tray config file content";
+      };
+
+    };
+
     extraCommandPiping = lib.mkOption {
       type = nullOr path;
       default = null;
@@ -88,12 +103,14 @@ in
       (lib.mkIf isDarwin {
         # enable karabiner driver
         auscybernix.keybinds.kanata.kanataCommand = lib.mkDefault [
-
           "${cfg.package}/bin/kanata"
           "-p"
           "${builtins.toString cfg.kanataPort}"
           "-c"
           "${outputFile}"
+        ];
+        auscybernix.keybinds.kanata.tray.command = lib.mkDefault [
+          "${cfg.tray.package}/bin/kanata-tray"
         ];
 
         launchd.agents.kanata-vk-agent = {
@@ -122,17 +139,36 @@ in
           };
 
         };
-
-        launchd.agents.kanata = {
+        launchd.agents.kanata_tray = {
           enable = true;
           config = {
             ProgramArguments = [
               "/usr/bin/sudo"
               "-E"
             ]
+            ++ cfg.tray.command;
+            StandardErrorPath = "/tmp/kanata_tray.err";
+            StandardOutPath = "/tmp/kanata_tray.out";
+            RunAtLoad = true;
+            KeepAlive = true;
+            EnvironmentVariables = {
+              PATH =
+                "/usr/bin/:/sbin:/bin:/usr/local/bin:"
+                + lib.makeBinPath (with pkgs; [ cfg.package ] ++ cfg.extraPackages);
+            };
+          };
+        };
+
+        launchd.agents.kanata = {
+          enable = false;
+          config = {
+            ProgramArguments = [
+              "/usr/bin/sudo"
+              "-E"
+            ]
             ++ cfg.kanataCommand;
-            StandardErrorPath = "/tmp/kanata.err";
-            StandardOutPath = "/tmp/kanata.out";
+            StandardErrorPath = "/tmp/kanata_tray.err";
+            StandardOutPath = "/tmp/kanata_tray.out";
             RunAtLoad = true;
             KeepAlive = true;
             EnvironmentVariables = {

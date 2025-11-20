@@ -87,6 +87,12 @@
       WLR_NO_HARDWARE_CURSORS = 1;
 
     };
+    #    nix.registry = {
+    #      "dotfiles" = {
+    #        from = "dotfiles";
+    #        to = inputs.self;
+    #      };
+    #    };
 
   };
   options = with lib; {

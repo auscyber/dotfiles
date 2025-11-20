@@ -41,8 +41,11 @@ in
           "${pkgs.yabai}/bin/yabai"
           "--load-sa"
         ];
+        kanataTray =
+          config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.tray.command;
         kanata =
           config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.kanataCommand;
+
       };
 
       security.sudo.extraConfig = lib.concatStringsSep "\n" sudoersEntries;

@@ -67,6 +67,9 @@
         pkgs.yabai
       ];
       extraCommandPiping = ../../../modules/home/keybinds/kanata/config.toml;
+      tray = {
+        configFile = builtins.toString ./tray_config.toml;
+      };
       appBundleIds = [
         "app.zen-browser.zen"
         "com.1password.1password"
