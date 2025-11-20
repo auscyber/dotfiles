@@ -19,26 +19,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Install nix
-      uses: DeterminateSystems/nix-installer-action@main
-      if: ${{ matrix.system == 'macos-latest' }}
-      with:
-        # use lix main
-#        source-url: "https://install.lix.systems/lix/lix-installer-aarch64-darwin"
-#        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - name: Install nix
-      uses: DeterminateSystems/nix-installer-action@main
-      if: ${{ matrix.system == 'ubuntu-latest' }}
-      with:
-        # use lix main
-#        source-url: "https://install.lix.systems/lix/lix-installer-x86_64-linux"
-#        nix-package-url: https://git.lix.systems/lix-project/lix/archive/main.tar.gz
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - name: Lix GHA Installer Action
+      uses: samueldr/lix-gha-installer-action@v2025-10-27
     - name: nix version
       run: nix --version
     - name: Show nixpkgs version
