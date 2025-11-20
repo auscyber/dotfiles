@@ -20,7 +20,7 @@
 # A list of formatters to apply
 # Defaults to all configured formatters
 # Env $TREEFMT_FORMATTERS
-# formatters = ["gofmt", "prettier"]
+ formatters = ["nixfmt-rfc-style"]
 
 # Log paths that did not match any formatters at the specified log level
 # Possible values are <debug|info|warn|error|fatal>
@@ -44,7 +44,7 @@ tree-root-file = ".git/config"
 # The method used to traverse the files within the tree root
 # Currently, we support 'auto', 'git' or 'filesystem'
 # Env $TREEFMT_WALK
-# walk = "filesystem"
+ walk = "git"
 
 [formatter.nixfmt-rfc-style]
 command = "nixfmt"

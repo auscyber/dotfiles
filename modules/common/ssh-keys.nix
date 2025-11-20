@@ -22,7 +22,7 @@ in
     users.users = {
       "${cfg.username}" = {
         openssh.authorizedKeys.keys = [
-	  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
         ];
       };
     };

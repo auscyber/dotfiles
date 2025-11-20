@@ -34,6 +34,14 @@
 
       group = config.services.nginx.group;
     };
+    certs."nextcloud.pierlot.com.au" = {
+      dnsProvider = "cloudflare";
+
+      environmentFile = config.sops.secrets.acme_cloudflare.path;
+
+      group = config.services.nginx.group;
+
+    };
   };
 
   hardware.graphics = {
@@ -65,6 +73,16 @@
     recommendedTlsSettings = true;
     recommendedOptimisation = true;
     virtualHosts = {
+      "nextcloud.pierlot.com.au" = {
+        useACMEHost = "nextcloud.pierlot.com.au";
+        forceSSL = true;
+        http2 = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:11000";
+          proxyWebsockets = true;
+        };
+
+      };
       "home.pierlot.com.au" = {
         useACMEHost = "home.pierlot.com.au";
         forceSSL = true;

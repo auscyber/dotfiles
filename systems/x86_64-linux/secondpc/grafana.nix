@@ -76,13 +76,22 @@
         ];
       }
       {
-        job_name = "docker";
+        job_name = "cadvisor";
         static_configs = [
           {
-            targets = [ "100.64.0.3:9323" ];
+            targets = [ "100.64.0.3:8069" ];
           }
         ];
       }
+      {
+        job_name = "authentik";
+        static_configs = [
+          {
+            targets = [ "100.64.0.3:9300" ];
+          }
+        ];
+      }
+
       #      {
       #        job_name = "home_asssistant";
       #        metrics_path = "/api/prometheus";

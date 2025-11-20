@@ -50,6 +50,7 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.home-manager.nixosModules.home-manager
     inputs.nixos-wsl.nixosModules.default
     inputs.sops-nix.nixosModules.sops
+    inputs.attic.nixosModules.atticd
 
     {
       nixpkgs = {

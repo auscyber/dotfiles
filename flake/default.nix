@@ -19,4 +19,9 @@
   flake = {
 
   };
+  perSystem =
+    { config, pkgs, ... }:
+    {
+      formatter = pkgs.treefmt;
+    };
 }
