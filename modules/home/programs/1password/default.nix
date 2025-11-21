@@ -24,7 +24,7 @@ in
 
     programs.fish.interactiveShellInit = ''
       function nixpkgs-review --wraps nixpkgs-review --description "1Password Shell Plugin for nixpkgs-review"
-              export GITHUB_TOKEN="op://Employee/7m4u7tcwjwqcuyojvwsmee2mdi/Security/token"
+              export GITHUB_TOKEN=$(cat ${config.sops.secrets."github_token".path})
               op run -- nixpkgs-review $argv
           end
 

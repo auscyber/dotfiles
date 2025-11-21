@@ -7,7 +7,7 @@
       treefmt = {
         projectRootFile = ".git/config";
         programs.nixfmt.enable = true;
-        programs.shellcheck.enable = true;
+        #        programs.shellcheck.enable = true;
       };
 
     };

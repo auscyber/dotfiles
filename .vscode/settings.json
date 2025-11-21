@@ -1,0 +1,15 @@
+{
+    "nix.enableLanguageServer": true,
+    "nix.serverPath": "nil",
+    "nix.serverSettings": {
+     "nil": {
+       "formatting": { "command": ["nixfmt"] },
+       "nix": {
+        "flake": {
+            "autoEvalInputs": true,
+            "autoArchive": true,
+        }
+       }
+     }
+   }
+}

@@ -28,7 +28,6 @@ in
       enable = true;
       package = pkgs.hello;
       settings = {
-
         git_protocol = "ssh";
       };
 

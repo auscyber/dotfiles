@@ -105,6 +105,7 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
+    input-branches.url = "github:mightyiam/input-branches";
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:nix-community/stylix";
