@@ -1,3 +1,81 @@
-= age-plugin-gpg
+= (r)age-plugin-gpg
 
 Age plugin which uses recipients/identities from gpg-agent, making it possible to use gpg smartcards
+
+Note: gpg recipient stanzas are not private right now, as it is makes little sense to try to use smartcard on every key
+to find the one we are recipient for, and I had no interest in doing such things, recipient keygrips are stored as plain
+text.
+
+== Installation
+
+Packaged for nix, you can quickly test it using temporary shell, or properly install it however you want
+
+[source,sh]
+----
+nix shell github:CertainLach/age-plugin-gpg#
+----
+
+== Usage
+
+First, you need to know a recipient encryption keygrip, it can be obtained by using
+
+[source,sh]
+----
+gpg --list-keys --with-keygrip
+----
+
+----
+pub   ed25519 2024-02-04 [SC]
+      296E44AC9C882827428FCE081379319040F2773D
+      Keygrip = 4A5D19D71F60103EC1749136F4D7EACF61CF83CC
+uid           [ultimate] Yaroslav Bolyukin <tense@0la.ch>
+sub   cv25519 2024-02-04 [E]
+      Keygrip = E968AB03A34F6F291B800C6121F350FCFCE8DE4C
+sub   ed25519 2024-02-04 [A]
+      Keygrip = FAB2A1B91432F3E0C70FBF583AC9B502FC6F5185
+----
+
+What you looking for here is [E]ncryption subkey keygrip = `E968AB03A34F6F291B800C6121F350FCFCE8DE4C`
+
+Then, you need to convert this keygrip into recipient format understandable by (r)age:
+
+[source,sh]
+----
+age-plugin-gpg export-keygrip E968AB03A34F6F291B800C6121F350FCFCE8DE4C
+----
+
+----
+age1gpg1a952kqarfahjjxuqp3sjru6sln7w3hjv8s02lm
+----
+
+And now you can use this recipient for (r)age:
+
+[source,sh]
+----
+echo "Hello, world!" | rage -r age1gpg1a952kqarfahjjxuqp3sjru6sln7w3hjv8s02lm > encrypted.age
+
+head -3 encrypted.age
+----
+
+----
+age-encryption.org/v1
+-> gpg-v1 E968AB03A34F6F291B800C6121F350FCFCE8DE4C 18
+AQdAzy8BQTBvunmdWQt6/QnJGG6+kSZXi2lHuWxtmumG3DgwCZT916/oPGvZKWa8
+----
+
+As you can see, the age encrypted file contains keygrip as plaintext, as mentioned above, this is the
+intended behavior.
+
+Recepient then can decrypt it as follows:
+
+[source,sh]
+----
+cat encrypted.age | rage -d -j gpg
+----
+
+----
+Hello, world!
+----
+
+Note the -j gpg argument: as this plugin only uses gpg-agent, and does not allow you to store identities elsewhere,
+you can only use the default identity mode with it, and you only need to specify that you want to use it from gpg plugin.
