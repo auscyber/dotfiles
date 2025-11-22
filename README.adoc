@@ -15,6 +15,13 @@ Packaged for nix, you can quickly test it using temporary shell, or properly ins
 nix shell github:CertainLach/age-plugin-gpg#
 ----
 
+Also available using cargo
+
+[source,sh]
+----
+cargo install --locked age-plugin-gpg
+----
+
 == Usage
 
 First, you need to know a recipient encryption keygrip, it can be obtained by using
