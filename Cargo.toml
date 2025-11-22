@@ -1,5 +1,7 @@
 [package]
 name = "age-plugin-gpg"
+description = "Age plugin that uses recipients/identities from gpg-agent, making it possible to use gpg smartcards"
+license = "MIT"
 version = "0.1.0"
 edition = "2024"
 
