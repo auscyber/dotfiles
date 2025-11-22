@@ -36,21 +36,46 @@
           let
             rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
             craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rust;
+
+            sharedDependencies = with pkgs; [ nettle ];
+            sharedBuildDependencies = with pkgs; [
+              pkg-config
+              rustPlatform.bindgenHook
+            ];
           in
           {
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
-              overlays = [inputs.rust-overlay.overlays.default];
+              overlays = [ inputs.rust-overlay.overlays.default ];
             };
+
+            packages =
+              let
+                age-plugin-gpg = craneLib.buildPackage {
+                  src = ./.;
+                  buildInputs = sharedDependencies;
+                  nativeBuildInputs = sharedBuildDependencies;
+                };
+              in
+              {
+                inherit age-plugin-gpg;
+                default = age-plugin-gpg;
+              };
+
             shelly.shells.default = {
               factory = craneLib.devShell;
-              packages = with pkgs; [
-                nettle
-                rust
-                rage
-                pkg-config
-                rustPlatform.bindgenHook
-              ];
+              packages =
+                with pkgs;
+                [
+                  nettle
+                  rust
+                  rage
+                ]
+                ++ sharedDependencies
+                ++ sharedBuildDependencies;
+              shellHook = ''
+                export PATH=$PATH:$PWD/target/debug
+              '';
             };
           };
       };

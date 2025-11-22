@@ -16,9 +16,7 @@ use sequoia_openpgp::crypto::SessionKey;
 use sequoia_openpgp::crypto::mpi::PublicKey;
 use sequoia_openpgp::packet::Key;
 use sequoia_openpgp::packet::key::{Key6, PublicParts, UnspecifiedRole};
-use sequoia_openpgp::types::{
-	Curve, HashAlgorithm, SymmetricAlgorithm, Timestamp,
-};
+use sequoia_openpgp::types::{Curve, HashAlgorithm, SymmetricAlgorithm, Timestamp};
 use std::io::Result as IoResult;
 
 use tokio::runtime::{Handle, Runtime};
@@ -35,7 +33,7 @@ mod stanza;
 enum Command {
 	/// Export gpg keygrip in format suitable for this plugin
 	ExportKeygrip {
-		// GPG keygrip for encryption key, can be seen with `gpg --list-keys --with-keygrip`
+		/// GPG keygrip for encryption key, can be seen with `gpg --list-keys --with-keygrip`
 		keygrip: String,
 	},
 }
@@ -49,20 +47,19 @@ struct Opts {
 }
 
 fn key(s: &Sexp) -> &[u8] {
-	if let Sexp::List(alist) = s {
-		if let Some(Sexp::String(key)) = alist.get(0) {
-			return key;
-		}
+	if let Sexp::List(alist) = s
+		&& let Some(Sexp::String(key)) = alist.first()
+	{
+		return key;
 	}
 	panic!("malformed alist");
 }
 fn value(s: &Sexp) -> &[Sexp] {
-	if let Sexp::List(alist) = s {
-		if let Some(Sexp::String(_key)) = alist.get(0) {
-			return &alist[1..];
-		}
+	if let Sexp::List(alist) = s
+		&& let Some(Sexp::String(_key)) = alist.first()
+	{
+		return &alist[1..];
 	}
-
 	panic!("malformed alist");
 }
 fn get<'e>(s: &'e Sexp, k: &[u8]) -> Option<&'e [Sexp]> {
@@ -73,7 +70,7 @@ fn find_string(v: &[Sexp], k: &[u8]) -> Option<String_> {
 	v.iter().find_map(|p| {
 		get(p, k)
 			.unwrap_or_default()
-			.get(0)
+			.first()
 			.and_then(Sexp::string)
 			.cloned()
 	})
@@ -82,7 +79,7 @@ fn find_string(v: &[Sexp], k: &[u8]) -> Option<String_> {
 fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	let e = get(&e, b"public-key")
 		.expect("todo: not a public key")
-		.into_iter()
+		.iter()
 		.next()
 		.expect("todo: not a public key");
 
@@ -94,12 +91,12 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 		let curve = find_string(e, b"curve").expect("todo: not a public key");
 		let q = find_string(e, b"q").expect("todo: not a public key");
 
-		if let Some(flags) = find_string(e, b"flags") {
-			if &*flags != b"djb-tweak" {
-				bail!("unsupported flags: {flags:?}");
-			}
+		if let Some(flags) = find_string(e, b"flags")
+			&& &*flags != b"djb-tweak"
+		{
+			bail!("unsupported flags: {flags:?}");
 		}
-		ensure!(&*curve == b"Curve25519", "unsupported curve: {:?}", curve);
+		ensure!(&*curve == b"Curve25519", "unsupported curve: {curve:?}");
 
 		// Those parameters should depend on curve: https://datatracker.ietf.org/doc/html/rfc6637
 		// Those are for Cv25519
@@ -130,7 +127,7 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 }
 
 fn gpg_to_age(gpg: SessionKey) -> FileKey {
-	FileKey::init_with_mut(|data| data.copy_from_slice(&*gpg))
+	FileKey::init_with_mut(|data| data.copy_from_slice(&gpg))
 }
 
 struct IdentityV1 {
@@ -146,7 +143,7 @@ impl IdentityPluginV1 for IdentityV1 {
 		if plugin_name != "gpg" {
 			return Ok(());
 		}
-		if bytes.len() != 0 {
+		if !bytes.is_empty() {
 			return Err(IdentityError::Identity {
 				index,
 				message: "only default identity supported for gpg plugin".to_owned(),
@@ -210,7 +207,7 @@ impl IdentityPluginV1 for IdentityV1 {
 			}
 			if let Some(ok) = stanza_ok {
 				out.insert(file_index, Ok(ok));
-			} else if stanza_errs.len() > 0 {
+			} else if !stanza_errs.is_empty() {
 				out.insert(file_index, Err(stanza_errs));
 			}
 		}
@@ -260,9 +257,9 @@ impl RecipientPluginV1 for RecipientV1 {
 		if plugin_name != "gpg" {
 			return Ok(());
 		}
-		return Err(RecipientError::Identity {
+		Err(RecipientError::Identity {
 			index,
-			message: format!("gpg plugin doesn't use age own identity management"),
+			message: "gpg plugin doesn't use age own identity management".to_string(),
 		})
 	}
 

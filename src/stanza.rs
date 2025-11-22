@@ -31,15 +31,15 @@ pub struct GpgStanza {
 	pub ciphertext: Ciphertext,
 }
 
-impl Into<Stanza> for GpgStanza {
-	fn into(self) -> Stanza {
+impl From<GpgStanza> for Stanza {
+	fn from(val: GpgStanza) -> Self {
 		Stanza {
 			tag: GPG_STANZA_TAG.to_owned(),
 			args: vec![
-				self.keygrip.to_string(),
-				u8::from(self.ciphertext.pk_algo().expect("expected known algo")).to_string(),
+				val.keygrip.to_string(),
+				u8::from(val.ciphertext.pk_algo().expect("expected known algo")).to_string(),
 			],
-			body: self.ciphertext.to_vec().expect("to_vec shouldn't fail"),
+			body: val.ciphertext.to_vec().expect("to_vec shouldn't fail"),
 		}
 	}
 }
@@ -51,7 +51,7 @@ impl TryFrom<Stanza> for GpgStanza {
 		if value.tag != GPG_STANZA_TAG {
 			return Err(Error::InvalidTag);
 		}
-		let keygrip = value.args.get(0).ok_or(Error::MissingKeygrip)?;
+		let keygrip = value.args.first().ok_or(Error::MissingKeygrip)?;
 		let keygrip: Keygrip = keygrip.parse().map_err(Error::Keygrip)?;
 
 		let pk_algo = value.args.get(1).ok_or(Error::MissingPkAlgo)?;
