@@ -342,7 +342,7 @@
                 }
               ))
 
-              (lib.fold (cur: acc: {
+              (lib.foldr (cur: acc: {
                 init = acc.init ++ (if cur.init != null then [ cur.init ] else [ ]);
                 rebase = acc.rebase ++ [ cur.rebase ];
                 push-force = acc.push-force ++ [ cur.push-force ];
