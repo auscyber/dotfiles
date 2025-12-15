@@ -49,13 +49,13 @@
     signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
 
   };
-  services.ollama = {
-    enable = true;
-    environmentVariables = {
-      "OLLAMA_ORIGINS" = "moz-extension://*";
-    };
-
-  };
+  #  services.ollama = {
+  #    enable = true;
+  #    environmentVariables = {
+  #      "OLLAMA_ORIGINS" = "moz-extension://*";
+  #    };
+  #
+  #  };
   auscybernix = {
     services.mopidy.enable = false;
     wms.yabai.enable = true;

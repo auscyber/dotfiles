@@ -43,7 +43,7 @@
   # $ nix-env -qaP | grep wget
   system.primaryUser = "ivypierlot";
   environment.systemPackages = with pkgs; [
-    ollama
+    #ollama
     #    bartender
     zen-browser
     ghostty
@@ -81,7 +81,7 @@
   nix.distributedBuilds = true;
 
   nix.linux-builder = {
-    enable = true;
+    enable = false;
     systems = with inputs.flake-utils.lib.system; [
       aarch64-linux
     ];

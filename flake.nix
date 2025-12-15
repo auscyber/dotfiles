@@ -110,6 +110,7 @@
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
+    stylix.inputs.nur.follows = "nur";
     wezterm = {
       url = "git+https://github.com/wezterm/wezterm?submodules=1";
       flake = false;

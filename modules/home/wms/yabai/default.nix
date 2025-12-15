@@ -56,7 +56,7 @@ in
         mouse_follows_focus = "off";
         window_placement = "second_child";
         window_opacity = "off";
-        external_bar = "all:40:0";
+        external_bar = "main:40:0";
         layout = "bsp";
         top_padding = 10;
         bottom_padding = 6;

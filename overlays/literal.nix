@@ -70,17 +70,21 @@ in
     mopidy-tidal = pkgs.mopidy-tidal.overrideAttrs (_: {
       doCheck = false;
     });
+    game-devices-udev-rules = pkgs.game-devices-udev-rules.overrideAttrs (attrs: {
+
+      src = inputs.game-devices-udev-rules;
+    });
 
   }
   // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
-    gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
-      patches = attrs.patches ++ [
-        (pkgs.fetchpatch {
-          url = "https://raw.githubusercontent.com/NixOS/nixpkgs/refs/heads/staging/pkgs/development/libraries/gtk/patches/3.0-mr5531-backport.patch";
-          hash = "sha256-vP0xmeKQazr93bTV+2kIwsNA+rZPmNd9iaUfpYOpD0M=";
-        })
-      ];
-    });
+    #    gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
+    #      patches = attrs.patches ++ [
+    #        (pkgs.fetchpatch {
+    #          url = "https://raw.githubusercontent.com/NixOS/nixpkgs/refs/heads/staging/pkgs/development/libraries/gtk/patches/3.0-mr5531-backport.patch";
+    #          hash = "sha256-vP0xmeKQazr93bTV+2kIwsNA+rZPmNd9iaUfpYOpD0M=";
+    #        })
+    #      ];
+    #    });
 
     zotero-extensions = {
       zotero-better-bibtex = pkgs.fetchFirefoxAddon {
@@ -99,10 +103,7 @@ in
         platforms = lib.platforms.unix;
       };
     });
-    game-devices-udev-rules = pkgs.game-devices-udev-rules.overrideAttrs (attrs: {
 
-      src = inputs.game-devices-udev-rules;
-    });
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
 
