@@ -92,6 +92,7 @@ rec {
   home.packages =
     with pkgs;
     [
+      heroic
       shadps4
       #      element-desktop
       tidal-hifi
