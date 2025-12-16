@@ -55,15 +55,7 @@ in
       };
       optimise = {
         automatic = true;
-        interval = [
-
-          {
-            Hour = 4;
-            Minute = 15;
-            Weekday = 7;
-          }
-
-        ];
+        
       };
 
       package = pkgs.nixVersions.stable;
