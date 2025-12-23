@@ -37,8 +37,12 @@ in
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
   flake = {
-    homeModules = {
+    homeModules = rec {
       default = ../modules/home;
+      recursive = {
+        imports = lib.importModulesRecursive ../modules/home ++ lib.externalHmModules ++ [ default ];
+
+      };
     };
 
     # Dynamically generated home configurations
