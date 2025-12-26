@@ -55,7 +55,7 @@ in
       };
       optimise = {
         automatic = true;
-        
+
       };
 
       package = pkgs.nixVersions.stable;

@@ -17,8 +17,8 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    home.file.".config/ghostty/shaders/cursor_shader.glsl".source =
-      "${inputs.cursor_shader}/cursor_synesthaxia(tweened).glsl";
+    #    home.file.".config/ghostty/shaders/cursor_shader.glsl".source =
+    #      "${inputs.cursor_shader}/cursor_synesthaxia(tweened).glsl";
     stylix.targets.ghostty.enable = false;
 
     programs.ghostty = {
@@ -54,10 +54,13 @@ in
         };
 
       };
+      installBatSyntax = false;
       settings = {
+        shell-integration = "none";
+        shell-integration-features = "no-path";
         custom-shader = [
-          "./shaders/cursor_shader.glsl"
-          #        "${inputs.ghostty-shaders}/cursor_blaze.glsl"
+          #          "./shaders/cursor_shader.glsl"
+          "${inputs.ghostty-shaders}/cursor_blaze.glsl"
         ];
         cursor-style = "block";
         #      macos-icon = "paper";

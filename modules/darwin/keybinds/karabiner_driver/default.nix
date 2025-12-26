@@ -7,7 +7,6 @@
 
 let
   cfg = config.auscybernix.keybinds.karabiner-driver-kit;
-  parentAppDir = "/Applications/Nix Apps";
 
 in
 {
