@@ -125,7 +125,7 @@
     homebrew = {
       enable = true;
 
-      brews = [ "nowplaying-cli" ];
+      brews = [ "nowplaying-cli" "mole" ];
       casks = [
         # "cinny"
         "mark-text"
