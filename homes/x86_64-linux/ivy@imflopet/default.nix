@@ -1,7 +1,9 @@
 { config, pkgs, ... }:
 {
+  sops.age.keyFile = "/home/ivy/.config/sops/age/keys.txt";
   auscybernix = {
     nix.flake = "/home/ivy/dotfiles";
+    secrets.enable = true;
     shell = {
       enable = true;
       fish = {
