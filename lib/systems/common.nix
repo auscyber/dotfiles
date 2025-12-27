@@ -30,6 +30,7 @@ in
     }:
     {
       inherit (inputs) self;
+      flakeSelf = inputs.self;
       inherit username;
       inherit inputs hostname system;
       lib = extendedLib;

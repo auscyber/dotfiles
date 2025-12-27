@@ -15,7 +15,7 @@
     {
 
       packages.ci = pkgs.nix-fast-build;
-      checks.ci =
+      checks =
         with builtins;
         let
           isDerivation = p: isAttrs p && p ? type && p.type == "derivation";
@@ -47,11 +47,16 @@
             systemBuilds
           ];
           outputsOf = p: map (o: p.${o}) p.outputs;
-          outputPkgs = lib.concatLists [
-            (lib.concatLists systemPackages)
-            packages
-            nixShells
-          ];
+          outputPkgs =
+            (lib.concatLists [
+              (lib.concatLists systemPackages)
+              packages
+              nixShells
+            ])
+            ++ [
+              pkgs.nixVersions.latest
+
+            ];
 
         in
         #        builtins.listToAttrs (
@@ -59,10 +64,12 @@
         #            name = drv.name;
         #            value = drv;
         #}) (
-        pkgs.stdenv.mkDerivation {
-          name = "ci-checks-${system}";
-          buildInputs = outputPkgs;
-        }
+        builtins.listToAttrs (
+          builtins.map (drv: {
+            name = "ci-${drv.name}";
+            value = drv;
+          }) (builtins.concatLists (builtins.map outputsOf outputPkgs))
+        )
       #		  ))
       ;
 

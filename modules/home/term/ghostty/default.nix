@@ -60,7 +60,8 @@ in
         shell-integration-features = "no-path";
         custom-shader = [
           #          "./shaders/cursor_shader.glsl"
-          "${inputs.ghostty-shaders}/cursor_blaze.glsl"
+          #          "${inputs.ghostty-shaders}/cursor_blaze.glsl"
+          (builtins.toString ./cursor_warp.glsl)
         ];
         cursor-style = "block";
         #      macos-icon = "paper";

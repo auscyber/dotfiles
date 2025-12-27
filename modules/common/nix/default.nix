@@ -53,10 +53,6 @@ in
         automatic = true;
         options = "--delete-older-than 30d";
       };
-      optimise = {
-        automatic = true;
-
-      };
 
       package = pkgs.nixVersions.stable;
     };
