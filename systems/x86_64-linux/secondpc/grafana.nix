@@ -6,6 +6,13 @@
     mode = "4444";
 
   };
+  sops.secrets."grafana/client_id" = {
+    sopsFile = ../../../secrets/secondpc/grafana.yaml;
+
+  };
+  sops.secrets."grafana/client_secret" = {
+    sopsFile = ../../../secrets/secondpc/grafana.yaml;
+  };
   services.grafana = {
     enable = true;
     settings = {
@@ -14,6 +21,24 @@
         http_port = 3001;
         enforce_domain = true;
         domain = "grafana.pierlot.com.au";
+      };
+
+      auth = {
+        signout_redirect_url = "https://sso.imflo.pet/application/o/grafana/end-session/";
+        oauth_auto_login = true;
+
+      };
+      "auth.generic_oauth" = {
+        name = "imflo";
+        enabled = true;
+        client_id = "$__file{${config.sops.secrets."grafana/client_id".path}}";
+        client_secret = "$__file{${config.sops.secrets."grafana/client_secret".path}}";
+        scopes = "openid email profile";
+        auth_url = "https://sso.imflo.pet/application/o/authorize/";
+        token_url = "https://sso.imflo.pet/application/o/token/";
+        api_url = "https://sso.imflo.pet/application/o/userinfo/";
+        # Optionally map user groups to Grafana roles
+        role_attribute_path = "contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'";
       };
 
     };
@@ -43,6 +68,17 @@
     };
 
   };
+  #  services.loki = {
+  #    enable = true;
+  #    configuration = {
+  #
+  #    };
+  #
+  #  };
+  #  services.alloy = {
+  #    enable = true;
+  #
+  #  };
   services.prometheus = {
     enable = true;
     port = 9091;
