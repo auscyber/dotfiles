@@ -11,6 +11,10 @@
       type = lib.types.str;
 
     };
+    reloadProgram = lib.mkOption {
+      type = lib.types.str;
+      default = "re";
+    };
   };
   config = {
 

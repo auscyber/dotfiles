@@ -1,5 +1,7 @@
 keys:
   - &server_imflo age1yuapchjs3ucvhftlv75t26m5vfyjdjjtrpmknvnk7cdy9n7jmf5sgvht94
+  - &gpg_key B0BF08E64E9D0F45DAC341F0725B4C10D3322170
+  - &new_server age1j96shgsvmwp4ltf6evxrxf5tp883tveqxx6knpxfm5n9gc2tr4qs6phnu6
   - &mac age1dkwz3c2jprv8kz9e4r2yj5ugfsgx8hvmxc466k96d38c9hnuxp0s2u4qpa
   - &admin_ivy age1wl25zsmys6cdzacrx4xh2fe89jk8enx4dalc52075kg9rdnuxf9qe2yw7p
   - &desktop_ivy age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm
@@ -14,7 +16,10 @@ creation_rules:
       key_groups:
       - age:
         - *admin_ivy
+        - *new_server
         - *mac
         - *server_imflo
         - *desktop_ivy
         - *server_ivy
+        pgp:
+        - *gpg_key

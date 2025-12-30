@@ -16,7 +16,7 @@
   ];
   programs.fish.enable = true;
   auscybernix = {
-  nix.flake = "/home/auscyber/dotfiles";
+    nix.flake = "/home/auscyber/dotfiles";
     nixos.games.enable = true;
     bootlogo.enable = true;
     secrets.enable = true;

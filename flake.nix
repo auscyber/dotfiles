@@ -8,9 +8,10 @@
       url = "github:zhaofengli/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-	nil = { url = "github:oxalica/nil";
-	inputs.nixpkgs.follows = "nixpkgs";
-	};
+    nil = {
+      url = "github:oxalica/nil";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     game-devices-udev-rules = {
       url = "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.tar.gz";
       flake = false;

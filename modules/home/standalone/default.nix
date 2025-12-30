@@ -17,7 +17,7 @@ in
     stylix.image = ../../../backgrounds/phoebebridgers-2.jpg;
     home.sessionVariables.NH_HOME_FLAKE = "${config.auscybernix.nix.flake}";
     home.shellAliases = {
-      re = "nh home switch";
+      "${config.auscybernix.nix.reloadProgram}" = "nh home switch";
     };
   };
 }

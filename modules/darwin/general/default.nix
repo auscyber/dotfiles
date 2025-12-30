@@ -8,7 +8,7 @@
     }
   ];
   environment.shellAliases = {
-    re = "nh darwin switch";
+    "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
 
   };
 
