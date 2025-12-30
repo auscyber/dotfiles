@@ -11,6 +11,7 @@
 {
 
   auscybernix.nix.caches = false;
+  auscybernix.nix.flake = "/home/auscyber/dotfiles";
   nix = {
     settings = {
       trusted-users = [ "auscyber" ];

@@ -25,6 +25,7 @@ in
 (
   {
 
+	nil = inputs.nil.packages."${system}".default;
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
