@@ -195,6 +195,18 @@
     # '';
   };
 
+  programs.ssh = {
+    enable = true;
+    package = pkgs.openssh;
+    matchBlocks = {
+      "109.123.227.80" = {
+        host = "109.123.227.80";
+        forwardAgent = true;
+        identitiesOnly = true;
+        identityFile = "~/.ssh/id_ed25519.pub";
+      };
+    };
+  };
   # You can also manage environment variables but you will have to manually
 
   targets.darwin.defaults.NSGlobalDomain = {

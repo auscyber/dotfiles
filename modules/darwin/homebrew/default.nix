@@ -42,6 +42,7 @@ in
       taps = {
         "homebrew/homebrew-cask" = inputs.homebrew-cask;
         "homebrew/homebrew-core" = inputs.homebrew-core;
+        "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
       };
 
       mutableTaps = false;

@@ -1,5 +1,3 @@
-(module plugins.distant
-  {require {distant distant}})
+(module plugins.distant {require {distant distant}})
 
 (distant:setup)
-

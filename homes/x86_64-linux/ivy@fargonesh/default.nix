@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 {
   auscybernix = {
-    nix.flake = "/home/ivy/dotfiles";
     shell = {
       enable = true;
       fish = {

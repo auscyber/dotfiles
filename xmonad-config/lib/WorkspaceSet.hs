@@ -124,7 +124,7 @@ data WorkspaceState = WorkspaceState
 
 $(makeLenses ''WorkspaceState)
 
---Discriminator
+-- Discriminator
 discrim = "-|-"
 
 instance ExtensionClass WorkspaceState where
@@ -168,8 +168,7 @@ workspaceSetHook wssets = liftX $ do
         else do
             tag' <- gets (W.currentTag . windowset)
             XS.modify
-                ( set (currentWorkspaceSet . currentWorkspaceTag) . flip cleanWS tag' . modifyTags <$> view currentWorkspaceSet <*> id
-                )
+                (set (currentWorkspaceSet . currentWorkspaceTag) . flip cleanWS tag' . modifyTags <$> view currentWorkspaceSet <*> id)
             mempty
   where
     f modifiedTags layout winset =
@@ -271,7 +270,7 @@ filterOutInvalidWSet pp = do
 
 -- | Given a key and a series of actions for that key, create a keybind
 createWsKeybind ::
-    Eq a =>
+    (Eq a) =>
     -- | The key to use (Can be ('KeyMask','KeySym') or a 'String) depending on what keys are in use
     a ->
     -- | The 'WorkspaceSetId' and accompanying X actions
@@ -309,7 +308,7 @@ createDefaultWorkspaceKeybinds :: XConfig l -> [(WorkspaceSetId, [WorkspaceId])]
 createDefaultWorkspaceKeybinds xconf = createKeybinds' . map (uncurry changeWorkspaces) . (("default", workspaces xconf) :)
 
 -- | From a set of a 'WorkspaceSetId' and keybinds, reify them into a list of keybinds
-createKeybinds' :: Eq a => [(WorkspaceSetId, [(a, X ())])] -> [(a, X ())]
+createKeybinds' :: (Eq a) => [(WorkspaceSetId, [(a, X ())])] -> [(a, X ())]
 createKeybinds' keys = map f keySets
   where
     keySets = nub $ concatMap (map fst . snd) keys

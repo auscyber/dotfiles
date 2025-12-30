@@ -15,5 +15,9 @@ in
   };
   config = lib.mkIf cfg.enable {
     stylix.image = ../../../backgrounds/phoebebridgers-2.jpg;
+    home.sessionVariables.NH_HOME_FLAKE = "${config.auscybernix.nix.flake}";
+    home.shellAliases = {
+      re = "nh home switch";
+    };
   };
 }

@@ -94,6 +94,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    homebrew-speedtest = {
+      url = "github:teamookla/homebrew-speedtest";
+      flake = false;
+    };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
     zen-browser.inputs.home-manager.follows = "home-manager";

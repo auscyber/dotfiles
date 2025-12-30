@@ -83,6 +83,7 @@ in
           ++ [
 
             ../../modules/common/secrets.nix
+            ../../modules/common/allConfigs.nix
           ]
           ++ (extendedLib.optional (!isInstaller) {
             auscybernix.secrets.enable = true;

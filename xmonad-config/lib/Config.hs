@@ -77,7 +77,7 @@ import XMonad.Hooks.ServerMode (serverModeEventHookCmd)
 import XMonad.Hooks.WindowSwallowing
 import qualified XMonad.Util.ExtensibleConf as XC
 
---import XMonad.Hooks.WindowSwallowing ()
+-- import XMonad.Hooks.WindowSwallowing ()
 import qualified XMonad.Layout.Fullscreen as F
 
 ---import XMonad.Layout.LayoutModifier ()
@@ -237,7 +237,8 @@ polybarLogHook :: X ()
 polybarLogHook = do
     str <- gets (map W.tag . W.workspaces . windowset)
     pp <-
-        polybarPP myWorkspaces >>= dynamicIconsPP myIconConfig
+        polybarPP myWorkspaces
+            >>= dynamicIconsPP myIconConfig
             >>= fmap (switchMoveWindowsPolybar str . filterOutWsPP [scratchpadWorkspaceTag]) <$> workspaceNamesPP
     io . ppOutput pp =<< dynamicLogString pp
 
@@ -289,8 +290,8 @@ mainColor = "#FFEBEF"
 --
 secondaryColor = "#8BB2C1"
 
---mainColor = "#FFDB9E"
---secondaryColor = "#ffd1dc"
+-- mainColor = "#FFDB9E"
+-- secondaryColor = "#ffd1dc"
 
 tertiaryColor = "#A3FFE6"
 
@@ -322,7 +323,7 @@ myLayout =
 myManageHook =
     composeAll
         [ className =? "Gimp" --> doFloat
-        , --className =? "Firefox" --> doShift (myWorkspaces !! 1),),
+        , -- className =? "Firefox" --> doShift (myWorkspaces !! 1),),
           className =? "Steam" --> doFloat
         , className =? "steam" --> doFloat
         , className =? "jetbrains-idea" --> doFloat
@@ -371,11 +372,11 @@ appKeys =
         [ ("M-S-r", "~/.config/rofi/bin/launcher_colorful", doc "Launch rofi")
         , -- Start alacritty
           ("M-S-t", myTerm, doc $ "Launch " ++ myTerm)
-        , --Take screenshot
+        , -- Take screenshot
           ("M-S-s", "~/.xmonad/screenshot-sec.sh", doc "Take screenshot")
-        , --Chrome
+        , -- Chrome
           ("M-S-g", "google-chrome-stable", doc "Launch Chrome")
-        , --Start emacs
+        , -- Start emacs
           ("M-d", "emacsclient -c", doc "Start emacs client")
         , -- start nvim
           ("M-S-n", "wezterm start -- nvim", doc "Launch neovim with neovim")

@@ -85,6 +85,7 @@
       #      BROWSER = "firefox";
       _JAVA_AWT_WM_NONREPARENTING = 1;
       WLR_NO_HARDWARE_CURSORS = 1;
+      NH_HOME_FLAKE = "${config.auscybernix.nix.flake}";
 
     };
     #    nix.registry = {

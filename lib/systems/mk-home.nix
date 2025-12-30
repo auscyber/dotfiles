@@ -33,6 +33,8 @@ inputs.home-manager.lib.homeManagerConfiguration {
     { _module.args.lib = extendedLib; }
     ../../modules/common/secrets.nix
     ../../modules/common/nix
+
+    ../../modules/common/allConfigs.nix
     inputs.stylix.homeModules.stylix
     {
     }

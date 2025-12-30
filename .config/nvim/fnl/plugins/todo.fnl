@@ -1,5 +1,3 @@
-(module plugins.todo
-  {require {todo todo-comments}})
-
+(module plugins.todo {require {todo todo-comments}})
 
 (todo.setup {})

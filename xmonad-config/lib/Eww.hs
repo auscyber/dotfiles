@@ -156,16 +156,17 @@ ewwPP defaultIcons =
                     , ("halign", show "start")
                     , ("spacing", show 10)
                     ]
-                    x :
-                xs
+                    x
+                    : xs
             , ppSep = " "
-            , --, ppSep = polybarColour 'F' "#4D3636" " | "
+            , -- , ppSep = polybarColour 'F' "#4D3636" " | "
               --             ppLayout = xmonadPolybarAction 1 "next-layout" . xmonadPolybarAction 3 "default-layout"
               --
               --  , ppOrder = \(x:xs) -> wrap "%{T2}" "%{T-}" x:xs
               --    , ppOrder = \(x:_:y) -> x:y
               ppOutput =
-                appendFile "/tmp/xmonad-status-json.log" . (++ "\n")
+                appendFile "/tmp/xmonad-status-json.log"
+                    . (++ "\n")
                     . box
                         [ ("spacing", "1")
                         , ("orientation", wrapQ "h")

@@ -13,10 +13,10 @@
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
-      "http://secondpc.devices.imflo.pet:8501"
+      #      "http://secondpc.devices.imflo.pet:8501"
     ];
     trusted-public-keys = [
-      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+      #      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
 
@@ -81,16 +81,12 @@
   nix.distributedBuilds = true;
 
   nix.linux-builder = {
-    enable = false;
-    systems = with inputs.flake-utils.lib.system; [
-      aarch64-linux
+    enable = true;
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
     ];
-    #config.nix.settings.extra-trusted-public-keys = [
-    #  "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
-
-    #];
-    #config.nix.settings.trusted-users = [ "builder" ];
-    #    config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+    config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
   };
 
   nix.settings = {
@@ -111,6 +107,7 @@
   # The platform the configuration will be used on.
   services.karabiner-elements.enable = false;
   auscybernix = {
+    nix.flake = "/Users/ivypierlot/dotfiles";
     sudo.pam = {
       enable = true;
       touchIdAuth = true;
@@ -128,6 +125,7 @@
       brews = [
         "nowplaying-cli"
         "mole"
+        "speedtest"
       ];
       casks = [
         # "cinny"

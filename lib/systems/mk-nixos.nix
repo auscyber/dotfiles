@@ -62,6 +62,8 @@ inputs.nixpkgs.lib.nixosSystem {
 
     ../../modules/common/secrets.nix
     ../../modules/common/nix
+
+    ../../modules/common/allConfigs.nix
     ../../modules/common/hm
     ../../modules/common/common
     ../../modules/common/ssh-keys.nix

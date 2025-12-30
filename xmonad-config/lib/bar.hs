@@ -43,7 +43,7 @@ putMessage str last = do
             Ref.writeIORef last str
             putStrLn str
 
-statefulDbusAction :: Monoid m => (Ref.IORef m -> IO ()) -> IO ()
+statefulDbusAction :: (Monoid m) => (Ref.IORef m -> IO ()) -> IO ()
 statefulDbusAction f = Ref.newIORef mempty >>= forever1Delay . f
 
 main = do
@@ -51,8 +51,8 @@ main = do
     args <- getArgs
     hSetBuffering stdout LineBuffering
     case args of
-        ["play-pause"] -> statefulDbusAction $ pausePlay client --client lastMessage True
-        ["play-pause", "--instance"] -> Ref.newIORef [] >>= pausePlay client --client lastMessage True
+        ["play-pause"] -> statefulDbusAction $ pausePlay client -- client lastMessage True
+        ["play-pause", "--instance"] -> Ref.newIORef [] >>= pausePlay client -- client lastMessage True
         ["--help"] -> putStrLn helpMessage
         ["polybar"] -> statefulDbusAction $ bar False client
         _ -> statefulDbusAction $ bar False client
@@ -129,5 +129,5 @@ displayImage image = do
 parseUrl :: String -> String
 parseUrl = ("https://i.scdn.co" <>) . drop (length ("https://open.spotify.com" :: String))
 
-getMetaData :: IsVariant a => String -> M.Map String Variant -> Maybe a
+getMetaData :: (IsVariant a) => String -> M.Map String Variant -> Maybe a
 getMetaData str = M.lookup str >=> fromVariant

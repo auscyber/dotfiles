@@ -22,7 +22,7 @@ import qualified XMonad.StackSet as S
 import qualified XMonad.Util.ExtensibleConf as XC
 import qualified XMonad.Util.ExtensibleState as XS
 
---Process Colours
+-- Process Colours
 type Colour = String
 polyBarAction :: Int -> String -> String -> String
 polyBarAction button command
@@ -47,7 +47,7 @@ polybarColour area color text
 
 colourCurrent = "#f9f9f9"
 
---colourVisible = "#5AB1BB"
+-- colourVisible = "#5AB1BB"
 colourVisible = "#ffd1dc"
 colourHidden = "#ffeFdc"
 colourHiddenNoWindows = "#A4A4A4"
@@ -79,7 +79,7 @@ polybarPP defaultIcons = do
             , ppLayout = xmonadPolybarAction 1 "next-layout" . xmonadPolybarAction 3 "default-layout"
             , ppOrder = \(x : y : z : xs) ->
                 (highlightEnds "\57526" ++ "%{B#FF3f3f3f}" ++ x) : y : (z ++ highlightEnds "\57524") : xs
-                --"\57524"
+                -- "\57524"
                 --
                 --  , ppOrder = \(x:xs) -> wrap "%{T2}" "%{T-}" x:xs
                 --    , ppOrder = \(x:_:y) -> x:y
@@ -97,14 +97,14 @@ switchMoveWindowsPolybar defaultIcons pp =
 
 switchAndMoveF x = xmonadPolybarAction 1 ("view\\\"" ++ x ++ "\\\"") . xmonadPolybarAction 3 ("moveTo\"" ++ x ++ "\"")
 
---iconCurrent = \xf10c""\xf10c"
+-- iconCurrent = \xf10c""\xf10c"
 
---polybarWorkspace :: (String -> String)  -> Bool -> String -> String
---polybarWorkspace format bool str = (if bool then moveToWS str . switchWS str  else id) . format $ str
---Underline Text
+-- polybarWorkspace :: (String -> String)  -> Bool -> String -> String
+-- polybarWorkspace format bool str = (if bool then moveToWS str . switchWS str  else id) . format $ str
+-- Underline Text
 polybarUnderline :: String -> String
 polybarUnderline text = "%{+u}" ++ text ++ "%{-u}"
 
---Underline Polybar Text with Colour
+-- Underline Polybar Text with Colour
 polybarUnderlineWithColor :: Colour -> String -> String
 polybarUnderlineWithColor color = polybarColour 'u' color . polybarUnderline

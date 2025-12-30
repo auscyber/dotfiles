@@ -1749,6 +1749,22 @@
         "type": "github"
       }
     },
+    "homebrew-speedtest": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1660162552,
+        "narHash": "sha256-IaVzg2Nw02RXXz0hmWHP5oq94aAN4Qn6+Y1dC+k+JVM=",
+        "owner": "teamookla",
+        "repo": "homebrew-speedtest",
+        "rev": "1ff487f465bb01c3007c0bc17f1f793244ee2eaa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "teamookla",
+        "repo": "homebrew-speedtest",
+        "type": "github"
+      }
+    },
     "hyprcursor": {
       "inputs": {
         "hyprlang": [
@@ -3850,6 +3866,7 @@
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "homebrew-speedtest": "homebrew-speedtest",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
         "hyprpanel": "hyprpanel",
