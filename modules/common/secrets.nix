@@ -12,11 +12,28 @@ in
     enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
   };
   config = lib.mkIf cfg.enable {
+
+    age.secrets.github_token = {
+      rekeyFile = ./github_token.age;
+#      intermediary = true;
+    };
     age.rekey = {
-      agePlugins = with pkgs; [ age-plugin-1p ];
+      agePlugins = with pkgs; [
+      ] ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.age-plugin-1p ];
       # Obtain this using `ssh-keyscan` or by looking it up in your ~/.ssh/known_hosts
       # The path to the master identity used for decryption. See the option's description for more information.
-      masterIdentities = [ ./main.pub ];
+      masterIdentities = [
+        #        ./main.pub
+        #        {
+        #          git
+        #        }
+        #        ./publickey.txt
+        #        "age1se1qf48z2tlp6ua8hpyg7vypm0dw8z8nmgusell62r8vpyufemre6escazv5f2"
+        {
+          identity = ./main.pub; # Private key
+          pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key
+        }
+      ];
       #masterIdentities = [ "/home/myuser/master-key" ]; # External master key
       #masterIdentities = [
       #  # It is possible to specify an identity using the following alternate syntax,

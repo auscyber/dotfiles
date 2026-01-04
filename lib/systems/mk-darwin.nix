@@ -24,6 +24,7 @@ let
       inputs
       system
       matchingHomes
+      hostname
       ;
     isNixOS = false;
   };
@@ -61,6 +62,7 @@ inputs.darwin.lib.darwinSystem {
 
     ../../modules/common/nix
     ../../modules/common/secrets.nix
+
     ../../modules/common/hm
     ../../modules/common/common
 
@@ -75,6 +77,12 @@ inputs.darwin.lib.darwinSystem {
 
     ../../systems/${system}/${hostname}
   ]
-  ++ modules;
+  ++ modules ++ [
+  ({config,...}:{
+	home-manager.sharedModules = [{
+	age.rekey.hostPubkey = config.age.rekey.hostPubkey;
+
+	}];
+  })];
 
 }

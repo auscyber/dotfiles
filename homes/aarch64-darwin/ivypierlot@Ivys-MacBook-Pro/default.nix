@@ -10,7 +10,8 @@
 
 {
 
-  sops.age.keyFile = "/users/ivypierlot/Library/Application Support/sops/age/keys.txt";
+#  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
 

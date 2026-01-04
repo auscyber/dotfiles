@@ -10,6 +10,8 @@
 }:
 {
 
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIH68LfeU1ib2+c5DCGLRtZkaSSjz2w6DgBeshr6lwOb";
+  #  age.rekey.hostPubkey = "ssh-ed25519 age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm";
   auscybernix.nix.caches = false;
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
   nix = {
@@ -198,6 +200,7 @@
       "libvirtd"
       "docker"
     ];
+    hashedPasswordFile = config.age.secrets."ivy-pwd-hash".path;
     shell = pkgs.fish;
   };
 

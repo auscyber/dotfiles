@@ -19,25 +19,25 @@
     defaults.email = "ivyp@outlook.com.au";
     certs."jellyfin.pierlot.com.au" = {
       dnsProvider = "cloudflare";
-      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      environmentFile = config.age.secrets."acme_cloudflare.env".path;
       group = config.services.nginx.group;
     };
     certs."home.pierlot.com.au" = {
       dnsProvider = "cloudflare";
-      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
       group = config.services.nginx.group;
     };
     certs."grafana.pierlot.com.au" = {
       dnsProvider = "cloudflare";
-      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
       group = config.services.nginx.group;
     };
     certs."nextcloud.pierlot.com.au" = {
       dnsProvider = "cloudflare";
 
-      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
       group = config.services.nginx.group;
 
@@ -125,9 +125,6 @@
   sops.secrets."tailscale/auth_key" = {
     sopsFile = ../../../secrets/secondpc/default.yaml;
   };
-  sops.secrets."acme_cloudflare" = {
-    sopsFile = ../../../secrets/secondpc/acme.env;
-    format = "dotenv";
-  };
+  age.secrets."acme_cloudflare.env".rekeyFile = ./acme_cloudflare.age;
 
 }

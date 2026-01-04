@@ -210,6 +210,8 @@
       "tty"
       "dialout"
     ]; # Enable ‘sudo’ for the user.
+
+    hashedPasswordFile = config.age.secrets."ivy-pwd-hash".path;
     packages = with pkgs; [
     ];
   };

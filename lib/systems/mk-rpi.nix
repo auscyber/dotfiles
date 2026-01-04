@@ -26,6 +26,7 @@ let
         inputs
         system
         matchingHomes
+        hostname
         ;
       isNixOS = true;
       inherit isInstaller;
@@ -100,7 +101,7 @@ in
 
         }
         // common.mkNixpkgsConfig flake;
-        auscybernix.secrets.enable = false;
+        auscybernix.secrets.enable = true;
       }
       (homeManagerConfig true)
     ]
@@ -119,6 +120,8 @@ in
       { _module.args.lib = extendedLib; }
       stylixConfig
       inputs.stylix.nixosModules.stylix
+      inputs.agenix.nixosModules.default
+      inputs.agenix-rekey.nixosModules.default
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager
       inputs.sops-nix.nixosModules.sops

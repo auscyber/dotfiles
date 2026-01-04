@@ -24,6 +24,7 @@ let
       extendedLib
       inputs
       system
+      hostname
       matchingHomes
       ;
     isNixOS = true;
@@ -49,6 +50,8 @@ inputs.nixpkgs.lib.nixosSystem {
     inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
     inputs.nixos-wsl.nixosModules.default
+    inputs.agenix.nixosModules.default
+    inputs.agenix-rekey.nixosModules.default
     inputs.sops-nix.nixosModules.sops
     inputs.attic.nixosModules.atticd
 
@@ -67,6 +70,15 @@ inputs.nixpkgs.lib.nixosSystem {
     ../../modules/common/hm
     ../../modules/common/common
     ../../modules/common/ssh-keys.nix
+    (
+      { config, lib, ... }:
+      {
+        auscybernix.secrets.enable = true;
+		home-manager.sharedModules = [{
+		age.rekey.hostPubkey = config.age.rekey.hostPubkey;
+		}];
+      }
+    )
     homeManagerConfig
   ]
   ++ (extendedLib.importModulesRecursive ../../modules/nixos)

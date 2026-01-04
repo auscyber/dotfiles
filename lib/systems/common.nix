@@ -57,6 +57,7 @@ in
       extendedLib,
       inputs,
       system,
+      hostname,
       matchingHomes,
       isNixOS ? true,
       isInstaller ? false,
@@ -68,6 +69,8 @@ in
           useUserPackages = true;
           extraSpecialArgs = {
             inherit inputs system;
+            inherit hostname;
+			isInside = true;
             inherit (inputs) self;
             lib = extendedLib;
             flake-parts-lib = inputs.flake-parts.lib;
@@ -87,11 +90,12 @@ in
 
             inputs.agenix.homeManagerModules.default
             inputs.agenix-rekey.homeManagerModules.default
-            #            ../../modules/common/secrets.nix
+            ../../modules/common/secrets.nix
+
             ../../modules/common/allConfigs.nix
           ]
           ++ (extendedLib.optional (!isInstaller) {
-            #            auscybernix.secrets.enable = true;
+            auscybernix.secrets.enable = true;
           })
           ++ externalHmModules
           ++ (extendedLib.importModulesRecursive ../../modules/home);

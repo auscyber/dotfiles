@@ -27,43 +27,49 @@ inputs.home-manager.lib.homeManagerConfiguration {
       system
       extendedLib
       ;
-  };
 
-  modules = [
-    common.externalHmModules
-    { _module.args.lib = extendedLib; }
+ } // {
+ isInside = false;
+};
 
-    ../../modules/common/secrets.nix
-    ../../modules/common/nix
+modules =
 
-    ../../modules/common/allConfigs.nix
-    inputs.agenix.homeManagerModules.default
-    inputs.agenix-rekey.homeManagerModules.default
+common.externalHmModules
+++ [
+{ _module.args.lib = extendedLib; }
+inputs.agenix.homeManagerModules.default
+inputs.agenix-rekey.homeManagerModules.default
 
-    inputs.stylix.homeModules.stylix
-    {
-    }
-  ]
-  ++ (extendedLib.importModulesRecursive ../../modules/home)
-  ++ [
-    ../../modules/home/default.nix
-    {
-      home = {
-        inherit username;
-        homeDirectory =
-          if system == "x86_64-darwin" || system == "aarch64-darwin" then
-            "/Users/${username}"
-          else
-            "/home/${username}";
-      };
-    }
-    (
-      { config, lib, ... }:
-      {
-        auscybernix.standalone.enable = true;
-      }
-    )
-  ]
-  ++ modules;
+../../modules/common/secrets.nix
+../../modules/common/nix
 
+../../modules/common/allConfigs.nix
+
+inputs.stylix.homeModules.stylix
+{
 }
+]
+++ (extendedLib.importModulesRecursive ../../modules/home)
+	++ [
+		../../modules/home/default.nix
+{
+	home = {
+		inherit username;
+		homeDirectory =
+			if system == "x86_64-darwin" || system == "aarch64-darwin" then
+				"/Users/${username}"
+			else
+				"/home/${username}";
+	};
+}
+(
+ { config, lib, ... }:
+ {
+ auscybernix.standalone.enable = true;
+ auscybernix.secrets.enable = true;
+ }
+ )
+	]
+	++ modules;
+
+	}

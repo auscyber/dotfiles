@@ -37,6 +37,8 @@
                 sops
                 age
                 ssh-to-age
+                age-plugin-1p
+                age-plugin-se
                 perSystemArgs.config.agenix-rekey.package
               ]
               ++ perSystemArgs.config.input-branches.commands.all;

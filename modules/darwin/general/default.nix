@@ -16,6 +16,6 @@
     "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
 
   };
-  age.rekey.localStorageDir = ../.. + "/secrets/rekeyed/${hostname}";
+  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
 
 }
