@@ -395,17 +395,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1767028240,
-        "narHash": "sha256-0/fLUqwJ4Z774muguUyn5t8AQ6wyxlNbHexpje+5hRo=",
-        "ref": "refs/heads/master",
-        "rev": "c31afa6e76da9bbc7c9295e39c7de9fca1071ea1",
-        "revCount": 2303,
-        "type": "git",
-        "url": "ssh://git@github.com/nix-darwin/nix-darwin"
+        "lastModified": 1765767116,
+        "narHash": "sha256-A/Kq7XgbMK/DBuGxOT2V5ZyVnygVh7axoMuTK7sphl4=",
+        "owner": "auscyber",
+        "repo": "nix-darwin",
+        "rev": "3b7be74e607b5a93c0592f1524929d572a2136fd",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/nix-darwin/nix-darwin"
+        "owner": "auscyber",
+        "ref": "karabiner",
+        "repo": "nix-darwin",
+        "type": "github"
       }
     },
     "devenv": {
