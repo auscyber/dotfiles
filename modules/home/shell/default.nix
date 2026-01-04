@@ -48,10 +48,6 @@ in
         matchBlocks = {
           "imflo.pet" = {
             forwardAgent = true;
-#            extraOptions = {
-#              "RemoteForward" =
-#                "/run/user/1001/gnupg/S.gpg-agent ${config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName}";
-#            };
           };
         };
 

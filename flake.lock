@@ -462,14 +462,19 @@
         ]
       },
       "locked": {
-        "path": "./inputs/darwin",
-        "type": "path"
+        "lastModified": 1767494714,
+        "narHash": "sha256-SFb+RyVMQcPFAgi7YQ+Ag4o9y9hpSEK6l2/VUkrMYwg=",
+        "owner": "auscyber",
+        "repo": "nix-darwin",
+        "rev": "937c840059f3b3229eb87c7fbd38287bab17b85f",
+        "type": "github"
       },
       "original": {
-        "path": "./inputs/darwin",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "auscyber",
+        "ref": "karabiner",
+        "repo": "nix-darwin",
+        "type": "github"
+      }
     },
     "devenv": {
       "inputs": {
@@ -3191,6 +3196,21 @@
         "type": "github"
       }
     },
+    "nixos-facter-modules": {
+      "locked": {
+        "lastModified": 1766558141,
+        "narHash": "sha256-Ud9v49ZPsoDBFuyJSQ2Mpw1ZgAH/aMwUwwzrVoetNus=",
+        "owner": "nix-community",
+        "repo": "nixos-facter-modules",
+        "rev": "e796d536e3d83de74267069e179dc620a608ed7d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-facter-modules",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1766568855,
@@ -4375,6 +4395,7 @@
         "nix-topology": "nix-topology",
         "nixcord": "nixcord",
         "nixos-conf-editor": "nixos-conf-editor",
+        "nixos-facter-modules": "nixos-facter-modules",
         "nixos-hardware": "nixos-hardware",
         "nixos-images": "nixos-images",
         "nixos-mailserver": "nixos-mailserver",

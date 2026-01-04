@@ -2,7 +2,7 @@
 
   description = "AusCyber nix flake config";
   inputs = {
-    self.submodules = true;
+#    self.submodules = true;
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
@@ -19,6 +19,7 @@
       url = "github:oxalica/nil";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     game-devices-udev-rules = {
       url = "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz";
       flake = false;
@@ -150,7 +151,7 @@
     sops-nix.url = "github:auscyber/sops-nix/age-plugin";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin.url = "path:./inputs/darwin";
+    darwin.url = "path:./inputs/darwin/";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
