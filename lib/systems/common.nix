@@ -7,6 +7,9 @@ let
     inputs.nixvim.homeModules.default
     inputs.nix-index-database.homeModules.nix-index
     inputs.sops-nix.homeManagerModules.sops
+
+    #    inputs.agenix.homeManagerModules.default
+    #    inputs.agenix-rekey.homeManagerModules.default
   ];
 in
 {
@@ -82,11 +85,13 @@ in
           )
           ++ [
 
-            ../../modules/common/secrets.nix
+            inputs.agenix.homeManagerModules.default
+            inputs.agenix-rekey.homeManagerModules.default
+            #            ../../modules/common/secrets.nix
             ../../modules/common/allConfigs.nix
           ]
           ++ (extendedLib.optional (!isInstaller) {
-            auscybernix.secrets.enable = true;
+            #            auscybernix.secrets.enable = true;
           })
           ++ externalHmModules
           ++ (extendedLib.importModulesRecursive ../../modules/home);

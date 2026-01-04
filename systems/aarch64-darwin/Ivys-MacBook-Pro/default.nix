@@ -19,10 +19,10 @@
       #      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
-  sops.age.plugins = with pkgs; [
-    age-plugin-1p
-    age-plugin-se
-  ];
+  #  sops.age.plugins = with pkgs; [
+  #    age-plugin-1p
+  #    age-plugin-se
+  #  ];
 
   documentation.enable = true;
   stylix.targets.jankyborders.enable = false;
@@ -75,7 +75,7 @@
     polarity = "dark";
     image = ../../../backgrounds/phoebebridgers-2.jpg;
   };
-  age.rekey.hostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
 
   nix.channel.enable = false;
   nix.gc.automatic = true;

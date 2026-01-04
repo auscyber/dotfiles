@@ -223,7 +223,6 @@
       }
     );
   nixConfig = {
-    extra-experimental-features = [ "flake-self-attrs" ];
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
     ];

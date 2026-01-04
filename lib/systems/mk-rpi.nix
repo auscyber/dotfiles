@@ -86,6 +86,8 @@ in
       inputs.stylix.nixosModules.stylix
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager
+      inputs.agenix.nixosModules.default
+      inputs.agenix-rekey.nixosModules.default
       inputs.sops-nix.nixosModules.sops
 
       ../../modules/common/secrets.nix

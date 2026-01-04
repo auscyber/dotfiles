@@ -30,16 +30,20 @@ inputs.home-manager.lib.homeManagerConfiguration {
   };
 
   modules = [
+    common.externalHmModules
     { _module.args.lib = extendedLib; }
+
     ../../modules/common/secrets.nix
     ../../modules/common/nix
 
     ../../modules/common/allConfigs.nix
+    inputs.agenix.homeManagerModules.default
+    inputs.agenix-rekey.homeManagerModules.default
+
     inputs.stylix.homeModules.stylix
     {
     }
   ]
-  ++ common.externalHmModules
   ++ (extendedLib.importModulesRecursive ../../modules/home)
   ++ [
     ../../modules/home/default.nix
