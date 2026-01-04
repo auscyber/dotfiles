@@ -6,11 +6,15 @@
 }:
 {
   imports = [
+
+    inputs.agenix-rekey.flakeModule
     ./systems.nix
     ../lib
     ../docs
     ../overlays
     ./homes.nix
+
+    ./secrets.nix
     ./shells.nix
     ../ci
     ./packages.nix

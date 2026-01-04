@@ -40,22 +40,22 @@ in
             "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
           ];
         })
-        {
-          auto-optimise-store = true;
-        }
+#        {
+#          auto-optimise-store = true;
+#        }
       ];
 
       #    package = pkgs.lixPackageSets.latest.lix;
 
       extraOptions = ''
-        experimental-features = nix-command flakes flake-self-attrs
+        experimental-features = nix-command flakes
       '';
       gc = {
         automatic = true;
         options = "--delete-older-than 30d";
       };
 
-      package = pkgs.nixVersions.stable;
+      package = pkgs.nixVersions.latest;
     };
 
     nixpkgs.config = {

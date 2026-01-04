@@ -31,11 +31,15 @@
         ) { } shellNames)
         // {
           default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              sops
-              age
-              ssh-to-age
-            ] ++ perSystemArgs.config.input-branches.commands.all;
+            buildInputs =
+              with pkgs;
+              [
+                sops
+                age
+                ssh-to-age
+                perSystemArgs.config.agenix-rekey.package
+              ]
+              ++ perSystemArgs.config.input-branches.commands.all;
           };
         };
 
