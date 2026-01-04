@@ -22,6 +22,12 @@
       environmentFile = config.age.secrets."acme_cloudflare.env".path;
       group = config.services.nginx.group;
     };
+    certs."logs.pierlot.com.au" = {
+      dnsProvider = "cloudflare";
+      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      group = config.services.nginx.group;
+
+    };
     certs."home.pierlot.com.au" = {
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets."acme_cloudflare.env".path;

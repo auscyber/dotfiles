@@ -8,10 +8,20 @@
   };
   sops.secrets."grafana/client_id" = {
     sopsFile = ../../../secrets/secondpc/grafana.yaml;
+    owner = "grafana";
 
   };
   sops.secrets."grafana/client_secret" = {
     sopsFile = ../../../secrets/secondpc/grafana.yaml;
+    owner = "grafana";
+  };
+  sops.secrets."grafana/smtp/password" = {
+    sopsFile = ../../../secrets/secondpc/grafana.yaml;
+    owner = "grafana";
+  };
+  sops.secrets."htpasswd" = {
+    sopsFile = ../../../secrets/secondpc/nginx.yaml;
+    owner = config.services.nginx.user;
   };
   services.grafana = {
     enable = true;
@@ -21,6 +31,14 @@
         http_port = 3001;
         enforce_domain = true;
         domain = "grafana.pierlot.com.au";
+        root_url = "https://grafana.pierlot.com.au";
+      };
+      smtp = {
+        enabled = true;
+        host = "mail.imflo.pet:465";
+        user = "alerts@ivymect.in";
+        password = "$__file{${config.sops.secrets."grafana/smtp/password".path}}";
+        from_address = "alerts@ivymect.in";
       };
 
       auth = {
@@ -45,14 +63,14 @@
     provision = {
       enable = true;
       dashboards.settings.providers = [
-        {
-          name = "my dashboards";
-          disableDeletion = true;
-          options = {
-            path = "/etc/grafana-dashboards";
-            foldersFromFilesStructure = true;
-          };
-        }
+        #        {
+        #          name = "my dashboards";
+        #          disableDeletion = true;
+        #          options = {
+        #            path = "/etc/grafana-dashboards";
+        #            foldersFromFilesStructure = true;
+        #          };
+        #        }
       ];
 
       datasources.settings.datasources = [
@@ -68,20 +86,22 @@
     };
 
   };
-  #  services.loki = {
-  #    enable = true;
-  #    configuration = {
-  #
-  #    };
-  #
-  #  };
-  #  services.alloy = {
-  #    enable = true;
-  #
-  #  };
+  services.loki = {
+    enable = true;
+    extraFlags = [ "" ];
+    configFile = ./loki.yaml;
+
+  };
+  services.alloy = {
+    enable = true;
+    configPath = ./alloy;
+
+  };
+  systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "docker" ];
   services.prometheus = {
     enable = true;
     port = 9091;
+    extraFlags = [ "--web.enable-remote-write-receiver" ];
     exporters.node = {
       enable = true;
       port = 9000;
@@ -89,6 +109,12 @@
 
     };
     globalConfig.scrape_interval = "10s"; # "1m"
+    remoteWrite = [
+      {
+        url = "http://100.64.0.1:9090/api/v1/write";
+      }
+
+    ];
     scrapeConfigs = [
       {
         job_name = "node";
@@ -140,6 +166,17 @@
       #      }
 
     ];
+  };
+
+  services.nginx.virtualHosts."logs.pierlot.com.au" = {
+    addSSL = true;
+    useACMEHost = "logs.pierlot.com.au";
+    basicAuthFile = config.sops.secrets."htpasswd".path;
+    locations."/" = {
+      proxyPass = "http://localhost:3100";
+      recommendedProxySettings = true;
+    };
+
   };
 
   services.nginx.virtualHosts."${config.services.grafana.settings.server.domain}" = {
