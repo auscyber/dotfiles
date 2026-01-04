@@ -1610,13 +1610,12 @@
       "locked": {
         "lastModified": 1758567709,
         "narHash": "sha256-CLQFdPr489OKZRj1v8EZypM1KOXgAOAOF0VQpeud4uo=",
-        "rev": "a508fceff29e6f7ef5fac4478dc6285930b2040b",
         "type": "tarball",
-        "url": "https://codeberg.org/api/v1/repos/fabiscafe/game-devices-udev/archive/a508fceff29e6f7ef5fac4478dc6285930b2040b.tar.gz"
+        "url": "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.tar.gz"
+        "url": "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
       }
     },
     "ghostty-shaders": {
