@@ -2,6 +2,7 @@
 
   description = "AusCyber nix flake config";
   inputs = {
+  self.submodules = true;
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 	 nix-topology.url = "github:oddlama/nix-topology";
@@ -146,7 +147,7 @@
     sops-nix.url = "github:auscyber/sops-nix/age-plugin";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin.url = "./inputs/darwin";
+    darwin.url = "./inputs/darwin?flake=true";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
