@@ -20,7 +20,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     game-devices-udev-rules = {
-      url = "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.tar.gz";
+      url = "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz";
       flake = false;
 
     };

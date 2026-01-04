@@ -13,6 +13,10 @@
     };
     programs.neovim.enable = true;
   };
+  programs.git.settings = {
+  safe.directory = "/nixos-config";
+
+  };
   home.packages = with pkgs; [ gnupg ];
   home.stateVersion = "24.05";
 
