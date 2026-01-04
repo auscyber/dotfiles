@@ -172,7 +172,7 @@
              :handlers (lsp-status.extensions.clangd.setup)}) ;  (init-lsp :ccls {:fts [:cpp :c]})
   (init-lsp :nil_ls
             {:fts [:nix]
-             :settings {:nil {:nix {:flake {:autoEvalInputs true
+             :settings {:nil {:nix {:flake { ;:autoEvalInputs true
                                             :autoArchive true}}}}})
   (init-lsp :ocamlls {:fts :ocaml})
   (init-lsp :pyright

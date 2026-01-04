@@ -39,6 +39,7 @@ in
       nix-output-monitor.enable = true;
     };
     programs.nh.enable = true;
+
     programs = {
       ssh = {
 

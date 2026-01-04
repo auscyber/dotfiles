@@ -19,6 +19,7 @@
       #      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
+  sops.age.plugins = with pkgs; [ age-plugin-1p age-plugin-se ];
 
   documentation.enable = true;
   stylix.targets.jankyborders.enable = false;

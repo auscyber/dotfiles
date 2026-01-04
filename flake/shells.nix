@@ -7,7 +7,7 @@
 {
 
   perSystem =
-    { pkgs, ... }:
+    perSystemArgs@{ pkgs, ... }:
 
     let
       shellPath = ../shells;
@@ -35,7 +35,7 @@
               sops
               age
               ssh-to-age
-            ];
+            ] ++ perSystemArgs.config.input-branches.commands.all;
           };
         };
 

@@ -4,10 +4,13 @@
   inputs = {
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+	 nix-topology.url = "github:oddlama/nix-topology";
     attic = {
       url = "github:zhaofengli/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+      searchix.url = "git+https://codeberg.org/alanpearce/searchix";
     nil = {
       url = "github:oxalica/nil";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -140,10 +143,10 @@
       flake = false;
     };
     #flakes
-    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.url = "github:auscyber/sops-nix/age-plugin";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin.url = "github:auscyber/nix-darwin/karabiner";
+    darwin.url = "./inputs/darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
@@ -203,6 +206,7 @@
           # Optional: use external flake logic, e.g.
           # inputs.foo.flakeModules.default
           ./flake
+		  inputs.nix-topology.flakeModule
         ];
         systems = [
           # systems for which you want to build the `perSystem` attributes

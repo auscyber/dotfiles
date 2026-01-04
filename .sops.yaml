@@ -6,12 +6,17 @@ keys:
   - &admin_ivy age1wl25zsmys6cdzacrx4xh2fe89jk8enx4dalc52075kg9rdnuxf9qe2yw7p
   - &desktop_ivy age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm
   - &server_ivy age1n6ufle4xhy0fe6nkwp7yzfv7mxqdm06wtp2uj0dwzrtfv4rtzpfsmslgjn
+  - &test_key age1z8sprx3lnrysdrcpse0fedsxvwpn75tt9j5mwul3ax97qnml5frs03njwy
 creation_rules:
     - path_regex: secrets/secondpc/[^/]+\.(yaml|json|env|ini)$
       key_groups:
       - age:
         - *admin_ivy
         - *server_ivy
+    - path_regex: secrets/test/[^/]+\.(yaml|json|env|ini)$
+      key_groups:
+      - age:
+        - *test_key
     - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
       key_groups:
       - age:

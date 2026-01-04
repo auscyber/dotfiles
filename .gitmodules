@@ -1,0 +1,3 @@
+[submodule "inputs/darwin"]
+	path = inputs/darwin
+	url = ./.
