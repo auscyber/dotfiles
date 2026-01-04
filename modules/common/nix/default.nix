@@ -48,7 +48,7 @@ in
       #    package = pkgs.lixPackageSets.latest.lix;
 
       extraOptions = ''
-        experimental-features = nix-command flakes
+        experimental-features = nix-command flakes flake-self-attrs
       '';
       gc = {
         automatic = true;
