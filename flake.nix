@@ -147,7 +147,7 @@
     sops-nix.url = "github:auscyber/sops-nix/age-plugin";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin.url = "./inputs/darwin?flake=true";
+    darwin.url = "path:./inputs/darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     eww.url = "github:elkowar/eww";
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
