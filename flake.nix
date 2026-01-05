@@ -2,7 +2,7 @@
 
   description = "AusCyber nix flake config";
   inputs = {
-#    self.submodules = true;
+    self.submodules = true;
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
@@ -192,7 +192,7 @@
 	stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
 
-    nixpkgs.follows = "stable";
+    nixpkgs.follows = "unstable";
 
   };
   outputs =
