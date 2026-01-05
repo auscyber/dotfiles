@@ -24,7 +24,7 @@
     };
     certs."logs.pierlot.com.au" = {
       dnsProvider = "cloudflare";
-      environmentFile = config.sops.secrets.acme_cloudflare.path;
+      environmentFile = config.age.secrets."acme_cloudflare.env".path;
       group = config.services.nginx.group;
 
     };
