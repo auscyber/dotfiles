@@ -5,12 +5,11 @@ let
 in
 {
 
-  inherit (auscyberLib.flake.lib.file)
+  inherit (auscyberLib.config.flake.lib.file)
     importModulesRecursive
     ;
 
-  inherit (auscyberLib.flake.lib) system file extra;
-
+  inherit (auscyberLib.config.flake.lib) system file extra;
   inherit (inputs.home-manager.lib) hm;
 
 }

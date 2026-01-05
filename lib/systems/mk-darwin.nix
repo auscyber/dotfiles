@@ -1,4 +1,8 @@
-{ inputs }:
+{
+  inputs,
+  importedDarwinModules,
+  common,
+}:
 {
   system,
   hostname,
@@ -8,7 +12,6 @@
 
 }:
 let
-  common = import ./common.nix { inherit inputs; };
   flake = inputs.self;
   extendedLib = common.mkExtendedLib flake inputs.nixpkgs;
   matchingHomes = common.mkHomeConfigs {
@@ -42,13 +45,9 @@ inputs.darwin.lib.darwinSystem {
   inherit system;
   modules = [
     { _module.args.lib = extendedLib; }
-
-    inputs.stylix.darwinModules.stylix
-    inputs.nix-homebrew.darwinModules.nix-homebrew
-    inputs.home-manager.darwinModules.home-manager
-    inputs.sops-nix.darwinModules.sops
-    inputs.agenix.darwinModules.default
-    inputs.agenix-rekey.nixosModules.default
+  ]
+  ++ importedDarwinModules
+  ++ [
 
     {
       nixpkgs = {
@@ -77,12 +76,19 @@ inputs.darwin.lib.darwinSystem {
 
     ../../systems/${system}/${hostname}
   ]
-  ++ modules ++ [
-  ({config,...}:{
-	home-manager.sharedModules = [{
-	age.rekey.hostPubkey = config.age.rekey.hostPubkey;
+  ++ modules
+  ++ [
+    (
+      { config, ... }:
+      {
+        home-manager.sharedModules = [
+          {
+            age.rekey.hostPubkey = config.age.rekey.hostPubkey;
 
-	}];
-  })];
+          }
+        ];
+      }
+    )
+  ];
 
 }

@@ -10,6 +10,9 @@
 
   home-manager.sharedModules = [
     ../../home/default.nix
+    {
+      age.rekey.hostPubkey = config.age.rekey.hostPubkey;
+    }
 
   ];
   home-manager.useUserPackages = true;

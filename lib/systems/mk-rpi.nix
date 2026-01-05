@@ -1,5 +1,8 @@
 {
   inputs,
+  common,
+  importedNixosModules,
+
 }:
 {
   system,
@@ -8,7 +11,6 @@
   ...
 }:
 let
-  common = import ./common.nix { inherit inputs; };
   flake = inputs.self;
   extendedLib = (common.mkExtendedLib flake inputs.nixpkgs-nvmd);
   matchingHomes = common.mkHomeConfigs {

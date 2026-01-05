@@ -20,6 +20,7 @@
     ./packages.nix
     ./input-branches.nix
     inputs.flake-parts.flakeModules.partitions
+	inputs.flake-parts.flakeModules.flakeModules
     inputs.input-branches.flakeModules.default
     ./formatter.nix
   ];

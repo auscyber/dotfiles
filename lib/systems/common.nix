@@ -1,15 +1,7 @@
-{ inputs }:
+{ inputs, importedHomeModules }:
 let
   inherit (inputs.nixpkgs.lib) filterAttrs mapAttrs';
   externalHmModules = [
-    inputs._1password-shell-plugins.hmModules.default
-    inputs.zen-browser.homeModules.default
-    inputs.nixvim.homeModules.default
-    inputs.nix-index-database.homeModules.nix-index
-    inputs.sops-nix.homeManagerModules.sops
-
-    #    inputs.agenix.homeManagerModules.default
-    #    inputs.agenix-rekey.homeManagerModules.default
   ];
 in
 {
@@ -70,7 +62,7 @@ in
           extraSpecialArgs = {
             inherit inputs system;
             inherit hostname;
-			isInside = true;
+            isInside = true;
             inherit (inputs) self;
             lib = extendedLib;
             flake-parts-lib = inputs.flake-parts.lib;
@@ -78,6 +70,8 @@ in
           sharedModules = [
             { _module.args.lib = extendedLib; }
           ]
+          ++ importedHomeModules
+
           ++ (
             if isNixOS then
               [
@@ -88,8 +82,6 @@ in
           )
           ++ [
 
-            inputs.agenix.homeManagerModules.default
-            inputs.agenix-rekey.homeManagerModules.default
             ../../modules/common/secrets.nix
 
             ../../modules/common/allConfigs.nix

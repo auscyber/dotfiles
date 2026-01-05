@@ -7,7 +7,7 @@
 {
 
   perSystem =
-    perSystemArgs@{ pkgs, ... }:
+    perSystemArgs@{ pkgs, system, ... }:
 
     let
       shellPath = ../shells;
@@ -38,9 +38,9 @@
                 age
                 ssh-to-age
                 age-plugin-1p
-                age-plugin-se
                 perSystemArgs.config.agenix-rekey.package
               ]
+              ++ lib.optionals pkgs.stdenv.isDarwin [ age-plugin-se ]
               ++ perSystemArgs.config.input-branches.commands.all;
           };
         };

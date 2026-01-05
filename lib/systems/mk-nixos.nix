@@ -1,5 +1,7 @@
 {
   inputs,
+  importedNixosModules,
+  common,
 }:
 {
   system,
@@ -8,7 +10,6 @@
   ...
 }:
 let
-  common = import ./common.nix { inherit inputs; };
 
   flake = inputs.self;
   extendedLib = common.mkExtendedLib flake inputs.nixpkgs;
@@ -44,16 +45,9 @@ inputs.nixpkgs.lib.nixosSystem {
 
   modules = [
     { _module.args.lib = extendedLib; }
-
-    inputs.stylix.nixosModules.stylix
-    inputs.lanzaboote.nixosModules.lanzaboote
-    inputs.impermanence.nixosModules.impermanence
-    inputs.home-manager.nixosModules.home-manager
-    inputs.nixos-wsl.nixosModules.default
-    inputs.agenix.nixosModules.default
-    inputs.agenix-rekey.nixosModules.default
-    inputs.sops-nix.nixosModules.sops
-    inputs.attic.nixosModules.atticd
+  ]
+  ++ importedNixosModules
+  ++ [
 
     {
       nixpkgs = {
@@ -74,9 +68,7 @@ inputs.nixpkgs.lib.nixosSystem {
       { config, lib, ... }:
       {
         auscybernix.secrets.enable = true;
-		home-manager.sharedModules = [{
-		age.rekey.hostPubkey = config.age.rekey.hostPubkey;
-		}];
+
       }
     )
     homeManagerConfig
