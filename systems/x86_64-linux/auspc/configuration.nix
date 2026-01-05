@@ -22,6 +22,8 @@
     secrets.enable = true;
   };
 
+  age.rekey.hostPubkey = "age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm";
+
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   stylix = {
