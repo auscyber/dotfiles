@@ -11,6 +11,7 @@
 {
 
 #  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W9nMZfAYMHgjZ+RUqxOx7UWs7";
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.

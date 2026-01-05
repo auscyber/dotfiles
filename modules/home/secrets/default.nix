@@ -9,7 +9,8 @@
 
 {
 
-  age.secretsDir = if pkgs.stdenv.isDarwin then "${config.home.homeDirectory}/Library/agenix/secrets" else "${config.home.homeDirectory}/.config/agenix/secrets";
+  age.secretsDir = if pkgs.stdenv.isDarwin then "${config.home.homeDirectory}/Library/agenix" else "${config.home.homeDirectory}/.config/agenix";
+  age.secretsMountPoint = if pkgs.stdenv.isDarwin then "${config.home.homeDirectory}/Library/agenix.d" else "${config.home.homeDirectory}/.config/agenix.d";
   age.rekey.storageMode = "local";
   age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${if isInside then "inside-" else ""}${config.home.username}-${hostname}";
 

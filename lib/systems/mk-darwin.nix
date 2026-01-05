@@ -77,18 +77,6 @@ inputs.darwin.lib.darwinSystem {
     ../../systems/${system}/${hostname}
   ]
   ++ modules
-  ++ [
-    (
-      { config, ... }:
-      {
-        home-manager.sharedModules = [
-          {
-            age.rekey.hostPubkey = config.age.rekey.hostPubkey;
-
-          }
-        ];
-      }
-    )
-  ];
+  ;
 
 }
