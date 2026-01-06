@@ -4,44 +4,51 @@ let
   path = "/mnt/hdd/Music";
 in
 {
-  services.samba = {
-  enable = true;
-  securityType = "user";
-  openFirewall = true;
-  settings = {
-  global = {
-       "workgroup" = "WORKGROUP";
-      "server string" = "smbnix";
-      "netbios name" = "smbnix";
-      "security" = "user";
-      #"use sendfile" = "yes";
-      #"max protocol" = "smb2";
-      # note: localhost is the ipv6 localhost ::1
-      "hosts allow" = "192.168.0. 127.0.0.1 localhost 100.64.0.";
-      "hosts deny" = "0.0.0.0/0";
-      "guest account" = "nobody";
-      "map to guest" = "bad user";
-  };
-    public = {
-    browseable = "yes";
-    comment = "Public samba share.";
-    "guest ok" = "yes";
-    path = "/srv/public";
-    "read only" = "yes";
-  };
-
-  "hdd" = {
-      "path" = "/mnt/hdd";
-      "browseable" = "yes";
-      "read only" = "no";
-      "guest ok" = "no";
-      "create mask" = "0644";
-      "directory mask" = "0755";
-#      "force user" = "username";
-      "force group" = "music";
+  services.audiobookshelf = {
+    enable = true;
+    settings = {
+      # dataDir = "/mnt/hdd/Podcasts";
     };
 
   };
+  services.samba = {
+    enable = true;
+    securityType = "user";
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "smbnix";
+        "netbios name" = "smbnix";
+        "security" = "user";
+        #"use sendfile" = "yes";
+        #"max protocol" = "smb2";
+        # note: localhost is the ipv6 localhost ::1
+        "hosts allow" = "192.168.0. 127.0.0.1 localhost 100.64.0.";
+        "hosts deny" = "0.0.0.0/0";
+        "guest account" = "nobody";
+        "map to guest" = "bad user";
+      };
+      public = {
+        browseable = "yes";
+        comment = "Public samba share.";
+        "guest ok" = "yes";
+        path = "/srv/public";
+        "read only" = "yes";
+      };
+
+      "hdd" = {
+        "path" = "/mnt/hdd";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+        #      "force user" = "username";
+        "force group" = "music";
+      };
+
+    };
 
   };
   age.secrets.slskd_secrets_env = {
@@ -54,28 +61,32 @@ in
 
   };
   age.secrets.soularr = {
-  rekeyFile = ./soularr.age;
-  symlink = "/var/lib/soularr/config.ini";
-
+    rekeyFile = ./soularr.age;
+    symlink = "/var/lib/soularr/config.ini";
 
   };
   age.secrets."soularr_api_key" = {
 
-  generator = {
-  	script =
-		{
-		  pkgs,
-		  lib,
-		  ...
-		}:
-		''
-		${lib.getExe pkgs.openssl} rand -base64 48
-		'';
+    generator = {
+      script =
+        {
+          pkgs,
+          lib,
+          ...
+        }:
+        ''
+          		${lib.getExe pkgs.openssl} rand -base64 48
+          		'';
+    };
   };
-  };
-
 
   systemd.tmpfiles.settings.music = {
+    "/var/lib/audiobookshelf"."L" = {
+      group = ":music";
+      mode = ":770";
+      argument = "/mnt/hdd/AudioBooks";
+
+    };
     "/mnt/hdd/Music/Downloads"."d" = {
       user = ":music";
       group = ":music";
@@ -98,11 +109,11 @@ in
             SCRIPT_INTERVAL = 300;
 
           };
-		  volumes = {
-		  "/mnt/hdd/Music/Downloads" = "/downloads";
-		  "/var/lib/soularr" = "/data";
+          volumes = {
+            "/mnt/hdd/Music/Downloads" = "/downloads";
+            "/var/lib/soularr" = "/data";
 
-		  };
+          };
           restart = "unless-stopped";
 
         };
@@ -128,11 +139,11 @@ in
           ...
         }:
         ''
-						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.00.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
-                    	printf 'SLSKD_USERNAME=ivy\n'
-                    	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
-          			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
-                    	'';
+          						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.00.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
+                              	printf 'SLSKD_USERNAME=ivy\n'
+                              	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
+                    			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
+                              	'';
 
     };
 
@@ -179,6 +190,14 @@ in
   };
 
   services.nginx.virtualHosts = {
+    "audiobookshelf.ivymect.in" = {
+      useACMEHost = "ivymect.in";
+      forceSSL = true;
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${builtins.toString config.services.audiobookshelf.port}";
+      };
+
+    };
     "lidarr.ivymect.in" = {
       useACMEHost = "ivymect.in";
       forceSSL = true;
