@@ -97,6 +97,12 @@ in
       mode = ":770";
 
     };
+	"/var/lib/soularr"."d" = {
+	user = "1000";
+	group = "1000";
+	mode = ":770";
+
+	};
   };
   virtualisation.arion = {
     backend = "docker"; # or "docker"
