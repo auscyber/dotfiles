@@ -195,12 +195,9 @@ in
     settings = {
       shares.directories = [ "${path}" ];
       directories.downloads = "/mnt/hdd/Music/Downloads";
-      #      web.authentication.api_keys = {
-      #        my_api_key = "soulseekpasswordddd";
-      #        cidr = "";
-      #      };
-      web.authentication.api_keys = {
-        my_api_key = "soulseekpasswordddd";
+
+      web.authentication.api_keys.lol = {
+        key = "soulseekpasswordddd";
         cidr = "172.16.238.0/24";
 		role = "Administrator";
       };
