@@ -49,6 +49,7 @@ intermediary = true;
 	environmentFile = config.age.secrets."slskd.env".path;
     settings = {
       shares.directories = [ "${path}" ];
+	  directories.downloads = "/mnt/hdd/Music/Downloads";
 
     };
     domain = "slskd.music.ivymect.in";
