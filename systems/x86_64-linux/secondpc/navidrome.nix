@@ -53,7 +53,6 @@ in
     rekeyFile = ./navidrome.age;
 
   };
-<<<<<<< HEAD
   age.secrets.soularr = {
   rekeyFile = ./soularr.age;
   symlink = "/var/lib/soularr/config.ini";
