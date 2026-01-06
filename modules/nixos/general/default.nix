@@ -7,7 +7,6 @@
     intermediary = true;
   };
   age.secrets.ivy-pwd-hash = {
-    rekeyFile = ../../../secrets/ivy-pwd-hash.age;
     generator = {
       dependencies = [ config.age.secrets.ivy-password ];
       script =

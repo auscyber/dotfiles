@@ -5,7 +5,7 @@ let
 in
 {
   age.secrets."slskd.env" = {
-    rekeyFile = ./slskd.env.age;
+    owner = config.services.slskd.user;
     generator = {
       dependencies = {
         inherit (config.age.secrets) ivy-password;
@@ -42,7 +42,7 @@ in
   services.slskd = {
     enable = true;
     openFirewall = true;
-	environmentFile = config.age.secrets."slskd.env";
+	environmentFile = config.age.secrets."slskd.env".path;
     settings = {
       shares.directories = [ "${path}" ];
 

@@ -18,6 +18,7 @@ in
 #      intermediary = true;
     };
     age.rekey = {
+	generatedSecretsDir = ../../secrets/generated;
       agePlugins = with pkgs; [
       ] ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.age-plugin-1p ];
       # Obtain this using `ssh-keyscan` or by looking it up in your ~/.ssh/known_hosts

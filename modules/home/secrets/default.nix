@@ -15,7 +15,6 @@
   age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${if isInside then "inside-" else ""}${config.home.username}-${hostname}";
 
   age.secrets."extra-nix-conf" = {
-    rekeyFile = ./extra-nix-conf.age;
     generator = {
       dependencies = {
         inherit (config.age.secrets) github_token;
