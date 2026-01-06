@@ -117,6 +117,10 @@ in
 
 
 
+#        networks."main".ipam = {
+#          driver = "default";
+#          config = [ { subnet = "172.28.0.0/24"; gateway = "172.28.0.1"; } ];
+#        };
 
         services.soularr = {
           service = {
@@ -136,6 +140,7 @@ in
             ];
 
 			network_mode = "host";
+
 
             restart = "unless-stopped";
           };
@@ -205,10 +210,11 @@ in
 
       web.authentication.api_keys.lol = {
         key = "soulseekpasswordddd";
-        cidr = "172.28.0.0/24";
-		role = "Administrator";
+        cidr = "127.0.0.0/24";
+        role = "Administrator";
       };
-	  web.logging = true;
+	  web.ip_address = "0.0.0.0";
+      web.logging = true;
     };
     domain = "slsk.ivymect.in";
     nginx = {
