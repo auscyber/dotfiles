@@ -203,6 +203,7 @@ in
         cidr = "127.0.0.0/24";
 		role = "Administrator";
       };
+	  web.logging = true;
     };
     domain = "slsk.ivymect.in";
     nginx = {
