@@ -53,12 +53,29 @@ in
     rekeyFile = ./navidrome.age;
 
   };
+<<<<<<< HEAD
   age.secrets.soularr = {
   rekeyFile = ./soularr.age;
   symlink = "/var/lib/soularr/config.ini";
 
 
   };
+  age.secrets."soularr_api_key" = {
+
+  generator = {
+  	script =
+		{
+		  pkgs,
+		  lib,
+		  ...
+		}:
+		''
+		${lib.getExe pkgs.openssl} rand -base64 48
+		'';
+  };
+  };
+
+
   systemd.tmpfiles.settings.music = {
     "/mnt/hdd/Music/Downloads"."d" = {
       user = ":music";
@@ -100,7 +117,7 @@ in
     owner = "music";
     generator = {
       dependencies = {
-        inherit (config.age.secrets) ivy-password slskd_secrets_env;
+        inherit (config.age.secrets) ivy-password slskd_secrets_env soularr_api_key;
       };
 
       script =
@@ -112,6 +129,7 @@ in
           ...
         }:
         ''
+						printf 'SLSKD_API_KEY=role=administrator;cidr=0.0.00.0/0,::/0;%s\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
                     	printf 'SLSKD_USERNAME=ivy\n'
                     	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
           			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
