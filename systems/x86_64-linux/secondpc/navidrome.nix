@@ -5,7 +5,7 @@ let
 in
 {
   age.secrets."slskd.env" = {
-    reKeyfile = ./slskd.env.age;
+    rekeyFile = ./slskd.env.age;
     generator = {
       dependencies = {
         inherit (config.age.secrets) ivy-password;
