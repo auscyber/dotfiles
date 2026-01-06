@@ -128,7 +128,7 @@ in
           ...
         }:
         ''
-						printf 'SLSKD_API_KEY=role=administrator;cidr=0.0.00.0/0,::/0;%s\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
+						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.00.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
                     	printf 'SLSKD_USERNAME=ivy\n'
                     	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
           			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
