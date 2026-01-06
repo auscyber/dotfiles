@@ -17,36 +17,47 @@
   security.acme = {
     acceptTerms = true;
     defaults.email = "ivyp@outlook.com.au";
-    certs."jellyfin.pierlot.com.au" = {
-      dnsProvider = "cloudflare";
-      environmentFile = config.age.secrets."acme_cloudflare.env".path;
-      group = config.services.nginx.group;
-    };
-    certs."logs.pierlot.com.au" = {
-      dnsProvider = "cloudflare";
-      environmentFile = config.age.secrets."acme_cloudflare.env".path;
-      group = config.services.nginx.group;
+    certs = {
+      "jellyfin.pierlot.com.au" = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
+        group = config.services.nginx.group;
+      };
+      "logs.pierlot.com.au" = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
+        group = config.services.nginx.group;
 
-    };
-    certs."home.pierlot.com.au" = {
-      dnsProvider = "cloudflare";
-      environmentFile = config.age.secrets."acme_cloudflare.env".path;
+      };
+      "home.pierlot.com.au" = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
-      group = config.services.nginx.group;
-    };
-    certs."grafana.pierlot.com.au" = {
-      dnsProvider = "cloudflare";
-      environmentFile = config.age.secrets."acme_cloudflare.env".path;
+        group = config.services.nginx.group;
+      };
+      "grafana.pierlot.com.au" = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
-      group = config.services.nginx.group;
-    };
-    certs."nextcloud.pierlot.com.au" = {
-      dnsProvider = "cloudflare";
+        group = config.services.nginx.group;
+      };
+      "nextcloud.pierlot.com.au" = {
+        dnsProvider = "cloudflare";
 
-      environmentFile = config.age.secrets."acme_cloudflare.env".path;
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
 
-      group = config.services.nginx.group;
+        group = config.services.nginx.group;
 
+      };
+      "ivymect.in" = {
+        dnsProvider = "cloudflare";
+
+        environmentFile = config.age.secrets."acme_cloudflare.env".path;
+
+        group = config.services.nginx.group;
+        domain = "*.ivymect.in";
+
+      };
     };
   };
 

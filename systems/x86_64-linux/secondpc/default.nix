@@ -10,6 +10,8 @@
     ./services.nix
     ./grafana.nix
     ./cache.nix
+#	./jitsi.nix
+./navidrome.nix
     #    ./../../modules/system/grub.nix
     #    ./mailserver.nix
     #    ./minecraft.nix
