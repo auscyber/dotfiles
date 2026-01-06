@@ -4,11 +4,16 @@ let
   path = "/mnt/hdd/Music";
 in
 {
+  age.secrets.slskd_secrets_env = {
+  rekeyFile = ../../../secrets/slsk_creds.env.age;
+
+intermediary = true;
+  };
   age.secrets."slskd.env" = {
     owner = config.services.slskd.user;
     generator = {
       dependencies = {
-        inherit (config.age.secrets) ivy-password;
+        inherit (config.age.secrets) ivy-password slskd_secrets_env;
       };
 
       script =
@@ -20,10 +25,9 @@ in
           ...
         }:
         ''
-          	printf 'SLSKD_SLSK_USERNAME=ivy\n'
           	printf 'SLSKD_USERNAME=ivy\n'
-          	printf 'SLSKD_SLSK_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
           	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
+			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
           	'';
 
     };
