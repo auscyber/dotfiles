@@ -106,12 +106,16 @@ in
       serviceName = "soularr"; # optional systemd service name, defaults to arion-example in this case
 
       settings = {
-        networks."main" = {
-          ipam = {
-            driver = "default";
-            config = [ { subnet = "172.16.238.0/24"; } ];
-          };
-        };
+
+	  networks.main.ipam = {
+	  driver= "default";
+	  config = [{subnet= "172.28.0.0/24";}];
+	  };
+
+
+
+
+
 
 
         services.soularr = {
@@ -132,6 +136,7 @@ in
             ];
 
 			network_mode = "host";
+
             restart = "unless-stopped";
           };
 
@@ -200,7 +205,7 @@ in
 
       web.authentication.api_keys.lol = {
         key = "soulseekpasswordddd";
-        cidr = "127.0.0.0/24";
+        cidr = "172.28.0.0/24";
 		role = "Administrator";
       };
 	  web.logging = true;
