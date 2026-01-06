@@ -61,8 +61,12 @@ in
 
   };
   age.secrets.soularr = {
-    rekeyFile = ./soularr.age;
-    symlink = "/var/lib/soularr/config.ini";
+  rekeyFile = ./soularr.age;
+  symlink = false;
+  owner = "1000";
+  group = "1000";
+  path = "/var/lib/soularr/config.ini";
+
 
   };
   age.secrets."soularr_api_key" = {
@@ -95,11 +99,12 @@ in
     };
   };
   virtualisation.arion = {
-    backend = "podman-socket"; # or "docker"
+    backend = "docker"; # or "docker"
     projects.soularr = {
       serviceName = "soularr"; # optional systemd service name, defaults to arion-example in this case
       settings = {
         services.soularr = {
+		  service = {
           image = "mrusse08/soularr:latest";
           container_name = "soularr";
           hostname = "soularr";
@@ -109,12 +114,13 @@ in
             SCRIPT_INTERVAL = 300;
 
           };
-          volumes = {
-            "/mnt/hdd/Music/Downloads" = "/downloads";
-            "/var/lib/soularr" = "/data";
+		  volumes = [
+		  "/mnt/hdd/Music/Downloads:/downloads"
+		  "/var/lib/soularr:/data"
 
-          };
+		  ];
           restart = "unless-stopped";
+		  };
 
         };
         # Specify you project here, or import it from a file.
