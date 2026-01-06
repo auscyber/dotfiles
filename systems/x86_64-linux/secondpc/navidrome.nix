@@ -36,21 +36,27 @@ intermediary = true;
     };
 
   };
+  users.groups.music = {
+  };
 
   services.navidrome = {
     enable = true;
 	environmentFile = config.age.secrets.navidrome_env.path;
+	group = "music";
     settings = {
       MusicFolder = "${path}";
     };
   };
   services.lidarr = {
     enable = true;
+	group = "music";
   };
+
   services.slskd = {
     enable = true;
     openFirewall = true;
-	environmentFile = config.age.secrets."slskd.env".path;
+	group = "music";
+    environmentFile = config.age.secrets."slskd.env".path;
     settings = {
       shares.directories = [ "${path}" ];
 	  directories.downloads = "/mnt/hdd/Music/Downloads";
