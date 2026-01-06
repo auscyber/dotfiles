@@ -6,9 +6,6 @@ in
 {
   services.audiobookshelf = {
     enable = true;
-    settings = {
-      # dataDir = "/mnt/hdd/Podcasts";
-    };
 
   };
   services.samba = {
@@ -61,12 +58,11 @@ in
 
   };
   age.secrets.soularr = {
-  rekeyFile = ./soularr.age;
-  symlink = false;
-  owner = "1000";
-  group = "1000";
-  path = "/var/lib/soularr/config.ini";
-
+    rekeyFile = ./soularr.age;
+    symlink = false;
+    owner = "1000";
+    group = "1000";
+    path = "/var/lib/soularr/config.ini";
 
   };
   age.secrets."soularr_api_key" = {
@@ -85,10 +81,10 @@ in
   };
 
   systemd.tmpfiles.settings.music = {
-    "/var/lib/audiobookshelf"."L" = {
+    "/mnt/hdd/AudioBooks"."d" = {
+      user = "audiobookshelf";
       group = ":music";
       mode = ":770";
-      argument = "/mnt/hdd/AudioBooks";
 
     };
     "/mnt/hdd/Music/Downloads"."d" = {
@@ -97,36 +93,45 @@ in
       mode = ":770";
 
     };
-	"/var/lib/soularr"."d" = {
-	user = "1000";
-	group = "1000";
-	mode = ":770";
+    "/var/lib/soularr"."d" = {
+      user = "1000";
+      group = "1000";
+      mode = ":770";
 
-	};
+    };
   };
   virtualisation.arion = {
     backend = "docker"; # or "docker"
     projects.soularr = {
       serviceName = "soularr"; # optional systemd service name, defaults to arion-example in this case
+
       settings = {
+networks."main" = {
+ipam = {
+driver = "default";
+config = [{subnet = "172.16.238.0/24";}];
+};
+};
+
         services.soularr = {
-		  service = {
-          image = "mrusse08/soularr:latest";
-          container_name = "soularr";
-          hostname = "soularr";
-          user = "1000:1000";
-          environment = {
-            TZ = "Australia/Melbourne";
-            SCRIPT_INTERVAL = 300;
+          service = {
+            image = "mrusse08/soularr:latest";
+            container_name = "soularr";
+            hostname = "soularr";
+            user = "1000:1000";
+            environment = {
+              TZ = "Australia/Melbourne";
+              SCRIPT_INTERVAL = 300;
 
+            };
+            volumes = [
+              "/mnt/hdd/Music/Downloads:/downloads"
+              "/var/lib/soularr:/data"
+
+            ];
+			networks = ["main"];
+            restart = "unless-stopped";
           };
-		  volumes = [
-		  "/mnt/hdd/Music/Downloads:/downloads"
-		  "/var/lib/soularr:/data"
-
-		  ];
-          restart = "unless-stopped";
-		  };
 
         };
         # Specify you project here, or import it from a file.
@@ -151,7 +156,7 @@ in
           ...
         }:
         ''
-          						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.00.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
+          						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.0.0.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
                               	printf 'SLSKD_USERNAME=ivy\n'
                               	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
                     			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
@@ -190,6 +195,10 @@ in
     settings = {
       shares.directories = [ "${path}" ];
       directories.downloads = "/mnt/hdd/Music/Downloads";
+#      web.authentication.api_keys = {
+#        my_api_key = "soulseekpasswordddd";
+#        cidr = "";
+#      };
     };
     domain = "slsk.ivymect.in";
     nginx = {
@@ -206,6 +215,8 @@ in
       useACMEHost = "ivymect.in";
       forceSSL = true;
       locations."/" = {
+
+        proxyWebsockets = true;
         proxyPass = "http://127.0.0.1:${builtins.toString config.services.audiobookshelf.port}";
       };
 
