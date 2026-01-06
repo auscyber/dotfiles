@@ -11,9 +11,18 @@ intermediary = true;
   };
   age.secrets.navidrome_env = {
   rekeyFile = ./navidrome.age;
+
   };
+  systemd.tmpfiles.settings.music = {
+  "/mnt/hdd/Music/Downloads"."d" = {
+  user = ":music";
+  group = ":music";
+  mode = ":770";
+
+  };
+
   age.secrets."slskd.env" = {
-    owner = config.services.slskd.user;
+    owner = "music";
     generator = {
       dependencies = {
         inherit (config.age.secrets) ivy-password slskd_secrets_env;
@@ -38,31 +47,36 @@ intermediary = true;
   };
   users.groups.music = {
   };
+  users.users.music = {
+   isSystemUser = true;
+   group = "music";
+
+  };
 
   services.navidrome = {
     enable = true;
 	environmentFile = config.age.secrets.navidrome_env.path;
 	group = "music";
     settings = {
+	user = "music";
       MusicFolder = "${path}";
     };
   };
   services.lidarr = {
     enable = true;
-	group = "music";
+	user = "music";
   };
 
   services.slskd = {
     enable = true;
     openFirewall = true;
-	group = "music";
+	user = "music";
     environmentFile = config.age.secrets."slskd.env".path;
     settings = {
       shares.directories = [ "${path}" ];
 	  directories.downloads = "/mnt/hdd/Music/Downloads";
-
     };
-    domain = "slskd.music.ivymect.in";
+    domain = "slsk.ivymect.in";
     nginx = {
       useACMEHost = "ivymect.in";
 
@@ -71,7 +85,7 @@ intermediary = true;
   };
 
   services.nginx.virtualHosts = {
-    "download.${host}" = {
+    "lidarr.ivymect.in" = {
       useACMEHost = "ivymect.in";
       forceSSL = true;
 
