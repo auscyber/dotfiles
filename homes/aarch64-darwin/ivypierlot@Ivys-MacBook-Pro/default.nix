@@ -72,11 +72,11 @@ age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W
       tray = {
         configFile = builtins.toString ./tray_config.toml;
       };
-      appBundleIds = [
-        "app.zen-browser.zen"
-        "com.1password.1password"
-        "com.1password.1password-launcher"
-      ];
+#      appBundleIds = [
+#        "app.zen-browser.zen"
+#        "com.1password.1password"
+#        "com.1password.1password-launcher"
+#      ];
       config = config.lib.file.getLocalPath ../../../kanata.kbd;
       extraConfigPaths = [
         #        (

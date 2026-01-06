@@ -185,7 +185,8 @@
     persistent-apps = [
       "/System/Applications/Apps.app"
       "/Applications/Nix Apps/Zen.app"
-      "/Applications/TIDAL.app"
+#      "/Applications/TIDAL.app"
+"/Applications/Musly.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
       #      "/System/Applications/App Store.app/"
