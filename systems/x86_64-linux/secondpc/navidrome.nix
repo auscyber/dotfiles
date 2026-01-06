@@ -4,6 +4,46 @@ let
   path = "/mnt/hdd/Music";
 in
 {
+  services.samba = {
+  enable = true;
+  securityType = "user";
+  openFirewall = true;
+  settings = {
+  global = {
+       "workgroup" = "WORKGROUP";
+      "server string" = "smbnix";
+      "netbios name" = "smbnix";
+      "security" = "user";
+      #"use sendfile" = "yes";
+      #"max protocol" = "smb2";
+      # note: localhost is the ipv6 localhost ::1
+      "hosts allow" = "192.168.0. 127.0.0.1 localhost 100.64.0.";
+      "hosts deny" = "0.0.0.0/0";
+      "guest account" = "nobody";
+      "map to guest" = "bad user";
+  };
+    public = {
+    browseable = "yes";
+    comment = "Public samba share.";
+    "guest ok" = "yes";
+    path = "/srv/public";
+    "read only" = "yes";
+  };
+
+  "hdd" = {
+      "path" = "/mnt/hdd";
+      "browseable" = "yes";
+      "read only" = "no";
+      "guest ok" = "no";
+      "create mask" = "0644";
+      "directory mask" = "0755";
+#      "force user" = "username";
+      "force group" = "music";
+    };
+
+  };
+
+  };
   age.secrets.slskd_secrets_env = {
     rekeyFile = ../../../secrets/slsk_creds.env.age;
 
@@ -13,12 +53,46 @@ in
     rekeyFile = ./navidrome.age;
 
   };
+  age.secrets.soularr = {
+  rekeyFile = ./soularr.age;
+  symlink = "/var/lib/soularr/config.ini";
+
+
+  };
   systemd.tmpfiles.settings.music = {
     "/mnt/hdd/Music/Downloads"."d" = {
       user = ":music";
       group = ":music";
       mode = ":770";
 
+    };
+  };
+  virtualisation.arion = {
+    backend = "podman-socket"; # or "docker"
+    projects.soularr = {
+      serviceName = "soularr"; # optional systemd service name, defaults to arion-example in this case
+      settings = {
+        services.soularr = {
+          image = "mrusse08/soularr:latest";
+          container_name = "soularr";
+          hostname = "soularr";
+          user = "1000:1000";
+          environment = {
+            TZ = "Australia/Melbourne";
+            SCRIPT_INTERVAL = 300;
+
+          };
+		  volumes = {
+		  "/mnt/hdd/Music/Downloads" = "/downloads";
+		  "/var/lib/soularr" = "/data";
+
+		  };
+          restart = "unless-stopped";
+
+        };
+        # Specify you project here, or import it from a file.
+        # NOTE: This does NOT use ./arion-pkgs.nix, but defaults to NixOS' pkgs.
+      };
     };
   };
 
@@ -80,7 +154,7 @@ in
     domain = "slsk.ivymect.in";
     nginx = {
 
-	forceSSL = true;
+      forceSSL = true;
       useACMEHost = "ivymect.in";
 
     };
