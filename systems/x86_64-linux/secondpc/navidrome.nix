@@ -113,6 +113,7 @@ in
           };
         };
 
+
         services.soularr = {
           service = {
             image = "mrusse08/soularr:latest";
@@ -129,7 +130,8 @@ in
               "/var/lib/soularr:/data"
 
             ];
-            networks = [ "main" ];
+
+			network_mode = "host";
             restart = "unless-stopped";
           };
 
@@ -198,7 +200,7 @@ in
 
       web.authentication.api_keys.lol = {
         key = "soulseekpasswordddd";
-        cidr = "172.16.238.0/24";
+        cidr = "127.0.0.0/24";
 		role = "Administrator";
       };
     };
