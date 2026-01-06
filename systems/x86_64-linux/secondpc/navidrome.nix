@@ -9,6 +9,9 @@ in
 
 intermediary = true;
   };
+  age.secrets.navidrome_env = {
+  rekeyFile = ./navidrome.age;
+  };
   age.secrets."slskd.env" = {
     owner = config.services.slskd.user;
     generator = {
@@ -36,6 +39,7 @@ intermediary = true;
 
   services.navidrome = {
     enable = true;
+	environmentFile = config.age.secrets.navidrome_env.path;
     settings = {
       MusicFolder = "${path}";
     };
