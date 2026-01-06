@@ -199,6 +199,11 @@ in
       #        my_api_key = "soulseekpasswordddd";
       #        cidr = "";
       #      };
+      web.authentication.api_keys = {
+        my_api_key = "soulseekpasswordddd";
+        cidr = "172.16.238.0/24";
+		role = "Administrator";
+      };
     };
     domain = "slsk.ivymect.in";
     nginx = {
