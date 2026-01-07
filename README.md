@@ -39,6 +39,7 @@
 ## Homes
 <h3 id="home-auscyber@arch-x86_64-linux">🏠 auscyber@arch </h3>
 * [config](homes/x86_64-linux/auscyber@arch)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -49,6 +50,7 @@
 ```
 <h3 id="home-auscyber@auspc-x86_64-linux">🏠 auscyber@auspc </h3>
 * [config](homes/x86_64-linux/auscyber@auspc)
+
 ```
 | -- config
 |    | -- browsers
@@ -68,6 +70,7 @@
 ```
 <h3 id="home-auscyber@laptop-x86_64-linux">🏠 auscyber@laptop </h3>
 * [config](homes/x86_64-linux/auscyber@laptop)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -78,6 +81,7 @@
 ```
 <h3 id="home-auscyber@secondpc-x86_64-linux">🏠 auscyber@secondpc </h3>
 * [config](homes/x86_64-linux/auscyber@secondpc)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -91,6 +95,7 @@
 ```
 <h3 id="home-ivy@fargonesh-x86_64-linux">🏠 ivy@fargonesh </h3>
 * [config](homes/x86_64-linux/ivy@fargonesh)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -104,6 +109,7 @@
 ```
 <h3 id="home-ivy@imflopet-x86_64-linux">🏠 ivy@imflopet </h3>
 * [config](homes/x86_64-linux/ivy@imflopet)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -117,6 +123,7 @@
 ```
 <h3 id="home-ivy@lora-pi-aarch64-linux-rpi">🏠 ivy@lora-pi </h3>
 * [config](homes/aarch64-linux-rpi/ivy@lora-pi)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -128,6 +135,7 @@
 ```
 <h3 id="home-ivy@vmi1472413.contaboserver.net-x86_64-linux">🏠 ivy@vmi1472413.contaboserver.net </h3>
 * [config](homes/x86_64-linux/ivy@vmi1472413.contaboserver.net)
+
 ```
 | -- config
 |    | -- flakeConfig
@@ -141,6 +149,7 @@
 ```
 <h3 id="home-ivypierlot@Ivys-MacBook-Pro-aarch64-darwin">🏠 ivypierlot@Ivys-MacBook-Pro </h3>
 * [config](homes/aarch64-darwin/ivypierlot@Ivys-MacBook-Pro)
+
 ```
 | -- config
 |    | -- browsers
@@ -168,6 +177,7 @@
 ## Systems
 <h3 id="system-Ivys-MacBook-Pro-aarch64-darwin"> Ivys-MacBook-Pro </h3>
 * [config](homes/aarch64-darwin/Ivys-MacBook-Pro)
+
 ```
 | -- config
 |    | -- hmApps  : enabled
@@ -184,6 +194,7 @@
 ```
 <h3 id="system-auspc-x86_64-linux"> auspc </h3>
 * [config](homes/x86_64-linux/auspc)
+
 ```
 | -- config
 |    | -- bootlogo  : enabled
@@ -196,11 +207,13 @@
 ```
 <h3 id="system-lora-pi-aarch64-linux-rpi"> lora-pi </h3>
 * [config](homes/aarch64-linux-rpi/lora-pi)
+
 ```
 &lt;nil&gt;
 ```
 <h3 id="system-macmini-aarch64-darwin"> macmini </h3>
 * [config](homes/aarch64-darwin/macmini)
+
 ```
 | -- config
 |    | -- hmApps  : enabled
@@ -212,6 +225,7 @@
 ```
 <h3 id="system-pentestvm-x86_64-linux"> pentestvm </h3>
 * [config](homes/x86_64-linux/pentestvm)
+
 ```
 | -- config
 |    | -- nix  : enabled
@@ -221,6 +235,7 @@
 ```
 <h3 id="system-secondpc-x86_64-linux"> secondpc </h3>
 * [config](homes/x86_64-linux/secondpc)
+
 ```
 | -- config
 |    | -- nix  : enabled
@@ -230,6 +245,7 @@
 ```
 <h3 id="system-surfacelaptop-x86_64-linux"> surfacelaptop </h3>
 * [config](homes/x86_64-linux/surfacelaptop)
+
 ```
 | -- config
 |    | -- nix  : enabled
@@ -239,6 +255,7 @@
 ```
 <h3 id="system-wsl-nixos-x86_64-linux"> wsl-nixos </h3>
 * [config](homes/x86_64-linux/wsl-nixos)
+
 ```
 | -- config
 |    | -- nix  : enabled
