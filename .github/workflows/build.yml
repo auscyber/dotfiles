@@ -23,10 +23,10 @@ jobs:
       uses: cachix/install-nix-action@v31
       with:
         github_acccess_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: nix version
-      run: nix --version
-    - name: Show nixpkgs version
-      run: nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
+
+
+
+
     - name: Setup cachix
       uses: cachix/cachix-action@v15
       # Don't replace <YOUR_CACHIX_NAME> here!
