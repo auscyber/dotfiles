@@ -9,14 +9,15 @@
 
 {
   # List packages installed in system profile. To search by name, run:
-  auscybernix.nix.caches = false;
+  auscybernix.nix.caches = true;
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
-      #      "http://secondpc.devices.imflo.pet:8501"
+#            "http://secondpc.devices.imflo.pet:8501"
+#"https://auscyber.cachix.org"
     ];
     trusted-public-keys = [
-      #      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+#            "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
   #  sops.age.plugins = with pkgs; [
