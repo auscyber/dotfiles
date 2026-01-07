@@ -20,7 +20,7 @@ in
     age.rekey = {
 	generatedSecretsDir = ../../secrets/generated;
       agePlugins = with pkgs; [
-      ] ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.age-plugin-1p ];
+      ] ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.age-plugin-1p pkgs.age-plugin-se ];
       # Obtain this using `ssh-keyscan` or by looking it up in your ~/.ssh/known_hosts
       # The path to the master identity used for decryption. See the option's description for more information.
       masterIdentities = [
@@ -30,6 +30,12 @@ in
         #        }
         #        ./publickey.txt
         #        "age1se1qf48z2tlp6ua8hpyg7vypm0dw8z8nmgusell62r8vpyufemre6escazv5f2"
+
+		#{
+		#identity = "/users/ivypierlot/.config/se.txt";
+		#pubkey = "age1se1q2ae7s32el5t7fpsut9996tch347w55ysut8jhed3f05tjgt293lz55u5p";
+
+		#}
 		{
 		identity = ./age-yubikey.pub;
 		pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
