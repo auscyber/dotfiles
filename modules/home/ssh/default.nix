@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.auscybernix.programs;
+  cfg = config.auscybernix.programs.ssh;
 in
 
 {

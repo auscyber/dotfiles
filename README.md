@@ -46,6 +46,8 @@
 |    | -- flakeConfig
 |    |    | -- flakeFolder : /home/auscyber/dotfiles
 |    | -- nix  : enabled
+|    | -- programs
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- standalone  : enabled
 ```
@@ -63,6 +65,7 @@
 |    | -- programs
 |    |    | -- _1password-cli  : enabled
 |    |    | -- neovim  : enabled
+|    |    | -- ssh  : enabled
 |    |    | -- zotero  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
@@ -79,6 +82,8 @@
 |    | -- flakeConfig
 |    |    | -- flakeFolder : /home/auscyber/dotfiles
 |    | -- nix  : enabled
+|    | -- programs
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- standalone  : enabled
 ```
@@ -93,6 +98,7 @@
 |    | -- nix  : enabled
 |    | -- programs
 |    |    | -- neovim  : enabled
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
 |    | -- standalone  : enabled
@@ -108,6 +114,7 @@
 |    | -- nix  : enabled
 |    | -- programs
 |    |    | -- neovim  : enabled
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
 |    | -- standalone  : enabled
@@ -123,6 +130,7 @@
 |    | -- nix  : enabled
 |    | -- programs
 |    |    | -- neovim  : enabled
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
 |    | -- standalone  : enabled
@@ -136,6 +144,8 @@
 |    | -- flakeConfig
 |    |    | -- flakeFolder : /home/ivy/dotfiles
 |    | -- nix  : enabled
+|    | -- programs
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
 |    | -- standalone  : enabled
@@ -151,6 +161,7 @@
 |    | -- nix  : enabled
 |    | -- programs
 |    |    | -- neovim  : enabled
+|    |    | -- ssh  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
 |    | -- standalone  : enabled
@@ -174,6 +185,7 @@
 |    |    | -- _1password-cli  : enabled
 |    |    | -- neovim  : enabled
 |    |    | -- sketchybar  : enabled
+|    |    | -- ssh  : enabled
 |    |    | -- zotero  : enabled
 |    | -- secrets  : enabled
 |    | -- shell  : enabled
