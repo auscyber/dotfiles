@@ -19,9 +19,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    age.secrets."wakatime_config" = {
-      rekeyFile = ../../../../secrets/wakatime_config.age;
-    };
+
+
+
     programs.zed-editor = {
       enable = true;
 
