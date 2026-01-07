@@ -19,8 +19,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Lix GHA Installer Action
-      uses: samueldr/lix-gha-installer-action@v2025-10-27
+    - name: nix install action
+      uses: achix/install-nix-action@v31
+      with:
+        github_acccess_token: ${{ secrets.GITHUB_TOKEN }}
     - name: nix version
       run: nix --version
     - name: Show nixpkgs version
