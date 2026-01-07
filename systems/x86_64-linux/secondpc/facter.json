@@ -496,7 +496,7 @@
         "power_management": [
           ""
         ],
-        "bogo": 7399,
+        "bogo": 7400,
         "cache": 3072,
         "units": 16,
         "page_size": 4096,
@@ -507,7 +507,7 @@
         "fpu_exception": false,
         "cpuid_level": 13,
         "write_protect": false,
-        "tlb_size": 32764,
+        "tlb_size": 32552,
         "clflush_size": 64,
         "cache_alignment": 64,
         "address_sizes": {
@@ -871,7 +871,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 xhci-hcd",
+          "name": "Linux 6.12.57 xhci-hcd",
           "value": 7531
         },
         "device": {
@@ -885,7 +885,7 @@
           "value": 0
         },
         "serial": "0000:03:00.0",
-        "model": "Linux 6.12.52 xhci-hcd xHCI Host Controller",
+        "model": "Linux 6.12.57 xhci-hcd xHCI Host Controller",
         "sysfs_id": "/devices/pci0000:00/0000:00:1c.5/0000:03:00.0/usb6/6-0:1.0",
         "sysfs_bus_id": "6-0:1.0",
         "detail": {
@@ -951,8 +951,8 @@
           "value": 32903
         },
         "device": {
-          "hex": "8008",
-          "value": 32776
+          "hex": "8000",
+          "value": 32768
         },
         "revision": {
           "hex": "0000",
@@ -960,7 +960,7 @@
           "value": 0
         },
         "model": "Hub",
-        "sysfs_id": "/devices/pci0000:00/0000:00:1a.0/usb2/2-1/2-1:1.0",
+        "sysfs_id": "/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1:1.0",
         "sysfs_bus_id": "2-1:1.0",
         "resources": [
           {
@@ -1007,7 +1007,7 @@
         "driver_modules": [
           "usbcore"
         ],
-        "module_alias": "usb:v8087p8008d0005dc09dsc00dp01ic09isc00ip00in00"
+        "module_alias": "usb:v8087p8000d0005dc09dsc00dp01ic09isc00ip00in00"
       },
       {
         "index": 30,
@@ -1032,7 +1032,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 xhci-hcd",
+          "name": "Linux 6.12.57 xhci-hcd",
           "value": 7531
         },
         "device": {
@@ -1046,7 +1046,7 @@
           "value": 0
         },
         "serial": "0000:00:14.0",
-        "model": "Linux 6.12.52 xhci-hcd xHCI Host Controller",
+        "model": "Linux 6.12.57 xhci-hcd xHCI Host Controller",
         "sysfs_id": "/devices/pci0000:00/0000:00:14.0/usb3/3-0:1.0",
         "sysfs_bus_id": "3-0:1.0",
         "resources": [
@@ -1119,7 +1119,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 xhci-hcd",
+          "name": "Linux 6.12.57 xhci-hcd",
           "value": 7531
         },
         "device": {
@@ -1133,7 +1133,7 @@
           "value": 0
         },
         "serial": "0000:00:14.0",
-        "model": "Linux 6.12.52 xhci-hcd xHCI Host Controller",
+        "model": "Linux 6.12.57 xhci-hcd xHCI Host Controller",
         "sysfs_id": "/devices/pci0000:00/0000:00:14.0/usb4/4-0:1.0",
         "sysfs_bus_id": "4-0:1.0",
         "detail": {
@@ -1175,7 +1175,7 @@
       },
       {
         "index": 32,
-        "attached_to": 20,
+        "attached_to": 19,
         "class_list": [
           "usb",
           "hub"
@@ -1196,7 +1196,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 ehci_hcd",
+          "name": "Linux 6.12.57 ehci_hcd",
           "value": 7531
         },
         "device": {
@@ -1209,9 +1209,9 @@
           "name": "6.12",
           "value": 0
         },
-        "serial": "0000:00:1d.0",
-        "model": "Linux 6.12.52 ehci_hcd EHCI Host Controller",
-        "sysfs_id": "/devices/pci0000:00/0000:00:1d.0/usb1/1-0:1.0",
+        "serial": "0000:00:1a.0",
+        "model": "Linux 6.12.57 ehci_hcd EHCI Host Controller",
+        "sysfs_id": "/devices/pci0000:00/0000:00:1a.0/usb1/1-0:1.0",
         "sysfs_bus_id": "1-0:1.0",
         "resources": [
           {
@@ -1283,7 +1283,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 xhci-hcd",
+          "name": "Linux 6.12.57 xhci-hcd",
           "value": 7531
         },
         "device": {
@@ -1297,7 +1297,7 @@
           "value": 0
         },
         "serial": "0000:03:00.0",
-        "model": "Linux 6.12.52 xhci-hcd xHCI Host Controller",
+        "model": "Linux 6.12.57 xhci-hcd xHCI Host Controller",
         "sysfs_id": "/devices/pci0000:00/0000:00:1c.5/0000:03:00.0/usb5/5-0:1.0",
         "sysfs_bus_id": "5-0:1.0",
         "resources": [
@@ -1373,8 +1373,8 @@
           "value": 32903
         },
         "device": {
-          "hex": "8000",
-          "value": 32768
+          "hex": "8008",
+          "value": 32776
         },
         "revision": {
           "hex": "0000",
@@ -1382,7 +1382,7 @@
           "value": 0
         },
         "model": "Hub",
-        "sysfs_id": "/devices/pci0000:00/0000:00:1d.0/usb1/1-1/1-1:1.0",
+        "sysfs_id": "/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1:1.0",
         "sysfs_bus_id": "1-1:1.0",
         "resources": [
           {
@@ -1429,11 +1429,11 @@
         "driver_modules": [
           "usbcore"
         ],
-        "module_alias": "usb:v8087p8000d0005dc09dsc00dp01ic09isc00ip00in00"
+        "module_alias": "usb:v8087p8008d0005dc09dsc00dp01ic09isc00ip00in00"
       },
       {
         "index": 35,
-        "attached_to": 19,
+        "attached_to": 20,
         "class_list": [
           "usb",
           "hub"
@@ -1454,7 +1454,7 @@
         },
         "vendor": {
           "hex": "1d6b",
-          "name": "Linux 6.12.52 ehci_hcd",
+          "name": "Linux 6.12.57 ehci_hcd",
           "value": 7531
         },
         "device": {
@@ -1467,9 +1467,9 @@
           "name": "6.12",
           "value": 0
         },
-        "serial": "0000:00:1a.0",
-        "model": "Linux 6.12.52 ehci_hcd EHCI Host Controller",
-        "sysfs_id": "/devices/pci0000:00/0000:00:1a.0/usb2/2-0:1.0",
+        "serial": "0000:00:1d.0",
+        "model": "Linux 6.12.57 ehci_hcd EHCI Host Controller",
+        "sysfs_id": "/devices/pci0000:00/0000:00:1d.0/usb2/2-0:1.0",
         "sysfs_bus_id": "2-0:1.0",
         "resources": [
           {
@@ -1635,7 +1635,7 @@
     ],
     "network_interface": [
       {
-        "index": 43,
+        "index": 42,
         "attached_to": 12,
         "class_list": [
           "network_interface"
@@ -1676,7 +1676,7 @@
         ]
       },
       {
-        "index": 47,
+        "index": 55,
         "attached_to": 0,
         "class_list": [
           "network_interface"
