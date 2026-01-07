@@ -11,14 +11,14 @@ rec {
   displayLine =
     key: value: numIndents:
     let
-      indent = builtins.concatStringsSep "" (builtins.genList (x: "|    ") numIndents);
+      indent = builtins.concatStringsSep "" (builtins.genList (x: "│    ") numIndents);
     in
     if builtins.typeOf value == "set" then
       (
         if builtins.length (lib.attrsToList value) == 0 then
           null
         else
-          "${indent}| -- ${key}\n"
+          "${indent}├── ${key}\n"
           + builtins.concatStringsSep "\n" (
             builtins.filter (x: x != null) (lib.mapAttrsToList (k: v: displayLine k v (numIndents + 1)) value)
           )
@@ -27,16 +27,16 @@ rec {
       if builtins.length value == 0 then
         null
       else
-        "${indent}| -- ${key}"
+        "${indent}├── ${key}"
         + builtins.concatStringsSep "\n" (
           builtins.filter (x: x != null) (builtins.map (v: displayLine "-" v (numIndents + 1)) value)
         )
     else if builtins.typeOf value == "null" then
       null
     else if builtins.typeOf value == "bool" then
-      "${indent}| -- ${key}  : ${if value then "enabled" else "disabled"}"
+      "${indent}├── ${key}  : ${if value then "enabled" else "disabled"}"
     else
-      "${indent}| -- ${key} : ${builtins.toString value}";
+      "${indent}├── ${key} : ${builtins.toString value}";
 
   walkConfig =
     config:

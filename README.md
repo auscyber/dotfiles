@@ -42,158 +42,158 @@
 * [config](/homes/x86_64-linux/auscyber@arch)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/auscyber/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/auscyber/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-auscyber@auspc-x86_64-linux">🏠 auscyber@auspc </h3>
 
 * [config](/homes/x86_64-linux/auscyber@auspc)
 
 ```
-| -- config
-|    | -- browsers
-|    |    | -- zen-browser  : enabled
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/auscyber/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- _1password-cli  : enabled
-|    |    | -- neovim  : enabled
-|    |    | -- ssh  : enabled
-|    |    | -- zotero  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
-|    | -- terms
-|    |    | -- ghostty  : enabled
+├── config
+│    ├── browsers
+│    │    ├── zen-browser  : enabled
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/auscyber/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── _1password-cli  : enabled
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    │    ├── zotero  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
+│    ├── terms
+│    │    ├── ghostty  : enabled
 ```
 <h3 id="home-auscyber@laptop-x86_64-linux">🏠 auscyber@laptop </h3>
 
 * [config](/homes/x86_64-linux/auscyber@laptop)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/auscyber/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/auscyber/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-auscyber@secondpc-x86_64-linux">🏠 auscyber@secondpc </h3>
 
 * [config](/homes/x86_64-linux/auscyber@secondpc)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/auscyber/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- neovim  : enabled
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/auscyber/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-ivy@fargonesh-x86_64-linux">🏠 ivy@fargonesh </h3>
 
 * [config](/homes/x86_64-linux/ivy@fargonesh)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/ivy/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- neovim  : enabled
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/ivy/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-ivy@imflopet-x86_64-linux">🏠 ivy@imflopet </h3>
 
 * [config](/homes/x86_64-linux/ivy@imflopet)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/ivy/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- neovim  : enabled
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/ivy/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-ivy@lora-pi-aarch64-linux-rpi">🏠 ivy@lora-pi </h3>
 
 * [config](/homes/aarch64-linux-rpi/ivy@lora-pi)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/ivy/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/ivy/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-ivy@vmi1472413.contaboserver.net-x86_64-linux">🏠 ivy@vmi1472413.contaboserver.net </h3>
 
 * [config](/homes/x86_64-linux/ivy@vmi1472413.contaboserver.net)
 
 ```
-| -- config
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /home/ivy/dotfiles
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- neovim  : enabled
-|    |    | -- ssh  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/ivy/dotfiles
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
 ```
 <h3 id="home-ivypierlot@Ivys-MacBook-Pro-aarch64-darwin">🏠 ivypierlot@Ivys-MacBook-Pro </h3>
 
 * [config](/homes/aarch64-darwin/ivypierlot@Ivys-MacBook-Pro)
 
 ```
-| -- config
-|    | -- browsers
-|    |    | -- zen-browser  : enabled
-|    | -- editors
-|    |    | -- zed  : enabled
-|    | -- flakeConfig
-|    |    | -- flakeFolder : /Users/ivypierlot/dotfiles
-|    | -- keybinds
-|    |    | -- kanata  : enabled
-|    | -- nix  : enabled
-|    | -- programs
-|    |    | -- _1password-cli  : enabled
-|    |    | -- neovim  : enabled
-|    |    | -- sketchybar  : enabled
-|    |    | -- ssh  : enabled
-|    |    | -- zotero  : enabled
-|    | -- secrets  : enabled
-|    | -- shell  : enabled
-|    | -- standalone  : enabled
-|    | -- terms
-|    |    | -- ghostty  : enabled
-|    | -- wms
-|    |    | -- yabai  : enabled
+├── config
+│    ├── browsers
+│    │    ├── zen-browser  : enabled
+│    ├── editors
+│    │    ├── zed  : enabled
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /Users/ivypierlot/dotfiles
+│    ├── keybinds
+│    │    ├── kanata  : enabled
+│    ├── nix  : enabled
+│    ├── programs
+│    │    ├── _1password-cli  : enabled
+│    │    ├── neovim  : enabled
+│    │    ├── sketchybar  : enabled
+│    │    ├── ssh  : enabled
+│    │    ├── zotero  : enabled
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
+│    ├── terms
+│    │    ├── ghostty  : enabled
+│    ├── wms
+│    │    ├── yabai  : enabled
 ```
 ## Systems
 <h3 id="system-Ivys-MacBook-Pro-aarch64-darwin"> Ivys-MacBook-Pro </h3>
@@ -201,32 +201,32 @@
 * [config](/systems/aarch64-darwin/Ivys-MacBook-Pro)
 
 ```
-| -- config
-|    | -- hmApps  : enabled
-|    | -- homebrew  : enabled
-|    | -- keybinds
-|    |    | -- karabiner-driver-kit  : enabled
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- sudo
-|    |    | -- agents  : enabled
-|    |    | -- pam  : enabled
-|    | -- user
-|    |    | -- username : ivypierlot
+├── config
+│    ├── hmApps  : enabled
+│    ├── homebrew  : enabled
+│    ├── keybinds
+│    │    ├── karabiner-driver-kit  : enabled
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── sudo
+│    │    ├── agents  : enabled
+│    │    ├── pam  : enabled
+│    ├── user
+│    │    ├── username : ivypierlot
 ```
 <h3 id="system-auspc-x86_64-linux"> auspc </h3>
 
 * [config](/systems/x86_64-linux/auspc)
 
 ```
-| -- config
-|    | -- bootlogo  : enabled
-|    | -- nix  : enabled
-|    | -- nixos
-|    |    | -- games  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : auscyber
+├── config
+│    ├── bootlogo  : enabled
+│    ├── nix  : enabled
+│    ├── nixos
+│    │    ├── games  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : auscyber
 ```
 <h3 id="system-lora-pi-aarch64-linux-rpi"> lora-pi </h3>
 
@@ -240,57 +240,57 @@
 * [config](/systems/aarch64-darwin/macmini)
 
 ```
-| -- config
-|    | -- hmApps  : enabled
-|    | -- homebrew  : enabled
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : ivypierlot
+├── config
+│    ├── hmApps  : enabled
+│    ├── homebrew  : enabled
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : ivypierlot
 ```
 <h3 id="system-pentestvm-x86_64-linux"> pentestvm </h3>
 
 * [config](/systems/x86_64-linux/pentestvm)
 
 ```
-| -- config
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : auscyber
+├── config
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : auscyber
 ```
 <h3 id="system-secondpc-x86_64-linux"> secondpc </h3>
 
 * [config](/systems/x86_64-linux/secondpc)
 
 ```
-| -- config
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : auscyber
+├── config
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : auscyber
 ```
 <h3 id="system-surfacelaptop-x86_64-linux"> surfacelaptop </h3>
 
 * [config](/systems/x86_64-linux/surfacelaptop)
 
 ```
-| -- config
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : auscyber
+├── config
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : auscyber
 ```
 <h3 id="system-wsl-nixos-x86_64-linux"> wsl-nixos </h3>
 
 * [config](/systems/x86_64-linux/wsl-nixos)
 
 ```
-| -- config
-|    | -- nix  : enabled
-|    | -- secrets  : enabled
-|    | -- user
-|    |    | -- username : auscyber
+├── config
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+│    ├── user
+│    │    ├── username : auscyber
 ```
 
 
