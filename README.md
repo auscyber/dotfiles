@@ -8,10 +8,10 @@
 ![small](screenshots/fetch/small.jpg)
 ![image](screenshots/fetch/picture.jpg)
 * [vim theme "pink ocean"](.config/nvim/colors/pink_ocean.vim)
-![xmonad](screenshots/theme/xmonad.jpg)
-![rust](screenshots/theme/rust.jpg)
-![nvim](screenshots/nvim/full.jpg)
-![bar](screenshots/polybar/whole.jpg)
+
+
+
+
 
 | System name  |  system |
 |:------------:|:--------|
