@@ -23,6 +23,7 @@
 	inputs.flake-parts.flakeModules.flakeModules
     inputs.input-branches.flakeModules.default
     ./formatter.nix
+	./templates.nix
   ];
   flake = {
 

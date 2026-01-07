@@ -30,6 +30,11 @@ in
         #        }
         #        ./publickey.txt
         #        "age1se1qf48z2tlp6ua8hpyg7vypm0dw8z8nmgusell62r8vpyufemre6escazv5f2"
+		{
+		identity = ./age-yubikey.pub;
+		pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
+
+		}
         {
           identity = ./main.pub; # Private key
           pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key

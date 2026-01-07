@@ -45,17 +45,17 @@ in
 #        }
       ];
 
-      #    package = pkgs.lixPackageSets.latest.lix;
+      #    package = pkgs.nixVersions.latest;
 
       extraOptions = ''
         experimental-features = nix-command flakes
       '';
 #	  auto-optimise-store = true;
 #optimise.automatic = true;
-      gc = {
-        automatic = true;
-        options = "--delete-older-than 30d";
-      };
+#      gc = {
+#        automatic = true;
+#        options = "--delete-older-than 30d";
+#      };
 
       package = pkgs.nixVersions.latest;
     };
