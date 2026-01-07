@@ -18,12 +18,14 @@
   };
   age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
   nix.optimise = {
-  automatic = true;
-   interval = [{
-	Hour = 4;
-	Minute = 15;
-    Weekday = 7;
-  }];
+    automatic = true;
+    interval = [
+      {
+        Hour = 4;
+        Minute = 15;
+        Weekday = 7;
+      }
+    ];
   };
 
 }

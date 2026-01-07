@@ -10,11 +10,12 @@
 
 {
 
-#  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
-age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W9nMZfAYMHgjZ+RUqxOx7UWs7";
-	  services.gpg-agent.socketAddress = config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
+  #  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W9nMZfAYMHgjZ+RUqxOx7UWs7";
+  services.gpg-agent.socketAddress =
+    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
 
-services.yubikey-agent.enable = true;
+  services.yubikey-agent.enable = true;
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -75,11 +76,11 @@ services.yubikey-agent.enable = true;
       tray = {
         configFile = builtins.toString ./tray_config.toml;
       };
-#      appBundleIds = [
-#        "app.zen-browser.zen"
-#        "com.1password.1password"
-#        "com.1password.1password-launcher"
-#      ];
+      #      appBundleIds = [
+      #        "app.zen-browser.zen"
+      #        "com.1password.1password"
+      #        "com.1password.1password-launcher"
+      #      ];
       config = config.lib.file.getLocalPath ../../../kanata.kbd;
       extraConfigPaths = [
         #        (
@@ -210,12 +211,12 @@ services.yubikey-agent.enable = true;
         identitiesOnly = true;
         identityFile = "~/.ssh/id_ed25519.pub";
       };
-	  "secondpc" = {
+      "secondpc" = {
 
-extraOptions = {
-		"RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
-};
-	  };
+        extraOptions = {
+          "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
+        };
+      };
     };
   };
   # You can also manage environment variables but you will have to manually

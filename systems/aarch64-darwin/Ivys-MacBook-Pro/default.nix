@@ -13,11 +13,11 @@
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
-#            "http://secondpc.devices.imflo.pet:8501"
-#"https://auscyber.cachix.org"
+      #            "http://secondpc.devices.imflo.pet:8501"
+      #"https://auscyber.cachix.org"
     ];
     trusted-public-keys = [
-#            "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+      #            "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
   #  sops.age.plugins = with pkgs; [
@@ -186,8 +186,8 @@
     persistent-apps = [
       "/System/Applications/Apps.app"
       "/Applications/Nix Apps/Zen.app"
-#      "/Applications/TIDAL.app"
-"/Applications/Musly.app"
+      #      "/Applications/TIDAL.app"
+      "/Applications/Musly.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
       #      "/System/Applications/App Store.app/"

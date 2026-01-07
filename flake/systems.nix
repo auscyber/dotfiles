@@ -38,7 +38,7 @@ in
       ];
       importedNixosModules = [
         inputs.stylix.nixosModules.stylix
-		inputs.arion.nixosModules.arion
+        inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote
         inputs.impermanence.nixosModules.impermanence
         inputs.home-manager.nixosModules.home-manager

@@ -17,7 +17,7 @@ in
   ];
   services.gpg-agent = {
     enable = true;
-#    enableSshSupport = true;
+    #    enableSshSupport = true;
     pinentry.package = pkgs.pinentry;
     pinentry.program = "pinentry-mac";
     enableExtraSocket = true;

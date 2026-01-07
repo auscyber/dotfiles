@@ -40,9 +40,9 @@ in
             "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
           ];
         })
-#        {
-#          auto-optimise-store = true;
-#        }
+        #        {
+        #          auto-optimise-store = true;
+        #        }
       ];
 
       #    package = pkgs.nixVersions.latest;
@@ -50,12 +50,12 @@ in
       extraOptions = ''
         experimental-features = nix-command flakes
       '';
-#	  auto-optimise-store = true;
-#optimise.automatic = true;
-#      gc = {
-#        automatic = true;
-#        options = "--delete-older-than 30d";
-#      };
+      #	  auto-optimise-store = true;
+      #optimise.automatic = true;
+      #      gc = {
+      #        automatic = true;
+      #        options = "--delete-older-than 30d";
+      #      };
 
       package = pkgs.nixVersions.latest;
     };

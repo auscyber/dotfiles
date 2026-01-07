@@ -189,8 +189,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     #nixpkgs
     unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-	stable.url = "github:nixos/nixpkgs/nixos-25.11";
-
+    stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     nixpkgs.follows = "unstable";
 

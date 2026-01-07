@@ -76,7 +76,6 @@ inputs.darwin.lib.darwinSystem {
 
     ../../systems/${system}/${hostname}
   ]
-  ++ modules
-  ;
+  ++ modules;
 
 }

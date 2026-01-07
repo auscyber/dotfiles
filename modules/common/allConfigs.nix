@@ -9,7 +9,7 @@
   options.auscybernix.nix = {
     flake = lib.mkOption {
       type = lib.types.str;
-	  default = "/home/auscyber/dotfiles";
+      default = "/home/auscyber/dotfiles";
 
     };
     reloadProgram = lib.mkOption {

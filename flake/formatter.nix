@@ -12,13 +12,17 @@
         programs.stylua.enable = true;
         #        programs.shellcheck.enable = true;
         settings.formatter."grafana-alloy" = {
-          command = "${pkgs.grafana-alloy}/bin/alloy";
+          command = "${pkgs.bash}/bin/bash";
           options = [
-            "fmt"
-            "$@"
-
+            "-euc"
+            ''
+              for file in "$@"; do
+                ${lib.getExe pkgs.grafana-alloy} fmt --write "$file"
+              done
+            ''
+            "--" # bash swallows the second argument when using -c
           ];
-          includes = [ "*.alloy" ];
+          includes = [ "**/*.alloy" ];
         };
       };
 

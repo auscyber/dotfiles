@@ -19,10 +19,10 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-age.secrets."wakatime_config" = {
-  rekeyFile = ../../../../secrets/wakatime_config.age;
-  path = "${config.home.homeDirectory}/.wakatime.cfg";
-};
+    age.secrets."wakatime_config" = {
+      rekeyFile = ../../../../secrets/wakatime_config.age;
+      path = "${config.home.homeDirectory}/.wakatime.cfg";
+    };
 
     home.file = {
       ".config/nvim" = {

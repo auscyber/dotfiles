@@ -1,83 +1,90 @@
 prometheus.exporter.unix "integrations_node_exporter" {
-  disable_collectors = ["ipvs", "btrfs", "infiniband", "xfs", "zfs"]
-  enable_collectors = ["meminfo"]
+	disable_collectors = ["ipvs", "btrfs", "infiniband", "xfs", "zfs"]
+	enable_collectors  = ["meminfo"]
 
-  filesystem {
-    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
-    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
-    mount_timeout        = "5s"
-  }
+	filesystem {
+		fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+		mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+		mount_timeout        = "5s"
+	}
 
-  netclass {
-    ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
-  }
+	netclass {
+		ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+	}
 
-  netdev {
-    device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
-  }
+	netdev {
+		device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
+	}
 }
+
 discovery.relabel "integrations_node_exporter" {
-  targets = prometheus.exporter.unix.integrations_node_exporter.targets
+	targets = prometheus.exporter.unix.integrations_node_exporter.targets
 
-  rule {
-    target_label = "instance"
-    replacement  = constants.hostname
-  }
+	rule {
+		target_label = "instance"
+		replacement  = constants.hostname
+	}
 
-  rule {
-    target_label = "job"
-    replacement = "integrations/node_exporter"
-  }
+	rule {
+		target_label = "job"
+		replacement  = "integrations/node_exporter"
+	}
 }
+
 discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" {
-  targets = []
+	targets = []
 
-  rule {
-    source_labels = ["__journal__systemd_unit"]
-    target_label  = "unit"
-  }
+	rule {
+		source_labels = ["__journal__systemd_unit"]
+		target_label  = "unit"
+	}
 
-  rule {
-    source_labels = ["__journal__boot_id"]
-    target_label  = "boot_id"
-  }
+	rule {
+		source_labels = ["__journal__boot_id"]
+		target_label  = "boot_id"
+	}
 
-  rule {
-    source_labels = ["__journal__transport"]
-    target_label  = "transport"
-  }
+	rule {
+		source_labels = ["__journal__transport"]
+		target_label  = "transport"
+	}
 
-  rule {
-    source_labels = ["__journal_priority_keyword"]
-    target_label  = "level"
-  }
+	rule {
+		source_labels = ["__journal_priority_keyword"]
+		target_label  = "level"
+	}
 }
+
 loki.write "local" {
-  endpoint {
-    url = "http://100.64.0.1:3100/loki/api/v1/push"
-  }
+	endpoint {
+		url = "http://100.64.0.1:3100/loki/api/v1/push"
+	}
 }
-discovery.docker "linux" {
-  host = "unix:///var/run/docker.sock"
-}
-discovery.relabel "logs_integrations_docker" {
-  targets = []
 
-  rule {
-    source_labels = ["__meta_docker_container_name"]
-    regex = "/(.*)"
-    target_label = "service_name"
-  }
+discovery.docker "linux" {
+	host = "unix:///var/run/docker.sock"
 }
+
+discovery.relabel "logs_integrations_docker" {
+	targets = []
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "service_name"
+	}
+}
+
 loki.source.docker "default" {
-  host       = "unix:///var/run/docker.sock"
-  targets    = discovery.docker.linux.targets
-  labels     = {"platform" = "docker"}
-  relabel_rules = discovery.relabel.logs_integrations_docker.rules
-  forward_to = [loki.write.local.receiver]
+	host          = "unix:///var/run/docker.sock"
+	targets       = discovery.docker.linux.targets
+	labels        = {"platform" = "docker"}
+	relabel_rules = discovery.relabel.logs_integrations_docker.rules
+	forward_to    = [loki.write.local.receiver]
 }
+
 loki.source.journal "logs_integrations_integrations_node_exporter_journal_scrape" {
-  max_age       = "24h0m0s"
-  relabel_rules = discovery.relabel.logs_integrations_integrations_node_exporter_journal_scrape.rules
-  forward_to    = [loki.write.local.receiver]
+	max_age       = "24h0m0s"
+	relabel_rules = discovery.relabel.logs_integrations_integrations_node_exporter_journal_scrape.rules
+	forward_to    = [loki.write.local.receiver]
 }

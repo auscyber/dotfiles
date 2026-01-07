@@ -45,7 +45,7 @@ in
         style = "round";
         #blur_radius = 5.0;
         width = 6.0;
-#        ax_focus = true;
+        #        ax_focus = true;
       };
     };
     services.yabai = {

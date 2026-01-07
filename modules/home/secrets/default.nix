@@ -1,6 +1,6 @@
 {
   config,
-    pkgs,
+  pkgs,
   lib,
   hostname,
   isInside,
@@ -9,10 +9,20 @@
 
 {
 
-  age.secretsDir = if pkgs.stdenv.isDarwin then "${config.home.homeDirectory}/Library/agenix" else "${config.home.homeDirectory}/.config/agenix";
-  age.secretsMountPoint = if pkgs.stdenv.isDarwin then "${config.home.homeDirectory}/Library/agenix.d" else "${config.home.homeDirectory}/.config/agenix.d";
+  age.secretsDir =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Library/agenix"
+    else
+      "${config.home.homeDirectory}/.config/agenix";
+  age.secretsMountPoint =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Library/agenix.d"
+    else
+      "${config.home.homeDirectory}/.config/agenix.d";
   age.rekey.storageMode = "local";
-  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${if isInside then "inside-" else ""}${config.home.username}-${hostname}";
+  age.rekey.localStorageDir =
+    ../../..
+    + "/secrets/rekeyed/${if isInside then "inside-" else ""}${config.home.username}-${hostname}";
 
   age.secrets."extra-nix-conf" = {
     generator = {

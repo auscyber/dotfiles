@@ -106,12 +106,12 @@ in
       serviceName = "soularr"; # optional systemd service name, defaults to arion-example in this case
 
       settings = {
-networks."main" = {
-ipam = {
-driver = "default";
-config = [{subnet = "172.16.238.0/24";}];
-};
-};
+        networks."main" = {
+          ipam = {
+            driver = "default";
+            config = [ { subnet = "172.16.238.0/24"; } ];
+          };
+        };
 
         services.soularr = {
           service = {
@@ -129,7 +129,7 @@ config = [{subnet = "172.16.238.0/24";}];
               "/var/lib/soularr:/data"
 
             ];
-			networks = ["main"];
+            networks = [ "main" ];
             restart = "unless-stopped";
           };
 
@@ -195,10 +195,10 @@ config = [{subnet = "172.16.238.0/24";}];
     settings = {
       shares.directories = [ "${path}" ];
       directories.downloads = "/mnt/hdd/Music/Downloads";
-#      web.authentication.api_keys = {
-#        my_api_key = "soulseekpasswordddd";
-#        cidr = "";
-#      };
+      #      web.authentication.api_keys = {
+      #        my_api_key = "soulseekpasswordddd";
+      #        cidr = "";
+      #      };
     };
     domain = "slsk.ivymect.in";
     nginx = {

@@ -14,7 +14,7 @@
     programs.neovim.enable = true;
   };
   programs.git.settings = {
-  safe.directory = "/nixos-config";
+    safe.directory = "/nixos-config";
 
   };
   home.packages = with pkgs; [ gnupg ];

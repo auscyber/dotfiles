@@ -1,9 +1,9 @@
-{inputs,...}:
+{ inputs, ... }:
 {
-flake.templates = {
-flake-parts = {
-path  = ../templates/flake-parts;
-};
+  flake.templates = {
+    flake-parts = {
+      path = ../templates/flake-parts;
+    };
 
-};
+  };
 }
