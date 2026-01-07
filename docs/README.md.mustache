@@ -16,8 +16,30 @@
 | System name  |  system |
 |:------------:|:--------|
 {{#systems}}
-| {{name}} |  {{system}} |
+| [{{name}}](#{{id}}) |  {{system}} |
 {{/systems}}
+
+| Home | system |
+|:------------:|:--------|
+{{#homes}}
+| [{{name}}](#{{id}}) |  {{system}} |
+{{/homes}}
+
+## Homes
+{{#homes}}
+### 🏠 {{name}} {#{{id}}}
+* [config](homes/{{system}}/{{name}})
+{{config}}
+{{/homes}}
+## Systems
+{{#systems}}
+### {{name}} {#{{id}}}
+* [config](homes/{{system}}/{{hostname}})
+{{config}}
+{{/systems}}
+
+
+
 
 
 ### 🤝 Other Projects

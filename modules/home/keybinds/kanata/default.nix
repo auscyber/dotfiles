@@ -50,14 +50,14 @@ in
 
     kanataCommand = lib.mkOption {
       type = listOf str;
-      default = "";
+      default = [""];
       description = "kanata command to run";
     };
     tray = {
       package = lib.mkPackageOption pkgs "kanata-tray" { };
       command = lib.mkOption {
         type = listOf str;
-        default = "";
+        default = [""];
         description = "kanata tray command to run";
       };
       configFile = lib.mkOption {

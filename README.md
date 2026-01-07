@@ -15,14 +15,206 @@
 
 | System name  |  system |
 |:------------:|:--------|
-| Ivys-MacBook-Pro |  aarch64-darwin |
-| auspc |  x86_64-linux |
-| lora-pi |  aarch64-linux-rpi |
-| macmini |  aarch64-darwin |
-| pentestvm |  x86_64-linux |
-| secondpc |  x86_64-linux |
-| surfacelaptop |  x86_64-linux |
-| wsl-nixos |  x86_64-linux |
+| [Ivys-MacBook-Pro](#system-Ivys-MacBook-Pro-aarch64-darwin) |  aarch64-darwin |
+| [auspc](#system-auspc-x86_64-linux) |  x86_64-linux |
+| [lora-pi](#system-lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi |
+| [macmini](#system-macmini-aarch64-darwin) |  aarch64-darwin |
+| [pentestvm](#system-pentestvm-x86_64-linux) |  x86_64-linux |
+| [secondpc](#system-secondpc-x86_64-linux) |  x86_64-linux |
+| [surfacelaptop](#system-surfacelaptop-x86_64-linux) |  x86_64-linux |
+| [wsl-nixos](#system-wsl-nixos-x86_64-linux) |  x86_64-linux |
+
+| Home | system |
+|:------------:|:--------|
+| [auscyber@arch](#home-auscyber@arch-x86_64-linux) |  x86_64-linux |
+| [auscyber@auspc](#home-auscyber@auspc-x86_64-linux) |  x86_64-linux |
+| [auscyber@laptop](#home-auscyber@laptop-x86_64-linux) |  x86_64-linux |
+| [auscyber@secondpc](#home-auscyber@secondpc-x86_64-linux) |  x86_64-linux |
+| [ivy@fargonesh](#home-ivy@fargonesh-x86_64-linux) |  x86_64-linux |
+| [ivy@imflopet](#home-ivy@imflopet-x86_64-linux) |  x86_64-linux |
+| [ivy@lora-pi](#home-ivy@lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi |
+| [ivy@vmi1472413.contaboserver.net](#home-ivy@vmi1472413.contaboserver.net-x86_64-linux) |  x86_64-linux |
+| [ivypierlot@Ivys-MacBook-Pro](#home-ivypierlot@Ivys-MacBook-Pro-aarch64-darwin) |  aarch64-darwin |
+
+## Homes
+### 🏠 auscyber@arch {#home-auscyber@arch-x86_64-linux}
+* [config](homes/x86_64-linux/auscyber@arch)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/auscyber/dotfiles
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- standalone  : enabled
+### 🏠 auscyber@auspc {#home-auscyber@auspc-x86_64-linux}
+* [config](homes/x86_64-linux/auscyber@auspc)
+| -- config
+|    | -- browsers
+|    |    | -- zen-browser  : enabled
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/auscyber/dotfiles
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- _1password-cli  : enabled
+|    |    | -- neovim  : enabled
+|    |    | -- zotero  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+|    | -- terms
+|    |    | -- ghostty  : enabled
+### 🏠 auscyber@laptop {#home-auscyber@laptop-x86_64-linux}
+* [config](homes/x86_64-linux/auscyber@laptop)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/auscyber/dotfiles
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- standalone  : enabled
+### 🏠 auscyber@secondpc {#home-auscyber@secondpc-x86_64-linux}
+* [config](homes/x86_64-linux/auscyber@secondpc)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/auscyber/dotfiles
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- neovim  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+### 🏠 ivy@fargonesh {#home-ivy@fargonesh-x86_64-linux}
+* [config](homes/x86_64-linux/ivy@fargonesh)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/ivy/dotfiles
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- neovim  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+### 🏠 ivy@imflopet {#home-ivy@imflopet-x86_64-linux}
+* [config](homes/x86_64-linux/ivy@imflopet)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/ivy/dotfiles
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- neovim  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+### 🏠 ivy@lora-pi {#home-ivy@lora-pi-aarch64-linux-rpi}
+* [config](homes/aarch64-linux-rpi/ivy@lora-pi)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/ivy/dotfiles
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+### 🏠 ivy@vmi1472413.contaboserver.net {#home-ivy@vmi1472413.contaboserver.net-x86_64-linux}
+* [config](homes/x86_64-linux/ivy@vmi1472413.contaboserver.net)
+| -- config
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /home/ivy/dotfiles
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- neovim  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+### 🏠 ivypierlot@Ivys-MacBook-Pro {#home-ivypierlot@Ivys-MacBook-Pro-aarch64-darwin}
+* [config](homes/aarch64-darwin/ivypierlot@Ivys-MacBook-Pro)
+| -- config
+|    | -- browsers
+|    |    | -- zen-browser  : enabled
+|    | -- editors
+|    |    | -- zed  : enabled
+|    | -- flakeConfig
+|    |    | -- flakeFolder : /Users/ivypierlot/dotfiles
+|    | -- keybinds
+|    |    | -- kanata  : enabled
+|    | -- nix  : enabled
+|    | -- programs
+|    |    | -- _1password-cli  : enabled
+|    |    | -- neovim  : enabled
+|    |    | -- sketchybar  : enabled
+|    |    | -- zotero  : enabled
+|    | -- secrets  : enabled
+|    | -- shell  : enabled
+|    | -- standalone  : enabled
+|    | -- terms
+|    |    | -- ghostty  : enabled
+|    | -- wms
+|    |    | -- yabai  : enabled
+## Systems
+### Ivys-MacBook-Pro {#system-Ivys-MacBook-Pro-aarch64-darwin}
+* [config](homes/aarch64-darwin/Ivys-MacBook-Pro)
+| -- config
+|    | -- hmApps  : enabled
+|    | -- homebrew  : enabled
+|    | -- keybinds
+|    |    | -- karabiner-driver-kit  : enabled
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- sudo
+|    |    | -- agents  : enabled
+|    |    | -- pam  : enabled
+|    | -- user
+|    |    | -- username : ivypierlot
+### auspc {#system-auspc-x86_64-linux}
+* [config](homes/x86_64-linux/auspc)
+| -- config
+|    | -- bootlogo  : enabled
+|    | -- nix  : enabled
+|    | -- nixos
+|    |    | -- games  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : auscyber
+### lora-pi {#system-lora-pi-aarch64-linux-rpi}
+* [config](homes/aarch64-linux-rpi/lora-pi)
+&lt;nil&gt;
+### macmini {#system-macmini-aarch64-darwin}
+* [config](homes/aarch64-darwin/macmini)
+| -- config
+|    | -- hmApps  : enabled
+|    | -- homebrew  : enabled
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : ivypierlot
+### pentestvm {#system-pentestvm-x86_64-linux}
+* [config](homes/x86_64-linux/pentestvm)
+| -- config
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : auscyber
+### secondpc {#system-secondpc-x86_64-linux}
+* [config](homes/x86_64-linux/secondpc)
+| -- config
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : auscyber
+### surfacelaptop {#system-surfacelaptop-x86_64-linux}
+* [config](homes/x86_64-linux/surfacelaptop)
+| -- config
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : auscyber
+### wsl-nixos {#system-wsl-nixos-x86_64-linux}
+* [config](homes/x86_64-linux/wsl-nixos)
+| -- config
+|    | -- nix  : enabled
+|    | -- secrets  : enabled
+|    | -- user
+|    |    | -- username : auscyber
+
+
+
 
 
 ### 🤝 Other Projects

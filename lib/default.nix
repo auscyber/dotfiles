@@ -26,7 +26,7 @@ in
         self = ../.;
       };
       overlay = import ./overlay.nix { inherit inputs; };
-      extra = import ./extra.nix { inherit inputs; } // inp;
+      extra = import ./extra.nix { inherit inputs; } ;
     };
   };
   options = {
