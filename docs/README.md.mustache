@@ -27,15 +27,19 @@
 
 ## Homes
 {{#homes}}
-### 🏠 {{name}} {#{{id}}}
+<h3 id="{{id}}">🏠 {{name}} </h3>
 * [config](homes/{{system}}/{{name}})
+```
 {{config}}
+```
 {{/homes}}
 ## Systems
 {{#systems}}
-### {{name}} {#{{id}}}
+<h3 id="{{id}}"> {{name}} </h3>
 * [config](homes/{{system}}/{{hostname}})
+```
 {{config}}
+```
 {{/systems}}
 
 

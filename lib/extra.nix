@@ -27,7 +27,7 @@ rec {
       if builtins.length value == 0 then
         null
       else
-        "${indent}| -- ${key}\n"
+        "${indent}| -- ${key}"
         + builtins.concatStringsSep "\n" (
           builtins.filter (x: x != null) (builtins.map (v: displayLine "-" v (numIndents + 1)) value)
         )
