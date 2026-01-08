@@ -30,7 +30,6 @@
 | [auscyber@auspc](#home-auscyber@auspc-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [auscyber@laptop](#home-auscyber@laptop-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [auscyber@secondpc](#home-auscyber@secondpc-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
-| [ivy@fargonesh](#home-ivy@fargonesh-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [ivy@imflopet](#home-ivy@imflopet-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [ivy@lora-pi](#home-ivy@lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi | &lt;nil&gt; |
 | [ivy@vmi1472413.contaboserver.net](#home-ivy@vmi1472413.contaboserver.net-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
@@ -115,29 +114,6 @@
 ├── config
 │    ├── flakeConfig
 │    │    ├── flakeFolder : /home/auscyber/dotfiles
-│    ├── meta
-
-│    ├── nix  : enabled
-│    ├── programs
-│    │    ├── neovim  : enabled
-│    │    ├── ssh  : enabled
-│    ├── secrets  : enabled
-│    ├── shell  : enabled
-│    ├── standalone  : enabled
-├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
-│    ├── github_token : github_token
-│    ├── wakatime_config : wakatime_config
-```
-<h3 id="home-ivy@fargonesh-x86_64-linux">🏠 ivy@fargonesh </h3>
-
-&lt;nil&gt;
-* [config](/homes/x86_64-linux/ivy@fargonesh)
-
-```
-├── config
-│    ├── flakeConfig
-│    │    ├── flakeFolder : /home/ivy/dotfiles
 │    ├── meta
 
 │    ├── nix  : enabled
@@ -270,6 +246,8 @@ M4 Macbook Pro 2024
 │    ├── meta
 │    │    ├── description : M4 Macbook Pro 2024
 │    ├── nix  : enabled
+│    ├── programs
+│    │    ├── finder  : enabled
 │    ├── secrets  : enabled
 │    ├── sudo
 │    │    ├── agents  : enabled
@@ -326,6 +304,8 @@ Main Gaming desktop
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── programs
+│    │    ├── finder  : enabled
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : ivypierlot
