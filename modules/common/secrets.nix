@@ -20,7 +20,7 @@ in
 
     age.secrets.github_token = {
       rekeyFile = ./github_token.age;
-#            intermediary = true;
+      #            intermediary = true;
     };
     age.rekey = {
       generatedSecretsDir = ../../secrets/generated + "/${cfg.configId}";

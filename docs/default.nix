@@ -35,7 +35,7 @@ in
               {
                 inherit name system;
                 id = "home-${name}-${system}";
-				description = self.homeConfigurations.${name}.config.auscybernix.meta.description or "";
+                description = self.homeConfigurations.${name}.config.auscybernix.meta.description or "";
                 config =
                   displayLine "config" self.homeConfigurations.${name}.config.auscybernix
                   + "\n"
@@ -51,21 +51,20 @@ in
             systems = pkgs.lib.mapAttrsToList (
               name:
               { system, hostname, ... }:
-let
-                    config =
-                      if lib.strings.hasSuffix "linux" system then
-                        self.nixosConfigurations.${name}.config
-                      else if lib.strings.hasSuffix "darwin" system then
-                        self.darwinConfigurations.${name}.config
-                      else
-                        self.nixosConfigurations."${name}".config;
-						in
+              let
+                config =
+                  if lib.strings.hasSuffix "linux" system then
+                    self.nixosConfigurations.${name}.config
+                  else if lib.strings.hasSuffix "darwin" system then
+                    self.darwinConfigurations.${name}.config
+                  else
+                    self.nixosConfigurations."${name}".config;
+              in
               {
                 inherit name system hostname;
                 id = "system-${name}-${system}";
-				description = config.auscybernix.meta.description or "";
-                config =
-                  displayLine "config" config.auscybernix + "\n" + getSecrets config;
+                description = config.auscybernix.meta.description or "";
+                config = displayLine "config" config.auscybernix + "\n" + getSecrets config;
 
               }
             ) systems;

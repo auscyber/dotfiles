@@ -6,7 +6,7 @@
   inputs,
   lib,
   hostname,
-#  darwinConfig,
+  #  darwinConfig,
   ...
 }:
 

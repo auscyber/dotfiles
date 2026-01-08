@@ -16,16 +16,16 @@
       type = lib.types.str;
       default = "re";
     };
-	meta = {
-	userFriendlyName = lib.mkOption {
-	  type = lib.types.nullOr lib.types.str;
-	  default = null;
-	};
-	description = lib.mkOption {
-	  type = lib.types.nullOr lib.types.str;
-	  default = null;
-	};
-	};
+    meta = {
+      userFriendlyName = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+      };
+      description = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+      };
+    };
 
   };
   config = {
