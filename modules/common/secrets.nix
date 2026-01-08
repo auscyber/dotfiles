@@ -10,22 +10,22 @@ in
 {
   options.auscybernix.secrets = {
     enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
-	configId = lib.mkOption {
-	  type = lib.types.str;
-	  default = "";
-	  description = "config id to put in rekeys and generated";
-	};
+    configId = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "config id to put in rekeys and generated";
+    };
   };
   config = lib.mkIf cfg.enable {
 
     age.secrets.github_token = {
       rekeyFile = ./github_token.age;
-      #      intermediary = true;
+            intermediary = true;
     };
     age.rekey = {
       generatedSecretsDir = ../../secrets/generated + "/${cfg.configId}";
 
-    localStorageDir = ../.. + "/secrets/rekeyed/${cfg.configId}";
+      localStorageDir = ../.. + "/secrets/rekeyed/${cfg.configId}";
       agePlugins =
         with pkgs;
         [
