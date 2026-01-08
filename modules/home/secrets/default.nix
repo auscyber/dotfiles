@@ -20,10 +20,9 @@
     else
       "${config.home.homeDirectory}/.config/agenix.d";
   age.rekey.storageMode = "local";
-  age.rekey.localStorageDir =
-    ../../..
-    + "/secrets/rekeyed/${if isInside then "inside-" else ""}${config.home.username}-${hostname}";
-
+  auscybernix.secrets.configId = "${
+    if isInside then "inside-" else ""
+  }${config.home.username}-${hostname}";
   age.secrets."extra-nix-conf" = {
     generator = {
       dependencies = {

@@ -50,6 +50,9 @@
 │    │    ├── ssh  : enabled
 │    ├── secrets  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
 ```
 <h3 id="home-auscyber@auspc-x86_64-linux">🏠 auscyber@auspc </h3>
 
@@ -72,6 +75,10 @@
 │    ├── standalone  : enabled
 │    ├── terms
 │    │    ├── ghostty  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 <h3 id="home-auscyber@laptop-x86_64-linux">🏠 auscyber@laptop </h3>
 
@@ -86,6 +93,9 @@
 │    │    ├── ssh  : enabled
 │    ├── secrets  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
 ```
 <h3 id="home-auscyber@secondpc-x86_64-linux">🏠 auscyber@secondpc </h3>
 
@@ -102,6 +112,10 @@
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 <h3 id="home-ivy@fargonesh-x86_64-linux">🏠 ivy@fargonesh </h3>
 
@@ -118,6 +132,10 @@
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 <h3 id="home-ivy@imflopet-x86_64-linux">🏠 ivy@imflopet </h3>
 
@@ -134,6 +152,10 @@
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 <h3 id="home-ivy@lora-pi-aarch64-linux-rpi">🏠 ivy@lora-pi </h3>
 
@@ -149,6 +171,9 @@
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
 ```
 <h3 id="home-ivy@vmi1472413.contaboserver.net-x86_64-linux">🏠 ivy@vmi1472413.contaboserver.net </h3>
 
@@ -165,6 +190,10 @@
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 <h3 id="home-ivypierlot@Ivys-MacBook-Pro-aarch64-darwin">🏠 ivypierlot@Ivys-MacBook-Pro </h3>
 
@@ -194,6 +223,10 @@
 │    │    ├── ghostty  : enabled
 │    ├── wms
 │    │    ├── yabai  : enabled
+├── secrets
+│    ├── extra-nix-conf : extra-nix-conf
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
 ```
 ## Systems
 <h3 id="system-Ivys-MacBook-Pro-aarch64-darwin"> Ivys-MacBook-Pro </h3>
@@ -213,6 +246,8 @@
 │    │    ├── pam  : enabled
 │    ├── user
 │    │    ├── username : ivypierlot
+├── secrets
+│    ├── github_token : github_token
 ```
 <h3 id="system-auspc-x86_64-linux"> auspc </h3>
 
@@ -227,13 +262,23 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+├── secrets
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
 ```
 <h3 id="system-lora-pi-aarch64-linux-rpi"> lora-pi </h3>
 
 * [config](/systems/aarch64-linux-rpi/lora-pi)
 
 ```
-&lt;nil&gt;
+├── config
+│    ├── nix  : enabled
+│    ├── secrets  : enabled
+├── secrets
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
 ```
 <h3 id="system-macmini-aarch64-darwin"> macmini </h3>
 
@@ -247,6 +292,8 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : ivypierlot
+├── secrets
+│    ├── github_token : github_token
 ```
 <h3 id="system-pentestvm-x86_64-linux"> pentestvm </h3>
 
@@ -258,6 +305,10 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+├── secrets
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
 ```
 <h3 id="system-secondpc-x86_64-linux"> secondpc </h3>
 
@@ -269,6 +320,16 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+├── secrets
+│    ├── acme_cloudflare.env : acme_cloudflare.env
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
+│    ├── navidrome_env : navidrome_env
+│    ├── slskd.env : slskd.env
+│    ├── slskd_secrets_env : slskd_secrets_env
+│    ├── soularr : soularr
+│    ├── soularr_api_key : soularr_api_key
 ```
 <h3 id="system-surfacelaptop-x86_64-linux"> surfacelaptop </h3>
 
@@ -280,6 +341,10 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+├── secrets
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
 ```
 <h3 id="system-wsl-nixos-x86_64-linux"> wsl-nixos </h3>
 
@@ -291,6 +356,10 @@
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+├── secrets
+│    ├── github_token : github_token
+│    ├── ivy-password : ivy-password
+│    ├── ivy-pwd-hash : ivy-pwd-hash
 ```
 
 

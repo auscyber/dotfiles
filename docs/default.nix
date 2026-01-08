@@ -23,6 +23,10 @@ in
         let
           systems = self.lib.file.parseSystemConfigurations ../systems;
           homes = self.lib.file.parseHomeConfigurations ../homes;
+		  displayLine = name: value: self.lib.extra.displayLine name (walkConfig value) 0;
+		  getSecrets = conf: displayLine "secrets" (walkConfig (lib.mapAttrs (k: v: v.name ) conf.age.secrets));
+
+
 
           data = {
 
@@ -32,9 +36,10 @@ in
               {
                 inherit name system;
                 id = "home-${name}-${system}";
-                config = self.lib.extra.displayLine "config" (walkConfig
+                config = displayLine "config"
                   self.homeConfigurations.${name}.config.auscybernix
-                ) 0;
+                  + "\n" + getSecrets
+				  self.homeConfigurations.${name}.config;
 
                 #          builtins.readFile (pkgs.runCommand "script"  {} ''
                 #				echo '${builtins.toJSON (walkConfig self.homeConfigurations.${name}.config.auscybernix)}'
@@ -49,14 +54,17 @@ in
               {
                 inherit name system hostname;
                 id = "system-${name}-${system}";
-                config = self.lib.extra.displayLine "config" (walkConfig (
-                  if lib.strings.hasSuffix "linux" system then
-                    self.nixosConfigurations.${name}.config.auscybernix
+                config = let config =
+if lib.strings.hasSuffix "linux" system then
+                    self.nixosConfigurations.${name}.config
                   else if lib.strings.hasSuffix "darwin" system then
-                    self.darwinConfigurations.${name}.config.auscybernix
+                    self.darwinConfigurations.${name}.config
                   else
-                    { }
-                )) 0;
+                    self.nixosConfigurations."${name}".config;
+					in
+
+				displayLine "config" config.auscybernix
+                  + "\n" + getSecrets config;
 
               }
             ) systems;

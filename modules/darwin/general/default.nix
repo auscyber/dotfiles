@@ -2,6 +2,7 @@
   config,
   pkgs,
   hostname,
+  system,
   ...
 }:
 {
@@ -16,7 +17,8 @@
     "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
 
   };
-  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
+  auscybernix.secrets.configId = "${system}-${hostname}";
+  #  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
   nix.optimise = {
     automatic = true;
     interval = [

@@ -38,6 +38,7 @@
                 age
                 ssh-to-age
                 age-plugin-1p
+				age-plugin-yubikey
                 perSystemArgs.config.agenix-rekey.package
               ]
               ++ lib.optionals pkgs.stdenv.isDarwin [ age-plugin-se ]

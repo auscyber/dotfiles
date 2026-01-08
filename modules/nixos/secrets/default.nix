@@ -12,7 +12,7 @@ in
   config = lib.mkIf cfg.enable {
     age.rekey.storageMode = "local";
 
-    age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
+    auscybernix.secrets.configId = "${hostname}";
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   };
 }
