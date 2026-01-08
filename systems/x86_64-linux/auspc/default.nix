@@ -4,6 +4,7 @@
   ...
 }:
 {
+auscybernix.meta.description = "Main Gaming desktop";
   imports = [
     ./configuration.nix
     ./hardware-configuration.nix

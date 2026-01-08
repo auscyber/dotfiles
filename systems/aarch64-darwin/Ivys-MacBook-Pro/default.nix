@@ -10,6 +10,8 @@
 {
   # List packages installed in system profile. To search by name, run:
   auscybernix.nix.caches = true;
+  auscybernix.meta.description = "M4 Macbook Pro 2024";
+
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
@@ -184,22 +186,23 @@
   };
   system.defaults.dock = {
     persistent-apps = [
-      "/System/Applications/Apps.app"
+#      "/System/Applications/Apps.app"
       "/Applications/Nix Apps/Zen.app"
       #      "/Applications/TIDAL.app"
-      "/Applications/Musly.app"
+#      "/Applications/Musly.app"
       "/Applications/Microsoft Outlook.app"
       "/Applications/Fantastical.app"
       #      "/System/Applications/App Store.app/"
       "/Applications/Microsoft Teams.app"
-      "/Applications/Craft.app"
+      "/Applications/Notion.app"
       "/Applications/Microsoft Word.app"
       "/System/Applications/Messages.app"
       "/Applications/Beeper Desktop.app"
       "/Applications/1Password.app"
       "/System/Applications/System Settings.app"
       #      "/System/Applications/Home.app"
-      "/Applications/Nix Apps/Zed.App"
+#      "/Applications/Nix Apps/Zed.App"
+		"/Applications/Nix Apps/Visual Studio Code.app"
       "/Applications/Nix Apps/Ghostty.app"
       "/Applications/Nix Apps/Zotero.app"
       "/Applications/Todoist.app"

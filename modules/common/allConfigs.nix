@@ -6,16 +6,27 @@
 }:
 {
 
-  options.auscybernix.nix = {
-    flake = lib.mkOption {
+  options.auscybernix = {
+    nix.flake = lib.mkOption {
       type = lib.types.str;
       default = "/home/auscyber/dotfiles";
 
     };
-    reloadProgram = lib.mkOption {
+    nix.reloadProgram = lib.mkOption {
       type = lib.types.str;
       default = "re";
     };
+	meta = {
+	userFriendlyName = lib.mkOption {
+	  type = lib.types.nullOr lib.types.str;
+	  default = null;
+	};
+	description = lib.mkOption {
+	  type = lib.types.nullOr lib.types.str;
+	  default = null;
+	};
+	};
+
   };
   config = {
 

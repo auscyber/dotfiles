@@ -3,6 +3,7 @@
   ...
 }:
 {
+  auscybernix.meta.description = "Home server";
   imports = [
     ./configuration.nix
     #   ./minecraft.nix

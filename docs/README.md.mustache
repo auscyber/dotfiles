@@ -13,22 +13,23 @@
 
 
 
-| System name  |  system |
-|:------------:|:--------|
+| System name  |  System | Description |
+|:------------:|:--------|:------|
 {{#systems}}
-| [{{name}}](#{{id}}) |  {{system}} |
+| [{{name}}](#{{id}}) |  {{system}} | {{description}} |
 {{/systems}}
 
-| Home | system |
-|:------------:|:--------|
+| Home | system | Description |
+|:------------:|:--------|:---------|
 {{#homes}}
-| [{{name}}](#{{id}}) |  {{system}} |
+| [{{name}}](#{{id}}) |  {{system}} | {{description}} |
 {{/homes}}
 
 ## Homes
 {{#homes}}
 <h3 id="{{id}}">🏠 {{name}} </h3>
 
+{{description}}
 * [config](/homes/{{system}}/{{name}})
 
 ```
@@ -38,6 +39,7 @@
 ## Systems
 {{#systems}}
 <h3 id="{{id}}"> {{name}} </h3>
+{{description}}
 
 * [config](/systems/{{system}}/{{hostname}})
 
