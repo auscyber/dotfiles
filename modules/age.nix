@@ -150,7 +150,7 @@ let
         if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
           UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
           echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
-          systemctl try-restart "''${UNIQUE_UNITS[@]}"
+          ${pkgs.systemd}/bin/systemctl try-restart "''${UNIQUE_UNITS[@]}"
         fi
         if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
           UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
@@ -158,7 +158,7 @@ let
           for entry in "''${UNIQUE_USER_UNITS[@]}"; do
              user="''${entry%%:*}"
              unit="''${entry#*:}"
-             systemctl --user -M "$user@" try-restart "$unit"
+             ${pkgs.systemd}/bin/systemctl --user -M "$user@" try-restart "$unit"
           done
         fi
       '')
