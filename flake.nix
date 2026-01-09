@@ -6,7 +6,7 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
-    agenix-rekey.url = "github:oddlama/agenix-rekey";
+    agenix-rekey.url = "path:./inputs/agenix-rekey";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     nix-topology.url = "github:oddlama/nix-topology";
     attic = {
@@ -103,7 +103,7 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
-    input-branches.url = "github:mightyiam/input-branches";
+    input-branches.url = "path:./inputs/input-branches";
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:nix-community/stylix";

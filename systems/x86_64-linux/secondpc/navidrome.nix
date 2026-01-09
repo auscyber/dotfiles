@@ -57,8 +57,92 @@ in
     rekeyFile = ./navidrome.age;
 
   };
+  age.secrets.lidar_key = {
+    rekeyFile = ./lidar_key.age;
+  };
   age.secrets.soularr = {
     rekeyFile = ./soularr.age;
+    generator = {
+      dependencies = {
+        soularr_api_key = config.age.secrets.lidar_key;
+      };
+      value =
+        { placeholders }:
+        {
+          Lidarr = {
+            # Get from Lidarr: Settings > General > Security
+            api_key = placeholders.soularr_api_key;
+            # URL Lidarr uses (e.g., what you use in your browser)
+            host_url = "https://lidarr.ivymect.in";
+            # Path to slskd downloads inside the Lidarr container
+            download_dir = "/mnt/hdd/Music/Downloads";
+            # If true, Lidarr won't auto-import from Slskd
+            disable_sync = "False";
+          };
+
+          Slskd = {
+            # Create manually (see docs)
+            api_key = "soulseekpasswordddd";
+            # URL Slskd uses
+            host_url = "http://127.0.0.1:5030";
+            url_base = "/";
+            # Download path inside Slskd container
+            download_dir = "/mnt/hdd/Music/Downloads";
+            # Delete search after Soularr runs
+            delete_searches = "False";
+            # Max seconds to wait for downloads (prevents infinite hangs)
+            stalled_timeout = 3600;
+          };
+
+          "Release Settings" = {
+            # Pick release with most common track count
+            use_most_common_tracknum = "True";
+            allow_multi_disc = "True";
+            # Accepted release countries
+            accepted_countries = "Europe,Japan,United Kingdom,United States,[Worldwide],Australia,Canada";
+            # Accepted formats
+            accepted_formats = "CD,Digital Media,Vinyl";
+          };
+          "Search Settings" = {
+            search_timeout = 5000;
+            maximum_peer_queue = 50;
+            # Minimum upload speed (bits/sec)
+            minimum_peer_upload_speed = 0;
+            # Minimum match ratio between Lidarr track and Soulseek filename
+            minimum_filename_match_ratio = 0.8;
+            # Preferred file types and qualities (most to least preferred)
+            # Use "flac" or "mp3" to ignore quality details
+            allowed_filetypes = "flac 24/192,flac 16/44.1,flac,mp3 320,mp3";
+            #ignored_users = User1,User2,Fred,Bob
+            # Set to False to only search for album titles (Note Soularr does not search for individual tracks, this setting searches for track titles but still tries to match to the full album).
+            search_for_tracks = "True";
+            # Prepend artist name when searching for albums
+            album_prepend_artist = "False";
+            track_prepend_artist = "True";
+            # Search modes: all, incrementing_page, first_page
+            # "all": search for every wanted record, "first_page": repeatedly searchs the first page, "incrementing_page": starts with the first page and increments on each run.
+            search_type = "incrementing_page";
+            # Albums to process per run
+            number_of_albums_to_grab = 10;
+            # Unmonitor album on failure; logs to failure_list.txt
+            remove_wanted_on_failure = "False";
+            # Blacklist words in album or track titles (case-insensitive)
+            title_blacklist = "Word1,word2";
+            # Lidarr search source: "missing" or "cutoff_unmet"
+            search_source = "missing";
+          };
+
+          Logging = {
+            # Passed to Python's logging.basicConfig()
+            # See: https://docs.python.org/3/library/logging.html
+            level = "INFO";
+            format = "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s";
+            datefmt = "%Y-%m-%dT%H:%M:%S%z";
+
+          };
+        };
+      script = config.age.generators.toINI;
+    };
     symlink = false;
     owner = "1000";
     group = "1000";

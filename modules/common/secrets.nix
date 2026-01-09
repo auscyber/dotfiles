@@ -6,22 +6,73 @@
 }:
 let
   cfg = config.auscybernix.secrets;
+  mapListOrAttrs = f: x: if builtins.isList x then map f x else lib.mapAttrs (_: f) x;
+  mapListOrAttrsToList = f: x: if builtins.isList x then map f x else lib.mapAttrsToList (_: f) x;
+
 in
 {
-  options.auscybernix.secrets = {
-    enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
-    configId = lib.mkOption {
-      type = lib.types.str;
-      default = "";
-      description = "config id to put in rekeys and generated";
+  options = {
+    auscybernix.secrets = {
+      enable = lib.mkEnableOption "Enable sops integration for managing secrets.";
+      configId = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "config id to put in rekeys and generated";
+      };
     };
   };
   config = lib.mkIf cfg.enable {
+    age.generators = {
+      toYAML =
+        {
+          deps,
+          value,
+          pkgs,
+          decrypt,
+          ...
+        }:
+        let
+          yaml = pkgs.lib.generators.toYAML { } value;
+        in
+        ''
+                set -euo pipefail
+                yaml='${yaml}'
+          ${pkgs.lib.concatStrings (
+            mapListOrAttrsToList (dep: ''
+              yaml=$(echo "$yaml" | sed "s|${dep.placeholder}|$(${decrypt} ${lib.escapeShellArg dep.file})|g")
+            '') deps
+          )}
+                echo "$yaml"
+        '';
+      toINI =
+        {
+          deps,
+          value,
+          pkgs,
+          decrypt,
+          ...
+        }:
+        let
+          ini = pkgs.lib.generators.toINI { } value;
+        in
+        ''
+                set -euo pipefail
+                ini='${ini}'
+          ${pkgs.lib.concatStrings (
+            mapListOrAttrsToList (dep: ''
+              ini=$(echo "$ini" | sed "s|${dep.placeholder}|$(${decrypt} ${lib.escapeShellArg dep.file})|g")
+            '') deps
+          )}
+            echo "$ini"
+        '';
+
+    };
 
     age.secrets.github_token = {
       rekeyFile = ./github_token.age;
       #            intermediary = true;
     };
+
     age.rekey = {
       generatedSecretsDir = ../../secrets/generated + "/${cfg.configId}";
 

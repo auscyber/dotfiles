@@ -79,18 +79,14 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1759699908,
-        "narHash": "sha256-kYVGY8sAfqwpNch706Fy2+/b+xbtfidhXSnzvthAhIQ=",
-        "owner": "oddlama",
-        "repo": "agenix-rekey",
-        "rev": "42362b12f59978aabf3ec3334834ce2f3662013d",
-        "type": "github"
+        "path": "./inputs/agenix-rekey",
+        "type": "path"
       },
       "original": {
-        "owner": "oddlama",
-        "repo": "agenix-rekey",
-        "type": "github"
-      }
+        "path": "./inputs/agenix-rekey",
+        "type": "path"
+      },
+      "parent": []
     },
     "aquamarine": {
       "inputs": {
@@ -2681,18 +2677,14 @@
         "nixpkgs-lib": "nixpkgs-lib_2"
       },
       "locked": {
-        "lastModified": 1764254272,
-        "narHash": "sha256-Jsu6qO7b7dwSzUMQP+vIPl4WYdbHFNY/1fbPiyPqFq8=",
-        "owner": "mightyiam",
-        "repo": "input-branches",
-        "rev": "96343c6ca9e84d559c93484c45c3864fcf2e1026",
-        "type": "github"
+        "path": "./inputs/input-branches",
+        "type": "path"
       },
       "original": {
-        "owner": "mightyiam",
-        "repo": "input-branches",
-        "type": "github"
-      }
+        "path": "./inputs/input-branches",
+        "type": "path"
+      },
+      "parent": []
     },
     "input-leap": {
       "flake": false,
