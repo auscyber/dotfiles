@@ -9,6 +9,13 @@
 
       shallow = true;
     };
+    agenix = {
+      upstream = {
+        url = "https://github.com/ryantm/agenix.git";
+        ref = "main";
+      };
+    };
+    #	shallow = true;
 
   };
 }

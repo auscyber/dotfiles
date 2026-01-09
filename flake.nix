@@ -5,7 +5,7 @@
     self.submodules = true;
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix.url = "github:ryantm/agenix";
+    agenix.url = "path:./inputs/agenix";
     agenix-rekey.url = "github:oddlama/agenix-rekey";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     nix-topology.url = "github:oddlama/nix-topology";
