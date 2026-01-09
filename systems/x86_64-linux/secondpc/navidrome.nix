@@ -55,7 +55,7 @@ in
   };
   age.secrets.navidrome_env = {
     rekeyFile = ./navidrome.age;
-	restartUnits = ["navidrome.service"];
+    restartUnits = [ "navidrome.service" ];
 
   };
   age.secrets.lidar_key = {
@@ -65,14 +65,16 @@ in
     rekeyFile = ./soularr.age;
     generator = {
       dependencies = {
-        soularr_api_key = config.age.secrets.lidar_key;
+        lidar_key = config.age.secrets.lidar_key;
+        slskd_api_key = config.age.secrets.slskd_soularr_apikey;
+
       };
       value =
         { placeholders }:
         {
           Lidarr = {
             # Get from Lidarr: Settings > General > Security
-            api_key = placeholders.soularr_api_key;
+            api_key = placeholders.lidar_key;
             # URL Lidarr uses (e.g., what you use in your browser)
             host_url = "https://lidarr.ivymect.in";
             # Path to slskd downloads inside the Lidarr container
@@ -83,7 +85,7 @@ in
 
           Slskd = {
             # Create manually (see docs)
-            api_key = "soulseekpasswordddd";
+            api_key = placeholders.slskd_api_key;
             # URL Slskd uses
             host_url = "http://127.0.0.1:5030";
             url_base = "/";
@@ -144,14 +146,15 @@ in
         };
       script = config.age.generators.toINI;
     };
-	restartUnits = ["soularr.service"];
+
+    restartUnits = [ "soularr.service" ];
     symlink = false;
     owner = "1000";
     group = "1000";
     path = "/var/lib/soularr/config.ini";
 
   };
-  age.secrets."soularr_api_key" = {
+  age.secrets."slskd_soularr_apikey" = {
 
     generator = {
       script =
@@ -193,20 +196,15 @@ in
 
       settings = {
 
-	  networks.main.ipam = {
-	  driver= "default";
-	  config = [{subnet= "172.28.0.0/24";}];
-	  };
+        networks.main.ipam = {
+          driver = "default";
+          config = [ { subnet = "172.28.0.0/24"; } ];
+        };
 
-
-
-
-
-
-#        networks."main".ipam = {
-#          driver = "default";
-#          config = [ { subnet = "172.28.0.0/24"; gateway = "172.28.0.1"; } ];
-#        };
+        #        networks."main".ipam = {
+        #          driver = "default";
+        #          config = [ { subnet = "172.28.0.0/24"; gateway = "172.28.0.1"; } ];
+        #        };
 
         services.soularr = {
           service = {
@@ -225,8 +223,7 @@ in
 
             ];
 
-			network_mode = "host";
-
+            network_mode = "host";
 
             restart = "unless-stopped";
           };
@@ -240,10 +237,10 @@ in
 
   age.secrets."slskd.env" = {
     owner = "music";
-	restartUnits = ["slskd.service"];
+    restartUnits = [ "slskd.service" ];
     generator = {
       dependencies = {
-        inherit (config.age.secrets) ivy-password slskd_secrets_env soularr_api_key;
+        inherit (config.age.secrets) ivy-password slskd_soularr_apikey slskd_secrets_env;
       };
 
       script =
@@ -255,11 +252,11 @@ in
           ...
         }:
         ''
-          						printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.0.0.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.soularr_api_key.file})
-                              	printf 'SLSKD_USERNAME=ivy\n'
-                              	printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
-                    			${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
-                              	'';
+          printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.0.0.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.slskd_soularr_apikey.file})
+          printf 'SLSKD_USERNAME=ivy\n'
+          printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
+          ${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
+                        	'';
 
     };
 
@@ -295,12 +292,12 @@ in
       shares.directories = [ "${path}" ];
       directories.downloads = "/mnt/hdd/Music/Downloads";
 
-      web.authentication.api_keys.lol = {
-        key = "soulseekpasswordddd";
-        cidr = "127.0.0.0/24";
-        role = "Administrator";
-      };
-	  web.ip_address = "0.0.0.0";
+      #      web.authentication.api_keys.lol = {
+      #        key = "soulseekpasswordddd";
+      #        cidr = "127.0.0.0/24";
+      #        role = "Administrator";
+      #      };
+      web.ip_address = "0.0.0.0";
       web.logging = true;
     };
     domain = "slsk.ivymect.in";

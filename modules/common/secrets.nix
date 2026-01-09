@@ -23,6 +23,31 @@ in
   };
   config = lib.mkIf cfg.enable {
     age.generators = {
+      toEnv =
+        # takes values of form { SECRET_KEY = placheholders.secret; } and converts to env file
+        {
+          deps,
+          value,
+          pkgs,
+          decrypt,
+          ...
+        }:
+        let
+          env = builtins.toJSON value;
+        in
+        ''
+          (
+          value='${env}'
+          ${pkgs.lib.concatStrings (
+            mapListOrAttrsToList (dep: ''
+              echo '${dep.placeholder}' > /dev/stderr
+              echo "s|${dep.placeholder}|$(${decrypt} ${lib.escapeShellArg dep.file})|" > /dev/stderr
+              value=$(echo "$value" | sed "s|${dep.placeholder}|$(${decrypt} ${lib.escapeShellArg dep.file})|g")
+            '') deps
+          )}
+          echo "$value" | ${pkgs.lib.getExe pkgs.jq} -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]'
+          )
+        '';
       toYAML =
         {
           deps,
