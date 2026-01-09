@@ -1,3 +1,6 @@
 [submodule "inputs/darwin"]
 	path = inputs/darwin
 	url = https://github.com/auscyber/dotfiles.git
+[submodule "inputs/agenix"]
+	path = inputs/agenix
+	url = https://github.com/auscyber/dotfiles.git

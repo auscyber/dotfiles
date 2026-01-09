@@ -19,7 +19,7 @@ with lib;
   };
   config = mkIf cfg.enable {
     system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
-    system.defaults.NSGlobalDomain.AppleTemperatureUnit = "Celsisus";
+    system.defaults.NSGlobalDomain.AppleTemperatureUnit = "Celsius";
     system.defaults.finder = {
       ShowPathbar = true;
 
