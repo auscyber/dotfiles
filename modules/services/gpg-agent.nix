@@ -152,9 +152,10 @@ let
 
   # Launchd agent socket generator.
   mkAgentSock = name: {
-    SockType = "stream";
+#    SockType = "stream";
+    SocketFamily = "Unix";
     SockPathName = gpgconf name;
-    SockPathMode = 384; # Property lists don't support octal literals (0600 = 384).
+    SockPathMode = 448; # Property lists don't support octal literals (0600 = 384).
   };
 
 in
@@ -448,9 +449,9 @@ in
         ProcessType = "Background";
         RunAtLoad = cfg.enableSshSupport;
         Sockets = {
-          std = mkAgentSock "S.gpg-agent";
           ssh = mkIf cfg.enableSshSupport (mkAgentSock "S.gpg-agent.ssh");
           extra = mkIf cfg.enableExtraSocket (mkAgentSock "S.gpg-agent.extra");
+          std = mkAgentSock "S.gpg-agent";
         };
       };
     };
