@@ -409,22 +409,6 @@
         "type": "github"
       }
     },
-    "cursor_shader": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1751251857,
-        "narHash": "sha256-za6zGqiVDF0Ph+hE3m6Mcr3K1thQpiMmUG0yPmzn6m4=",
-        "owner": "Crackerfracks",
-        "repo": "synesthaxia.glsl",
-        "rev": "fb494d124d6b16a2472ae1815f70c48ece38f9e4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Crackerfracks",
-        "repo": "synesthaxia.glsl",
-        "type": "github"
-      }
-    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -1613,19 +1597,6 @@
         "type": "github"
       }
     },
-    "game-devices-udev-rules": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1758567709,
-        "narHash": "sha256-CLQFdPr489OKZRj1v8EZypM1KOXgAOAOF0VQpeud4uo=",
-        "type": "tarball",
-        "url": "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
-      }
-    },
     "ghostty-shaders": {
       "flake": false,
       "locked": {
@@ -2720,22 +2691,6 @@
         "type": "github"
       }
     },
-    "jankyborders": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1758708859,
-        "narHash": "sha256-31Er+cUQNJbZnXKC6KvlrBhOvyPAM7nP3BaxunAtvWg=",
-        "owner": "FelixKratz",
-        "repo": "JankyBorders",
-        "rev": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "FelixKratz",
-        "repo": "JankyBorders",
-        "type": "github"
-      }
-    },
     "json": {
       "flake": false,
       "locked": {
@@ -2749,22 +2704,6 @@
       "original": {
         "owner": "stefan-hoeck",
         "repo": "idris2-json",
-        "type": "github"
-      }
-    },
-    "kanata": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1767860648,
-        "narHash": "sha256-jqXLD53RCBCEwH7sS6Eib+epn4LUGYJPb92KS7hNCQw=",
-        "owner": "jtroo",
-        "repo": "kanata",
-        "rev": "94ee585866747a8f82780cf08a4464adbeecc495",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jtroo",
-        "repo": "kanata",
         "type": "github"
       }
     },
@@ -4420,7 +4359,6 @@
         "agenix-rekey": "agenix-rekey",
         "arion": "arion",
         "attic": "attic",
-        "cursor_shader": "cursor_shader",
         "darwin": "darwin_2",
         "devenv": "devenv",
         "emacs": "emacs",
@@ -4428,7 +4366,6 @@
         "flake-compat": "flake-compat_5",
         "flake-parts": "flake-parts_5",
         "flake-utils": "flake-utils",
-        "game-devices-udev-rules": "game-devices-udev-rules",
         "ghostty-shaders": "ghostty-shaders",
         "home-manager": "home-manager_2",
         "homebrew-cask": "homebrew-cask",
@@ -4442,8 +4379,6 @@
         "impermanence": "impermanence",
         "input-branches": "input-branches",
         "input-leap": "input-leap",
-        "jankyborders": "jankyborders",
-        "kanata": "kanata",
         "kmonad": "kmonad",
         "lanzaboote": "lanzaboote",
         "lix": "lix",
@@ -4485,7 +4420,6 @@
         "treefmt-nix": "treefmt-nix_4",
         "unstable": "unstable",
         "wezterm": "wezterm",
-        "yabai": "yabai",
         "zen-browser": "zen-browser"
       }
     },
@@ -5276,22 +5210,6 @@
       "original": {
         "owner": "madman-bob",
         "repo": "idris2-xml",
-        "type": "github"
-      }
-    },
-    "yabai": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1765322155,
-        "narHash": "sha256-bQenrG2KJN9sF0CvvNrufvMS/XPVyL40nyeLLW200yo=",
-        "owner": "koekeishiya",
-        "repo": "yabai",
-        "rev": "996e26da7bef444d170d4f82fcc9fa5fdabba5ff",
-        "type": "github"
-      },
-      "original": {
-        "owner": "koekeishiya",
-        "repo": "yabai",
         "type": "github"
       }
     },

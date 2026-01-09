@@ -55,6 +55,7 @@ in
   };
   age.secrets.navidrome_env = {
     rekeyFile = ./navidrome.age;
+	restartUnits = ["navidrome.service"];
 
   };
   age.secrets.lidar_key = {
@@ -143,6 +144,7 @@ in
         };
       script = config.age.generators.toINI;
     };
+	restartUnits = ["soularr.service"];
     symlink = false;
     owner = "1000";
     group = "1000";
@@ -238,6 +240,7 @@ in
 
   age.secrets."slskd.env" = {
     owner = "music";
+	restartUnits = ["slskd.service"];
     generator = {
       dependencies = {
         inherit (config.age.secrets) ivy-password slskd_secrets_env soularr_api_key;
