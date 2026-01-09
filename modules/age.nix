@@ -366,6 +366,7 @@ in
         path = [
           pkgs.mount
           pkgs.diffutils
+          pkgs.systemd
         ];
         serviceConfig = {
           Type = "oneshot";

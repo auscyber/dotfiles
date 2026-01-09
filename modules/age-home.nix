@@ -174,10 +174,12 @@ let
     let
       app = pkgs.writeShellApplication {
         name = "agenix-home-manager-mount-secrets";
-        runtimeInputs = with pkgs; [
-          coreutils
-          diffutils
-        ];
+        runtimeInputs = with pkgs;
+          [
+            coreutils
+            diffutils
+          ]
+          ++ lib.optionals stdenv.isLinux [ systemd ];
         text = ''
           ${newGeneration}
           ${installSecrets}
