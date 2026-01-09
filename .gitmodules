@@ -4,3 +4,9 @@
 [submodule "inputs/agenix"]
 	path = inputs/agenix
 	url = https://github.com/auscyber/dotfiles.git
+[submodule "inputs/input-branches"]
+	path = inputs/input-branches
+	url = https://github.com/auscyber/dotfiles
+[submodule "inputs/agenix-rekey"]
+	path = inputs/agenix-rekey
+	url = https://github.com/auscyber/dotfiles.git
