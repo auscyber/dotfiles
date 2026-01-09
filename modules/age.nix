@@ -274,6 +274,7 @@ in
   ];
 
   options.age = {
+
     ageBin = mkOption {
       type = types.str;
       default = "${pkgs.age}/bin/age";
@@ -341,6 +342,7 @@ in
         Path to SSH keys to be used as identities in age decryption.
       '';
     };
+
   };
 
   config = mkIf (cfg.secrets != { }) (mkMerge [
@@ -352,6 +354,7 @@ in
         }
       ];
     }
+
     (optionalAttrs (!isDarwin) {
       # When using sysusers we no longer be started as an activation script
       # because those are started in initrd while sysusers is started later.
