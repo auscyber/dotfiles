@@ -14,6 +14,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+nvfetcher.url = "github:berberman/nvfetcher";
     searchix.url = "git+https://codeberg.org/alanpearce/searchix";
     nil = {
       url = "github:oxalica/nil";

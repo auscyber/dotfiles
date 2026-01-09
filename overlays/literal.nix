@@ -44,11 +44,11 @@ in
 
     yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
-		inherit (sources.jankyborders) src version;
+      inherit (sources.jankyborders) src version;
     });
     input-leap = pkgs.input-leap.overrideAttrs (attrs: {
       # patches = [ ];
-	  inherit (sources.input-leap) src version;
+      inherit (sources.input-leap) src version;
     });
 
     inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
@@ -62,6 +62,13 @@ in
     inherit (inputs.eww.packages.${system}) eww;
     #    inherit (inputs.rnix.packages."${system}") rnix-lsp;
     ghostty = ghostty."${system}";
+    slskd = pkgs.callPackage ../packages/slskd.nix {
+	source = {
+	inherit (sources.slskd) src;
+	version = "0.24.2";
+	npmHash = "sha256-i2ZeMFM7z/Hab8vFaCCoEWArDNkKWZflwHw92DBP+Oo=";
+	};
+	};
     buildEnvExtra =
       lib.extra.overrideDerivation inputs.staging-next.legacyPackages."${system}".buildEnv
         pkgs;
@@ -74,7 +81,7 @@ in
     });
     game-devices-udev-rules = pkgs.game-devices-udev-rules.overrideAttrs (attrs: {
 
-	  inherit (sources.game-devices-udev-rules) src;
+      inherit (sources.game-devices-udev-rules) src;
     });
 
   }

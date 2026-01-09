@@ -37,6 +37,7 @@
       inputs.hyprland-plugins.overlays.default
       inputs.emacs.overlays.default
       inputs.rust-overlay.overlays.default
+	  inputs.nvfetcher.overlays.default
       #      inputs.lix-module.overlays.default
       inputs.neovim.overlays.default
       (

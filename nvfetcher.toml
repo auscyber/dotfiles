@@ -18,3 +18,7 @@ fetch.git = "https://github.com/koekeishiya/yabai"
 [jankyborders]
 src.git = "https://github.com/felixkratz/jankyborders"
 fetch.git = "https://github.com/felixkratz/jankyborders"
+[slskd]
+src.git = "https://github.com/slskd/slskd.git"
+fetch.git = "https://github.com/slskd/slskd.git"
+extract = ["./src/web/package-lock.json"]

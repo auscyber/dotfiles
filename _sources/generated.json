@@ -1,6 +1,6 @@
 {
     "cursor_shader": {
-        "cargoLock": null,
+        "cargoLocks": null,
         "date": "2025-06-29",
         "extract": null,
         "name": "cursor_shader",
@@ -20,7 +20,7 @@
         "version": "fb494d124d6b16a2472ae1815f70c48ece38f9e4"
     },
     "game-devices-udev-rules": {
-        "cargoLock": null,
+        "cargoLocks": null,
         "date": null,
         "extract": null,
         "name": "game-devices-udev-rules",
@@ -34,7 +34,7 @@
         "version": "main"
     },
     "jankyborders": {
-        "cargoLock": null,
+        "cargoLocks": null,
         "date": "2025-09-24",
         "extract": null,
         "name": "jankyborders",
@@ -54,12 +54,7 @@
         "version": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e"
     },
     "kanata": {
-        "cargoLock": {
-            "Cargo.lock": [
-                "sha256-jzTK_ZK9UrXTP_Ow662ENBv3cim6klA8+DQv4DLVSNU=/Cargo.lock",
-                {}
-            ]
-        },
+        "cargoLocks": null,
         "date": null,
         "extract": null,
         "name": "kanata",
@@ -79,8 +74,30 @@
         },
         "version": "v1.10.1"
     },
+    "slskd": {
+        "cargoLocks": null,
+        "date": "2026-01-03",
+        "extract": {
+            "./src/web/package-lock.json": "./slskd-02df53f215a57c58d78df20a03497f03cce12185/./src/web/package-lock.json"
+        },
+        "name": "slskd",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "02df53f215a57c58d78df20a03497f03cce12185",
+            "sha256": "sha256-nsMyJOAt1khMJV4HoNgF4kPsC7RxwFR5lczPhOZfiog=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/slskd/slskd.git"
+        },
+        "version": "02df53f215a57c58d78df20a03497f03cce12185"
+    },
     "yabai": {
-        "cargoLock": null,
+        "cargoLocks": null,
         "date": "2025-12-10",
         "extract": null,
         "name": "yabai",
