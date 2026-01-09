@@ -60,6 +60,17 @@ let
         config.i18n.defaultLocale or "C"
       } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
     )
+    if [ -f "${cfg.secretsDir}/${secretType.name}" ]; then
+      if cmp -s "${cfg.secretsDir}/${secretType.name}" "$TMP_FILE"; then
+        :
+      else
+        echo "${secretType.name} changed."
+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
+      fi
+    else
+        echo "${secretType.name} is new."
+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
+    fi
     chmod ${secretType.mode} "$TMP_FILE"
     mv -f "$TMP_FILE" "$_truePath"
 
@@ -86,10 +97,28 @@ let
   '';
 
   installSecrets = builtins.concatStringsSep "\n" (
-    [ "echo '[agenix] decrypting secrets...'" ]
+    [
+      "echo '[agenix] decrypting secrets...'"
+      "UNITS_TO_RESTART=()"
+    ]
     ++ testIdentities
     ++ (map installSecret (builtins.attrValues cfg.secrets))
-    ++ [ cleanupAndLink ]
+    ++ [
+      cleanupAndLink
+      ''
+        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
+          mapfile -t UNIQUE_UNITS < <(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u)
+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
+          if [ "$(uname)" = "Darwin" ]; then
+             for unit in "''${UNIQUE_UNITS[@]}"; do
+               launchctl kickstart -k "gui/$(id -u)/$unit"
+             done
+          else
+             systemctl --user try-restart "''${UNIQUE_UNITS[@]}"
+          fi
+        fi
+      ''
+    ]
   );
 
   secretType = types.submodule (
@@ -127,6 +156,13 @@ let
             Permissions mode of the decrypted secret in a format understood by chmod.
           '';
         };
+        restartUnits = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            List of units to restart when this secret is updated.
+          '';
+        };
         symlink = mkEnableOption "symlinking secrets to their destination" // {
           default = true;
         };
@@ -138,7 +174,10 @@ let
     let
       app = pkgs.writeShellApplication {
         name = "agenix-home-manager-mount-secrets";
-        runtimeInputs = with pkgs; [ coreutils ];
+        runtimeInputs = with pkgs; [
+          coreutils
+          diffutils
+        ];
         text = ''
           ${newGeneration}
           ${installSecrets}

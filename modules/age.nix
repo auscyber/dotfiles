@@ -38,6 +38,7 @@ let
       '';
   newGeneration = ''
     _agenix_generation="$(basename "$(readlink ${cfg.secretsDir})" || echo 0)"
+    _old_generation="$_agenix_generation"
     (( ++_agenix_generation ))
     echo "[agenix] creating new generation in ${cfg.secretsMountPoint}/$_agenix_generation"
     mkdir -p "${cfg.secretsMountPoint}"
@@ -92,6 +93,25 @@ let
         config.i18n.defaultLocale or "C"
       } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
     )
+
+    if [ -f "${cfg.secretsDir}/${secretType.name}" ]; then
+      if ${pkgs.diffutils}/bin/cmp -s "${cfg.secretsDir}/${secretType.name}" "$TMP_FILE"; then
+        :
+      else
+        echo "${secretType.name} changed."
+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
+        ${concatStringsSep "\n" (
+          map (unit: "USER_UNITS_TO_RESTART+=('${secretType.owner}:${unit}')") secretType.restartUserUnits
+        )}
+      fi
+    else
+        echo "${secretType.name} is new."
+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
+        ${concatStringsSep "\n" (
+          map (unit: "USER_UNITS_TO_RESTART+=('${secretType.owner}:${unit}')") secretType.restartUserUnits
+        )}
+    fi
+
     chmod ${secretType.mode} "$TMP_FILE"
     mv -f "$TMP_FILE" "$_truePath"
 
@@ -117,10 +137,51 @@ let
   '';
 
   installSecrets = builtins.concatStringsSep "\n" (
-    [ "echo '[agenix] decrypting secrets...'" ]
+    [
+      "echo '[agenix] decrypting secrets...'"
+      "UNITS_TO_RESTART=()"
+      "USER_UNITS_TO_RESTART=()"
+    ]
     ++ testIdentities
     ++ (map installSecret (builtins.attrValues cfg.secrets))
-    ++ [ cleanupAndLink ]
+    ++ [
+      cleanupAndLink
+      (optionalString (!isDarwin) ''
+        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
+          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
+          systemctl try-restart "''${UNIQUE_UNITS[@]}"
+        fi
+        if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
+          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
+          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
+          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
+             user="''${entry%%:*}"
+             unit="''${entry#*:}"
+             systemctl --user -M "$user@" try-restart "$unit"
+          done
+        fi
+      '')
+      (optionalString isDarwin ''
+        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
+          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
+          for unit in "''${UNIQUE_UNITS[@]}"; do
+            launchctl kickstart -k "system/$unit"
+          done
+        fi
+        if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
+          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
+          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
+          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
+             user="''${entry%%:*}"
+             unit="''${entry#*:}"
+             uid=$(id -u "$user")
+             launchctl kickstart -k "gui/$uid/$unit"
+          done
+        fi
+      '')
+    ]
   );
 
   chownSecret = secretType: ''
@@ -167,6 +228,20 @@ let
           default = "0400";
           description = ''
             Permissions mode of the decrypted secret in a format understood by chmod.
+          '';
+        };
+        restartUnits = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            List of units to restart when this secret is updated.
+          '';
+        };
+        restartUserUnits = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            List of user units to restart when this secret is updated.
           '';
         };
         owner = mkOption {
@@ -285,7 +360,10 @@ in
         after = [ "systemd-sysusers.service" ];
         unitConfig.DefaultDependencies = "no";
 
-        path = [ pkgs.mount ];
+        path = [
+          pkgs.mount
+          pkgs.diffutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           ExecStart = pkgs.writeShellScript "agenix-install" (concatLines [
@@ -341,7 +419,7 @@ in
         script = ''
           set -e
           set -o pipefail
-          export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:${pkgs.diffutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
           ${newGeneration}
           ${installSecrets}
           ${chownSecrets}
