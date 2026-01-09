@@ -73,17 +73,31 @@ let
           secret.rekeyFile != null
         ) "Host ${host}: age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
         relativeToFlake secret.rekeyFile;
+      shahHash = v: builtins.hashString "sha256" (toString v);
+      placeholderFunc =
+        dep:
+        "<AGENIX_REKEY_PLACEHOLDER:${shahHash dep.id}:${shahHash (toString (relativeToFlake dep.rekeyFile))}:${shahHash (toString (findHost dep))}>";
+
       script = secret.generator._script {
         inherit secret pkgs;
         inherit (pkgs) lib;
         file = sourceFile;
         name = secretName;
         decrypt = ageMasterDecrypt;
-        deps = flip mapListOrAttrs secret.generator.dependencies (dep: {
+        value =
+          if secret.generator.value != null then
+            secret.generator.value {
+              placeholders = mapListOrAttrs placeholderFunc secret.generator.dependencies;
+            }
+          else
+            null;
+        deps = flip mapListOrAttrs secret.generator.dependencies (dep: rec {
           host = findHost dep;
           name = dep.id;
           file = relativeToFlake dep.rekeyFile;
+          placeholder = "${placeholderFunc dep}";
         });
+
       };
     in
     # Filter secrets that don't need to be generated
