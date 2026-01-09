@@ -6,6 +6,7 @@
 
 let
   inherit (pkgs) lib;
+  sources = pkgs.callPackage ../_sources/generated.nix { };
   zen-browser = {
     aarch64-darwin = inputs.my-nur.packages.aarch64-darwin.zen-browser;
     x86_64-linux = inputs.zen-browser.packages.x86_64-linux.beta-unwrapped;
@@ -43,11 +44,11 @@ in
 
     yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
-      src = inputs.jankyborders;
+		inherit (sources.jankyborders) src version;
     });
     input-leap = pkgs.input-leap.overrideAttrs (attrs: {
       # patches = [ ];
-      src = inputs.input-leap;
+	  inherit (sources.input-leap) src version;
     });
 
     inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
@@ -73,7 +74,7 @@ in
     });
     game-devices-udev-rules = pkgs.game-devices-udev-rules.overrideAttrs (attrs: {
 
-      src = inputs.game-devices-udev-rules;
+	  inherit (sources.game-devices-udev-rules) src;
     });
 
   }

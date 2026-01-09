@@ -1,0 +1,20 @@
+# nvfetcher.toml
+[game-devices-udev-rules]
+src.manual = "main"
+fetch.tarball = "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
+# Compute outputHashes for git dependencies in cargo lock
+[kanata]
+src.github = "jtroo/kanata"
+fetch.github = "jtroo/kanata"
+cargo_lock = ["Cargo.lock"]
+[cursor_shader]
+src.git = "https://github.com/Crackerfracks/synesthaxia.glsl"
+src.branch = "main"
+fetch.git = "https://github.com/Crackerfracks/synesthaxia.glsl"
+[yabai]
+src.git = "https://github.com/koekeishiya/yabai"
+src.git_branch = "main"
+fetch.git = "https://github.com/koekeishiya/yabai"
+[jankyborders]
+src.git = "https://github.com/felixkratz/jankyborders"
+fetch.git = "https://github.com/felixkratz/jankyborders"

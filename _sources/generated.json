@@ -1,0 +1,102 @@
+{
+    "cursor_shader": {
+        "cargoLock": null,
+        "date": "2025-06-29",
+        "extract": null,
+        "name": "cursor_shader",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "fb494d124d6b16a2472ae1815f70c48ece38f9e4",
+            "sha256": "sha256-za6zGqiVDF0Ph+hE3m6Mcr3K1thQpiMmUG0yPmzn6m4=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/Crackerfracks/synesthaxia.glsl"
+        },
+        "version": "fb494d124d6b16a2472ae1815f70c48ece38f9e4"
+    },
+    "game-devices-udev-rules": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "game-devices-udev-rules",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "sha256": "sha256-CLQFdPr489OKZRj1v8EZypM1KOXgAOAOF0VQpeud4uo=",
+            "type": "tarball",
+            "url": "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz"
+        },
+        "version": "main"
+    },
+    "jankyborders": {
+        "cargoLock": null,
+        "date": "2025-09-24",
+        "extract": null,
+        "name": "jankyborders",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e",
+            "sha256": "sha256-31Er+cUQNJbZnXKC6KvlrBhOvyPAM7nP3BaxunAtvWg=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/felixkratz/jankyborders"
+        },
+        "version": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e"
+    },
+    "kanata": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-jzTK_ZK9UrXTP_Ow662ENBv3cim6klA8+DQv4DLVSNU=/Cargo.lock",
+                {}
+            ]
+        },
+        "date": null,
+        "extract": null,
+        "name": "kanata",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "jtroo",
+            "repo": "kanata",
+            "rev": "v1.10.1",
+            "sha256": "sha256-jzTK/ZK9UrXTP/Ow662ENBv3cim6klA8+DQv4DLVSNU=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v1.10.1"
+    },
+    "yabai": {
+        "cargoLock": null,
+        "date": "2025-12-10",
+        "extract": null,
+        "name": "yabai",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "996e26da7bef444d170d4f82fcc9fa5fdabba5ff",
+            "sha256": "sha256-bQenrG2KJN9sF0CvvNrufvMS/XPVyL40nyeLLW200yo=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/koekeishiya/yabai"
+        },
+        "version": "996e26da7bef444d170d4f82fcc9fa5fdabba5ff"
+    }
+}

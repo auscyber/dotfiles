@@ -20,11 +20,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
-    game-devices-udev-rules = {
-      url = "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz";
-      flake = false;
 
-    };
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
     nixos-images = {
       # url = "github:nix-community/nixos-images";
@@ -42,11 +38,7 @@
       flake = false;
     };
     qanata.url = "github:veyxov/qanata";
-    kanata = {
-      url = "github:jtroo/kanata";
-      flake = false;
-    };
-    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
+        nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat = {
       url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
@@ -54,10 +46,7 @@
       flake = false;
     };
     devenv.url = "github:cachix/devenv";
-    cursor_shader = {
-      url = "github:Crackerfracks/synesthaxia.glsl";
-      flake = false;
-    };
+
     kmonad = {
       url = "git+https://github.com/kmonad/kmonad?submodules=1&dir=nix";
     };
@@ -65,14 +54,7 @@
       url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
       flake = false;
     };
-    yabai = {
-      url = "github:koekeishiya/yabai";
-      flake = false;
-    };
-    jankyborders = {
-      url = "github:FelixKratz/JankyBorders";
-      flake = false;
-    };
+
 
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
