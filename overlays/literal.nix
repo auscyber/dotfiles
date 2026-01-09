@@ -30,6 +30,14 @@ in
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
+	gnupg-wrapped = pkgs.symlinkJoin {
+	  name = "gnupg";
+	  paths = [
+(pkgs.callPackage ../packages/gpg {  inherit (pkgs) gnupg; })
+pkgs.gnupg
+	  ];
+	};
+
     lix = pkgs.lix.overrideAttrs (attrs: {
       doCheck = false;
     });
@@ -69,9 +77,6 @@ in
 	npmHash = "sha256-i2ZeMFM7z/Hab8vFaCCoEWArDNkKWZflwHw92DBP+Oo=";
 	};
 	};
-    buildEnvExtra =
-      lib.extra.overrideDerivation inputs.staging-next.legacyPackages."${system}".buildEnv
-        pkgs;
     zen-browser = zen-browser."${system}";
     picom = pkgs.picom.overrideAttrs (attrs: {
       src = inputs.picom;

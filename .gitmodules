@@ -10,3 +10,6 @@
 [submodule "inputs/agenix-rekey"]
 	path = inputs/agenix-rekey
 	url = https://github.com/auscyber/dotfiles.git
+[submodule "inputs/home-manager"]
+	path = inputs/home-manager
+	url = https://github.com/auscyber/dotfiles.git

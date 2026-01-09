@@ -2016,18 +2016,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1767909183,
-        "narHash": "sha256-u/bcU0xePi5bgNoRsiqSIwaGBwDilKKFTz3g0hqOBAo=",
-        "owner": "nix-community",
-        "repo": "home-manager",
-        "rev": "cd6e96d56ed4b2a779ac73a1227e0bb1519b3509",
-        "type": "github"
+        "path": "./inputs/home-manager",
+        "type": "path"
       },
       "original": {
-        "owner": "nix-community",
-        "repo": "home-manager",
-        "type": "github"
-      }
+        "path": "./inputs/home-manager",
+        "type": "path"
+      },
+      "parent": []
     },
     "home-manager_3": {
       "inputs": {

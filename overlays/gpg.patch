@@ -1,0 +1,102 @@
+diff --git a/agent/agent.h b/agent/agent.h
+index 9fdbc76d3..7ff2580d8 100644
+--- a/agent/agent.h
++++ b/agent/agent.h
+@@ -175,6 +175,10 @@ struct
+   /* The value of the option --s2k-count.  If this option is not given
+    * or 0 an auto-calibrated value is used.  */
+   unsigned long s2k_count;
++  /* Launchd activation. macOS only. When enabled, the sockets will
++   * be acquired from launchd by calling launch_activate_socket.
++   * Usable in the supervised mode. */
++  int launchd_activate_sockets;
+ } opt;
+ 
+ 
+diff --git a/agent/gpg-agent.c b/agent/gpg-agent.c
+index 1fdc94d0f..6dfb10f35 100644
+--- a/agent/gpg-agent.c
++++ b/agent/gpg-agent.c
+@@ -30,6 +30,9 @@
+ #include <time.h>
+ #include <fcntl.h>
+ #include <sys/stat.h>
++#ifdef __APPLE__
++#include <launch.h>
++#endif
+ #ifdef HAVE_W32_SYSTEM
+ # ifndef WINVER
+ #  define WINVER 0x0500  /* Same as in common/sysutils.c */
+@@ -137,6 +140,7 @@ enum cmd_and_opt_values
+   oS2KCount,
+   oAutoExpandSecmem,
+   oListenBacklog,
++  oLaunchdActivateSockets,
+ 
+   oWriteEnvFile
+ };
+@@ -263,6 +267,9 @@ static ARGPARSE_OPTS opts[] = {
+   ARGPARSE_s_n (oUseStandardSocket, "use-standard-socket", "@"),
+   ARGPARSE_s_n (oNoUseStandardSocket, "no-use-standard-socket", "@"),
+ 
++  /* Launchd activation */
++  ARGPARSE_s_n (oLaunchdActivateSockets, "launchd-activate-sockets",
+N_("activate sockets from launchd")),
++
+   ARGPARSE_end () /* End of list */
+ };
+ 
+@@ -732,6 +739,30 @@ map_supervised_sockets (gnupg_fd_t *r_fd,
+               if (!strcmp (fdnames[i], tbl[j].label) || j == DIM(tbl)-1)
+                 {
+                   fd = 3 + i;
++#if __APPLE__
++                    if( opt.launchd_activate_sockets )
++                    {
++                        int* fds = NULL;
++                        size_t cnt = 0;
++                        int err = launch_activate_socket( fdnames[i],
+&fds, &cnt );
++                        if( err != 0 )
++                        {
++                            log_error("cannot activate socket %s
+because of error %d\n", fdnames[i], err);
++                            break;
++                        }
++                        if( cnt > 0 )
++                        {
++                            fd = fds[0];
++                            free(fds);
++                        }
++                        else
++                        {
++                            log_error("no socket returned for
+activation of socket %s\n", fdnames[i]);
++                            continue;
++                        }
++                    }
++#endif
++
+                   if (**tbl[j].fdaddr == -1)
+                     {
+                       name = gnupg_get_socket_name (fd);
+@@ -834,6 +865,7 @@ parse_rereadable_options (ARGPARSE_ARGS *pargs, int
+reread)
+       /* Note: When changing the next line, change also gpgconf_list.  */
+       opt.ssh_fingerprint_digest = GCRY_MD_MD5;
+       opt.s2k_count = 0;
++      opt.launchd_activate_sockets = 0;
+       return 1;
+     }
+ 
+@@ -1260,6 +1292,10 @@ main (int argc, char **argv )
+           /* Only used by the first stage command line parser.  */
+           break;
+ 
++        case oLaunchdActivateSockets:
++          opt.launchd_activate_sockets = 1;
++          break;
++
+         case oWriteEnvFile:
+           obsolete_option (configname, configlineno, "write-env-file");
+           break;

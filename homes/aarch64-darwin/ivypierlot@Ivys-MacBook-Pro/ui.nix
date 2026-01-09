@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   onePassPath = "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   #  onePassPath = "~/.1password/agent.sock";
@@ -15,12 +20,27 @@ in
     #    google-chrome
     #    thunderbird
   ];
+  programs.gpg = {
+    enable = true;
+	package = pkgs.gnupg-wrapped;
+
+  };
   services.gpg-agent = {
     enable = true;
     #    enableSshSupport = true;
     pinentry.package = pkgs.pinentry;
     pinentry.program = "pinentry-mac";
     enableExtraSocket = true;
+  };
+  launchd.agents.gpg-agent.config = {
+    StandardOutPath = "${config.home.homeDirectory}/.local/share/gpg-agent.log";
+    StandardErrorPath = "${config.home.homeDirectory}/.local/share/gpg-agent-erro.log";
+#    EnvironmentVariables = {
+#      LISTEN_FDNAMES = "${lib.concatStringsSep ":" (lib.mapAttrsToList (
+#        _: v: v.SockPathName
+#      ) config.launchd.agents.gpg-agent.config.Sockets)}";
+#
+#    };
   };
 
   #  programs._1password.enable = true;

@@ -15,8 +15,8 @@
   #  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
   auscybernix.meta.description = "Home configuration for ${hostname}";
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W9nMZfAYMHgjZ+RUqxOx7UWs7";
-  services.gpg-agent.socketAddress =
-    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
+#  services.gpg-agent.socketAddress =
+#    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
 
   services.yubikey-agent.enable = true;
 
@@ -181,7 +181,6 @@
     texliveFull
     #    wezterm
     zotero
-    gnupg
     #    prismlauncher
     mupdf
     #      (agda.withPackages
@@ -203,16 +202,20 @@
     #   org.gradle.daemon.idletimeout=3600000
     # '';
   };
+#  services.gpg-agent.socketAddress = "${config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName}";
+
 
   programs.ssh = {
     enable = true;
     package = pkgs.openssh;
     matchBlocks = {
-      "109.123.227.80" = {
-        host = "109.123.227.80";
+      "faggot.sh" = {
         forwardAgent = true;
-        identitiesOnly = true;
-        identityFile = "~/.ssh/id_ed25519.pub";
+#        identityFile = "~/.ssh/id_ed25519.pub";
+extraOptions = {
+          "RemoteForward" = " /run/user/1001/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
+        };
+
       };
       "secondpc" = {
 

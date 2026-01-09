@@ -6,23 +6,20 @@
 }:
 let
 
-  inherit (pkgs.stdenv.hostPlatform) isDarwin;
+#isDarwin = lib.attrsets.hasAttrByPath [ "environment" "darwinConfig" ] options;
+  extraSocketEnabled = config.services.gpg-agent.enableExtraSocket;
 in
 {
   options.services.gpg-agent.socketAddress = lib.mkOption {
     type = lib.types.str;
   };
 
-  config = lib.mkIf config.services.gpg-agent.enableExtraSocket (
+  config = lib.mkIf extraSocketEnabled (
     lib.mkMerge [
-      #  (lib.mkIf isDarwin
-      #	{
-      #	  services.gpg-agent.socketAddress = config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
-      #	}
-      #  )
-      #  lib.mkIf (!isDarwin)
-      #  	{
-      #	services.gpg-agent.socketAddress = "${config.systemd.user.}"
+		  {
+      	  services.gpg-agent.socketAddress = if pkgs.stdenv.hostPlatform.isDarwin then config.launchd.agents.gpg-agent.config.Sockets.std.SockPathName else
+      	config.systemd.user.gpg-agent.config.sockets.gpg-agent-extra;
+		}
 
     ]
   );

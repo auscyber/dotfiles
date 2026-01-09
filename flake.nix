@@ -155,7 +155,7 @@ nvfetcher.url = "github:berberman/nvfetcher";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "path:./inputs/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arion.url = "github:hercules-ci/arion";

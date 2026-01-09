@@ -13,7 +13,6 @@
   perSystem =
     { pkgs, system,... }:
     {
-	packages = import ../overlays/literal.nix { inherit pkgs inputs system; };
-
+	packages = import ../overlays/literal.nix { inherit pkgs system inputs; };
     };
 }

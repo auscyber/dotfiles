@@ -31,7 +31,7 @@ in
       ];
 
       system.build.applications = lib.mkForce (
-        pkgs.buildEnvExtra {
+        pkgs.buildEnv {
           name = "system-applications";
           pathsToLink = [
             "/Applications"
