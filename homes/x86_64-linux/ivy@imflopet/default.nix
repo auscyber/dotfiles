@@ -18,6 +18,13 @@
   safe.directory = ["/nixos-config" "/nixos-config/services/loft"];
 
   };
+  programs.gpg.settings = {
+  "use-agent" ="";
+
+  };
+  home.sessionVariables = {
+  NH_OS_FLAKE = "/nixos-config";
+  };
   home.packages = with pkgs; [ gnupg ];
   home.stateVersion = "24.05";
 

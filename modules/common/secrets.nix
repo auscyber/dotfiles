@@ -105,6 +105,7 @@ in
       agePlugins =
         with pkgs;
         [
+		age-plugin-gpg
         ]
         ++ lib.optionals pkgs.stdenv.isDarwin [
           pkgs.age-plugin-1p

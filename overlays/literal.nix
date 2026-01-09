@@ -41,6 +41,7 @@ pkgs.gnupg
     lix = pkgs.lix.overrideAttrs (attrs: {
       doCheck = false;
     });
+	age-plugin-gpg = inputs.age-plugin-gpg.packages."${system}".default;
     #.overrideAttrs
     # (attrs: {
     #   version = "5.0.0";
