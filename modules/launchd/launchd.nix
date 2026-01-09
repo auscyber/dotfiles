@@ -883,6 +883,7 @@ in
                 '';
               };
 
+
               SockFamily = mkOption {
                 type = types.nullOr (
                   types.enum [
@@ -892,7 +893,18 @@ in
                 );
                 default = null;
                 description = ''
-                  This optional key can be used to specifically request that "IPv4" or "IPv6" socket(s) be created.
+                  This optional key can be used to specifically request that "IPv4" or "IPv6" or "Unix" socket(s) be created.
+                '';
+              };
+              SocketFamily = mkOption {
+                type = types.nullOr (
+                  types.enum [
+                    "Unix"
+                  ]
+                );
+                default = null;
+                description = ''
+                  Deprecated synonym for SockFamily.
                 '';
               };
 

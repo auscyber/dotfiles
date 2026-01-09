@@ -448,9 +448,9 @@ in
         ProcessType = "Background";
         RunAtLoad = cfg.enableSshSupport;
         Sockets = {
-          Agent = mkAgentSock "S.gpg-agent";
-          Ssh = mkIf cfg.enableSshSupport (mkAgentSock "S.gpg-agent.ssh");
-          Extra = mkIf cfg.enableExtraSocket (mkAgentSock "S.gpg-agent.extra");
+          std = mkAgentSock "S.gpg-agent";
+          ssh = mkIf cfg.enableSshSupport (mkAgentSock "S.gpg-agent.ssh");
+          extra = mkIf cfg.enableExtraSocket (mkAgentSock "S.gpg-agent.extra");
         };
       };
     };
