@@ -125,6 +125,11 @@ let
           are rekeyed via the same flake.
         '';
       };
+      value = mkOption {
+        type = types.nullOr (types.functionTo types.anything);
+        default = null;
+        description = "This function will take deps and pass it to the script as 'value' parameter.";
+      };
 
       script = mkOption {
         type = types.either types.str (types.functionTo types.str);
@@ -196,27 +201,26 @@ let
 in
 {
   config = {
-    assertions =
-      [
-        {
-          assertion = config.age.rekey.masterIdentities != [ ];
-          message = "rekey.masterIdentities must be set.";
-        }
-      ]
-      ++ flatten (
-        flip mapAttrsToList config.age.secrets (
-          secretName: secretCfg: [
-            {
-              assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
-              message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
-            }
-            {
-              assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
-              message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
-            }
-          ]
-        )
-      );
+    assertions = [
+      {
+        assertion = config.age.rekey.masterIdentities != [ ];
+        message = "rekey.masterIdentities must be set.";
+      }
+    ]
+    ++ flatten (
+      flip mapAttrsToList config.age.secrets (
+        secretName: secretCfg: [
+          {
+            assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
+            message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
+          }
+          {
+            assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
+            message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
+          }
+        ]
+      )
+    );
 
     warnings =
       let
