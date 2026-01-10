@@ -13,3 +13,7 @@
 [submodule "inputs/home-manager"]
 	path = inputs/home-manager
 	url = https://github.com/auscyber/dotfiles.git
+
+[submodule "inputs/age-plugin-gpg"]
+	path = inputs/age-plugin-gpg
+	url = https://github.com/auscyber/dotfiles.git
