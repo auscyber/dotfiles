@@ -13,7 +13,7 @@
       url = "github:zhaofengli/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-	age-plugin-gpg.url = "github:CertainLach/age-plugin-gpg";
+	age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
 #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
 nvfetcher.url = "github:berberman/nvfetcher";

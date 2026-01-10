@@ -34,6 +34,12 @@
 		  ref = "master";
 		};
 	  };
+	  age-plugin-gpg = {
+	  		upstream = {
+					  url = "https://github.com/certainlach/age-plugin-gpg.git";
+					  ref = "main";
+					};
+	  };
 
       #	shallow = true;
 

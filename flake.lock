@@ -60,18 +60,14 @@
         "shelly": "shelly"
       },
       "locked": {
-        "lastModified": 1763855494,
-        "narHash": "sha256-S6zO+8DAC37CkQjp75CU6rxq1MUbSU3vag5XBlBMmPk=",
-        "owner": "CertainLach",
-        "repo": "age-plugin-gpg",
-        "rev": "9a485c1af359e877e01b45956342769087f7559b",
-        "type": "github"
+        "path": "./inputs/age-plugin-gpg",
+        "type": "path"
       },
       "original": {
-        "owner": "CertainLach",
-        "repo": "age-plugin-gpg",
-        "type": "github"
-      }
+        "path": "./inputs/age-plugin-gpg",
+        "type": "path"
+      },
+      "parent": []
     },
     "agenix": {
       "inputs": {
@@ -3750,11 +3746,10 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1767313136,
-        "narHash": "sha256-16KkgfdYqjaeRGBaYsNrhPRRENs0qzkQVUooNHtoy2w=",
+        "lastModified": 1760392495,
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "ac62194c3917d5f474c1a844b6fd6da2db95077d",
+        "rev": "4c0426efac242de67c7ae62b463df08f7d12a462",
         "type": "github"
       },
       "original": {

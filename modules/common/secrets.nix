@@ -105,7 +105,6 @@ in
       agePlugins =
         with pkgs;
         [
-		age-plugin-gpg
         ]
         ++ lib.optionals pkgs.stdenv.isDarwin [
           pkgs.age-plugin-1p
@@ -126,6 +125,9 @@ in
         #pubkey = "age1se1q2ae7s32el5t7fpsut9996tch347w55ysut8jhed3f05tjgt293lz55u5p";
 
         #}
+		{
+		identity = ./gpg.pub;
+		}
         {
           identity = ./age-yubikey.pub;
           pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
