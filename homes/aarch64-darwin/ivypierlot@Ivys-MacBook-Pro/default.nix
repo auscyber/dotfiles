@@ -19,6 +19,15 @@
 #    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
 
   services.yubikey-agent.enable = true;
+  age.rekey.masterIdentities = [
+  {
+          identity = ../../../modules/common/age-yubikey.pub;
+          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
+
+        }
+
+
+  ];
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
