@@ -127,17 +127,21 @@ in
         #}
 		{
 		identity = ./gpg.pub;
+		pubkey = "age1gpg12zpyqnalkuf5sfpurlzfla2jzr2dvs5msdjvxl";
 		}
-        {
-          identity = ./age-yubikey.pub;
-          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
-
-        }
-        {
-          identity = ./main.pub; # Private key
-          pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key
-        }
+#        {
+#          identity = ./age-yubikey.pub;
+#          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
+#
+#        }
+    #    {
+    #      identity = ./main.pub; # Private key
+    #      pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key
+    #    }
       ];
+	  extraEncryptionPubkeys = [
+"age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3"
+	  ];
       #masterIdentities = [ "/home/myuser/master-key" ]; # External master key
       #masterIdentities = [
       #  # It is possible to specify an identity using the following alternate syntax,
