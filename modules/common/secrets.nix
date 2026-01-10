@@ -124,16 +124,16 @@ in
         #identity = "/users/ivypierlot/.config/se.txt";
         #pubkey = "age1se1q2ae7s32el5t7fpsut9996tch347w55ysut8jhed3f05tjgt293lz55u5p";
 
-        #}
+       #}
 		{
 		identity = ./gpg.pub;
-		pubkey = "age1gpg12zpyqnalkuf5sfpurlzfla2jzr2dvs5msdjvxl";
+#		pubkey = "age1gpg1a3f2fxpqvz6f24479mv3k623d84yj40lsla2rj";
 		}
-#        {
-#          identity = ./age-yubikey.pub;
-#          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
-#
-#        }
+        {
+          identity = ./age-yubikey.pub;
+          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
+
+        }
     #    {
     #      identity = ./main.pub; # Private key
     #      pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key
