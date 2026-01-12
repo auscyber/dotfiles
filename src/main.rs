@@ -81,18 +81,18 @@ fn find_string(v: &[Sexp], k: &[u8]) -> Option<String_> {
 
 fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	let e = get(&e, b"public-key")
-		.expect("todo: not a public key")
+		.with_context(|| "todo: not a public key")?
 		.iter()
 		.next()
-		.expect("todo: not a public key");
+		.with_context(|| "todo: not a public key")?;
 
 	if let Some(e) = get(e, b"rsa") {
-		let n = find_string(e, b"n").expect("todo: not a public key");
-		let e = find_string(e, b"e").expect("todo: not a public key");
+		let n = find_string(e, b"n").with_context(|| "todo: not a public key")?;
+		let e = find_string(e, b"e").with_context(|| "todo: not a public key")?;
 		Ok(Key::V6(Key6::import_public_rsa(&e, &n, None)?))
 	} else if let Some(e) = get(e, b"ecc") {
-		let curve = find_string(e, b"curve").expect("todo: not a public key");
-		let q = find_string(e, b"q").expect("todo: not a public key");
+		let curve = find_string(e, b"curve").with_context(|| "todo: not a public key")?;
+		let q = find_string(e, b"q").with_context(|| "todo: not a public key")?;
 
 		if let Some(flags) = find_string(e, b"flags")
 			&& &*flags != b"djb-tweak"
@@ -125,7 +125,7 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 			},
 		)?))
 	} else {
-		todo!()
+		bail!("unsupported key type")
 	}
 }
 
@@ -400,38 +400,20 @@ async fn fetch_keypair(agent: &mut Agent, keygrip: Keygrip) -> Result<KeyPair> {
 	let pair = agent.keypair(&key)?;
 	Ok(pair)
 }
+struct OptionItem {
+	label: String,
+	keygrip: String,
+}
 
 fn generate_identity(agent: &mut Agent) -> Result<()> {
-	let response = Handle::current()
-		.block_on(agent.send_simple("KEYINFO --data --list"))
-		.context("Failed to list keys from agent")?;
-	// gpg-agent returns percent-encoded data for this command
-	let response = String::from_utf8(response.to_vec())
-		.context("Agent output is not UTF-8")?
-		.replace("%0A", "\n");
+	let list = Handle::current().block_on(agent.list_keys())?;
 
-	struct OptionItem {
-		label: String,
-		keygrip: String,
-	}
+	// gpg-agent returns percent-encoded data for this command
+
 	let mut options = Vec::new();
 
-	for line in response.lines() {
-		let parts: Vec<&str> = line.split_whitespace().collect();
-		if parts.is_empty() {
-			continue;
-		}
-
-		let keygrip_str = parts[0];
-		let keygrip: Keygrip = match keygrip_str.parse() {
-			Ok(k) => k,
-			Err(_) => continue,
-		};
-
-		let type_str = parts.get(1).copied().unwrap_or("-");
-		let is_smartcard = type_str == "T";
-
-		let key_info = match Handle::current().block_on(fetch_key(agent, keygrip.clone())) {
+	for key in &list {
+		let key_info = match Handle::current().block_on(fetch_key(agent, key.keygrip().clone())) {
 			Ok(k) => k,
 			Err(_) => continue,
 		};
@@ -446,9 +428,10 @@ fn generate_identity(agent: &mut Agent) -> Result<()> {
 			_ => "Unknown".to_string(),
 		};
 
+		let is_smartcard = key.keytype() == sequoia_gpg_agent::keyinfo::KeyType::Smartcard;
 		let stub_mark = if is_smartcard { " (Card)" } else { "" };
 		let serial = if is_smartcard {
-			parts.get(2).copied().unwrap_or("")
+			key.serialno().unwrap_or("")
 		} else {
 			""
 		};
@@ -460,8 +443,14 @@ fn generate_identity(agent: &mut Agent) -> Result<()> {
 		};
 
 		options.push(OptionItem {
-			label: format!("{} - {}{}{}", algo_str, keygrip_str, stub_mark, serial_info),
-			keygrip: keygrip_str.to_string(),
+			label: format!(
+				"{} - {}{}{}",
+				algo_str,
+				key.keygrip(),
+				stub_mark,
+				serial_info
+			),
+			keygrip: key.keygrip().to_string(),
 		});
 	}
 	if options.is_empty() {
@@ -480,13 +469,9 @@ fn generate_identity(agent: &mut Agent) -> Result<()> {
 	let keygripbytes = hex::decode(&selected.keygrip).expect("hex valid");
 
 	use bech32::ToBase32;
-	let identity = bech32::encode(
-		"AGE-PLUGIN-GPG-",
-		keygripbytes.to_base32(),
-		Variant::Bech32,
-	)
-	.unwrap()
-	.to_uppercase();
+	let identity = bech32::encode("AGE-PLUGIN-GPG-", keygripbytes.to_base32(), Variant::Bech32)
+		.unwrap()
+		.to_uppercase();
 	let recipient = bech32::encode("age1gpg", keygripbytes.to_base32(), Variant::Bech32).unwrap();
 
 	println!("# recipient: {}", recipient);
