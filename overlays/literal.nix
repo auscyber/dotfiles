@@ -30,13 +30,13 @@ in
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
-	gnupg-wrapped = pkgs.symlinkJoin {
-	  name = "gnupg";
-	  paths = [
-(pkgs.callPackage ../packages/gpg {  inherit (pkgs) gnupg; })
-pkgs.gnupg
-	  ];
-	};
+#	gnupg-wrapped = pkgs.symlinkJoin {
+#	  name = "gnupg";
+#	  paths = [
+#(pkgs.callPackage ../packages/gpg {  inherit (pkgs) gnupg; })
+#pkgs.gnupg
+#	  ];
+#	};
 
     lix = pkgs.lix.overrideAttrs (attrs: {
       doCheck = false;

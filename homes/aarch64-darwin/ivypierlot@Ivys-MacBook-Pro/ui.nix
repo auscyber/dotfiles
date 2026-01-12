@@ -22,7 +22,7 @@ in
   ];
   programs.gpg = {
     enable = true;
-	package = pkgs.gnupg-wrapped;
+#	package = pkgs.gnupg-wrapped;
 
   };
   services.gpg-agent = {

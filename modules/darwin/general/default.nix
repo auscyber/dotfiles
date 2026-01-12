@@ -17,7 +17,7 @@
     "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
 
   };
-  programs.gnupg.package = pkgs.gnupg-wrapped;
+#  programs.gnupg.package = pkgs.gnupg-wrapped;
   auscybernix.secrets.configId = "${system}-${hostname}";
   #  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
   nix.optimise = {
