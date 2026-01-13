@@ -69,7 +69,7 @@ in
     };
     content =
       { placeholders, pkgs, ... }:
-      pkgs.lib.generators.toYAML { } {
+      pkgs.lib.generators.toINI { } {
         Lidarr = {
           # Get from Lidarr: Settings > General > Security
           api_key = placeholders.lidar_key;
