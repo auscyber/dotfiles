@@ -19,7 +19,6 @@ let
 
   newGeneration = ''
     _agenix_generation="$(basename "$(readlink "${cfg.secretsDir}")" || echo 0)"
-    _old_generation="$_agenix_generation"
     (( ++_agenix_generation ))
     echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
     mkdir -p "${cfg.ageMountPoint}"

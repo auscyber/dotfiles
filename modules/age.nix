@@ -568,6 +568,7 @@ in
           pkgs.mount
           pkgs.diffutils
           pkgs.systemd
+          pkgs.gnused
         ];
         serviceConfig = {
           Type = "oneshot";
@@ -624,7 +625,7 @@ in
         script = ''
           set -e
           set -o pipefail
-          export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:${pkgs.diffutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          export PATH="${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:${pkgs.diffutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
           ${newGeneration}
           ${installSecrets}
           ${chownSecrets}
