@@ -72,7 +72,12 @@ let
             echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."
             test -f "${dep.file}" || echo "[agenix] WARNING: dependency file ${dep.file} does not exist!"
 
-            sed -i.bak "s|${dep.placeholder}|$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})|g" "$TMP_FILE"
+            _secret=$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})
+            _secret="''${_secret//\\/\\\\}"
+            _secret="''${_secret//|/\\|}"
+            _secret="''${_secret//&/\\&}"
+            _secret="''${_secret//$'\n'/\\n}"
+            sed -i.bak "s|${dep.placeholder}|''${_secret}|g" "$TMP_FILE"
             rm -f "$TMP_FILE.bak"
           '')
         )}
