@@ -110,8 +110,8 @@ let
       '')
     )}
     # check if the template changed then add units
-    if [ -f "${cfg.templateDir}/${templateType.name}" ]; then
-      if ${pkgs.diffutils}/bin/cmp -s "${cfg.templateDir}/${templateType.name}" "$TMP_FILE"; then
+    if [ -f "$_truePath" ]; then
+      if ${pkgs.diffutils}/bin/cmp -s "$_truePath" "$TMP_FILE"; then
         :
       else
         echo "template ${templateType.name} changed."
@@ -151,8 +151,8 @@ let
       } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
     )
 
-    if [ -f "${cfg.secretsDir}/${secretType.name}" ]; then
-      if ${pkgs.diffutils}/bin/cmp -s "${cfg.secretsDir}/${secretType.name}" "$TMP_FILE"; then
+    if [ -f "$_truePath" ]; then
+      if ${pkgs.diffutils}/bin/cmp -s "$_truePath" "$TMP_FILE"; then
         :
       else
         echo "${secretType.name} changed."

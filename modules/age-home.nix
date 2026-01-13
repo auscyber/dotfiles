@@ -77,8 +77,8 @@ let
           '')
         )}
         # check if the template changed then add units
-        if [ -f "${cfg.templateDir}/${templateType.name}" ]; then
-          if cmp -s "${cfg.templateDir}/${templateType.name}" "$TMP_FILE"; then
+        if [ -f "$_truePath" ]; then
+          if cmp -s "$_truePath" "$TMP_FILE"; then
             :
           else
             echo "template ${templateType.name} changed."
@@ -115,8 +115,8 @@ let
         config.i18n.defaultLocale or "C"
       } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
     )
-    if [ -f "${cfg.secretsDir}/${secretType.name}" ]; then
-      if cmp -s "${cfg.secretsDir}/${secretType.name}" "$TMP_FILE"; then
+    if [ -f "$_truePath" ]; then
+      if cmp -s "$_truePath" "$TMP_FILE"; then
         :
       else
         echo "${secretType.name} changed."
