@@ -8,6 +8,8 @@
     agenix.url = "path:./inputs/agenix";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
+	vscode-server.url = "github:nix-community/nixos-vscode-server";
+	vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     nix-topology.url = "github:oddlama/nix-topology";
     attic = {
       url = "github:zhaofengli/attic";

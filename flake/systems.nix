@@ -31,6 +31,7 @@ in
         inputs.sops-nix.homeManagerModules.sops
         inputs.agenix.homeManagerModules.default
         inputs.agenix-rekey.homeManagerModules.default
+		inputs.vscode-server.homeModules.default
 
       ];
       standaloneHomeModules = [
