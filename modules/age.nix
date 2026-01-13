@@ -97,6 +97,8 @@ let
 
   installTemplate = templateType: ''
     ${setupStart templateType}
+    echo "generating template '${templateType.name}' to '$_truePath'..."
+    cp ${templateType.file} "$TMP_FILE"
      
     ${builtins.concatStringsSep "\n" (
       lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
