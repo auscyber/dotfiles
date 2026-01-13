@@ -324,7 +324,7 @@ let
         };
         group = mkOption {
           type = types.str;
-          default = "0";
+          default = users.${config.owner}.group or "0";
         };
         mode = mkOption {
           type = types.str;
