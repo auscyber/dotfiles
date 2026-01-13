@@ -99,7 +99,7 @@ let
     ${setupStart templateType}
     echo "generating template '${templateType.name}' to '$_truePath'..."
     cp ${templateType.file} "$TMP_FILE"
-     
+
     ${builtins.concatStringsSep "\n" (
       lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
         echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."
@@ -327,7 +327,7 @@ let
         };
         path = mkOption {
           type = types.str;
-          default = "${config.age.templateDir}/${config.name}";
+          default = "${cfg.templateDir}/${config.name}";
           description = "The path where the generated file will be written to.";
         };
         placeholderMap = mkOption {
