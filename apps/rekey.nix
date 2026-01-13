@@ -12,6 +12,8 @@ let
     escapeShellArg
     escapeShellArgs
     filterAttrs
+    concatMapAttrs
+    mapAttrs'
     flip
     hasPrefix
     makeBinPath
@@ -34,6 +36,8 @@ let
       hostConfig = hostCfg.config;
     };
 
+  concatMapListOrAttrsToAttrs =
+    f: x: if builtins.isList x then builtins.listToAttrs (map (f x.name x)) else mapAttrs' f x;
   # Returns the outPath/drvPath for the secrets of a given host, without
   # triggering a build of the derivation.
   outPathFor =
@@ -64,8 +68,17 @@ let
   rekeyCommandsForHost =
     hostName: hostCfg:
     let
-      # All secrets that have rekeyFile set. These will be rekeyed.
-      secretsToRekey = flip filterAttrs hostCfg.config.age.secrets (
+
+      # get all secrets from dependencies of templates
+      templateSecrets = flip concatMapAttrs (hostCfg.config.age.templates) (
+        templateName: template:
+        concatMapListOrAttrsToAttrs (secretName: secret: {
+          name = "${templateName}-${secretName}";
+          value = secret;
+        }) template.dependencies
+      );
+
+      secretsToRekey = flip filterAttrs (hostCfg.config.age.secrets // templateSecrets) (
         name: secret:
         let
           hint =
