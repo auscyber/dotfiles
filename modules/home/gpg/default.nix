@@ -19,6 +19,9 @@ in
 		  {
       	  services.gpg-agent.socketAddress = if pkgs.stdenv.hostPlatform.isDarwin then config.launchd.agents.gpg-agent.config.Sockets.std.SockPathName else
       	config.systemd.user.gpg-agent.config.sockets.gpg-agent-extra;
+		programs.gpg.publicKeys = [{
+		source = ../../../publickey.asc;
+		}];
 		}
 
     ]

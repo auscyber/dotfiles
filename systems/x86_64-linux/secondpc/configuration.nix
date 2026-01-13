@@ -179,6 +179,10 @@ hardware.facter.reportPath = ./facter.json;
   services.accounts-daemon = {
     enable = true;
   };
+  services.openssh.settings = {
+	StreamLocalBindUnlink = "yes";
+
+  };
 
   # Enable CUPS to print documents.
   # services.printing.enable = true;

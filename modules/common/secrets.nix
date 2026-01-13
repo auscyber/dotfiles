@@ -140,9 +140,20 @@ in
         #      pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"; # Public key
         #    }
       ];
-      extraEncryptionPubkeys = [
-        "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3"
-      ];
+      	  extraEncryptionPubkeys = [
+#{
+         # identity = ./age-yubikey.pub;
+        #  pubkey =
+		  "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3"
+		 # ;
+
+        #}
+#        {
+         # identity = ./main.pub; # Private key
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
+		 # ; # Public key
+       # }
+	  ];
       #masterIdentities = [ "/home/myuser/master-key" ]; # External master key
       #masterIdentities = [
       #  # It is possible to specify an identity using the following alternate syntax,
