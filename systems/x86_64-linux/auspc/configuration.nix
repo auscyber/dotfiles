@@ -22,7 +22,7 @@
     secrets.enable = true;
   };
 
-  age.rekey.hostPubkey = "age1ga2d9jh6wkrhqejfl4e4wdt88429ec8w0ek3r5lhlkf9c66vy4esw8jznm";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDqzUK8FRDaf17agDGRsk5vHR6YIsnY9ZifmW0NlmV63 root@auspc";
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -33,7 +33,7 @@
     #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
     services.tailscale = {
-	authKeyFile =
+#	authKeyFile =
 
 	};
   boot.supportedFilesystems = [ "ntfs" ];

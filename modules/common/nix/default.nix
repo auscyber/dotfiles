@@ -50,7 +50,6 @@ in
       extraOptions = ''
         experimental-features = nix-command flakes
       '';
-<<<<<<< HEAD
       #	  auto-optimise-store = true;
       #optimise.automatic = true;
       #      gc = {

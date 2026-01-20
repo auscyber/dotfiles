@@ -240,21 +240,7 @@
   #  ];
   #};
   services.logrotate.checkConfig = false;
-  security.sudo = {
-    enable = true;
-    #	extraRules = {
 
-    #	};
-  };
-  security.pam.services.sudo = {
-    rssh = true;
-  };
-  security.pam.rssh = {
-
-    enable = true;
-    settings.cue = true;
-    settings.cue_prompt = "please touch";
-  };
 
   programs.fish.enable = true;
 
