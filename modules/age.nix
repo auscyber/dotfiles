@@ -53,6 +53,8 @@ let
     chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
     mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}"
     mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}"
+	mkdir -p "$(dirname "${cfg.secretsDir}")"
+	mkdir -p "$(dirname "${cfg.templateDir}")"
   '';
 
   chownGroup = if isDarwin then "admin" else "keys";
