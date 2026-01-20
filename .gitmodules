@@ -19,4 +19,4 @@
 	url = https://github.com/auscyber/dotfiles.git
 [submodule "inputs/rift"]
 	path = inputs/rift
-	url = git@github.com:auscyber/rift
+	url = https://github.com/auscyber/rift.git
