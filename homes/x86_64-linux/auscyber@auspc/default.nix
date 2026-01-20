@@ -27,7 +27,7 @@ rec {
     git = {
       enable = true;
       signing = {
-        key = "0xDC87498CF2EF7D8D";
+        key = "0x64C359636F8BC1D4";
         signByDefault = true;
       };
     };

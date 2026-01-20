@@ -17,6 +17,8 @@
   programs.fish.enable = true;
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
+
+    ssh.enable = true;
     nixos.games.enable = true;
     bootlogo.enable = true;
     secrets.enable = true;
@@ -32,10 +34,10 @@
     polarity = "dark";
     #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
-    services.tailscale = {
-#	authKeyFile =
+  services.tailscale = {
+    #	authKeyFile =
 
-	};
+  };
   boot.supportedFilesystems = [ "ntfs" ];
   boot.kernelPackages = pkgs.linuxPackages_zen;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
@@ -215,6 +217,10 @@
       "tty"
       "dialout"
     ]; # Enable ‘sudo’ for the user.
+	openssh.authorizedKeys.keys = [
+
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
+	];
 
     hashedPasswordFile = config.age.secrets."ivy-pwd-hash".path;
     packages = with pkgs; [
