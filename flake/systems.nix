@@ -33,11 +33,14 @@ in
         inputs.agenix-rekey.homeManagerModules.default
         inputs.vscode-server.homeModules.default
 
+		inputs.niri.homeModules.niri
       ];
       standaloneHomeModules = [
+#		inputs.niri.homeModules.default
         inputs.stylix.homeModules.stylix
       ];
       importedNixosModules = [
+		inputs.niri.nixosModules.niri
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote

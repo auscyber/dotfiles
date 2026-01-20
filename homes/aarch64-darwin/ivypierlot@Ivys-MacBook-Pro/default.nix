@@ -263,6 +263,14 @@
         };
 
       };
+	  "auspc" = {
+	  forwardAgent = true;
+	  host = "192.168.0.24";
+	  user = "auscyber";
+extraOptions = {
+          "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
+        };
+	  };
       "secondpc" = {
 
         extraOptions = {

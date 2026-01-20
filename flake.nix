@@ -16,6 +16,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
+	niri.url = "github:sodiboo/niri-flake";
+	niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
     nvfetcher.url = "github:berberman/nvfetcher";
