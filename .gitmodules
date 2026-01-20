@@ -17,3 +17,6 @@
 [submodule "inputs/age-plugin-gpg"]
 	path = inputs/age-plugin-gpg
 	url = https://github.com/auscyber/dotfiles.git
+[submodule "inputs/rift"]
+	path = inputs/rift
+	url = git@github.com:auscyber/rift

@@ -22,3 +22,10 @@ fetch.git = "https://github.com/felixkratz/jankyborders"
 src.git = "https://github.com/slskd/slskd.git"
 fetch.git = "https://github.com/slskd/slskd.git"
 extract = ["./src/web/package-lock.json"]
+[rift]
+src.github = "acsandmann/rift"
+fetch.github = "acsandmann/rift"
+cargo_lock = ["Cargo.lock"]
+[icon_map]
+src.github = "kvndrsslr/sketchybar-app-font"
+fetch.url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/$ver/icon_map.sh"

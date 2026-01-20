@@ -8,16 +8,16 @@
   };
   sops.secrets."grafana/client_id" = {
     sopsFile = ../../../secrets/secondpc/grafana.yaml;
-#    owner = "grafana";
+    #    owner = "grafana";
 
   };
   sops.secrets."grafana/client_secret" = {
     sopsFile = ../../../secrets/secondpc/grafana.yaml;
-#    owner = "grafana";
+    #    owner = "grafana";
   };
   sops.secrets."grafana/smtp/password" = {
     sopsFile = ../../../secrets/secondpc/grafana.yaml;
-#    owner = "grafana";
+    #    owner = "grafana";
   };
   sops.secrets."htpasswd" = {
     sopsFile = ../../../secrets/secondpc/nginx.yaml;

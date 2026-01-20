@@ -1,6 +1,6 @@
 {
     "cursor_shader": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": "2025-06-29",
         "extract": null,
         "name": "cursor_shader",
@@ -20,7 +20,7 @@
         "version": "fb494d124d6b16a2472ae1815f70c48ece38f9e4"
     },
     "game-devices-udev-rules": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": null,
         "extract": null,
         "name": "game-devices-udev-rules",
@@ -33,9 +33,24 @@
         },
         "version": "main"
     },
+    "icon_map": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "icon_map",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-ECwcBOX2t0SqKjtCEcpE1S9NQ9vrZYjoxrQMhJO1iVY=",
+            "type": "url",
+            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.51/icon_map.sh"
+        },
+        "version": "v2.0.51"
+    },
     "jankyborders": {
-        "cargoLocks": null,
-        "date": "2025-09-24",
+        "cargoLock": null,
+        "date": "2026-01-10",
         "extract": null,
         "name": "jankyborders",
         "passthru": null,
@@ -45,16 +60,21 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e",
-            "sha256": "sha256-31Er+cUQNJbZnXKC6KvlrBhOvyPAM7nP3BaxunAtvWg=",
+            "rev": "a56a76a8a6ed77325f03655b23fcf525144d120b",
+            "sha256": "sha256-odhoKy+aABfv19fxaINWtmY6hbmYyeQzWzxgOlD8ONE=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/felixkratz/jankyborders"
         },
-        "version": "af2791346fa3b595dfa9822e6fe9d8f6959d5a9e"
+        "version": "a56a76a8a6ed77325f03655b23fcf525144d120b"
     },
     "kanata": {
-        "cargoLocks": null,
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-jzTK_ZK9UrXTP_Ow662ENBv3cim6klA8+DQv4DLVSNU=/Cargo.lock",
+                {}
+            ]
+        },
         "date": null,
         "extract": null,
         "name": "kanata",
@@ -74,11 +94,40 @@
         },
         "version": "v1.10.1"
     },
+    "rift": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-CONRczgoojHc6mRlurzU1a4PJ5sNSlcGF3fSDUpovII=/Cargo.lock",
+                {
+                    "continue-0.1.1": "sha256-9irDEeiPbjIG3e1F/jpWd3fCL1/nei/IYjhMqRp+Q+s=",
+                    "dispatchr-1.0.0": "sha256-Df6PdDA5bpmy2P30vGdad+EiHJiANmHrRF2q75Uegik="
+                }
+            ]
+        },
+        "date": null,
+        "extract": null,
+        "name": "rift",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "acsandmann",
+            "repo": "rift",
+            "rev": "v0.3.5",
+            "sha256": "sha256-CONRczgoojHc6mRlurzU1a4PJ5sNSlcGF3fSDUpovII=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.3.5"
+    },
     "slskd": {
-        "cargoLocks": null,
-        "date": "2026-01-03",
+        "cargoLock": null,
+        "date": "2026-01-16",
         "extract": {
-            "./src/web/package-lock.json": "./slskd-02df53f215a57c58d78df20a03497f03cce12185/./src/web/package-lock.json"
+            "./src/web/package-lock.json": "sha256-0dR05N1zLGj41t1x2g5NoCol+5wktJAdN5a7Y_O0bE0=/./src/web/package-lock.json"
         },
         "name": "slskd",
         "passthru": null,
@@ -88,17 +137,17 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "02df53f215a57c58d78df20a03497f03cce12185",
-            "sha256": "sha256-nsMyJOAt1khMJV4HoNgF4kPsC7RxwFR5lczPhOZfiog=",
+            "rev": "9c1c726f2de69dd3fd38740f5bdb7f1f76e97fcf",
+            "sha256": "sha256-0dR05N1zLGj41t1x2g5NoCol+5wktJAdN5a7Y/O0bE0=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-        "version": "02df53f215a57c58d78df20a03497f03cce12185"
+        "version": "9c1c726f2de69dd3fd38740f5bdb7f1f76e97fcf"
     },
     "yabai": {
-        "cargoLocks": null,
-        "date": "2025-12-10",
+        "cargoLock": null,
+        "date": "2026-01-17",
         "extract": null,
         "name": "yabai",
         "passthru": null,
@@ -108,12 +157,12 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "996e26da7bef444d170d4f82fcc9fa5fdabba5ff",
-            "sha256": "sha256-bQenrG2KJN9sF0CvvNrufvMS/XPVyL40nyeLLW200yo=",
+            "rev": "5bde933ec85a4a601a186163b7db04aa3bf6c3b1",
+            "sha256": "sha256-IVVwlqMlkfkgqmZegVeVwt/YRSIfaH+swTWAikl64wY=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/koekeishiya/yabai"
         },
-        "version": "996e26da7bef444d170d4f82fcc9fa5fdabba5ff"
+        "version": "5bde933ec85a4a601a186163b7db04aa3bf6c3b1"
     }
 }

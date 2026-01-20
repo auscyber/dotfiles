@@ -8,17 +8,17 @@
     agenix.url = "path:./inputs/agenix";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
-	vscode-server.url = "github:nix-community/nixos-vscode-server";
-	vscode-server.inputs.nixpkgs.follows = "nixpkgs";
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
+    vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     nix-topology.url = "github:oddlama/nix-topology";
     attic = {
       url = "github:zhaofengli/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-	age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
-#	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
+    age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
+    #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
-nvfetcher.url = "github:berberman/nvfetcher";
+    nvfetcher.url = "github:berberman/nvfetcher";
     searchix.url = "git+https://codeberg.org/alanpearce/searchix";
     nil = {
       url = "github:oxalica/nil";
@@ -43,7 +43,7 @@ nvfetcher.url = "github:berberman/nvfetcher";
       flake = false;
     };
     qanata.url = "github:veyxov/qanata";
-        nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat = {
       url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
@@ -59,7 +59,6 @@ nvfetcher.url = "github:berberman/nvfetcher";
       url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
       flake = false;
     };
-
 
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";

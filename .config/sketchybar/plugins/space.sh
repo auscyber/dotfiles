@@ -4,33 +4,43 @@
 # the space invoking this script (with name: $NAME) is currently selected:
 # https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
 
+source "$HOME/.config/icon_map.sh"
 
-APP_NAMES="$(yabai -m query --windows --space "$SID" | jq '.[] | select(.scratchpad | test("^$") ) | .app')"
 
 
 APP_ICON_LIST=""
+WORKSPACE_ID=${1:-${NAME#space.}}
 
+RIFT_SPACE_ID=$(echo "$WORKSPACE_ID" | sed 's/__/ /g') # Space with full name
 
-for APP_NAME in $APP_NAMES; do
-    APP_NAME=$(echo "$APP_NAME" | tr -d '"')
-    case "$APP_NAME" in
-        "Code") APP_ICON_LIST+="󰨞 " ;;
-        "Ghostty") APP_ICON_LIST+=" " ;;
-        "Finder") APP_ICON_LIST+="󰀶 " ;;
-        "Fantastical") APP_ICON_LIST+="󰃰 " ;;
-        "Beeper" | "Messages" ) APP_ICON_LIST+="󰭹 " ;;
-        "Zen") APP_ICON_LIST+="􀎬 " ;;
-        "Slack") APP_ICON_LIST+="󰒱 " ;;
+apps=$(rift-cli query workspaces | jq -r ".[] | select(.name == \"$RIFT_SPACE_ID\") | .windows[].bundle_id" | sort -u)
 
-        *) APP_ICON_LIST+="" ;;
-    esac
-done
+FOCUSED_WORKSPACE=$(rift-cli query workspaces | jq -r '.[] | select(.is_active == true) | .name')
+if [ "$FOCUSED_WORKSPACE" = "$RIFT_SPACE_ID" ]; then
+	SELECTED="true"
+else
+	SELECTED="false"
+fi
 
-if [ -z "$APP_ICON_LIST" ]; then
+while read -r app; do
+			icon_strip+=" $(
+				__icon_map "$app"
+				echo $icon_result
+			)"
+		done <<<"${apps}"
+
+if [ -z "$icon_strip" ]; then
 LABEL_DRAWING="off"
 else
 LABEL_DRAWING="on"
 fi
 
+case "$SENDER" in
+	"mouse.clicked")
+		rift-cli execute workspace switch  "${NAME#space.}"
+		;;
+	"rift_windows_changed")
+		;;
+esac
 
-sketchybar --set "$NAME" background.drawing="$SELECTED" icon="$SID"  label="$APP_ICON_LIST" label.drawing="$LABEL_DRAWING" label.border_color=0xff$COLOR_FOREGROUND
+sketchybar --set "$NAME" background.drawing="$SELECTED" icon.drawing=off label="$icon_strip" label.drawing="$LABEL_DRAWING" label.border_color=0xff$COLOR_FOREGROUND icon.drawing=off label.padding_left=1 label.border_width=1

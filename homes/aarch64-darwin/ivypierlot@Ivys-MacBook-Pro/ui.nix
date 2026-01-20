@@ -22,7 +22,7 @@ in
   ];
   programs.gpg = {
     enable = true;
-#	package = pkgs.gnupg-wrapped;
+    #	package = pkgs.gnupg-wrapped;
 
   };
   services.gpg-agent = {
@@ -35,12 +35,12 @@ in
   launchd.agents.gpg-agent.config = {
     StandardOutPath = "${config.home.homeDirectory}/.local/share/gpg-agent.log";
     StandardErrorPath = "${config.home.homeDirectory}/.local/share/gpg-agent-erro.log";
-#    EnvironmentVariables = {
-#      LISTEN_FDNAMES = "${lib.concatStringsSep ":" (lib.mapAttrsToList (
-#        _: v: v.SockPathName
-#      ) config.launchd.agents.gpg-agent.config.Sockets)}";
-#
-#    };
+    #    EnvironmentVariables = {
+    #      LISTEN_FDNAMES = "${lib.concatStringsSep ":" (lib.mapAttrsToList (
+    #        _: v: v.SockPathName
+    #      ) config.launchd.agents.gpg-agent.config.Sockets)}";
+    #
+    #    };
   };
 
   #  programs._1password.enable = true;

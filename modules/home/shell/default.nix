@@ -26,7 +26,7 @@ in
     };
     programs.gh = {
       enable = true;
-#      package = pkgs.hello;
+      #      package = pkgs.hello;
       settings = {
         git_protocol = "ssh";
       };

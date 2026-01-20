@@ -13,8 +13,8 @@
 {
 
   #  _module.args.pkgs = lib.mkForce (import inputs.stable { inherit system ; inherit (config.nixpkgs) config overlays; });
-hardware.facter.reportPath = ./facter.json;
-#  _module.args.pkgs = lib.mkForce (import inputs.stable { inherit system ; inherit (config.nixpkgs) config overlays; });
+  hardware.facter.reportPath = ./facter.json;
+  #  _module.args.pkgs = lib.mkForce (import inputs.stable { inherit system ; inherit (config.nixpkgs) config overlays; });
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIH68LfeU1ib2+c5DCGLRtZkaSSjz2w6DgBeshr6lwOb";
   auscybernix.nix.caches = false;
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
@@ -180,7 +180,7 @@ hardware.facter.reportPath = ./facter.json;
     enable = true;
   };
   services.openssh.settings = {
-	StreamLocalBindUnlink = "yes";
+    StreamLocalBindUnlink = "yes";
 
   };
 

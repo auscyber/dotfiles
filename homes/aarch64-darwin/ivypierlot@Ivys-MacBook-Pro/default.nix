@@ -15,17 +15,16 @@
   #  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
   auscybernix.meta.description = "Home configuration for ${hostname}";
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMA2BIUJfAXT/4WGJZ+W9nMZfAYMHgjZ+RUqxOx7UWs7";
-#  services.gpg-agent.socketAddress =
-#    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
+  #  services.gpg-agent.socketAddress =
+  #    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
 
   services.yubikey-agent.enable = true;
   age.rekey.masterIdentities = [
-  {
-          identity = ../../../modules/common/age-yubikey.pub;
-          pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
+    {
+      identity = ../../../modules/common/age-yubikey.pub;
+      pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
 
-        }
-
+    }
 
   ];
 
@@ -76,17 +75,56 @@
   #  };
   auscybernix = {
     services.mopidy.enable = false;
-    wms.yabai.enable = true;
+    wms.rift.enable = true;
     programs.sketchybar.enable = true;
     keybinds.kanata = {
       enable = true;
       extraPackages = [
         pkgs.jq
         pkgs.yabai
+        pkgs.rift
       ];
       extraCommandPiping = ../../../modules/home/keybinds/kanata/config.toml;
       tray = {
-        configFile = builtins.toString ./tray_config.toml;
+          config = {
+            "$schema" = "https://raw.githubusercontent.com/rszyma/kanata-tray/main/doc/config_schema.json";
+
+            general = {
+              allow_concurrent_presets = false; # (default: false)
+
+              # Optional TCP control server to listen for remote commands, such as stopping/starting a preset.
+              # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/control_server.md
+              control_server_enable = true; # (default: false)
+            };
+
+            defaults = {
+              #kanata_executable = '~/bin/kanata' # if empty or omitted, system $PATH will be searched.
+              kanata_config = ""; # if empty or not omitted, kanata default config locations will be used.
+              tcp_port = 5829; # (default: 5829)
+              autorestart_on_crash = false; # (default: false)
+
+              # Hooks allow running custom commands on specific events (e.g. starting preset).
+              # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/hooks.md
+
+              layer_icons = {
+                frenchkeys = "french.ico";
+                qwerty = "qwerty.ico";
+                "*" = "other_layers.ico";
+              };
+
+              presets."main cfg" = {
+                autorun = true;
+                layer_icons = {
+                  frenchkeys = "french.ico";
+                };
+                # kanata_executable = ''
+              };
+            };
+          };
+          # layer_icons = {  }
+          # tcp_port = 1234
+          # extra_args = ['-n', '-c=~/.config/kanata/another.kbd']
+
       };
       #      appBundleIds = [
       #        "app.zen-browser.zen"
@@ -211,8 +249,7 @@
     #   org.gradle.daemon.idletimeout=3600000
     # '';
   };
-#  services.gpg-agent.socketAddress = "${config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName}";
-
+  #  services.gpg-agent.socketAddress = "${config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName}";
 
   programs.ssh = {
     enable = true;
@@ -220,8 +257,8 @@
     matchBlocks = {
       "faggot.sh" = {
         forwardAgent = true;
-#        identityFile = "~/.ssh/id_ed25519.pub";
-extraOptions = {
+        #        identityFile = "~/.ssh/id_ed25519.pub";
+        extraOptions = {
           "RemoteForward" = " /run/user/1001/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
         };
 

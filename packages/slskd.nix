@@ -34,7 +34,7 @@ buildDotnetModule rec {
     name = "${pname}-${version}-npm-deps";
     inherit src;
     sourceRoot = "${src.name}/${npmRoot}";
-  	hash = source.npmHash;
+    hash = source.npmHash;
   };
 
   projectFile = "slskd.sln";
@@ -80,4 +80,3 @@ buildDotnetModule rec {
     platforms = lib.platforms.linux;
   };
 }
-

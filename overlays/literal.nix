@@ -30,22 +30,32 @@ in
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
-#	gnupg-wrapped = pkgs.symlinkJoin {
-#	  name = "gnupg";
-#	  paths = [
-#(pkgs.callPackage ../packages/gpg {  inherit (pkgs) gnupg; })
-#pkgs.gnupg
-#	  ];
-#	};
+    #	gnupg-wrapped = pkgs.symlinkJoin {
+    #	  name = "gnupg";
+    #	  paths = [
+    #(pkgs.callPackage ../packages/gpg {  inherit (pkgs) gnupg; })
+    #pkgs.gnupg
+    #	  ];
+    #	};
 
     lix = pkgs.lix.overrideAttrs (attrs: {
       doCheck = false;
     });
-	age-plugin-gpg = inputs.age-plugin-gpg.packages."${system}".default.overrideAttrs (attrs: {
-	postInstall = (attrs.postInstall or "") + ''
-	  ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
-	  '';
-	});
+    age-plugin-gpg = inputs.age-plugin-gpg.packages."${system}".default.overrideAttrs (attrs: {
+      postInstall = (attrs.postInstall or "") + ''
+        	  ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
+        	  '';
+    });
+    rift = pkgs.callPackage ../packages/rift.nix {
+
+      source = {
+	  src = ../inputs/rift;
+	  version = "0.8.3";
+	  cargoLock = ../inputs/rift/Cargo.lock;
+        pname = "rift";
+      };
+
+    };
     #.overrideAttrs
     # (attrs: {
     #   version = "5.0.0";
@@ -76,12 +86,12 @@ in
     #    inherit (inputs.rnix.packages."${system}") rnix-lsp;
     ghostty = ghostty."${system}";
     slskd = pkgs.callPackage ../packages/slskd.nix {
-	source = {
-	inherit (sources.slskd) src;
-	version = "0.24.2";
-	npmHash = "sha256-i2ZeMFM7z/Hab8vFaCCoEWArDNkKWZflwHw92DBP+Oo=";
-	};
-	};
+      source = {
+        inherit (sources.slskd) src;
+        version = "0.24.2";
+        npmHash = "sha256-i2ZeMFM7z/Hab8vFaCCoEWArDNkKWZflwHw92DBP+Oo=";
+      };
+    };
     zen-browser = zen-browser."${system}";
     picom = pkgs.picom.overrideAttrs (attrs: {
       src = inputs.picom;

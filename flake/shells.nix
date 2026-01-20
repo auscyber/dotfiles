@@ -38,7 +38,7 @@
                 age
                 ssh-to-age
                 age-plugin-1p
-				age-plugin-gpg
+                age-plugin-gpg
                 age-plugin-yubikey
                 perSystemArgs.config.agenix-rekey.package
               ]

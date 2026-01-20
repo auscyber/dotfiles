@@ -143,6 +143,7 @@
         #    "vivaldi"
         "calibre"
         #    "ollama"
+		"sf-symbols" "font-sketchybar-app-font" "font-sf-pro"
         "todoist-app"
 
         "beeper"
