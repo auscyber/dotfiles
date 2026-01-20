@@ -103,7 +103,7 @@ rec {
       #      firefox
       tmux
       wineWowPackages.stable
-      emacsGcc
+      #      emacs
       pcmanfm
       fzf
       vscode

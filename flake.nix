@@ -63,7 +63,7 @@
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.lix.follows = "lix";
+      #  inputs.lix.follows = "lix";
     };
     ghostty-shaders = {
       url = "github:hackr-sh/ghostty-shaders";

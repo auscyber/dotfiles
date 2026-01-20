@@ -3,3 +3,4 @@
 *.stack-work
 *.DS_Store
 .direnv
+.emacs.d

@@ -32,7 +32,10 @@
     polarity = "dark";
     #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
-  #  services.tailscale.enable = true;
+    services.tailscale = {
+	authKeyFile =
+
+	};
   boot.supportedFilesystems = [ "ntfs" ];
   boot.kernelPackages = pkgs.linuxPackages_zen;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
@@ -254,6 +257,7 @@
   #  user = "auscyber";
   #};
   services.desktopManager.plasma6.enable = true;
+  #  services.desktopManager.cosmic.enable = true;
 
   services.xserver = {
     xkb.layout = "us";
@@ -305,6 +309,7 @@
       ];
       trusted-public-keys = [
         "192.168.0.26:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+        "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       ];
 

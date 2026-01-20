@@ -50,6 +50,7 @@ in
       extraOptions = ''
         experimental-features = nix-command flakes
       '';
+<<<<<<< HEAD
       #	  auto-optimise-store = true;
       #optimise.automatic = true;
       #      gc = {
@@ -58,7 +59,9 @@ in
       #      };
 
       package = pkgs.nixVersions.latest;
+
     };
+
 
     nixpkgs.config = {
       #      contentAddressedByDefault = true;
