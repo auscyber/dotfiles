@@ -11,7 +11,7 @@ in
 
   flake.auscybernix.vpn.configMap =
     let
-	filteredConfigs = self.lib.extra.filterDummy (lib.filterAttrs (name: value: value.config.auscybernix.vpn.enable) config.flake.auscybernix.systems);
+	filteredConfigs = self.lib.extra.filterDummy (lib.filterAttrs (name: value: value.config.auscybernix ? vpn && value.config.auscybernix.vpn.enable) config.flake.auscybernix.systems);
       folded =
         builtins.foldl'
           (out: config: {
@@ -31,7 +31,7 @@ in
           }
           (
             lib.mapAttrsToList (name: value: {
-			  name = "${name}-${value.system.system}";
+			  name = value._module.specialArgs.systemIdentifier;
 			  description = "${name}";
                 pubkey = value.config.auscybernix.vpn.pubkey;
             }) filteredConfigs

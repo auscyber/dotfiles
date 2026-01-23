@@ -58,8 +58,7 @@ in
         {
           publicKey = cfg.pubkey;
           allowedIPs = [
-            "0.0.0.0/0"
-            "::/0"
+            "10.100.0.0/32"
           ];
           endpoint = cfg.endpoint;
         }
