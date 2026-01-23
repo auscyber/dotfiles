@@ -17,9 +17,11 @@ in
   age.secrets."wg_private_key" = {
     rekeyFile = ./wg_private_key.age;
     generator.script =
-      { pkgs, ... }:
+      { pkgs, file, ... }:
       ''
-        ${pkgs.wireguard-tools}/bin/wg genkey
+        privkey="$(${pkgs.wireguard-tools}/bin/wg genkey)"
+		echo "$privkey" | ${pkgs.wireguard-tools}/bin/wg pubkey > ${lib.escapeShellArg (lib.removeSuffix ".age" file) + ".pub"}
+		echo "$privkey"
       '';
   };
   networking.wireguard = {

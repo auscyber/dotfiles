@@ -43,10 +43,9 @@ in
     };
     auscybernix.vpn.ipAddress =
       flakeConfig.flake.auscybernix.vpn.configMap."${systemIdentifier}".ipAddress;
-    auscybernix.vpn.pubkey = # lib.escapeShellArg (
-      builtins.path { path = config.age.rekey.generatedSecretsDir; } + ("/wireguard_key.pub")
+    auscybernix.vpn.pubkey = ../../systems/x86_64-linux/secondpc/wg_private_key.pub;
+
     #)
-    ;
     networking.wg-quick.interfaces.wg0 = {
       address = [ cfg.ipAddress ];
       privateKeyFile = config.age.secrets.wireguard_key.path;
