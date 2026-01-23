@@ -17,7 +17,7 @@ in
       description = "Wireguard VPN IP address";
     };
     pubkey = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
+      type = lib.types.nullOr lib.types.path;
       default = null;
       description = "Wireguard public key";
     };
@@ -60,6 +60,7 @@ in
             "10.100.0.0/32"
           ];
           endpoint = cfg.endpoint;
+		  persistentKeepalive = 25;
         }
       ];
     };

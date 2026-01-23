@@ -28,16 +28,16 @@ in
     enable = true;
     interfaces = {
       wg0 = {
-        ips = [ "10.100.0.1/24" ];
+        ips = [ "10.100.0.1/32" ];
 
         listenPort = 51820;
         postSetup = ''
-          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/32 -o br0 -j MASQUERADE
         '';
 
         # This undoes the above command
         postShutdown = ''
-          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/32 -o br0 -j MASQUERADE
         '';
         privateKeyFile = config.age.secrets."wg_private_key".path;
         peers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (

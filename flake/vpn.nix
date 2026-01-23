@@ -18,7 +18,7 @@ in
             num = out.num + 1;
             configs = out.configs // {
               "${config.name}" = {
-                pubkey = builtins.readFile config.pubkey;
+                pubkey = lib.removeSuffix "\n" (builtins.readFile config.pubkey);
 				description = config.description;
                 ipAddress = "10.100.0.${builtins.toString out.num}/32";
               };
