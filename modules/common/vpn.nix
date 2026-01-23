@@ -23,7 +23,7 @@ in
     };
     endpoint = lib.mkOption {
       type = lib.types.str;
-      default = "vpn.example.com:51820";
+      default = "pierlot.com.au:51820";
       description = "Wireguard VPN endpoint";
     };
 

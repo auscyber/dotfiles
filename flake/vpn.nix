@@ -11,7 +11,7 @@ in
 
   flake.auscybernix.vpn.configMap =
     let
-	filteredConfigs = self.lib.extra.filterDummy (lib.filterAttrs (name: value: value.config.auscybernix ? vpn && value.config.auscybernix.vpn.enable) config.flake.auscybernix.systems);
+	filteredConfigs = self.lib.extra.filterDummy (lib.filterAttrs (name: value: if value.config.auscybernix ? vpn then value.config.auscybernix.vpn.enable else false) config.flake.auscybernix.systems);
       folded =
         builtins.foldl'
           (out: config: {
