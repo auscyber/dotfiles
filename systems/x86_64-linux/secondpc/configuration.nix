@@ -19,6 +19,14 @@
   auscybernix.nix.caches = false;
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
   auscybernix.ssh.enable = true;
+  auscybernix.nix.builders = {
+    enable = true;
+    builderConfig = {
+      speedFactor = 1;
+      maxJobs = 2;
+
+    };
+  };
   nix = {
     settings = {
       trusted-users = [ "auscyber" ];
@@ -241,7 +249,6 @@
   #  ];
   #};
   services.logrotate.checkConfig = false;
-
 
   programs.fish.enable = true;
 

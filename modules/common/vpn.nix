@@ -47,7 +47,7 @@ in
       builtins.path { path = config.age.rekey.generatedSecretsDir; } + ("/wireguard_key.pub")
     #)
     ;
-    networking.wg-quick.interfaces.vpn = {
+    networking.wg-quick.interfaces.wg0 = {
       address = [ cfg.ipAddress ];
       privateKeyFile = config.age.secrets.wireguard_key.path;
       dns = [
@@ -56,7 +56,7 @@ in
       ];
       peers = [
         {
-          publicKey = cfg.pubkey;
+          publicKey = builtins.readFile cfg.pubkey;
           allowedIPs = [
             "10.100.0.0/32"
           ];

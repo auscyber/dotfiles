@@ -17,12 +17,27 @@
   programs.fish.enable = true;
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
+    nix.builders = {
+      enable = true;
+      builderConfig = {
+        enable = true;
+        maxJobs = 4;
+        speedFactor = 4;
+        features = [
+          "big-parallel"
+          "cached-compilation"
+          "kvm"
+        ];
+
+      };
+
+    };
 
     ssh.enable = true;
     nixos.games.enable = true;
     bootlogo.enable = true;
     secrets.enable = true;
-	vpn.enable = true;
+    vpn.enable = true;
   };
 
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDqzUK8FRDaf17agDGRsk5vHR6YIsnY9ZifmW0NlmV63 root@auspc";
@@ -218,10 +233,10 @@
       "tty"
       "dialout"
     ]; # Enable ‘sudo’ for the user.
-	openssh.authorizedKeys.keys = [
+    openssh.authorizedKeys.keys = [
 
-"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
-	];
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
+    ];
 
     hashedPasswordFile = config.age.secrets."ivy-pwd-hash".path;
     packages = with pkgs; [

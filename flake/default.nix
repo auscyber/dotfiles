@@ -13,8 +13,8 @@
     ../docs
     ../overlays
     ./homes.nix
-	./apps.nix
-	./vpn.nix
+    ./apps.nix
+    ./vpn.nix
 
     ./secrets.nix
     ./shells.nix
@@ -26,6 +26,7 @@
     inputs.input-branches.flakeModules.default
     ./formatter.nix
     ./templates.nix
+    ./builders.nix
   ];
   flake = {
 

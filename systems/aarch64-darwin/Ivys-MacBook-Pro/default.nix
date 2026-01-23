@@ -127,6 +127,16 @@
       package = pkgs.kanata.darwinDriver;
     };
 	vpn.enable = true;
+	nix.builders = {
+	enable = true;
+	builderConfig = {
+	maxJobs = 4;
+
+	  systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
+
+	};
+
+	};
 
     homebrew = {
       enable = true;
