@@ -43,7 +43,6 @@ in
 	  ../modules/common/vpn.nix
 	  ../modules/common/builders
 #	  ../modules/common/builders/builder.nix
-		inputs.niri.nixosModules.niri
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote

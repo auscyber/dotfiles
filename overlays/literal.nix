@@ -20,7 +20,7 @@ aarch64-darwin = pkgs.ghostty-bin;
   };
   pinentry = {
     aarch64-darwin = pkgs.pinentry_mac;
-    x86_64-linux = pkgs.pinentry_curses;
+    x86_64-linux = pkgs.pinentry-curses;
     aarch64-linux = pkgs.pinentry;
   };
 in
@@ -90,7 +90,7 @@ in
       source = {
         inherit (sources.slskd) src;
         version = "0.24.2";
-        npmHash = "sha256-i2ZeMFM7z/Hab8vFaCCoEWArDNkKWZflwHw92DBP+Oo=";
+        npmHash = "sha256-cNYnYp+QrbwvpYs/qKKivDlMpdQP6EbDUBS32S3TrO4=";
       };
     };
     zen-browser = zen-browser."${system}";

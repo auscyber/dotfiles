@@ -40,9 +40,9 @@ in
         privateKeyFile = config.age.secrets."wg_private_key".path;
         peers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (
           name: peerConfig: {
-            publicKey = peerConfig.publicKey;
+            publicKey = peerConfig.pubkey;
             name = peerConfig.description;
-            allowedIPs = [ peerConfig.allowedIPs ];
+            allowedIPs = [ peerConfig.ipAddress ];
           }
         );
 
