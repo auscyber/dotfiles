@@ -175,7 +175,7 @@
   # services.xserver.xkbOptions = "eurosign:e";
   services.espanso.enable = false;
   services.tailscale = {
-    enable = true;
+    enable = false;
     useRoutingFeatures = "both";
   };
   #fonts.fonts = with pkgs;

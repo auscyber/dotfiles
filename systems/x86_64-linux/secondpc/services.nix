@@ -130,7 +130,7 @@
     };
   };
   services.tailscale = {
-    enable = true;
+    enable = false;
     authKeyFile = config.sops.secrets."tailscale/auth_key".path;
     extraSetFlags = [ "--advertise-exit-node" ];
   };
