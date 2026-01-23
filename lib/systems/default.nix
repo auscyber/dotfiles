@@ -4,6 +4,7 @@
   importedNixosModules,
   importedHomeModules,
   standaloneHomeModules,
+  config,
   ...
 }:
 rec {
@@ -17,7 +18,7 @@ rec {
       mkSystem = args: (rpi args).mkSystem;
       mkInstaller = args: (rpi args).mkInstaller;
     };
-  common = import ./common.nix { inherit inputs importedHomeModules; };
+  common = import ./common.nix { inherit inputs importedHomeModules; flakeConfig = config;};
   mkHome = import ./mk-home.nix {
     inherit
       inputs

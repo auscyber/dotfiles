@@ -1,4 +1,4 @@
-{ inputs, importedHomeModules }:
+{ inputs, importedHomeModules, flakeConfig }:
 let
   inherit (inputs.nixpkgs.lib) filterAttrs mapAttrs';
   externalHmModules = [
@@ -26,7 +26,7 @@ in
     {
       inherit (inputs) self;
       flakeSelf = inputs.self;
-      inherit username;
+      inherit username flakeConfig;
       inherit inputs hostname system;
       lib = extendedLib;
     };

@@ -13,6 +13,7 @@ in
   home.packages = with pkgs; [
     #input-leap
     discord
+	pinentry
     #    wezterm
     #    spotify
     #    rnix-lsp

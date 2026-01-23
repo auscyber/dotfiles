@@ -1,0 +1,54 @@
+diff --git a/src/build/GhosttyXCFramework.zig b/src/build/GhosttyXCFramework.zig
+index 3afeb9073..c3731437d 100644
+--- a/src/build/GhosttyXCFramework.zig
++++ b/src/build/GhosttyXCFramework.zig
+@@ -25,7 +25,7 @@ pub fn init(
+     ));
+ 
+     // iOS
+-    const ios = try GhosttyLib.initStatic(b, &try deps.retarget(
++    const ios = if (target == .universal) try GhosttyLib.initStatic(b, &try deps.retarget(
+         b,
+         b.resolveTargetQuery(.{
+             .cpu_arch = .aarch64,
+@@ -33,10 +33,10 @@ pub fn init(
+             .os_version_min = Config.osVersionMin(.ios),
+             .abi = null,
+         }),
+-    ));
++    )) else null;
+ 
+     // iOS Simulator
+-    const ios_sim = try GhosttyLib.initStatic(b, &try deps.retarget(
++    const ios_sim = if (target == .universal) try GhosttyLib.initStatic(b, &try deps.retarget(
+         b,
+         b.resolveTargetQuery(.{
+             .cpu_arch = .aarch64,
+@@ -51,7 +51,7 @@ pub fn init(
+             // back to running simulator builds.
+             .cpu_model = .{ .explicit = &std.Target.aarch64.cpu.apple_a17 },
+         }),
+-    ));
++    )) else null;
+ 
+     // The xcframework wraps our ghostty library so that we can link
+     // it to the final app built with Swift.
+@@ -66,14 +66,14 @@ pub fn init(
+                     .dsym = macos_universal.dsym,
+                 },
+                 .{
+-                    .library = ios.output,
++                    .library = ios.?.output,
+                     .headers = b.path("include"),
+-                    .dsym = ios.dsym,
++                    .dsym = ios.?.dsym,
+                 },
+                 .{
+-                    .library = ios_sim.output,
++                    .library = ios_sim.?.output,
+                     .headers = b.path("include"),
+-                    .dsym = ios_sim.dsym,
++                    .dsym = ios_sim.?.dsym,
+                 },
+             },
+ 

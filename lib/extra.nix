@@ -4,8 +4,12 @@
 
 let
   lib = inputs.nixpkgs.lib;
+dummyPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
 in
+
 rec {
+
+filterDummy = lib.filterAttrs (_: system:  system.config.age.rekey.hostPubkey != dummyPubkey || system.config.age.rekey.hostPubkey == null);
   overrideDerivation =
     drv: basePkgs: drv.override (builtins.intersectAttrs drv.override.__functionArgs basePkgs);
   displayLine =

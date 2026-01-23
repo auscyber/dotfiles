@@ -35,6 +35,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
 
     }
     // {
+	  systemIdentifier = "${username}@${hostname}-${system}";
       isInside = false;
     };
 

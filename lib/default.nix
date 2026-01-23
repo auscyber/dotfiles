@@ -20,6 +20,7 @@ in
           importedHomeModules
           standaloneHomeModules
           ;
+        config = inp.config;
       };
       file = import ./file.nix {
         inherit inputs;
@@ -47,6 +48,37 @@ in
       standaloneHomeModules = mkOption {
         type = types.listOf types.unspecified;
         default = [ ];
+      };
+      systems = mkOption {
+
+        type = types.attrsOf types.unspecified;
+        default =
+          inputs.self.homeConfigurations
+          // inputs.self.nixosConfigurations
+          // inputs.self.darwinConfigurations;
+      };
+      vpn = {
+        configMap = mkOption {
+          type = types.attrsOf (
+            types.submodule (submod: {
+              options = {
+                description = mkOption {
+                  type = types.str;
+                  default = "";
+                };
+                ipAddress = mkOption {
+                  type = types.str;
+                  default = "";
+                };
+                pubkey = mkOption {
+                  type = types.str;
+                  default = "";
+                };
+              };
+            })
+          );
+          default = { };
+        };
       };
 
     };

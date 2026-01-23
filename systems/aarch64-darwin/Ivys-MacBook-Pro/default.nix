@@ -126,6 +126,7 @@
       enable = true;
       package = pkgs.kanata.darwinDriver;
     };
+	vpn.enable = true;
 
     homebrew = {
       enable = true;

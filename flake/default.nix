@@ -13,6 +13,8 @@
     ../docs
     ../overlays
     ./homes.nix
+	./apps.nix
+	./vpn.nix
 
     ./secrets.nix
     ./shells.nix

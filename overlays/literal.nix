@@ -13,7 +13,8 @@ let
     aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
   };
   ghostty = {
-    aarch64-darwin = pkgs.ghostty-bin; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
+#    aarch64-darwin = pkgs.callPackage ../packages/ghostty/default.nix { source = sources.ghostty; }; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
+aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.ghostty;
     aarch64-linux = pkgs.ghostty;
   };

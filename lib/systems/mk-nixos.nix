@@ -41,42 +41,45 @@ inputs.nixpkgs.lib.nixosSystem {
       system
       extendedLib
       ;
-  };
 
-  modules = [
-    { _module.args.lib = extendedLib; }
-  ]
-  ++ importedNixosModules
-  ++ [
+ }// {
+ systemIdentifier = "${hostname}-${system}";
+};
 
-    {
-      nixpkgs = {
-        inherit system;
+modules = [
+{ _module.args.lib = extendedLib; }
+]
+++ importedNixosModules
+++ [
 
-      }
-      // common.mkNixpkgsConfig flake;
-    }
+{
+	nixpkgs = {
+		inherit system;
 
-    ../../modules/common/secrets.nix
-    ../../modules/common/nix
-
-    ../../modules/common/allConfigs.nix
-    ../../modules/common/hm
-    ../../modules/common/common
-    ../../modules/common/ssh-keys.nix
-    (
-      { config, lib, ... }:
-      {
-        auscybernix.secrets.enable = true;
-
-      }
-    )
-    homeManagerConfig
-  ]
-  ++ (extendedLib.importModulesRecursive ../../modules/nixos)
-  ++ [
-    ../../systems/${system}/${hostname}
-  ]
-  ++ modules;
-
+	}
+	// common.mkNixpkgsConfig flake;
 }
+
+../../modules/common/secrets.nix
+../../modules/common/nix
+
+../../modules/common/allConfigs.nix
+../../modules/common/hm
+../../modules/common/common
+../../modules/common/ssh-keys.nix
+(
+ { config, lib, ... }:
+ {
+ auscybernix.secrets.enable = true;
+
+ }
+ )
+homeManagerConfig
+	]
+++ (extendedLib.importModulesRecursive ../../modules/nixos)
+	++ [
+		../../systems/${system}/${hostname}
+	]
+	++ modules;
+
+	}

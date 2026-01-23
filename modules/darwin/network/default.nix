@@ -1,5 +1,17 @@
 { ... }:
-{ }
+let
+in
+{
+	networking.wg-quick = {
+	interfaces = {
+		wg0 = {
+			enable = true;
+
+	};
+	};
+	};
+
+}
 #{
 #  config,
 #  lib,

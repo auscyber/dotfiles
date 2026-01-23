@@ -28,6 +28,17 @@
       sha256 = "sha256-CLQFdPr489OKZRj1v8EZypM1KOXgAOAOF0VQpeud4uo=";
     };
   };
+  ghostty = {
+    pname = "ghostty";
+    version = "tip";
+    src = fetchFromGitHub {
+      owner = "ghostty-org";
+      repo = "ghostty";
+      rev = "tip";
+      fetchSubmodules = false;
+      sha256 = "sha256-W9k+ADDJU5+5b9FrstMD8f8XYQu1Xh+9H01vllLgKUE=";
+    };
+  };
   icon_map = {
     pname = "icon_map";
     version = "v2.0.51";
@@ -69,16 +80,16 @@
   };
   rift = {
     pname = "rift";
-    version = "v0.3.5";
+    version = "v0.3.7";
     src = fetchFromGitHub {
       owner = "acsandmann";
       repo = "rift";
-      rev = "v0.3.5";
+      rev = "v0.3.7";
       fetchSubmodules = false;
-      sha256 = "sha256-CONRczgoojHc6mRlurzU1a4PJ5sNSlcGF3fSDUpovII=";
+      sha256 = "sha256-5PU28eFob8FANCK2HbX4aDMW0NnTxbYhk2r2pkKrjg0=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-CONRczgoojHc6mRlurzU1a4PJ5sNSlcGF3fSDUpovII=/Cargo.lock";
+      lockFile = ./. + "/sha256-5PU28eFob8FANCK2HbX4aDMW0NnTxbYhk2r2pkKrjg0=/Cargo.lock";
       outputHashes = {
         "dispatchr-1.0.0" = "sha256-Df6PdDA5bpmy2P30vGdad+EiHJiANmHrRF2q75Uegik=";
         "continue-0.1.1" = "sha256-9irDEeiPbjIG3e1F/jpWd3fCL1/nei/IYjhMqRp+Q+s=";
@@ -87,19 +98,19 @@
   };
   slskd = {
     pname = "slskd";
-    version = "9c1c726f2de69dd3fd38740f5bdb7f1f76e97fcf";
+    version = "337fe1c7abb9af3b1915bca18224fe4869b52eb4";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "9c1c726f2de69dd3fd38740f5bdb7f1f76e97fcf";
+      rev = "337fe1c7abb9af3b1915bca18224fe4869b52eb4";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-0dR05N1zLGj41t1x2g5NoCol+5wktJAdN5a7Y/O0bE0=";
+      sha256 = "sha256-Sg/AOs70HojHXI93WsC//oxmKck5uSxapG8uwtrGxK8=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-0dR05N1zLGj41t1x2g5NoCol+5wktJAdN5a7Y_O0bE0=/./src/web/package-lock.json";
-    };date = "2026-01-16";
+      "./src/web/package-lock.json" = ./. + "/sha256-Sg_AOs70HojHXI93WsC__oxmKck5uSxapG8uwtrGxK8=/./src/web/package-lock.json";
+    };date = "2026-01-19";
   };
   yabai = {
     pname = "yabai";

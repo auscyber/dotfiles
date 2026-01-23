@@ -22,6 +22,7 @@
     nixos.games.enable = true;
     bootlogo.enable = true;
     secrets.enable = true;
+	vpn.enable = true;
   };
 
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDqzUK8FRDaf17agDGRsk5vHR6YIsnY9ZifmW0NlmV63 root@auspc";

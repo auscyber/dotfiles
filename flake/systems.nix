@@ -40,6 +40,7 @@ in
         inputs.stylix.homeModules.stylix
       ];
       importedNixosModules = [
+	  ../modules/common/vpn.nix
 		inputs.niri.nixosModules.niri
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
@@ -54,6 +55,7 @@ in
 
       ];
       importedDarwinModules = [
+	  ../modules/common/vpn.nix
         inputs.stylix.darwinModules.stylix
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.home-manager.darwinModules.home-manager

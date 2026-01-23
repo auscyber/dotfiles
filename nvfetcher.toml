@@ -29,3 +29,6 @@ cargo_lock = ["Cargo.lock"]
 [icon_map]
 src.github = "kvndrsslr/sketchybar-app-font"
 fetch.url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/$ver/icon_map.sh"
+[ghostty]
+src.manual = "tip"
+fetch.github = "ghostty-org/ghostty"
