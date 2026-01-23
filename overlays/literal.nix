@@ -20,7 +20,7 @@ aarch64-darwin = pkgs.ghostty-bin;
   };
   pinentry = {
     aarch64-darwin = pkgs.pinentry_mac;
-    x86_64-linux = pkgs.pinentry;
+    x86_64-linux = pkgs.pinentry_curses;
     aarch64-linux = pkgs.pinentry;
   };
 in
