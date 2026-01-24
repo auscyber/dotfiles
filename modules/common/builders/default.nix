@@ -76,26 +76,26 @@ with lib;
               ...
             }:
             ''
-                            			tmpdir=$(mktemp -d)
-                            trap 'rm -rf "$tmpdir"' EXIT
+                                          			tmpdir=$(mktemp -d)
+                                          trap 'rm -rf "$tmpdir"' EXIT
 
-                            key="$tmpdir/key"
+                                          key="$tmpdir/key"
 
-                            ${pkgs.openssh}/bin/ssh-keygen \
-                              -q \
-                              -t ed25519 \
-                              -N "" \
-                              -C ${lib.escapeShellArg "${hostname}:${name}"} \
-                              -f "$key" <<< y
+                                          ${pkgs.openssh}/bin/ssh-keygen \
+                                            -q \
+                                            -t ed25519 \
+                                            -N "" \
+                                            -C ${lib.escapeShellArg "${hostname}:${name}"} \
+                                            -f "$key" <<< y
 
-                            ${pkgs.openssh}/bin/ssh-keygen \
-                              -y \
-                              -f "$key" \
-                              > ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".pub")}
-							  cat $key
+                                          ${pkgs.openssh}/bin/ssh-keygen \
+                                            -y \
+                                            -f "$key" \
+                                            > ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".pub")}
+              							  cat $key
 
 
-                                          		  '';
+                                                        		  '';
           tags = [ "builder-ssh-key" ];
         };
       };
@@ -118,19 +118,16 @@ with lib;
       users.users.${cfg.builderConfig.builderUser} = {
         openssh.authorizedKeys.keyFiles = flakeConfig.flake.auscybernix.builders.sshKeys;
 
-      } // lib.optionalAttrs pkgs.stdenv.isLinux {
-	  isSystemUser = true;
-	  group = cfg.builderConfig.builderUser;
-	  };
-	  users.groups = lib.optionalAttrs pkgs.stdenv.isLinux {
-	  "${cfg.builderConfig.builderUser}" = {};
-	  };
+      }
+      // lib.optionalAttrs pkgs.stdenv.isLinux {
+        isSystemUser = true;
+        group = cfg.builderConfig.builderUser;
+      };
+      users.groups = lib.optionalAttrs pkgs.stdenv.isLinux {
+        "${cfg.builderConfig.builderUser}" = { };
+      };
 
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-		users.knownUsers = [ cfg.builderConfig.builderUser];
-
-
-	} )
+    }))
   ]);
 
 }
