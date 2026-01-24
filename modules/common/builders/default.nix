@@ -92,7 +92,7 @@ with lib;
                               -y \
                               -f "$key" \
                               > ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".pub")}
-              				echo $key
+							  cat $key
 
 
                                           		  '';
