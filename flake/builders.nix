@@ -20,7 +20,7 @@ in
                 false
             ) config.flake.auscybernix.systems;
           in
-          lib.mapAttrsToList filteredConfigs (
+          lib.flip lib.mapAttrsToList filteredConfigs (
             name: value: value.config.auscybernix.nix.builders.sshPublicKey
           );
 

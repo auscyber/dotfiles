@@ -67,11 +67,37 @@ with lib;
   config = mkIf cfg.enable (mkMerge [
     {
       age.secrets."builder-ssh-key" = {
-        generator.script =
-          { pkgs, file, name,... }:
-          ''(exec 3>&1; ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${hostname}:${name}"} -f /proc/self/fd/3 <<<y >${
-            lib.escapeShellArg (lib.removePrefix file ".age" + ".pub")
-          } 2>&1; true)'';
+        generator = {
+          script =
+            {
+              pkgs,
+              file,
+              name,
+              ...
+            }:
+            ''
+                            			tmpdir=$(mktemp -d)
+                            trap 'rm -rf "$tmpdir"' EXIT
+
+                            key="$tmpdir/key"
+
+                            ${pkgs.openssh}/bin/ssh-keygen \
+                              -q \
+                              -t ed25519 \
+                              -N "" \
+                              -C ${lib.escapeShellArg "${hostname}:${name}"} \
+                              -f "$key" <<< y
+
+                            ${pkgs.openssh}/bin/ssh-keygen \
+                              -y \
+                              -f "$key" \
+                              > ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".pub")}
+              				echo $key
+
+
+                                          		  '';
+          tags = [ "builder-ssh-key" ];
+        };
       };
       auscybernix.nix.builders.sshPublicKey =
         builtins.path { path = config.age.rekey.generatedSecretsDir; } + ("/builder-ssh-key.pub");
@@ -82,7 +108,7 @@ with lib;
         	  builders-use-substitutes = true
         	'';
     }
-        (mkIf cfg.builderConfig.enable {
+    (mkIf cfg.builderConfig.enable {
       services.openssh.extraConfig = ''
         SetEnv PATH=/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         	'';

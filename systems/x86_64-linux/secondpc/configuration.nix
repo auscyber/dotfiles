@@ -20,8 +20,10 @@
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
   auscybernix.ssh.enable = true;
   auscybernix.nix.builders = {
-    enable = false;
+    enable = true;
     builderConfig = {
+	enable = true;
+	ipAddress = "10.100.0.1";
       speedFactor = 1;
       maxJobs = 2;
 
