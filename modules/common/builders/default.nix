@@ -118,6 +118,8 @@ with lib;
       users.users.${cfg.builderConfig.builderUser} = {
         openssh.authorizedKeys.keyFiles = flakeConfig.flake.auscybernix.builders.sshKeys;
 
+
+		shell =  pkgs.bashInteractive;
       }
       // lib.optionalAttrs pkgs.stdenv.isLinux {
         isSystemUser = true;

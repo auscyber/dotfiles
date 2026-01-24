@@ -36,6 +36,7 @@ in
       }
       (lib.mkIf cfg.builderConfig.enable {
         users.knownUsers = [ cfg.builderConfig.builderUser ];
+		users.groups."com.apple.access_ssh".members = [ cfg.builderConfig.builderUser ];
 		users.users."${cfg.builderConfig.builderUser}" = {
 		  uid = 3000;
 		};
