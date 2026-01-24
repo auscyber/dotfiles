@@ -57,7 +57,7 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
     };
     networks.wg0 = {
       matchConfig.Name = "wg0";
-      address = ["10.100.0.1/24"];
+      address = ["10.100.0.1/32"];
       networkConfig = {
         IPMasquerade = "ipv4";
         IPv4Forwarding = true;

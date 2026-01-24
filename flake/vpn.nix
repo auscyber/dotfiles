@@ -20,7 +20,7 @@ in
               "${config.name}" = {
                 pubkey = lib.removeSuffix "\n" (builtins.readFile config.pubkey);
 				description = config.description;
-                ipAddress = "10.100.0.${builtins.toString out.num}/32";
+                ipAddress = "10.100.0.${builtins.toString out.num}";
               };
 
             };
