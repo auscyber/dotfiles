@@ -51,14 +51,14 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
           name: peerConfig: {
             PublicKey = peerConfig.pubkey;
 #            Name = peerConfig.description;
-            AllowedIPs = [ "${peerConfig.ipAddress}/32" ];
+            AllowedIPs = [ "${peerConfig.ipAddress}/24" ];
           }
         );
       };
     };
     networks.wg0 = {
       matchConfig.Name = "wg0";
-      address = ["10.100.0.1/32"];
+      address = ["10.100.0.1/24"];
       networkConfig = {
         IPMasquerade = "ipv4";
         IPv4Forwarding = true;
