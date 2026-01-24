@@ -29,7 +29,7 @@ clientpubkey = lib.mkOption {
 
     endpoint = lib.mkOption {
       type = lib.types.str;
-      default = "192.168.0.26:51820";
+      default = "pierlot.com.au:51820";
       description = "Wireguard VPN endpoint";
     };
 
