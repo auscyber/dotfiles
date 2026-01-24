@@ -56,7 +56,7 @@ clientpubkey = lib.mkOption {
 
     #)
     networking.wg-quick.interfaces.wg0 = {
-      address = [ "${cfg.ipAddress}/32" ];
+      address = [ "${cfg.ipAddress}/24" ];
       privateKeyFile = config.age.secrets.wireguard_key.path;
       dns = [
         "1.1.1.1"
