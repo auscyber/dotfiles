@@ -20,7 +20,7 @@
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
   auscybernix.ssh.enable = true;
   auscybernix.nix.builders = {
-    enable = true;
+    enable = false;
     builderConfig = {
       speedFactor = 1;
       maxJobs = 2;

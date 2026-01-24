@@ -7,8 +7,12 @@
   systemIdentifier,
   ...
 }:
+let
+cfg = config.auscybernix.nix.builders;
+in
 {
 
+  config = lib.mkIf cfg.enable {
   nix.buildMachines =
     lib.flip lib.mapAttrsToList
       (lib.filterAttrs (
@@ -27,5 +31,6 @@
         }
 
       );
+	  };
 
 }

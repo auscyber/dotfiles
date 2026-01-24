@@ -38,9 +38,10 @@ in
         netdevConfig = {
           Kind = "wireguard";
           Name = "wg0";
-          MTUBytes = "1300";
+          MTUBytes = "1500";
         };
         wireguardConfig = {
+		RouteTable = "main";
 
         PrivateKeyFile = config.age.secrets."wg_private_key".path;
           ListenPort = 51820;
@@ -50,7 +51,7 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
           name: peerConfig: {
             PublicKey = peerConfig.pubkey;
 #            Name = peerConfig.description;
-            AllowedIPs = [ peerConfig.ipAddress ];
+            AllowedIPs = [ "${peerConfig.ipAddress}/32" ];
           }
         );
       };
