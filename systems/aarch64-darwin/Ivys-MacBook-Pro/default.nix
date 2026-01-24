@@ -15,11 +15,11 @@
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
-      #            "http://secondpc.devices.imflo.pet:8501"
+                  "http://10.100.0.1:8501"
       #"https://auscyber.cachix.org"
     ];
     trusted-public-keys = [
-      #            "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+                  "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
   #  sops.age.plugins = with pkgs; [
@@ -130,6 +130,7 @@
 	nix.builders = {
 	enable = true;
 	builderConfig = {
+	enable = true;
 	maxJobs = 4;
 
 	  systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
