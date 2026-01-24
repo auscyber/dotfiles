@@ -27,6 +27,7 @@ in
                 systems = builder.systems;
                 maxJobs = builder.maxJobs;
                 speedFactor = builder.speedFactor;
+				publicHostKey = builder.publicHostKey;
                 supportedFeatures = builder.features;
                 sshUser = builder.username;
                 sshKey = config.age.secrets."builder-ssh-key".path;

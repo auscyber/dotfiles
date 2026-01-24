@@ -23,6 +23,7 @@ in
           protocol = "ssh-ng";
           hostName = builder.ipAddress;
           systems = builder.systems;
+		  publicHostKey = builder.publicHostKey;
           maxJobs = builder.maxJobs;
           speedFactor = builder.speedFactor;
           supportedFeatures = builder.features;

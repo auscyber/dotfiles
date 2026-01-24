@@ -39,6 +39,7 @@ in
         name: value: {
           name = value._module.specialArgs.systemIdentifier;
           value = {
+			publicHostKey = value.config.auscybernix.nix.builders.builderConfig.publicHostKey;
             username = value.config.auscybernix.nix.builders.builderConfig.builderUser;
             systems = value.config.auscybernix.nix.builders.builderConfig.systems;
             maxJobs = value.config.auscybernix.nix.builders.builderConfig.maxJobs;

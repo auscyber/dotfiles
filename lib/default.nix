@@ -67,6 +67,10 @@ in
           type = types.attrsOf (
             types.submodule (submod: {
               options = {
+			  publicHostKey = mkOption {
+				  type = types.str;
+				  description = "Public SSH host key of the build machine.";
+				};
                 username = mkOption {
                   type = types.str;
                   default = "builder";
