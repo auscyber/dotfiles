@@ -12,6 +12,7 @@ let
     x86_64-linux = inputs.zen-browser.packages.x86_64-linux.beta-unwrapped;
     aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
   };
+
   ghostty = {
 #    aarch64-darwin = pkgs.callPackage ../packages/ghostty/default.nix { source = sources.ghostty; }; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
 aarch64-darwin = pkgs.ghostty-bin;
@@ -75,7 +76,6 @@ in
       inherit (sources.input-leap) src version;
     });
 
-    inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
     ivy-fetch = pkgs.callPackage ../packages/ivy-fetch { };
     hln = pkgs.callPackage ../packages/hardlink.nix { };
     pinentry = pinentry."${system}";
@@ -83,7 +83,6 @@ in
     #desktoppr = pkgs.callPackage ../packages/desktoppr.nix { };
     inherit (inputs.nixos-conf-editor.packages."${system}") nixos-conf-editor;
     #            nh = inputs.nh.packages."${system}".default;
-    inherit (inputs.eww.packages.${system}) eww;
     #    inherit (inputs.rnix.packages."${system}") rnix-lsp;
     ghostty = ghostty."${system}";
     slskd = pkgs.callPackage ../packages/slskd.nix {
@@ -136,6 +135,10 @@ in
 
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
+
+    inherit (inputs.eww.packages.${system}) eww;
+
+    inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
 
     #    ipython = pkgs.ipython.overrideAttrs (attrs: {
     #

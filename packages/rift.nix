@@ -1,4 +1,4 @@
-{ rustPlatform, source }:
+{ rustPlatform, lib, source }:
 rustPlatform.buildRustPackage rec {
   inherit (source) pname version src;
   cargoDeps = rustPlatform.importCargoLock {
@@ -9,4 +9,8 @@ rustPlatform.buildRustPackage rec {
     };
   };
 
+meta = {
+platforms = lib.platforms.darwin;
+license = lib.licences.mit;
+};
 }

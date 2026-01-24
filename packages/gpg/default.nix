@@ -3,6 +3,7 @@
   makeWrapper,
   gnupg,
   rsync,
+  lib,
 }:
 stdenv.mkDerivation {
   name = "gpg-agent-wrapper";
@@ -20,5 +21,9 @@ stdenv.mkDerivation {
 
     	  wrapProgram $out/bin/gpg-agent --add-flags "${gnupg}/bin/gpg-agent"
     	'';
+meta = {
+platforms = lib.platforms.darwin;
+
+};
 
 }
