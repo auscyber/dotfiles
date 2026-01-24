@@ -120,6 +120,10 @@ with lib;
 
       } // lib.optionalAttrs pkgs.stdenv.isLinux {
 	  isSystemUser = true;
+	  group = cfg.builderConfig.builderUser;
+	  };
+	  users.groups = lib.optionalAttrs pkgs.stdenv.isLinux {
+	  "${cfg.builderConfig.builderUser}" = {};
 	  };
 
     })
