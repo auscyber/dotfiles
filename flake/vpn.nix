@@ -33,7 +33,7 @@ in
             lib.mapAttrsToList (name: value: {
 			  name = value._module.specialArgs.systemIdentifier;
 			  description = "${name}";
-                pubkey = value.config.auscybernix.vpn.pubkey;
+                pubkey = value.config.auscybernix.vpn.clientpubkey;
             }) filteredConfigs
           );
     in

@@ -16,14 +16,20 @@ in
       type = lib.types.nullOr lib.types.str;
       description = "Wireguard VPN IP address";
     };
-    pubkey = lib.mkOption {
+    serverpubkey = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
       description = "Wireguard public key";
     };
+clientpubkey = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Wireguard public key";
+    };
+
     endpoint = lib.mkOption {
       type = lib.types.str;
-      default = "pierlot.com.au:51820";
+      default = "192.168.0.26:51820";
       description = "Wireguard VPN endpoint";
     };
 
@@ -43,7 +49,10 @@ in
     };
     auscybernix.vpn.ipAddress =
       flakeConfig.flake.auscybernix.vpn.configMap."${systemIdentifier}".ipAddress;
-    auscybernix.vpn.pubkey = ../../systems/x86_64-linux/secondpc/wg_private_key.pub;
+    auscybernix.vpn.serverpubkey = ../../systems/x86_64-linux/secondpc/wg_private_key.pub;
+    auscybernix.vpn.clientpubkey = builtins.path { path = config.age.rekey.generatedSecretsDir + "/wireguard_key.pub"; };
+
+
 
     #)
     networking.wg-quick.interfaces.wg0 = {
@@ -55,7 +64,7 @@ in
       ];
       peers = [
         {
-          publicKey = builtins.readFile cfg.pubkey;
+          publicKey = builtins.readFile cfg.serverpubkey;
           allowedIPs = [
             "10.100.0.0/32"
           ];
