@@ -10,9 +10,7 @@
 }:
 let
   cfg = config.auscybernix.nix.builders;
-  base64Key = pkgs.runCommand "base64Key" { } ''
-	echo -n "${config.age.rekey.hostPubkey}" | base64  > $out
-	'';
+  base64Key = lib.extra.toBase64 config.age.rekey.hostPubkey;
   inherit lib;
 
 in
@@ -33,7 +31,7 @@ with lib;
       enable = mkEnableOption "Use this machine as a Nix build machine.";
 	  publicHostKey = mkOption {
 		type = types.str;
-		default = builtins.readFile base64Key;
+		default = base64Key;
 		description = "SSH Public key of the build machine.";
 	  };
       builderUser = mkOption {
