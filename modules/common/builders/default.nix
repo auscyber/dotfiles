@@ -108,7 +108,7 @@ with lib;
         	  builders-use-substitutes = true
         	'';
     }
-    (mkIf cfg.builderConfig.enable {
+    (mkIf cfg.builderConfig.enable ({
       services.openssh.extraConfig = ''
         SetEnv PATH=/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         	'';
@@ -126,7 +126,11 @@ with lib;
 	  "${cfg.builderConfig.builderUser}" = {};
 	  };
 
-    })
+    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+		users.knownUsers = [ cfg.builderConfig.builderUser];
+
+
+	} )
   ]);
 
 }
