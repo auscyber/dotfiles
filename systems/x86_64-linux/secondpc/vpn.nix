@@ -51,7 +51,7 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
           name: peerConfig: {
             PublicKey = peerConfig.pubkey;
 #            Name = peerConfig.description;
-            AllowedIPs = [ "${peerConfig.ipAddress}/24" ];
+            AllowedIPs = [ "${peerConfig.ipAddress}/32" ];
           }
         );
       };
