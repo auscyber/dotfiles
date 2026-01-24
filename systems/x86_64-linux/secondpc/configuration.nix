@@ -46,7 +46,7 @@
     '';
   };
   fileSystems."/mnt/hdd" = {
-    device = "/dev/sdb";
+    device = "/dev/disk/by-uuid/f36e6507-7db6-46ab-bc49-8b2770d3652a";
     fsType = "ext4";
   };
   services.netatalk = {

@@ -16,6 +16,8 @@ in
   };
   age.secrets."wg_private_key" = {
     rekeyFile = ./wg_private_key.age;
+	owner = "systemd-network";
+	group = "systemd-network";
     generator.script =
       { pkgs, file, ... }:
       ''
@@ -24,32 +26,42 @@ in
 		echo "$privkey"
       '';
   };
-  networking.wireguard = {
+  networking.defaultGateway = {
+  address = "192.168.0.1";
+  interface = "br0";
+  };
+  networking.useNetworkd = true;
+  systemd.network = {
     enable = true;
-    interfaces = {
-      wg0 = {
-        ips = [ "10.100.0.1/32" ];
+    netdevs = {
+      "50-wg0" = {
+        netdevConfig = {
+          Kind = "wireguard";
+          Name = "wg0";
+          MTUBytes = "1300";
+        };
+        wireguardConfig = {
 
-        listenPort = 51820;
-        postSetup = ''
-          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/32 -o br0 -j MASQUERADE
-        '';
+        PrivateKeyFile = config.age.secrets."wg_private_key".path;
+          ListenPort = 51820;
+        };
 
-        # This undoes the above command
-        postShutdown = ''
-          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/32 -o br0 -j MASQUERADE
-        '';
-        privateKeyFile = config.age.secrets."wg_private_key".path;
-        peers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (
+wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (
           name: peerConfig: {
-            publicKey = peerConfig.pubkey;
-            name = peerConfig.description;
-            allowedIPs = [ peerConfig.ipAddress ];
+            PublicKey = peerConfig.pubkey;
+#            Name = peerConfig.description;
+            AllowedIPs = [ peerConfig.ipAddress ];
           }
         );
-
+      };
+    };
+    networks.wg0 = {
+      matchConfig.Name = "wg0";
+      address = ["10.100.0.1/24"];
+      networkConfig = {
+        IPMasquerade = "ipv4";
+        IPv4Forwarding = true;
       };
     };
   };
-
-}
+  }
