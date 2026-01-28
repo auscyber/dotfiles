@@ -20,7 +20,7 @@
       proxyPass = "http://localhost:8069";
     };
     extraConfig = ''
-      	client_max_body_size 100m;
+      	client_max_body_size 500m;
       	'';
   };
 
