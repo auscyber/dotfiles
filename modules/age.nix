@@ -42,7 +42,7 @@ let
           mount -t ramfs none "${cfg.ageMountPoint}" -o nodev,nosuid,mode=0751
       '';
   newGeneration = ''
-    _agenix_generation="$(basename "$(readlink ${cfg.secretsDir})" || echo 0)"
+    _agenix_generation="$(basename "$(dirname "$(readlink ${cfg.secretsDir})")" || echo 0)"
     _old_generation="$_agenix_generation"
     (( ++_agenix_generation ))
     echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
@@ -189,7 +189,7 @@ let
   '') cfg.identityPaths;
 
   cleanupAndLink = ''
-    _agenix_generation="$(basename "$(readlink ${cfg.secretsDir})" || echo 0)"
+    _agenix_generation="$(basename "$(dirname "$(readlink ${cfg.secretsDir})")" || echo 0)"
     (( ++_agenix_generation ))
     echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
     ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}" ${cfg.secretsDir}
