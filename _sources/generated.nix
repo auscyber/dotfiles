@@ -36,15 +36,15 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-W9k+ADDJU5+5b9FrstMD8f8XYQu1Xh+9H01vllLgKUE=";
+      sha256 = "sha256-/tFsaoKUGoyQKWQbFPtQOge+azCP3hPfzl7Yu1AW58Y=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.51";
+    version = "v2.0.52";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.51/icon_map.sh";
-      sha256 = "sha256-ECwcBOX2t0SqKjtCEcpE1S9NQ9vrZYjoxrQMhJO1iVY=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.52/icon_map.sh";
+      sha256 = "sha256-qfOpIFtZz0yGKajXhOZPWl4VynwDbhYvxv8uSajx5cQ=";
     };
   };
   jankyborders = {
@@ -80,16 +80,16 @@
   };
   rift = {
     pname = "rift";
-    version = "v0.3.7";
+    version = "v0.3.8";
     src = fetchFromGitHub {
       owner = "acsandmann";
       repo = "rift";
-      rev = "v0.3.7";
+      rev = "v0.3.8";
       fetchSubmodules = false;
-      sha256 = "sha256-5PU28eFob8FANCK2HbX4aDMW0NnTxbYhk2r2pkKrjg0=";
+      sha256 = "sha256-4CExoT2fxx1YlZRxorpQIyvckaZvR8Y/wA0Fc5/bW8Y=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-5PU28eFob8FANCK2HbX4aDMW0NnTxbYhk2r2pkKrjg0=/Cargo.lock";
+      lockFile = ./. + "/sha256-4CExoT2fxx1YlZRxorpQIyvckaZvR8Y_wA0Fc5_bW8Y=/Cargo.lock";
       outputHashes = {
         "dispatchr-1.0.0" = "sha256-Df6PdDA5bpmy2P30vGdad+EiHJiANmHrRF2q75Uegik=";
         "continue-0.1.1" = "sha256-9irDEeiPbjIG3e1F/jpWd3fCL1/nei/IYjhMqRp+Q+s=";
@@ -98,19 +98,19 @@
   };
   slskd = {
     pname = "slskd";
-    version = "337fe1c7abb9af3b1915bca18224fe4869b52eb4";
+    version = "92b49b7a4035822240ba51ffdf3383eb9a30b164";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "337fe1c7abb9af3b1915bca18224fe4869b52eb4";
+      rev = "92b49b7a4035822240ba51ffdf3383eb9a30b164";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-Sg/AOs70HojHXI93WsC//oxmKck5uSxapG8uwtrGxK8=";
+      sha256 = "sha256-/dcx2qKdo+x0CnXUwl6+5DeL1G1dozm6rVrnOaWm8NM=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-Sg_AOs70HojHXI93WsC__oxmKck5uSxapG8uwtrGxK8=/./src/web/package-lock.json";
-    };date = "2026-01-19";
+      "./src/web/package-lock.json" = ./. + "/sha256-_dcx2qKdo+x0CnXUwl6+5DeL1G1dozm6rVrnOaWm8NM=/./src/web/package-lock.json";
+    };date = "2026-01-22";
   };
   yabai = {
     pname = "yabai";
