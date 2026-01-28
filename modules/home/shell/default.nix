@@ -19,6 +19,23 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+  age.secrets = {
+  attic_token = {
+  rekeyFile = ../../../secrets/attickey.age;
+  };
+  };
+  age.templates."attic-config" = {
+  path = "~/.config/attic/config.toml";
+  dependencies = {
+  inherit (config.age.secrets) attic_token;
+  };
+  content = { pkgs, placeholders, ...}: ''
+  default-server = "central";
+  [servers.central]
+  endpoint = "https://cache.ivymect.in"
+  token = "${placeholders.attic_token}"
+'';
+  };
   home.packages = with pkgs; [
   attic-client
   ];
