@@ -2,6 +2,13 @@
 {
   input-branches = {
     inputs = {
+	  attic = {
+	  		upstream = {
+		  url = "https://github.com/zhaofengli/attic.git";
+		  ref = "main";
+		  };
+	  };
+
       input-branches = {
         upstream = {
           url = "https://github.com/mightyiam/input-branches.git";

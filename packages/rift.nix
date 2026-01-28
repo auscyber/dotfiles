@@ -11,6 +11,6 @@ rustPlatform.buildRustPackage rec {
 
 meta = {
 platforms = lib.platforms.darwin;
-license = lib.licences.mit;
+license = lib.licenses.mit;
 };
 }

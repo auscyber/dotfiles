@@ -44,6 +44,7 @@
       '';
 
   };
+
   nix.extraOptions = ''
     !include "${config.age.templates."extra-nix-conf".path}"
         		'';

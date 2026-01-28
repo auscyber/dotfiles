@@ -20,3 +20,6 @@
 [submodule "inputs/rift"]
 	path = inputs/rift
 	url = https://github.com/auscyber/rift.git
+[submodule "inputs/attic"]
+	path = inputs/attic
+	url = https://github.com/auscyber/dotfiles.git

@@ -187,18 +187,14 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1758711588,
-        "narHash": "sha256-0nZlCCDC5PfndsQJXXtcyrtrfW49I3KadGMDlutzaGU=",
-        "owner": "zhaofengli",
-        "repo": "attic",
-        "rev": "12cbeca141f46e1ade76728bce8adc447f2166c6",
-        "type": "github"
+        "path": "./inputs/attic",
+        "type": "path"
       },
       "original": {
-        "owner": "zhaofengli",
-        "repo": "attic",
-        "type": "github"
-      }
+        "path": "./inputs/attic",
+        "type": "path"
+      },
+      "parent": []
     },
     "base16": {
       "inputs": {
