@@ -14,13 +14,17 @@ rec {
     targets.kde.enable = true;
   };
   #  imports = [ ./picom.nix ];
+  home.sessionVariables = {
+	SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
+  };
+
   programs = {
     ssh = {
       enable = true;
       matchBlocks = {
-        "*" = {
-          identityAgent = "~/.1password/agent.sock";
-        };
+#        "*" = {
+#          identityAgent = "~/.1password/agent.sock";
+#        };
       };
 
     };
