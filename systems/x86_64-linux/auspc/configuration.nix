@@ -21,8 +21,8 @@
       enable = true;
       builderConfig = {
         enable = true;
-        maxJobs = 4;
-        speedFactor = 4;
+        maxJobs = 10;
+        speedFactor = 6;
         features = [
           "big-parallel"
           "cached-compilation"
