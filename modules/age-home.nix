@@ -18,7 +18,11 @@ let
   templatesMountPoint = "/templates";
 
   newGeneration = ''
-    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
+    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
+    then
+	  _agenix_generation=0
+fi
     (( ++_agenix_generation ))
     echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
     mkdir -p "${cfg.ageMountPoint}"
@@ -145,12 +149,17 @@ let
   '') cfg.identityPaths;
 
   cleanupAndLink = ''
-    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
+    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
+    then
+	  _agenix_generation=0
+fi
+
     (( ++_agenix_generation ))
     echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
      # Ensure parent dir exists (e.g. .../agenix if targets are .../agenix/secrets)
-    mkdir -p "$(dirname "${cfg.secretsDir}")"
-    mkdir -p "$(dirname "${cfg.templateDir}")"
+    [[ -d "$(dirname "${cfg.secretsDir}")" ]] || mkdir -p "$(dirname "${cfg.secretsDir}")"
+    [[ -d "$(dirname "${cfg.templateDir}")" ]] || mkdir -p "$(dirname "${cfg.templateDir}")"
 
     ln -sfT "${cfg.ageMountPoint}/$_agenix_generation${secretsMountPoint}" "${cfg.secretsDir}"
 

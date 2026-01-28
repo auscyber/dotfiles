@@ -42,19 +42,23 @@ let
           mount -t ramfs none "${cfg.ageMountPoint}" -o nodev,nosuid,mode=0751
       '';
   newGeneration = ''
-    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
-    _old_generation="$_agenix_generation"
-    (( ++_agenix_generation ))
-    echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
-    mkdir -p "${cfg.ageMountPoint}"
-    chmod 0751 "${cfg.ageMountPoint}"
-    ${mountCommand}
-    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
-    chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
-    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}"
-    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}"
-	mkdir -p "$(dirname "${cfg.secretsDir}")"
-	mkdir -p "$(dirname "${cfg.templateDir}")"
+        _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+    	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
+        then
+    	  _agenix_generation=0
+    fi
+            _old_generation="$_agenix_generation"
+            (( ++_agenix_generation ))
+            echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
+            mkdir -p "${cfg.ageMountPoint}"
+            chmod 0751 "${cfg.ageMountPoint}"
+            ${mountCommand}
+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
+            chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}"
+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}"
+        	mkdir -p "$(dirname "${cfg.secretsDir}")"
+        	mkdir -p "$(dirname "${cfg.templateDir}")"
   '';
 
   chownGroup = if isDarwin then "admin" else "keys";
@@ -189,17 +193,22 @@ let
   '') cfg.identityPaths;
 
   cleanupAndLink = ''
-    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
-    (( ++_agenix_generation ))
-    echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
-    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}" ${cfg.secretsDir}
-    echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."
-    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}" ${cfg.templateDir}
+    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+        	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
+            then
+        	  _agenix_generation=0
+        fi
 
-    (( _agenix_generation > 1 )) && {
-    echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
-    rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
-    }
+        (( ++_agenix_generation ))
+        echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}" ${cfg.secretsDir}
+        echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."
+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}" ${cfg.templateDir}
+
+        (( _agenix_generation > 1 )) && {
+        echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
+        rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
+        }
   '';
 
   installSecrets = builtins.concatStringsSep "\n" (
@@ -278,7 +287,7 @@ let
               (listOf unspecified)
               (attrsOf unspecified)
             ];
-          example = literalExpression ''[ config.age.secrets.basicAuthPw1 nixosConfigurations.machine2.config.age.secrets.basicAuthPw ]'';
+          example = literalExpression "[ config.age.secrets.basicAuthPw1 nixosConfigurations.machine2.config.age.secrets.basicAuthPw ]";
           default = [ ];
           description = ''
             Other secrets on which this template depends. This guarantees that in the final
