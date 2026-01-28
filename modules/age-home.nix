@@ -18,7 +18,7 @@ let
   templatesMountPoint = "/templates";
 
   newGeneration = ''
-    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
     (( ++_agenix_generation ))
     echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
     mkdir -p "${cfg.ageMountPoint}"
@@ -145,7 +145,7 @@ let
   '') cfg.identityPaths;
 
   cleanupAndLink = ''
-    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
+    _agenix_generation="$(basename "$(readlink "$(dirname ${cfg.secretsDir})")" || echo 0)"
     (( ++_agenix_generation ))
     echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
      # Ensure parent dir exists (e.g. .../agenix if targets are .../agenix/secrets)
