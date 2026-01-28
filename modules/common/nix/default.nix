@@ -78,7 +78,7 @@ in
           ...
         }:
         ''
-          		machine https://cache.ivymect.in/.+
+          		machine cache.ivymect.in
           		password ${placeholders.attic_token}
           	  '';
     };
