@@ -96,6 +96,7 @@ in
       ../../modules/common/secrets.nix
 
       ../../modules/common/nix
+	  ../../modules/common/builders/default.nix
       ../../modules/common/common
       {
         nixpkgs = {
@@ -131,6 +132,7 @@ in
 
       ../../modules/common/nix
       ../../modules/common/common
+	  ../../modules/common/builders/default.nix
 
       {
         nixpkgs = {

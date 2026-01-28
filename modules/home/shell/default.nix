@@ -94,10 +94,9 @@ in
       };
       home-manager.enable = true;
       gpg = {
-        enable = true;
-        settings = {
-        };
-      };
+
+	  enable = true;
+	  };
 
       git = {
         enable = true;

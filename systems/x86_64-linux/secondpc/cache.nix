@@ -14,17 +14,26 @@
 
   };
   services.nginx.virtualHosts."cache.ivymect.in" = {
-    useACMEHost = "*.ivymect.in";
+    useACMEHost = "ivymect.in";
     forceSSL = true;
     locations."/" = {
       proxyPass = "http://localhost:8069";
     };
+    extraConfig = ''
+      	client_max_body_size 100m;
+      	'';
   };
+
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets."attic_env".path;
     settings = {
       listen = "[::]:8069";
+      storage = {
+        type = "local";
+        path = "/mnt/hdd/attic";
+
+      };
 
       jwt = { };
 

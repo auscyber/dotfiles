@@ -30,9 +30,11 @@ in
   address = "192.168.0.1";
   interface = "br0";
   };
+  systemd.network.wait-online.ignoredInterfaces = [ "br0" ];
   networking.useNetworkd = true;
   systemd.network = {
     enable = true;
+
     netdevs = {
       "50-wg0" = {
         netdevConfig = {
@@ -64,5 +66,13 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
         IPv4Forwarding = true;
       };
     };
+	networks."40-br0" = {
+	extraConfig = ''
+	[Link]
+	RequiredForOnline=routable
+	'';
+
+	};
+
   };
   }

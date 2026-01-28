@@ -19,6 +19,7 @@
       };
     };
   };
+  home.packages = with pkgs; [ pinentry-curses];
   #  programs.neovim.enable = true;
   home.stateVersion = "25.05";
 }
