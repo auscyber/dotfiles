@@ -10,6 +10,20 @@ in
 {
 
   flake.auscybernix.builders = {
+  extraBuildMachines = {
+  "laptop-builder" = let
+  darwinBuilderConfig = self.darwinConfigurations."Ivys-MacBook-Pro";
+  builderConfig = self.darwinConfigurations."Ivys-MacBook-Pro".config.nix.linux-builder;
+  in
+  {
+	inherit (builderConfig) maxJobs systems speedFactor ;
+	features = builderConfig.supportedFeatures;
+	username = "builder";
+	ipAddress = "${darwinBuilderConfig.config.auscybernix.nix.builders.builderConfig.ipAddress}:31022";
+	hostname = "linux-builder";
+	publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
+  };
+  };
     sshKeys =
           let
             filteredConfigs = lib.filterAttrs (
@@ -24,8 +38,8 @@ in
             name: value: value.config.auscybernix.nix.builders.sshPublicKey
           );
 
-    buildMachines =
-      let
+    buildMachines = self.auscybernix.builders.extraBuildMachines //
+      (let
         filteredConfigs = lib.filterAttrs (
           name: value:
           if value.config.auscybernix.nix ? builders then
@@ -49,7 +63,7 @@ in
             features = value.config.auscybernix.nix.builders.builderConfig.features;
           };
         }
-      );
+      ));
   };
 
 }

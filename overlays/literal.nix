@@ -135,6 +135,11 @@ in
 
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
+  heroic =(pkgs.heroic.override {
+  extraPkgs = pkgs: [
+    pkgs.gamescope
+  ];
+});
 
     inherit (inputs.eww.packages.${system}) eww;
 

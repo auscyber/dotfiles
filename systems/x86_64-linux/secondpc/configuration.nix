@@ -25,7 +25,7 @@
 	enable = true;
 	ipAddress = "10.100.0.1";
       speedFactor = 1;
-      maxJobs = 2;
+      maxJobs = 4;
 
     };
   };
@@ -61,7 +61,7 @@
       };
       time-machine = {
         path = "/timemachine";
-        "valid users" = "auscyber";
+        "valid users" = "ivypierlot";
         "time machine" = true;
       };
     };

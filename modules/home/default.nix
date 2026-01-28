@@ -65,8 +65,8 @@
       vim
       nil
       neovim
-      nixfmt-rfc-style
       starship
+	  nixfmt
       treefmt
       coreutils
     ];
