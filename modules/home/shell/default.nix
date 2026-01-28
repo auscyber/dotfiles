@@ -19,38 +19,40 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-  age.secrets = {
-  attic_token = {
-  rekeyFile = ../../../secrets/attickey.age;
-  };
-  };
-  age.templates."attic-config" = {
-  path = "~/.config/attic/config.toml";
-  dependencies = {
-  inherit (config.age.secrets) attic_token;
-  };
-  content = { pkgs, placeholders, ...}: ''
-  default-server = "central";
-  [servers.central]
-  endpoint = "https://cache.ivymect.in"
-  token = "${placeholders.attic_token}"
-'';
-  };
-  home.packages = with pkgs; [
-  attic-client
-  ];
-  services.gpg-agent = {
-  extraConfig = ''
-   allow-loopback-pinentry
-   default-cache-ttl 600
-max-cache-ttl 7200
-ttyname $GPG_TTY
-enable-ssh-support
-debug-level 2
+    age.secrets = {
+      attic_token = {
+        rekeyFile = ../../../secrets/attickey.age;
+      };
+    };
+    age.templates."attic-config" = {
+      path = "${config.home.homeDirectory}/.config/attic/config.toml";
+      dependencies = {
+        inherit (config.age.secrets) attic_token;
+      };
+      content =
+        { pkgs, placeholders, ... }:
+        ''
+          default-server = "central"
+          [servers.central]
+          endpoint = "https://cache.ivymect.in"
+          token = "${placeholders.attic_token}"
+        '';
+    };
+    home.packages = with pkgs; [
+      attic-client
+    ];
+    services.gpg-agent = {
+      extraConfig = ''
+           allow-loopback-pinentry
+           default-cache-ttl 600
+        max-cache-ttl 7200
+        ttyname $GPG_TTY
+        enable-ssh-support
+        debug-level 2
 
-'';
-enableScDaemon = true;
-};
+      '';
+      enableScDaemon = true;
+    };
     home.file = {
       ".config/starship.toml" = {
         source = ../../../.config/starship.toml;
@@ -92,10 +94,10 @@ enableScDaemon = true;
       };
       home-manager.enable = true;
       gpg = {
-	  enable = true;
-	  settings = {
-	  };
-	  };
+        enable = true;
+        settings = {
+        };
+      };
 
       git = {
         enable = true;
