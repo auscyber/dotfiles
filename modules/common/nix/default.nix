@@ -7,6 +7,26 @@
 }:
 let
   cfg = config.auscybernix.nix;
+  build-hook = pkgs.writeTextFile {
+    name = "build-hook";
+    executable = true;
+    destination = "/bin/build-hook";
+    text = ''
+      #!/bin/sh
+                      	  set -eu
+                      set -f # disable globbing
+                      export IFS=' '
+        			  export PATH="$PATH:${pkgs.attic-client}/bin"
+        			  attic login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
+
+                      echo "Uploading paths" $OUT_PATHS
+                      exec attic push main $OUT_PATHS
+
+    '';
+
+    meta.mainProgram = "build-hook";
+  };
+
 in
 {
 
@@ -50,8 +70,9 @@ in
       #    package = pkgs.nixVersions.latest;
 
       extraOptions = ''
-                experimental-features = nix-command flakes
-        		netrc-file = "${config.age.templates.netrc.path}"
+                        experimental-features = nix-command flakes
+                		netrc-file = "${config.age.templates.netrc.path}"
+        				post-build-hook = ${build-hook}/bin/build-hook
       '';
       #	  auto-optimise-store = true;
       #optimise.automatic = true;

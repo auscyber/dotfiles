@@ -3639,6 +3639,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-swift": {
+      "locked": {
+        "lastModified": 1769105483,
+        "narHash": "sha256-cC4W6KDq3942hk4zyoDWYOvb/9lvlsPZbrdlTj9hsxw=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7",
+        "type": "github"
+      }
+    },
     "nixpkgs_10": {
       "locked": {
         "lastModified": 1639213685,
@@ -4570,6 +4586,7 @@
         ],
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-nvmd": "nixpkgs-nvmd",
+        "nixpkgs-swift": "nixpkgs-swift",
         "nixvim": "nixvim",
         "nur": "nur",
         "nvfetcher": "nvfetcher_2",

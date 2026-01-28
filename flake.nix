@@ -7,6 +7,7 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
+	nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";

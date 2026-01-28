@@ -24,10 +24,12 @@ aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.pinentry-curses;
     aarch64-linux = pkgs.pinentry;
   };
+   pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
 in
 (
   {
 
+	inherit  (pkgsSwift) swift swiftPackages;
     nil = inputs.nil.packages."${system}".default;
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
