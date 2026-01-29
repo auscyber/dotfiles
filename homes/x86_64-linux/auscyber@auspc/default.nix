@@ -15,16 +15,16 @@ rec {
   };
   #  imports = [ ./picom.nix ];
   home.sessionVariables = {
-	SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
+    SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
   };
 
   programs = {
     ssh = {
       enable = true;
       matchBlocks = {
-#        "*" = {
-#          identityAgent = "~/.1password/agent.sock";
-#        };
+        #        "*" = {
+        #          identityAgent = "~/.1password/agent.sock";
+        #        };
       };
 
     };
@@ -41,6 +41,7 @@ rec {
   wayland.windowManager.hyprland.settings.exec-once = [
     "${pkgs.kdePackages.kwallet-pam}/libexec/pam_kwallet_init"
   ];
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIZAourM3ZASk6AiN8qDD1gm+jW6/FvlXNc3sfNudQtU auscyber@auspc";
   sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   auscybernix = {
     keybinds.kanata = {
