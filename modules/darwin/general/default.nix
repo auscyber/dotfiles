@@ -13,6 +13,7 @@
       auscybernix.nix.flake = config.auscybernix.nix.flake;
     }
   ];
+
   environment.shellAliases = {
     "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
 
