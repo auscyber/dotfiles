@@ -14,8 +14,8 @@ let
   };
 
   ghostty = {
-#    aarch64-darwin = pkgs.callPackage ../packages/ghostty/default.nix { source = sources.ghostty; }; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
-aarch64-darwin = pkgs.ghostty-bin;
+    #    aarch64-darwin = pkgs.callPackage ../packages/ghostty/default.nix { source = sources.ghostty; }; # inputs.my-nur.packages.aarch64-darwin.ghostty-nightly-bin;
+    aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.ghostty;
     aarch64-linux = pkgs.ghostty;
   };
@@ -24,12 +24,16 @@ aarch64-darwin = pkgs.ghostty-bin;
     x86_64-linux = pkgs.pinentry-curses;
     aarch64-linux = pkgs.pinentry;
   };
-   pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
+  helium = {
+    x86_64-linux = pkgs.nur.repos.forkprince.helium-nightly;
+  };
+  pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
 in
 (
   {
 
-	inherit  (pkgsSwift) swift swiftPackages;
+    inherit (pkgsSwift) swift swiftPackages;
+    helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
 	attic = pkgs.attic;
 	attic-server = pkgs.attic-server;
@@ -55,9 +59,9 @@ in
     rift = pkgs.callPackage ../packages/rift.nix {
 
       source = {
-	  src = ../inputs/rift;
-	  version = "0.8.3";
-	  cargoLock = ../inputs/rift/Cargo.lock;
+        src = ../inputs/rift;
+        version = "0.8.3";
+        cargoLock = ../inputs/rift/Cargo.lock;
         pname = "rift";
       };
 
@@ -139,11 +143,13 @@ in
 
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
-  heroic =(pkgs.heroic.override {
-  extraPkgs = pkgs: [
-    pkgs.gamescope
-  ];
-});
+    heroic = (
+      pkgs.heroic.override {
+        extraPkgs = pkgs: [
+          pkgs.gamescope
+        ];
+      }
+    );
 
     inherit (inputs.eww.packages.${system}) eww;
 
