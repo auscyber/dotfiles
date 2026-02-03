@@ -7,11 +7,12 @@
     intermediary = true;
   };
   nix.optimise = {
-  automatic = true;
+    automatic = true;
 
-dates = [  "03:45"
-];
-  }
+    dates = [
+      "03:45"
+    ];
+  };
   age.secrets.ivy-pwd-hash = {
     generator = {
       dependencies = [ config.age.secrets.ivy-password ];
