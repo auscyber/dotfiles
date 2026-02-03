@@ -97,6 +97,7 @@ rec {
   home.packages =
     with pkgs;
     [
+      helium
       heroic
       shadps4
       #      element-desktop
