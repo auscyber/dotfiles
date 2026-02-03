@@ -274,7 +274,7 @@
     kdePackages.breeze-grub
     qemu
     OVMF
-    virt-manager
+#    virt-manager
 
     #Required for vscode
     #nodejs-14_x

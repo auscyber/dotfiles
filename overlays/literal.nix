@@ -31,6 +31,8 @@ in
 
 	inherit  (pkgsSwift) swift swiftPackages;
     nil = inputs.nil.packages."${system}".default;
+	attic = pkgs.attic;
+	attic-server = pkgs.attic-server;
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
@@ -91,7 +93,7 @@ in
       source = {
         inherit (sources.slskd) src;
         version = "0.24.2";
-        npmHash = "sha256-cNYnYp+QrbwvpYs/qKKivDlMpdQP6EbDUBS32S3TrO4=";
+        npmHash = "sha256-bGD3s/ukksrO1uIiM0V8iw62Gyxynh3kTnqkq4kHaQM=";
       };
     };
     zen-browser = zen-browser."${system}";

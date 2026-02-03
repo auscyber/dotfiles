@@ -27,6 +27,7 @@
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets."attic_env".path;
+	useFlakeCompatOverlay = false;
     settings = {
       listen = "[::]:8069";
       storage = {

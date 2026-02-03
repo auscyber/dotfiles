@@ -131,7 +131,7 @@
   };
   services.tailscale = {
     enable = false;
-    authKeyFile = config.sops.secrets."tailscale/auth_key".path;
+    authKeyFile = config.age.secrets."tailscale/auth_key".path;
     extraSetFlags = [ "--advertise-exit-node" ];
   };
 
@@ -139,9 +139,8 @@
     enable = true;
     openFirewall = true;
   };
-  sops.secrets."tailscale/auth_key" = {
-    sopsFile = ../../../secrets/secondpc/default.yaml;
-  };
+
+  age.secrets."tailscale/auth_key".rekeyFile = ./tailscale_key.age;
   age.secrets."acme_cloudflare.env".rekeyFile = ./acme_cloudflare.age;
 
 }
