@@ -34,12 +34,14 @@ in
 
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
+
     nix.builders = {
+
+      absoluteSpeedFactor = 20;
       enable = true;
       builderConfig = {
         enable = true;
         maxJobs = 10;
-        speedFactor = 20;
         features = [
           "big-parallel"
           "cached-compilation"

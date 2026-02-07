@@ -22,6 +22,11 @@ with lib;
       default = false;
       description = "Enable distributed Nix builds using remote builders.";
     };
+    absoluteSpeedFactor = mkOption {
+      type = types.int;
+      default = 0;
+      description = "Absolute speed factor for this machine. Overrides speedFactor if set to a non-zero value.";
+    };
     sshPublicKey = mkOption {
       type = types.str;
       default = "";
@@ -29,11 +34,11 @@ with lib;
     };
     builderConfig = {
       enable = mkEnableOption "Use this machine as a Nix build machine.";
-	  publicHostKey = mkOption {
-		type = types.str;
-		default = base64Key;
-		description = "SSH Public key of the build machine.";
-	  };
+      publicHostKey = mkOption {
+        type = types.str;
+        default = base64Key;
+        description = "SSH Public key of the build machine.";
+      };
       builderUser = mkOption {
         type = types.str;
         default = "builder";
@@ -49,10 +54,11 @@ with lib;
         default = 1;
         description = "Maximum number of concurrent jobs this build machine can handle.";
       };
-      speedFactor = mkOption {
+
+      absoluteSpeedFactor = mkOption {
         type = types.int;
-        default = 1;
-        description = "Speed factor for this build machine.";
+        default = cfg.absoluteSpeedFactor;
+        description = "Absolute speed factor for this build machine. Overrides speedFactor if set to a non-zero value.";
       };
       hostname = mkOption {
         type = types.str;
@@ -124,8 +130,7 @@ with lib;
       users.users.${cfg.builderConfig.builderUser} = {
         openssh.authorizedKeys.keyFiles = flakeConfig.flake.auscybernix.builders.sshKeys;
 
-
-		shell =  pkgs.bashInteractive;
+        shell = pkgs.bashInteractive;
       }
       // lib.optionalAttrs pkgs.stdenv.isLinux {
         isSystemUser = true;

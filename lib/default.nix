@@ -7,55 +7,55 @@ let
   self = inputs.self;
   inherit (inputs.nixpkgs.lib) mapAttrs mkOption types;
   inherit (inputs.flake-parts.lib) mkSubmoduleOptions;
-  builderConfig =  types.submodule (submod: {
-              options = {
-			  publicHostKey = mkOption {
-				  type = types.str;
-				  description = "Public SSH host key of the build machine.";
-				};
-                username = mkOption {
-                  type = types.str;
-                  default = "builder";
-                  description = "Username for the build machine.";
-                };
-                name = mkOption {
-                  type = types.str;
-                  default = "";
-                  description = "Name identifier for the build machine.";
-                };
-                hostname = mkOption {
-                  type = types.str;
-                  default = "";
-                  description = "Hostname of the build machine.";
-                };
-                ipAddress = mkOption {
-                  type = types.str;
-                  default = "";
-                  description = "IP Address of the build machine.";
-                };
-                systems = mkOption {
-                  type = types.listOf types.str;
-                  default = [ ];
-                  description = "List of systems this build machine can build for.";
-                };
-                maxJobs = mkOption {
-                  type = types.int;
-                  default = 1;
-                  description = "Maximum number of concurrent jobs this build machine can handle.";
-                };
-                speedFactor = mkOption {
-                  type = types.int;
-                  default = 1;
-                  description = "Speed factor for this build machine.";
-                };
-                features = mkOption {
-                  type = types.listOf types.str;
-                  default = [ ];
-                  description = "List of supported features for this build machine.";
-                };
+  builderConfig = types.submodule (submod: {
+    options = {
+      publicHostKey = mkOption {
+        type = types.str;
+        description = "Public SSH host key of the build machine.";
+      };
+      username = mkOption {
+        type = types.str;
+        default = "builder";
+        description = "Username for the build machine.";
+      };
+      name = mkOption {
+        type = types.str;
+        default = "";
+        description = "Name identifier for the build machine.";
+      };
+      hostname = mkOption {
+        type = types.str;
+        default = "";
+        description = "Hostname of the build machine.";
+      };
+      ipAddress = mkOption {
+        type = types.str;
+        default = "";
+        description = "IP Address of the build machine.";
+      };
+      systems = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of systems this build machine can build for.";
+      };
+      maxJobs = mkOption {
+        type = types.int;
+        default = 1;
+        description = "Maximum number of concurrent jobs this build machine can handle.";
+      };
+      absoluteSpeedFactor = mkOption {
+        type = types.int;
+        default = 1;
+        description = "Speed factor for this build machine.";
+      };
+      features = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of supported features for this build machine.";
+      };
 
-              };
-            });
+    };
+  });
 in
 {
 
@@ -112,12 +112,13 @@ in
           default = [ ];
           description = "List of SSH public keys for accessing build machines.";
         };
-		extraBuildMachines = mkOption {
-		  type = types.attrsOf (builderConfig);
-		  default = { };
-		};
+        extraBuildMachines = mkOption {
+          type = types.attrsOf (builderConfig);
+          default = { };
+        };
         buildMachines = mkOption {
-          type = types.attrsOf (builderConfig
+          type = types.attrsOf (
+            builderConfig
 
           );
           default = [ ];

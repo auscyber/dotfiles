@@ -21,10 +21,10 @@
   auscybernix.ssh.enable = true;
   auscybernix.nix.builders = {
     enable = true;
+    absoluteSpeedFactor = 5;
     builderConfig = {
       enable = true;
       ipAddress = "10.100.0.1";
-      speedFactor = 1;
       maxJobs = 5;
 
     };
