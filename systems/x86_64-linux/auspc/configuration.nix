@@ -8,6 +8,22 @@
   pkgs,
   ...
 }:
+let
+  kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
+    pname = "linux-cachyos-with-custom-source";
+
+    # Customize CachyOS settings
+    cpusched = "bore";
+    lto = "thin";
+    rt = true;
+    processorOpt = "x86_64-v3";
+    hzTicks = "1000";
+    bbr3 = true;
+    hardened = false;
+
+    # Additional args are available. See kernel-cachyos/mkCachyKernel.nix
+  };
+in
 
 {
   imports = [
@@ -15,6 +31,7 @@
     ./hardware-configuration.nix
   ];
   programs.fish.enable = true;
+
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
     nix.builders = {
@@ -55,7 +72,7 @@
 
   };
   boot.supportedFilesystems = [ "ntfs" ];
-  boot.kernelPackages = pkgs.cachosKernels.linuxPackages-cachyos-latest;
+  boot.kernelPackages = pkgs.linuxKernel.packagesFor kernel;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
   #  environment.persistence."/persistent" = {
   #    enable = true; # NB: Defaults to true, not needed

@@ -25,7 +25,7 @@
         lib = prev.lib.extend self.lib.overlay;
       })
       inputs.nur.overlays.default
-      inputs.nix-cachyos-kernel.overlays.default
+      inputs.nix-cachyos-kernel.overlays.pinned
       #      inputs.my-nur.overlays.default
       #      (final: prev: {
       #        nur = prev.nur // {
