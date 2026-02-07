@@ -25,6 +25,7 @@
         lib = prev.lib.extend self.lib.overlay;
       })
       inputs.nur.overlays.default
+      inputs.nix-cachyos-kernel.overlays.default
       #      inputs.my-nur.overlays.default
       #      (final: prev: {
       #        nur = prev.nur // {
@@ -34,9 +35,9 @@
       #        };
       #
       #      })
-	  inputs.attic.overlays.default
+      inputs.attic.overlays.default
       inputs.hyprland-plugins.overlays.default
-	  inputs.niri.overlays.niri
+      inputs.niri.overlays.niri
       inputs.emacs.overlays.default
       inputs.rust-overlay.overlays.default
       inputs.nvfetcher.overlays.default

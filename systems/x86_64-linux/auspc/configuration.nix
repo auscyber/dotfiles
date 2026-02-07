@@ -55,7 +55,7 @@
 
   };
   boot.supportedFilesystems = [ "ntfs" ];
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.cachosKernels.linuxPackages-cachyos-latest;
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
   #  environment.persistence."/persistent" = {
   #    enable = true; # NB: Defaults to true, not needed

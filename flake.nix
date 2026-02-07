@@ -6,8 +6,9 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
-	nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
+    nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
@@ -17,8 +18,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
-	niri.url = "github:sodiboo/niri-flake";
-	niri.inputs.nixpkgs.follows = "nixpkgs";
+    niri.url = "github:sodiboo/niri-flake";
+    niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
     nvfetcher.url = "github:berberman/nvfetcher";
