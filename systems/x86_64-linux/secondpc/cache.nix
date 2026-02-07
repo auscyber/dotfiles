@@ -1,6 +1,5 @@
 { config, pkgs, ... }:
 {
-
   age.secrets."attic_env" = {
     rekeyFile = ./attic_env.age;
     generator = {
@@ -20,14 +19,14 @@
       proxyPass = "http://localhost:8069";
     };
     extraConfig = ''
-      	client_max_body_size 500m;
+      	client_max_body_size 15g;
       	'';
   };
 
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets."attic_env".path;
-	useFlakeCompatOverlay = false;
+    useFlakeCompatOverlay = false;
     settings = {
       listen = "[::]:8069";
       storage = {
@@ -80,8 +79,10 @@
           "https://devenv.cachix.org"
           "https://auscyber.cachix.org"
           "https://cache.ivymect.in/main"
+          "https://attic.xuyh0120.win/lantian"
         ];
         publicKeys = [
+          "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
           "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
           "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c="
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
