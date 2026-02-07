@@ -22,10 +22,10 @@
   auscybernix.nix.builders = {
     enable = true;
     builderConfig = {
-	enable = true;
-	ipAddress = "10.100.0.1";
+      enable = true;
+      ipAddress = "10.100.0.1";
       speedFactor = 1;
-      maxJobs = 4;
+      maxJobs = 5;
 
     };
   };
@@ -274,7 +274,7 @@
     kdePackages.breeze-grub
     qemu
     OVMF
-#    virt-manager
+    #    virt-manager
 
     #Required for vscode
     #nodejs-14_x
