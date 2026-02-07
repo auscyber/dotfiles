@@ -31,7 +31,12 @@ let
 in
 (
   {
-
+linuxZenWMuQSS = pkgs.linuxPackagesFor (pkgs.linux_zen.kernel.override {
+          structuredExtraConfig = with lib.kernel; {
+            SCHED_MUQSS = yes;
+          };
+          ignoreConfigErrors = true;
+        });
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
