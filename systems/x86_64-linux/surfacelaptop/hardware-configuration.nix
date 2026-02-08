@@ -31,10 +31,10 @@
     };
 
   # If you also did the home logical volume
-  fileSystems."/home" =
-    {  device = "/dev/disk/by-label/NixOS-Home"; # <- Change this
-      fsType = "ext4";
-    };
+
+
+
+
 
   # Modify this to the name of the encrypted partition (name you used in cryptsetup luksFormat)
   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-label/NixOS-Encrypted"; # If you followed the guide with the same names, or else change "NixOS-Encrypted" to whetever you named it
@@ -45,7 +45,7 @@
       fsType = "vfat";
     };
   # Modify this to the name of the swap logical volume (name you used in mkswap)
-  swapDevices = [{device = "/dev/disk/by-label/NixOS-Swap"}];
+  swapDevices = [{device = "/dev/disk/by-label/NixOS-Swap";}];
 
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

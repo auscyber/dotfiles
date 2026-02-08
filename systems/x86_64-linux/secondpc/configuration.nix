@@ -365,6 +365,8 @@
     };
 
   };
+ # `keymap` won't apply when prompted to enter the passphrase to decrypt on boot
+  
 
   #services.espanso.enable = true;
 
