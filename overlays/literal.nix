@@ -31,17 +31,19 @@ let
 in
 (
   {
-linuxZenWMuQSS = pkgs.linuxPackagesFor (pkgs.linux_zen.kernel.override {
-          structuredExtraConfig = with lib.kernel; {
-            SCHED_MUQSS = yes;
-          };
-          ignoreConfigErrors = true;
-        });
+    linuxZenWMuQSS = pkgs.linuxPackagesFor (
+      pkgs.linuxPackages_zen.kernel.override {
+        structuredExtraConfig = with lib.kernel; {
+          SCHED_MUQSS = yes;
+        };
+        ignoreConfigErrors = true;
+      }
+    );
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
-	attic = pkgs.attic;
-	attic-server = pkgs.attic-server;
+    attic = pkgs.attic;
+    attic-server = pkgs.attic-server;
     kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;

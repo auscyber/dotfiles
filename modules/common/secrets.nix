@@ -108,14 +108,12 @@ in
         generatedSecretsDir = ../../secrets/generated + "/${cfg.configId}";
 
         localStorageDir = ../.. + "/secrets/rekeyed/${cfg.configId}";
-        agePlugins =
-          with pkgs;
-          [
-          ]
-          ++ lib.optionals pkgs.stdenv.isDarwin [
-            pkgs.age-plugin-1p
-            pkgs.age-plugin-se
-          ];
+        agePlugins = with pkgs; [
+        ];
+        #          ++ lib.optionals pkgs.stdenv.isDarwin [
+        #            pkgs.age-plugin-1p
+        #            pkgs.age-plugin-se
+        #          ];
         # Obtain this using `ssh-keyscan` or by looking it up in your ~/.ssh/known_hosts
         # The path to the master identity used for decryption. See the option's description for more information.
         masterIdentities = [

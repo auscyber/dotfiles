@@ -74,7 +74,8 @@ in
 
   };
   boot.supportedFilesystems = [ "ntfs" ];
-  boot.kernelPackages = pkgs.linuxKernel.packagesFor kernel;
+  boot.kernelPackages = pkgs.linuxZenWMuQSS;
+
   #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
   #  environment.persistence."/persistent" = {
   #    enable = true; # NB: Defaults to true, not needed

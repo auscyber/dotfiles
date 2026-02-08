@@ -14,6 +14,15 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  auscybernix = {
+    ssh.enable = true;
+    nix.flake = "/home/ivy/dotfiles";
+
+    secrets.enable = true;
+    vpn.enable = true;
+
+  };
+  services.linux-enable-ir-emitter.enable = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -53,11 +62,11 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  #  services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+
+  services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -88,7 +97,7 @@
   services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.auscyber = {
+  users.users.ivy = {
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "Ivy Pierlot";
@@ -116,10 +125,10 @@
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
 
   # List services that you want to enable:
 
