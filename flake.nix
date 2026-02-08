@@ -172,7 +172,7 @@
     rnix.url = "github:nix-community/rnix-lsp";
     neovim.url = "github:nix-community/neovim-nightly-overlay";
     neovim.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware.url = "github:NixOS/nixos-hardware?ref=pull/1696/merge";
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
     emacs.url = "github:/nix-community/emacs-overlay";
@@ -217,8 +217,10 @@
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
+      "https://cache.ivymect.in/main"
     ];
     extra-trusted-public-keys = [
+      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
     ];
   };
