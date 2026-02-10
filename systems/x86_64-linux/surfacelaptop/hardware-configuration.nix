@@ -36,11 +36,6 @@
 
   # If you also did the home logical volume
 
-
-
-
-
-
   # Modify this to the name of the encrypted partition (name you used in cryptsetup luksFormat)
   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-label/NixOS-Encrypted"; # If you followed the guide with the same names, or else change "NixOS-Encrypted" to whetever you named it
 
@@ -50,12 +45,7 @@
     fsType = "vfat";
   };
   # Modify this to the name of the swap logical volume (name you used in mkswap)
-<<<<<<< HEAD
-  swapDevices = [{device = "/dev/disk/by-label/NixOS-Swap";}];
-
-=======
   swapDevices = [ { device = "/dev/disk/by-label/NixOS-Swap"; } ];
->>>>>>> 087a5ee7d (lets build)
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
