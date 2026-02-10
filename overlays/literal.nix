@@ -26,6 +26,8 @@ let
   };
   helium = {
     x86_64-linux = pkgs.nur.repos.forkprince.helium-nightly;
+    aarch64-darwin = pkgs.nur.repos.forkprince.helium-nightly;
+    aarch64-linux = pkgs.nur.repos.forkprince.helium-nightly;
   };
   pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
 in

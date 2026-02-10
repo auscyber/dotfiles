@@ -97,6 +97,7 @@ rec {
   home.packages =
     with pkgs;
     [
+      obs-studio
       helium
       heroic
       shadps4

@@ -22,11 +22,15 @@
   ];
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
-    boot.initrd.kernelModules = [ "dm-snapshot" "cryptd" ]; # <- Add "cryptd" in it
+  boot.initrd.kernelModules = [
+    "dm-snapshot"
+    "cryptd"
+  ]; # <- Add "cryptd" in it
 
   fileSystems."/" =
     # Modify this to the name of the root logical volume (name you used in mkfs.ext4)
-    { device = "/dev/disk/by-label/NixOS-Root"; # <- Change this
+    {
+      device = "/dev/disk/by-label/NixOS-Root"; # <- Change this
       fsType = "ext4";
     };
 
@@ -36,17 +40,22 @@
 
 
 
+
   # Modify this to the name of the encrypted partition (name you used in cryptsetup luksFormat)
   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-label/NixOS-Encrypted"; # If you followed the guide with the same names, or else change "NixOS-Encrypted" to whetever you named it
 
   # Modify this to the name of the unencrypted boot partition (name you used in mkfs.fat)
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-label/NixOS-Boot"; # <- Change this
-      fsType = "vfat";
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/NixOS-Boot"; # <- Change this
+    fsType = "vfat";
+  };
   # Modify this to the name of the swap logical volume (name you used in mkswap)
+<<<<<<< HEAD
   swapDevices = [{device = "/dev/disk/by-label/NixOS-Swap";}];
 
+=======
+  swapDevices = [ { device = "/dev/disk/by-label/NixOS-Swap"; } ];
+>>>>>>> 087a5ee7d (lets build)
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

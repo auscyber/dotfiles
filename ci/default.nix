@@ -70,8 +70,8 @@
 
           drvByName = builtins.listToAttrs (
             builtins.map (name: {
-              name = name;
-              value = builtins.findFirst (p: p.name == name) (
+              name = pname;
+              value = builtins.findFirst (p: p.pname == name) (
                 lib.attrValues allPackages ++ lib.attrValues allBuilds
               );
             }) uniqueDrvNames

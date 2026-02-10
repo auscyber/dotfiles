@@ -13,6 +13,12 @@
   perSystem =
     { pkgs, system, ... }:
     {
-      packages = import ../overlays/literal.nix { inherit pkgs system inputs; };
+      packages =
+        let
+          packages = import ../overlays/literal.nix { inherit pkgs system inputs; };
+
+        in
+        pkgs.lib.filterAttrs (_: p: p ? meta && p.meta ? platforms) packages;
+
     };
 }

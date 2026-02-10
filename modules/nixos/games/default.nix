@@ -19,7 +19,7 @@ in
   config = lib.mkIf cfg.enable {
     programs.gamescope = {
       enable = true;
-      capSysNice = true;
+      capSysNice = false;
     };
     environment.systemPackages = with pkgs; [
       gamescope-wsi # HDR
