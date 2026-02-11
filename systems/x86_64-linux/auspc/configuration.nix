@@ -230,6 +230,7 @@ boot.initrd.compressor = "lzma";
       enable = true;
       # package = pkgs.pulseaudioFull;
     };
+    jack.enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).

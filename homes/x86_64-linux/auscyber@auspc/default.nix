@@ -110,6 +110,8 @@ rec {
       #      firefox
       tmux
       wineWowPackages.stable
+      bottles
+      wineasio
       #      emacs
       pcmanfm
       fzf
