@@ -32,6 +32,8 @@ in
   ];
   programs.fish.enable = true;
 
+boot.initrd.compressor = "lzma";
+
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
 
