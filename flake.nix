@@ -172,7 +172,7 @@
     rnix.url = "github:nix-community/rnix-lsp";
     neovim.url = "github:nix-community/neovim-nightly-overlay";
     neovim.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-hardware.url = "github:NixOS/nixos-hardware?ref=pull/1696/merge";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
     emacs.url = "github:/nix-community/emacs-overlay";
