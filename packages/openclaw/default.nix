@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
     description = "Reimplementation of Captain Claw (1997) platformer";
     homepage = "https://github.com/pjasicek/OpenClaw";
     license = licenses.gpl3Plus;
-    maintainers = [ ];
+    maintainers = with maintainers; [ auscyber ];
     platforms = platforms.linux;
   };
 }
