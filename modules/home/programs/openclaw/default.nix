@@ -17,7 +17,7 @@ in
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Enable OpenClaw, a declarative OpenClaw packaging for AI assistant gateway.";
+      description = "Enable OpenClaw (github:openclaw/nix-openclaw), an AI assistant gateway with Telegram/Discord integration.";
     };
   };
 
