@@ -152,6 +152,8 @@ in
 
   }
   // (lib.optionalAttrs (pkgs.stdenv.isLinux) {
+    openclaw = pkgs.callPackage ../packages/openclaw { };
+
     heroic = (
       pkgs.heroic.override {
         extraPkgs = pkgs: [
