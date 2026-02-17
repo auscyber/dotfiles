@@ -48,7 +48,7 @@
             lib.attrValues (lib.filterAttrs (name: _: name != "ci") self.packages."${pkgs.stdenv.system}")
           );
           packagesToBuild = builtins.listToAttrs (
-            builtins.map (v: { "check-package-${v.name}" = v; }) packages
+            builtins.map (v: { "check-package-${v.pname}" = v; }) packages
           );
 
           allBuilds = lib.mergeAttrsList [
