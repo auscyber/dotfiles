@@ -63,8 +63,8 @@
           ];
 
           drvNames =
-            builtins.concatMap (p: [ p.name ]) (lib.attrValues allPackages)
-            ++ builtins.concatMap (p: [ p.name ]) (lib.attrValues allBuilds);
+            builtins.concatMap (p: [ p.pname ]) (lib.attrValues allPackages)
+            ++ builtins.concatMap (p: [ p.pname ]) (lib.attrValues allBuilds);
 
           uniqueDrvNames = builtins.removeDuplicates drvNames;
 
@@ -84,7 +84,7 @@
 
       #        builtins.listToAttrs (
       #          builtins.map (drv: {
-      #            name = drv.name;
+      #            name = drv.pname;
       #            value = drv;
       #}) (
 
