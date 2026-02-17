@@ -19,6 +19,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+       submodules: recursive
     - name: nix install action
       uses: cachix/install-nix-action@v31
       with:
