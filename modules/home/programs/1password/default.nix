@@ -37,11 +37,7 @@ in
       # automatically installed and configured to use shell plugins
       plugins = with pkgs; [
         gh
-        (nodePackages.vercel.overrideAttrs (res: {
-          meta = res.meta // {
-            mainProgram = "vercel";
-          };
-        }))
+
         pkgs.awscli2
       ];
     };
