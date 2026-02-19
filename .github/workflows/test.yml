@@ -1,0 +1,135 @@
+name: "Test"
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - master
+
+env:
+  NIXPKGS_BRANCH: nixpkgs-unstable
+  NIX_VERSION: 2.24.11
+
+jobs:
+  # The `test-stable` and `install-against-stable` job names are
+  # load‐bearing, despite their inaccuracy on the unstable branch, as
+  # they are set as required checks in the repository configuration,
+  # which only repository admins can change.
+  #
+  # TODO: Change them once the repository configuration is updated.
+
+  test-stable:
+    runs-on: macos-14
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v30
+      with:
+        install_url: https://releases.nixos.org/nix/nix-${{ env.NIX_VERSION }}/install
+    - run: nix flake check --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+
+  install-against-stable:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v30
+      with:
+        install_url: https://releases.nixos.org/nix/nix-${{ env.NIX_VERSION }}/install
+        nix_path: nixpkgs=channel:${{ env.NIXPKGS_BRANCH }}
+    - name: Install channels
+      run: |
+        sudo nix-channel --add https://nixos.org/channels/${{ env.NIXPKGS_BRANCH }} nixpkgs
+        sudo nix-channel --update
+    - name: Install nix-darwin
+      run: |
+        sudo mkdir -p /etc/nix-darwin
+        sudo cp modules/examples/simple.nix /etc/nix-darwin/configuration.nix
+
+        nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+        sudo /usr/bin/sed -i.bak \
+          "s/# programs.fish.enable = true;/ \
+            imports = [ \
+              ({ options, ... }: { \
+                nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; \
+                environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ]; \
+                nix.nixPath = \
+                  [ { darwin = \"${PWD////\/}\"; } ] \
+                  ++ options.nix.nixPath.default; \
+              }) \
+            ]; \
+          /" \
+          /etc/nix-darwin/configuration.nix
+
+        sudo nix run .#darwin-rebuild -- switch \
+          -I darwin=. \
+          -I darwin-config=/etc/nix-darwin/configuration.nix
+    - name: Switch to new configuration
+      run: |
+        . /etc/bashrc
+
+        sudo /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          /etc/nix-darwin/configuration.nix
+
+        sudo darwin-rebuild switch
+
+        hello
+    - name: Test uninstallation of nix-darwin
+      run: |
+        # We need to specify `--extra-experimental-features` because `experimental-features` is set by
+        # `cachix/install-nix-action` but not by our default config above
+        sudo nix run .#darwin-uninstaller \
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+        sudo nix run .#darwin-uninstaller.tests.uninstaller \
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+
+  install-flake:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v30
+      with:
+        install_url: https://releases.nixos.org/nix/nix-${{ env.NIX_VERSION }}/install
+    - name: Install nix-darwin
+      run: |
+        sudo mkdir -p /etc/nix-darwin
+        darwin=$(pwd)
+        pushd /etc/nix-darwin
+          sudo nix flake init -t $darwin
+          nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+          sudo /usr/bin/sed -i.bak \
+            "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            flake.nix
+          sudo /usr/bin/sed -i.bak \
+            's/darwinConfigurations."simple"/darwinConfigurations."'$(scutil --get LocalHostName)'"/g' \
+            flake.nix
+          sudo /usr/bin/sed -i.bak \
+            's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
+            flake.nix
+        popd
+        sudo nix run .#darwin-rebuild -- switch \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+    - name: Switch to new configuration
+      run: |
+        . /etc/bashrc
+
+        sudo /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          /etc/nix-darwin/flake.nix
+
+        sudo darwin-rebuild switch \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+
+        hello
+    - name: Test uninstallation of nix-darwin
+      run: |
+        sudo nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
+        sudo nix run .#darwin-uninstaller.tests.uninstaller --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
