@@ -11,10 +11,16 @@ let
     (include ${cfg.config})
     ${lib.concatStringsSep "\n" (map (path: "(include " + path + ")") cfg.extraConfigPaths)}
   '';
-  defaultConfigFile = (pkgs.writers.writeTOML "kanata-tray-config" (lib.recursiveUpdate cfg.tray.config {
-  defaults.kanata_config = "~/.config/kanata/kanata.kbd";
+  defaultConfigFile = (
+    pkgs.writers.writeTOML "kanata-tray-config" (
+      lib.recursiveUpdate cfg.tray.config {
+        defaults.kanata_config = "~/.config/kanata/kanata.kbd";
+        defaults.autorestart_on_crash = true;
+        defaults.autorun = true;
 
-  }));
+      }
+    )
+  );
 in
 {
   options.auscybernix.keybinds.kanata = with lib.types; {
@@ -64,11 +70,11 @@ in
         default = [ "" ];
         description = "kanata tray command to run";
       };
-	  config = lib.mkOption {
-		type = types.attrs;
-		default = "";
-		description = "kanata tray config file path";
-	  };
+      config = lib.mkOption {
+        type = types.attrs;
+        default = "";
+        description = "kanata tray config file path";
+      };
       configFile = lib.mkOption {
         type = types.path;
         default = defaultConfigFile;
@@ -121,8 +127,8 @@ in
         auscybernix.keybinds.kanata.tray.command = lib.mkDefault [
           "${cfg.tray.package}/bin/kanata-tray"
         ];
-		home.file.".config/kanata/kanata.kbd".source = outputFile;
-		home.file."Library/Application Support/kanata-tray/kanata-tray.toml".source = cfg.tray.configFile;
+        home.file.".config/kanata/kanata.kbd".source = outputFile;
+        home.file."Library/Application Support/kanata-tray/kanata-tray.toml".source = cfg.tray.configFile;
 
         launchd.agents.kanata-vk-agent = {
           enable = true;
@@ -163,7 +169,7 @@ in
             RunAtLoad = true;
             KeepAlive = true;
             EnvironmentVariables = {
-			KANATA_TRAY_LOG_DIR="/tmp";
+              KANATA_TRAY_LOG_DIR = "/tmp";
               PATH =
                 "/usr/bin/:/sbin:/bin:/usr/local/bin:"
                 + lib.makeBinPath (with pkgs; [ cfg.package ] ++ cfg.extraPackages);

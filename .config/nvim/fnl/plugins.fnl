@@ -20,6 +20,7 @@
             ; :mod feline}
             :akinsho/nvim-bufferline.lua
             {:config #(require :plugins.bufferline)} ;
+            :stevearc/conform.nvim {:config #(require :plugins.conform)} ;:mod conform}
             :nvim-telescope/telescope.nvim
             {:cmd :Telescope
              :keys [:<C-f> :<C-b>]
@@ -102,6 +103,7 @@
             {:do :TSUpdate
              :dependencies [:JoosepAlviste/nvim-ts-context-commentstring
                             :nvim-treesitter/nvim-treesitter-refactor
+                            :DariusCorvus/tree-sitter-language-injection.nvim
                             :nvim-treesitter/playground]
              :config #(require :plugins.treesitter)}
             ; :mod treesitter}
@@ -137,6 +139,7 @@
             :esensar/nvim-dev-container
             {:config (fn []
                        ((. (require :devcontainer) :setup) {}))}
+            :jmbuhr/otter.nvim {:dependencies [:nvim-treesitter/nvim-treesitter]}
             :neovim/nvim-lspconfig
             {:ft [:scss
                   :htmldjango

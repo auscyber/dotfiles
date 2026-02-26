@@ -21,9 +21,9 @@
                                    (let [(ok?# res#) (pcall ,(. block :config)
                                                             ,name)]
                                      (when (not ok?#)
-                                       (vim.notify (string.format "Failure loading config for %s: %s"
-                                                                  ,(tostring name)
-                                                                  res#)))))))
+                                       (_G.vim.notify (string.format "Failure loading config for %s: %s"
+                                                                     ,(tostring name)
+                                                                     res#)))))))
                      (table.insert use-statements block)))
                  (let [use-sym (gensym)]
                    `(let [lazy# (require :lazy)]

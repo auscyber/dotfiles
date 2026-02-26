@@ -11,18 +11,20 @@ let
     name = "build-hook";
     executable = true;
     destination = "/bin/build-hook";
-    text = ''
-      #!/bin/sh
-                      	  set -eu
-                      set -f # disable globbing
-                      export IFS=' '
-        			  export PATH="$PATH:${pkgs.attic-client}/bin"
-        			  attic login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
+    text =
+      # sh
+      ''
+        #!/bin/sh
+                        	  set -eu
+                        set -f # disable globbing
+                        export IFS=' '
+          			  export PATH="$PATH:${pkgs.attic-client}/bin"
+          			  attic login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
 
-                      echo "Uploading paths" $OUT_PATHS
-                      exec attic push main $OUT_PATHS
+                        echo "Uploading paths" $OUT_PATHS
+                        exec attic push main $OUT_PATHS
 
-    '';
+      '';
 
     meta.mainProgram = "build-hook";
   };

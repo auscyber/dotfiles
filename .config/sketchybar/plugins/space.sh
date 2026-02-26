@@ -13,7 +13,7 @@ WORKSPACE_ID=${1:-${NAME#space.}}
 
 RIFT_SPACE_ID=$(echo "$WORKSPACE_ID" | sed 's/__/ /g') # Space with full name
 
-apps=$(rift-cli query workspaces | jq -r ".[] | select(.name == \"$RIFT_SPACE_ID\") | .windows[].bundle_id" | sort -u)
+apps=$(rift-cli query workspaces | jq -r ".[] | select(.name == \"$RIFT_SPACE_ID\") | .windows[].app_name" | sort -u)
 
 FOCUSED_WORKSPACE=$(rift-cli query workspaces | jq -r '.[] | select(.is_active == true) | .name')
 if [ "$FOCUSED_WORKSPACE" = "$RIFT_SPACE_ID" ]; then

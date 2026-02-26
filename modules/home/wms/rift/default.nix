@@ -26,7 +26,9 @@ in
       };
     };
     auscybernix.keybinds.kanata.extraConfigPaths = [
-      (pkgs.writeText "rift-keybinds" ''
+      (pkgs.writeText "rift-keybinds"
+	  # commonlisp
+	  ''
         (defalias
         toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a Discord")
         toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
@@ -71,8 +73,11 @@ in
 
         settings = {
           run_on_start = [
+		  	# sh
             "rift-cli subscribe cli --event workspace_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_workspace_changed FOCUSED_WORKSPACE=\\\"$RIFT_WORKSPACE_NAME\\\"'"
+			# sh
             "rift-cli subscribe cli --event windows_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\\\"$RIFT_WORKSPACE_NAME\\\" RIFT_WINDOW_COUNT=\\\"$RIFT_WINDOW_COUNT\\\"'"
+			# sh
 
             "rift-cli subscribe cli --event window_title_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_title'"
           ];

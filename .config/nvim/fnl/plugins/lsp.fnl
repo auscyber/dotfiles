@@ -51,8 +51,8 @@
          "See code actions under cursor")
     (map :ff "<cmd>lua vim.lsp.buf.formatting()<CR>" "format file")
     (rangemap :ff "<cmd>lua vim.lsp.buf.range_formatting()<CR>"
-              "format selected")
-    (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
+              "format selected"))
+;    (def-autocmd [:BufWritePre] :<buffer> "lua vim.lsp.buf.format()"))
   (when client.server_capabilities.hover
     (def-augroup :lsp_hover)) ;      (def-autocmd :CursorHold :* "lua vim.lsp.buf.hover()")))
   (when client.server_capabilities.document_highlight

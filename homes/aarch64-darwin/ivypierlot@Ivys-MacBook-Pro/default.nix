@@ -86,44 +86,44 @@
       ];
       extraCommandPiping = ../../../modules/home/keybinds/kanata/config.toml;
       tray = {
-          config = {
-            "$schema" = "https://raw.githubusercontent.com/rszyma/kanata-tray/main/doc/config_schema.json";
+        config = {
+          "$schema" = "https://raw.githubusercontent.com/rszyma/kanata-tray/main/doc/config_schema.json";
 
-            general = {
-              allow_concurrent_presets = false; # (default: false)
+          general = {
+            allow_concurrent_presets = false; # (default: false)
 
-              # Optional TCP control server to listen for remote commands, such as stopping/starting a preset.
-              # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/control_server.md
-              control_server_enable = true; # (default: false)
+            # Optional TCP control server to listen for remote commands, such as stopping/starting a preset.
+            # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/control_server.md
+            control_server_enable = true; # (default: false)
+          };
+
+          defaults = {
+            #kanata_executable = '~/bin/kanata' # if empty or omitted, system $PATH will be searched.
+            kanata_config = ""; # if empty or not omitted, kanata default config locations will be used.
+            tcp_port = 5829; # (default: 5829)
+            autorestart_on_crash = true; # (default: false)
+
+            # Hooks allow running custom commands on specific events (e.g. starting preset).
+            # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/hooks.md
+
+            layer_icons = {
+              frenchkeys = "french.ico";
+              qwerty = "qwerty.ico";
+              "*" = "other_layers.ico";
             };
 
-            defaults = {
-              #kanata_executable = '~/bin/kanata' # if empty or omitted, system $PATH will be searched.
-              kanata_config = ""; # if empty or not omitted, kanata default config locations will be used.
-              tcp_port = 5829; # (default: 5829)
-              autorestart_on_crash = false; # (default: false)
-
-              # Hooks allow running custom commands on specific events (e.g. starting preset).
-              # Reference: https://github.com/rszyma/kanata-tray/blob/main/doc/hooks.md
-
+            presets."main cfg" = {
+              autorun = true;
               layer_icons = {
                 frenchkeys = "french.ico";
-                qwerty = "qwerty.ico";
-                "*" = "other_layers.ico";
               };
-
-              presets."main cfg" = {
-                autorun = true;
-                layer_icons = {
-                  frenchkeys = "french.ico";
-                };
-                # kanata_executable = ''
-              };
+              # kanata_executable = ''
             };
           };
-          # layer_icons = {  }
-          # tcp_port = 1234
-          # extra_args = ['-n', '-c=~/.config/kanata/another.kbd']
+        };
+        # layer_icons = {  }
+        # tcp_port = 1234
+        # extra_args = ['-n', '-c=~/.config/kanata/another.kbd']
 
       };
       #      appBundleIds = [
@@ -216,7 +216,7 @@
       };
     };
     programs.neovim.enable = true;
-    editors.zed.enable = true;
+    #    editors.zed.enable = true;
 
   };
   home.packages = with pkgs; [
@@ -263,14 +263,14 @@
         };
 
       };
-	  "auspc" = {
-	  forwardAgent = true;
-	  host = "192.168.0.24";
-	  user = "auscyber";
-extraOptions = {
+      "auspc" = {
+        forwardAgent = true;
+        host = "192.168.0.24";
+        user = "auscyber";
+        extraOptions = {
           "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
         };
-	  };
+      };
       "secondpc" = {
 
         extraOptions = {
@@ -304,9 +304,12 @@ extraOptions = {
   #
   # if you don't want to manage your shell through Home Manager.
   home.activation = {
-    background = lib.mkIf config.stylix.enable ''
-      run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
-    '';
+    background =
+      lib.mkIf config.stylix.enable
+        # sh
+        ''
+          run ${pkgs.desktoppr}/bin/desktoppr all ${config.stylix.image}
+        '';
 
   };
   home.stateVersion = "24.05"; # Did you read the comment?

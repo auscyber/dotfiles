@@ -1,6 +1,7 @@
 (module plugins.treesitter
         {require {treesitter nvim-treesitter.configs
                   parsers nvim-treesitter.parsers
+                  tree-sitter-language-injection tree-sitter-language-injection
                   install nvim-treesitter.install}})
 
 ;(tset (parsers.get_parser_configs) :agda {
@@ -37,6 +38,7 @@
                                       :typescript
                                       :yaml
                                       :css
+                                      :commonlisp
                                       :kotlin
                                       :markdown
                                       :jsonc]
@@ -53,3 +55,40 @@
                                            :ac "@class.outer"
                                            :ic "@class.inner"}
                                  :move {:enable true :set_jumps true}}})
+(tree-sitter-language-injection.setup
+  {
+   :nix {
+         :comment {
+;                   :query "
+;                   ((comment) @comment .
+;          (lexical_declaration
+;            (variable_declarator
+;              value: [
+;                (string(string_fragment)@injection.content)
+;                (template_string(string_fragment)@injection.content)
+;              ]@injection.content)
+;          )
+;          (#match? @comment \"{match}\")
+;          (#set! injection.language \"{name}\")
+;        )
+;                   "
+                   :langs [
+                            {:name :bash :match  "^(\r\n|\r|\n)#( )*{lang}"}
+                            {:name :sh :match  "^(\r\n|\r|\n)#( )*{lang}"}
+                            {:name :fish :match  "^(\r\n|\r|\n)#( )*{lang}"}
+                            {:name :commonlisp :match  "^(\r\n|\r|\n)#( )*{lang}"}]}
+
+
+         :string {
+;                   :query  "
+;                              ((string_fragment) @injection.content
+;                                              (#match? @injection.content \"{match}\")
+;                                              (#set! injection.language \"{name}\"))
+;                              "
+
+                  :langs [
+                          {:name :bash :match  "^(\r\n|\r|\n)#( )*{lang}"}
+                          {:name :sh :match  "^(\r\n|\r|\n)#( )*{lang}"}]}}})
+
+
+

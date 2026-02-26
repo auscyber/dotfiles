@@ -25,7 +25,6 @@ in
       name = "Zotero";
       wrappedPackageName = "zotero";
       unwrappedPackageName = "zotero";
-      visible = true;
       platforms = {
         linux = {
           vendorPath = linuxConfigPath;
