@@ -1,5 +1,5 @@
 use anstyle::Style;
-use clap::{Args, Parser, Subcommand, builder::Styles};
+use clap::{Parser, Subcommand, builder::Styles};
 use clap_verbosity_flag::InfoLevel;
 use nh_core::{
   checks::{FeatureRequirements, NoFeatures},
@@ -94,15 +94,4 @@ impl NHCommand {
       Self::Darwin(args) => args.run(elevation),
     }
   }
-}
-
-#[derive(Debug, Args)]
-pub struct UpdateArgs {
-  #[arg(short = 'u', long = "update", conflicts_with = "update_input")]
-  /// Update all flake inputs
-  pub update_all: bool,
-
-  #[arg(short = 'U', long = "update-input", conflicts_with = "update_all")]
-  /// Update the specified flake input(s)
-  pub update_input: Option<Vec<String>>,
 }
