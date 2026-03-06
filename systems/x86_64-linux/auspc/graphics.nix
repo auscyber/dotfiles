@@ -17,7 +17,7 @@
     };
   };
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     #    fullCompositionPipeline = true;
     modesetting.enable = true;
     open = true;
