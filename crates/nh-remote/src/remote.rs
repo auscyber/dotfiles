@@ -22,7 +22,7 @@ use nh_core::{
   util::NixVariant,
 };
 use secrecy::{ExposeSecret, SecretString};
-use subprocess::{Exec, ExitStatus, Redirection};
+use subprocess::{Exec, Redirection};
 use tracing::{debug, error, info, warn};
 
 /// Global flag indicating whether a SIGINT (Ctrl+C) was received.
@@ -614,7 +614,7 @@ fn attempt_remote_cleanup(host: &RemoteHost, remote_cmd: &str) {
   debug!("Attempting remote cleanup on '{host}': pkill -INT --full <command>");
 
   // Use popen with timeout to avoid hanging on unresponsive hosts
-  let mut process = match ssh_cmd.popen() {
+  let mut job = match ssh_cmd.start() {
     Ok(p) => p,
     Err(e) => {
       info!("Failed to execute remote cleanup on '{host}': {e}");
@@ -624,14 +624,14 @@ fn attempt_remote_cleanup(host: &RemoteHost, remote_cmd: &str) {
 
   // Wait up to 5 seconds for cleanup to complete
   let timeout = Duration::from_secs(5);
-  match process.wait_timeout(timeout) {
+  match job.wait_timeout(timeout) {
     Ok(Some(_)) => {
       // Process exited, check status below
     },
     Ok(None) => {
       // Timeout - kill the process and continue
-      let _ = process.kill();
-      let _ = process.wait();
+      let _ = job.kill();
+      let _ = job.wait();
       info!("Remote cleanup on '{host}' timed out after 5 seconds");
       return;
     },
@@ -642,12 +642,13 @@ fn attempt_remote_cleanup(host: &RemoteHost, remote_cmd: &str) {
   }
 
   // Check exit status
-  if let Some(exit_status) = process.exit_status() {
+  let exit_status = job.wait().ok();
+  if let Some(exit_status) = exit_status {
     if exit_status.success() {
       info!("Cleaned up remote process on '{}'", host);
     } else {
       // Capture stderr for error diagnosis
-      let stderr = process.stderr.take().map_or_else(String::new, |mut e| {
+      let stderr = job.stderr.take().map_or_else(String::new, |mut e| {
         let mut s = String::new();
         let _ = e.read_to_string(&mut s);
         s
@@ -1231,7 +1232,7 @@ fn activate_nixos_remote(
       // Pass password via stdin if elevation is needed
       if let Some(ref password) = sudo_password {
         ssh_cmd =
-          ssh_cmd.stdin(format!("{}\n", password.expose_secret()).as_str());
+          ssh_cmd.stdin(format!("{}\n", password.expose_secret()).into_bytes());
       }
 
       debug!(?ssh_cmd, "Activating NixOS configuration");
@@ -1277,7 +1278,7 @@ fn activate_nixos_remote(
       // Pass password via stdin if elevation is needed
       if let Some(ref password) = sudo_password {
         profile_ssh_cmd = profile_ssh_cmd
-          .stdin(format!("{}\n", password.expose_secret()).as_str());
+          .stdin(format!("{}\n", password.expose_secret()).into_bytes());
       }
 
       debug!(?profile_ssh_cmd, "Setting NixOS profile");
@@ -1319,7 +1320,7 @@ fn activate_nixos_remote(
       // Pass password via stdin if elevation is needed
       if let Some(ref password) = sudo_password {
         boot_ssh_cmd = boot_ssh_cmd
-          .stdin(format!("{}\n", password.expose_secret()).as_str());
+          .stdin(format!("{}\n", password.expose_secret()).into_bytes());
       }
 
       debug!(?boot_ssh_cmd, "Bootloader activation");
@@ -1656,20 +1657,20 @@ fn build_on_remote_simple(
     .stdout(Redirection::Pipe)
     .stderr(Redirection::Pipe);
 
-  // Execute with popen to get process handle
-  let mut process = ssh_cmd.popen()?;
+  // Execute with start() to get a Job handle
+  let mut job = ssh_cmd.start()?;
 
   // Wait for completion with interrupt checking
   let exit_status = loop {
-    match process.wait_timeout(std::time::Duration::from_millis(100))? {
+    match job.wait_timeout(std::time::Duration::from_millis(100))? {
       Some(status) => break status,
       None => {
         // Check interrupt flag while waiting
         if get_interrupt_flag().load(Ordering::Relaxed) {
           debug!("Interrupt detected, killing SSH process");
 
-          let _ = process.kill();
-          let _ = process.wait(); // reap zombie
+          let _ = job.kill();
+          let _ = job.wait(); // reap zombie
 
           // Attempt remote cleanup if enabled
           attempt_remote_cleanup(host, &remote_cmd);
@@ -1682,7 +1683,7 @@ fn build_on_remote_simple(
 
   // Check exit status
   if !exit_status.success() {
-    let stderr = process
+    let stderr = job
       .stderr
       .take()
       .and_then(|mut e| {
@@ -1694,7 +1695,7 @@ fn build_on_remote_simple(
   }
 
   // Read stdout
-  let stdout = process
+  let stdout = job
     .stdout
     .take()
     .ok_or_else(|| eyre!("Failed to capture stdout"))?;
@@ -1762,13 +1763,12 @@ fn build_on_remote_with_nom(
   // ssh's exit status, not nom's. The pipeline's join() only returns
   // the exit status of the last command (nom), which always succeeds
   // even when the remote nix command fails.
-  let mut processes =
-    pipeline.popen().wrap_err("Remote build with nom failed")?;
+  let job = pipeline.start().wrap_err("Remote build with nom failed")?;
 
   // Use wait_timeout in a polling loop to check interrupt flag every 100ms
   let poll_interval = Duration::from_millis(100);
 
-  for proc in &mut processes {
+  for proc in &job.processes {
     #[allow(
       clippy::needless_continue,
       reason = "Better for explicitness and consistency"
@@ -1779,7 +1779,7 @@ fn build_on_remote_with_nom(
         debug!("Interrupt detected during build with nom");
         // Kill remaining local processes. This will cause SSH to terminate
         // the remote command automatically
-        for p in &mut processes {
+        for p in &job.processes {
           let _ = p.kill();
           let _ = p.wait(); // reap zombie
         }
@@ -1794,7 +1794,7 @@ fn build_on_remote_with_nom(
       match proc.wait_timeout(poll_interval)? {
         Some(_) => {
           // Process has exited, exit status is automatically cached in the
-          // Popen struct Move to next process
+          // Process handle. Move to next process.
           break;
         },
 
@@ -1810,12 +1810,10 @@ fn build_on_remote_with_nom(
   // Check the exit status of the FIRST process (ssh -> nix build)
   // This is the one that matters. If the remote build fails, we should fail
   // too
-  if let Some(ssh_proc) = processes.first() {
-    if let Some(exit_status) = ssh_proc.exit_status() {
-      match exit_status {
-        ExitStatus::Exited(0) => {},
-        other => bail!("Remote build failed with exit status: {other:?}"),
-      }
+  if let Some(ssh_proc) = job.processes.first() {
+    let exit_status = ssh_proc.wait()?;
+    if !exit_status.success() {
+      bail!("Remote build failed with exit status: {exit_status:?}");
     }
   }
 
