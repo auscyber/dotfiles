@@ -20,31 +20,31 @@
     nix.enable = true;
 
     secrets.enable = true;
-    #    vpn.enable = true;
+    vpn.enable = true;
 
   };
-stylix = {
+  stylix = {
     enable = true;
     image = ../../../backgrounds/phoebebridgers-2.jpg;
     polarity = "dark";
     #    base16Scheme = "${pkgs.base16-schemes}/share/themes/darcula.yaml";
   };
 
-age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyShCwXbZxI/E2LJEiQwoP6TEcOOON2PUHLcTtp9UkF root@ivyslaptop";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyShCwXbZxI/E2LJEiQwoP6TEcOOON2PUHLcTtp9UkF root@ivyslaptop";
   services.linux-enable-ir-emitter.enable = true;
   hardware.microsoft-surface.kernelVersion = "stable";
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-#boot.loader = {
-#        efi.canTouchEfiVariables = true;
-#        grub = {
-#          enable = true;
-#          device = "nodev";
-#          efiSupport = true;
-#        };
-#      };
+  #boot.loader = {
+  #        efi.canTouchEfiVariables = true;
+  #        grub = {
+  #          enable = true;
+  #          device = "nodev";
+  #          efiSupport = true;
+  #        };
+  #      };
 
   boot.initrd.availableKernelModules = [
     "hid_generic"
@@ -52,8 +52,6 @@ age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyShCwXbZxI/E2LJEiQ
     "usbhid"
     "xhci_pci"
   ];
-
-    
 
   # `keymap` won't apply when prompted to enter the passphrase to decrypt on boot
   console = {

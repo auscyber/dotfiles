@@ -30,12 +30,16 @@ let
     aarch64-linux = pkgs.nur.repos.forkprince.helium-nightly;
   };
   pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
+  pkgsMaster = import inputs.nixpkgs-master {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
 in
 (
   {
-    linuxZenWMuQSS = pkgs.linuxPackagesFor (
-      pkgs.linuxPackages_zen.kernel.override {
-        structuredExtraConfig = with lib.kernel; {
+    linuxZenWMuQSS = pkgsMaster.linuxPackagesFor (
+      pkgsMaster.linuxPackages_zen.kernel.override {
+        structuredExtraConfig = with pkgsMaster.lib.kernel; {
           SCHED_MUQSS = yes;
         };
         ignoreConfigErrors = true;
