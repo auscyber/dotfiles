@@ -30,9 +30,11 @@ in
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  hardware.openrazer.enable = true;
+  users.groups.openrazer.members = [ "auscyber" ];
   programs.fish.enable = true;
 
-boot.initrd.compressor = "lzma";
+  boot.initrd.compressor = "lzma";
 
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
@@ -101,7 +103,10 @@ boot.initrd.compressor = "lzma";
     	SUBSYSTEM=="usb", ATTR{idVendor}=="057e", ATTR{idProduct}=="2069", MODE="0666"
   '';
   environment.etc."1password/custom_allowed_browsers" = {
-    text = "zen";
+    text = ''
+      	zen
+      	helium
+      	'';
     mode = "0755";
   };
 
@@ -269,7 +274,7 @@ boot.initrd.compressor = "lzma";
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     google-chrome
-    #input-leap
+    input-leap
     vscode
     sbctl
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.

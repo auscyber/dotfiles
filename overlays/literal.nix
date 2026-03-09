@@ -34,15 +34,27 @@ let
     inherit (pkgs) system;
     config.allowUnfree = true;
   };
+  pkgsUnstableSmall = import inputs.unstable-small {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
 in
 (
   {
-    linuxZenWMuQSS = pkgsMaster.linuxPackagesFor (
-      pkgsMaster.linuxPackages_zen.kernel.override {
-        structuredExtraConfig = with pkgsMaster.lib.kernel; {
-          SCHED_MUQSS = yes;
-        };
-        ignoreConfigErrors = true;
+
+    linuxZenWMuQSS = pkgsUnstableSmall.linuxPackagesFor (
+      pkgsUnstableSmall.linuxKernel.kernels.linux_zen.override {
+        #        kernelPatches = [
+        #          {
+        #            name = "muqss";
+        #            patch = null;
+        #            structuredExtraConfig = with pkgs.lib.kernel; {
+        #              SCHED_MUQSS = yes;
+        #            };
+        #          }
+        #        ];
+
+        #ignoreConfigErrors = true;
       }
     );
     inherit (pkgsSwift) swift swiftPackages;
