@@ -88,10 +88,7 @@ in
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
       inherit (sources.jankyborders) src version;
     });
-    input-leap = pkgs.input-leap.overrideAttrs (attrs: {
-      # patches = [ ];
-      inherit (sources.input-leap) src version;
-    });
+    input-leap = pkgs.input-leap;
 
     ivy-fetch = pkgs.callPackage ../packages/ivy-fetch { };
     hln = pkgs.callPackage ../packages/hardlink.nix { };

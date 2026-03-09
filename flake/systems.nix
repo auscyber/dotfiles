@@ -21,7 +21,8 @@ let
 in
 {
   flake = {
-    auscybernix = {
+    auscybernix = rec {
+	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
 
       importedHomeModules = [
         inputs._1password-shell-plugins.hmModules.default
@@ -42,6 +43,10 @@ in
       importedNixosModules = [
 	  ../modules/common/vpn.nix
 	  ../modules/common/builders
+    ../modules/common/secrets.nix
+    ../modules/common/nix
+    ../modules/common/common
+
 #	  ../modules/common/builders/builder.nix
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion

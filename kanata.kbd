@@ -50,6 +50,7 @@
   app.zen-browser.zen nop0
   com.1password.1password nop0
   com.1password.1password-launcher nop0
+  notion.id (layer-while-held frenchkeys)
   com.microsoft.Word.Language.french (layer-while-held frenchkeys)
 
 ))
@@ -78,8 +79,11 @@
   8  (fork @8s @8m (lshift))
   9  (fork @9s @9m (lshift))
   0  (fork @10s @10m (lshift))
-  r   lrld
-  right (fork _ @dm (lshift))
+  r   (fork lrld @enable_spaces (lshift))
+  up (fork @focusUp @shiftUp (lshift))
+  down (fork @focusDown @shiftDown (lshift))
+  left (fork @focusLeft @shiftLeft (lshift))
+  right (fork @focusRight @shiftRight (lshift))
   tab (fork @switch-focus @reverse-switch-focus (lshift))
   enter @terminal_app
   spc (fork @launcher_app @search_windows (lshift))

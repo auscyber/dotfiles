@@ -27,39 +27,50 @@ in
     };
     auscybernix.keybinds.kanata.extraConfigPaths = [
       (pkgs.writeText "rift-keybinds"
-	  # commonlisp
-	  ''
-        (defalias
-        toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a Discord")
-        toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
-        minimise (t! runasuser "yabai -m window --minimize")
-        toggle_1password_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name 1password  || open -a '1Password'")
-        switch-focus (t! runasuser "yabai -m window --focus next")
-        reverse-switch-focus (t! runasuser "yabai -m window --focus prev")
-        kill-focus (t! runasuser "rift-cli query windows | jq '.[] | select(.is_focused) | .window_server_id' | xargs -I{} rift-cli execute window close --window-id {}")
-          1s (t! runasuser "rift-cli execute workspace switch 0")
-          2s (t! runasuser "rift-cli execute workspace switch 1")
-          3s (t! runasuser "rift-cli execute workspace switch 2")
-          4s (t! runasuser "rift-cli execute workspace switch 3")
-          5s (t! runasuser "rift-cli execute workspace switch 4")
-          6s (t! runasuser "rift-cli execute workspace switch 5")
-          7s (t! runasuser "rift-cli execute workspace switch 6")
-          8s (t! runasuser "rift-cli execute workspace switch 7")
-          9s (t! runasuser "rift-cli execute workspace switch 8")
-          10s (t! runasuser "rift-cli execute workspace switch 10")
+        # commonlisp
+        ''
+                              (defalias
+                    		  enable_spaces (t! runasuser "rift-cli execute window toggle-space-activated ")
+                              toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a Discord")
+                              toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
+                              minimise (t! runasuser "yabai -m window --minimize")
+                              toggle_1password_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name 1password  || open -a '1Password'")
+                              switch-focus (t! runasuser "yabai -m window --focus next")
+                              reverse-switch-focus (t! runasuser "yabai -m window --focus prev")
+                              kill-focus (t! runasuser "rift-cli query windows | jq '.[] | select(.is_focused) | .window_server_id' | xargs -I{} rift-cli execute window close --window-id {}")
+                                1s (t! runasuser "rift-cli execute workspace switch 0")
+                                2s (t! runasuser "rift-cli execute workspace switch 1")
+                                3s (t! runasuser "rift-cli execute workspace switch 2")
+                                4s (t! runasuser "rift-cli execute workspace switch 3")
+                                5s (t! runasuser "rift-cli execute workspace switch 4")
+                                6s (t! runasuser "rift-cli execute workspace switch 5")
+                                7s (t! runasuser "rift-cli execute workspace switch 6")
+                                8s (t! runasuser "rift-cli execute workspace switch 7")
+                                9s (t! runasuser "rift-cli execute workspace switch 8")
+                                10s (t! runasuser "rift-cli execute workspace switch 10")
 
-          1m (t! runasuser "rift-cli execute workspace move-window 0")
-          2m (t! runasuser "rift-cli execute workspace move-window 1")
-          3m (t! runasuser "rift-cli execute workspace move-window 2")
-          4m (t! runasuser "rift-cli execute workspace move-window 3")
-          5m (t! runasuser "rift-cli execute workspace move-window 4")
-          6m (t! runasuser "rift-cli execute workspace move-window 5")
-          7m (t! runasuser "rift-cli execute workspace move-window 6")
-          8m (t! runasuser "rift-cli execute workspace move-window 7")
-          9m (t! runasuser "rift-cli execute workspace move-window 8")
-          10m (t! runasuser "rift-cli execute workspace move-window 10")
-          dm (t! runasuser "rift-cli execute window move-to-display recent"))
-      '')
+                                1m (t! runasuser "rift-cli execute workspace move-window 0")
+                                2m (t! runasuser "rift-cli execute workspace move-window 1")
+                                3m (t! runasuser "rift-cli execute workspace move-window 2")
+                                4m (t! runasuser "rift-cli execute workspace move-window 3")
+                                5m (t! runasuser "rift-cli execute workspace move-window 4")
+                                6m (t! runasuser "rift-cli execute workspace move-window 5")
+                                7m (t! runasuser "rift-cli execute workspace move-window 6")
+                                8m (t! runasuser "rift-cli execute workspace move-window 7")
+                                9m (t! runasuser "rift-cli execute workspace move-window 8")
+                                10m (t! runasuser "rift-cli execute workspace move-window 10")
+
+          					    shiftUp (t! runasuser "rift-cli execute display move-window --direction up")
+          					    shiftDown (t! runasuser "rift-cli execute display move-window --direction down")
+          					    shiftLeft (t! runasuser "rift-cli execute display move-window --direction left")
+          					    shiftRight (t! runasuser "rift-cli execute display move-window --direction right")
+
+          					    focusUp (t! runasuser "rift-cli execute display focus --direction up")
+          					    focusDown (t! runasuser "rift-cli execute display focus --direction down")
+          					    focusLeft (t! runasuser "rift-cli execute display focus --direction left")
+          					    focusRight (t! runasuser "rift-cli execute display focus --direction right"))
+        ''
+      )
     ];
 
     services.rift = {
@@ -73,11 +84,11 @@ in
 
         settings = {
           run_on_start = [
-		  	# sh
+            # sh
             "rift-cli subscribe cli --event workspace_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_workspace_changed FOCUSED_WORKSPACE=\\\"$RIFT_WORKSPACE_NAME\\\"'"
-			# sh
+            # sh
             "rift-cli subscribe cli --event windows_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\\\"$RIFT_WORKSPACE_NAME\\\" RIFT_WINDOW_COUNT=\\\"$RIFT_WINDOW_COUNT\\\"'"
-			# sh
+            # sh
 
             "rift-cli subscribe cli --event window_title_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_title'"
           ];
@@ -101,14 +112,20 @@ in
         virtual_workspaces = {
           enabled = true;
           default_workspace_count = 5;
-		  workspace_names = ["Main" "Dev" "Chat" "Media" "Misc"];
+          workspace_names = [
+            "Main"
+            "Dev"
+            "Chat"
+            "Media"
+            "Misc"
+          ];
           app_rules = [
             {
               app_id = "com.hnc.Discord";
               scratchpad = "discord";
             }
             {
-              app_id = "com.beeper.Beeper-Desktop";
+              app_id = "com.automattic.beeper.desktop";
               scratchpad = "beeper";
             }
             {

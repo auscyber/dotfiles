@@ -11,9 +11,9 @@ in
 {
   #  targets.genericLinux.enable = true;
   home.packages = with pkgs; [
-    #input-leap
+    input-leap
     discord
-	pinentry
+    pinentry
     #    wezterm
     #    spotify
     #    rnix-lsp

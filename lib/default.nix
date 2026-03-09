@@ -81,6 +81,11 @@ in
   };
   options = {
     flake.auscybernix = mkSubmoduleOptions {
+	  containerModules = mkOption {
+	  	type = types.listOf types.unspecified;
+		default = [ ];
+	  };
+
       importedDarwinModules = mkOption {
         type = types.listOf types.unspecified;
         default = [ ];

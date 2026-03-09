@@ -16,11 +16,11 @@
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
-                  "http://10.100.0.1:8501"
+      "http://10.100.0.1:8501"
       #"https://auscyber.cachix.org"
     ];
     trusted-public-keys = [
-                  "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+      "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
     ];
   };
   #  sops.age.plugins = with pkgs; [
@@ -67,7 +67,7 @@
     thunderbird-latest-bin-unwrapped
     texliveFull
     #    wezterm
-    zotero
+    #zotero
     qemu
     gnupg
     #    prismlauncher
@@ -91,13 +91,13 @@
 
   nix.linux-builder = {
     enable = true;
-	ephemeral = true;
+    ephemeral = true;
     systems = [
       "x86_64-linux"
       "aarch64-linux"
     ];
     config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
-	config.users.users.builder.openssh.authorizedKeys.keyFiles = flakeSelf.auscybernix.builders.sshKeys;
+    config.users.users.builder.openssh.authorizedKeys.keyFiles = flakeSelf.auscybernix.builders.sshKeys;
   };
 
   nix.settings = {
@@ -129,18 +129,18 @@
       enable = true;
       package = pkgs.kanata.darwinDriver;
     };
-	vpn.enable = true;
-	nix.builders = {
-	enable = true;
-	builderConfig = {
-	enable = true;
-	maxJobs = 4;
+    vpn.enable = true;
+    nix.builders = {
+      enable = true;
+      builderConfig = {
+        enable = true;
+        maxJobs = 4;
 
-	  systems = [ "aarch64-darwin" ];
+        systems = [ "aarch64-darwin" ];
 
-	};
+      };
 
-	};
+    };
 
     homebrew = {
       enable = true;
@@ -158,7 +158,9 @@
         #    "vivaldi"
         "calibre"
         #    "ollama"
-		"sf-symbols" "font-sketchybar-app-font" "font-sf-pro"
+        "sf-symbols"
+        "font-sketchybar-app-font"
+        "font-sf-pro"
         "todoist-app"
 
         "beeper"
@@ -170,6 +172,7 @@
         #    "arc"
         #      "zen@twilight"
         "affinity-designer"
+        "zotero"
         "affinity-publisher"
         #    "grammarly-desktop"
         #        "nitro-pdf-pro"
@@ -190,7 +193,7 @@
         #    "1Password for Safari" = 1569813296;
         #    "Microsoft 365" = 1450038993;
         #  "Microsoft Word" = 462054704;
-        Fantastical = 975937182;
+        #        Fantastical = 975937182;
         # "Microsoft Outlook" = 985367838;
       };
     };
@@ -198,7 +201,7 @@
 
   programs._1password-gui = {
     enable = true;
-    package = pkgs._1password-gui-beta;
+    #    package = pkgs._1password-gui-beta;
   };
   system.defaults.dock = {
     persistent-apps = [
@@ -219,8 +222,8 @@
       #      "/System/Applications/Home.app"
       #      "/Applications/Nix Apps/Zed.App"
       "/Applications/Nix Apps/Visual Studio Code.app"
+      "/Applications/Zotero.app"
       "/Applications/Nix Apps/Ghostty.app"
-      "/Applications/Nix Apps/Zotero.app"
       "/Applications/Todoist.app"
     ];
   };

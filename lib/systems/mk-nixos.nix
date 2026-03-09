@@ -34,52 +34,51 @@ let
 in
 inputs.nixpkgs.lib.nixosSystem {
   inherit system;
-  specialArgs = common.mkSpecialArgs {
-    inherit
-      inputs
-      hostname
-      system
-      extendedLib
-      ;
+  specialArgs =
+    common.mkSpecialArgs {
+      inherit
+        inputs
+        hostname
+        system
+        extendedLib
+        ;
 
- }// {
- systemIdentifier = "${hostname}-${system}";
-};
+    }
+    // {
+      systemIdentifier = "${hostname}-${system}";
+    };
 
-modules = [
-{ _module.args.lib = extendedLib; }
-]
-++ importedNixosModules
-++ [
+  modules = [
+    { _module.args.lib = extendedLib; }
+  ]
+  ++ importedNixosModules
+  ++ [
 
-{
-	nixpkgs = {
-		inherit system;
+    {
+      nixpkgs = {
+        inherit system;
 
-	}
-	// common.mkNixpkgsConfig flake;
+      }
+      // common.mkNixpkgsConfig flake;
+    }
+
+
+    ../../modules/common/allConfigs.nix
+    ../../modules/common/hm
+    ../../modules/common/ssh-keys.nix
+    (
+      { config, lib, ... }:
+      {
+        auscybernix.secrets.enable = true;
+
+      }
+    )
+    homeManagerConfig
+  ]
+  ++ (extendedLib.importModulesRecursive ../../modules/nixos)
+  ++ [
+    ../../systems/${system}/${hostname}
+  ]
+  ++ modules;
+
 }
-
-../../modules/common/secrets.nix
-../../modules/common/nix
-
-../../modules/common/allConfigs.nix
-../../modules/common/hm
-../../modules/common/common
-../../modules/common/ssh-keys.nix
-(
- { config, lib, ... }:
- {
- auscybernix.secrets.enable = true;
-
- }
- )
-homeManagerConfig
-	]
-++ (extendedLib.importModulesRecursive ../../modules/nixos)
-	++ [
-		../../systems/${system}/${hostname}
-	]
-	++ modules;
-
-	}

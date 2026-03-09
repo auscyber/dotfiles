@@ -28,7 +28,7 @@ in
     };
 
     home.packages = with pkgs; [
-      zotero
+      #      zotero
       tesseract
       poppler-utils
     ];

@@ -79,6 +79,7 @@
     programs.sketchybar.enable = true;
     keybinds.kanata = {
       enable = true;
+      appBundleIds = [ "notion.id" ];
       extraPackages = [
         pkgs.jq
         pkgs.yabai
@@ -227,7 +228,7 @@
     discord
     texliveFull
     #    wezterm
-    zotero
+    #    zotero
     #    prismlauncher
     mupdf
     #      (agda.withPackages
