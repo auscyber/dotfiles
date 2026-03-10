@@ -91,6 +91,12 @@ fn generate_single(
     CompletionShell::Zsh => {
       generate_to(clap_complete::Shell::Zsh, cmd, BINARY_NAME, out_dir)
         .map_err(|e| format!("Failed to generate Zsh completion: {}", e))
+        .and_then(|path| {
+          let new_path = path.with_file_name(format!("{}.zsh", BINARY_NAME));
+          std::fs::rename(&path, &new_path)
+            .map_err(|e| format!("Failed to rename Zsh completion: {}", e))?;
+          Ok(new_path)
+        })
     },
     CompletionShell::Nushell => {
       generate_to(clap_complete_nushell::Nushell, cmd, BINARY_NAME, out_dir)
