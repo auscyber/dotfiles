@@ -25,7 +25,9 @@ let
     aarch64-linux = pkgs.pinentry;
   };
   helium = {
-    x86_64-linux = pkgs.nur.repos.forkprince.helium-nightly;
+    x86_64-linux = pkgs.callPackage ../packages/helium/default.nix {
+      source = sources.helium_linux;
+    };
     aarch64-darwin = pkgs.nur.repos.forkprince.helium-nightly;
     aarch64-linux = pkgs.nur.repos.forkprince.helium-nightly;
   };
@@ -42,21 +44,7 @@ in
 (
   {
 
-    linuxZenWMuQSS = pkgsUnstableSmall.linuxPackagesFor (
-      pkgsUnstableSmall.linuxKernel.kernels.linux_zen.override {
-        #        kernelPatches = [
-        #          {
-        #            name = "muqss";
-        #            patch = null;
-        #            structuredExtraConfig = with pkgs.lib.kernel; {
-        #              SCHED_MUQSS = yes;
-        #            };
-        #          }
-        #        ];
-
-        #ignoreConfigErrors = true;
-      }
-    );
+    linuxZenWMuQSS = pkgs.linuxPackages_zen;
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;

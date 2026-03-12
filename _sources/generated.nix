@@ -25,7 +25,7 @@
     version = "main";
     src = fetchTarball {
       url = "https://github.com/fabiscafe/game-devices-udev/archive/main.tar.gz";
-      sha256 = "sha256-CLQFdPr489OKZRj1v8EZypM1KOXgAOAOF0VQpeud4uo=";
+      sha256 = "sha256-LXTlnimC0Xw+4YwUc151ePOaktdqlUDAdX01L21wmO0=";
     };
   };
   ghostty = {
@@ -36,15 +36,23 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-/tFsaoKUGoyQKWQbFPtQOge+azCP3hPfzl7Yu1AW58Y=";
+      sha256 = "sha256-JmIVbdjtMFcGEJ7H883zvMs/TxNVyi7zFWc0cbB3q3M=";
+    };
+  };
+  helium_linux = {
+    pname = "helium_linux";
+    version = "0.9.4.1";
+    src = fetchTarball {
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.9.4.1/helium-0.9.4.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-m+4XLxSq/Ssr/k1s+Wgz0QWLsvrHR0T7by65GkySMgk=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.52";
+    version = "v2.0.55";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.52/icon_map.sh";
-      sha256 = "sha256-qfOpIFtZz0yGKajXhOZPWl4VynwDbhYvxv8uSajx5cQ=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.55/icon_map.sh";
+      sha256 = "sha256-pQ9ujP4QED6v7QUISZK2umV8/9oLNi6thvKbXdNrdMo=";
     };
   };
   jankyborders = {
@@ -63,16 +71,16 @@
   };
   kanata = {
     pname = "kanata";
-    version = "v1.10.1";
+    version = "v1.11.0";
     src = fetchFromGitHub {
       owner = "jtroo";
       repo = "kanata";
-      rev = "v1.10.1";
+      rev = "v1.11.0";
       fetchSubmodules = false;
-      sha256 = "sha256-jzTK/ZK9UrXTP/Ow662ENBv3cim6klA8+DQv4DLVSNU=";
+      sha256 = "sha256-7rGV0nfI/ntvByz3NQs/2Sa2q/Ml8O3XRD14Mbt5fIU=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-jzTK_ZK9UrXTP_Ow662ENBv3cim6klA8+DQv4DLVSNU=/Cargo.lock";
+      lockFile = ./. + "/sha256-7rGV0nfI_ntvByz3NQs_2Sa2q_Ml8O3XRD14Mbt5fIU=/Cargo.lock";
       outputHashes = {
         
       };
@@ -80,50 +88,50 @@
   };
   rift = {
     pname = "rift";
-    version = "v0.3.8";
+    version = "v0.4.0";
     src = fetchFromGitHub {
       owner = "acsandmann";
       repo = "rift";
-      rev = "v0.3.8";
+      rev = "v0.4.0";
       fetchSubmodules = false;
-      sha256 = "sha256-4CExoT2fxx1YlZRxorpQIyvckaZvR8Y/wA0Fc5/bW8Y=";
+      sha256 = "sha256-3TKhoLJE+GtTfcnskH7yUBamCV+G5xXzy1n15mNWDzk=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-4CExoT2fxx1YlZRxorpQIyvckaZvR8Y_wA0Fc5_bW8Y=/Cargo.lock";
+      lockFile = ./. + "/sha256-3TKhoLJE+GtTfcnskH7yUBamCV+G5xXzy1n15mNWDzk=/Cargo.lock";
       outputHashes = {
         "dispatchr-1.0.0" = "sha256-Df6PdDA5bpmy2P30vGdad+EiHJiANmHrRF2q75Uegik=";
-        "continue-0.1.1" = "sha256-9irDEeiPbjIG3e1F/jpWd3fCL1/nei/IYjhMqRp+Q+s=";
+        "continue-0.1.1" = "sha256-8S+gPfz6CtzIKsGh9wg3CevMdNA9V+KOyHR9F9DlVcw=";
       };
     };
   };
   slskd = {
     pname = "slskd";
-    version = "92b49b7a4035822240ba51ffdf3383eb9a30b164";
+    version = "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "92b49b7a4035822240ba51ffdf3383eb9a30b164";
+      rev = "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-/dcx2qKdo+x0CnXUwl6+5DeL1G1dozm6rVrnOaWm8NM=";
+      sha256 = "sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-_dcx2qKdo+x0CnXUwl6+5DeL1G1dozm6rVrnOaWm8NM=/./src/web/package-lock.json";
-    };date = "2026-01-22";
+      "./src/web/package-lock.json" = ./. + "/sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=/./src/web/package-lock.json";
+    };date = "2026-02-28";
   };
   yabai = {
     pname = "yabai";
-    version = "5bde933ec85a4a601a186163b7db04aa3bf6c3b1";
+    version = "54728ce89a134d3ff83b356b1f0b86fba50b90b5";
     src = fetchgit {
       url = "https://github.com/koekeishiya/yabai";
-      rev = "5bde933ec85a4a601a186163b7db04aa3bf6c3b1";
+      rev = "54728ce89a134d3ff83b356b1f0b86fba50b90b5";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-IVVwlqMlkfkgqmZegVeVwt/YRSIfaH+swTWAikl64wY=";
+      sha256 = "sha256-Uc24XZXkIJMWsXbbAODxclQTl5qYPsDoOlD/7yKKp7w=";
     };
-    date = "2026-01-17";
+    date = "2026-02-26";
   };
 }

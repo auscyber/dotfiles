@@ -90,7 +90,7 @@ in
 
   services.udev.packages = with pkgs; [
     yubikey-personalization
-    game-devices-udev-rules
+    #    game-devices-udev-rules
   ];
 
   services.udev.extraRules = ''
@@ -104,9 +104,10 @@ in
   '';
   environment.etc."1password/custom_allowed_browsers" = {
     text = ''
-      	zen
-      	helium
-      	'';
+            zen
+      	  .helium-wrapped
+            helium-browser
+            helium'';
     mode = "0755";
   };
 
@@ -371,7 +372,6 @@ in
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
-    package = pkgs._1password-gui-beta;
     polkitPolicyOwners = [ "auscyber" ];
   };
 

@@ -32,3 +32,6 @@ fetch.url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/
 [ghostty]
 src.manual = "tip"
 fetch.github = "ghostty-org/ghostty"
+[helium_linux]
+src.github = "imputnet/helium-linux"
+fetch.tarball = "https://github.com/imputnet/helium-linux/releases/download/$ver/helium-$ver-x86_64_linux.tar.xz"

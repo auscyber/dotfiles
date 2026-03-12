@@ -23,6 +23,7 @@ in
     };
     environment.systemPackages = with pkgs; [
       gamescope-wsi # HDR
+      mangohud
     ];
     programs.gamemode.enable = true;
     programs.steam = {
@@ -42,8 +43,10 @@ in
             libpng
             libpulseaudio
             libvorbis
+            mangohud
             stdenv.cc.cc.lib # Provides libstdc++.so.6
             gamescope
+            gamemode
             gamescope-wsi
             libkrb5
             keyutils
