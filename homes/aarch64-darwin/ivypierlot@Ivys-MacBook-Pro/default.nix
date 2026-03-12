@@ -207,6 +207,7 @@
     };
     programs.zotero.enable = true;
     browsers.zen-browser.enable = true;
+    browsers.helium.enable = true;
     programs._1password-cli.enable = true;
     terms.ghostty.enable = true;
 

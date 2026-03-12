@@ -44,7 +44,10 @@ in
 (
   {
 
-    linuxZenWMuQSS = pkgs.linuxPackages_zen;
+    linuxZenWMuQSS = pkgs.linuxPackages_zen.extend (self: super: {
+      alx-wol = self.callPackage ../packages/alx-wol.nix {
+      };
+    });
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;

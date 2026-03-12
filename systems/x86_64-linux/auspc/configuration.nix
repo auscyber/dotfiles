@@ -80,7 +80,7 @@ in
   boot.supportedFilesystems = [ "ntfs" ];
   boot.kernelPackages = pkgs.linuxZenWMuQSS;
 
-  #  boot.extraModulePackages = [ (config.boot.kernelPackages.callPackage ./alx-wol.nix { }) ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ alx-wol ];
   #  environment.persistence."/persistent" = {
   #    enable = true; # NB: Defaults to true, not needed
   #    hideMounts = true;
