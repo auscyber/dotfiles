@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   kernel,
+  kernelModuleMakeFlags,
   kmod,
 }:
 
@@ -24,15 +25,22 @@ stdenv.mkDerivation rec {
     "pic"
     "format"
   ];
-  nativeBuildInputs = kernel.moduleBuildDependencies;
+  nativeBuildInputs = [ kmod ] ++ kernel.moduleBuildDependencies;
+
+  postUnpack = ''
+    # Move the alx driver to the top level to simplify patching and building
+
+  '';
 
   # Move the alx driver to the top level to simplify patching and building
-  prePatch = ''
-    mv drivers/net/ethernet/atheros/alx .
-  '';
+  modulePath = "drivers/net/ethernet/atheros/alx";
+  enableParallelBuilding = true;
+  kernel_dev = kernel.dev;
 
   patchPhase = ''
     runHook prePatch
+    cp -r $src/${modulePath} ./
+
 
     patch_file=$(${stdenv.shell} ${alxRepo}/scripts/read_tag.sh "${kernel.version}" patches 1 ${alxRepo}/sources.txt)
 
@@ -42,26 +50,34 @@ stdenv.mkDerivation rec {
       exit 1
     fi
 
+
     # The patches are relative to the 'alx' directory parent (e.g. v6.13/alx/...)
     # We moved 'alx' to the current directory.
-    patch -p1 < "${alxRepo}/$patch_file"
+    cd ${modulePath}
+    patch -p2 < "${alxRepo}/$patch_file"
+    runHook postPatch
   '';
 
-  preBuild = ''
-    cd alx
-  '';
-
-  makeFlags = [
+  makeFlags = kernelModuleMakeFlags ++ [
     "-C"
     "${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+    "KVER=${kernel.modDirVersion}"
+    "KSRC=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+    #    "INSTALL_MOD_PATH=${placeholder "out"}"
+    #    "INSTALL_MOD_DIR=${modulePath}"
     "M=$(PWD)"
-    "modules"
-    "CONFIG_ALX=m"
   ];
 
-  installPhase = ''
-    install -D alx.ko $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/net/ethernet/atheros/alx/alx.ko
-  '';
+  installFlags = makeFlags ++ [
+    "INSTALL_MOD_PATH=${placeholder "out"}"
+    "INSTALL_MOD_DIR=${modulePath}"
+
+  ]
+
+  ;
+  installTargets = [
+    "modules_install"
+  ];
 
   meta = with lib; {
     description = "Atheros ALX Ethernet driver with WOL support";
