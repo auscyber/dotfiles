@@ -6,10 +6,6 @@ edition.workspace      = true
 license.workspace      = true
 rust-version.workspace = true
 
-[lints]
-workspace = true
-
-
 [lib]
 path = "src/search.rs"
 
@@ -25,3 +21,6 @@ supports-hyperlinks.workspace = true
 textwrap.workspace            = true
 tracing.workspace             = true
 yansi.workspace               = true
+
+[lints]
+workspace = true

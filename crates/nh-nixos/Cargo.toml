@@ -6,9 +6,6 @@ edition.workspace      = true
 license.workspace      = true
 rust-version.workspace = true
 
-[lints]
-workspace = true
-
 [dependencies]
 chrono.workspace     = true
 clap.workspace       = true
@@ -20,3 +17,6 @@ nix.workspace        = true
 serde_json.workspace = true
 tempfile.workspace   = true
 tracing.workspace    = true
+
+[lints]
+workspace = true
