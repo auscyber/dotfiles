@@ -7,30 +7,22 @@
   kmod,
 }:
 
-let
-  alxRepo = fetchFromGitHub {
+stdenv.mkDerivation rec {
+  pname = "alx-wol";
+  version = kernel.version;
+
+  src = fetchFromGitHub {
     owner = "AndiWeiss";
     repo = "alx-wol";
     rev = "master";
     hash = "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=";
   };
-in
-stdenv.mkDerivation rec {
-  pname = "alx-wol";
-  version = kernel.version;
-
-  src = kernel.src;
 
   hardeningDisable = [
     "pic"
     "format"
   ];
   nativeBuildInputs = [ kmod ] ++ kernel.moduleBuildDependencies;
-
-  postUnpack = ''
-    # Move the alx driver to the top level to simplify patching and building
-
-  '';
 
   # Move the alx driver to the top level to simplify patching and building
   modulePath = "drivers/net/ethernet/atheros/alx";
@@ -39,10 +31,9 @@ stdenv.mkDerivation rec {
 
   patchPhase = ''
     runHook prePatch
-    cp -r $src/${modulePath} ./
 
 
-    patch_file=$(${stdenv.shell} ${alxRepo}/scripts/read_tag.sh "${kernel.version}" patches 1 ${alxRepo}/sources.txt)
+    patch_file=$(${stdenv.shell} $src/scripts/read_tag.sh "${kernel.version}" patches 1 $src/sources.txt)
 
     echo "Applying patch: $patch_file"
     if [ -z "$patch_file" ]; then
@@ -53,8 +44,9 @@ stdenv.mkDerivation rec {
 
     # The patches are relative to the 'alx' directory parent (e.g. v6.13/alx/...)
     # We moved 'alx' to the current directory.
-    cd ${modulePath}
-    patch -p2 < "${alxRepo}/$patch_file"
+    cp -r --no-preserve=all ${kernel.src}/${modulePath} .
+    ls -la .
+    patch -p1 < "$src/$patch_file"
     runHook postPatch
   '';
 
@@ -65,7 +57,7 @@ stdenv.mkDerivation rec {
     "KSRC=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
     #    "INSTALL_MOD_PATH=${placeholder "out"}"
     #    "INSTALL_MOD_DIR=${modulePath}"
-    "M=$(PWD)"
+    "M=$(PWD)/alx"
   ];
 
   installFlags = makeFlags ++ [
@@ -83,7 +75,7 @@ stdenv.mkDerivation rec {
     description = "Atheros ALX Ethernet driver with WOL support";
     homepage = "https://github.com/AndiWeiss/alx-wol";
     license = licenses.gpl2;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ auscyber ];
     platforms = platforms.linux;
   };
 }

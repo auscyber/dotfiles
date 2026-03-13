@@ -1,0 +1,632 @@
+[?25l[?2026h[35;1mwarning:[0m Git tree '/Users/ivypierlot/dotfiles' is dirty
+[1m⏱ 0s[0m[?2026l[?2026h[1G[2K[35;1mwarning:[0m Git tree '/Users/ivypierlot/dotfiles/inputs/rift' is dirty
+[35;1mwarning:[0m Git tree '/Users/ivypierlot/dotfiles' is dirty
+[1m⏱ 0s[0m[?2026l[?2026h[1G[2K[1m⏱ 1s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2KUsing saved setting for 'extra-substituters = https://nixos-raspberrypi.cachix.org https://cache.ivymect.in/main' from ~/.local/share/nix/trusted-settings.json.
+Using saved setting for 'extra-trusted-public-keys = main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI=' from ~/.local/share/nix/trusted-settings.json.
+[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 2s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 3s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[35;1mevaluation warning:[0m 'system' has been renamed to/replaced by 'stdenv.hostPlatform.system'
+[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 4s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 5s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 6s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 7s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 8s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 9s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2K[1m⏱ 10s[0m[?2026l[?2026h[1G[2Kthis derivation will be built:
+  /nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv
+┏━ [1mDependency Graph[0m:
+┃ [34m⏸ alx-wol-6.18.13-x86_64-linux[0m[0m
+┣━━━ [1mBuilds         [0m
+┗━ ∑ [33m⏵ 0[0m │ [32m✔ 0[0m │ [34m⏸ [1m1[0m[0m │ [1m⏱ 10s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [34m⏸ alx-wol-6.18.13-x86_64-linux[0m[0m
+┣━━━ [1mBuilds         [0m
+┗━ ∑ [33m⏵ 0[0m │ [32m✔ 0[0m │ [34m⏸ [1m1[0m[0m │ [1m⏱ 11s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mbuilding '/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv' on 'ssh-ng://builder@linux-builder'
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m on [35m[1][0m[0m
+┣━━━ [1mBuilds         [0m │ [1mHost                               [0m
+┃    [33m   [0m │ [32m   [0m │     │ [35mlocalhost                          [0m
+┃    [33m⏵ [1m1[0m[0m │ [32m   [0m │     │ [35m[1]: ssh-ng://builder@linux-builder[0m
+┗━ ∑ [33m⏵ [1m1[0m[0m │ [32m✔ 0[0m │ [34m⏸ 0[0m │ [1m⏱ 11s                              [0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2Kcopying 0 paths
+[0m[34malx-wol-x86_64-linux> [0mbuilding '/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv'
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m[0m
+┣━━━      
+┗━ ∑ [1m⏱ 11s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mRunning phase: unpackPhase
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m[0m
+┣━━━      
+┗━ ∑ [1m⏱ 12s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0munpacking source archive /nix/store/lnl85yzlcwv81vll6z3cm6d1r14hqja8-source
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m[0m
+┣━━━      
+┗━ ∑ [1m⏱ 12s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 1s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 13s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 2s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 14s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 3s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 15s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 4s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 16s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 5s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 17s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 6s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 18s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 7s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 19s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 8s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 20s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 9s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 21s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 10s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 22s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 11s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 23s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 12s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 24s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 13s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 25s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 14s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 26s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 15s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 27s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 16s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 28s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 17s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 29s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 18s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 30s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 19s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 31s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0msource root is source
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 20s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 31s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 21s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 32s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(unpackPhase)[0m ⏱ 22s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 33s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mRunning phase: patchPhase
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 22s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 33s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 23s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 34s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 24s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 36s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 25s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 37s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 26s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 38s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 27s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 39s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 28s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 40s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 29s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 41s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 30s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 42s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 31s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 43s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 32s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 44s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 33s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 45s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 34s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 46s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 35s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 47s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 36s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 48s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 37s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 49s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 38s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 50s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 39s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 51s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 40s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 52s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 41s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 53s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 42s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 54s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 43s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 55s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 44s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 45s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 46s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 47s[0m
+┣━━━      
+┗━ ∑ [1m⏱ 59s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 48s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 1m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 49s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 1m1s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 50s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 1m2s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 51s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 1m3s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 52s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 1m4s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m2s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m14s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m3s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m15s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m4s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m16s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m5s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m17s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m6s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m18s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m7s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m19s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m8s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m20s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m9s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m21s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m10s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m22s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m11s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m23s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m12s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m24s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m13s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m25s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m14s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m26s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m15s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m27s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m16s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m28s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m17s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m29s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m18s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m30s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m19s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m31s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m20s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m32s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 3m21s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 3m33s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m25s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m36s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m26s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m37s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m27s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m38s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m28s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m39s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m29s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m40s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m30s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m41s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m31s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m43s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m32s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m44s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m33s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m45s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m34s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m46s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m35s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m47s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m36s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m48s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m37s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m49s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m38s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m50s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m39s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m51s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mApplying patch: patches/alx-wol_v6.13.patch
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m40s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m51s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mpatching file alx/ethtool.c
+[0m[34malx-wol-x86_64-linux> [0mpatching file alx/hw.c
+[0m[34malx-wol-x86_64-linux> [0mpatching file alx/hw.h
+[0m[34malx-wol-x86_64-linux> [0mpatching file alx/main.c
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(patchPhase)[0m ⏱ 5m40s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m51s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mpatchPhase completed in 1 minutes 5 seconds
+[0m[34malx-wol-x86_64-linux> [0mRunning phase: updateAutotoolsGnuConfigScriptsPhase
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(updateAutotoolsGnuConfigScriptsPhase)[0m ⏱ 5m40s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m51s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mRunning phase: configurePhase
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(configurePhase)[0m ⏱ 5m41s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m52s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mno configure script, doing nothing
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(configurePhase)[0m ⏱ 5m42s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m53s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mRunning phase: buildPhase
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m42s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m53s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mbuild flags: SHELL=/nix/store/2hjsch59amjs3nbgh7ahcfzm2bfwl8zi-bash-5.3p9/bin/bash CC=/nix/store/sca0pf46jmxva40qahkcwys5c1lvk6n2-gcc-15.2.0/bin/gcc LD=/nix/store/9nmzd62x45ayp4vmswvn6z45h6bzrsla-binutils-2.44/bin/ld AR=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/ar NM=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/nm STRIP=/nix/store/9nmzd62x45ayp4vmswvn6z45h6bzrsla-binutils-2.44/bin/strip OBJCOPY=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/objcopy OBJDUMP=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/objdump READELF=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/readelf HOSTCC=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/cc HOSTCXX=/nix/store/kbw2j1vag664b3sj3rjwz9v53cqx87sb-gcc-wrapper-15.2.0/bin/c++ HOSTAR=/nix/store/4yi6jj75bb5hhdzpzlxfyf69d35wsf2x-binutils-wrapper-2.44/bin/ar HOSTLD=/nix/store/4yi6jj75bb5hhdzpzlxfyf69d35wsf2x-binutils-wrapper-2.44/bin/ld ARCH=x86_64 CROSS_COMPILE= KBUILD_OUTPUT=/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build -C /nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build CONFIG_ALX=m
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m42s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m53s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmake: Entering directory '/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build'
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m42s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m53s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6650': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m43s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m54s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6659': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m43s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m54s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6668': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m43s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m55s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6677': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m43s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m55s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6686': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m43s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m55s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6711': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m44s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6720': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m44s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6729': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m44s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6738': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6747': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6756': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6765': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m56s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6774': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6783': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6792': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6801': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m45s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6810': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6819': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6828': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6837': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m57s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6846': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6855': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6864': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6873': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m46s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6882': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6891': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6900': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6909': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m58s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6918': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m59s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0m  SYNC    include/config/auto.conf
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m47s[0m
+┣━━━        
+┗━ ∑ [1m⏱ 5m59s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6976': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m48s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6985': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m48s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_6994': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m48s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7003': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m48s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7019': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m49s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m0s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7028': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m49s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m1s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m50s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m2s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7085': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m51s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m2s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7094': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m51s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m3s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmkdir: cannot create directory '.tmp_7121': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m51s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m3s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mln: failed to create symbolic link 'source': Permission denied
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m52s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m3s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[0m[34malx-wol-x86_64-linux> [0mmake[2]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:686: outputmakefile] Error 1
+[0m[34malx-wol-x86_64-linux> [0mmake[1]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:843: include/config/auto.conf] Error 2
+[0m[34malx-wol-x86_64-linux> [0mmake[1]: *** [include/config/auto.conf] Deleting file 'include/generated/rustc_cfg'
+[0m[34malx-wol-x86_64-linux> [0mmake[1]: unlink: include/generated/rustc_cfg: Permission denied
+[0m[34malx-wol-x86_64-linux> [0mmake[1]: *** [include/config/auto.conf] Deleting file 'include/generated/autoconf.h'
+[0m[34malx-wol-x86_64-linux> [0mmake[1]: unlink: include/generated/autoconf.h: Permission denied
+[0m[34malx-wol-x86_64-linux> [0mmake: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:248: __sub-make] Error 2
+[0m[34malx-wol-x86_64-linux> [0mmake: Leaving directory '/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build'
+┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m52s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m4s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m53s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m5s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K┏━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m53s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m5s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[31;1merror:[0m build of '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m' on '[35;1mssh-ng://builder@linux-builder[0m' failed: [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+       Reason: [31;1mbuilder failed with exit code 2[0m.
+       Output paths:
+         [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m
+       Last 25 log lines:
+       > mkdir: cannot create directory '.tmp_6873': Permission denied
+       > mkdir: cannot create directory '.tmp_6882': Permission denied
+       > mkdir: cannot create directory '.tmp_6891': Permission denied
+       > mkdir: cannot create directory '.tmp_6900': Permission denied
+       > mkdir: cannot create directory '.tmp_6909': Permission denied
+       > mkdir: cannot create directory '.tmp_6918': Permission denied
+       >   SYNC    include/config/auto.conf
+       > mkdir: cannot create directory '.tmp_6976': Permission denied
+       > mkdir: cannot create directory '.tmp_6985': Permission denied
+       > mkdir: cannot create directory '.tmp_6994': Permission denied
+       > mkdir: cannot create directory '.tmp_7003': Permission denied
+       > mkdir: cannot create directory '.tmp_7019': Permission denied
+       > mkdir: cannot create directory '.tmp_7028': Permission denied
+       > mkdir: cannot create directory '.tmp_7085': Permission denied
+       > mkdir: cannot create directory '.tmp_7094': Permission denied
+       > mkdir: cannot create directory '.tmp_7121': Permission denied
+       > ln: failed to create symbolic link 'source': Permission denied
+       > make[2]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:686: outputmakefile] Error 1
+       > make[1]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:843: include/config/auto.conf] Error 2
+       > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/rustc_cfg'
+       > make[1]: unlink: include/generated/rustc_cfg: Permission denied
+       > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/autoconf.h'
+       > make[1]: unlink: include/generated/autoconf.h: Permission denied
+       > make: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:248: __sub-make] Error 2
+       > make: Leaving directory '/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build'
+       For full logs, run:
+         [1mnix-store -l /nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m[0m
+[31;1merror:[0m [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+       Reason: [31;1mbuilder failed with exit code 1[0m.
+       Output paths:
+         [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m[0m
+┏━[1;31m 2 Errors: [0m
+┃ [31;1merror:[0m [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+┃        Reason: [31;1mbuilder failed with exit code 1[0m.
+┃        Output paths:
+┃          [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m[0m
+┃ [31;1merror:[0m build of '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m' on '[35;1mssh-ng://builder@linux-builder[0m' failed: [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+┃        Reason: [31;1mbuilder failed with exit code 2[0m.
+┃        Output paths:
+┃          [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m
+┃        Last 25 log lines:
+┃        > mkdir: cannot create directory '.tmp_6873': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6882': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6891': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6900': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6909': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6918': Permission denied
+┃        >   SYNC    include/config/auto.conf
+┃        > mkdir: cannot create directory '.tmp_6976': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6985': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6994': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7003': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7019': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7028': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7085': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7094': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7121': Permission denied
+┃        > ln: failed to create symbolic link 'source': Permission denied
+┃        > make[2]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:686: outputmakefile] Error 1
+┃        > make[1]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:843: include/config/auto.conf] Error 2
+┃        > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/rustc_cfg'
+┃        > make[1]: unlink: include/generated/rustc_cfg: Permission denied
+┃        > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/autoconf.h'
+┃        > make[1]: unlink: include/generated/autoconf.h: Permission denied
+┃        > make: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:248: __sub-make] Error 2
+┃        > make: Leaving directory '/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build'
+┃        For full logs, run:
+┃          [1mnix-store -l /nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m[0m[0m
+┣━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m53s[0m
+┣━━━       
+┗━ ∑ [1m⏱ 6m5s[0m[?2026l[?2026h[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K[1F[2K┏━[1;31m 2 Errors: [0m
+┃ [31;1merror:[0m [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+┃        Reason: [31;1mbuilder failed with exit code 1[0m.
+┃        Output paths:
+┃          [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m[0m
+┃ [31;1merror:[0m build of '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m' on '[35;1mssh-ng://builder@linux-builder[0m' failed: [35;1m[0mCannot build '[35;1m/nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m'.
+┃        Reason: [31;1mbuilder failed with exit code 2[0m.
+┃        Output paths:
+┃          [35;1m/nix/store/xh1jjdd96pa5njzbwnpvkw2pzdlana3s-alx-wol-6.18.13[0m
+┃        Last 25 log lines:
+┃        > mkdir: cannot create directory '.tmp_6873': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6882': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6891': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6900': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6909': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6918': Permission denied
+┃        >   SYNC    include/config/auto.conf
+┃        > mkdir: cannot create directory '.tmp_6976': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6985': Permission denied
+┃        > mkdir: cannot create directory '.tmp_6994': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7003': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7019': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7028': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7085': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7094': Permission denied
+┃        > mkdir: cannot create directory '.tmp_7121': Permission denied
+┃        > ln: failed to create symbolic link 'source': Permission denied
+┃        > make[2]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:686: outputmakefile] Error 1
+┃        > make[1]: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:843: include/config/auto.conf] Error 2
+┃        > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/rustc_cfg'
+┃        > make[1]: unlink: include/generated/rustc_cfg: Permission denied
+┃        > make[1]: *** [include/config/auto.conf] Deleting file 'include/generated/autoconf.h'
+┃        > make[1]: unlink: include/generated/autoconf.h: Permission denied
+┃        > make: *** [/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/source/Makefile:248: __sub-make] Error 2
+┃        > make: Leaving directory '/nix/store/602w3jx2j22m6yzp4z8vlc2v7iri4mg9-linux-zen-6.18.13-dev/lib/modules/6.18.13-zen1/build'
+┃        For full logs, run:
+┃          [1mnix-store -l /nix/store/0l87p5543xzkgl6ds4cgrrswj6m00vwi-alx-wol-6.18.13.drv[0m[0m[0m
+┣━ [1mDependency Graph[0m:
+┃ [33m[1m⏵ alx-wol-6.18.13-x86_64-linux[0m[0m [1m(buildPhase)[0m ⏱ 5m53s[0m
+┣━━━                                                              
+┗━ ∑ [1m[31m⚠ Exited with 2 errors reported by nix at 13:54:47 after 6m5s[0m[0m[?2026l[?25h
