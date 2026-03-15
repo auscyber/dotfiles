@@ -6,10 +6,6 @@ edition.workspace      = true
 license.workspace      = true
 rust-version.workspace = true
 
-[lints]
-workspace = true
-
-
 [lib]
 path = "src/remote.rs"
 
@@ -25,3 +21,6 @@ signal-hook.workspace = true
 subprocess.workspace  = true
 tracing.workspace     = true
 which.workspace       = true
+
+[lints]
+workspace = true

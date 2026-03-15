@@ -6,9 +6,6 @@ edition.workspace      = true
 license.workspace      = true
 rust-version.workspace = true
 
-[lints]
-workspace = true
-
 [lib]
 path = "src/home.rs"
 
@@ -20,3 +17,6 @@ nh-core.workspace    = true
 nh-remote.workspace  = true
 tempfile.workspace   = true
 tracing.workspace    = true
+
+[lints]
+workspace = true
