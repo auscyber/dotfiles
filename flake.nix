@@ -22,13 +22,14 @@
     niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvfetcher.url = "github:berberman/nvfetcher";
+    nvfetcher.url = "github:auscyber/nvfetcher";
     searchix.url = "git+https://codeberg.org/alanpearce/searchix";
     nil = {
       url = "github:oxalica/nil";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
+    deadlock.url = "github:deadlock-mod-manager/deadlock-mod-manager";
 
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
     nixos-images = {

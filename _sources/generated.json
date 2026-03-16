@@ -48,7 +48,7 @@
             "owner": "ghostty-org",
             "repo": "ghostty",
             "rev": "tip",
-            "sha256": "sha256-JmIVbdjtMFcGEJ7H883zvMs/TxNVyi7zFWc0cbB3q3M=",
+            "sha256": "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=",
             "sparseCheckout": [],
             "type": "github"
         },
@@ -62,11 +62,11 @@
         "passthru": null,
         "pinned": false,
         "src": {
-            "sha256": "sha256-m+4XLxSq/Ssr/k1s+Wgz0QWLsvrHR0T7by65GkySMgk=",
+            "sha256": "sha256-IDnhpxnP1xKcPE/P01Lq67/4pWHvW7Io/AuPa6zJk4E=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.9.4.1/helium-0.9.4.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.10.5.1/helium-0.10.5.1-x86_64_linux.tar.xz"
         },
-        "version": "0.9.4.1"
+        "version": "0.10.5.1"
     },
     "icon_map": {
         "cargoLock": null,
@@ -77,11 +77,11 @@
         "pinned": false,
         "src": {
             "name": null,
-            "sha256": "sha256-pQ9ujP4QED6v7QUISZK2umV8/9oLNi6thvKbXdNrdMo=",
+            "sha256": "sha256-aAX6yydhSGwVe+C/BJRftksa90a+1LpVjCm7qmKPaS0=",
             "type": "url",
-            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.55/icon_map.sh"
+            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.56/icon_map.sh"
         },
-        "version": "v2.0.55"
+        "version": "v2.0.56"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -160,9 +160,9 @@
     },
     "slskd": {
         "cargoLock": null,
-        "date": "2026-02-28",
+        "date": "2026-03-15",
         "extract": {
-            "./src/web/package-lock.json": "sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=/./src/web/package-lock.json"
+            "./src/web/package-lock.json": "sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=/./src/web/package-lock.json"
         },
         "name": "slskd",
         "passthru": null,
@@ -172,13 +172,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e",
-            "sha256": "sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=",
+            "rev": "769cc99f8fa8e859d953d446a92db0c9510782ec",
+            "sha256": "sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-        "version": "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e"
+        "version": "769cc99f8fa8e859d953d446a92db0c9510782ec"
     },
     "yabai": {
         "cargoLock": null,

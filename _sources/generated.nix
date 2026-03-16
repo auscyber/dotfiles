@@ -36,23 +36,23 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-JmIVbdjtMFcGEJ7H883zvMs/TxNVyi7zFWc0cbB3q3M=";
+      sha256 = "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.9.4.1";
+    version = "0.10.5.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.9.4.1/helium-0.9.4.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-m+4XLxSq/Ssr/k1s+Wgz0QWLsvrHR0T7by65GkySMgk=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.10.5.1/helium-0.10.5.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-IDnhpxnP1xKcPE/P01Lq67/4pWHvW7Io/AuPa6zJk4E=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.55";
+    version = "v2.0.56";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.55/icon_map.sh";
-      sha256 = "sha256-pQ9ujP4QED6v7QUISZK2umV8/9oLNi6thvKbXdNrdMo=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.56/icon_map.sh";
+      sha256 = "sha256-aAX6yydhSGwVe+C/BJRftksa90a+1LpVjCm7qmKPaS0=";
     };
   };
   jankyborders = {
@@ -106,19 +106,19 @@
   };
   slskd = {
     pname = "slskd";
-    version = "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e";
+    version = "769cc99f8fa8e859d953d446a92db0c9510782ec";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "9c1c02035e6c9fb4e70251a2dea17b32c0e51d7e";
+      rev = "769cc99f8fa8e859d953d446a92db0c9510782ec";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=";
+      sha256 = "sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-B0LAd9Fn1E5heGPk5dd7DoHWreHRxe42Xew5PmLId7g=/./src/web/package-lock.json";
-    };date = "2026-02-28";
+      "./src/web/package-lock.json" = ./. + "/sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=/./src/web/package-lock.json";
+    };date = "2026-03-15";
   };
   yabai = {
     pname = "yabai";

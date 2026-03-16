@@ -44,10 +44,12 @@ in
 (
   {
 
-    linuxZenWMuQSS = pkgs.linuxPackages_zen.extend (self: super: {
-      alx-wol = self.callPackage ../packages/alx-wol.nix {
-      };
-    });
+    linuxZenWMuQSS = pkgs.linuxPackages_zen.extend (
+      self: super: {
+        alx-wol = self.callPackage ../packages/alx-wol.nix {
+        };
+      }
+    );
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
@@ -110,7 +112,7 @@ in
       source = {
         inherit (sources.slskd) src;
         version = "0.24.2";
-        npmHash = "sha256-bGD3s/ukksrO1uIiM0V8iw62Gyxynh3kTnqkq4kHaQM=";
+        npmHash = sources.slskd."src/web/package-lock.json";
       };
     };
     zen-browser = zen-browser."${system}";
@@ -164,6 +166,7 @@ in
       }
     );
 
+    deadlock-mod-manager = inputs.deadlock.packages."${system}".default;
     inherit (inputs.eww.packages.${system}) eww;
 
     inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;
