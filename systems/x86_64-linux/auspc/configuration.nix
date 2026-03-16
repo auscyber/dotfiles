@@ -31,6 +31,7 @@ in
     ./hardware-configuration.nix
   ];
   hardware.openrazer.enable = true;
+  services.flatpak.enable = true;
   users.groups.openrazer.members = [ "auscyber" ];
   programs.fish.enable = true;
 

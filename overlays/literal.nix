@@ -93,6 +93,9 @@ in
     #   };
     # })
 
+    deadlock-mod-manager = pkgs.deadlock-mod-manager.overrideAttrs (attrs: {
+      src = inputs.deadlock-mod-manager;
+    });
     yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
       inherit (sources.jankyborders) src version;

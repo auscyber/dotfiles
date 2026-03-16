@@ -129,6 +129,7 @@ rec {
       polybarFull
       playerctl
       htop
+      #      deadlock-mod-manager
       #      eclipses.eclipse-java
       starship
       fish

@@ -3,6 +3,10 @@
   description = "AusCyber nix flake config";
   inputs = {
     self.submodules = true;
+    deadlock-mod-manager = {
+      url = "github:deadlock-mod-manager/deadlock-mod-manager";
+      flake = false;
+    };
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
