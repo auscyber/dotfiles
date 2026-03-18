@@ -6,12 +6,13 @@
   - [Code of Conduct](#code-of-conduct)
   - [Making Changes](#making-changes)
     - [Writing Code](#writing-code)
-      - [Running the Fix Script](#running-the-fix-script)
+      - [Pre-flight Checklist](#pre-flight-checklist)
   - [Testing](#testing)
     - [Running Tests](#running-tests)
     - [Platform-Specific Testing](#platform-specific-testing)
   - [Submitting Changes](#submitting-changes)
     - [Commit Messages](#commit-messages)
+      - [Common Scopes](#common-scopes)
     - [Pull Request Process](#pull-request-process)
   - [Code Style](#code-style)
     - [Rust](#rust)
@@ -70,25 +71,32 @@ the fix has been merged.
    minimal. Code should be self-documenting where possible.
 4. Update the [changelog] with your changes when your work is complete
 
-#### Running the Fix Script
+#### Pre-flight Checklist
 
-Before committing your changes, you may consider the "fix" script located in the
+We use `just` to orchestrate some common maintenance tasks. The `just` tool is
+provided by the default dev shell and may be invoked to either check for or
+automatically fix common issues you might forget about. Before committing your
+changes, consider running the "fix" task provided by the Justfile located in the
 repository root. It will apply the necessary formatting and linting changes
 enforced by `rustfmt` and `clippy`:
 
 ```bash
-# Run the script
-$ ./fix.sh
+# Check for common issues
+$ just check
+
+# Fix issues that can be fixed automatically
+$ just fix
 ```
 
-This script will:
+The `fix` task will run:
 
 - Run `cargo fix` for automatic fixes
 - Run `cargo clippy --fix` for lint fixes
 - Run `cargo fmt` for code formatting
 - Run `taplo fmt` for TOML formatting
 
-You may run those commands manually as well.
+while the `check` task runs a "dry-run" of sorts to _check_ for issues without
+modifying anything. If you wish, you may run those commands manually as well.
 
 ## Testing
 
@@ -108,6 +116,9 @@ $ cargo nextest run
 
 # Or with plain cargo
 $ cargo test
+
+# Or with Just
+$ just test
 ```
 
 ### Platform-Specific Testing
@@ -145,6 +156,17 @@ your commits atomic, and focus each commit on one logical change.
 
 You do not need to reference issues in commit bodies, but you _may_ add
 something like `Fixes #XXX` to the long description.
+
+#### Common Scopes
+
+It is _usually_ safe to use the crate or module name for the scope. For example
+if you are editing `crates/nh-core/args.rs` you may use `nh-core:` as the scope.
+If you are editing multiple modules or crates, `various` or `treewide` may be
+more suitable. We use `docs:`, `chore:` and `meta:` for changes around
+documentation, basic maintenance (such as dependency updates) and permanent
+repository changes respectively.
+
+If in doubt, feel free to ask the maintainers for guidance.
 
 ### Pull Request Process
 
@@ -188,6 +210,10 @@ annotate your code with `#[expect]` with a `reason` parameter.
 > longer fires (e.g., if it was fixed or the code changed). This catches stale
 > suppressions that would otherwise go unnoticed.
 
+The lints and formatting rules are enforced by the CI, and can be checked easily
+with `just check` as described in [pre-flight checklist](#pre-flight-checklist)
+section.
+
 ### Error Handling
 
 Use `color_eyre::Result` and `thiserror::Error`:
@@ -205,7 +231,8 @@ pub enum MyError {
 
 Panics, i.e., `panic!`, `unwrap()` and `expect()` are banned throughout the
 codebase but they may be used in tests. It is allowed to suppress them within
-test fields.
+test fields. As described above, you must explicitly use `#[expect]` with the
+`reason` parameter.
 
 ### Shell Command Quoting
 
@@ -232,6 +259,9 @@ debug!("Detailed debugging information");
 info!("General progress information");
 warn!("Potential issues that aren't errors");
 ```
+
+Keep in mind to provide developer-friendly information in `debug!` and `trace!`
+level logs, as those will come in handy for pinpointing code issues.
 
 ### Derive Macros
 
