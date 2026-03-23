@@ -17,6 +17,11 @@ in
   config = lib.mkIf cfg.enable {
     programs.helium = {
       enable = true;
+      extensions = [
+        {
+          id = "cdglnehniifkbagbbombnjghhcihifij";
+        }
+      ];
     };
   };
 

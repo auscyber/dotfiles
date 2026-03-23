@@ -128,53 +128,54 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
-    	   runHook preInstall
+        # sh
+            	   runHook preInstall
 
-    	   install -dm755 "${heliumRoot}"
-    	   shopt -s dotglob
-    	   mv ./* "${heliumRoot}/"
-    	   shopt -u dotglob
+            	   install -dm755 "${heliumRoot}"
+            	   shopt -s dotglob
+            	   mv ./* "${heliumRoot}/"
+            	   shopt -u dotglob
 
-    	   rm -f "${heliumRoot}/libEGL.so" "${heliumRoot}/libGLESv2.so" "${heliumRoot}/libvulkan.so.1"
-    	   ln -s "${libglvnd}/lib/libEGL.so.1" "${heliumRoot}/libEGL.so"
-    	   ln -s "${libglvnd}/lib/libGLESv2.so.2" "${heliumRoot}/libGLESv2.so"
-    	   ln -s "${vulkan-loader}/lib/libvulkan.so.1" "${heliumRoot}/libvulkan.so.1"
+            	   rm -f "${heliumRoot}/libEGL.so" "${heliumRoot}/libGLESv2.so" "${heliumRoot}/libvulkan.so.1"
+            	   ln -s "${libglvnd}/lib/libEGL.so.1" "${heliumRoot}/libEGL.so"
+            	   ln -s "${libglvnd}/lib/libGLESv2.so.2" "${heliumRoot}/libGLESv2.so"
+            	   ln -s "${vulkan-loader}/lib/libvulkan.so.1" "${heliumRoot}/libvulkan.so.1"
 
-    	   find "${heliumRoot}" -type f -name '*.so*' -exec chmod 0644 {} +
+            	   find "${heliumRoot}" -type f -name '*.so*' -exec chmod 0644 {} +
 
-    	   install -dm755 "${heliumRoot}/resources/ublock"
-    	   cat > "${heliumRoot}/resources/ublock/managed_storage.json" <<'EOF'
-    	   {
-    	     "type": "object",
-    	     "properties": {}
-    	   }
-    	   EOF
+            	   install -dm755 "${heliumRoot}/resources/ublock"
+            	   cat > "${heliumRoot}/resources/ublock/managed_storage.json" <<'EOF'
+            	   {
+            	     "type": "object",
+            	     "properties": {}
+            	   }
+    EOF
 
-    	   install -Dm644 "${heliumRoot}/helium.desktop" "$out/share/applications/helium.desktop"
-    	   sed -i \
-    	     -e 's/^Name=Helium$/Name=Helium Browser/' \
-    	     -e 's/^Exec=helium %U$/Exec=helium-browser %U/' \
-    	     -e 's/^Exec=helium --incognito$/Exec=helium-browser --incognito/' \
-    	     -e 's/^Exec=helium$/Exec=helium-browser/' \
-    	     -e 's/^Icon=helium$/Icon=helium-browser/' \
-    	     "$out/share/applications/helium.desktop"
+            	   install -Dm644 "${heliumRoot}/helium.desktop" "$out/share/applications/helium.desktop"
+            	   sed -i \
+            	     -e 's/^Name=Helium$/Name=Helium Browser/' \
+            	     -e 's/^Exec=helium %U$/Exec=helium-browser %U/' \
+            	     -e 's/^Exec=helium --incognito$/Exec=helium-browser --incognito/' \
+            	     -e 's/^Exec=helium$/Exec=helium-browser/' \
+            	     -e 's/^Icon=helium$/Icon=helium-browser/' \
+            	     "$out/share/applications/helium.desktop"
 
-    	   install -Dm644 "${heliumRoot}/product_logo_256.png" "$out/share/pixmaps/helium-browser.png"
-    	   install -Dm644 "${heliumRoot}/product_logo_256.png" "$out/share/icons/hicolor/256x256/apps/helium-browser.png"
-    	   install -Dm644 "$ungoogledChromiumLicense" "$out/share/licenses/${pname}/LICENSE.ungoogled_chromium"
-    	   makeWrapper "$heliumWrapper" "$out/bin/helium-browser" \
-    	     --set-default CHROME_VERSION_EXTRA "nixpkgs" \
-    	     --set-default CHROME_WRAPPER "$out/bin/helium-browser" \
-    	  --append-flags "''${commandLineArgs[*]}" \
-    	     --set HELIUM_HOME "${heliumRoot}" \
-    	     --prefix LD_LIBRARY_PATH : "${heliumRoot}:${heliumRoot}/lib:${heliumRoot}/lib.target:${
-            lib.makeLibraryPath [
-              libglvnd
-              mesa
-            ]
-          }"
+            	   install -Dm644 "${heliumRoot}/product_logo_256.png" "$out/share/pixmaps/helium-browser.png"
+            	   install -Dm644 "${heliumRoot}/product_logo_256.png" "$out/share/icons/hicolor/256x256/apps/helium-browser.png"
+            	   install -Dm644 "$ungoogledChromiumLicense" "$out/share/licenses/${pname}/LICENSE.ungoogled_chromium"
+            	   makeWrapper "$heliumWrapper" "$out/bin/helium-browser" \
+            	     --set-default CHROME_VERSION_EXTRA "nixpkgs" \
+            	     --set-default CHROME_WRAPPER "$out/bin/helium-browser" \
+            	  --append-flags "''${commandLineArgs[*]}" \
+            	     --set HELIUM_HOME "${heliumRoot}" \
+            	     --prefix LD_LIBRARY_PATH : "${heliumRoot}:${heliumRoot}/lib:${heliumRoot}/lib.target:${
+                    lib.makeLibraryPath [
+                      libglvnd
+                      mesa
+                    ]
+                  }"
 
-        runHook postInstall
+                runHook postInstall
   '';
 
   postFixup = ''

@@ -43,7 +43,9 @@ let
 in
 (
   {
-
+    proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
+      inherit (sources.proton-ge-bin) src version;
+    });
     linuxZenWMuQSS = pkgs.linuxPackages_zen.extend (
       self: super: {
         alx-wol = self.callPackage ../packages/alx-wol.nix {
@@ -93,9 +95,6 @@ in
     #   };
     # })
 
-    deadlock-mod-manager = pkgs.deadlock-mod-manager.overrideAttrs (attrs: {
-      src = inputs.deadlock-mod-manager;
-    });
     yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
       inherit (sources.jankyborders) src version;
@@ -169,7 +168,40 @@ in
       }
     );
 
-    deadlock-mod-manager = inputs.deadlock.packages."${system}".default;
+    deadlock-mod-manager = inputs.deadlock.packages."${system}".default.overrideAttrs (attrs: {
+      preFixup = ''
+        gappsWrapperArgs+=(
+          --set FONTCONFIG_FILE "${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+          --set TAURI_DIST_DIR "$out/share/deadlock-modmanager/dist"
+          --set DISABLE_UPDATE_DESKTOP_DATABASE 1
+          --prefix PATH : ${lib.makeBinPath [ pkgs.desktop-file-utils ]}
+          --add-flags "--disable-auto-update"
+        )
+      '';
+      env.VITE_API_URL = "https://api.deadlockmods.app";
+      buildInputs = attrs.buildInputs ++ [
+        pkgs.copyDesktopItems
+        pkgs.desktop-file-utils
+        pkgs.wrapGAppsHook3
+      ];
+
+      desktopItems = [
+        (pkgs.makeDesktopItem {
+          desktopName = "deadlock-mod-manager";
+          name = "Deadlock Mod Manager";
+          exec = "deadlock-mod-manager %u";
+          terminal = false;
+          type = "Application";
+          icon = "deadlock-mod-manager";
+          mimeTypes = [ "x-scheme-handler/deadlock-mod-manager" ];
+          categories = [
+            "Utility"
+            "Game"
+          ];
+        })
+      ];
+
+    });
     inherit (inputs.eww.packages.${system}) eww;
 
     inherit (inputs.hyprland.packages."${system}") hyprland xdg-desktop-portal-hyprland;

@@ -37,4 +37,6 @@ fetch.github = "ghostty-org/ghostty"
 [helium_linux]
 src.github = "imputnet/helium-linux"
 fetch.tarball = "https://github.com/imputnet/helium-linux/releases/download/$ver/helium-$ver-x86_64_linux.tar.xz"
-
+[proton-ge-bin]
+src.github = "gloriouseggroll/proton-ge-custom"
+fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver.tar.gz"

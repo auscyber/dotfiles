@@ -36,7 +36,7 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=";
+      sha256 = "sha256-JmIVbdjtMFcGEJ7H883zvMs/TxNVyi7zFWc0cbB3q3M=";
     };
   };
   helium_linux = {
@@ -84,6 +84,14 @@
       outputHashes = {
         
       };
+    };
+  };
+  proton-ge-bin = {
+    pname = "proton-ge-bin";
+    version = "GE-Proton10-33";
+    src = fetchTarball {
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton10-33/GE-Proton10-33.tar.gz";
+      sha256 = "sha256-vuPqz9vD/B1H6IFA7Wi/YEPbklNTbVbEZ2Erm62kBnk=";
     };
   };
   rift = {

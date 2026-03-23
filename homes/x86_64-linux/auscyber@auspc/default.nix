@@ -56,6 +56,7 @@ rec {
     };
     programs.zotero.enable = true;
     browsers.zen-browser.enable = true;
+    browsers.helium.enable = true;
     programs._1password-cli.enable = true;
     terms.ghostty.enable = true;
     wms.hyprland.enable = false;
@@ -99,7 +100,7 @@ rec {
     [
       obs-studio
       helium
-      heroic
+      #      heroic
       shadps4
       #      element-desktop
       tidal-hifi
@@ -129,7 +130,7 @@ rec {
       polybarFull
       playerctl
       htop
-      #      deadlock-mod-manager
+      deadlock-mod-manager
       #      eclipses.eclipse-java
       starship
       fish

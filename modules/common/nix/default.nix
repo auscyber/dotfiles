@@ -73,7 +73,7 @@ in
 
       extraOptions = ''
                         experimental-features = nix-command flakes
-                		netrc-file = "${config.age.templates.netrc.path}"
+                		netrc-file = ${config.age.templates.netrc.path}"
         				post-build-hook = ${build-hook}/bin/build-hook
       '';
       #	  auto-optimise-store = true;

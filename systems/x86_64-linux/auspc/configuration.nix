@@ -34,6 +34,7 @@ in
   services.flatpak.enable = true;
   users.groups.openrazer.members = [ "auscyber" ];
   programs.fish.enable = true;
+  programs.kdeconnect.enable = true;
 
   boot.initrd.compressor = "lzma";
 
@@ -275,6 +276,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    #bottles
     google-chrome
     input-leap
     vscode

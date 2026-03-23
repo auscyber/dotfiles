@@ -54,6 +54,23 @@ in
         search = {
           force = true;
           engines = {
+            kagi = {
+              name = "Kagi Search";
+              urls = [
+                {
+                  template = "https://kagi.com/search";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+              ];
+
+              icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/kagi-search.svg";
+              definedAliases = [ "@kagi" ];
+            };
             nix-packages = {
               name = "Nix Packages";
               urls = [
@@ -123,8 +140,8 @@ in
               definedAliases = [ "@hm" ];
             };
           };
-          default = "unduck";
-          privateDefault = "unduck";
+          default = "kagi";
+          privateDefault = "kagi";
         };
 
         isDefault = true;
@@ -153,6 +170,7 @@ in
           libkey-nomad
           onepassword-password-manager
           zotero-connector
+          kagi-search
           ublock-origin
         ];
 
