@@ -30,6 +30,7 @@ in
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+services.zfs.autoScrub.enable = true;
   hardware.openrazer.enable = true;
   services.flatpak.enable = true;
   users.groups.openrazer.members = [ "auscyber" ];
@@ -65,7 +66,7 @@ in
     vpn.enable = true;
   };
 
-  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDqzUK8FRDaf17agDGRsk5vHR6YIsnY9ZifmW0NlmV63 root@auspc";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYM1mZ3fYfOjhyMhIiKbUOLYTQifG82P2NnGWHyIwHt root@nixos";
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -79,7 +80,43 @@ in
     #	authKeyFile =
 
   };
-  boot.supportedFilesystems = [ "ntfs" ];
+ boot = {
+    loader = {
+grub = {
+    enable = true;
+    zfsSupport = true;
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+    mirroredBoots = [
+      { devices = [ "nodev"]; path = "/boot"; }
+    ];
+  };
+      
+      generationsDir.copyKernels = true;
+
+      efi = {
+        #canTouchEfiVariables = true;
+      }; # efi
+    }; # loader
+
+#    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+
+    initrd = {
+      kernelModules = [ "zfs" ];
+
+      postDeviceCommands = ''
+        zpool import -lf zpool
+      ''; # postDeviceCommands
+  }; # initrd
+
+  supportedFilesystems = [ "zfs"  "ntfs" ];
+
+    zfs = {
+requestEncryptionCredentials = true;
+forceImportRoot = true;
+    }; # zfs
+
+  }; # boot
   boot.kernelPackages = pkgs.linuxZenWMuQSS;
 
   boot.extraModulePackages = with config.boot.kernelPackages; [ alx-wol ];
@@ -135,31 +172,8 @@ in
 
   services.pcscd.enable = true;
   #  home-manager.backupFileExtension = ".bak";
-  fileSystems."/mnt/hdd" = {
-    device = "/dev/sda3";
-    fsType = "ext4";
-    #    options = [
-    #      "uid=1000"
-    #      "gid=100"
-    #      "rw"
-    #      "user"
-    #      "exec"
-    #      "umask=000"
-    #    ];
-  };
-  fileSystems."/mnt/ssd2" = {
-    device = "/dev/disk/by-uuid/704821B848217DCA";
-    fsType = "lowntfs-3g";
-    options = [
-      "uid=1000"
-      "gid=100"
-      "rw"
-      "user"
-      "exec"
-      "umask=000"
-    ];
-  };
-  #  programs.virt-manager.enable = true;
+  
+    #  programs.virt-manager.enable = true;
 
   #  users.groups.libvirtd.members = [ "auscyber" ];
 
@@ -170,19 +184,20 @@ in
   boot.kernelModules = [ "kvm-intel" ];
   #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  #boot.loader.systemd-boot.enable = true;
+#  boot.loader.systemd-boot.enable = lib.mkForce false;
+#  boot.loader.systemd-boot.enable = true;
 
   boot.lanzaboote = {
-    enable = true;
+    enable = false;
     pkiBundle = "/var/lib/sbctl";
   };
   boot.loader.efi = {
-    canTouchEfiVariables = true;
+    #canTouchEfiVariables = true;
     efiSysMountPoint = "/boot";
   };
 
   networking.hostName = "auspc"; # Define your hostname.
+networking.hostId = "230c61e9";
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
