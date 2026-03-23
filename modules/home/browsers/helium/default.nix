@@ -15,11 +15,27 @@ in
     enable = lib.mkEnableOption "Helium browser";
   };
   config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      helium
+    ];
     programs.helium = {
       enable = true;
       extensions = [
         {
           id = "cdglnehniifkbagbbombnjghhcihifij";
+        }
+        {
+          id = "aeblfdkhhhdcdjpifhhbdiojplfjncoa"; # 1Password
+
+        }
+        {
+          id = "ekhagklcjbdpajgpjgmbionohlpdbjgc"; # Zotero
+        }
+        {
+          id = "lkoeejijapdihgbegpljiehpnlkadljb"; # libKey nomad
+        }
+        {
+          id = "hghakoefmnkhamdhenpbogkeopjlkpoa"; # Lean library
         }
       ];
     };

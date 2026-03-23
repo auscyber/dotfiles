@@ -222,7 +222,7 @@
       #      "/System/Applications/Home.app"
       #      "/Applications/Nix Apps/Zed.App"
       "/Applications/Nix Apps/Visual Studio Code.app"
-      "/Applications/Zotero.app"
+      "/Applications/Nix Apps/Zotero.app"
       "/Applications/Nix Apps/Ghostty.app"
       "/Applications/Todoist.app"
     ];

@@ -41,6 +41,27 @@ in
     })
   ];
   config = lib.mkIf cfg.enable {
+    home.file = lib.mkMerge (
+      lib.flip lib.mapAttrsToList cfg.profiles (
+        _: profile: {
+          "${cfg.profilesPath}/${profile.path}/extensions" = lib.mkIf (profile.extensions.packages != [ ]) (
+            lib.mkForce {
+              source =
+                let
+                  extensionsEnvPkg = pkgs.symlinkJoin {
+                    name = "hm-zotero-extensions";
+                    paths = profile.extensions.packages;
+                  };
+                in
+                lib.mkForce "${extensionsEnvPkg}";
+              recursive = true;
+              force = true;
+            }
+          );
+
+        }
+      )
+    );
     programs.zotero = {
 
       package = pkgs.wrapFirefox (pkgs.zotero.overrideAttrs (attrs: {

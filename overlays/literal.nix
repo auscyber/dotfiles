@@ -128,18 +128,6 @@ in
 
       inherit (sources.game-devices-udev-rules) src;
     });
-
-  }
-  // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
-    #    gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
-    #      patches = attrs.patches ++ [
-    #        (pkgs.fetchpatch {
-    #          url = "https://raw.githubusercontent.com/NixOS/nixpkgs/refs/heads/staging/pkgs/development/libraries/gtk/patches/3.0-mr5531-backport.patch";
-    #          hash = "sha256-vP0xmeKQazr93bTV+2kIwsNA+rZPmNd9iaUfpYOpD0M=";
-    #        })
-    #      ];
-    #    });
-
     zotero-extensions = {
       zotero-better-bibtex = pkgs.fetchFirefoxAddon {
         name = "zotero-better-bibtex";
@@ -152,6 +140,18 @@ in
         hash = "sha256-C8YC473o1gthq5gpi5FEdbIcTX4MsA7hGcC1oLyJotw=";
       };
     };
+
+  }
+  // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+    #    gtk3 = pkgs.gtk3.overrideAttrs (attrs: {
+    #      patches = attrs.patches ++ [
+    #        (pkgs.fetchpatch {
+    #          url = "https://raw.githubusercontent.com/NixOS/nixpkgs/refs/heads/staging/pkgs/development/libraries/gtk/patches/3.0-mr5531-backport.patch";
+    #          hash = "sha256-vP0xmeKQazr93bTV+2kIwsNA+rZPmNd9iaUfpYOpD0M=";
+    #        })
+    #      ];
+    #    });
+
     pam_rssh = pkgs.pam_rssh.overrideAttrs (attrs: {
       meta = attrs.meta // {
         platforms = lib.platforms.unix;
