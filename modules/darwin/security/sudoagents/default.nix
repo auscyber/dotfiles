@@ -21,12 +21,8 @@ in
   config = lib.mkIf cfg.enable (
     let
       sudoersEntries = lib.mapAttrsToList (
-        agentName: commandList:
-        let
-          commandBin = builtins.head commandList;
-          shasum = builtins.hashFile "sha256" commandBin;
-        in
-        "${config.system.primaryUser} ALL=(root) SETENV: NOPASSWD: sha256:${shasum} ${builtins.concatStringsSep " " commandList}"
+        _agentName: commandList:
+        "${config.system.primaryUser} ALL=(root) SETENV: NOPASSWD: ${builtins.concatStringsSep " " commandList}"
       ) cfg.commands;
 
     in
