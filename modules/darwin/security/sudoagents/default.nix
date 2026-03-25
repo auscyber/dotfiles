@@ -22,15 +22,11 @@ in
     let
       sudoersEntries = lib.mapAttrsToList (
         agentName: commandList:
-        builtins.readFile (
-          pkgs.runCommand "sudoers-${agentName}" { } ''
-            COMMAND_BIN="${builtins.head commandList}"
-            SHASUM=$(sha256sum "$COMMAND_BIN" | cut -d' ' -f1)
-            cat << EOF >"$out"
-            ${config.system.primaryUser} ALL=(root) SETENV: NOPASSWD: sha256:$SHASUM ${builtins.concatStringsSep " " commandList}
-            EOF
-          ''
-        )
+        let
+          commandBin = builtins.head commandList;
+          shasum = builtins.hashFile "sha256" commandBin;
+        in
+        "${config.system.primaryUser} ALL=(root) SETENV: NOPASSWD: sha256:${shasum} ${builtins.concatStringsSep " " commandList}"
       ) cfg.commands;
 
     in
