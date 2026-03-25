@@ -61,19 +61,19 @@ modules = [
 	auscybernix.secrets.enable = true;
 }
 
-../../modules/common/nix
-../../modules/common/secrets.nix
+../../modules/_common/nix
+../../modules/_common/secrets.nix
 
-../../modules/common/hm
-../../modules/common/common
+../../modules/_common/hm
+../../modules/_common/common
 
-../../modules/common/allConfigs.nix
-../../modules/common/kmonad
-../../modules/common/ssh-keys.nix
+../../modules/_common/allConfigs.nix
+../../modules/_common/kmonad
+../../modules/_common/ssh-keys.nix
 homeManagerConfig
 
 	]
-++ (extendedLib.importModulesRecursive ../../modules/darwin)
+++ (extendedLib.importModulesRecursive ../../modules/_darwin)
 	++ [
 
 		../../systems/${system}/${hostname}

@@ -38,9 +38,9 @@ in
 
   flake = {
     homeModules = rec {
-      default = ../modules/home;
+      default = ./_home;
       recursive = {
-        imports = lib.importModulesRecursive ../modules/home ++ lib.externalHmModules ++ [ default ];
+        imports = lib.importModulesRecursive ./_home ++ lib.externalHmModules ++ [ default ];
 
       };
     };

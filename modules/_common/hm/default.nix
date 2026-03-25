@@ -9,7 +9,7 @@
   home-manager.backupFileExtension = "backup";
 
   home-manager.sharedModules = [
-    ../../home/default.nix
+    ../../_home/default.nix
     #    {
     #      age.rekey.hostPubkey = config.age.rekey.hostPubkey;
     #    }

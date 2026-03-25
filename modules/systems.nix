@@ -33,7 +33,7 @@ in
   ];
   flake = {
     auscybernix = rec {
-	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
+	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ./_nixos;
 
       importedHomeModules = [
         inputs._1password-shell-plugins.hmModules.default
@@ -52,13 +52,13 @@ in
         inputs.stylix.homeModules.stylix
       ];
       importedNixosModules = [
-	  ../modules/common/vpn.nix
-	  ../modules/common/builders
-    ../modules/common/secrets.nix
-    ../modules/common/nix
-    ../modules/common/common
+	  ./_common/vpn.nix
+	  ./_common/builders
+    ./_common/secrets.nix
+    ./_common/nix
+    ./_common/common
 
-#	  ../modules/common/builders/builder.nix
+#	  ./_common/builders/builder.nix
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote
@@ -73,9 +73,9 @@ in
       ];
       importedDarwinModules = [
 
-#	  ../modules/common/builders/builder.nix
-	  ../modules/common/builders
-	  ../modules/common/vpn.nix
+#	  ./_common/builders/builder.nix
+	  ./_common/builders
+	  ./_common/vpn.nix
         inputs.stylix.darwinModules.stylix
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.home-manager.darwinModules.home-manager

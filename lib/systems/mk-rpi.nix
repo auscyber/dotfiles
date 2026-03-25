@@ -93,11 +93,11 @@ in
       inputs.agenix-rekey.nixosModules.default
       inputs.sops-nix.nixosModules.sops
 
-      ../../modules/common/secrets.nix
+      ../../modules/_common/secrets.nix
 
-      ../../modules/common/nix
-	  ../../modules/common/builders/default.nix
-      ../../modules/common/common
+      ../../modules/_common/nix
+	  ../../modules/_common/builders/default.nix
+      ../../modules/_common/common
       {
         nixpkgs = {
           inherit system;
@@ -109,7 +109,7 @@ in
       (homeManagerConfig true)
     ]
 
-    ++ (extendedLib.importModulesRecursive ../../modules/nixos)
+    ++ (extendedLib.importModulesRecursive ../../modules/_nixos)
     ++ [
       ../../systems/${system}/${hostname}
     ]
@@ -128,11 +128,11 @@ in
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager
       inputs.sops-nix.nixosModules.sops
-      ../../modules/common/secrets.nix
+      ../../modules/_common/secrets.nix
 
-      ../../modules/common/nix
-      ../../modules/common/common
-	  ../../modules/common/builders/default.nix
+      ../../modules/_common/nix
+      ../../modules/_common/common
+	  ../../modules/_common/builders/default.nix
 
       {
         nixpkgs = {
@@ -145,7 +145,7 @@ in
       (homeManagerConfig false)
     ]
 
-    ++ (extendedLib.importModulesRecursive ../../modules/nixos)
+    ++ (extendedLib.importModulesRecursive ../../modules/_nixos)
     ++ [
       ../../systems/${system}/${hostname}
     ]

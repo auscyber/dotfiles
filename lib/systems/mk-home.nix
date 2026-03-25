@@ -45,17 +45,17 @@ inputs.home-manager.lib.homeManagerConfiguration {
     ++ [
       { _module.args.lib = extendedLib; }
 
-      ../../modules/common/secrets.nix
-      ../../modules/common/nix
+      ../../modules/_common/secrets.nix
+      ../../modules/_common/nix
 
-      ../../modules/common/allConfigs.nix
+      ../../modules/_common/allConfigs.nix
 
       {
       }
     ]
-    ++ (extendedLib.importModulesRecursive ../../modules/home)
+    ++ (extendedLib.importModulesRecursive ../../modules/_home)
     ++ [
-      ../../modules/home/default.nix
+      ../../modules/_home/default.nix
       {
         home = {
           inherit username;

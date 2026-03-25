@@ -82,15 +82,15 @@ in
           )
           ++ [
 
-            ../../modules/common/secrets.nix
+            ../../modules/_common/secrets.nix
 
-            ../../modules/common/allConfigs.nix
+            ../../modules/_common/allConfigs.nix
           ]
           ++ (extendedLib.optional (!isInstaller) {
             auscybernix.secrets.enable = true;
           })
           ++ externalHmModules
-          ++ (extendedLib.importModulesRecursive ../../modules/home);
+          ++ (extendedLib.importModulesRecursive ../../modules/_home);
           users = mapAttrs' (_name: homeConfig: {
             name = homeConfig.username;
             value = {

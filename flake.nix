@@ -198,7 +198,7 @@
   };
   outputs =
     inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./flake);
+    flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"

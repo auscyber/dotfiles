@@ -21,7 +21,7 @@
   services.yubikey-agent.enable = true;
   age.rekey.masterIdentities = [
     {
-      identity = ../../../modules/common/age-yubikey.pub;
+      identity = ../../../modules/_common/age-yubikey.pub;
       pubkey = "age1yubikey1qv6zc6sjz4klkjxnnt2sv8ptlcjtmhphduu4rrqjuw88jn2nftuu6ep0kr3";
 
     }
@@ -85,7 +85,7 @@
         pkgs.yabai
         pkgs.rift
       ];
-      extraCommandPiping = ../../../modules/home/keybinds/kanata/config.toml;
+      extraCommandPiping = ../../../modules/_home/keybinds/kanata/config.toml;
       tray = {
         config = {
           "$schema" = "https://raw.githubusercontent.com/rszyma/kanata-tray/main/doc/config_schema.json";
