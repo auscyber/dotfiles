@@ -7,6 +7,7 @@
       url = "github:deadlock-mod-manager/deadlock-mod-manager";
       flake = false;
     };
+    import-tree.url = "github:vic/import-tree";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
@@ -196,35 +197,8 @@
 
   };
   outputs =
-    inputs@{
-      self,
-      flake-parts,
-      ...
-    }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      top@{
-        config,
-        withSystem,
-        moduleWithSystem,
-        ...
-      }:
-      {
-        imports = [
-          # Optional: use external flake logic, e.g.
-          # inputs.foo.flakeModules.default
-          ./flake
-          inputs.nix-topology.flakeModule
-        ];
-        systems = [
-          # systems for which you want to build the `perSystem` attributes
-          "aarch64-darwin"
-          "x86_64-linux"
-          "aarch64-linux"
-          # ...
-        ];
-
-      }
-    );
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./flake);
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"

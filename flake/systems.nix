@@ -20,6 +20,17 @@ let
   allSystems = parseSystemConfigurations systemsPath;
 in
 {
+  imports = [
+    inputs.nix-topology.flakeModule
+    inputs.flake-parts.flakeModules.partitions
+    inputs.flake-parts.flakeModules.flakeModules
+  ];
+
+  systems = [
+    "aarch64-darwin"
+    "x86_64-linux"
+    "aarch64-linux"
+  ];
   flake = {
     auscybernix = rec {
 	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;

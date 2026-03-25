@@ -1,5 +1,9 @@
 { inputs, ... }:
 {
+  imports = [
+    inputs.input-branches.flakeModules.default
+  ];
+
   input-branches = {
     inputs = {
       attic = {
