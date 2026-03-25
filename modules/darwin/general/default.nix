@@ -21,6 +21,7 @@
   #  programs.gnupg.package = pkgs.gnupg-wrapped;
   auscybernix.secrets.configId = "${system}-${hostname}";
   #  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
+  #  determinateNix.enable = true;
   nix.optimise = {
     automatic = true;
     interval = [

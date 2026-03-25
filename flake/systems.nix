@@ -22,7 +22,7 @@ in
 {
   flake = {
     auscybernix = rec {
-	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
+      containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
 
       importedHomeModules = [
         inputs._1password-shell-plugins.hmModules.default
@@ -34,20 +34,21 @@ in
         inputs.agenix-rekey.homeManagerModules.default
         inputs.vscode-server.homeModules.default
 
-		inputs.niri.homeModules.niri
+        inputs.niri.homeModules.niri
       ];
       standaloneHomeModules = [
-#		inputs.niri.homeModules.default
+        #		inputs.niri.homeModules.default
         inputs.stylix.homeModules.stylix
       ];
       importedNixosModules = [
-	  ../modules/common/vpn.nix
-	  ../modules/common/builders
-    ../modules/common/secrets.nix
-    ../modules/common/nix
-    ../modules/common/common
+        ../modules/common/vpn.nix
+        ../modules/common/builders
+        ../modules/common/secrets.nix
+        ../modules/common/nix
+        ../modules/common/common
 
-#	  ../modules/common/builders/builder.nix
+        #	  ../modules/common/builders/builder.nix
+        inputs.determinate.nixosModules.default
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote
@@ -62,9 +63,11 @@ in
       ];
       importedDarwinModules = [
 
-#	  ../modules/common/builders/builder.nix
-	  ../modules/common/builders
-	  ../modules/common/vpn.nix
+        #	  ../modules/common/builders/builder.nix
+        ../modules/common/builders
+        ../modules/common/vpn.nix
+
+        #        inputs.determinate.darwinModules.default
         inputs.stylix.darwinModules.stylix
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.home-manager.darwinModules.home-manager

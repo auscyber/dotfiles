@@ -69,10 +69,11 @@ in
         #        }
       ];
 
+      package = pkgs.nix;
       #    package = pkgs.nixVersions.latest;
 
       extraOptions = ''
-                        experimental-features = nix-command flakes
+                        experimental-features = nix-command flakes ca-references
                 		netrc-file = ${config.age.templates.netrc.path}"
         				post-build-hook = ${build-hook}/bin/build-hook
       '';
@@ -83,7 +84,7 @@ in
       #        options = "--delete-older-than 30d";
       #      };
 
-      package = pkgs.nixVersions.latest;
+      #package = pkgs.nixVersions.latest;
 
     };
     age.secrets.attic_token = {

@@ -158,7 +158,7 @@ sketchybar --add slider volume_options popup.volume 100 \
 
 sketchybar --add bracket all_utils clock item volume power  "Control Centre,Fantastical" "Control Centre,FocusModes" \
 		   --set all_utils background.color=0x40$COLOR_YELLOW \
-		   	background.height=30 background.corner_radius=20 background.padding=10
+		   	background.height=30 background.corner_radius=20 background.padding_right=10 background.padding_left = 10
 sketchybar --add bracket utils power battery volume \
 		   --set utils background.color=0x40$COLOR_YELLOW \
 		   	background.height=30 background.corner_radius=5 background.padding=10 background.corner_radius=15

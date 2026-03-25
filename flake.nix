@@ -8,8 +8,10 @@
       flake = false;
     };
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    nix.url = "github:nixos/nix/latest-release";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
     nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
