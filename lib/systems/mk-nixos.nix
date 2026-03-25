@@ -53,7 +53,6 @@ inputs.nixpkgs.lib.nixosSystem {
   ]
   ++ importedNixosModules
   ++ [
-
     {
       nixpkgs = {
         inherit system;
@@ -61,11 +60,6 @@ inputs.nixpkgs.lib.nixosSystem {
       }
       // common.mkNixpkgsConfig flake;
     }
-
-
-    ../../modules/_common/allConfigs.nix
-    ../../modules/_common/hm
-    ../../modules/_common/ssh-keys.nix
     (
       { config, lib, ... }:
       {
@@ -75,7 +69,6 @@ inputs.nixpkgs.lib.nixosSystem {
     )
     homeManagerConfig
   ]
-  ++ (extendedLib.importModulesRecursive ../../modules/_nixos)
   ++ [
     ../../systems/${system}/${hostname}
   ]

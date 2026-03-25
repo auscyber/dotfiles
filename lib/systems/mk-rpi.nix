@@ -86,18 +86,9 @@ in
         }
       )
 
-      inputs.stylix.nixosModules.stylix
-      inputs.impermanence.nixosModules.impermanence
-      inputs.home-manager.nixosModules.home-manager
-      inputs.agenix.nixosModules.default
-      inputs.agenix-rekey.nixosModules.default
-      inputs.sops-nix.nixosModules.sops
-
-      ../../modules/_common/secrets.nix
-
-      ../../modules/_common/nix
-	  ../../modules/_common/builders/default.nix
-      ../../modules/_common/common
+    ]
+    ++ importedNixosModules
+    ++ [
       {
         nixpkgs = {
           inherit system;
@@ -108,8 +99,6 @@ in
       }
       (homeManagerConfig true)
     ]
-
-    ++ (extendedLib.importModulesRecursive ../../modules/_nixos)
     ++ [
       ../../systems/${system}/${hostname}
     ]
@@ -122,18 +111,9 @@ in
     modules = [
       { _module.args.lib = extendedLib; }
       stylixConfig
-      inputs.stylix.nixosModules.stylix
-      inputs.agenix.nixosModules.default
-      inputs.agenix-rekey.nixosModules.default
-      inputs.impermanence.nixosModules.impermanence
-      inputs.home-manager.nixosModules.home-manager
-      inputs.sops-nix.nixosModules.sops
-      ../../modules/_common/secrets.nix
-
-      ../../modules/_common/nix
-      ../../modules/_common/common
-	  ../../modules/_common/builders/default.nix
-
+    ]
+    ++ importedNixosModules
+    ++ [
       {
         nixpkgs = {
           inherit system;
@@ -144,8 +124,6 @@ in
       }
       (homeManagerConfig false)
     ]
-
-    ++ (extendedLib.importModulesRecursive ../../modules/_nixos)
     ++ [
       ../../systems/${system}/${hostname}
     ]

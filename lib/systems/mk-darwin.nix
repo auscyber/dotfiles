@@ -42,42 +42,27 @@ inputs.darwin.lib.darwinSystem {
       extendedLib
       ;
  } // {
- systemIdentifier = "${hostname}-${system}";
+  systemIdentifier = "${hostname}-${system}";
 };
 inherit system;
 modules = [
-{ _module.args.lib = extendedLib; }
+  { _module.args.lib = extendedLib; }
 ]
 ++ importedDarwinModules
 ++ [
+  {
+    nixpkgs = {
+      inherit system;
+    }
+    // common.mkNixpkgsConfig flake;
 
-{
-	nixpkgs = {
-		inherit system;
+    auscybernix.secrets.enable = true;
+  }
+  homeManagerConfig
+]
+++ [
+  ../../systems/${system}/${hostname}
+]
+++ modules;
 
-	}
-	// common.mkNixpkgsConfig flake;
-
-	auscybernix.secrets.enable = true;
 }
-
-../../modules/_common/nix
-../../modules/_common/secrets.nix
-
-../../modules/_common/hm
-../../modules/_common/common
-
-../../modules/_common/allConfigs.nix
-../../modules/_common/kmonad
-../../modules/_common/ssh-keys.nix
-homeManagerConfig
-
-	]
-++ (extendedLib.importModulesRecursive ../../modules/_darwin)
-	++ [
-
-		../../systems/${system}/${hostname}
-	]
-	++ modules;
-
-	}

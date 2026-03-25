@@ -63,12 +63,12 @@ in
     flake.lib = {
       system = import ./systems {
         inherit inputs;
-        inherit (self.auscybernix)
-          importedDarwinModules
-          importedNixosModules
-          importedHomeModules
-          standaloneHomeModules
-          ;
+        # Derive module lists from flake.modules.* so every feature module
+        # registered via the dendritic pattern is automatically included.
+        importedNixosModules    = builtins.attrValues (inp.config.flake.modules.nixos or { });
+        importedDarwinModules   = builtins.attrValues (inp.config.flake.modules.darwin or { });
+        importedHomeModules     = builtins.attrValues (inp.config.flake.modules.homeManager or { });
+        standaloneHomeModules   = inp.config.flake.auscybernix.standaloneHomeModules;
         config = inp.config;
       };
       file = import ./file.nix {
@@ -81,27 +81,12 @@ in
   };
   options = {
     flake.auscybernix = mkSubmoduleOptions {
-	  containerModules = mkOption {
-	  	type = types.listOf types.unspecified;
-		default = [ ];
-	  };
-
-      importedDarwinModules = mkOption {
-        type = types.listOf types.unspecified;
-        default = [ ];
-
-      };
-      importedNixosModules = mkOption {
-        type = types.listOf types.unspecified;
-        default = [ ];
-      };
-      importedHomeModules = mkOption {
-        type = types.listOf types.unspecified;
-        default = [ ];
-      };
+      # Module lists are now derived from flake.modules.* in config.
+      # Only standalone-specific home-manager modules (not embedded) remain here.
       standaloneHomeModules = mkOption {
         type = types.listOf types.unspecified;
         default = [ ];
+        description = "Home-manager modules only used in standalone (non-embedded) configurations.";
       };
       systems = mkOption {
 

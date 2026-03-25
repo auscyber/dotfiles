@@ -44,18 +44,10 @@ inputs.home-manager.lib.homeManagerConfiguration {
     ++ standaloneHomeModules
     ++ [
       { _module.args.lib = extendedLib; }
-
-      ../../modules/_common/secrets.nix
-      ../../modules/_common/nix
-
-      ../../modules/_common/allConfigs.nix
-
       {
       }
     ]
-    ++ (extendedLib.importModulesRecursive ../../modules/_home)
     ++ [
-      ../../modules/_home/default.nix
       {
         home = {
           inherit username;

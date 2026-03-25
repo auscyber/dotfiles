@@ -2,6 +2,7 @@
   inputs,
   self,
   lib,
+  config,
   ...
 }:
 let
@@ -37,11 +38,10 @@ in
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
   flake = {
-    homeModules = rec {
+    homeModules = {
       default = ./_home;
       recursive = {
-        imports = lib.importModulesRecursive ./_home ++ lib.externalHmModules ++ [ default ];
-
+        imports = builtins.attrValues (config.flake.modules.homeManager or { });
       };
     };
 
