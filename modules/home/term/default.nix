@@ -2,6 +2,6 @@
 { ... }:
 {
   flake.modules.homeManager = {
-    term-ghostty = ../_home/term/ghostty/default.nix;
+    ghostty = ../_home/term/ghostty/default.nix;
   };
 }

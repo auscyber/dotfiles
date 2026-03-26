@@ -2,10 +2,10 @@
 { ... }:
 {
   flake.modules.homeManager = {
-    wms-defaults = ../_home/wms/default.nix;
-    wm-hyprland  = ../_home/wms/hyprland/default.nix;
-    wm-niri      = ../_home/wms/niri/default.nix;
-    wm-rift      = ../_home/wms/rift/default.nix;
-    wm-yabai     = ../_home/wms/yabai/default.nix;
+    wm-defaults = ../_home/wms/default.nix;
+    hyprland  = ../_home/wms/hyprland/default.nix;
+    niri      = ../_home/wms/niri/default.nix;
+    rift      = ../_home/wms/rift/default.nix;
+    yabai     = ../_home/wms/yabai/default.nix;
   };
 }

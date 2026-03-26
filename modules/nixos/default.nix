@@ -4,7 +4,7 @@
 { ... }:
 {
   flake.modules.nixos = {
-    nixos-bootlogo = ../_nixos/bootlogo/default.nix;
-    nixos-games    = ../_nixos/games/default.nix;
+    bootlogo = ../_nixos/bootlogo/default.nix;
+    games    = ../_nixos/games/default.nix;
   };
 }

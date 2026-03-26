@@ -4,8 +4,8 @@
 { ... }:
 {
   flake.modules.homeManager = {
-    program-openclaw   = ../_home/programs/openclaw/default.nix;
-    program-sketchybar = ../_home/programs/sketchybar/default.nix;
-    program-zotero     = ../_home/programs/zotero/default.nix;
+    openclaw   = ../_home/programs/openclaw/default.nix;
+    sketchybar = ../_home/programs/sketchybar/default.nix;
+    zotero     = ../_home/programs/zotero/default.nix;
   };
 }

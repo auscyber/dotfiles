@@ -80,9 +80,6 @@ in
             else
               [ ]
           )
-          ++ (extendedLib.optional (!isInstaller) {
-            auscybernix.secrets.enable = true;
-          })
           ++ externalHmModules;
           users = mapAttrs' (_name: homeConfig: {
             name = homeConfig.username;

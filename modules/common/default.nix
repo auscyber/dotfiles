@@ -14,18 +14,18 @@
   flake.modules = {
     # ── NixOS + nix-darwin (system-level) ─────────────────────────────────
     generic = {
-      common-allConfigs = ../_common/allConfigs.nix;
-      common-common     = ../_common/common/default.nix;
-      common-hm         = ../_common/hm/default.nix;
-      common-nix        = ../_common/nix/default.nix;
-      common-ssh-keys   = ../_common/ssh-keys.nix;
-      common-vpn        = ../_common/vpn.nix;
+      allConfigs = ../_common/allConfigs.nix;
+      common     = ../_common/common/default.nix;
+      hm         = ../_common/hm/default.nix;
+      nix        = ../_common/nix/default.nix;
+      ssh-keys   = ../_common/ssh-keys.nix;
+      vpn        = ../_common/vpn.nix;
     };
 
     # ── Home-Manager (shared modules for every HM evaluation) ──────────────
     homeManager = {
-      common-allConfigs = ../_common/allConfigs.nix;
-      common-nix        = ../_common/nix/default.nix;
+      allConfigs = ../_common/allConfigs.nix;
+      nix        = ../_common/nix/default.nix;
     };
   };
 }

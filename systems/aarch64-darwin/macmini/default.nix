@@ -3,6 +3,18 @@
 { pkgs, ... }:
 
 {
+  auscybernix.modules.enable = {
+    # ── generic ───────────────────────────────────────────────────────────
+    allConfigs       = true;
+    nix              = true;
+    general          = true;
+    hm               = true;
+    # ── darwin ────────────────────────────────────────────────────────────
+    homebrew         = true;
+    ext-nix-homebrew = true;
+    ext-home-manager = true;
+  };
+
   # List packages installed in system profile. To search by name, run:
   documentation.enable = true;
   security.pam.services.sudo_local.touchIdAuth = true;

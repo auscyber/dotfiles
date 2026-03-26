@@ -12,14 +12,14 @@ let
   # that:
   #   1. Declares options.auscybernix.modules.enable as an attrsOf bool.
   #   2. Imports each `path` only when
-  #      `config.auscybernix.modules.enable.NAME` is not explicitly `false`.
+  #      `config.auscybernix.modules.enable.NAME` is explicitly `true`.
   #
-  # This lets any system configuration opt out of a registered feature module
-  # by its NAME label — the same label used in flake.modules.<kind>.NAME:
+  # This lets any system configuration opt in to registered feature modules
+  # by their NAME label — the same label used in flake.modules.<kind>.NAME:
   #
-  #   auscybernix.modules.enable = { "nixos-games" = false; };
+  #   auscybernix.modules.enable = { games = true; bootlogo = true; };
   #
-  # Modules whose NAME is absent from the attrset are enabled by default.
+  # Modules whose NAME is absent from the attrset are disabled by default.
   mkSelectableModules =
     moduleMap:
     { config, lib, ... }:
@@ -30,7 +30,7 @@ let
         description = ''
           Per-name enable flags for feature modules registered via
           flake.modules.<kind>.NAME.  Modules not listed here default to
-          enabled.  Set NAME = false to exclude a module from this
+          disabled.  Set NAME = true to include a module in this
           system's evaluation.
 
           Available names are the keys of flake.modules.nixos,
@@ -39,15 +39,15 @@ let
 
           Example:
             auscybernix.modules.enable = {
-              "nixos-games"    = false;
-              "nixos-bootlogo" = false;
+              games    = true;
+              bootlogo = true;
             };
         '';
       };
 
       imports = builtins.concatLists (
         inputs.nixpkgs.lib.mapAttrsToList (
-          name: path: inputs.nixpkgs.lib.optional (config.auscybernix.modules.enable.${name} or true) path
+          name: path: inputs.nixpkgs.lib.optional (config.auscybernix.modules.enable.${name} or false) path
         ) moduleMap
       );
     };

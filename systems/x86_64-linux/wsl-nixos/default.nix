@@ -3,6 +3,13 @@
   ...
 }:
 {
+  # WSL NixOS — minimal, no secrets, uses ext-nixos-wsl for WSL integration.
+  auscybernix.modules.enable = {
+    nix              = true;
+    ext-nixos-wsl    = true;
+    ext-home-manager = true;
+  };
+
   imports = [ ./configuration.nix ];
   #./../../modules/system/grub.nix
   #./boot.nix

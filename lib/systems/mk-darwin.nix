@@ -55,8 +55,6 @@ modules = [
       inherit system;
     }
     // common.mkNixpkgsConfig flake;
-
-    auscybernix.secrets.enable = true;
   }
   homeManagerConfig
 ]

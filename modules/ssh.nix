@@ -3,7 +3,7 @@
 { ... }:
 {
   flake.modules = {
-    nixos.ssh-service      = ../_nixos/ssh/default.nix;
-    homeManager.ssh-client = ../_home/ssh/default.nix;
+    nixos.ssh      = ../_nixos/ssh/default.nix;
+    homeManager.ssh = ../_home/ssh/default.nix;
   };
 }

@@ -5,26 +5,38 @@
 }:
 {
   auscybernix.meta.description = "Main Gaming desktop";
+  auscybernix.secrets.enable = true;
 
-  # Feature modules registered in flake.modules.nixos / flake.modules.generic
-  # are all enabled by default.  Set a name to false to exclude it from this
-  # system's evaluation.  Available names: common-allConfigs, common-common,
-  # common-hm, common-nix, common-ssh-keys, common-vpn, general,
-  # nix-builds-options, nix-builds-platform, secrets-options, secrets-platform,
-  # system-1password, ssh-service, nixos-bootlogo, nixos-games.
-  #
-  # auscybernix.modules.enable = {
-  #   "nixos-bootlogo" = false;  # skip boot logo on this host
-  # };
+  auscybernix.modules.enable = {
+    # ── generic (NixOS + nix-darwin) ─────────────────────────────────────
+    allConfigs        = true;
+    common            = true;
+    hm                = true;
+    nix               = true;
+    ssh-keys          = true;
+    vpn               = true;
+    general           = true;
+    builds-options    = true;
+    builds-platform   = true;
+    secrets           = true;
+    secrets-platform  = true;
+    "1password"       = true;
+    # ── nixos ─────────────────────────────────────────────────────────────
+    games             = true;
+    bootlogo          = true;
+    ssh               = true;
+    ext-stylix        = true;
+    ext-home-manager  = true;
+    ext-agenix        = true;
+    ext-agenix-rekey  = true;
+    ext-lanzaboote    = true;
+    ext-sops          = true;
+  };
 
   imports = [
     ./configuration.nix
     ./hardware-configuration.nix
     ./graphics.nix
-    #./../../modules/system/grub.nix
-    #./boot.nix
-    #    ./mailserver.nix
-    #    ./minecraft.nix
   ];
 
 }

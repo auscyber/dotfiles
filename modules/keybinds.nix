@@ -5,12 +5,12 @@
 {
   flake.modules = {
     darwin = {
-      keybind-kmonad           = ../_common/kmonad/default.nix;
-      keybind-karabiner-driver = ../_darwin/keybinds/karabiner_driver/default.nix;
+      kmonad           = ../_common/kmonad/default.nix;
+      karabiner-driver = ../_darwin/keybinds/karabiner_driver/default.nix;
     };
     homeManager = {
-      keybind-kanata = ../_home/keybinds/kanata/default.nix;
-      keybind-skhd   = ../_home/keybinds/skhd/default.nix;
+      kanata = ../_home/keybinds/kanata/default.nix;
+      skhd   = ../_home/keybinds/skhd/default.nix;
     };
   };
 }

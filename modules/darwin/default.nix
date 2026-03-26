@@ -4,12 +4,12 @@
 { ... }:
 {
   flake.modules.darwin = {
-    darwin-finder              = ../_darwin/finder/default.nix;
-    darwin-hmApps              = ../_darwin/hmApps/default.nix;
-    darwin-homebrew            = ../_darwin/homebrew/default.nix;
-    darwin-keys                = ../_darwin/keys/default.nix;
-    darwin-network             = ../_darwin/network/default.nix;
-    darwin-security-pam        = ../_darwin/security/pam/default.nix;
-    darwin-security-sudoagents = ../_darwin/security/sudoagents/default.nix;
+    finder              = ../_darwin/finder/default.nix;
+    hmApps              = ../_darwin/hmApps/default.nix;
+    homebrew            = ../_darwin/homebrew/default.nix;
+    keys                = ../_darwin/keys/default.nix;
+    network             = ../_darwin/network/default.nix;
+    security-pam        = ../_darwin/security/pam/default.nix;
+    security-sudoagents = ../_darwin/security/sudoagents/default.nix;
   };
 }

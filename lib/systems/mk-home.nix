@@ -58,13 +58,6 @@ inputs.home-manager.lib.homeManagerConfiguration {
               "/home/${username}";
         };
       }
-      (
-        { config, lib, ... }:
-        {
-          auscybernix.standalone.enable = true;
-          auscybernix.secrets.enable = true;
-        }
-      )
     ]
     ++ modules;
 

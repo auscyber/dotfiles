@@ -2,6 +2,6 @@
 { ... }:
 {
   flake.modules.homeManager = {
-    lang-agda = ../_home/languages/agda/default.nix;
+    agda = ../_home/languages/agda/default.nix;
   };
 }

@@ -10,6 +10,37 @@ let
 
 in
 rec {
+  auscybernix.modules.enable = {
+    allConfigs        = true;
+    nix               = true;
+    secrets           = true;
+    secrets-platform  = true;
+    "1password"       = true;
+    ssh               = true;
+    standalone        = true;
+    default           = true;
+    file              = true;
+    gpg               = true;
+    neovim            = true;
+    fish              = true;
+    shell             = true;
+    zotero            = true;
+    zen               = true;
+    helium            = true;
+    ghostty           = true;
+    wm-defaults       = true;
+    hyprland          = true;
+    kanata            = true;
+    ext-nixvim             = true;
+    ext-sops               = true;
+    ext-agenix             = true;
+    ext-agenix-rekey       = true;
+    ext-1password-shell-plugins = true;
+    ext-nix-index          = true;
+  };
+  auscybernix.secrets.enable = true;
+  auscybernix.standalone.enable = true;
+
   stylix = {
     targets.kde.enable = true;
   };

@@ -5,9 +5,9 @@
 { ... }:
 {
   flake.modules.homeManager = {
-    hm-default    = ../_home/default.nix;
-    hm-file       = ../_home/file/default.nix;
-    hm-gpg        = ../_home/gpg/default.nix;
-    hm-standalone = ../_home/standalone/default.nix;
+    default    = ../_home/default.nix;
+    file       = ../_home/file/default.nix;
+    gpg        = ../_home/gpg/default.nix;
+    standalone = ../_home/standalone/default.nix;
   };
 }

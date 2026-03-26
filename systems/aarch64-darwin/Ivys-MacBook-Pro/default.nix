@@ -9,6 +9,39 @@
 }:
 
 {
+  auscybernix.secrets.enable = true;
+
+  auscybernix.modules.enable = {
+    # ── generic (NixOS + nix-darwin) ─────────────────────────────────────
+    allConfigs        = true;
+    common            = true;
+    hm                = true;
+    nix               = true;
+    ssh-keys          = true;
+    vpn               = true;
+    general           = true;
+    builds-options    = true;
+    builds-platform   = true;
+    secrets           = true;
+    secrets-platform  = true;
+    "1password"       = true;
+    # ── darwin ────────────────────────────────────────────────────────────
+    finder              = true;
+    homebrew            = true;
+    keys                = true;
+    network             = true;
+    security-pam        = true;
+    security-sudoagents = true;
+    kmonad              = true;
+    karabiner-driver    = true;
+    ext-stylix          = true;
+    ext-nix-homebrew    = true;
+    ext-home-manager    = true;
+    ext-sops            = true;
+    ext-agenix          = true;
+    ext-agenix-rekey    = true;
+  };
+
   # List packages installed in system profile. To search by name, run:
   auscybernix.nix.caches = true;
   auscybernix.meta.description = "M4 Macbook Pro 2024";

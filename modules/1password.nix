@@ -5,7 +5,7 @@
 { ... }:
 {
   flake.modules = {
-    generic.system-1password     = ../_common/1password/default.nix;
-    homeManager.hm-1password     = ../_home/programs/1password/default.nix;
+    generic.1password     = ../_common/1password/default.nix;
+    homeManager.1password = ../_home/programs/1password/default.nix;
   };
 }

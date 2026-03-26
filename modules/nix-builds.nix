@@ -5,7 +5,7 @@
 { ... }:
 {
   flake.modules.generic = {
-    nix-builds-options  = ../_common/builders/default.nix;
-    nix-builds-platform = ../_common/builders-platform/default.nix;
+    builds-options  = ../_common/builders/default.nix;
+    builds-platform = ../_common/builders-platform/default.nix;
   };
 }

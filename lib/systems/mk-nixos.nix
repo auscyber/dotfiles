@@ -60,13 +60,6 @@ inputs.nixpkgs.lib.nixosSystem {
       }
       // common.mkNixpkgsConfig flake;
     }
-    (
-      { config, lib, ... }:
-      {
-        auscybernix.secrets.enable = true;
-
-      }
-    )
     homeManagerConfig
   ]
   ++ [

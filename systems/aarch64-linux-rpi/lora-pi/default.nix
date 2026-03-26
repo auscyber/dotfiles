@@ -6,6 +6,15 @@
   ...
 }:
 {
+  auscybernix.modules.enable = {
+    nix              = true;
+    allConfigs       = true;
+    ext-home-manager = true;
+    ext-agenix       = true;
+    ext-agenix-rekey = true;
+    ext-sops         = true;
+  };
+
   imports =
     with nixos-raspberrypi.nixosModules;
     [
