@@ -7,6 +7,57 @@ let
   self = inputs.self;
   inherit (inputs.nixpkgs.lib) mapAttrs mkOption types;
   inherit (inputs.flake-parts.lib) mkSubmoduleOptions;
+
+  # Convert a named module map { NAME = path; ... } into a single Nix module
+  # that:
+  #   1. Declares options.auscybernix.modules.enable as an attrsOf bool.
+  #   2. Imports each `path` only when
+  #      `config.auscybernix.modules.enable.NAME` is not explicitly `false`.
+  #
+  # This lets any system configuration opt out of a registered feature module
+  # by its NAME label — the same label used in flake.modules.<kind>.NAME:
+  #
+  #   auscybernix.modules.enable = { "nixos-games" = false; };
+  #
+  # Modules whose NAME is absent from the attrset are enabled by default.
+  mkSelectableModules =
+    moduleMap:
+    { config, lib, ... }:
+    {
+      options.auscybernix.modules.enable = mkOption {
+        type = types.attrsOf types.bool;
+        default = { };
+        description = ''
+          Per-name enable flags for feature modules registered via
+          flake.modules.<kind>.NAME.  Modules not listed here default to
+          enabled.  Set NAME = false to exclude a module from this
+          system's evaluation.
+
+          Available names are the keys of flake.modules.nixos,
+          flake.modules.darwin, flake.modules.generic, and
+          flake.modules.homeManager.
+
+          Example:
+            auscybernix.modules.enable = {
+              "nixos-games"    = false;
+              "nixos-bootlogo" = false;
+            };
+        '';
+      };
+
+      imports = builtins.concatLists (
+        inputs.nixpkgs.lib.mapAttrsToList (
+          name: path: inputs.nixpkgs.lib.optional (config.auscybernix.modules.enable.${name} or true) path
+        ) moduleMap
+      );
+    };
+
+  # Named module maps (merged at flake-evaluation time, before any system
+  # evaluation).  Generic modules are included in both OS families.
+  nixosModuleMap = (inp.config.flake.modules.generic or { }) // (inp.config.flake.modules.nixos or { });
+  darwinModuleMap = (inp.config.flake.modules.generic or { }) // (inp.config.flake.modules.darwin or { });
+  homeModuleMap = inp.config.flake.modules.homeManager or { };
+
   builderConfig = types.submodule (submod: {
     options = {
       publicHostKey = mkOption {
@@ -63,18 +114,12 @@ in
     flake.lib = {
       system = import ./systems {
         inherit inputs;
-        # Derive module lists from flake.modules.* so every feature module
-        # registered via the dendritic pattern is automatically included.
-        # Modules under flake.modules.generic are automatically merged into
-        # both the NixOS and nix-darwin module lists, eliminating the need to
-        # register the same module twice when it applies to both OS types.
-        importedNixosModules  = builtins.attrValues (
-          (inp.config.flake.modules.generic or { }) // (inp.config.flake.modules.nixos or { })
-        );
-        importedDarwinModules = builtins.attrValues (
-          (inp.config.flake.modules.generic or { }) // (inp.config.flake.modules.darwin or { })
-        );
-        importedHomeModules   = builtins.attrValues (inp.config.flake.modules.homeManager or { });
+        # Each mkSelectableModules call produces one wrapper module that
+        # defines options.auscybernix.modules.enable and conditionally imports
+        # every registered path based on that option's per-name bool values.
+        importedNixosModules  = [ (mkSelectableModules nixosModuleMap) ];
+        importedDarwinModules = [ (mkSelectableModules darwinModuleMap) ];
+        importedHomeModules   = [ (mkSelectableModules homeModuleMap) ];
         standaloneHomeModules   = inp.config.flake.auscybernix.standaloneHomeModules;
         config = inp.config;
       };
