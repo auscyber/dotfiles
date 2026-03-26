@@ -1,15 +1,16 @@
-# Nix distributed builds — options live in _common/builders, platform
-# implementations live in _nixos/builders and _darwin/builders.
+# Nix distributed builds — a single platform-guarded implementation in
+# _common/builders-platform handles both NixOS and nix-darwin.
+# The option definitions live in _common/builders.
 { ... }:
 {
   flake.modules = {
     nixos = {
       nix-builds-options  = ../_common/builders/default.nix;
-      nix-builds-platform = ../_nixos/builders/default.nix;
+      nix-builds-platform = ../_common/builders-platform/default.nix;
     };
     darwin = {
       nix-builds-options  = ../_common/builders/default.nix;
-      nix-builds-platform = ../_darwin/builders/default.nix;
+      nix-builds-platform = ../_common/builders-platform/default.nix;
     };
   };
 }

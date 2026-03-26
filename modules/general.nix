@@ -1,9 +1,9 @@
-# General OS settings — combines NixOS and nix-darwin general configuration.
-# Both platforms share the concept of: NH env variable, reload alias, nix.optimise.
+# General OS settings — a single file handles both NixOS and nix-darwin using
+# platform guards (pkgs.stdenv.hostPlatform.isLinux / .isDarwin) internally.
 { ... }:
 {
   flake.modules = {
-    nixos.general  = ../_nixos/general/default.nix;
-    darwin.general = ../_darwin/general/default.nix;
+    nixos.general  = ../_common/general/default.nix;
+    darwin.general = ../_common/general/default.nix;
   };
 }

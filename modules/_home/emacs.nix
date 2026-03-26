@@ -1,18 +1,24 @@
 {
   config,
   pkgs,
-  system,
   lib,
   ...
 }:
+let
+  cfg = config.auscybernix.programs.emacs;
+in
 {
-  programs.emacs = {
-    enable = true;
-    #    extraPackages = epkgs: with epkgs; [ magit vterm ];
-    package = pkgs.emacsNativeComp;
+  options.auscybernix.programs.emacs = {
+    enable = lib.mkEnableOption "Enable Emacs with native-compilation and the Emacs daemon service.";
   };
-  #  home.packages = with pkgs; [ ];
-  services.emacs = {
-    enable = true;
+
+  config = lib.mkIf cfg.enable {
+    programs.emacs = {
+      enable = true;
+      package = pkgs.emacsNativeComp;
+    };
+    services.emacs = {
+      enable = true;
+    };
   };
 }
