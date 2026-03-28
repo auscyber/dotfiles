@@ -89,24 +89,14 @@ in
 
       optionsDoc = pkgs.nixosOptionsDoc {
         options = builtins.removeAttrs modulesEval.options [ "_module" ];
-        # Only surface options in the auscybernix.* namespace.
-        transformOptions =
-          opt:
-          opt
-          // {
-            visible =
-              opt.visible
-              && opt.loc != [ ]
-              && builtins.head opt.loc == "auscybernix";
-          };
       };
     in
     {
 
       # Combined options documentation package.  The derivation exposes both a
       # human-readable Markdown file (options.md) and a machine-readable JSON
-      # file (options.json) containing all auscybernix.* option declarations
-      # collected across the NixOS, Darwin, Home-Manager and common modules.
+      # file (options.json) containing all option declarations collected across
+      # the NixOS, Darwin, Home-Manager and common modules.
       packages.options-doc = pkgs.runCommand "options-doc" { } ''
         mkdir -p $out
         cp ${optionsDoc.optionsCommonMark} $out/options.md
