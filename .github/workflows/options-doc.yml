@@ -1,0 +1,40 @@
+name: "Generate options documentation"
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+jobs:
+  options-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Setup cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: auscyber
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Build options-doc
+        run: nix build .#packages.x86_64-linux.options-doc
+      - name: Copy generated markdown
+        run: cp result/options.md docs/options.md
+      - name: Commit updated options.md
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/options.md
+          git diff --cached --quiet || git commit -m "docs: update generated options.md"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
