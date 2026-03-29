@@ -46,7 +46,9 @@ in
     proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
       inherit (sources.proton-ge-bin) src version;
     });
-    linuxZenWMuQSS = pkgs.linuxPackages_zen.extend (
+    linuxZenWMuQSS = (pkgs.linuxPackagesFor (pkgs.linuxZen.override {
+stdenv = pkgs.clang11Stdenv;
+})).extend (
       self: super: {
         alx-wol = self.callPackage ../packages/alx-wol.nix {
         };
