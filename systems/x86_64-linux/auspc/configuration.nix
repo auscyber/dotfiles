@@ -181,7 +181,7 @@ forceImportRoot = true;
 
   #  virtualisation.spiceUSBRedirection.enable = true;
 
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ "kvm-intel" "ntsync"];
   #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
   # Use the systemd-boot EFI boot loader.
 #  boot.loader.systemd-boot.enable = lib.mkForce false;
