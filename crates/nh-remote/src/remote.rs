@@ -75,12 +75,12 @@ fn build_remote_command(
     match (program_name, strategy) {
       // sudo passwordless: use --non-interactive to fail if password required
       ("sudo", ElevationStrategy::Passwordless) => {
-        Ok(format!("sudo --non-interactive {}", base_cmd))
+        Ok(format!("sudo --non-interactive {base_cmd}"))
       },
-      ("sudo", _) => Ok(format!("sudo --prompt= --stdin {}", base_cmd)),
+      ("sudo", _) => Ok(format!("sudo --prompt= --stdin {base_cmd}")),
       // doas passwordless: use -n flag (non-interactive)
       ("doas", ElevationStrategy::Passwordless) => {
-        Ok(format!("doas -n {}", base_cmd))
+        Ok(format!("doas -n {base_cmd}"))
       },
       ("doas", _) => {
         bail!(
@@ -91,7 +91,7 @@ fn build_remote_command(
       },
       // run0 passwordless: use --no-ask-password flag
       ("run0", ElevationStrategy::Passwordless) => {
-        Ok(format!("run0 --no-ask-password {}", base_cmd))
+        Ok(format!("run0 --no-ask-password {base_cmd}"))
       },
       ("run0", _) => {
         bail!(
@@ -204,37 +204,37 @@ fn cleanup_ssh_control_sockets(control_dir: &std::path::Path) {
     let path = entry.path();
 
     // Only process files starting with "ssh-"
-    if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
-      if filename.starts_with("ssh-") {
-        debug!("Closing SSH control socket: {}", path.display());
+    if let Some(filename) = path.file_name().and_then(|n| n.to_str())
+      && filename.starts_with("ssh-")
+    {
+      debug!("Closing SSH control socket: {}", path.display());
 
-        // Run: ssh -o ControlPath=<socket> -O exit dummyhost
-        let result = Exec::cmd("ssh")
-          .args(&["-o", &format!("ControlPath={}", path.display())])
-          .args(&["-O", "exit", "dummyhost"])
-          .stdout(Redirection::Pipe)
-          .stderr(Redirection::Pipe)
-          .capture();
+      // Run: ssh -o ControlPath=<socket> -O exit dummyhost
+      let result = Exec::cmd("ssh")
+        .args(["-o", &format!("ControlPath={}", path.display())])
+        .args(["-O", "exit", "dummyhost"])
+        .stdout(Redirection::Pipe)
+        .stderr(Redirection::Pipe)
+        .capture();
 
-        match result {
-          Ok(capture) => {
-            if !capture.exit_status.success() {
-              // This is normal if the connection was already closed
-              debug!(
-                "SSH control socket cleanup exited with status {:?} for {}",
-                capture.exit_status,
-                path.display()
-              );
-            }
-          },
-          Err(e) => {
-            tracing::warn!(
-              "Failed to close SSH control socket at {}: {}",
-              path.display(),
-              e
+      match result {
+        Ok(capture) => {
+          if !capture.exit_status.success() {
+            // This is normal if the connection was already closed
+            debug!(
+              "SSH control socket cleanup exited with status {:?} for {}",
+              capture.exit_status,
+              path.display()
             );
-          },
-        }
+          }
+        },
+        Err(e) => {
+          tracing::warn!(
+            "Failed to close SSH control socket at {}: {}",
+            path.display(),
+            e
+          );
+        },
       }
     }
   }
@@ -988,7 +988,7 @@ pub fn copy_to_remote(
   let flake_flags = get_flake_flags();
   let mut cmd = Exec::cmd("nix")
     .args(&flake_flags)
-    .args(&["copy", "--to"])
+    .args(["copy", "--to"])
     .arg(format!("ssh://{}", host.ssh_host()));
 
   if use_substitutes {
@@ -1023,7 +1023,7 @@ fn copy_closure_between_remotes(
   let flake_flags = get_flake_flags();
   let mut cmd = Exec::cmd("nix")
     .args(&flake_flags)
-    .args(&["copy", "--from"])
+    .args(["copy", "--from"])
     .arg(format!("ssh://{}", from_host.ssh_host()))
     .arg("--to")
     .arg(format!("ssh://{}", to_host.ssh_host()));
