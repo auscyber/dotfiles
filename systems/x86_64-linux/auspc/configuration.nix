@@ -30,7 +30,7 @@ in
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
-services.zfs.autoScrub.enable = true;
+  services.zfs.autoScrub.enable = true;
   hardware.openrazer.enable = true;
   services.flatpak.enable = true;
   users.groups.openrazer.members = [ "auscyber" ];
@@ -80,18 +80,18 @@ services.zfs.autoScrub.enable = true;
     #	authKeyFile =
 
   };
- boot = {
+  boot = {
     loader = {
-grub = {
-    enable = true;
-    zfsSupport = true;
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-    mirroredBoots = [
-      { devices = [ "nodev"]; path = "/boot"; }
-    ];
-  };
-      
+      #grub = {
+      #    enable = true;
+      #    zfsSupport = true;
+      #    efiSupport = true;
+      #    efiInstallAsRemovable = true;
+      #    mirroredBoots = [
+      #      { devices = [ "nodev"]; path = "/boot"; }
+      #    ];
+      #  };
+
       generationsDir.copyKernels = true;
 
       efi = {
@@ -99,21 +99,25 @@ grub = {
       }; # efi
     }; # loader
 
-#    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+    #    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
     initrd = {
       kernelModules = [ "zfs" ];
+      systemd.enable = true;
 
-      postDeviceCommands = ''
-        zpool import -lf zpool
-      ''; # postDeviceCommands
-  }; # initrd
+      #      postDeviceCommands = ''
+      #        #        zpool import -lf zpool
+      #      ''; # postDeviceCommands
+    }; # initrd
 
-  supportedFilesystems = [ "zfs"  "ntfs" ];
+    supportedFilesystems = [
+      "zfs"
+      "ntfs"
+    ];
 
     zfs = {
-requestEncryptionCredentials = true;
-forceImportRoot = true;
+      requestEncryptionCredentials = true;
+      forceImportRoot = true;
     }; # zfs
 
   }; # boot
@@ -172,8 +176,8 @@ forceImportRoot = true;
 
   services.pcscd.enable = true;
   #  home-manager.backupFileExtension = ".bak";
-  
-    #  programs.virt-manager.enable = true;
+
+  #  programs.virt-manager.enable = true;
 
   #  users.groups.libvirtd.members = [ "auscyber" ];
 
@@ -184,12 +188,15 @@ forceImportRoot = true;
   boot.kernelModules = [ "kvm-intel" "ntsync"];
   #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
   # Use the systemd-boot EFI boot loader.
-#  boot.loader.systemd-boot.enable = lib.mkForce false;
-#  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  #  boot.loader.systemd-boot.enable = true;
 
   boot.lanzaboote = {
-    enable = false;
+    enable = true;
     pkiBundle = "/var/lib/sbctl";
+    #    autoEnrollKeys = {
+    #      enable = true;
+    #    };
   };
   boot.loader.efi = {
     #canTouchEfiVariables = true;
@@ -197,7 +204,7 @@ forceImportRoot = true;
   };
 
   networking.hostName = "auspc"; # Define your hostname.
-networking.hostId = "230c61e9";
+  networking.hostId = "230c61e9";
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
