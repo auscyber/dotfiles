@@ -26,9 +26,16 @@ jobs:
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build options-doc
-        run: nix build .#packages.x86_64-linux.options-doc
-      - name: Copy generated markdown
-        run: cp result/options.md docs/options.md
+        run: |
+          nix build .#packages.x86_64-linux.options-doc-nixos
+          nix build .#packages.x86_64-linux.options-doc-darwin
+          nix build .#packages.x86_64-linux.options-doc
+      - name: Copy generated documentation
+        run: |
+          mkdir -p docs/options
+          cp result/options.md docs/options.md
+          cp result-1/options.md docs/options-nixos.md
+          cp result-2/options.md docs/options-darwin.md
       - name: Commit updated options.md
         run: |
           git config user.name "github-actions"

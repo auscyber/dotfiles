@@ -46,14 +46,46 @@ in
     proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
       inherit (sources.proton-ge-bin) src version;
     });
-    linuxZenWMuQSS = (pkgs.linuxPackagesFor (pkgs.linuxZen.override {
-stdenv = pkgs.clang11Stdenv;
-})).extend (
-      self: super: {
-        alx-wol = self.callPackage ../packages/alx-wol.nix {
-        };
-      }
-    );
+    linuxZenWMuQSS =
+      let
+        llvmKernelStdenv = pkgs.stdenvAdapters.overrideInStdenv pkgs.llvmPackages.stdenv [
+          pkgs.llvm
+          pkgs.lld
+          pkgs.llvmPackages.clang-unwrapped
+        ];
+      in
+      (pkgs.linuxPackagesFor (
+        pkgs.linux_zen.override {
+          stdenv = llvmKernelStdenv;
+
+          ignoreConfigErrors = true;
+          kernelPatches = [
+            {
+              name = "llvm-lto";
+              patch = null;
+              structuredExtraConfig = with lib.kernel; {
+                # We are not a k8s server
+                CPU_MITIGATIONS = lib.mkForce no;
+
+                # Clang options require a lot of extra config
+                CC_IS_CLANG = lib.mkForce yes;
+                LTO = lib.mkForce yes;
+                LTO_CLANG = lib.mkForce yes;
+                # full LTO is much more expsneive
+                LTO_CLANG_THIN = lib.mkForce yes;
+              };
+              ignoreConfigErrors = true;
+
+            }
+          ];
+        }
+      )).extend
+        (
+          self: super: {
+            alx-wol = self.callPackage ../packages/alx-wol.nix {
+            };
+          }
+        );
     inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;

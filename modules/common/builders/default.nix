@@ -36,7 +36,8 @@ with lib;
       enable = mkEnableOption "Use this machine as a Nix build machine.";
       publicHostKey = mkOption {
         type = types.str;
-        default = base64Key;
+        default = "";
+        defaultText = lib.literalExpression "lib.extra.toBase64 config.age.rekey.hostPubkey";
         description = "SSH Public key of the build machine.";
       };
       builderUser = mkOption {
@@ -57,7 +58,8 @@ with lib;
 
       absoluteSpeedFactor = mkOption {
         type = types.int;
-        default = cfg.absoluteSpeedFactor;
+        default = 0;
+        defaultText = lib.literalExpression "config.auscybernix.nix.builders.absoluteSpeedFactor";
         description = "Absolute speed factor for this build machine. Overrides speedFactor if set to a non-zero value.";
       };
       hostname = mkOption {
@@ -67,7 +69,8 @@ with lib;
       };
       ipAddress = mkOption {
         type = types.str;
-        default = config.auscybernix.vpn.ipAddress;
+        default = "";
+        defaultText = lib.literalExpression "config.auscybernix.vpn.ipAddress";
       };
       features = mkOption {
         type = types.listOf types.str;
