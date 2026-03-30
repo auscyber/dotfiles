@@ -14,6 +14,7 @@ let
     google-chrome-dev = "Google Chrome Dev";
     brave = "Brave Browser";
     vivaldi = "Vivaldi Browser";
+    helium = "Helium Browser";
   };
 
   plasmaSupportedBrowsers = [
@@ -192,10 +193,12 @@ let
         google-chrome-beta = "Google/Chrome Beta";
         google-chrome-dev = "Google/Chrome Dev";
         brave = "BraveSoftware/Brave-Browser";
+        helium = "net.imput.helium";
       };
 
       linuxDirs = {
         brave = "BraveSoftware/Brave-Browser";
+        helium = "net.imput.helium";
       };
 
       configDir =
