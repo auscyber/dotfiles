@@ -11,6 +11,39 @@
 }:
 
 {
+  auscybernix.modules.enable = {
+    allConfigs        = true;
+    nix               = true;
+    secrets           = true;
+    secrets-platform  = true;
+    standalone        = true;
+    default           = true;
+    file              = true;
+    gpg               = true;
+    neovim            = true;
+    fish              = true;
+    shell             = true;
+    rift              = true;
+    yabai             = true;
+    wm-defaults       = true;
+    sketchybar        = true;
+    zotero            = true;
+    ghostty           = true;
+    kanata            = true;
+    skhd              = true;
+    "1password"            = true;
+    mopidy            = true;
+    ext-nixvim             = true;
+    ext-sops               = true;
+    ext-agenix             = true;
+    ext-agenix-rekey       = true;
+    ext-1password-shell-plugins = true;
+    ext-nix-index          = true;
+    ext-zen-browser        = true;
+    ext-niri               = true;
+  };
+  auscybernix.secrets.enable = true;
+  auscybernix.standalone.enable = true;
 
   #  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
   auscybernix.meta.description = "Home configuration for ${hostname}";
