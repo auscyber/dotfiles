@@ -39,7 +39,7 @@ stdenv.mkDerivation rec {
   heliumWrapper = writeShellScript "helium-flags-wrapper" ''
     HERE="''${HELIUM_HOME:?HELIUM_HOME is not set}"
 
-    XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-"$HOME/.config"}"
+    #XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-"$HOME/.config"}"
 
     SYS_CONF="/etc/helium-browser-flags.conf"
     USR_CONF="''${XDG_CONFIG_HOME}/helium-browser-flags.conf"

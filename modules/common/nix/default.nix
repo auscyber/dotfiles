@@ -69,11 +69,11 @@ in
         #        }
       ];
 
-      package = pkgs.nix;
-      #    package = pkgs.nixVersions.latest;
+      #package = pkgs.nix;
+      package = pkgs.nixVersions.latest;
 
       extraOptions = ''
-                        experimental-features = nix-command flakes ca-references
+                        experimental-features = nix-command flakes ca-derivations
                 		netrc-file = ${config.age.templates.netrc.path}"
         				post-build-hook = ${build-hook}/bin/build-hook
       '';

@@ -121,6 +121,11 @@ in
           ];
           app_rules = [
             {
+              app_id = "org.zotero.zotero";
+              title_substring = "Citation Dialog";
+              floating = true;
+            }
+            {
               app_id = "com.hnc.Discord";
               scratchpad = "discord";
             }

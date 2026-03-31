@@ -58,8 +58,13 @@ stdenv = pkgs.clang11Stdenv;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
     attic = pkgs.attic;
+    direnv = pkgs.direnv.overrideAttrs (attrs: {
+      postPatch = ''
+        substituteInPlace GNUmakefile --replace-fail " -linkmode=external" ""
+      '';
+    });
     attic-server = pkgs.attic-server;
-    kmonad = inputs.kmonad.packages."${system}".default;
+    #    kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
     #	gnupg-wrapped = pkgs.symlinkJoin {

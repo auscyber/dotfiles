@@ -26,7 +26,7 @@
       })
       inputs.nur.overlays.default
       inputs.nix-cachyos-kernel.overlays.pinned
-      inputs.nix.overlays.default
+      #      inputs.nix.overlays.default
       #      inputs.my-nur.overlays.default
       #      (final: prev: {
       #        nur = prev.nur // {
