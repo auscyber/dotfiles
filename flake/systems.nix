@@ -1,119 +1,30 @@
 {
-  config,
-  inputs,
   self,
+  inputs,
   lib,
   ...
 }:
 let
-  overlay = config.overlays.default;
-  inherit (self.lib.file)
-    parseSystemConfigurations
-    filterNixOSSystems
-    filterDarwinSystems
-    filterRpiSystems
-    ;
-  inherit (inputs.nixpkgs.lib)
-    hasSuffix
-    ;
-  systemsPath = ../systems;
-  allSystems = parseSystemConfigurations systemsPath;
+  inherit (self.lib.file) parseSystemConfigurations filterRpiSystems;
+  allSystems = parseSystemConfigurations ../systems;
 in
 {
-  flake = {
-    auscybernix = rec {
-	containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
+  # Architectures that flake-parts builds perSystem attributes for.
+  systems = [
+    "aarch64-darwin"
+    "x86_64-linux"
+    "aarch64-linux"
+  ];
 
-      importedHomeModules = [
-        inputs._1password-shell-plugins.hmModules.default
-        inputs.zen-browser.homeModules.default
-        inputs.nixvim.homeModules.default
-        inputs.nix-index-database.homeModules.nix-index
-        inputs.sops-nix.homeManagerModules.sops
-        inputs.agenix.homeManagerModules.default
-        inputs.agenix-rekey.homeManagerModules.default
-        inputs.vscode-server.homeModules.default
-
-		inputs.niri.homeModules.niri
-      ];
-      standaloneHomeModules = [
-#		inputs.niri.homeModules.default
-        inputs.stylix.homeModules.stylix
-      ];
-      importedNixosModules = [
-	  ../modules/common/vpn.nix
-	  ../modules/common/builders
-    ../modules/common/secrets.nix
-    ../modules/common/nix
-    ../modules/common/common
-
-#	  ../modules/common/builders/builder.nix
-        inputs.stylix.nixosModules.stylix
-        inputs.arion.nixosModules.arion
-        inputs.lanzaboote.nixosModules.lanzaboote
-        inputs.impermanence.nixosModules.impermanence
-        inputs.home-manager.nixosModules.home-manager
-        inputs.nixos-wsl.nixosModules.default
-        inputs.agenix.nixosModules.default
-        inputs.agenix-rekey.nixosModules.default
-        inputs.sops-nix.nixosModules.sops
-        inputs.attic.nixosModules.atticd
-
-      ];
-      importedDarwinModules = [
-
-#	  ../modules/common/builders/builder.nix
-	  ../modules/common/builders
-	  ../modules/common/vpn.nix
-        inputs.stylix.darwinModules.stylix
-        inputs.nix-homebrew.darwinModules.nix-homebrew
-        inputs.home-manager.darwinModules.home-manager
-        inputs.sops-nix.darwinModules.sops
-        inputs.agenix.darwinModules.default
-        inputs.agenix-rekey.nixosModules.default
-
-      ];
-    };
-
-    nixosConfigurations = lib.mapAttrs' (
-      name:
-      { system, hostname, ... }:
-      {
-        name = hostname;
-        value =
-          if hasSuffix "rpi" system then
-            self.lib.system.rpi.mkSystem {
-              inherit inputs system hostname;
-            }
-          else
-
-            self.lib.system.mkNixos {
-              inherit inputs system hostname;
-            };
-      }
-    ) (filterNixOSSystems allSystems);
-
-    darwinConfigurations = lib.mapAttrs' (
-      name:
-      { system, hostname, ... }:
-      {
-        name = hostname;
-        value = self.lib.system.mkDarwin {
-          inherit inputs system hostname;
-          username = "IvyPierlot";
-        };
-      }
-    ) (filterDarwinSystems allSystems);
-    installImages = lib.mapAttrs' (
-      name:
-      { system, hostname, ... }:
-      {
-        name = hostname;
-        value =
-          (self.lib.system.rpi.mkInstaller {
-            inherit inputs system hostname;
-          }).config.system.build.sdImage;
-      }
-    ) (filterRpiSystems allSystems);
-  };
+  # Raspberry Pi SD-card installer images.  NixOS/darwin hosts are now
+  # declared in flake/den.nix and built by den; only the non-standard RPi
+  # installer flow stays here.
+  flake.installImages = lib.mapAttrs' (
+    name:
+    { system, hostname, ... }:
+    {
+      name = hostname;
+      value = (self.lib.system.rpi.mkInstaller { inherit inputs system hostname; }).config.system.build.sdImage;
+    }
+  ) (filterRpiSystems allSystems);
 }
