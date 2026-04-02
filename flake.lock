@@ -659,6 +659,21 @@
         "type": "github"
       }
     },
+    "den": {
+      "locked": {
+        "lastModified": 1774596030,
+        "narHash": "sha256-Gf24DeJaS0wttVoqYOiRPC3DrEKPeaQ5XYOXazzdLWA=",
+        "owner": "vic",
+        "repo": "den",
+        "rev": "91d41ed8b4a07e8b175ef2c9f8fc8470f0d75a41",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vic",
+        "repo": "den",
+        "type": "github"
+      }
+    },
     "devenv": {
       "inputs": {
         "cachix": "cachix",
@@ -3166,6 +3181,21 @@
         "type": "github"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1771045967,
+        "narHash": "sha256-oYO4poyw0Sb/db2PigqugMlDwsvwLg6CSpFrMUWxA3Q=",
+        "owner": "vic",
+        "repo": "import-tree",
+        "rev": "c968d3b54d12cf5d9c13f16f7c545a06c9d1fde6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vic",
+        "repo": "import-tree",
+        "type": "github"
+      }
+    },
     "indexed": {
       "flake": false,
       "locked": {
@@ -5364,6 +5394,7 @@
         "darwin": "darwin_2",
         "deadlock": "deadlock",
         "deadlock-mod-manager": "deadlock-mod-manager",
+        "den": "den",
         "devenv": "devenv",
         "emacs": "emacs",
         "eww": "eww",
@@ -5381,6 +5412,7 @@
         "idris2": "idris2",
         "idris2-pkgs": "idris2-pkgs",
         "impermanence": "impermanence",
+        "import-tree": "import-tree",
         "input-branches": "input-branches",
         "input-leap": "input-leap",
         "kmonad": "kmonad",

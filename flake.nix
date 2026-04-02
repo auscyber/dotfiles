@@ -194,37 +194,11 @@
 
     nixpkgs.follows = "unstable";
 
-  };
-  outputs =
-    inputs@{
-      self,
-      flake-parts,
-      ...
-    }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      top@{
-        config,
-        withSystem,
-        moduleWithSystem,
-        ...
-      }:
-      {
-        imports = [
-          # Optional: use external flake logic, e.g.
-          # inputs.foo.flakeModules.default
-          ./flake
-          inputs.nix-topology.flakeModule
-        ];
-        systems = [
-          # systems for which you want to build the `perSystem` attributes
-          "aarch64-darwin"
-          "x86_64-linux"
-          "aarch64-linux"
-          # ...
-        ];
+    den.url = "github:vic/den";
+    import-tree.url = "github:vic/import-tree";
 
-      }
-    );
+  };
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./flake);
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"

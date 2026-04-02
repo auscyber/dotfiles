@@ -1,61 +1,48 @@
 {
-  inputs,
   self,
+  inputs,
   lib,
   ...
 }:
 let
   inherit (self.lib.file) parseHomeConfigurations;
-
-  homesPath = ../homes;
-  allHomes = parseHomeConfigurations homesPath;
-
-  generateHomeConfiguration =
-    name:
-    {
-      system,
-      username,
-      userAtHost,
-      hostname,
-      path,
-      ...
-    }:
-    {
-      name = userAtHost; # Use the full "username@hostname" as key
-      value = self.lib.system.mkHome {
-        inherit
-          inputs
-          hostname
-          username
-          ;
-        system = lib.strings.removeSuffix "-rpi" system; # Strip -rpi suffix for rpi homes
-        modules = [ path ];
-      };
-    };
+  # Only the Raspberry Pi home is built as a standalone homeConfiguration
+  # here.  All other hosts/users are handled by den (flake/den.nix) which
+  # creates both NixOS-embedded and standalone homeConfigurations via its
+  # homeManager user class.
+  rpiHomes = lib.filterAttrs (
+    _: { system, ... }: lib.hasSuffix "rpi" system
+  ) (parseHomeConfigurations ../homes);
 in
 {
-  imports = [ inputs.home-manager.flakeModules.home-manager ];
-
   flake = {
     homeModules = rec {
       default = ../modules/home;
       recursive = {
-        imports = lib.importModulesRecursive ../modules/home ++ lib.externalHmModules ++ [ default ];
-
+        imports = [ default ] ++ self.lib.file.importModulesRecursive ../modules/home;
       };
     };
 
-    # Dynamically generated home configurations
-    homeConfigurations = lib.mapAttrs' generateHomeConfiguration allHomes;
+    # Standalone home configurations for Raspberry Pi users (non-standard
+    # builder — kept outside den).
+    homeConfigurations = lib.mapAttrs' (
+      _:
+      {
+        system,
+        username,
+        userAtHost,
+        hostname,
+        path,
+        ...
+      }:
+      {
+        name = userAtHost;
+        value = self.lib.system.mkHome {
+          inherit inputs hostname username;
+          system = lib.strings.removeSuffix "-rpi" system;
+          modules = [ path ];
+        };
+      }
+    ) rpiHomes;
   };
-  perSystem =
-    {
-      config,
-      system,
-      pkgs,
-      ...
-    }:
-    {
-
-    };
 }
