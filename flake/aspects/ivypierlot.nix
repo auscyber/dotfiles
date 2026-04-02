@@ -1,4 +1,8 @@
-{ ... }:
+{ den, ... }:
+let
+  # Enable <angle-bracket> syntax for den aspect references in this file.
+  __findFile = den.lib.__findFile;
+in
 {
   den.aspects.ivypierlot = {
     # Base home-manager configuration shared across all hosts where ivypierlot
@@ -11,6 +15,19 @@
           username = "ivypierlot";
           homeDirectory = "/Users/ivypierlot";
         };
+        programs.home-manager.enable = true;
       };
+
+    # Feature aspects included for all ivypierlot homes (Darwin hosts).
+    includes = [
+      <shell>
+      <editors>
+      <browsers>
+      <terminal>
+      <gpg>
+      <keybinds>
+      <wm-darwin>
+      <media>
+    ];
   };
 }

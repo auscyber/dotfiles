@@ -1,12 +1,19 @@
 {
   config,
   inputs,
-  # Enable <den/brackets> syntax for den battery references.
-  __findFile ? __findFile,
   den,
   ...
 }:
+let
+  # Enable <den/brackets> syntax for den battery references in this file.
+  # This must be defined before the angle-bracket expressions below.
+  __findFile = den.lib.__findFile;
+in
 {
+  # Propagate den's bracket resolver to all flake-parts modules so that any
+  # module accepting `__findFile` as an argument automatically gets den's
+  # resolver rather than the NIX_PATH fall-back.
+  _module.args.__findFile = den.lib.__findFile;
   # ── NixOS defaults ──────────────────────────────────────────────────────────
   den.default.nixos = {
     imports = [
