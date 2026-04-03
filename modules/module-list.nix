@@ -6,6 +6,7 @@
   ./meta.nix
   ./misc/ids.nix
   ./misc/lib.nix
+  ./misc/specialisation.nix
   ./security/pam.nix
   ./security/pki
   ./security/sandbox
