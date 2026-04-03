@@ -6,6 +6,32 @@
 }:
 let
   cfg = config.auscybernix.sudo.agents;
+  primaryUser = config.system.primaryUser;
+  kanataCfg = lib.attrByPath [
+    "home-manager"
+    "users"
+    primaryUser
+    "auscybernix"
+    "keybinds"
+    "kanata"
+  ] null config;
+  mergedCommands =
+    cfg.commands
+    // {
+      yabai = [
+        "${pkgs.yabai}/bin/yabai"
+        "--load-sa"
+      ];
+    }
+    // lib.optionalAttrs (kanataCfg != null && kanataCfg.enable) {
+      kanataTray = kanataCfg.tray.command;
+      kanata = kanataCfg.kanataCommand;
+    };
+  sudoersEntries = lib.mapAttrsToList (
+    _agentName: commandList:
+    "${primaryUser} ALL=(root) SETENV: NOPASSWD: ${lib.concatStringsSep " " commandList}"
+
+  ) mergedCommands;
 in
 
 {
@@ -19,28 +45,14 @@ in
   };
 
   config = lib.mkIf cfg.enable (
-    let
-      sudoersEntries = lib.mapAttrsToList (
-        _agentName: commandList:
-        "${config.system.primaryUser} ALL=(root) SETENV: NOPASSWD: ${builtins.concatStringsSep " " commandList}"
-      ) cfg.commands;
+    lib.mkMerge [
+      (
 
-    in
-    {
+        {
 
-      auscybernix.sudo.agents.commands = {
-        yabai = [
-          "${pkgs.yabai}/bin/yabai"
-          "--load-sa"
-        ];
-        kanataTray =
-          config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.tray.command;
-        kanata =
-          config.home-manager.users.${config.system.primaryUser}.auscybernix.keybinds.kanata.kanataCommand;
+          security.sudo.extraConfig = lib.concatStringsSep "\n" sudoersEntries;
 
-      };
-
-      security.sudo.extraConfig = lib.concatStringsSep "\n" sudoersEntries;
-    }
+        })
+    ]
   );
 }

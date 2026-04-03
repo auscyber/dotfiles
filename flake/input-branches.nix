@@ -8,6 +8,12 @@
           ref = "main";
         };
       };
+      nh = {
+        upstream = {
+          url = "https://github.com/nix-community/nh.git";
+          ref = "master";
+        };
+      };
 
       input-branches = {
         upstream = {

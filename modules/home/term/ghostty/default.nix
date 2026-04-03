@@ -61,7 +61,12 @@ in
         custom-shader = [
           #          "./shaders/cursor_shader.glsl"
           #          "${inputs.ghostty-shaders}/cursor_blaze.glsl"
-          (builtins.toString ./cursor_warp.glsl)
+          (builtins.toString (
+            builtins.path {
+              name = "cursor_warp";
+              path = ./cursor_warp.glsl;
+            }
+          ))
         ];
         cursor-style = "block";
         #      macos-icon = "paper";

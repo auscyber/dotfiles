@@ -46,6 +46,6 @@
   };
 
   nix.extraOptions = ''
-    !include "${config.age.templates."extra-nix-conf".path}"
+    !include ${config.age.templates."extra-nix-conf".path}
         		'';
 }

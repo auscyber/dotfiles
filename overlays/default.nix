@@ -36,6 +36,7 @@
       #        };
       #
       #      })
+      inputs.nh.overlays.default
       inputs.attic.overlays.default
       inputs.hyprland-plugins.overlays.default
       inputs.niri.overlays.niri

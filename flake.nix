@@ -129,8 +129,8 @@
       flake = false;
     };
     opnix.url = "github:brizzbuzz/opnix";
-    #    nh.url = "github:nix-community/nh";
-    #    nh.inputs.nixpkgs.follows = "nixpkgs";
+    nh.url = "path:./inputs/nh";
+    nh.inputs.nixpkgs.follows = "nixpkgs";
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";

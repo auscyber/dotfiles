@@ -2,6 +2,7 @@
 
 {
   pkgs,
+  lib,
   config,
   inputs,
   flakeSelf,
@@ -80,6 +81,18 @@
     image = ../../../backgrounds/phoebebridgers-2.jpg;
   };
   age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+  specialisation.assessment.configuration = {
+
+    home-manager.users.ivypierlot = {
+      auscybernix = {
+        wms.rift.enable = lib.mkForce false;
+        keybinds.kanata.enable = lib.mkForce false;
+        programs.sketchybar.enable = lib.mkForce false;
+      };
+
+    };
+
+  };
 
   nix.channel.enable = false;
   nix.gc.automatic = true;

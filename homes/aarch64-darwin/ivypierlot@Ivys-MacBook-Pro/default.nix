@@ -73,6 +73,15 @@
   #    };
   #
   #  };
+  specialisation.assessment.configuration = {
+    auscybernix = {
+      wms.rift.enable = lib.mkForce false;
+      keybinds.kanata.enable = lib.mkForce false;
+      programs.sketchybar.enable = lib.mkForce false;
+    };
+
+  };
+
   auscybernix = {
     services.mopidy.enable = false;
     wms.rift.enable = true;
@@ -85,7 +94,10 @@
         pkgs.yabai
         pkgs.rift
       ];
-      extraCommandPiping = ../../../modules/home/keybinds/kanata/config.toml;
+      extraCommandPiping = builtins.path {
+        name = "kanata-config";
+        path = ../../../modules/home/keybinds/kanata/config.toml;
+      };
       tray = {
         config = {
           "$schema" = "https://raw.githubusercontent.com/rszyma/kanata-tray/main/doc/config_schema.json";
