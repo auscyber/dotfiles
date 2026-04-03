@@ -80,6 +80,17 @@ pub struct DarwinRebuildArgs {
   /// Build the configuration on a different host over SSH
   #[arg(long)]
   pub build_host: Option<RemoteHost>,
+
+
+  /// Explicitly select some specialisation
+  #[arg(long, short)]
+  pub specialisation: Option<String>,
+
+  /// Ignore specialisations
+  #[arg(long, short = 'S')]
+  pub no_specialisation: bool,
+
+
 }
 
 impl DarwinRebuildArgs {
