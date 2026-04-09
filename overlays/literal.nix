@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  self,
   system,
 }:
 
@@ -46,25 +47,48 @@ in
     proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
       inherit (sources.proton-ge-bin) src version;
     });
-    linuxZenWMuQSS =
+    kernelStdenv =
       let
         llvmKernelStdenv = pkgs.stdenvAdapters.overrideInStdenv pkgs.llvmPackages.stdenv [
           pkgs.llvm
           pkgs.lld
           pkgs.llvmPackages.clang-unwrapped
         ];
+        stdenv = self.ccacheStdenv.override {
+          stdenv = llvmKernelStdenv;
+        };
+      in
+      stdenv;
+
+    linuxZenWMuQSS =
+      let
+        llvmKernelStdenv = pkgs.stdenvAdapters.overrideInStdenv pkgs.llvmPackages.stdenv [
+          pkgs.llvm
+          pkgs.lld
+          #          pkgs.llvmPackages.clang-unwrapped
+          pkgs.llvmPackages.clang
+        ];
+        stdenv = self.ccacheStdenv.override {
+          stdenv = llvmKernelStdenv;
+        };
       in
       (pkgs.linuxPackagesFor (
-        pkgs.linux_zen.override {
-          stdenv = llvmKernelStdenv;
+        pkgs.linux_zen.override (prev: {
+          #          stdenv = llvmKernelStdenv;
+          inherit stdenv;
+          buildPackages = pkgs.buildPackages // {
+            stdenv = stdenv;
+          };
 
           ignoreConfigErrors = true;
+
           kernelPatches = [
             {
               name = "llvm-lto";
               patch = null;
               structuredExtraConfig = with lib.kernel; {
                 # We are not a k8s server
+                SCHED_ALT = yes;
                 CPU_MITIGATIONS = lib.mkForce no;
 
                 # Clang options require a lot of extra config
@@ -78,7 +102,7 @@ in
 
             }
           ];
-        }
+        })
       )).extend
         (
           self: super: {

@@ -46,9 +46,10 @@ in
         ../modules/common/secrets.nix
         ../modules/common/nix
         ../modules/common/common
+        ../modules/common/nix/ccache
+        inputs.nix-flatpak.nixosModules.nix-flatpak
 
         #	  ../modules/common/builders/builder.nix
-        inputs.determinate.nixosModules.default
         inputs.stylix.nixosModules.stylix
         inputs.arion.nixosModules.arion
         inputs.lanzaboote.nixosModules.lanzaboote
@@ -66,8 +67,11 @@ in
         #	  ../modules/common/builders/builder.nix
         ../modules/common/builders
         ../modules/common/vpn.nix
+<<<<<<< HEAD
 
         #        inputs.determinate.darwinModules.default
+=======
+>>>>>>> 202e91e19 (change shit)
         inputs.stylix.darwinModules.stylix
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.home-manager.darwinModules.home-manager

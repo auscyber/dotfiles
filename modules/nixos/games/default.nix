@@ -54,7 +54,21 @@ in
           ];
       };
       protontricks.enable = true;
-      gamescopeSession.enable = true;
+      gamescopeSession = {
+        enable = true;
+        args = [
+          "--force-grab-cursor"
+          "--mangoapp"
+          "-f"
+          "-r"
+          "144"
+          "-w"
+          "1920"
+          "-h"
+          "1080"
+          "--adaptive-sync"
+        ];
+      };
 
     };
   };

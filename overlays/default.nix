@@ -49,6 +49,7 @@
         final: prev:
         import ./literal.nix {
           pkgs = prev;
+          self = final;
           system = final.stdenv.hostPlatform.system;
           inherit inputs;
         }

@@ -1,15 +1,26 @@
 {
-inputs,...
+  inputs,
+  ...
 }:
 
 {
 
+  perSystem =
+    { system, pkgs, ... }:
+    {
 
-perSystem = { system, pkgs, ... }: {
+      apps.fetch = {
+        type = "app";
+        program = pkgs.writeShellApplication {
+          name = "fetch";
+          runtimeInputs = [
+            inputs.nvfetcher.packages."${system}".default
+          ];
+          text = ''
+            	nvfetcher -k "$HOME/.config/nvchecker.toml"
+            	'';
+        };
 
-	apps.fetch = {
-	type = "app";
-	program = inputs.nvfetcher.packages."${system}".default;
-	};
-};
+      };
+    };
 }

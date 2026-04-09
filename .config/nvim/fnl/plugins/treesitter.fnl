@@ -1,5 +1,5 @@
 (module plugins.treesitter
-        {require {treesitter nvim-treesitter.configs
+        {require {treesitter nvim-treesitter
                   parsers nvim-treesitter.parsers
                   tree-sitter-language-injection tree-sitter-language-injection
                   install nvim-treesitter.install}})
@@ -21,27 +21,7 @@
                                                       (require :treesitter_compiler)))]
                             (if status res))])
 
-(treesitter.setup {:ensure_installed [:rust
-                                      :haskell
-                                      :javascript
-                                      :c
-                                      :fennel
-                                      :go
-                                      :zig
-                                      :nix
-                                      :cpp
-                                      :bash
-                                      :glsl
-                                      :python
-                                      :lua
-                                      :toml
-                                      :typescript
-                                      :yaml
-                                      :css
-                                      :commonlisp
-                                      :kotlin
-                                      :markdown
-                                      :jsonc]
+(treesitter.setup {
                    :highlight {:enable true}
                    :autopairs {:enable true}
                    :playground {:enable true}
@@ -55,6 +35,35 @@
                                            :ac "@class.outer"
                                            :ic "@class.inner"}
                                  :move {:enable true :set_jumps true}}})
+
+;(let [ensure_installed [:rust :haskell
+;                                      :javascript
+;                                      :c
+;                                      :fennel
+;                                      :go                                      
+;                                      :zig
+;                                      :nix
+;                                      :cpp
+;                                      :bash
+;                                      :glsl
+;                                      :python
+;                                      :lua
+;                                      :toml
+;                                      :typescript
+;                                      :yaml
+;                                      :css
+;                                      :commonlisp
+;                                      :kotlin
+;                                      :markdown
+;                                :jsonc]
+;                                already-installed ((. (require :nvim-treesitter.config) :get_installed))
+;                                        parsers-to-install (-> (require :nvim-treesitter.config)
+;                                                                     (. :get_installed)
+;                                                                     (vim.iter)
+;                                                                     (: :filter (fn [parser]
+;                                                                                        (not (vim.tbl_contains already-installed parser))))
+;                                                                     (: :totable))]
+;                                  ((. (require :nvim-treesitter) :install) parsers-to-install))
 (tree-sitter-language-injection.setup
   {
    :nix {

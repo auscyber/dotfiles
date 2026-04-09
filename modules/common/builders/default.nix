@@ -64,7 +64,8 @@ with lib;
       };
       hostname = mkOption {
         type = types.str;
-        default = "${systemIdentifier}-builder";
+        default = hostname;
+        defaultText = lib.literalExpression "hostname";
         description = "Hostname of the build machine.";
       };
       ipAddress = mkOption {

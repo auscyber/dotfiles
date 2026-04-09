@@ -11,10 +11,11 @@ in
   options.auscybernix.flakeConfig = {
     flakeFolder = lib.mkOption {
       type = lib.types.str;
-      default = "${config.home.homeDirectory}/dotfiles";
       description = "Folder where the flake.nix is located";
+      defaultText = lib.literalExpression ''"''${config.home.homeDirectory}/dotfiles"'';
     };
   };
+  config.auscybernix.flakeConfig.flakeFolder = lib.mkDefault "${config.home.homeDirectory}/dotfiles";
   config = {
 
     lib.file.getLocalPath =

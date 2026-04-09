@@ -13,6 +13,7 @@
     agenix.url = "path:./inputs/agenix";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    nix-flatpak.url = "github:gmodena/nix-flatpak/";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
     nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";

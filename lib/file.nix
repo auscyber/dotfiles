@@ -62,6 +62,27 @@ in
     in
     walkDir path;
 
+  filterModuleListForOptionsDoc =
+    {
+      moduleList,
+      excludedPaths ? [ ],
+    }:
+    lib.filter (
+      module:
+      if builtins.isAttrs module then
+        (module ? imports)
+        || (module ? options)
+        || (module ? config)
+        || (module ? _module)
+        || (module ? disabledModules)
+        || (module ? _file)
+      else
+        let
+          modulePath = builtins.tryEval (toString module);
+        in
+        modulePath.success && !(builtins.elem modulePath.value excludedPaths)
+    ) moduleList;
+
   parseSystemConfigurations =
     systemsPath:
     let

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -40,6 +41,7 @@ in
     };
     home.packages = with pkgs; [
       attic-client
+      inputs.self.packages.${pkgs.stdenv.system}.config-helper-commands
     ];
     services.gpg-agent = {
       extraConfig = ''
@@ -95,8 +97,8 @@ in
       home-manager.enable = true;
       gpg = {
 
-	  enable = true;
-	  };
+        enable = true;
+      };
 
       git = {
         enable = true;

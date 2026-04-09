@@ -9,6 +9,7 @@
   ...
 }:
 let
+  sources = pkgs.callPackage ../../../_sources/generated.nix { };
   kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
     pname = "linux-cachyos-with-custom-source";
 
@@ -30,9 +31,23 @@ in
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  programs.nix-ld.enable = true;
   services.zfs.autoScrub.enable = true;
   hardware.openrazer.enable = true;
-  services.flatpak.enable = true;
+  services.flatpak = {
+    enable = true;
+    update.onActivation = true;
+    remotes = [
+
+    ];
+    packages = [
+      {
+        appId = "dev.stormix.deadlock-mod-manager";
+        sha256 = sources.deadlock-mod-manager.src.hash;
+        bundle = "${sources.deadlock-mod-manager.src}";
+      }
+    ];
+  };
   users.groups.openrazer.members = [ "auscyber" ];
   programs.fish.enable = true;
   programs.kdeconnect.enable = true;
@@ -41,6 +56,7 @@ in
 
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
+    nix.ccache.enable = true;
 
     nix.builders = {
 
@@ -102,6 +118,29 @@ in
     #    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
     initrd = {
+      network = {
+        # This will use udhcp to get an ip address.
+        # Make sure you have added the kernel module for your network driver to `boot.initrd.availableKernelModules`,
+        # so your initrd can load it!
+        # Static ip addresses might be configured using the ip argument in kernel command line:
+        # https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
+        enable = true;
+        ssh = {
+          enable = true;
+          # To prevent ssh clients from freaking out because a different host key is used,
+          # a different port for ssh is useful (assuming the same host has also a regular sshd running)
+          port = 2222;
+          # hostKeys paths must be unquoted strings, otherwise you'll run into issues with boot.initrd.secrets
+          # the keys are copied to initrd from the path specified; multiple keys can be set
+          # you can generate any number of host keys using
+          # `ssh-keygen -t ed25519 -N "" -f /path/to/ssh_host_ed25519_key`
+          hostKeys = [ /etc/ssh/ssh_host_unlock_key ];
+          # public ssh key used for login
+          authorizedKeys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
+          ];
+        };
+      };
       kernelModules = [ "zfs" ];
       systemd.enable = true;
 
@@ -185,7 +224,10 @@ in
 
   #  virtualisation.spiceUSBRedirection.enable = true;
 
-  boot.kernelModules = [ "kvm-intel" "ntsync"];
+  boot.kernelModules = [
+    "kvm-intel"
+    "ntsync"
+  ];
   #boot.extraModulePackages = [ (config.boot.kernel.callPackage ./alx-wol.nix { }) ];
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = lib.mkForce false;

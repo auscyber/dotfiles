@@ -40,3 +40,6 @@ fetch.tarball = "https://github.com/imputnet/helium-linux/releases/download/$ver
 [proton-ge-bin]
 src.github = "gloriouseggroll/proton-ge-custom"
 fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver.tar.gz"
+[deadlock-mod-manager]
+src.github = "deadlock-mod-manager/deadlock-mod-manager"
+fetch.url = "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/$ver/deadlock-mod-manager.flatpak"

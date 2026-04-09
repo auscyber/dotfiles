@@ -26,6 +26,7 @@
     wget
     htop
     curl
+    inputs.self.packages.${pkgs.stdenv.system}.config-helper-commands
   ];
 
   programs.gnupg.agent = {

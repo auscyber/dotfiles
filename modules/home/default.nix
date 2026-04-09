@@ -48,7 +48,7 @@
     };
     home.shell.enableFishIntegration = true;
     manual.manpages.enable = true;
-    manual.html.enable = true;
+    #    manual.html.enable = true;
 
     services.lorri = {
       enable = false;
@@ -66,7 +66,7 @@
       nil
       neovim
       starship
-	  nixfmt
+      nixfmt
       treefmt
       coreutils
     ];

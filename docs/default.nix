@@ -19,11 +19,30 @@ in
       ...
     }:
     let
-      # Build an extended lib that includes lib.extra (toBase64, etc.) and lib.hm,
-      # matching how mkExtendedLib works in lib/systems/common.nix.
       extendedLib = inputs.nixpkgs.lib.extend self.lib.overlay;
 
-      # Stub specialArgs that various modules require at evaluation time.
+      # Poison module: prevents accidental config dependencies during doc generation
+      # Accessing any option value returns a dummy stub to allow docs generation
+      # This encourages using defaultText instead of config-dependent defaults
+      poisonModule =
+        { options, ... }:
+        {
+          config = extendedLib.listToAttrs (
+            extendedLib.mapAttrsToList (
+              name: _:
+              if extendedLib.hasPrefix "_" name then
+                extendedLib.nameValuePair name (extendedLib.mkDefault { })
+              else
+                extendedLib.nameValuePair name (extendedLib.mkDefault "")
+            ) options
+          );
+        };
+
+      nixosBaseModuleList = self.lib.file.filterModuleListForOptionsDoc {
+        moduleList = import "${inputs.nixpkgs}/nixos/modules/module-list.nix";
+        excludedPaths = [ "${inputs.nixpkgs}/nixos/modules/services/networking/atticd.nix" ];
+      };
+
       stubArgs = {
         inherit (inputs) self;
         flakeConfig = {
@@ -38,95 +57,172 @@ in
         };
         systemIdentifier = "options-doc";
         hostname = "options-doc";
+        homeDirectory = "/tmp/options-doc";
+        username = "options-doc";
         inherit system;
         isInside = false;
       };
 
-      # Module that prevents config references which would create circular dependencies
-      # (inspired by home-manager's approach). This catches any attempts to reference
-      # config values in option defaults/declarations, which would cause infinite recursion.
-      poisonModule =
-        let
-          poisonAttr = n: {
-            name = n;
-            value = abort ''
-              error: the option documentation generation has a dependency on the configuration.
-
-              Accessed config path: config.${n}
-
-              This usually happens when an option default or declaration references the config,
-              like: default = ''${config.some.value};
-
-              To fix this, use `defaultText` instead:
-                defaultText = lib.literalExpression "\\''${config.some.value}";
-            '';
-          };
-        in
-        { options, ... }:
-        {
-          config = lib.listToAttrs (map poisonAttr (lib.filter (n: n != "_module") (lib.attrNames options)));
-        };
-
-      # Reusable function to build options docs for a given set of modules
-      # This follows the home-manager pattern of using a poisonModule to catch bad references
       buildOptionsDocs =
-        { name, modules }:
+        {
+          name,
+          modules,
+          class ? null,
+          includePoison ? false,
+        }:
         let
-          modulesEval = extendedLib.evalModules {
-            specialArgs = {
-              inherit pkgs inputs;
-              lib = extendedLib;
-            };
-            modules = modules ++ [ { _module.check = false; } poisonModule ];
-          };
+          hasNixosOptionDocs = builtins.hasAttr "nixos-option-docs" pkgs;
+          nixosOptionDocsBin =
+            if hasNixosOptionDocs then "${pkgs."nixos-option-docs"}/bin/nixos-option-docs" else "";
+          modulesEval = extendedLib.evalModules (
+            {
+              specialArgs = {
+                inherit pkgs inputs;
+                lib = extendedLib;
+              };
+              modules = modules ++ [ { _module.check = false; } ] ++ lib.optional includePoison poisonModule;
+            }
+            // lib.optionalAttrs (class != null) { inherit class; }
+          );
           optionsDoc = pkgs.nixosOptionsDoc {
             options = builtins.removeAttrs modulesEval.options [ "_module" ];
             warningsAreErrors = false;
           };
         in
         pkgs.runCommand name { } ''
+          set -euo pipefail
           mkdir -p $out
-          cp ${optionsDoc.optionsCommonMark} $out/options.md
           cp ${optionsDoc.optionsJSON}/share/doc/nixos/options.json $out/options.json
+
+          # Prefer nixos-option-docs if present, otherwise synthesize markdown from JSON.
+          if [ -n "${nixosOptionDocsBin}" ] && [ -x "${nixosOptionDocsBin}" ]; then
+            if "${nixosOptionDocsBin}" --help >/dev/null 2>&1; then
+              if "${nixosOptionDocsBin}" "$out/options.json" > "$out/options.md" 2>/dev/null; then
+                exit 0
+              fi
+            fi
+          fi
+
+          {
+            echo "# Options"
+            echo
+            echo "Generated from options.json (CommonMark renderer bypassed)."
+            echo
+            ${pkgs.jq}/bin/jq -r '
+              def asText:
+                if . == null then
+                  "n/a"
+                elif (type == "object") then
+                  (.text // .literalExpression // tostring)
+                else
+                  tostring
+                end;
+
+              to_entries
+              | sort_by(.key)
+              | .[]
+              | . as $entry
+              | [
+                  "## `\($entry.key)`",
+                  "",
+                  "- **Type:** `\(($entry.value.type // "") | asText)`",
+                  "- **Default:** `\(($entry.value.default // null) | asText)`",
+                  "- **Example:** `\(($entry.value.example // null) | asText)`",
+                  "- **Read-only:** `\(($entry.value.readOnly // false) | tostring)`",
+                  "",
+                  "### Description",
+                  "",
+                  (($entry.value.description // "n/a") | tostring),
+                  "",
+                  "### Declarations",
+                  "",
+                  (if ($entry.value.declarations // []) | length == 0 then
+                     "- n/a"
+                   else
+                     (($entry.value.declarations // []) | map("- `" + tostring + "`") | join("\n"))
+                   end),
+                  "",
+                  "---",
+                  ""
+                ]
+              | join("\n")
+            ' "$out/options.json"
+          } > "$out/options.md"
         '';
 
-      # NixOS options documentation
-      # Uses safe modules that don't have config references in their option defaults
-      # Matching the evaluation strategy used for actual NixOS configurations
-      nixosOptionsModules =
-        [
-          ../modules/common/allConfigs.nix
-          ../modules/common/ssh-keys.nix
-          ../modules/common/builders
-        ]
-        ++ (self.lib.file.importModulesRecursive ../modules/nixos)
-        ++ [
-          # Stub config values to satisfy option defaults that reference them
-          {
-            age.rekey.hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
-            auscybernix.vpn.ipAddress = extendedLib.mkDefault null;
-          }
-          # Forward the required specialArgs as _module.args.
-          { _module.args = stubArgs; }
-        ];
+      homeOptionsModules = [
+        { _module.args.lib = extendedLib; }
+      ]
+      ++ (import "${inputs.home-manager}/modules/modules.nix" {
+        inherit pkgs;
+        lib = extendedLib;
+        check = false;
+      })
+      ++ self.auscybernix.importedHomeModules
+      ++ self.auscybernix.standaloneHomeModules
+      ++ [
+        ../modules/common/secrets.nix
+        ../modules/common/nix
+        ../modules/common/allConfigs.nix
+      ]
+      ++ (extendedLib.importModulesRecursive ../modules/home)
+      ++ [
+        ../modules/home/default.nix
+        {
+          home.username = "options-doc";
+          home.homeDirectory = "/tmp/options-doc";
+          home.stateVersion = "24.11";
+          age.rekey.storageMode = extendedLib.mkForce "local";
+          age.rekey.localStorageDir = ../secrets/rekeyed + "/options-doc";
+          age.rekey.hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
+          auscybernix.standalone.enable = true;
+          auscybernix.secrets.enable = true;
+        }
+      ];
 
-      # Darwin options documentation
-      # Uses safe modules that don't have config references in their option defaults
-      # Matching the evaluation strategy used for actual Darwin configurations
-      darwinOptionsModules =
-        [
-          ../modules/common/allConfigs.nix
-          ../modules/common/ssh-keys.nix
-          ../modules/common/builders
-        ]
-        ++ (self.lib.file.importModulesRecursive ../modules/darwin)
-        ++ [
-          {
-            age.rekey.hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
-            auscybernix.vpn.ipAddress = extendedLib.mkDefault null;
-          }
-          { _module.args = stubArgs; }
-        ];
+      nixosOptionsModules = [
+        { _module.args.lib = extendedLib; }
+      ]
+      ++ nixosBaseModuleList
+      ++ [
+        ../modules/common/allConfigs.nix
+        ../modules/common/hm
+        ../modules/common/ssh-keys.nix
+      ]
+      ++ (extendedLib.importModulesRecursive ../modules/nixos)
+      ++ [
+        {
+          age.rekey.hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
+          age.rekey.storageMode = "local";
+          age.rekey.localStorageDir = ../secrets/rekeyed;
+          auscybernix.vpn.ipAddress = extendedLib.mkDefault null;
+        }
+        { _module.args = stubArgs; }
+      ];
+
+      darwinOptionsModules = [
+        { _module.args.lib = extendedLib; }
+      ]
+      ++ (import "${inputs.darwin}/modules/module-list.nix")
+      ++ [
+        ../modules/common/nix
+        ../modules/common/secrets.nix
+        ../modules/common/hm
+        ../modules/common/common
+        ../modules/common/allConfigs.nix
+        ../modules/common/kmonad
+        ../modules/common/ssh-keys.nix
+      ]
+      ++ (extendedLib.importModulesRecursive ../modules/darwin)
+      ++ [
+        {
+          age.rekey.hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
+          age.rekey.storageMode = "local";
+          age.rekey.localStorageDir = ../secrets/rekeyed;
+          auscybernix.vpn.ipAddress = extendedLib.mkDefault null;
+        }
+        { _module.args = stubArgs; }
+      ];
     in
     {
 
@@ -143,16 +239,26 @@ in
       };
 
       # Combined options documentation package (for backward compatibility)
-      # Contains both NixOS and Darwin documentation
+      # Contains NixOS, Darwin, and Home documentation
+      packages.options-doc-home = buildOptionsDocs {
+        name = "options-doc-home";
+        modules = homeOptionsModules;
+        class = "homeManager";
+        includePoison = false;
+      };
+
       packages.options-doc = pkgs.runCommand "options-doc" { } ''
-        mkdir -p $out/nixos $out/darwin
+        mkdir -p $out/nixos $out/darwin $out/home
         cp -r ${config.packages.options-doc-nixos}/* $out/nixos/
         cp -r ${config.packages.options-doc-darwin}/* $out/darwin/
+        cp -r ${config.packages.options-doc-home}/* $out/home/
         # Provide copies at root level for easy access
         cp ${config.packages.options-doc-nixos}/options.md $out/options-nixos.md
         cp ${config.packages.options-doc-darwin}/options.md $out/options-darwin.md
+        cp ${config.packages.options-doc-home}/options.md $out/options-home.md
         cp ${config.packages.options-doc-nixos}/options.json $out/options-nixos.json
         cp ${config.packages.options-doc-darwin}/options.json $out/options-darwin.json
+        cp ${config.packages.options-doc-home}/options.json $out/options-home.json
       '';
 
       apps.docs =

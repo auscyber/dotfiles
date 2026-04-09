@@ -101,6 +101,7 @@
             ;Language support
             :nvim-treesitter/nvim-treesitter
             {:do :TSUpdate
+             :branch :main
              :dependencies [:JoosepAlviste/nvim-ts-context-commentstring
                             :nvim-treesitter/nvim-treesitter-refactor
                             :DariusCorvus/tree-sitter-language-injection.nvim

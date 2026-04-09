@@ -20,6 +20,14 @@
     };
     date = "2025-06-29";
   };
+  deadlock-mod-manager = {
+    pname = "deadlock-mod-manager";
+    version = "v0.18.0";
+    src = fetchurl {
+      url = "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/v0.18.0/deadlock-mod-manager.flatpak";
+      sha256 = "sha256-azZfebt3mHhiasssSCBtB95pvLianjwbLYB+vhV1DYU=";
+    };
+  };
   game-devices-udev-rules = {
     pname = "game-devices-udev-rules";
     version = "main";
@@ -36,15 +44,15 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-JmIVbdjtMFcGEJ7H883zvMs/TxNVyi7zFWc0cbB3q3M=";
+      sha256 = "sha256-gekCxD9VZypD7i/MCANBvY6MlNJ01HNWHUqfNkoi4MY=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.10.5.1";
+    version = "0.10.8.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.10.5.1/helium-0.10.5.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-IDnhpxnP1xKcPE/P01Lq67/4pWHvW7Io/AuPa6zJk4E=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.10.8.1/helium-0.10.8.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-31xrDlzJzKNE0hrDw0UERDdd7bgzyQSIbdACqpaPARY=";
     };
   };
   icon_map = {
@@ -88,10 +96,10 @@
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton10-33";
+    version = "GE-Proton10-34";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton10-33/GE-Proton10-33.tar.gz";
-      sha256 = "sha256-vuPqz9vD/B1H6IFA7Wi/YEPbklNTbVbEZ2Erm62kBnk=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton10-34/GE-Proton10-34.tar.gz";
+      sha256 = "sha256-lzPsYYcrp5NoT3B0WFj3o10Z7tXx7xva1wEP3edeuqM=";
     };
   };
   rift = {
@@ -114,32 +122,32 @@
   };
   slskd = {
     pname = "slskd";
-    version = "769cc99f8fa8e859d953d446a92db0c9510782ec";
+    version = "85a2252c3e8c1fb0200d94ca69fbc0abd0b74b56";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "769cc99f8fa8e859d953d446a92db0c9510782ec";
+      rev = "85a2252c3e8c1fb0200d94ca69fbc0abd0b74b56";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=";
+      sha256 = "sha256-aG+4fN0ta7cKrpfFXJu4NoFbTs4q2gRkH7T3R8u82mI=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-mXmBVNlhPxo7xwdNucP2PwAOzzDCQE0B3WqSFPCbqyI=/./src/web/package-lock.json";
-    };date = "2026-03-15";
+      "./src/web/package-lock.json" = ./. + "/sha256-aG+4fN0ta7cKrpfFXJu4NoFbTs4q2gRkH7T3R8u82mI=/./src/web/package-lock.json";
+    };date = "2026-04-07";
   };
   yabai = {
     pname = "yabai";
-    version = "54728ce89a134d3ff83b356b1f0b86fba50b90b5";
+    version = "5e213518d413d2bc41159a759d0e7de3adf9d799";
     src = fetchgit {
       url = "https://github.com/koekeishiya/yabai";
-      rev = "54728ce89a134d3ff83b356b1f0b86fba50b90b5";
+      rev = "5e213518d413d2bc41159a759d0e7de3adf9d799";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-Uc24XZXkIJMWsXbbAODxclQTl5qYPsDoOlD/7yKKp7w=";
+      sha256 = "sha256-mrqWimSbP8Yd9KLbbKWnoEmHOb/Ab0ZULE6HPVto18s=";
     };
-    date = "2026-02-26";
+    date = "2026-04-06";
   };
 }

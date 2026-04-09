@@ -17,6 +17,20 @@ rec {
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
   };
+  age.templates."nvchecker.toml" = {
+    dependencies = {
+      inherit (config.age.secrets) github_token;
+    };
+    path = "${config.home.homeDirectory}/.config/nvchecker.toml";
+    content =
+      { pkgs, placeholders, ... }:
+      ''
+        [keys]
+        github = "${placeholders.github_token}"
+
+      '';
+
+  };
 
   programs = {
     ssh = {
@@ -41,7 +55,7 @@ rec {
   wayland.windowManager.hyprland.settings.exec-once = [
     "${pkgs.kdePackages.kwallet-pam}/libexec/pam_kwallet_init"
   ];
-  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIZAourM3ZASk6AiN8qDD1gm+jW6/FvlXNc3sfNudQtU auscyber@auspc";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOJWDxkmOeVGAq7WcPI+BygJ2zbsn4J0UAq0R6B6ZVx auscyber@auspc";
   sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   auscybernix = {
     keybinds.kanata = {
@@ -120,7 +134,7 @@ rec {
       xorg.xmessage
       rofi
       arandr
-      steam
+      #      steam
       #      jetbrains.idea-ultimate
       libnotify
       stack
@@ -130,7 +144,8 @@ rec {
       polybarFull
       playerctl
       htop
-      deadlock-mod-manager
+      polychromatic
+      #      deadlock-mod-manager
       #      eclipses.eclipse-java
       starship
       fish
