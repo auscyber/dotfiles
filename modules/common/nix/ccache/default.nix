@@ -19,6 +19,16 @@ in
       description = "CCache directory";
       default = "/var/cache/ccache";
     };
+    packageNames = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = "Nix top-level packages to be compiled using CCache";
+      default = [ ];
+      example = [
+        "wxwidgets_3_2"
+        "ffmpeg"
+        "libav_all"
+      ];
+    };
     env = lib.mkOption {
       type = lib.types.attrsOf (lib.types.anything);
       default = {

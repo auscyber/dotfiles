@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.auscybernix.programs.sketchybar;
-  sources = pkgs.callPackage ../../../../_sources/generated.nix {};
+  sources = pkgs.callPackage ../../../../_sources/generated.nix { };
 in
 {
 
@@ -55,10 +55,12 @@ in
       source = config.lib.file.linkLocalPath ../../../../.config/sketchybar;
       #    recursive = true;
     };
-	home.file.".config/icon_map.sh".source = sources.icon_map.src;
+    home.file.".config/icon_map.sh".source = sources.icon_map.src;
     programs.sketchybar = {
       service.enable = true;
       enable = true;
+      luaPackage = pkgs.lua5_5;
+      configType = "lua";
       extraPackages = with pkgs; [
         jq
         yq

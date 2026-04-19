@@ -108,6 +108,10 @@
       url = "github:teamookla/homebrew-speedtest";
       flake = false;
     };
+    homebrew-whisper = {
+      url = "github:typewhisper/homebrew-tap";
+      flake = false;
+    };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
     zen-browser.inputs.home-manager.follows = "home-manager";
@@ -140,6 +144,7 @@
       url = "github:auscyber/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sccache.url = "github:mozilla/sccache";
 
     input-leap = {
       url = "git+https://github.com/input-leap/input-leap?submodules=1";

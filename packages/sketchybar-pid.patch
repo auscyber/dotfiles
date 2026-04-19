@@ -1,0 +1,2929 @@
+diff --git a/makefile b/makefile
+index 648fc47..a3007ed 100644
+--- a/makefile
++++ b/makefile
+@@ -18,7 +18,7 @@ _OBJ = alias.o background.o bar_item.o custom_events.o event.o graph.o \
+ 			 image.o mouse.o shadow.o font.o text.o message.o mouse.o bar.o color.o \
+ 			 window.o bar_manager.o display.o group.o mach.o popup.o \
+ 			 animation.o workspace.om volume.o slider.o power.o wifi.om media.om \
+-			 hotload.o app_windows.o
++			 hotload.o app_windows.o source_pid.om
+ 
+ OBJ  = $(patsubst %, $(ODIR)/%, $(_OBJ))
+ 
+diff --git a/src/alias.c b/src/alias.c
+index 19edd6f..c0beeca 100644
+--- a/src/alias.c
++++ b/src/alias.c
+@@ -1,42 +1,56 @@
+ #include "alias.h"
+ #include "misc/helpers.h"
++#include "source_pid.h"
+ #include <CoreFoundation/CFBase.h>
+ #include <CoreFoundation/CoreFoundation.h>
++#include <math.h>
+ 
+-void print_all_menu_items(FILE* rsp) {
++void print_all_menu_items(FILE *rsp)
++{
+ #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 110000
+-  if (__builtin_available(macOS 11.0, *)) {
+-    if (!CGRequestScreenCaptureAccess()) {
++  if (__builtin_available(macOS 11.0, *))
++  {
++    if (!CGRequestScreenCaptureAccess())
++    {
+       respond(rsp, "[!] Query (default_menu_items): Screen Recording "
+                    "Permissions not given. Restart SketchyBar after granting "
+                    "permissions.\n");
+       return;
+     }
+   }
+-
+ #endif
++
++  bool use_source_pid_workaround = source_pid_needs_workaround();
++  if (use_source_pid_workaround)
++  {
++    // Prompt for AX trust on first query if needed.
++    source_pid_request_permissions();
++    source_pid_cache_refresh();
++  }
++
+   CFArrayRef window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll,
+-                                                      kCGNullWindowID        );
++                                                      kCGNullWindowID);
+   int window_count = CFArrayGetCount(window_list);
+ 
+   float x_pos[window_count];
+-  char* owner[window_count];
+-  char* name[window_count];
++  char *owner[window_count];
++  char *name[window_count];
++  pid_t item_pid[window_count];
+   memset(owner, 0, sizeof(owner));
+   memset(name, 0, sizeof(name));
+ 
+   int item_count = 0;
+-  for (int i = 0; i < window_count; ++i) {
++  for (int i = 0; i < window_count; ++i)
++  {
+     x_pos[i] = -9999.f;
+     CFDictionaryRef dictionary = CFArrayGetValueAtIndex(window_list, i);
+-    if (!dictionary) continue;
++    if (!dictionary)
++      continue;
+ 
+     CFStringRef owner_ref = CFDictionaryGetValue(dictionary,
+                                                  kCGWindowOwnerName);
+-
+     CFNumberRef owner_pid_ref = CFDictionaryGetValue(dictionary,
+                                                      kCGWindowOwnerPID);
+-
+     CFStringRef name_ref = CFDictionaryGetValue(dictionary, kCGWindowName);
+     CFNumberRef layer_ref = CFDictionaryGetValue(dictionary, kCGWindowLayer);
+     CFDictionaryRef bounds_ref = CFDictionaryGetValue(dictionary,
+@@ -47,94 +61,160 @@ void print_all_menu_items(FILE* rsp) {
+ 
+     long long int layer = 0;
+     CFNumberGetValue(layer_ref, CFNumberGetType(layer_ref), &layer);
++    if (layer != MENUBAR_LAYER)
++      continue;
++
+     uint64_t owner_pid = 0;
+     CFNumberGetValue(owner_pid_ref,
+                      CFNumberGetType(owner_pid_ref),
+-                     &owner_pid                     );
++                     &owner_pid);
+ 
+-    if (layer != MENUBAR_LAYER) continue;
+     CGRect bounds = CGRectNull;
+-    if (!CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds)) continue;
+-    char* owner_copy = cfstring_copy(owner_ref);
+-    if (string_equals(owner_copy, "Window Server")) {
++    if (!CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds))
++      continue;
++
++    char *owner_copy = cfstring_copy(owner_ref);
++    if (string_equals(owner_copy, "Window Server"))
++    {
+       free(owner_copy);
+       continue;
+     }
++
++    pid_t resolved_pid = owner_pid;
++    if (use_source_pid_workaround &&
++        (string_equals(owner_copy, "Control Centre") ||
++         string_equals(owner_copy, "ControlCenter") ||
++         string_equals(owner_copy, "Control Center")))
++    {
++      char *source_name = NULL;
++      char *item_name = cfstring_copy(name_ref);
++      pid_t source_pid = source_pid_for_window_with_name_hint(bounds,
++                                                              item_name,
++                                                              &source_name);
++      if (item_name)
++      {
++        free(item_name);
++      }
++      if (source_pid != 0)
++      {
++        resolved_pid = source_pid;
++      }
++      if (source_name)
++      {
++        free(owner_copy);
++        owner_copy = source_name;
++      }
++    }
++
+     owner[item_count] = owner_copy;
+     name[item_count] = cfstring_copy(name_ref);
++    item_pid[item_count] = resolved_pid;
+     x_pos[item_count++] = bounds.origin.x;
+   }
+ 
+-  if (item_count > 0) {
++  if (item_count > 0)
++  {
+     fprintf(rsp, "[\n");
+     int counter = 0;
+-    for (int i = 0; i < item_count; i++) {
++    for (int i = 0; i < item_count; i++)
++    {
+       float current_pos = x_pos[0];
+       uint32_t current_pos_id = 0;
+-      for (int j = 0; j < window_count; j++) {
+-        if (!name[j] || !owner[j]) continue;
+-        if (x_pos[j] > current_pos) {
++      for (int j = 0; j < window_count; j++)
++      {
++        if (!name[j] || !owner[j])
++          continue;
++        if (x_pos[j] > current_pos)
++        {
+           current_pos = x_pos[j];
+           current_pos_id = j;
+         }
+       }
+ 
+-      if (!name[current_pos_id] || !owner[current_pos_id]) continue;
+-      if (strcmp(name[current_pos_id], "") != 0) {
+-        if (counter++ > 0) {
++      if (!name[current_pos_id] || !owner[current_pos_id])
++        continue;
++      if (strcmp(name[current_pos_id], "") != 0)
++      {
++        if (counter++ > 0)
++        {
+           fprintf(rsp, ", \n");
+         }
+-        fprintf(rsp, "\t\"%s,%s\"", owner[current_pos_id],
+-                                    name[current_pos_id]  );
++        fprintf(rsp, "\t\"%s,%s,%d\"", owner[current_pos_id],
++                name[current_pos_id],
++                item_pid[current_pos_id]);
+       }
+       x_pos[current_pos_id] = -9999.f;
+     }
+     fprintf(rsp, "\n]\n");
+-    for (int i = 0; i < window_count; i++) {
+-      if (owner[i]) free(owner[i]);
+-      if (name[i]) free(name[i]);
++    for (int i = 0; i < window_count; i++)
++    {
++      if (owner[i])
++        free(owner[i]);
++      if (name[i])
++        free(name[i]);
+     }
+   }
++  else
++  {
++    fprintf(rsp, "No menu bar items found.\n");
++  }
+   CFRelease(window_list);
+ }
+ 
+-void alias_get_permission(struct alias* alias) { 
+-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 110000 
+-  if (__builtin_available(macOS 11.0, *)) {
++void alias_get_permission(struct alias *alias)
++{
++#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 110000
++  if (__builtin_available(macOS 11.0, *))
++  {
+     alias->permission = CGRequestScreenCaptureAccess();
+   }
+ #else
+-  if(__builtin_available(macos 10.15, *)) {
++  if (__builtin_available(macos 10.15, *))
++  {
+     CGImageRef img = CGWindowListCreateImage(CGRectMake(0, 0, 1, 1),
+                                              kCGWindowListOptionOnScreenOnly,
+                                              kCGNullWindowID,
+-                                             kCGWindowImageDefault           );
++                                             kCGWindowImageDefault);
+ 
+     CFRelease(img);
+   }
+ #endif
+ }
+ 
+-void alias_init(struct alias* alias) {
++void alias_init(struct alias *alias)
++{
+   alias->name = NULL;
+   alias->owner = NULL;
+   alias->color_override = false;
+   color_init(&alias->color, 0xffff0000);
+   alias->update_frequency = 1;
+   alias->counter = 0;
+-
+-  window_init(&alias->window);
+   image_init(&alias->image);
+ }
+ 
+-static void alias_find_window(struct alias* alias) {
++static void alias_find_window(struct alias *alias)
++{
+   CFArrayRef window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll,
+-                                                      kCGNullWindowID        );
++                                                      kCGNullWindowID);
+   int window_count = CFArrayGetCount(window_list);
+ 
+-  for (int i = 0; i < window_count; ++i) {
++  bool use_source_pid_workaround = source_pid_needs_workaround();
++  if (use_source_pid_workaround)
++  {
++    source_pid_cache_refresh();
++  }
++
++  CGRect direct_bounds = CGRectNull;
++  bool has_direct_bounds =
++      alias->pid > 0 &&
++      alias->name &&
++      source_window_bounds_for_pid(alias->pid, alias->name, &direct_bounds);
++
++  for (int i = 0; i < window_count; ++i)
++  {
+     CFDictionaryRef dictionary = CFArrayGetValueAtIndex(window_list, i);
+-    if (!dictionary) continue;
++    if (!dictionary)
++      continue;
+ 
+     CFStringRef owner_ref = CFDictionaryGetValue(dictionary,
+                                                  kCGWindowOwnerName);
+@@ -143,51 +223,130 @@ static void alias_find_window(struct alias* alias) {
+                                                      kCGWindowOwnerPID);
+ 
+     CFStringRef name_ref = CFDictionaryGetValue(dictionary, kCGWindowName);
+-    if (!name_ref) continue;
+-    if (!owner_ref) continue;
+-    char* owner = cfstring_copy(owner_ref);
+-    char* name = cfstring_copy(name_ref);
+-
+-    if (!(alias->owner && strcmp(alias->owner, owner) == 0
+-          && ((alias->name && strcmp(alias->name, name) == 0)
+-              || (!alias->name && strcmp(name, "") != 0)     ))) {
+-      free(owner);
+-      free(name);
+-      continue;
+-    }
+-    free(owner);
+-    free(name);
+ 
++    if (!name_ref)
++      continue;
++    if (!owner_ref)
++      continue;
+     CFNumberRef layer_ref = CFDictionaryGetValue(dictionary, kCGWindowLayer);
+-    if (!layer_ref) continue;
++    if (!layer_ref)
++      continue;
++    CFDictionaryRef bounds_ref = CFDictionaryGetValue(dictionary, kCGWindowBounds);
++    if (!bounds_ref)
++      continue;
++    CGRect bounds;
++    if (!CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds))
++      continue;
+ 
+     uint64_t layer = 0;
+     CFNumberGetValue(layer_ref, CFNumberGetType(layer_ref), &layer);
+-    if (layer != MENUBAR_LAYER) continue;
++    if (layer != MENUBAR_LAYER)
++      continue;
++
++    if (has_direct_bounds)
++    {
++      if (fabs(bounds.origin.x - direct_bounds.origin.x) > 1.0 ||
++          fabs(bounds.origin.y - direct_bounds.origin.y) > 1.0 ||
++          fabs(bounds.size.width - direct_bounds.size.width) > 1.0 ||
++          fabs(bounds.size.height - direct_bounds.size.height) > 1.0)
++      {
++        continue;
++      }
++
++      CFNumberRef window_id_ref = CFDictionaryGetValue(dictionary,
++                                                       kCGWindowNumber);
++      if (!window_id_ref)
++        continue;
++
++      uint64_t wid;
++      CFNumberGetValue(window_id_ref,
++                       CFNumberGetType(window_id_ref),
++                       &wid);
++
++      alias->window.id = (uint32_t)wid;
++      alias->window.frame.size = bounds.size;
++      alias->window.origin = bounds.origin;
++
++      CFRelease(window_list);
++      return;
++    }
+ 
++    char *owner = cfstring_copy(owner_ref);
++    char *name = cfstring_copy(name_ref);
++    if (!owner || !name)
++    {
++      if (owner)
++        free(owner);
++      if (name)
++        free(name);
++      continue;
++    }
++
++    uint64_t owner_pid = 0;
+     CFNumberGetValue(owner_pid_ref,
+                      CFNumberGetType(owner_pid_ref),
+-                     &alias->pid                    );
++                     &owner_pid);
++
++    bool owner_is_control_centre =
++        use_source_pid_workaround &&
++        (string_equals(owner, "Control Centre") ||
++         string_equals(owner, "ControlCenter") ||
++         string_equals(owner, "Control Center"));
++
++    char *resolved_owner = owner;
++    char *source_name = NULL;
++    if (owner_is_control_centre &&
++        !(alias->owner &&
++          (string_equals(alias->owner, "Control Centre") ||
++           string_equals(alias->owner, "ControlCenter") ||
++           string_equals(alias->owner, "Control Center"))))
++    {
++      source_name = source_name_for_window(bounds);
++      if (source_name)
++      {
++        resolved_owner = source_name;
++      }
++    }
++
++    bool owner_matches = alias->owner && strcmp(alias->owner, resolved_owner) == 0;
++    bool name_matches = (alias->name && strcmp(alias->name, name) == 0) ||
++                        (!alias->name && strcmp(name, "") != 0);
++
++    if (!(owner_matches && name_matches))
++    {
++      if (source_name)
++        free(source_name);
++      free(owner);
++      free(name);
++      continue;
++    }
+ 
+     CFNumberRef window_id_ref = CFDictionaryGetValue(dictionary,
+                                                      kCGWindowNumber);
+ 
+-    if (!window_id_ref) continue;
+-    CFDictionaryRef bounds_ref = CFDictionaryGetValue(dictionary, kCGWindowBounds);
+-    if (!bounds_ref) continue;
+-
+-    CGRect bounds;
+-    CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds);
++    if (!window_id_ref)
++    {
++      if (source_name)
++        free(source_name);
++      free(owner);
++      free(name);
++      continue;
++    }
+ 
+     uint64_t wid;
+     CFNumberGetValue(window_id_ref,
+                      CFNumberGetType(window_id_ref),
+-                     &wid                           );
++                     &wid);
+ 
+     alias->window.id = (uint32_t)wid;
+     alias->window.frame.size = bounds.size;
+     alias->window.origin = bounds.origin;
+ 
++    if (source_name)
++      free(source_name);
++    free(owner);
++    free(name);
++
+     CFRelease(window_list);
+     return;
+   }
+@@ -195,15 +354,20 @@ static void alias_find_window(struct alias* alias) {
+   CFRelease(window_list);
+ }
+ 
+-static bool alias_update_image(struct alias* alias, bool forced) {
+-  if (alias->window.id == 0) alias_find_window(alias);
+-  if (alias->window.id == 0) return false;
++static bool alias_update_image(struct alias *alias, bool forced)
++{
++  if (alias->window.id == 0)
++    alias_find_window(alias);
++  if (alias->window.id == 0)
++    return false;
+ 
+   bool disabled = false;
+   CGImageRef image_ref = window_capture(&alias->window, &disabled);
+ 
+-  if (!image_ref) {
+-    if (!disabled) {
++  if (!image_ref)
++  {
++    if (!disabled)
++    {
+       alias->window.id = 0;
+       image_destroy(&alias->image);
+     }
+@@ -213,41 +377,53 @@ static bool alias_update_image(struct alias* alias, bool forced) {
+   return image_set_image(&alias->image,
+                          image_ref,
+                          alias->window.frame,
+-                         forced              );
++                         forced);
+ }
+ 
+-void alias_setup(struct alias* alias, char* owner, char* name) {
++void alias_setup(struct alias *alias, char *owner, char *name, pid_t pid)
++{
+   alias->name = name;
+   alias->owner = owner;
++  alias->pid = pid;
+   alias_get_permission(alias);
+   alias_update_image(alias, true);
+ }
+ 
+-uint32_t alias_get_length(struct alias* alias) {
+-  if (alias->image.image_ref) return alias->image.bounds.size.width;
++uint32_t alias_get_length(struct alias *alias)
++{
++  if (alias->image.image_ref)
++    return alias->image.bounds.size.width;
+   return 0;
+ }
+ 
+-uint32_t alias_get_height(struct alias* alias) {
+-  if (alias->image.image_ref) return alias->image.bounds.size.height;
++uint32_t alias_get_height(struct alias *alias)
++{
++  if (alias->image.image_ref)
++    return alias->image.bounds.size.height;
+   return 0;
+ }
+ 
+-bool alias_update(struct alias* alias, bool forced) {
+-  if (alias->update_frequency == 0) return false;
++bool alias_update(struct alias *alias, bool forced)
++{
++  if (alias->update_frequency == 0)
++    return false;
+ 
+   alias->counter++;
+-  if (forced || alias->counter >= alias->update_frequency) {
++  if (forced || alias->counter >= alias->update_frequency)
++  {
+     alias->counter = 0;
+-    if (alias_update_image(alias, forced)) {
++    if (alias_update_image(alias, forced))
++    {
+       return true;
+     }
+   }
+   return false;
+ }
+ 
+-void alias_draw(struct alias* alias, CGContextRef context) {
+-  if (alias->color_override) {
++void alias_draw(struct alias *alias, CGContextRef context)
++{
++  if (alias->color_override)
++  {
+     CGContextSaveGState(context);
+     image_draw(&alias->image, context);
+     CGContextClipToMask(context, alias->image.bounds, alias->image.image_ref);
+@@ -255,58 +431,73 @@ void alias_draw(struct alias* alias, CGContextRef context) {
+                              alias->color.r,
+                              alias->color.g,
+                              alias->color.b,
+-                             alias->color.a );
++                             alias->color.a);
+ 
+     CGContextFillRect(context, alias->image.bounds);
+     CGContextRestoreGState(context);
+   }
+-  else {
++  else
++  {
+     image_draw(&alias->image, context);
+   }
+ }
+ 
+-void alias_destroy(struct alias* alias) {
++void alias_destroy(struct alias *alias)
++{
+   image_destroy(&alias->image);
+-  if (alias->name) free(alias->name);
+-  if (alias->owner) free(alias->owner);
++  if (alias->name)
++    free(alias->name);
++  if (alias->owner)
++    free(alias->owner);
+   alias->name = NULL;
+   alias->owner = NULL;
+ }
+ 
+-void alias_calculate_bounds(struct alias* alias, uint32_t x, uint32_t y) {
++void alias_calculate_bounds(struct alias *alias, uint32_t x, uint32_t y)
++{
+   image_calculate_bounds(&alias->image, x, y);
+ }
+ 
+-bool alias_parse_sub_domain(struct alias* alias, FILE* rsp, struct token property, char* message) {
+-  struct key_value_pair key_value_pair = get_key_value_pair(property.text,'.');
+-  if (key_value_pair.key && key_value_pair.value) {
+-    struct token subdom = { key_value_pair.key, strlen(key_value_pair.key) };
+-    struct token entry = { key_value_pair.value, strlen(key_value_pair.value)};
++bool alias_parse_sub_domain(struct alias *alias, FILE *rsp, struct token property, char *message)
++{
++  struct key_value_pair key_value_pair = get_key_value_pair(property.text, '.');
++  if (key_value_pair.key && key_value_pair.value)
++  {
++    struct token subdom = {key_value_pair.key, strlen(key_value_pair.key)};
++    struct token entry = {key_value_pair.value, strlen(key_value_pair.value)};
+     if (token_equals(subdom, SUB_DOMAIN_SHADOW))
+       return shadow_parse_sub_domain(&alias->image.shadow,
+                                      rsp,
+                                      entry,
+-                                     message              );
+-    else if (token_equals(subdom, SUB_DOMAIN_COLOR)) {
++                                     message);
++    else if (token_equals(subdom, SUB_DOMAIN_COLOR))
++    {
+       bool changed = !alias->color_override;
+       alias->color_override = true;
+-      return color_parse_sub_domain(&alias->color, rsp, entry, message)
+-            || changed;
++      return color_parse_sub_domain(&alias->color, rsp, entry, message) || changed;
+     }
+-    else {
++    else
++    {
+       respond(rsp, "[!] Alias: Invalid subdomain '%s'\n", subdom.text);
+     }
+   }
+-  else if (token_equals(property, PROPERTY_COLOR)) {
++  else if (token_equals(property, PROPERTY_COLOR))
++  {
+     color_set_hex(&alias->color, token_to_uint32t(get_token(&message)));
+     alias->color_override = true;
+     return true;
+-  } else if (token_equals(property, PROPERTY_SCALE)) {
++  }
++  else if (token_equals(property, PROPERTY_SCALE))
++  {
+     return image_set_scale(&alias->image, token_to_float(get_token(&message)));
+-  } else if (token_equals(property, PROPERTY_UPDATE_FREQ)) {
++  }
++  else if (token_equals(property, PROPERTY_UPDATE_FREQ))
++  {
+     alias->update_frequency = token_to_uint32t(get_token(&message));
+     return false;
+-  } else {
++  }
++  else
++  {
+     respond(rsp, "[!] Alias: Invalid property '%s' \n", property.text);
+   }
+   return false;
+diff --git a/src/alias.h b/src/alias.h
+index d8eb0e3..98a6fc9 100644
+--- a/src/alias.h
++++ b/src/alias.h
+@@ -24,7 +24,7 @@ struct alias {
+ };
+ 
+ void alias_init(struct alias* alias);
+-void alias_setup(struct alias* alias, char* owner, char* name);
++void alias_setup(struct alias* alias, char* owner, char* name, pid_t pid);
+ uint32_t alias_get_length(struct alias* alias);
+ uint32_t alias_get_height(struct alias* alias);
+ 
+diff --git a/src/mach.c b/src/mach.c
+index 5f475dc..979bdd7 100644
+--- a/src/mach.c
++++ b/src/mach.c
+@@ -4,28 +4,32 @@
+ #include <stdint.h>
+ #include <CoreFoundation/CoreFoundation.h>
+ 
+-mach_port_t mach_get_bs_port(char* bs_name) {
++mach_port_t mach_get_bs_port(char *bs_name)
++{
+   mach_port_name_t task = mach_task_self();
+ 
+   mach_port_t bs_port;
+   if (task_get_special_port(task,
+                             TASK_BOOTSTRAP_PORT,
+-                            &bs_port            ) != KERN_SUCCESS) {
++                            &bs_port) != KERN_SUCCESS)
++  {
+     return 0;
+   }
+ 
+   mach_port_t port;
+   if (bootstrap_look_up(bs_port,
+                         bs_name,
+-                        &port   ) != KERN_SUCCESS) {
++                        &port) != KERN_SUCCESS)
++  {
+     return 0;
+   }
+ 
+   return port;
+ }
+ 
+-void mach_receive_message(mach_port_t port, struct mach_buffer* buffer, bool timeout) {
+-  *buffer = (struct mach_buffer) { 0 };
++void mach_receive_message(mach_port_t port, struct mach_buffer *buffer, bool timeout)
++{
++  *buffer = (struct mach_buffer){0};
+   mach_msg_return_t msg_return;
+   if (timeout)
+     msg_return = mach_msg(&buffer->message.header,
+@@ -34,54 +38,62 @@ void mach_receive_message(mach_port_t port, struct mach_buffer* buffer, bool tim
+                           sizeof(struct mach_buffer),
+                           port,
+                           100,
+-                          MACH_PORT_NULL                  );
+-  else 
++                          MACH_PORT_NULL);
++  else
+     msg_return = mach_msg(&buffer->message.header,
+                           MACH_RCV_MSG,
+                           0,
+                           sizeof(struct mach_buffer),
+                           port,
+                           MACH_MSG_TIMEOUT_NONE,
+-                          MACH_PORT_NULL            );
++                          MACH_PORT_NULL);
+ 
+-  if (msg_return != MACH_MSG_SUCCESS) {
++  if (msg_return != MACH_MSG_SUCCESS)
++  {
+     buffer->message.descriptor.address = NULL;
+   }
+ }
+ 
+-char* mach_send_message(mach_port_t port, char* message, uint32_t len, bool await_response) {
+-  if (!message || !port) return NULL;
++char *mach_send_message(mach_port_t port, char *message, uint32_t len, bool await_response)
++{
++  if (!message || !port)
++    return NULL;
+ 
+   mach_port_t response_port;
+-    mach_port_name_t task = mach_task_self();
+-  if (await_response) {
++  mach_port_name_t task = mach_task_self();
++  if (await_response)
++  {
+     if (mach_port_allocate(task, MACH_PORT_RIGHT_RECEIVE,
+-                                 &response_port          ) != KERN_SUCCESS) {
++                           &response_port) != KERN_SUCCESS)
++    {
+       return NULL;
+     }
+ 
+     if (mach_port_insert_right(task, response_port,
+-                                     response_port,
+-                                     MACH_MSG_TYPE_MAKE_SEND)!= KERN_SUCCESS) {
++                               response_port,
++                               MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS)
++    {
+       return NULL;
+     }
+   }
+ 
+-  struct mach_message msg = { 0 };
++  struct mach_message msg = {0};
+   msg.header.msgh_remote_port = port;
+-  if (await_response) {
++  if (await_response)
++  {
+     msg.header.msgh_local_port = response_port;
+     msg.header.msgh_id = response_port;
+     msg.header.msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND,
+                                               MACH_MSG_TYPE_MAKE_SEND,
+                                               0,
+-                                              MACH_MSGH_BITS_COMPLEX  );
+-  } else {
+-    msg.header.msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND
+-                                              & MACH_MSGH_BITS_REMOTE_MASK,
++                                              MACH_MSGH_BITS_COMPLEX);
++  }
++  else
++  {
++    msg.header.msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND & MACH_MSGH_BITS_REMOTE_MASK,
+                                               0,
+                                               0,
+-                                              MACH_MSGH_BITS_COMPLEX       );
++                                              MACH_MSGH_BITS_COMPLEX);
+   }
+ 
+   msg.header.msgh_size = sizeof(struct mach_message);
+@@ -99,17 +111,21 @@ char* mach_send_message(mach_port_t port, char* message, uint32_t len, bool awai
+            0,
+            MACH_PORT_NULL,
+            MACH_MSG_TIMEOUT_NONE,
+-           MACH_PORT_NULL             );
+-
+-  if (await_response) {
+-    struct mach_buffer buffer = { 0 };
+-    mach_receive_message(response_port, &buffer, true);
+-    char* rsp = NULL;
+-    if (buffer.message.descriptor.address) {
++           MACH_PORT_NULL);
++
++  if (await_response)
++  {
++    struct mach_buffer buffer = {0};
++    mach_receive_message(response_port, &buffer, false);
++    char *rsp = NULL;
++    if (buffer.message.descriptor.address)
++    {
+       rsp = malloc(strlen(buffer.message.descriptor.address) + 1);
+       memcpy(rsp, buffer.message.descriptor.address,
+-                  strlen(buffer.message.descriptor.address) + 1);
+-    } else {
++             strlen(buffer.message.descriptor.address) + 1);
++    }
++    else
++    {
+       rsp = malloc(1);
+       *rsp = '\0';
+     }
+@@ -124,10 +140,11 @@ char* mach_send_message(mach_port_t port, char* message, uint32_t len, bool awai
+   return NULL;
+ }
+ 
+-void mach_message_callback(CFMachPortRef port, void* message, CFIndex size, void* context) {
+-  struct mach_server* mach_server = context;
++void mach_message_callback(CFMachPortRef port, void *message, CFIndex size, void *context)
++{
++  struct mach_server *mach_server = context;
+   struct mach_buffer buffer;
+-  buffer.message = *(struct mach_message*)message;
++  buffer.message = *(struct mach_message *)message;
+   mach_server->handler(&buffer);
+   mach_msg_destroy(&buffer.message.header);
+ }
+@@ -135,12 +152,14 @@ void mach_message_callback(CFMachPortRef port, void* message, CFIndex size, void
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+ extern char g_name[256];
+-bool mach_server_begin(struct mach_server* mach_server, mach_handler handler) {
++bool mach_server_begin(struct mach_server *mach_server, mach_handler handler)
++{
+   mach_server->task = mach_task_self();
+ 
+   if (mach_port_allocate(mach_server->task,
+                          MACH_PORT_RIGHT_RECEIVE,
+-                         &mach_server->port      ) != KERN_SUCCESS) {
++                         &mach_server->port) != KERN_SUCCESS)
++  {
+     return false;
+   }
+ 
+@@ -151,20 +170,23 @@ bool mach_server_begin(struct mach_server* mach_server, mach_handler handler) {
+                                mach_server->port,
+                                MACH_PORT_LIMITS_INFO,
+                                (mach_port_info_t)&limits,
+-                               MACH_PORT_LIMITS_INFO_COUNT) != KERN_SUCCESS) {
++                               MACH_PORT_LIMITS_INFO_COUNT) != KERN_SUCCESS)
++  {
+     return false;
+   }
+ 
+   if (mach_port_insert_right(mach_server->task,
+                              mach_server->port,
+                              mach_server->port,
+-                             MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS) {
++                             MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS)
++  {
+     return false;
+   }
+ 
+   if (task_get_special_port(mach_server->task,
+                             TASK_BOOTSTRAP_PORT,
+-                            &mach_server->bs_port) != KERN_SUCCESS) {
++                            &mach_server->bs_port) != KERN_SUCCESS)
++  {
+     return false;
+   }
+ 
+@@ -173,24 +195,25 @@ bool mach_server_begin(struct mach_server* mach_server, mach_handler handler) {
+ 
+   if (bootstrap_register(mach_server->bs_port,
+                          bs_name,
+-                         mach_server->port    ) != KERN_SUCCESS) {
++                         mach_server->port) != KERN_SUCCESS)
++  {
+     return false;
+   }
+ 
+   mach_server->handler = handler;
+   mach_server->is_running = true;
+ 
+-  CFMachPortContext context = {0, (void*)mach_server};
++  CFMachPortContext context = {0, (void *)mach_server};
+ 
+   CFMachPortRef cf_mach_port = CFMachPortCreateWithPort(NULL,
+                                                         mach_server->port,
+                                                         mach_message_callback,
+                                                         &context,
+-                                                        false                );
++                                                        false);
+ 
+   CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(NULL,
+                                                             cf_mach_port,
+-                                                            0            );
++                                                            0);
+ 
+   CFRunLoopAddSource(CFRunLoopGetMain(), source, kCFRunLoopDefaultMode);
+   CFRelease(source);
+diff --git a/src/message.c b/src/message.c
+index 421d49a..38f38d4 100644
+--- a/src/message.c
++++ b/src/message.c
+@@ -11,67 +11,78 @@
+ 
+ extern struct bar_manager g_bar_manager;
+ 
+-static struct bar_item** get_bar_items_for_regex(struct token reg, FILE* rsp, uint32_t* count) {
+-  struct bar_item** bar_items = NULL;
++static struct bar_item **get_bar_items_for_regex(struct token reg, FILE *rsp, uint32_t *count)
++{
++  struct bar_item **bar_items = NULL;
+ 
+-  char* regstring = malloc(sizeof(char)*(reg.length - 1));
++  char *regstring = malloc(sizeof(char) * (reg.length - 1));
+   memcpy(regstring, &reg.text[1], reg.length - 2);
+   regstring[reg.length - 2] = '\0';
+   regex_t regex;
+   int reti;
+   reti = regcomp(&regex, regstring, 0);
+   free(regstring);
+-  if (reti) {
++  if (reti)
++  {
+     respond(rsp, "[!] Regex: Could not compile regex '%s'\n", reg.text);
+     return NULL;
+   }
+ 
+-  for (int i = 0; i < g_bar_manager.bar_item_count; i++) {
+-    struct bar_item* bar_item = g_bar_manager.bar_items[i];
++  for (int i = 0; i < g_bar_manager.bar_item_count; i++)
++  {
++    struct bar_item *bar_item = g_bar_manager.bar_items[i];
+ 
+     reti = regexec(&regex, bar_item->name, 0, NULL, 0);
+-    if (!reti) {
++    if (!reti)
++    {
+       ++*count;
+-      bar_items = realloc(bar_items, sizeof(struct bar_item*)* *count);
++      bar_items = realloc(bar_items, sizeof(struct bar_item *) * *count);
+       bar_items[*count - 1] = bar_item;
+     }
+-    else if (reti != REG_NOMATCH) {
++    else if (reti != REG_NOMATCH)
++    {
+       char buf[1024];
+       regerror(reti, &regex, buf, sizeof(buf));
+       respond(rsp, "[!] Regex: Regex match failed '%s'\n", buf);
+       return NULL;
+     }
+   }
+-  if (!bar_items) {
++  if (!bar_items)
++  {
+     respond(rsp, "[?] Regex: No match found for regex '%s'\n", reg.text);
+   }
+   regfree(&regex);
+   return bar_items;
+ }
+ 
+-static void handle_domain_subscribe(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_subscribe(FILE *rsp, struct token domain, char *message)
++{
+   struct token name = get_token(&message);
+ 
+   int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                                name.text    );
+-  if (item_index_for_name < 0) {
++                                                                name.text);
++  if (item_index_for_name < 0)
++  {
+     respond(rsp, "[!] Subscribe: Item not found '%s'\n", name.text);
+     return;
+   }
+-  struct bar_item* bar_item = g_bar_manager.bar_items[item_index_for_name];
++  struct bar_item *bar_item = g_bar_manager.bar_items[item_index_for_name];
+ 
+   bar_item_parse_subscribe_message(bar_item, message, rsp);
+ }
+ 
+-static void handle_domain_trigger(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_trigger(FILE *rsp, struct token domain, char *message)
++{
+   struct token event = get_token(&message);
+   struct env_vars env_vars;
+   env_vars_init(&env_vars);
+   struct token token = get_token(&message);
+-  while (token.text && token.length > 0) {
++  while (token.text && token.length > 0)
++  {
+     struct key_value_pair key_value_pair = get_key_value_pair(token.text, '=');
+ 
+-    if (key_value_pair.key && key_value_pair.value) {
++    if (key_value_pair.key && key_value_pair.value)
++    {
+       env_vars_set(&env_vars,
+                    string_copy(key_value_pair.key),
+                    string_copy(key_value_pair.value));
+@@ -80,86 +91,110 @@ static void handle_domain_trigger(FILE* rsp, struct token domain, char* message)
+     token = get_token(&message);
+   }
+ 
+-  if (token_equals(event, COMMAND_SUBSCRIBE_SPACE_CHANGE)) {
++  if (token_equals(event, COMMAND_SUBSCRIBE_SPACE_CHANGE))
++  {
+     bar_manager_handle_space_change(&g_bar_manager, true);
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_DISPLAY_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_DISPLAY_CHANGE))
++  {
+     bar_manager_handle_display_change(&g_bar_manager);
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_SPACE_WINDOWS_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_SPACE_WINDOWS_CHANGE))
++  {
+     forced_space_windows_event();
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_VOLUME_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_VOLUME_CHANGE))
++  {
+     forced_volume_event();
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_MEDIA_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_MEDIA_CHANGE))
++  {
+     forced_media_change_event();
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_WIFI_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_WIFI_CHANGE))
++  {
+     forced_network_event();
+-  } else if (token_equals(event, COMMAND_SUBSCRIBE_POWER_SOURCE_CHANGE)) {
++  }
++  else if (token_equals(event, COMMAND_SUBSCRIBE_POWER_SOURCE_CHANGE))
++  {
+     forced_power_event();
+-  } else {
++  }
++  else
++  {
+     bar_manager_custom_events_trigger(&g_bar_manager, event.text, &env_vars);
+   }
+   env_vars_destroy(&env_vars);
+ }
+ 
+-static void handle_domain_push(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_push(FILE *rsp, struct token domain, char *message)
++{
+   struct token name = get_token(&message);
+ 
+   int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                                name.text    );
++                                                                name.text);
+ 
+-  if (item_index_for_name < 0) {
++  if (item_index_for_name < 0)
++  {
+     respond(rsp, "[!] Push: Item '%s' not found\n", name.text);
+     return;
+   }
+-  struct bar_item* bar_item = g_bar_manager.bar_items[item_index_for_name];
+-  if (bar_item->type != BAR_COMPONENT_GRAPH) {
++  struct bar_item *bar_item = g_bar_manager.bar_items[item_index_for_name];
++  if (bar_item->type != BAR_COMPONENT_GRAPH)
++  {
+     respond(rsp, "[!] Push: Item '%s' not a graph\n", name.text);
+     return;
+   }
+   struct token y = get_token(&message);
+-  while (y.text && y.length > 0) {
++  while (y.text && y.length > 0)
++  {
+     graph_push_back(&bar_item->graph, token_to_float(y));
+     y = get_token(&message);
+   }
+   bar_item_needs_update(bar_item);
+ }
+ 
+-static void handle_domain_rename(FILE* rsp, struct token domain, char* message) {
+-  struct token old_name  = get_token(&message);
+-  struct token new_name  = get_token(&message);
++static void handle_domain_rename(FILE *rsp, struct token domain, char *message)
++{
++  struct token old_name = get_token(&message);
++  struct token new_name = get_token(&message);
+   int item_index_for_old_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+                                                                     old_name.text);
+   int item_index_for_new_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+                                                                     new_name.text);
+-  if (item_index_for_old_name < 0 || item_index_for_new_name >= 0) {
++  if (item_index_for_old_name < 0 || item_index_for_new_name >= 0)
++  {
+     respond(rsp, "[!] Rename: Failed to rename item: %s -> %s\n", old_name.text,
+-                                                                  new_name.text);
++            new_name.text);
+     return;
+   }
+   bar_item_set_name(g_bar_manager.bar_items[item_index_for_old_name],
+-                    token_to_string(new_name)                        );
++                    token_to_string(new_name));
+ }
+ 
+-static void handle_domain_clone(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_clone(FILE *rsp, struct token domain, char *message)
++{
+   struct token name = get_token(&message);
+   struct token parent = get_token(&message);
+   struct token modifier = get_token(&message);
+-  struct bar_item* parent_item = NULL;
++  struct bar_item *parent_item = NULL;
+ 
+   int parent_index = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                         parent.text    );
++                                                         parent.text);
+ 
+   if (parent_index >= 0)
+     parent_item = g_bar_manager.bar_items[parent_index];
+-  else {
++  else
++  {
+     respond(rsp, "[!] Clone: Parent Item '%s' not found\n", parent.text);
+     return;
+   }
+ 
+-  if (bar_manager_get_item_index_for_name(&g_bar_manager, name.text) >= 0) {
++  if (bar_manager_get_item_index_for_name(&g_bar_manager, name.text) >= 0)
++  {
+     respond(rsp, "[?] Clone: Item '%s' already exists\n", name.text);
+     return;
+   }
+-  struct bar_item* bar_item = bar_manager_create_item(&g_bar_manager);
++  struct bar_item *bar_item = bar_manager_create_item(&g_bar_manager);
+   bar_item_inherit_from_item(bar_item, parent_item);
+   bar_item_set_name(bar_item, token_to_string(name));
+   if (token_equals(modifier, ARGUMENT_COMMON_VAL_BEFORE))
+@@ -169,114 +204,145 @@ static void handle_domain_clone(FILE* rsp, struct token domain, char* message) {
+   bar_item_needs_update(bar_item);
+ }
+ 
+-static void handle_domain_add(FILE* rsp, struct token domain, char* message) {
+-  struct token command  = get_token(&message);
++static void handle_domain_add(FILE *rsp, struct token domain, char *message)
++{
++  struct token command = get_token(&message);
+ 
+-  if (token_equals(command, COMMAND_ADD_EVENT)) {
++  if (token_equals(command, COMMAND_ADD_EVENT))
++  {
+     struct token event = get_token(&message);
+     if (strlen(message) > 0)
+       custom_events_append(&g_bar_manager.custom_events,
+                            token_to_string(event),
+                            token_to_string(get_token(&message)));
+-    else custom_events_append(&g_bar_manager.custom_events,
+-                              token_to_string(event),
+-                              NULL                         );
++    else
++      custom_events_append(&g_bar_manager.custom_events,
++                           token_to_string(event),
++                           NULL);
+     return;
+   }
+ 
+   struct token name = get_token(&message);
+   struct token position = get_token(&message);
+ 
+-  if (bar_manager_get_item_index_for_name(&g_bar_manager, name.text) >= 0) {
++  if (bar_manager_get_item_index_for_name(&g_bar_manager, name.text) >= 0)
++  {
+     respond(rsp, "[?] Add: Item '%s' already exists\n", name.text);
+     return;
+   }
+-  struct bar_item* bar_item = bar_manager_create_item(&g_bar_manager);
++  struct bar_item *bar_item = bar_manager_create_item(&g_bar_manager);
+ 
+-  if (!bar_item_set_type(bar_item, command.text)) {
++  if (!bar_item_set_type(bar_item, command.text))
++  {
+     respond(rsp, "[?] Add %s: Invalid type '%s', assuming 'item'\n",
+-                 name.text,
+-                 command.text                                           );
++            name.text,
++            command.text);
+   }
+ 
+   if (bar_item->type != BAR_COMPONENT_GROUP &&
+-      !bar_item_set_position(bar_item, position.text)) {
++      !bar_item_set_position(bar_item, position.text))
++  {
+     respond(rsp, "[!] Add %s: Illegal position '%s'\n", name.text,
+-                                                        position.text);
++            position.text);
+     bar_manager_remove_item(&g_bar_manager, bar_item);
+     return;
+   }
+ 
+-  if (!bar_item_set_name(bar_item, token_to_string(name))) {
++  if (!bar_item_set_name(bar_item, token_to_string(name)))
++  {
+     respond(rsp, "[!] Add: Illegal name '%s'\n", name.text);
+     bar_manager_remove_item(&g_bar_manager, bar_item);
+     return;
+   }
+ 
+-  if (token_equals(command, COMMAND_ADD_ITEM)) {
+-  } else if (command.length > 0) {
+-    if (bar_item->type == BAR_COMPONENT_GRAPH) {
++  if (token_equals(command, COMMAND_ADD_ITEM))
++  {
++  }
++  else if (command.length > 0)
++  {
++    if (bar_item->type == BAR_COMPONENT_GRAPH)
++    {
+       struct token width = get_token(&message);
+       graph_setup(&bar_item->graph, token_to_uint32t(width));
+     }
+-    else if (bar_item->type == BAR_COMPONENT_SLIDER) {
++    else if (bar_item->type == BAR_COMPONENT_SLIDER)
++    {
+       struct token width = get_token(&message);
+       slider_setup(&bar_item->slider, token_to_uint32t(width));
+     }
+-    else if (bar_item->type == BAR_COMPONENT_ALIAS) {
+-      char* tmp_name = string_copy(name.text);
++    else if (bar_item->type == BAR_COMPONENT_ALIAS)
++    {
++      char *tmp_name = string_copy(name.text);
+       struct key_value_pair key_value_pair = get_key_value_pair(tmp_name, ',');
+       if (!key_value_pair.key || !key_value_pair.value)
+-        alias_setup(&bar_item->alias, token_to_string(name), NULL);
++        alias_setup(&bar_item->alias, token_to_string(name), NULL, 0);
+       else
++      {
++        struct key_value_pair pid_pair = get_key_value_pair(key_value_pair.value, ',');
++        pid_t p = 0;
++        if (pid_pair.value)
++        {
++          p = strtol(pid_pair.value, NULL, 0);
++        }
+         alias_setup(&bar_item->alias,
+                     string_copy(key_value_pair.key),
+-                    string_copy(key_value_pair.value));
++                    string_copy(key_value_pair.value), p);
++      }
+ 
+       free(tmp_name);
+     }
+-    else if (bar_item->type == BAR_COMPONENT_SLIDER) {
+-      char* tmp_name = string_copy(name.text);
++    else if (bar_item->type == BAR_COMPONENT_SLIDER)
++    {
++      char *tmp_name = string_copy(name.text);
+       struct key_value_pair key_value_pair = get_key_value_pair(tmp_name, ',');
+       if (!key_value_pair.key || !key_value_pair.value)
+-        alias_setup(&bar_item->alias, token_to_string(name), NULL);
++        alias_setup(&bar_item->alias, token_to_string(name), NULL, 0);
+       else
+         alias_setup(&bar_item->alias,
+                     string_copy(key_value_pair.key),
+-                    string_copy(key_value_pair.value));
++                    string_copy(key_value_pair.value), 0);
+ 
+       free(tmp_name);
+     }
+-    else if (bar_item->type == BAR_COMPONENT_GROUP) {
++    else if (bar_item->type == BAR_COMPONENT_GROUP)
++    {
+       struct token member = position;
+       bool first = true;
+-      while (member.text && member.length > 0) {
++      while (member.text && member.length > 0)
++      {
+ 
+         uint32_t count = 0;
+-        struct bar_item** bar_items = NULL;
++        struct bar_item **bar_items = NULL;
+ 
+-        if (member.length > 1 && member.text[0] == REGEX_DELIMITER
+-            && member.text[member.length - 1] == REGEX_DELIMITER  ) {
++        if (member.length > 1 && member.text[0] == REGEX_DELIMITER && member.text[member.length - 1] == REGEX_DELIMITER)
++        {
+           bar_items = get_bar_items_for_regex(member, rsp, &count);
+         }
+-        else {
++        else
++        {
+           int index = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                          member.text    );
++                                                          member.text);
+ 
+-          if (index >= 0) {
+-            bar_items = realloc(bar_items, sizeof(struct bar_item*));
++          if (index >= 0)
++          {
++            bar_items = realloc(bar_items, sizeof(struct bar_item *));
+             bar_items[0] = g_bar_manager.bar_items[index];
+             count = 1;
+           }
+-          else {
++          else
++          {
+             respond(rsp, "[?] Add (Group) %s: Failed to add member '%s', item not found\n", bar_item->name, member.text);
+           }
+         }
+ 
+-        if (bar_items && count > 0) {
+-          for (int i = 0; i < count; i++) {
+-            if (first) {
+-              if (bar_items[i]->position == POSITION_POPUP) {
++        if (bar_items && count > 0)
++        {
++          for (int i = 0; i < count; i++)
++          {
++            if (first)
++            {
++              if (bar_items[i]->position == POSITION_POPUP)
++              {
+                 popup_add_item(&bar_items[i]->parent->popup, bar_item);
+                 bar_item->position = POSITION_POPUP;
+               }
+@@ -285,7 +351,9 @@ static void handle_domain_add(FILE* rsp, struct token domain, char* message) {
+             group_add_member(bar_item->group, bar_items[i]);
+           }
+           free(bar_items);
+-        } else if (first) {
++        }
++        else if (first)
++        {
+           bar_manager_remove_item(&g_bar_manager, bar_item);
+           break;
+         }
+@@ -294,13 +362,16 @@ static void handle_domain_add(FILE* rsp, struct token domain, char* message) {
+     }
+   }
+ 
+-  if (position.text[0] == POSITION_POPUP) {
+-    char* pair = string_copy(position.text);
++  if (position.text[0] == POSITION_POPUP)
++  {
++    char *pair = string_copy(position.text);
+     struct key_value_pair key_value_pair = get_key_value_pair(pair, '.');
+-    if (key_value_pair.key && key_value_pair.value) {
++    if (key_value_pair.key && key_value_pair.value)
++    {
+       int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+                                                                     key_value_pair.value);
+-      if (item_index_for_name < 0) {
++      if (item_index_for_name < 0)
++      {
+         respond(rsp,
+                 "[!] Add (Popup) %s: Item '%s' is not a valid popup host\n",
+                 bar_item->name,
+@@ -310,7 +381,7 @@ static void handle_domain_add(FILE* rsp, struct token domain, char* message) {
+         bar_manager_remove_item(&g_bar_manager, bar_item);
+         return;
+       }
+-      struct bar_item* target_item = g_bar_manager.bar_items[item_index_for_name];
++      struct bar_item *target_item = g_bar_manager.bar_items[item_index_for_name];
+       popup_add_item(&target_item->popup, bar_item);
+     }
+     free(pair);
+@@ -319,68 +390,84 @@ static void handle_domain_add(FILE* rsp, struct token domain, char* message) {
+   bar_item_needs_update(bar_item);
+ }
+ 
+-static void handle_domain_default(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_default(FILE *rsp, struct token domain, char *message)
++{
+   bar_item_parse_set_message(&g_bar_manager.default_item, message, rsp);
+ }
+ 
+-static bool handle_domain_bar(FILE *rsp, struct token domain, char *message) {
+-  struct token command  = get_token(&message);
++static bool handle_domain_bar(FILE *rsp, struct token domain, char *message)
++{
++  struct token command = get_token(&message);
+   bool needs_refresh = false;
+ 
+-  if (token_equals(command, PROPERTY_MARGIN)) {
++  if (token_equals(command, PROPERTY_MARGIN))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_margin,
+             &g_bar_manager,
+             g_bar_manager.margin,
+-            token_to_int(token)    );
+-
+-  } else if (token_equals(command, PROPERTY_YOFFSET)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_YOFFSET))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_y_offset,
+             &g_bar_manager,
+             g_bar_manager.background.y_offset,
+-            token_to_int(token)      );
+-
+-  } else if (token_equals(command, PROPERTY_BLUR_RADIUS)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_BLUR_RADIUS))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_background_blur,
+             &g_bar_manager,
+             g_bar_manager.blur_radius,
+-            token_to_int(token)             );
+-
+-  } else if (token_equals(command, PROPERTY_FONT_SMOOTHING)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_FONT_SMOOTHING))
++  {
+     struct token state = get_token(&message);
+     needs_refresh = bar_manager_set_font_smoothing(&g_bar_manager,
+                                                    evaluate_boolean_state(state,
+                                                                           g_bar_manager.font_smoothing));
+-  } else if (token_equals(command, PROPERTY_SHADOW)) {
++  }
++  else if (token_equals(command, PROPERTY_SHADOW))
++  {
+     struct token state = get_token(&message);
+     needs_refresh = bar_manager_set_shadow(&g_bar_manager,
+                                            evaluate_boolean_state(state,
+                                                                   g_bar_manager.shadow));
+-  } else if (token_equals(command, PROPERTY_NOTCH_WIDTH)) {
++  }
++  else if (token_equals(command, PROPERTY_NOTCH_WIDTH))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_notch_width,
+             &g_bar_manager,
+             g_bar_manager.notch_width,
+-            token_to_int(token)         );
+-
+-  } else if (token_equals(command, PROPERTY_NOTCH_OFFSET)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_NOTCH_OFFSET))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_notch_offset,
+             &g_bar_manager,
+             g_bar_manager.notch_offset,
+-            token_to_int(token)         );
+-  } else if (token_equals(command, PROPERTY_NOTCH_DISPLAY_HEIGHT)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_NOTCH_DISPLAY_HEIGHT))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_notch_display_height,
+             &g_bar_manager,
+             g_bar_manager.notch_display_height,
+-            token_to_int(token)         );
+-  } else if (token_equals(command, PROPERTY_HIDDEN)) {
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_HIDDEN))
++  {
+     struct token state = get_token(&message);
+     uint32_t adid = 0;
+-    if (token_equals(state, "current")) {
++    if (token_equals(state, "current"))
++    {
+       adid = display_active_display_adid();
+ 
+       if (adid > 0 && adid <= g_bar_manager.bar_count)
+@@ -389,87 +476,115 @@ static bool handle_domain_bar(FILE *rsp, struct token domain, char *message) {
+                                                !g_bar_manager.bars[adid - 1]->hidden);
+       else
+         printf("No bar on display %u \n", adid);
+-    } else needs_refresh = bar_manager_set_hidden(&g_bar_manager,
+-                                                  adid,
+-                                                  evaluate_boolean_state(state,
+-                                                                         g_bar_manager.any_bar_hidden));
+-  } else if (token_equals(command, PROPERTY_TOPMOST)) {
++    }
++    else
++      needs_refresh = bar_manager_set_hidden(&g_bar_manager,
++                                             adid,
++                                             evaluate_boolean_state(state,
++                                                                    g_bar_manager.any_bar_hidden));
++  }
++  else if (token_equals(command, PROPERTY_TOPMOST))
++  {
+     struct token token = get_token(&message);
+-    if (token_equals(token, ARGUMENT_WINDOW)) {
++    if (token_equals(token, ARGUMENT_WINDOW))
++    {
+       needs_refresh = bar_manager_set_topmost(&g_bar_manager,
+                                               TOPMOST_LEVEL_WINDOW,
+-                                              true                 );
+-    } else {
++                                              true);
++    }
++    else
++    {
+       needs_refresh = bar_manager_set_topmost(&g_bar_manager,
+                                               TOPMOST_LEVEL_ALL,
+                                               evaluate_boolean_state(token,
+                                                                      g_bar_manager.topmost));
+     }
+-  } else if (token_equals(command, PROPERTY_STICKY)) {
++  }
++  else if (token_equals(command, PROPERTY_STICKY))
++  {
+     struct token token = get_token(&message);
+     needs_refresh = bar_manager_set_sticky(&g_bar_manager,
+                                            evaluate_boolean_state(token,
+                                                                   g_bar_manager.sticky));
+-  } else if (token_equals(command, PROPERTY_DISPLAY)) {
++  }
++  else if (token_equals(command, PROPERTY_DISPLAY))
++  {
+     struct token display = get_token(&message);
+ 
+     uint32_t display_pattern = 0;
+     uint32_t count;
+-    char** list = token_split(display, ',', &count);
+-    if (list && count > 0) {
+-      for (int i = 0; i < count; i++) {
+-        if (strcmp(list[i], ARGUMENT_DISPLAY_ALL) == 0) {
++    char **list = token_split(display, ',', &count);
++    if (list && count > 0)
++    {
++      for (int i = 0; i < count; i++)
++      {
++        if (strcmp(list[i], ARGUMENT_DISPLAY_ALL) == 0)
++        {
+           display_pattern = DISPLAY_ALL_PATTERN;
+-        } else if (strcmp(list[i], ARGUMENT_DISPLAY_MAIN) == 0) {
++        }
++        else if (strcmp(list[i], ARGUMENT_DISPLAY_MAIN) == 0)
++        {
+           display_pattern = DISPLAY_MAIN_PATTERN;
+         }
+-        else {
++        else
++        {
+           display_pattern |= 1 << (strtoul(list[i], NULL, 0) - 1);
+         }
+       }
+       free(list);
+     }
+     needs_refresh = bar_manager_set_displays(&g_bar_manager, display_pattern);
+-  } else if (token_equals(command, PROPERTY_POSITION)) {
++  }
++  else if (token_equals(command, PROPERTY_POSITION))
++  {
+     struct token position = get_token(&message);
+     if (position.length > 0)
+       needs_refresh = bar_manager_set_position(&g_bar_manager, position.text[0]);
+-  } else if (token_equals(command, PROPERTY_CLIP)) {
++  }
++  else if (token_equals(command, PROPERTY_CLIP))
++  {
+     respond(rsp, "[!] Bar: Invalid property 'clip'\n");
+-  } else if (token_equals(command, PROPERTY_HEIGHT)) {
++  }
++  else if (token_equals(command, PROPERTY_HEIGHT))
++  {
+     struct token token = get_token(&message);
+     ANIMATE(bar_manager_set_bar_height,
+             &g_bar_manager,
+             g_bar_manager.background.bounds.size.height,
+-            token_to_int(token)                         );
+-  } else if (token_equals(command, PROPERTY_SHOW_IN_FULLSCREEN)) {
+-      struct token token = get_token(&message);
++            token_to_int(token));
++  }
++  else if (token_equals(command, PROPERTY_SHOW_IN_FULLSCREEN))
++  {
++    struct token token = get_token(&message);
+ 
+-      needs_refresh = bar_manager_set_show_in_fullscreen(&g_bar_manager,
+-          evaluate_boolean_state(token, g_bar_manager.show_in_fullscreen));
+-  } else
++    needs_refresh = bar_manager_set_show_in_fullscreen(&g_bar_manager,
++                                                       evaluate_boolean_state(token, g_bar_manager.show_in_fullscreen));
++  }
++  else
+     needs_refresh = background_parse_sub_domain(&g_bar_manager.background, rsp, command, message);
+ 
+   return needs_refresh;
+ }
+ 
+-static char* reformat_batch_key_value_pair(struct token token) {
++static char *reformat_batch_key_value_pair(struct token token)
++{
+   struct key_value_pair key_value_pair = get_key_value_pair(token.text, '=');
+-  if (!key_value_pair.key) return NULL;
+-  char* rbr_msg = malloc((strlen(key_value_pair.key) + (key_value_pair.value
+-                                                        ? strlen(key_value_pair.value)
+-                                                        : 0)
+-                          + 3) * sizeof(char)                                         );
++  if (!key_value_pair.key)
++    return NULL;
++  char *rbr_msg = malloc((strlen(key_value_pair.key) + (key_value_pair.value ? strlen(key_value_pair.value) : 0) + 3) * sizeof(char));
+ 
+   pack_key_value_pair(rbr_msg, &key_value_pair);
+   return rbr_msg;
+ }
+ 
+-static char* get_batch_line(char** message) {
+-  char* cursor = *message;
++static char *get_batch_line(char **message)
++{
++  char *cursor = *message;
+   bool end_of_batch = false;
+-  while (true) {
+-    if (*cursor == '\0' && *(cursor + 1) == '\0') {
++  while (true)
++  {
++    if (*cursor == '\0' && *(cursor + 1) == '\0')
++    {
+       end_of_batch = true;
+       break;
+     }
+@@ -479,41 +594,59 @@ static char* get_batch_line(char** message) {
+ 
+     cursor++;
+   }
+-  char* rbr_msg = malloc(sizeof(char) * (cursor - *message + 2));
++  char *rbr_msg = malloc(sizeof(char) * (cursor - *message + 2));
+   memcpy(rbr_msg, *message, sizeof(char) * (cursor - *message + 1));
+   *(rbr_msg + (cursor - *message + 1)) = '\0';
+-  if (end_of_batch) *message = cursor;
+-  else *message = cursor + 1;
++  if (end_of_batch)
++    *message = cursor;
++  else
++    *message = cursor + 1;
+   return rbr_msg;
+ }
+ 
+-static void handle_domain_query(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_query(FILE *rsp, struct token domain, char *message)
++{
+   struct token token = get_token(&message);
+ 
+-  if (token_equals(token, COMMAND_QUERY_DEFAULT_ITEMS)) {
++  if (token_equals(token, COMMAND_QUERY_DEFAULT_ITEMS))
++  {
+     print_all_menu_items(rsp);
+-  } else if (token_equals(token, COMMAND_QUERY_ITEM)) {
+-    struct token name  = get_token(&message);
++  }
++  else if (token_equals(token, COMMAND_QUERY_ITEM))
++  {
++    struct token name = get_token(&message);
+     int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                                  name.text      );
+-    if (item_index_for_name < 0) {
++                                                                  name.text);
++    if (item_index_for_name < 0)
++    {
+       respond(rsp, "[!] Query: Item '%s' not found\n", name.text);
+       return;
+     }
+     bar_item_serialize(g_bar_manager.bar_items[item_index_for_name], rsp);
+-  } else if (token_equals(token, COMMAND_QUERY_BAR)) {
++  }
++  else if (token_equals(token, COMMAND_QUERY_BAR))
++  {
+     bar_manager_serialize(&g_bar_manager, rsp);
+-  } else if (token_equals(token, COMMAND_QUERY_DEFAULTS)) {
++  }
++  else if (token_equals(token, COMMAND_QUERY_DEFAULTS))
++  {
+     bar_item_serialize(&g_bar_manager.default_item, rsp);
+-  } else if (token_equals(token, COMMAND_QUERY_EVENTS)) {
++  }
++  else if (token_equals(token, COMMAND_QUERY_EVENTS))
++  {
+     custom_events_serialize(&g_bar_manager.custom_events, rsp);
+-  } else if (token_equals(token, COMMAND_QUERY_DISPLAYS)) {
++  }
++  else if (token_equals(token, COMMAND_QUERY_DISPLAYS))
++  {
+     display_serialize(rsp);
+-  } else {
++  }
++  else
++  {
+     struct token name = token;
+     int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                                  name.text      );
+-    if (item_index_for_name < 0) {
++                                                                  name.text);
++    if (item_index_for_name < 0)
++    {
+       respond(rsp, "[!] Query: Invalid query, or item '%s' not found \n", name.text);
+       return;
+     }
+@@ -521,45 +654,53 @@ static void handle_domain_query(FILE* rsp, struct token domain, char* message) {
+   }
+ }
+ 
+-static void handle_domain_remove(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_remove(FILE *rsp, struct token domain, char *message)
++{
+   struct token name = get_token(&message);
+   uint32_t count = 0;
+-  struct bar_item** bar_items = NULL;
++  struct bar_item **bar_items = NULL;
+ 
+-  if (name.length > 1 && name.text[0] == REGEX_DELIMITER
+-      && name.text[name.length - 1] == REGEX_DELIMITER  ) {
++  if (name.length > 1 && name.text[0] == REGEX_DELIMITER && name.text[name.length - 1] == REGEX_DELIMITER)
++  {
+     bar_items = get_bar_items_for_regex(name, rsp, &count);
+   }
+-  else {
++  else
++  {
+     int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager,
+-                                                                  name.text      );
+-    if (item_index_for_name < 0) {
++                                                                  name.text);
++    if (item_index_for_name < 0)
++    {
+       respond(rsp, "[!] Remove: Item '%s' not found\n", name.text);
+       return;
+     }
+-    bar_items = realloc(bar_items, sizeof(struct bar_item*));
++    bar_items = realloc(bar_items, sizeof(struct bar_item *));
+     bar_items[0] = g_bar_manager.bar_items[item_index_for_name];
+     count = 1;
+   }
+-  if (!bar_items || count == 0) return;
++  if (!bar_items || count == 0)
++    return;
+ 
+-  for (int i = 0; i < count; i++) {
++  for (int i = 0; i < count; i++)
++  {
+     bar_manager_remove_item(&g_bar_manager, bar_items[i]);
+   }
+ 
+-  if (bar_items) free(bar_items);
++  if (bar_items)
++    free(bar_items);
+ }
+ 
+-static void handle_domain_move(FILE* rsp, struct token domain, char* message) {
++static void handle_domain_move(FILE *rsp, struct token domain, char *message)
++{
+   struct token name = get_token(&message);
+   struct token direction = get_token(&message);
+   struct token reference = get_token(&message);
+ 
+   int item_index = bar_manager_get_item_index_for_name(&g_bar_manager, name.text);
+   int reference_item_index = bar_manager_get_item_index_for_name(&g_bar_manager, reference.text);
+-  if (item_index < 0 || reference_item_index < 0) {
+-      respond(rsp, "[!] Move: Item '%s' or '%s' not found\n", name.text, reference.text);
+-      return;
++  if (item_index < 0 || reference_item_index < 0)
++  {
++    respond(rsp, "[!] Move: Item '%s' or '%s' not found\n", name.text, reference.text);
++    return;
+   }
+ 
+   bar_manager_move_item(&g_bar_manager,
+@@ -570,15 +711,18 @@ static void handle_domain_move(FILE* rsp, struct token domain, char* message) {
+   bar_item_needs_update(g_bar_manager.bar_items[item_index]);
+ }
+ 
+-static void handle_domain_order(FILE* rsp, struct token domain, char* message) {
+-  struct bar_item* ordering[g_bar_manager.bar_item_count];
+-  memset(ordering, 0, sizeof(struct bar_item*)*g_bar_manager.bar_item_count);
++static void handle_domain_order(FILE *rsp, struct token domain, char *message)
++{
++  struct bar_item *ordering[g_bar_manager.bar_item_count];
++  memset(ordering, 0, sizeof(struct bar_item *) * g_bar_manager.bar_item_count);
+ 
+   uint32_t count = 0;
+   struct token name = get_token(&message);
+-  while (name.text && name.length > 0) {
++  while (name.text && name.length > 0)
++  {
+     int index = bar_manager_get_item_index_for_name(&g_bar_manager, name.text);
+-    if (index < 0) {
++    if (index < 0)
++    {
+       respond(rsp, "[!] Order: Item '%s' not found\n", name.text);
+       name = get_token(&message);
+       continue;
+@@ -593,12 +737,14 @@ static void handle_domain_order(FILE* rsp, struct token domain, char* message) {
+   bar_manager_refresh(&g_bar_manager, false, false);
+ }
+ 
+-void handle_message_mach(struct mach_buffer* buffer) {
+-  if (!buffer->message.descriptor.address) return;
+-  char* message = buffer->message.descriptor.address;
+-  char* response = NULL;
++void handle_message_mach(struct mach_buffer *buffer)
++{
++  if (!buffer->message.descriptor.address)
++    return;
++  char *message = buffer->message.descriptor.address;
++  char *response = NULL;
+   size_t length = 0;
+-  FILE* rsp = open_memstream(&response, &length);
++  FILE *rsp = open_memstream(&response, &length);
+   fprintf(rsp, "");
+ 
+   g_bar_manager.animator.interp_function = '\0';
+@@ -607,157 +753,223 @@ void handle_message_mach(struct mach_buffer* buffer) {
+   struct token command = get_token(&message);
+   bool bar_needs_refresh = false;
+ 
+-  while (command.text && command.length > 0) {
+-    if (token_equals(command, DOMAIN_SET)) {
++  while (command.text && command.length > 0)
++  {
++    if (token_equals(command, DOMAIN_SET))
++    {
+       struct token name = get_token(&message);
+       uint32_t count = 0;
+-      struct bar_item** bar_items = NULL;
++      struct bar_item **bar_items = NULL;
+ 
+-      if (name.length > 1 && name.text[0] == REGEX_DELIMITER
+-          && name.text[name.length - 1] == REGEX_DELIMITER  ) {
++      if (name.length > 1 && name.text[0] == REGEX_DELIMITER && name.text[name.length - 1] == REGEX_DELIMITER)
++      {
+         bar_items = get_bar_items_for_regex(name, rsp, &count);
+       }
+-      else {
++      else
++      {
+         int item_index_for_name = bar_manager_get_item_index_for_name(&g_bar_manager, name.text);
+-        if (item_index_for_name < 0) {
++        if (item_index_for_name < 0)
++        {
+           respond(rsp, "[!] Set: Item not found '%s'\n", name.text);
+-        } else {
+-          bar_items = realloc(bar_items, sizeof(struct bar_item*));
++        }
++        else
++        {
++          bar_items = realloc(bar_items, sizeof(struct bar_item *));
+           bar_items[0] = g_bar_manager.bar_items[item_index_for_name];
+           count = 1;
+         }
+       }
+-      if (!bar_items || count == 0) {
+-        char* rest = get_batch_line(&message);
++      if (!bar_items || count == 0)
++      {
++        char *rest = get_batch_line(&message);
+         free(rest);
+-      } else {
++      }
++      else
++      {
+         struct token token = get_token(&message);
+-        while (token.text && token.length > 0) {
+-          for (int i = 0; i < count; i++) {
++        while (token.text && token.length > 0)
++        {
++          for (int i = 0; i < count; i++)
++          {
+             struct token tmp = {string_copy(token.text), token.length};
+-            char* rbr_msg = reformat_batch_key_value_pair(tmp);
++            char *rbr_msg = reformat_batch_key_value_pair(tmp);
+             free(tmp.text);
+-            if (!rbr_msg) {
++            if (!rbr_msg)
++            {
+               respond(rsp, "[!] Set (%s): Expected <key>=<value> pair, but got: '%s'\n", bar_items[i]->name, token.text);
+               break;
+             }
+             bar_item_parse_set_message(bar_items[i], rbr_msg, rsp);
+             free(rbr_msg);
+           }
+-          if (message && *message == '-') break;
++          if (message && *message == '-')
++            break;
+           token = get_token(&message);
+         }
+         free(bar_items);
+       }
+-    } else if (token_equals(command, DOMAIN_DEFAULT)) {
++    }
++    else if (token_equals(command, DOMAIN_DEFAULT))
++    {
+       struct token token = get_token(&message);
+-      while (token.text && token.length > 0) {
+-        char* rbr_msg = reformat_batch_key_value_pair(token);
+-          if (!rbr_msg) {
+-            respond(rsp, "[!] Set (default): Expected <key>=<value> pair, but got: '%s'\n", token.text);
+-            break;
+-          }
++      while (token.text && token.length > 0)
++      {
++        char *rbr_msg = reformat_batch_key_value_pair(token);
++        if (!rbr_msg)
++        {
++          respond(rsp, "[!] Set (default): Expected <key>=<value> pair, but got: '%s'\n", token.text);
++          break;
++        }
+         handle_domain_default(rsp, command, rbr_msg);
+         free(rbr_msg);
+-        if (message && *message == '-') break;
++        if (message && *message == '-')
++          break;
+         token = get_token(&message);
+       }
+-    } else if (token_equals(command, DOMAIN_ANIMATE)) {
++    }
++    else if (token_equals(command, DOMAIN_ANIMATE))
++    {
+       g_bar_manager.animator.interp_function = get_token(&message).text[0];
+       g_bar_manager.animator.duration = token_to_uint32t(get_token(&message));
+-    } else if (token_equals(command, DOMAIN_BAR)) {
++    }
++    else if (token_equals(command, DOMAIN_BAR))
++    {
+       struct token token = get_token(&message);
+-      while (token.text && token.length > 0) {
+-        char* rbr_msg = reformat_batch_key_value_pair(token);
+-        if (!rbr_msg) {
++      while (token.text && token.length > 0)
++      {
++        char *rbr_msg = reformat_batch_key_value_pair(token);
++        if (!rbr_msg)
++        {
+           respond(rsp, "[!] Bar: Expected <key>=<value> pair, but got: '%s'\n", token.text);
+           break;
+         }
+         bar_needs_refresh |= handle_domain_bar(rsp, command, rbr_msg);
+         free(rbr_msg);
+-        if (message && *message == '-') break;
++        if (message && *message == '-')
++          break;
+         token = get_token(&message);
+       }
+-    } else if (token_equals(command, DOMAIN_ADD)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_ADD))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_add(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_CLONE)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_CLONE))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_clone(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_SUBSCRIBE)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_SUBSCRIBE))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_subscribe(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_PUSH)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_PUSH))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_push(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_UPDATE)) {
++    }
++    else if (token_equals(command, DOMAIN_UPDATE))
++    {
+       bar_manager_update(&g_bar_manager, true);
+       bar_needs_refresh = true;
+-    } else if (token_equals(command, DOMAIN_TRIGGER)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_TRIGGER))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_trigger(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_QUERY)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_QUERY))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_query(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_REORDER)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_REORDER))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_order(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_MOVE)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_MOVE))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_move(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_REMOVE)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_REMOVE))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_remove(rsp, command, rbr_msg);
+       bar_needs_refresh = true;
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_RENAME)) {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else if (token_equals(command, DOMAIN_RENAME))
++    {
++      char *rbr_msg = get_batch_line(&message);
+       handle_domain_rename(rsp, command, rbr_msg);
+       free(rbr_msg);
+-    } else if (token_equals(command, DOMAIN_EXIT)) {
++    }
++    else if (token_equals(command, DOMAIN_EXIT))
++    {
+       bar_manager_destroy(&g_bar_manager);
+       exit(0);
+-    } else if (token_equals(command, DOMAIN_HOTLOAD)) {
++    }
++    else if (token_equals(command, DOMAIN_HOTLOAD))
++    {
+       struct token token = get_token(&message);
+       hotload_set_state(evaluate_boolean_state(token, hotload_get_state()));
+-    } else if (token_equals(command, DOMAIN_ADD_FONT)) {
++    }
++    else if (token_equals(command, DOMAIN_ADD_FONT))
++    {
+       struct token token = get_token(&message);
+       font_register(token_to_string(token));
+-    } else if (token_equals(command, DOMAIN_RELOAD)) {
+-      char* rbr_msg = get_batch_line(&message);
+-      char* cur = rbr_msg;
++    }
++    else if (token_equals(command, DOMAIN_RELOAD))
++    {
++      char *rbr_msg = get_batch_line(&message);
++      char *cur = rbr_msg;
+       struct token token = get_token(&cur);
+ 
+       bool reload = false;
+-      if (token.length > 0 && token.text) {
+-        if (!set_config_file_path(token.text)) {
++      if (token.length > 0 && token.text)
++      {
++        if (!set_config_file_path(token.text))
++        {
+           respond(rsp, "[?] Reload: Invalid config path '%s'\n", token.text);
+-        } else reload = true;
+-      } else reload = true;
++        }
++        else
++          reload = true;
++      }
++      else
++        reload = true;
+       free(rbr_msg);
+ 
+-      if (reload) {
+-        struct event event = { NULL, HOTLOAD };
++      if (reload)
++      {
++        struct event event = {NULL, HOTLOAD};
+         event_post(&event);
+       }
+-    } else {
+-      char* rbr_msg = get_batch_line(&message);
++    }
++    else
++    {
++      char *rbr_msg = get_batch_line(&message);
+       respond(rsp, "[!] Unknown domain '%s'\n", command.text);
+       free(rbr_msg);
+     }
+     command = get_token(&message);
+   }
+ 
+-  if (bar_needs_refresh) {
+-    if (g_bar_manager.bar_needs_resize) bar_manager_resize(&g_bar_manager);
++  if (bar_needs_refresh)
++  {
++    if (g_bar_manager.bar_needs_resize)
++      bar_manager_resize(&g_bar_manager);
+ 
+     g_bar_manager.bar_needs_update = true;
+   }
+@@ -766,16 +978,19 @@ void handle_message_mach(struct mach_buffer* buffer) {
+   bar_manager_unfreeze(&g_bar_manager);
+   bar_manager_refresh(&g_bar_manager, false, false);
+ 
+-  if (rsp) fclose(rsp);
++  if (rsp)
++    fclose(rsp);
+ 
+   response[length] = '\0';
+   mach_send_message(buffer->message.header.msgh_remote_port, response,
+-                                                             length + 1,
+-                                                             false      );
+-  if (response) free(response);
++                    length + 1,
++                    false);
++  if (response)
++    free(response);
+ }
+ 
+-MACH_HANDLER(mach_message_handler) {
+-  struct event event = { message, MACH_MESSAGE };
++MACH_HANDLER(mach_message_handler)
++{
++  struct event event = {message, MACH_MESSAGE};
+   event_post(&event);
+ }
+diff --git a/src/misc/env_vars.h b/src/misc/env_vars.h
+index 18cba6f..4b75cd8 100644
+--- a/src/misc/env_vars.h
++++ b/src/misc/env_vars.h
+@@ -8,6 +8,9 @@ struct key_value_pair {
+   char* value;
+ };
+ 
++
++
++
+ struct env_vars {
+   uint32_t count;
+   struct key_value_pair** vars;
+diff --git a/src/source_pid.h b/src/source_pid.h
+new file mode 100644
+index 0000000..a746901
+--- /dev/null
++++ b/src/source_pid.h
+@@ -0,0 +1,61 @@
++#pragma once
++#include <ApplicationServices/ApplicationServices.h>
++#include <CoreFoundation/CoreFoundation.h>
++#include <stdbool.h>
++
++// In macOS 26 (Tahoe), menu bar item windows are owned by Control Center
++// instead of their source applications. This module provides functions to
++// find the actual source PID using the Accessibility API.
++
++// Check if we're running on macOS 26 or later where this workaround is needed
++bool source_pid_needs_workaround(void);
++
++// Get the source PID for a menu bar item window by matching its bounds
++// to accessibility elements in running applications' extras menu bars.
++// Returns 0 if the source PID cannot be determined.
++pid_t source_pid_for_window(CGRect window_bounds);
++
++// Get the source application name for a menu bar item window.
++// Returns NULL if not found. Caller must free the returned string.
++char *source_name_for_window(CGRect window_bounds);
++
++// Resolve source pid and source app name in a single lookup pass.
++// Returns 0 if not found. Caller must free out_name when non-NULL.
++pid_t source_pid_for_window_with_name(CGRect window_bounds, char **out_name);
++
++// Resolve source pid and source app name using optional menu item name hint.
++// Returns 0 if not found. Caller must free out_name when non-NULL.
++pid_t source_pid_for_window_with_name_hint(CGRect window_bounds,
++                                           const char *item_name,
++                                           char **out_name);
++
++// Derive the menu bar window bounds for a specific running application pid and
++// item name directly from its AX extras menu bar.
++bool source_window_bounds_for_pid(pid_t pid,
++                                  const char *name,
++                                  CGRect *out_bounds);
++
++// Initialize the source PID cache (call once at startup)
++void source_pid_cache_init(void);
++
++// Refresh the cached running applications list
++void source_pid_cache_refresh(void);
++
++// Request required permissions (Accessibility + Screen Recording)
++// for Tahoe workaround flows. Returns true when Accessibility is trusted.
++bool source_pid_request_permissions(void);
++
++// Menu item descriptor for enumeration
++typedef struct
++{
++    char *owner; // Application name (caller must free)
++    char *name;  // Menu item title (caller must free)
++    pid_t pid;   // Application process ID
++    float x_pos; // X position on menu bar (for sorting)
++} source_menu_item_t;
++
++// Enumerate all menu bar items across all running applications.
++// Returns dynamically allocated array of menu items; caller must free each item's
++// owner/name strings, and free the array itself.
++// Returns NULL if items is NULL or on error.
++int source_pid_enumerate_menu_items(source_menu_item_t **out_items);
+diff --git a/src/source_pid.m b/src/source_pid.m
+new file mode 100644
+index 0000000..37ed36c
+--- /dev/null
++++ b/src/source_pid.m
+@@ -0,0 +1,739 @@
++#include "source_pid.h"
++#include "misc/helpers.h"
++#include <AppKit/AppKit.h>
++#include <libproc.h>
++#include <pthread.h>
++#include <math.h>
++
++// The Accessibility API attribute for the extras menu bar (status items area)
++// This is documented in Apple's Accessibility Programming Guide
++#define kAXExtrasMenuBarAttribute CFSTR("AXExtrasMenuBar")
++
++// Older SDKs may not expose this symbol even though AX supports it at runtime.
++#ifndef kAXFrameAttribute
++#define kAXFrameAttribute CFSTR("AXFrame")
++#endif
++
++// Cache for running applications and their extras menu bars
++typedef struct {
++    pid_t pid;
++    char* name;
++    AXUIElementRef app_element;
++    AXUIElementRef extras_menu_bar;
++    bool has_extras_menu_bar;
++} cached_app_t;
++
++// Fast lookup cache: maps window bounds to (pid, app_name, menu_item_name)
++typedef struct {
++    CGRect bounds;
++    pid_t pid;
++    char* app_name;      // pointing to cached_app_t->name, do NOT free
++    char* menu_item_name; // owned by this cache entry, must free
++} bounds_cache_entry_t;
++
++static cached_app_t* g_cached_apps = NULL;
++static int g_cached_apps_count = 0;
++static bounds_cache_entry_t* g_bounds_cache = NULL;
++static int g_bounds_cache_count = 0;
++static uint64_t g_bounds_cache_refresh_time = 0;
++static pthread_mutex_t g_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
++static bool g_initialized = false;
++static uint64_t g_last_refresh_time = 0;
++static const uint64_t CACHE_REFRESH_INTERVAL_NS = 5000000000ULL; // 5 seconds in nanoseconds
++
++static void free_bounds_cache(void) {
++    if (!g_bounds_cache) {
++        g_bounds_cache_count = 0;
++        g_bounds_cache_refresh_time = 0;
++        return;
++    }
++
++    for (int i = 0; i < g_bounds_cache_count; i++) {
++        if (g_bounds_cache[i].menu_item_name) {
++            free(g_bounds_cache[i].menu_item_name);
++        }
++    }
++
++    free(g_bounds_cache);
++    g_bounds_cache = NULL;
++    g_bounds_cache_count = 0;
++    g_bounds_cache_refresh_time = 0;
++}
++
++// Helper to calculate distance between two points
++static double point_distance(CGPoint a, CGPoint b) {
++    double dx = a.x - b.x;
++    double dy = a.y - b.y;
++    return sqrt(dx * dx + dy * dy);
++}
++
++// Helper to get the center of a rect
++static CGPoint rect_center(CGRect rect) {
++    return CGPointMake(rect.origin.x + rect.size.width / 2.0,
++                       rect.origin.y + rect.size.height / 2.0);
++}
++
++static char *copy_process_name_for_pid(pid_t pid)
++{
++    if (pid <= 0)
++    {
++        return NULL;
++    }
++
++    NSRunningApplication *app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
++    if (app.localizedName)
++    {
++        return strdup([app.localizedName UTF8String]);
++    }
++
++    char buffer[PROC_PIDPATHINFO_MAXSIZE] = "";
++    if (proc_name(pid, buffer, sizeof(buffer)) > 0)
++    {
++        return strdup(buffer);
++    }
++
++    return NULL;
++}
++
++bool source_pid_needs_workaround(void) {
++    // macOS Tahoe (26.x) changed menu bar item ownership to Control Center
++    // Check at runtime using NSProcessInfo
++    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
++    // macOS Tahoe is version 26.x
++    return version.majorVersion >= 26;
++}
++
++bool source_pid_request_permissions(void) {
++    if (!source_pid_needs_workaround()) {
++        return true;
++    }
++
++#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 110000
++    if (__builtin_available(macOS 11.0, *)) {
++        // Trigger Screen Recording prompt when needed.
++        CGRequestScreenCaptureAccess();
++    }
++#endif
++
++    // Trigger Accessibility prompt when needed.
++    const void* keys[] = { kAXTrustedCheckOptionPrompt };
++    const void* values[] = { kCFBooleanTrue };
++    CFDictionaryRef options = CFDictionaryCreate(kCFAllocatorDefault,
++                                                 keys,
++                                                 values,
++                                                 1,
++                                                 &kCFCopyStringDictionaryKeyCallBacks,
++                                                 &kCFTypeDictionaryValueCallBacks);
++
++    bool trusted = AXIsProcessTrustedWithOptions(options);
++    CFRelease(options);
++    return trusted;
++}
++
++void source_pid_cache_init(void) {
++    if (g_initialized) return;
++    g_initialized = true;
++    source_pid_cache_refresh();
++}
++
++static void free_cached_app(cached_app_t* app) {
++    if (app->name) {
++        free(app->name);
++        app->name = NULL;
++    }
++    if (app->extras_menu_bar) {
++        CFRelease(app->extras_menu_bar);
++        app->extras_menu_bar = NULL;
++    }
++    if (app->app_element) {
++        CFRelease(app->app_element);
++        app->app_element = NULL;
++    }
++}
++
++void source_pid_cache_refresh(void) {
++    // Throttle refreshes to avoid performance issues
++    uint64_t now = clock_gettime_nsec_np(CLOCK_MONOTONIC);
++
++    pthread_mutex_lock(&g_cache_mutex);
++
++    // Check throttle inside the lock to avoid race conditions
++    if (g_last_refresh_time > 0 && (now - g_last_refresh_time) < CACHE_REFRESH_INTERVAL_NS) {
++        pthread_mutex_unlock(&g_cache_mutex);
++        return; // Skip refresh if we refreshed recently
++    }
++
++    g_last_refresh_time = now;
++
++    // Free existing cache
++    if (g_cached_apps) {
++        for (int i = 0; i < g_cached_apps_count; i++) {
++            free_cached_app(&g_cached_apps[i]);
++        }
++        free(g_cached_apps);
++        g_cached_apps = NULL;
++        g_cached_apps_count = 0;
++    }
++    free_bounds_cache();
++
++    // Get list of running applications
++    NSArray* running_apps = [[NSWorkspace sharedWorkspace] runningApplications];
++    g_cached_apps_count = (int)[running_apps count];
++    g_cached_apps = calloc(g_cached_apps_count, sizeof(cached_app_t));
++
++    int actual_count = 0;
++    for (NSRunningApplication* app in running_apps) {
++
++        pid_t pid = app.processIdentifier;
++
++        cached_app_t* cached = &g_cached_apps[actual_count];
++        cached->pid = pid;
++        cached->name = app.localizedName ? strdup([app.localizedName UTF8String]) : NULL;
++        cached->app_element = AXUIElementCreateApplication(pid);
++        cached->extras_menu_bar = NULL;
++        cached->has_extras_menu_bar = false;
++
++        actual_count++;
++    }
++    g_cached_apps_count = actual_count;
++
++    pthread_mutex_unlock(&g_cache_mutex);
++}
++
++// Try to get the extras menu bar for an application (lazy initialization)
++static AXUIElementRef get_extras_menu_bar(cached_app_t* app) {
++    if (app->extras_menu_bar) {
++        return app->extras_menu_bar;
++    }
++
++    if (app->has_extras_menu_bar == false && app->app_element == NULL) {
++        return NULL;
++    }
++
++    // Check if accessibility is trusted
++    if (!AXIsProcessTrusted()) {
++        return NULL;
++    }
++
++    // Try to get the extras menu bar attribute
++    AXUIElementRef extras_bar = NULL;
++    AXError error = AXUIElementCopyAttributeValue(app->app_element,
++                                                   kAXExtrasMenuBarAttribute,
++                                                   (CFTypeRef*)&extras_bar);
++
++    if (error == kAXErrorSuccess && extras_bar) {
++        app->extras_menu_bar = extras_bar;
++        app->has_extras_menu_bar = true;
++        return extras_bar;
++    }
++
++    // Mark that we've tried and failed
++    app->has_extras_menu_bar = false;
++    return NULL;
++}
++
++// Get the frame of an accessibility element
++static bool get_ax_frame(AXUIElementRef element, CGRect* out_frame) {
++    AXValueRef position_value = NULL;
++    AXValueRef size_value = NULL;
++    CGPoint position;
++    CGSize size;
++
++    AXError err = AXUIElementCopyAttributeValue(element, kAXPositionAttribute,
++                                                 (CFTypeRef*)&position_value);
++    if (err != kAXErrorSuccess || !position_value) {
++        return false;
++    }
++
++    err = AXUIElementCopyAttributeValue(element, kAXSizeAttribute,
++                                         (CFTypeRef*)&size_value);
++    if (err != kAXErrorSuccess || !size_value) {
++        CFRelease(position_value);
++        return false;
++    }
++
++    bool success = false;
++    if (AXValueGetValue(position_value, kAXValueCGPointType, &position) &&
++        AXValueGetValue(size_value, kAXValueCGSizeType, &size)) {
++        out_frame->origin = position;
++        out_frame->size = size;
++        success = true;
++    }
++
++    CFRelease(position_value);
++    CFRelease(size_value);
++    return success;
++}
++
++static bool get_ax_frame_with_fallback(AXUIElementRef element, CGRect* out_frame) {
++    if (!element || !out_frame) {
++        return false;
++    }
++
++    if (get_ax_frame(element, out_frame)) {
++        return true;
++    }
++
++    CFTypeRef frame_ref = NULL;
++    AXError err = AXUIElementCopyAttributeValue(element, kAXFrameAttribute, &frame_ref);
++    if (err == kAXErrorSuccess && frame_ref) {
++        if (CFGetTypeID(frame_ref) == AXValueGetTypeID()) {
++            if (AXValueGetValue((AXValueRef)frame_ref, kAXValueCGRectType, out_frame)) {
++                CFRelease(frame_ref);
++                return true;
++            }
++        }
++        CFRelease(frame_ref);
++    }
++
++    AXUIElementRef window_ref = NULL;
++    err = AXUIElementCopyAttributeValue(element, kAXWindowAttribute, (CFTypeRef *)&window_ref);
++    if (err == kAXErrorSuccess && window_ref) {
++        bool ok = get_ax_frame(window_ref, out_frame);
++        if (!ok) {
++            CFTypeRef win_frame_ref = NULL;
++            AXError win_err = AXUIElementCopyAttributeValue(window_ref, kAXFrameAttribute, &win_frame_ref);
++            if (win_err == kAXErrorSuccess && win_frame_ref) {
++                if (CFGetTypeID(win_frame_ref) == AXValueGetTypeID()) {
++                    ok = AXValueGetValue((AXValueRef)win_frame_ref, kAXValueCGRectType, out_frame);
++                }
++                CFRelease(win_frame_ref);
++            }
++        }
++        CFRelease(window_ref);
++        return ok;
++    }
++
++    return false;
++}
++
++// Check if an accessibility element is enabled
++static bool is_ax_element_enabled(AXUIElementRef element) {
++    CFBooleanRef enabled_ref = NULL;
++    AXError err = AXUIElementCopyAttributeValue(element, kAXEnabledAttribute,
++                                                 (CFTypeRef*)&enabled_ref);
++    if (err != kAXErrorSuccess || !enabled_ref) {
++        return false;
++    }
++
++    bool enabled = CFBooleanGetValue(enabled_ref);
++    CFRelease(enabled_ref);
++    return enabled;
++}
++
++// Get children of an accessibility element
++static CFArrayRef get_ax_children(AXUIElementRef element) {
++    CFArrayRef children = NULL;
++    AXUIElementCopyAttributeValue(element, kAXChildrenAttribute,
++                                   (CFTypeRef*)&children);
++    return children;
++}
++
++static CFArrayRef get_ax_visible_children(AXUIElementRef element) {
++    CFArrayRef children = NULL;
++    AXUIElementCopyAttributeValue(element, kAXVisibleChildrenAttribute,
++                                   (CFTypeRef*)&children);
++    return children;
++}
++
++static bool cfstring_equals_cstr(CFTypeRef value_ref, const char *expected)
++{
++    if (!value_ref || !expected)
++    {
++        return false;
++    }
++
++    if (CFGetTypeID(value_ref) != CFStringGetTypeID())
++    {
++        return false;
++    }
++
++    char buffer[256] = "";
++    if (!CFStringGetCString((CFStringRef)value_ref,
++                            buffer,
++                            sizeof(buffer),
++                            kCFStringEncodingUTF8))
++    {
++        return false;
++    }
++
++    return strcmp(buffer, expected) == 0;
++}
++
++static bool ax_element_matches_name(AXUIElementRef element, const char *expected)
++{
++    if (!element || !expected)
++    {
++        return false;
++    }
++
++    CFTypeRef title_ref = NULL;
++    CFTypeRef description_ref = NULL;
++    CFTypeRef identifier_ref = NULL;
++
++    AXUIElementCopyAttributeValue(element, kAXTitleAttribute, &title_ref);
++    AXUIElementCopyAttributeValue(element, kAXDescriptionAttribute, &description_ref);
++    AXUIElementCopyAttributeValue(element, kAXIdentifierAttribute, &identifier_ref);
++
++    bool matches = cfstring_equals_cstr(title_ref, expected) ||
++                   cfstring_equals_cstr(description_ref, expected) ||
++                   cfstring_equals_cstr(identifier_ref, expected);
++
++    if (title_ref)
++    {
++        CFRelease(title_ref);
++    }
++    if (description_ref)
++    {
++        CFRelease(description_ref);
++    }
++    if (identifier_ref)
++    {
++        CFRelease(identifier_ref);
++    }
++
++    return matches;
++}
++
++bool source_window_bounds_for_pid(pid_t pid, const char *name, CGRect *out_bounds)
++{
++    if (!source_pid_needs_workaround() || pid <= 0 || !name || !out_bounds)
++    {
++        return false;
++    }
++
++    if (!source_pid_request_permissions())
++    {
++        return false;
++    }
++
++    AXUIElementRef app = AXUIElementCreateApplication(pid);
++    if (!app)
++    {
++        return false;
++    }
++
++    CFTypeRef extras_ref = NULL;
++    AXError error = AXUIElementCopyAttributeValue(app,
++                                                  kAXExtrasMenuBarAttribute,
++                                                  &extras_ref);
++    if (error != kAXErrorSuccess || !extras_ref)
++    {
++        CFRelease(app);
++        return false;
++    }
++
++    CFArrayRef children = NULL;
++    error = AXUIElementCopyAttributeValue((AXUIElementRef)extras_ref,
++                                          kAXVisibleChildrenAttribute,
++                                          (CFTypeRef *)&children);
++    if (error != kAXErrorSuccess || !children)
++    {
++        CFRelease(extras_ref);
++        CFRelease(app);
++        return false;
++    }
++
++    bool found = false;
++    CFIndex child_count = CFArrayGetCount(children);
++    for (CFIndex i = 0; i < child_count; i++)
++    {
++        AXUIElementRef child = (AXUIElementRef)CFArrayGetValueAtIndex(children, i);
++        if (!child || !ax_element_matches_name(child, name))
++        {
++            continue;
++        }
++
++        CGRect child_frame;
++        if (get_ax_frame(child, &child_frame))
++        {
++            *out_bounds = child_frame;
++            found = true;
++            break;
++        }
++
++        AXUIElementRef window_ref = NULL;
++        error = AXUIElementCopyAttributeValue(child,
++                                              kAXWindowAttribute,
++                                              (CFTypeRef *)&window_ref);
++        if (error == kAXErrorSuccess && window_ref)
++        {
++            if (get_ax_frame(window_ref, &child_frame))
++            {
++                *out_bounds = child_frame;
++                found = true;
++                CFRelease(window_ref);
++                break;
++            }
++
++            CFRelease(window_ref);
++        }
++    }
++
++    CFRelease(children);
++    CFRelease(extras_ref);
++    CFRelease(app);
++    return found;
++}
++
++int source_pid_enumerate_menu_items(source_menu_item_t** out_items)
++{
++    if (!out_items)
++    {
++        return 0;
++    }
++
++    source_pid_cache_init();
++    source_pid_cache_refresh();
++
++    // Allocate temporary array to hold results
++    source_menu_item_t* items = calloc(256, sizeof(source_menu_item_t)); // Start with 256 slots
++    if (!items)
++    {
++        return 0;
++    }
++
++    int item_count = 0;
++    int max_items = 256;
++
++    pthread_mutex_lock(&g_cache_mutex);
++
++    // Iterate through all cached applications
++    for (int i = 0; i < g_cached_apps_count; i++)
++    {
++        cached_app_t* app = &g_cached_apps[i];
++
++        // Get this app's extras menu bar
++        AXUIElementRef extras_bar = get_extras_menu_bar(app);
++        if (!extras_bar)
++        {
++            continue;
++        }
++
++        CFArrayRef children = get_ax_children(extras_bar);
++        if (!children)
++        {
++            continue;
++        }
++
++        CFIndex child_count = CFArrayGetCount(children);
++        for (CFIndex j = 0; j < child_count; j++)
++        {
++            AXUIElementRef child = (AXUIElementRef)CFArrayGetValueAtIndex(children, j);
++            if (!child || !is_ax_element_enabled(child))
++            {
++                continue;
++            }
++
++            // Get the title/name of the menu item
++            CFStringRef title_ref = NULL;
++            AXError err = AXUIElementCopyAttributeValue(child, kAXTitleAttribute,
++                                                         (CFTypeRef*)&title_ref);
++            if (err != kAXErrorSuccess || !title_ref)
++            {
++                continue;
++            }
++
++            char* title = cfstring_copy(title_ref);
++            CFRelease(title_ref);
++
++            // Skip empty titles
++            if (!title || strlen(title) == 0)
++            {
++                if (title) free(title);
++                continue;
++            }
++
++            CGRect child_frame;
++            if (!get_ax_frame(child, &child_frame))
++            {
++                free(title);
++                continue;
++            }
++
++            // Reallocate if needed
++            if (item_count >= max_items)
++            {
++                max_items *= 2;
++                source_menu_item_t* new_items = realloc(items, max_items * sizeof(source_menu_item_t));
++                if (!new_items)
++                {
++                    free(title);
++                    CFRelease(children);
++                    break;
++                }
++                items = new_items;
++            }
++
++            // Fill in the item
++            items[item_count].owner = app->name ? strdup(app->name) : strdup("Unknown");
++            items[item_count].name = title;
++            items[item_count].pid = app->pid;
++            items[item_count].x_pos = child_frame.origin.x;
++            item_count++;
++        }
++
++        CFRelease(children);
++    }
++
++    pthread_mutex_unlock(&g_cache_mutex);
++
++    *out_items = items;
++    return item_count;
++}
++
++static void ensure_bounds_cache_locked(void) {
++    if (g_bounds_cache && g_bounds_cache_refresh_time == g_last_refresh_time) {
++        return;
++    }
++
++    free_bounds_cache();
++
++    int max_items = 256;
++    g_bounds_cache = calloc(max_items, sizeof(bounds_cache_entry_t));
++    if (!g_bounds_cache) {
++        return;
++    }
++
++    for (int i = 0; i < g_cached_apps_count; i++) {
++        cached_app_t* app = &g_cached_apps[i];
++
++        AXUIElementRef extras_bar = get_extras_menu_bar(app);
++        if (!extras_bar) {
++            continue;
++        }
++
++        CFArrayRef children = get_ax_visible_children(extras_bar);
++        if (!children) {
++            children = get_ax_children(extras_bar);
++        }
++        if (!children) {
++            continue;
++        }
++
++        CFIndex child_count = CFArrayGetCount(children);
++        for (CFIndex j = 0; j < child_count; j++) {
++            AXUIElementRef child = (AXUIElementRef)CFArrayGetValueAtIndex(children, j);
++            if (!child || !is_ax_element_enabled(child)) {
++                continue;
++            }
++
++            CGRect child_frame;
++            if (!get_ax_frame_with_fallback(child, &child_frame)) {
++                continue;
++            }
++
++            if (g_bounds_cache_count >= max_items) {
++                max_items *= 2;
++                bounds_cache_entry_t* new_cache = realloc(g_bounds_cache,
++                                                          max_items * sizeof(bounds_cache_entry_t));
++                if (!new_cache) {
++                    CFRelease(children);
++                    return;
++                }
++                g_bounds_cache = new_cache;
++            }
++
++            char* title = NULL;
++            CFTypeRef title_ref = NULL;
++            AXError err = AXUIElementCopyAttributeValue(child, kAXTitleAttribute, &title_ref);
++            if (err == kAXErrorSuccess && title_ref && CFGetTypeID(title_ref) == CFStringGetTypeID()) {
++                title = cfstring_copy((CFStringRef)title_ref);
++            }
++            if (title_ref) {
++                CFRelease(title_ref);
++            }
++
++            g_bounds_cache[g_bounds_cache_count].bounds = child_frame;
++            g_bounds_cache[g_bounds_cache_count].pid = app->pid;
++            g_bounds_cache[g_bounds_cache_count].app_name = app->name;
++            g_bounds_cache[g_bounds_cache_count].menu_item_name = title;
++            g_bounds_cache_count++;
++        }
++
++        CFRelease(children);
++    }
++
++    g_bounds_cache_refresh_time = g_last_refresh_time;
++}
++
++pid_t source_pid_for_window_with_name_hint(CGRect window_bounds,
++                                           const char *item_name,
++                                           char **out_name) {
++    if (!source_pid_needs_workaround()) {
++        if (out_name) *out_name = NULL;
++        return 0;
++    }
++
++    if (!source_pid_request_permissions()) {
++        if (out_name) *out_name = NULL;
++        return 0;
++    }
++
++    source_pid_cache_init();
++
++    pthread_mutex_lock(&g_cache_mutex);
++
++    ensure_bounds_cache_locked();
++
++    CGPoint window_center = rect_center(window_bounds);
++    pid_t result_pid = 0;
++    const char *result_app_name = NULL;
++    double best_distance = 1e9;
++
++    for (int pass = 0; pass < 2; pass++) {
++        for (int i = 0; i < g_bounds_cache_count; i++) {
++            bounds_cache_entry_t *entry = &g_bounds_cache[i];
++
++            if (pass == 0 && item_name) {
++                if (!entry->menu_item_name || strcmp(entry->menu_item_name, item_name) != 0) {
++                    continue;
++                }
++            }
++
++            CGPoint child_center = rect_center(entry->bounds);
++            double distance = point_distance(window_center, child_center);
++            double w_diff = fabs(entry->bounds.size.width - window_bounds.size.width);
++            double h_diff = fabs(entry->bounds.size.height - window_bounds.size.height);
++
++            if (distance <= 6.0 && w_diff <= 8.0 && h_diff <= 8.0 && distance < best_distance) {
++                result_pid = entry->pid;
++                result_app_name = entry->app_name;
++                best_distance = distance;
++            }
++            // Fallback for Tahoe menu extras where CG/AX size can drift.
++            else if (distance <= 14.0 && distance < best_distance) {
++                result_pid = entry->pid;
++                result_app_name = entry->app_name;
++                best_distance = distance;
++            }
++        }
++    }
++
++    if (out_name) {
++        *out_name = NULL;
++        if (result_app_name) {
++            *out_name = strdup(result_app_name);
++        }
++        if (!*out_name && result_pid > 0) {
++            *out_name = copy_process_name_for_pid(result_pid);
++        }
++    }
++
++    pthread_mutex_unlock(&g_cache_mutex);
++    return result_pid;
++}
++
++pid_t source_pid_for_window_with_name(CGRect window_bounds, char **out_name) {
++    return source_pid_for_window_with_name_hint(window_bounds, NULL, out_name);
++}
++
++pid_t source_pid_for_window(CGRect window_bounds) {
++    return source_pid_for_window_with_name_hint(window_bounds, NULL, NULL);
++}
++
++char* source_name_for_window(CGRect window_bounds) {
++    char *result = NULL;
++    source_pid_for_window_with_name_hint(window_bounds, NULL, &result);
++    return result;
++}

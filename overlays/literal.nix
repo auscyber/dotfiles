@@ -29,8 +29,9 @@ let
     x86_64-linux = pkgs.callPackage ../packages/helium/default.nix {
       source = sources.helium_linux;
     };
-    aarch64-darwin = pkgs.nur.repos.forkprince.helium-nightly;
-    aarch64-linux = pkgs.nur.repos.forkprince.helium-nightly;
+    aarch64-darwin = pkgs.callPackage ../packages/helium/mac.nix {
+      source = sources.helium_macos;
+    };
   };
   pkgsSwift = import inputs.nixpkgs-swift { inherit (pkgs) system; };
   pkgsMaster = import inputs.nixpkgs-master {
@@ -47,6 +48,51 @@ in
     proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
       inherit (sources.proton-ge-bin) src version;
     });
+    sketchybar = pkgs.sketchybar.overrideAttrs (attrs: {
+      inherit (sources.sketchybar) src version;
+      patches = [ ../packages/sketchybar-pid.patch ];
+    });
+
+    sccacheWrapper =
+      lib.makeOverridable
+        (
+          { extraConfig, cc }:
+          cc.override {
+            cc = pkgs.callPackage ../packages/sccache-links.nix {
+              inherit extraConfig;
+              unwrappedCC = cc.cc;
+            };
+          }
+        )
+        {
+          extraConfig = "";
+          inherit (pkgs.stdenv) cc;
+        };
+    sccacheStdenv = lib.lowPrio (
+      lib.makeOverridable
+        (
+          { stdenv, ... }@extraArgs:
+          pkgs.addAttrsToDerivation
+            {
+              env.RUSTC_WRAPPER = "${self.sccacheWrapper}";
+            }
+            (
+              pkgs.overrideCC stdenv (
+                self.ccacheWrapper.override (
+                  {
+                    inherit (stdenv) cc;
+                  }
+                  // lib.optionalAttrs (builtins.hasAttr "extraConfig" extraArgs) {
+                    extraConfig = extraArgs.extraConfig;
+                  }
+                )
+              )
+            )
+        )
+        {
+          inherit (pkgs) stdenv;
+        }
+    );
     kernelStdenv =
       let
         llvmKernelStdenv = pkgs.stdenvAdapters.overrideInStdenv pkgs.llvmPackages.stdenv [

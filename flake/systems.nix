@@ -67,11 +67,9 @@ in
         #	  ../modules/common/builders/builder.nix
         ../modules/common/builders
         ../modules/common/vpn.nix
-<<<<<<< HEAD
+        ../modules/common/nix/sccache
 
         #        inputs.determinate.darwinModules.default
-=======
->>>>>>> 202e91e19 (change shit)
         inputs.stylix.darwinModules.stylix
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.home-manager.darwinModules.home-manager

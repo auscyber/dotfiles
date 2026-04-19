@@ -17,20 +17,6 @@ rec {
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
   };
-  age.templates."nvchecker.toml" = {
-    dependencies = {
-      inherit (config.age.secrets) github_token;
-    };
-    path = "${config.home.homeDirectory}/.config/nvchecker.toml";
-    content =
-      { pkgs, placeholders, ... }:
-      ''
-        [keys]
-        github = "${placeholders.github_token}"
-
-      '';
-
-  };
 
   programs = {
     ssh = {

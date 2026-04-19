@@ -3,6 +3,7 @@
   inputs,
   pkgs,
   lib,
+  options,
   ...
 }:
 let
@@ -16,13 +17,13 @@ in
       description = "Whether to enable Homebrew on macOS.";
     };
     casks = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf (lib.types.str);
       default = [ ];
 
       description = "List of Homebrew casks to install.";
     };
     brews = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf (lib.types.str);
       default = [ ];
 
       description = "List of Homebrew formulae to install.";
@@ -43,6 +44,7 @@ in
         "homebrew/homebrew-cask" = inputs.homebrew-cask;
         "homebrew/homebrew-core" = inputs.homebrew-core;
         "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
+        "typewhisper/homebrew-tap" = inputs.homebrew-whisper;
       };
 
       mutableTaps = false;

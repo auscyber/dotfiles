@@ -44,23 +44,31 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-gekCxD9VZypD7i/MCANBvY6MlNJ01HNWHUqfNkoi4MY=";
+      sha256 = "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.10.8.1";
+    version = "0.11.1.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.10.8.1/helium-0.10.8.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-31xrDlzJzKNE0hrDw0UERDdd7bgzyQSIbdACqpaPARY=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.11.1.1/helium-0.11.1.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-37eUFdonXOtrXLXeMMuO0hBdGgpUkUkjY9Y1fwAn8uI=";
+    };
+  };
+  helium_macos = {
+    pname = "helium_macos";
+    version = "0.10.9.1";
+    src = fetchurl {
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.10.9.1/helium_0.10.9.1_arm64-macos.dmg";
+      sha256 = "sha256-qLsd9TNAri8ytp2LyRiRQmCxrvC60r/JYQZCpdEP8es=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.56";
+    version = "v2.0.58";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.56/icon_map.sh";
-      sha256 = "sha256-aAX6yydhSGwVe+C/BJRftksa90a+1LpVjCm7qmKPaS0=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.58/icon_map.sh";
+      sha256 = "sha256-+6avlG0pVeHPFwDVPKnkszXkVqpEwy7y8O1Ywr+dO9Y=";
     };
   };
   jankyborders = {
@@ -102,39 +110,32 @@
       sha256 = "sha256-lzPsYYcrp5NoT3B0WFj3o10Z7tXx7xva1wEP3edeuqM=";
     };
   };
-  rift = {
-    pname = "rift";
-    version = "v0.4.0";
+  sketchybar = {
+    pname = "sketchybar";
+    version = "v2.23.0";
     src = fetchFromGitHub {
-      owner = "acsandmann";
-      repo = "rift";
-      rev = "v0.4.0";
+      owner = "felixkratz";
+      repo = "sketchybar";
+      rev = "v2.23.0";
       fetchSubmodules = false;
-      sha256 = "sha256-3TKhoLJE+GtTfcnskH7yUBamCV+G5xXzy1n15mNWDzk=";
-    };
-    cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-3TKhoLJE+GtTfcnskH7yUBamCV+G5xXzy1n15mNWDzk=/Cargo.lock";
-      outputHashes = {
-        "dispatchr-1.0.0" = "sha256-Df6PdDA5bpmy2P30vGdad+EiHJiANmHrRF2q75Uegik=";
-        "continue-0.1.1" = "sha256-8S+gPfz6CtzIKsGh9wg3CevMdNA9V+KOyHR9F9DlVcw=";
-      };
+      sha256 = "sha256-PvKvevsSyRb6OfPWc2+1Bcfj2ngmgeP1URBoBiVeEdk=";
     };
   };
   slskd = {
     pname = "slskd";
-    version = "85a2252c3e8c1fb0200d94ca69fbc0abd0b74b56";
+    version = "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "85a2252c3e8c1fb0200d94ca69fbc0abd0b74b56";
+      rev = "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-aG+4fN0ta7cKrpfFXJu4NoFbTs4q2gRkH7T3R8u82mI=";
+      sha256 = "sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-aG+4fN0ta7cKrpfFXJu4NoFbTs4q2gRkH7T3R8u82mI=/./src/web/package-lock.json";
-    };date = "2026-04-07";
+      "./src/web/package-lock.json" = ./. + "/sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=/./src/web/package-lock.json";
+    };date = "2026-04-12";
   };
   yabai = {
     pname = "yabai";

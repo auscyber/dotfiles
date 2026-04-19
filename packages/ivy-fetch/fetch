@@ -57,11 +57,11 @@ get_packages () {
             _package_count=0
             if command -v home-manager 1>/dev/null
             then
-                _package_count="$((_package_count+$(nix-store -q -R ~/.local/state/home-manager/gcroots/current-home | wc -l)))"
+                _package_count="$((_package_count+$(cat ~/.local/state/home-manager/gcroots/current-home/packagelist| wc -l)))"
             fi
             if command -v nixos-rebuild 1> /dev/null || command -v darwin-rebuild 1> /dev/null
             then
-                _package_count="$((_package_count+$(nix-store -q -R /run/current-system/sw | wc -l)))"
+                _package_count="$((_package_count+$(cat /run/current-system/packagelist | wc -l)))"
             fi
             package_data="${package_data}$_package_count (nix) "
     #        package_data="${packages+ }$(wc -l < /etc/current-system-packages) (nix)"
@@ -113,6 +113,7 @@ command -v lspci >/dev/null && {
 }
 fi
 
+
 get_kernel () {
 	case $OSTYPE in
 		darwin*)
@@ -147,10 +148,10 @@ main_color="$(fg_t 158 203 219 )"
 category="$main_color$BOLD"
 
 eye_color="$(fg_c 236)"
-if [ -n "$(playerctl metadata title 2>&- )" ]; then
-    song=$(playerctl metadata --format "{{title}} - {{artist}}")
-elif [ -n "$(nowplaying-cli get-raw 2>&- )" ]; then
-	song=$(nowplaying-cli get title artist | awk '{ printf("%s - ", $0) }' | sed 's/ - $/\n/g')
+if song=$(playerctl metadata --format "{{title}} - {{artist}}" 2>/dev/null) && [ -n "$song" ]; then
+    :
+elif song=$(nowplaying-cli get title artist 2>/dev/null | paste -sd ' - ' -) && [ -n "$song" ]; then
+    :
 else
     song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
 fi

@@ -111,7 +111,7 @@ in
         };
         virtual_workspaces = {
           enabled = true;
-          default_workspace_count = 5;
+          default_workspace_count = 7;
           workspace_names = [
             "Main"
             "Dev"

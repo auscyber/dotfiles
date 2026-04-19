@@ -14,6 +14,36 @@
   ];
 
   config = {
+    age.templates."nvchecker.toml" = {
+      dependencies = {
+        inherit (config.age.secrets) github_token;
+      };
+      path = "${config.home.homeDirectory}/.config/nvchecker.toml";
+      content =
+        { pkgs, placeholders, ... }:
+        ''
+          [keys]
+          github = "${placeholders.github_token}"
+
+        '';
+
+    };
+    home.extraBuilderCommands =
+      let
+        packagelist = pkgs.writeText "extra-builder-commands" (
+          lib.concatMapAttrsStringSep "\n" (x: _: x) (
+            lib.genAttrs' config.home.packages (x: {
+              name = x.name;
+              value = x;
+            })
+          )
+        );
+      in
+      ''
+        		ln -s ${packagelist} $out/packagelist
+        	  ''
+
+    ;
 
     stylix.targets.fish.enable = false;
     #  services.keybindControl = {

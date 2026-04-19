@@ -131,6 +131,16 @@
   # The platform the configuration will be used on.
   services.karabiner-elements.enable = false;
   auscybernix = {
+    nix.sccache = {
+      enable = true;
+      #      packageNames = [
+      #        "attic-client"
+      #        "rift"
+      #        "nh"
+      #        "kanata"
+      #        "nil"
+      #      ];
+    };
     nix.flake = "/Users/ivypierlot/dotfiles";
     sudo.pam = {
       enable = true;
@@ -164,6 +174,9 @@
         "speedtest"
       ];
       casks = [
+        "jordanbaird-ice"
+
+        "typewhisper"
         # "cinny"
         "mark-text"
         "craft"
@@ -175,6 +188,7 @@
         "font-sketchybar-app-font"
         "font-sf-pro"
         "todoist-app"
+        "dockdoor"
 
         "beeper"
         "amethyst"
@@ -235,11 +249,20 @@
       #      "/System/Applications/Home.app"
       #      "/Applications/Nix Apps/Zed.App"
       "/Applications/Nix Apps/Visual Studio Code.app"
-      "/Applications/Nix Apps/Zotero.app"
+      "/Applications/Zotero.app"
       "/Applications/Nix Apps/Ghostty.app"
       "/Applications/Todoist.app"
     ];
   };
+  homebrew.casks = [
+    #    {
+    #      name = "wine-stable";
+    #      #      args = {
+    #      #        no_quarantine = true;
+    #      #      };
+    #    }
+
+  ];
 
   environment.shells = [
     pkgs.bash

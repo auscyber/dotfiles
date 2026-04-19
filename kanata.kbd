@@ -91,6 +91,7 @@
   d (fork _ @toggle_discord_scratchpad (lshift))
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
+  m (fork _ (push-msg "raycast:extensions/SeoFood/typewhisper/start-dictation") (lshift))
   )
 (deftemplate accented (key mod)
 	((and (key-history $key 1) (input-history real lsft 3))) (macro bspc 10 $mod S-($key)) break
