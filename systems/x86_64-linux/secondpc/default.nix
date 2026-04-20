@@ -12,6 +12,7 @@
     ./grafana.nix
     ./cache.nix
     #	./jitsi.nix
+    ./nextcloudtfu.nix
     ./vpn.nix
     ./navidrome.nix
     #    ./../../modules/system/grub.nix
