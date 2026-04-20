@@ -1,25 +1,29 @@
 {
-config, inputs,...
+  config,
+  inputs,
+  ...
 }:
 {
 
-perSystem = {pkgs,...}:
-{
+  perSystem =
+    { pkgs, ... }:
+    {
 
-apps.update = {
-type = "app";
+      apps.update = {
+        type = "app";
 
-program = pkgs.writeShellApplication {
- name = "update";
- runtimeInputs = with pkgs; [
- nvfetcher
- ];
+        program = pkgs.writeShellApplication {
+          name = "update";
+          runtimeInputs = with pkgs; [
+            nvfetcher
+          ];
 
-text = ''
-nvfetcher
-	 '';
+          text = ''
+            nvfetcher
+            	 '';
 
-};
+        };
 
-};
+      };
+    };
 }

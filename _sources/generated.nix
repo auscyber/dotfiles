@@ -44,31 +44,31 @@
       repo = "ghostty";
       rev = "tip";
       fetchSubmodules = false;
-      sha256 = "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=";
+      sha256 = "sha256-dnk4veKoZpWQPnwTaCtpfaE4WQi0tg1JSpM4/P/Rfe0=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.11.1.1";
+    version = "0.11.3.2";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.11.1.1/helium-0.11.1.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-37eUFdonXOtrXLXeMMuO0hBdGgpUkUkjY9Y1fwAn8uI=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.11.3.2/helium-0.11.3.2-x86_64_linux.tar.xz";
+      sha256 = "sha256-lnO/+suyCUWDIENVztx8TZlHfJiZrnWHluPuFBV4fPg=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.10.9.1";
+    version = "0.11.3.2";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.10.9.1/helium_0.10.9.1_arm64-macos.dmg";
-      sha256 = "sha256-qLsd9TNAri8ytp2LyRiRQmCxrvC60r/JYQZCpdEP8es=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.11.3.2/helium_0.11.3.2_arm64-macos.dmg";
+      sha256 = "sha256-nOk6FC0g6N1WXLzTxW6mFMu2OO/9TKRqj+nqeOiWi+o=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.58";
+    version = "v2.0.60";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.58/icon_map.sh";
-      sha256 = "sha256-+6avlG0pVeHPFwDVPKnkszXkVqpEwy7y8O1Ywr+dO9Y=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.60/icon_map.sh";
+      sha256 = "sha256-seYKDv4fFmxryBk9j+RLk3WA3LFPG9zN/ULMvIDNAlQ=";
     };
   };
   jankyborders = {
@@ -123,32 +123,35 @@
   };
   slskd = {
     pname = "slskd";
-    version = "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6";
+    version = "7961741f740abd240754ff6e39cda6d69f727268";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6";
+      rev = "7961741f740abd240754ff6e39cda6d69f727268";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=";
+      sha256 = "sha256-aoqhHzszhslk40YivlWT0kAUvzULUZRk6qvk41c1MlE=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=/./src/web/package-lock.json";
-    };date = "2026-04-12";
+      "./src/web/package-lock.json" = ./. + "/sha256-aoqhHzszhslk40YivlWT0kAUvzULUZRk6qvk41c1MlE=/./src/web/package-lock.json";
+    };date = "2026-04-19";prefetch = {
+    "./src/web/package-lock.json" = "sha256-6NyedIkVSApOxAqEOI6dUjOiAKpMvFNYOMa1JWtjcf0=";
+    
+    };
   };
   yabai = {
     pname = "yabai";
-    version = "5e213518d413d2bc41159a759d0e7de3adf9d799";
+    version = "53a00b12fe664fc71f04c74009df33f6380c7b14";
     src = fetchgit {
       url = "https://github.com/koekeishiya/yabai";
-      rev = "5e213518d413d2bc41159a759d0e7de3adf9d799";
+      rev = "53a00b12fe664fc71f04c74009df33f6380c7b14";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-mrqWimSbP8Yd9KLbbKWnoEmHOb/Ab0ZULE6HPVto18s=";
+      sha256 = "sha256-/nrQ1srlblgUtasvQTLKMMWupf5X13MV9EVxugu+SYI=";
     };
-    date = "2026-04-06";
+    date = "2026-04-20";
   };
 }

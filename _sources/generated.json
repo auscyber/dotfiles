@@ -6,6 +6,7 @@
         "name": "cursor_shader",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
@@ -26,6 +27,7 @@
         "name": "deadlock-mod-manager",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "name": null,
             "sha256": "sha256-azZfebt3mHhiasssSCBtB95pvLianjwbLYB+vhV1DYU=",
@@ -41,6 +43,7 @@
         "name": "game-devices-udev-rules",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "sha256": "sha256-LXTlnimC0Xw+4YwUc151ePOaktdqlUDAdX01L21wmO0=",
             "type": "tarball",
@@ -55,6 +58,7 @@
         "name": "ghostty",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
@@ -63,7 +67,7 @@
             "owner": "ghostty-org",
             "repo": "ghostty",
             "rev": "tip",
-            "sha256": "sha256-WX66DS0cs6sRutHhJqSGYHrffpszsgmJsl+O7kl4Hjs=",
+            "sha256": "sha256-dnk4veKoZpWQPnwTaCtpfaE4WQi0tg1JSpM4/P/Rfe0=",
             "sparseCheckout": [],
             "type": "github"
         },
@@ -76,12 +80,13 @@
         "name": "helium_linux",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
-            "sha256": "sha256-37eUFdonXOtrXLXeMMuO0hBdGgpUkUkjY9Y1fwAn8uI=",
+            "sha256": "sha256-lnO/+suyCUWDIENVztx8TZlHfJiZrnWHluPuFBV4fPg=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.11.1.1/helium-0.11.1.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.11.3.2/helium-0.11.3.2-x86_64_linux.tar.xz"
         },
-        "version": "0.11.1.1"
+        "version": "0.11.3.2"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -90,13 +95,14 @@
         "name": "helium_macos",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-qLsd9TNAri8ytp2LyRiRQmCxrvC60r/JYQZCpdEP8es=",
+            "sha256": "sha256-nOk6FC0g6N1WXLzTxW6mFMu2OO/9TKRqj+nqeOiWi+o=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.10.9.1/helium_0.10.9.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.11.3.2/helium_0.11.3.2_arm64-macos.dmg"
         },
-        "version": "0.10.9.1"
+        "version": "0.11.3.2"
     },
     "icon_map": {
         "cargoLock": null,
@@ -105,13 +111,14 @@
         "name": "icon_map",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-+6avlG0pVeHPFwDVPKnkszXkVqpEwy7y8O1Ywr+dO9Y=",
+            "sha256": "sha256-seYKDv4fFmxryBk9j+RLk3WA3LFPG9zN/ULMvIDNAlQ=",
             "type": "url",
-            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.58/icon_map.sh"
+            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.60/icon_map.sh"
         },
-        "version": "v2.0.58"
+        "version": "v2.0.60"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -120,6 +127,7 @@
         "name": "jankyborders",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
@@ -145,6 +153,7 @@
         "name": "kanata",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
@@ -166,6 +175,7 @@
         "name": "proton-ge-bin",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "sha256": "sha256-lzPsYYcrp5NoT3B0WFj3o10Z7tXx7xva1wEP3edeuqM=",
             "type": "tarball",
@@ -180,6 +190,7 @@
         "name": "sketchybar",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
@@ -196,44 +207,48 @@
     },
     "slskd": {
         "cargoLock": null,
-        "date": "2026-04-12",
+        "date": "2026-04-19",
         "extract": {
-            "./src/web/package-lock.json": "sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=/./src/web/package-lock.json"
+            "./src/web/package-lock.json": "sha256-aoqhHzszhslk40YivlWT0kAUvzULUZRk6qvk41c1MlE=/./src/web/package-lock.json"
         },
         "name": "slskd",
         "passthru": null,
         "pinned": false,
+        "prefetch": {
+            "./src/web/package-lock.json": "sha256-6NyedIkVSApOxAqEOI6dUjOiAKpMvFNYOMa1JWtjcf0="
+        },
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6",
-            "sha256": "sha256-GNzj5l5yB+uB7SqYfriVyE7Sc5TB5VaXtanK3HZ5tRM=",
+            "rev": "7961741f740abd240754ff6e39cda6d69f727268",
+            "sha256": "sha256-aoqhHzszhslk40YivlWT0kAUvzULUZRk6qvk41c1MlE=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-        "version": "76ccc5c1c8723df586cd4b4fc3d692cb2a7d73f6"
+        "version": "7961741f740abd240754ff6e39cda6d69f727268"
     },
     "yabai": {
         "cargoLock": null,
-        "date": "2026-04-06",
+        "date": "2026-04-20",
         "extract": null,
         "name": "yabai",
         "passthru": null,
         "pinned": false,
+        "prefetch": null,
         "src": {
             "deepClone": false,
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "5e213518d413d2bc41159a759d0e7de3adf9d799",
-            "sha256": "sha256-mrqWimSbP8Yd9KLbbKWnoEmHOb/Ab0ZULE6HPVto18s=",
+            "rev": "53a00b12fe664fc71f04c74009df33f6380c7b14",
+            "sha256": "sha256-/nrQ1srlblgUtasvQTLKMMWupf5X13MV9EVxugu+SYI=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/koekeishiya/yabai"
         },
-        "version": "5e213518d413d2bc41159a759d0e7de3adf9d799"
+        "version": "53a00b12fe664fc71f04c74009df33f6380c7b14"
     }
 }

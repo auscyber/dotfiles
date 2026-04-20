@@ -29,7 +29,7 @@
     niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvfetcher.url = "github:auscyber/nvfetcher";
+    nvfetcher.url = "github:auscyber/nvfetcher/customfetcher";
     searchix.url = "git+https://codeberg.org/alanpearce/searchix";
     nil = {
       url = "github:oxalica/nil";

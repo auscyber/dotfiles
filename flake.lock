@@ -1267,11 +1267,11 @@
     "flake-compat_20": {
       "flake": false,
       "locked": {
-        "lastModified": 1747046372,
-        "narHash": "sha256-CIVLLkVgvHYbgI2UpXvIIBJ12HWgX+fjA8Xf8PUmqCY=",
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
         "owner": "edolstra",
         "repo": "flake-compat",
-        "rev": "9100a0f413b0c601e0533d1d94ffd501ce2e7885",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
         "type": "github"
       },
       "original": {
@@ -5047,11 +5047,11 @@
     },
     "nixpkgs_31": {
       "locked": {
-        "lastModified": 1758035966,
-        "narHash": "sha256-qqIJ3yxPiB0ZQTT9//nFGQYn8X/PBoJbofA7hRKZnmE=",
+        "lastModified": 1771848320,
+        "narHash": "sha256-0MAd+0mun3K/Ns8JATeHT1sX28faLII5hVLq0L3BdZU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "8d4ddb19d03c65a36ad8d189d001dc32ffb0306b",
+        "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
         "type": "github"
       },
       "original": {
@@ -5334,15 +5334,16 @@
         "nixpkgs": "nixpkgs_31"
       },
       "locked": {
-        "lastModified": 1760516348,
-        "narHash": "sha256-nIsrxp6n1nQ63n1JTDaO/18RjvYbW9GVkanTP4G6Y18=",
+        "lastModified": 1773648838,
+        "narHash": "sha256-Hs0D8S8yboK/bHRe3ik5u0Iu+kpBuw+GWk7/aQxie0s=",
         "owner": "auscyber",
         "repo": "nvfetcher",
-        "rev": "546d277920282989fe592f9a2a8de39349a8502a",
+        "rev": "175cebc346346c09e2aa6570de83eb66099475e2",
         "type": "github"
       },
       "original": {
         "owner": "auscyber",
+        "ref": "customfetcher",
         "repo": "nvfetcher",
         "type": "github"
       }
