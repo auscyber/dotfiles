@@ -223,7 +223,7 @@ in
       source = {
         inherit (sources.slskd) src;
         version = "0.24.2";
-        npmHash = sources.slskd."src/web/package-lock.json";
+        npmHash = sources.slskd.extract."src/web/package-lock.json";
       };
     };
     zen-browser = zen-browser."${system}";
