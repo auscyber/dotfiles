@@ -2,6 +2,7 @@ use std::{
   collections::HashMap,
   convert::Infallible,
   ffi::{OsStr, OsString},
+  io::{Read, Write},
   path::PathBuf,
   str::FromStr,
   sync::{Mutex, OnceLock},
@@ -18,6 +19,118 @@ use tracing::{debug, info, warn};
 use which::which;
 
 use crate::{args::NixBuildPassthroughArgs, installable::Installable};
+
+/// Execute a command, streaming output to stdout/stderr while optionally
+/// capturing it for error reporting.
+///
+/// # Arguments
+///
+/// * `capture_output` - When `true`, stdout and stderr are accumulated and
+///   returned as strings. When `false`, output is streamed but not captured.
+///
+/// # Returns
+///
+/// Returns the exit status and captured stdout/stderr (or empty strings if
+/// `capture_output` is `false`), or an error.
+///
+/// # Errors
+///
+/// Returns an error if:
+///
+/// - The command fails to start
+/// - stdout or stderr cannot be captured
+/// - The command fails to complete
+/// - Either output thread panics
+pub fn exec_with_streaming(
+  cmd: Exec,
+  capture_output: bool,
+) -> Result<(subprocess::ExitStatus, String, String)> {
+  let mut job = cmd
+    .stdout(Redirection::Pipe)
+    .start()
+    .wrap_err("Failed to start command")?;
+
+  let stdout_pipe = job
+    .stdout
+    .take()
+    .ok_or_else(|| eyre::eyre!("Failed to capture stdout"))?;
+
+  let stdout_thread = std::thread::spawn(move || {
+    let mut stdout_reader = std::io::BufReader::new(stdout_pipe);
+    let mut stdout_bytes = Vec::new();
+    let mut stdout_buf = [0u8; 4096];
+
+    loop {
+      match stdout_reader.read(&mut stdout_buf) {
+        Ok(0) => break,
+        Ok(n) => {
+          let _ = std::io::stdout().write_all(&stdout_buf[..n]);
+          let _ = std::io::stdout().flush();
+          if capture_output {
+            stdout_bytes.extend_from_slice(&stdout_buf[..n]);
+          }
+        },
+        Err(e) => {
+          debug!("stdout read error: {e}");
+          break;
+        },
+      }
+    }
+
+    if capture_output {
+      String::from_utf8_lossy(&stdout_bytes).into_owned()
+    } else {
+      String::new()
+    }
+  });
+
+  let stderr_thread = if let Some(stderr_pipe) = job.stderr.take() {
+    Some(std::thread::spawn(move || {
+      let mut stderr_reader = std::io::BufReader::new(stderr_pipe);
+      let mut stderr_bytes = Vec::new();
+      let mut stderr_buf = [0u8; 4096];
+
+      loop {
+        match stderr_reader.read(&mut stderr_buf) {
+          Ok(0) => break,
+          Ok(n) => {
+            let _ = std::io::stderr().write_all(&stderr_buf[..n]);
+            let _ = std::io::stderr().flush();
+            if capture_output {
+              stderr_bytes.extend_from_slice(&stderr_buf[..n]);
+            }
+          },
+          Err(e) => {
+            debug!("stderr read error: {e}");
+            break;
+          },
+        }
+      }
+
+      if capture_output {
+        String::from_utf8_lossy(&stderr_bytes).into_owned()
+      } else {
+        String::new()
+      }
+    }))
+  } else {
+    None
+  };
+
+  let exit_status = job
+    .wait()
+    .wrap_err("Failed to wait for command completion")?;
+
+  let stdout_output = stdout_thread
+    .join()
+    .map_err(|_| eyre::eyre!("Stdout thread panicked"))?;
+  let stderr_output = stderr_thread
+    .map(|t| t.join().map_err(|_| eyre::eyre!("Stderr thread panicked")))
+    .transpose()?
+    .unwrap_or_default();
+
+  Ok((exit_status, stdout_output, stderr_output))
+}
 
 static PASSWORD_CACHE: OnceLock<Mutex<HashMap<String, SecretString>>> =
   OnceLock::new();
@@ -729,26 +842,38 @@ impl Command {
       .message
       .clone()
       .unwrap_or_else(|| "Command failed".to_string());
-    let res = cmd.capture();
-    match res {
-      Ok(capture) => {
-        let status = &capture.exit_status;
-        if !status.success() {
-          let stderr = capture.stderr_str();
-          if stderr.trim().is_empty() {
+
+    if self.show_output {
+      let exit_status = cmd.join().wrap_err(msg.clone())?;
+      if !exit_status.success() {
+        return Err(eyre::eyre!(format!(
+          "{} (exit status {:?})",
+          msg, exit_status
+        )));
+      }
+      Ok(())
+    } else {
+      let res = cmd.capture();
+      match res {
+        Ok(capture) => {
+          let status = &capture.exit_status;
+          if !status.success() {
+            let stderr = capture.stderr_str();
+            if stderr.trim().is_empty() {
+              return Err(eyre::eyre!(format!(
+                "{} (exit status {:?})",
+                msg, status
+              )));
+            }
             return Err(eyre::eyre!(format!(
-              "{} (exit status {:?})",
-              msg, status
+              "{} (exit status {:?})\nstderr:\n{}",
+              msg, status, stderr
             )));
           }
-          return Err(eyre::eyre!(format!(
-            "{} (exit status {:?})\nstderr:\n{}",
-            msg, status, stderr
-          )));
-        }
-        Ok(())
-      },
-      Err(e) => Err(e).wrap_err(msg),
+          Ok(())
+        },
+        Err(e) => Err(e).wrap_err(msg),
+      }
     }
   }
 
