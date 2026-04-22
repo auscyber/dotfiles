@@ -17,7 +17,7 @@
   };
   age.templates."minio/credentials-file" = {
     dependencies = {
-      root-password = "minio/root-password";
+      root-password = config.age.secrets."minio/root-password";
     };
     content =
       { placeholders, pkgs, ... }:
@@ -25,6 +25,9 @@
         	MINIO_ROOT_USER="root"
             MINIO_ROOT_PASSWORD=${placeholders.root-password}
         	'';
+  };
+  services.nginx.virtualHosts."tfu.ivymect.in" = {
+
   };
   #  containers.webserver = rec {
   #    autoStart = true;
@@ -42,6 +45,8 @@
   #      }:
   #      {
   #        services.nextcloud = {
+  #  enable = true;
+  #hostname =
   #          config.objectstore.s3 = {
   #            enable = true;
   #            bucket = "nextcloud";

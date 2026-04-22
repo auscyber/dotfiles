@@ -9,7 +9,7 @@
     #   ./minecraft.nix
     ./hardware-configuration.nix
     ./services.nix
-    ./grafana.nix
+    #    ./grafana.nix
     ./cache.nix
     #	./jitsi.nix
     ./nextcloudtfu.nix
