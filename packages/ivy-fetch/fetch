@@ -143,9 +143,11 @@ memused="$(free -m | awk '/Mem/ {print $3}')"
 memtotal="$(free -m | awk '/Mem/ {print $2}')"
 ;;
 esac
+
 #main_color="$(fg_t 255 216 158)"
 main_color="$(fg_t 158 203 219 )"
 category="$main_color$BOLD"
+
 
 eye_color="$(fg_c 236)"
 if song=$(playerctl metadata --format "{{title}} - {{artist}}" 2>/dev/null) && [ -n "$song" ]; then
@@ -155,6 +157,7 @@ elif song=$(nowplaying-cli get title artist 2>/dev/null | paste -sd ' - ' -) && 
 else
     song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
 fi
+
 if [[ $OSTYPE == "darwin"* ]]
 then
 ps_line=$(ps -e | grep -o \
@@ -274,6 +277,7 @@ segment () {
 data () {
     _variable="$1"
     _variable_value=${2:-" $(eval "get_$1")"}
+#	echo "fetching $1"
     if [ -n "${_variable_value# }" ]
     then
         segment "$category$_variable:$NORMAL$_variable_value"

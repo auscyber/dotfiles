@@ -45,6 +45,9 @@ let
 in
 (
   {
+    nowplaying-cli = pkgs.nowplaying-cli.overrideAttrs (attrs: {
+      src = inputs.nowplaying-cli;
+    });
     proton-ge-bin = pkgs.proton-ge-bin.overrideAttrs (attrs: {
       inherit (sources.proton-ge-bin) src version;
     });

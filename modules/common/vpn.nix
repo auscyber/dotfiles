@@ -21,7 +21,7 @@ in
       default = null;
       description = "Wireguard public key";
     };
-clientpubkey = lib.mkOption {
+    clientpubkey = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
       description = "Wireguard public key";
@@ -50,15 +50,15 @@ clientpubkey = lib.mkOption {
     auscybernix.vpn.ipAddress =
       flakeConfig.flake.auscybernix.vpn.configMap."${systemIdentifier}".ipAddress;
     auscybernix.vpn.serverpubkey = ../../systems/x86_64-linux/secondpc/wg_private_key.pub;
-    auscybernix.vpn.clientpubkey = builtins.path { path = config.age.rekey.generatedSecretsDir + "/wireguard_key.pub"; };
-
-
+    auscybernix.vpn.clientpubkey = builtins.path {
+      path = config.age.rekey.generatedSecretsDir + "/wireguard_key.pub";
+    };
 
     #)
     networking.wg-quick.interfaces.wg0 = {
       address = [ "${cfg.ipAddress}/24" ];
       privateKeyFile = config.age.secrets.wireguard_key.path;
-      dns = [
+      dns = lib.optionals pkgs.stdenv.isLinux [
         "1.1.1.1"
         "10.100.0.1"
       ];
@@ -69,7 +69,7 @@ clientpubkey = lib.mkOption {
             "10.100.0.0/24"
           ];
           endpoint = cfg.endpoint;
-		  persistentKeepalive = 25;
+          persistentKeepalive = 25;
         }
       ];
     };

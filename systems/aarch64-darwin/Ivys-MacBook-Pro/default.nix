@@ -69,6 +69,7 @@
     texliveFull
     #    wezterm
     #zotero
+    nowplaying-cli
     qemu
     gnupg
     #    prismlauncher
@@ -169,7 +170,6 @@
       enable = true;
 
       brews = [
-        "nowplaying-cli"
         "mole"
         "speedtest"
       ];

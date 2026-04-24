@@ -19,6 +19,10 @@
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
+    nowplaying-cli = {
+      url = "github:auscyber/nowplaying-cli";
+      flake = false;
+    };
     nix-topology.url = "github:oddlama/nix-topology";
     attic = {
       url = "path:./inputs/attic";
@@ -136,6 +140,8 @@
     opnix.url = "github:brizzbuzz/opnix";
     nh.url = "path:./inputs/nh";
     nh.inputs.nixpkgs.follows = "nixpkgs";
+    nh.inputs.rust-overlay.follows = "rust-overlay";
+
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
