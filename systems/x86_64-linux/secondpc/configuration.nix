@@ -15,7 +15,7 @@
   #  _module.args.pkgs = lib.mkForce (import inputs.stable { inherit system ; inherit (config.nixpkgs) config overlays; });
   hardware.facter.reportPath = ./facter.json;
   #  _module.args.pkgs = lib.mkForce (import inputs.stable { inherit system ; inherit (config.nixpkgs) config overlays; });
-  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIH68LfeU1ib2+c5DCGLRtZkaSSjz2w6DgBeshr6lwOb";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICj7wlOxTp0NQJoUhRtj7k8gtDC0lCr5MJqLV5LxG9Yf root@kexec-minimal";
   auscybernix.nix.caches = false;
   auscybernix.nix.flake = "/home/auscyber/dotfiles";
   auscybernix.ssh.enable = true;
@@ -364,8 +364,7 @@
     };
 
   };
- # `keymap` won't apply when prompted to enter the passphrase to decrypt on boot
-  
+  # `keymap` won't apply when prompted to enter the passphrase to decrypt on boot
 
   #services.espanso.enable = true;
 
@@ -376,11 +375,13 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.extraPools = [ "zroot" "zpool" ];
+  boot.zfs.extraPools = [
+    "zroot"
+    "zpool"
+  ];
   boot.loader = {
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/boot/efi";
-    systemd-boot.enable = true;
   };
 
   system.stateVersion = "24.11"; # Did you read the comment?
