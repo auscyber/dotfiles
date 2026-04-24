@@ -27,19 +27,17 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/9ad69ab9-fdff-4a88-9989-817ec5f9dad5";
-    fsType = "ext4";
-  };
+  fileSystems."/" =
+    { device = "zroot/nixos";
+      fsType = "zfs";
+    };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/A4A9-5000";
-    fsType = "vfat";
-    options = [
-      "fmask=0022"
-      "dmask=0022"
-    ];
-  };
+  fileSystems."/boot/efi" =
+    { device = "/dev/disk/by-uuid/A4A9-5000";
+      fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
+    };
+
 
   swapDevices = [ ];
 

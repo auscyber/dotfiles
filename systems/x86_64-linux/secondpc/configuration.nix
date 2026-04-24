@@ -48,8 +48,8 @@
     '';
   };
   fileSystems."/mnt/hdd" = {
-    device = "/dev/disk/by-uuid/f36e6507-7db6-46ab-bc49-8b2770d3652a";
-    fsType = "ext4";
+    device = "zpool/root";
+    fsType = "zfs";
   };
   services.netatalk = {
     enable = true;
@@ -90,7 +90,6 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   # boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot";
   #boot.loader.grub.devices = "/dev/sda";
   # boot.loader.grub.useOSProber = true;
   networking.hostName = "secondpc"; # Define your hostname.
@@ -376,6 +375,14 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.zfs.extraPools = [ "zroot" "zpool" ];
+  boot.loader = {
+    efi.canTouchEfiVariables = true;
+    efi.efiSysMountPoint = "/boot/efi";
+    systemd-boot.enable = true;
+  };
+
   system.stateVersion = "24.11"; # Did you read the comment?
   environment.etc."current-system-packages".text =
     let
