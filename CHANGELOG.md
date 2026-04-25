@@ -14,6 +14,14 @@ be put in the "Changed" section or, if it's just to remove code or
 functionality, under the "Removed" section.
 -->
 
+## Unreleased
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## 4.3.2
 
 ### Fixed
