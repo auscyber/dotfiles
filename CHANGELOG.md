@@ -14,6 +14,20 @@ be put in the "Changed" section or, if it's just to remove code or
 functionality, under the "Removed" section.
 -->
 
+## Unreleased
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## 4.3.2
+
+### Fixed
+
+- Bumped the version of the search backend from 44 to 46 to fix outdated elasticsearch credentials.
+
 ## 4.3.1
 
 ### Changed
