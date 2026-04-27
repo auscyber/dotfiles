@@ -5,7 +5,7 @@
   ...
 }:
 {
-  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPhUgRIXS75ItfXrTu1zi9cCgBgWZQRL0u0At374LkJe";
+  age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/+SE8omiIJ7VBQKgMLsgyADUVtY37o0kn0g0uwQVKi auscyber@secondpc";
   programs.home-manager.enable = true;
 
   programs.gpg.enable = true;
@@ -19,7 +19,7 @@
       };
     };
   };
-  home.packages = with pkgs; [ pinentry-curses];
+  home.packages = with pkgs; [ pinentry-curses ];
   #  programs.neovim.enable = true;
   home.stateVersion = "25.05";
 }
