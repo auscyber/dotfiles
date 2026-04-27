@@ -93,6 +93,7 @@
   #boot.loader.grub.devices = "/dev/sda";
   # boot.loader.grub.useOSProber = true;
   networking.hostName = "secondpc"; # Define your hostname.
+networking.hostId = "4f6f802e";
   #  networking.wireless = { enable = true;  # Enables wireless support via wpa_supplicant.
   #       networks.NeddySB.pskRaw = "e9331ef6ad7d0a1d67e81afaba284e4544cedb73b33f840c9812fc1991562dcc";
   #  };

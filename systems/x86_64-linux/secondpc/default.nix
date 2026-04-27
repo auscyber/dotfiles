@@ -12,9 +12,9 @@
     #    ./grafana.nix
     ./cache.nix
     #	./jitsi.nix
-    ./nextcloudtfu.nix
+#    ./nextcloudtfu.nix
     ./vpn.nix
-    ./navidrome.nix
+#    ./navidrome.nix
     #    ./../../modules/system/grub.nix
     #    ./mailserver.nix
     #    ./minecraft.nix
