@@ -249,6 +249,12 @@ the cleanup process to let you know what is to be cleaned.
     >
   </p>
 
+> [!NOTE]
+> By default `nh clean` will automatically clean up your
+> [gcroots](https://nixos.org/guides/nix-pills/11-garbage-collector.html#indirect-roots)
+> directory, which will remove all your built result and direnv directories. If
+> you do not want to have this behaviour you can use the flag `--no-gcroots`.
+
 ### Platform Specific Subcommands
 
 Platform specific subcommands are those that implement CLI utilities for
