@@ -806,40 +806,6 @@ fn run_remote_command(
   }
 }
 
-/// Copy a Nix closure to a remote host.
-fn copy_closure_to(
-  host: &RemoteHost,
-  path: &str,
-  use_substitutes: bool,
-) -> Result<()> {
-  info!("Copying closure to build host '{}'", host);
-
-  let mut cmd = Exec::cmd("nix-copy-closure")
-    .arg("--to")
-    .arg(host.ssh_host());
-
-  if use_substitutes {
-    cmd = cmd.arg("--use-substitutes");
-  }
-
-  cmd = cmd.arg(path).env("NIX_SSHOPTS", get_nix_sshopts_env());
-
-  debug!(?cmd, "nix-copy-closure --to");
-
-  let (exit_status, _stdout, _stderr) = exec_with_streaming(cmd, false)
-    .wrap_err("Failed to copy closure to remote host")?;
-
-  if !exit_status.success() {
-    bail!(
-      "nix-copy-closure --to '{}' failed (exit status: {:?})",
-      host,
-      exit_status
-    );
-  }
-
-  Ok(())
-}
-
 /// Validates that essential files exist in a closure on a remote host.
 ///
 /// Performs batched SSH checks using connection multiplexing. This is useful
@@ -1416,7 +1382,7 @@ const NIXOS_SYSTEM_PROFILE: &str = "/nix/var/nix/profiles/system";
 
 /// Evaluate a flake installable to get its derivation path.
 /// Matches nixos-rebuild-ng: `nix eval --raw <flake>.drvPath`
-fn eval_drv_path(installable: &Installable) -> Result<String> {
+fn eval_drv_path(installable: &Installable) -> Result<PathBuf> {
   // Build the installable with .drvPath appended
   let drv_installable = match installable {
     Installable::Flake {
@@ -1482,12 +1448,15 @@ fn eval_drv_path(installable: &Installable) -> Result<String> {
     );
   }
 
-  let drv_path = capture.stdout_str().trim().to_string();
-  if drv_path.is_empty() {
-    bail!("nix eval returned empty derivation path");
+  let drv_path = PathBuf::from(capture.stdout_str().trim().to_string());
+  if !drv_path.is_file() {
+    bail!(
+      "nix eval returned invalid derivation path: {}",
+      drv_path.display()
+    );
   }
 
-  debug!("Derivation path: {}", drv_path);
+  debug!("Derivation path: {}", drv_path.display());
   Ok(drv_path)
 }
 
@@ -1558,7 +1527,7 @@ pub fn build_remote(
   let drv_path = eval_drv_path(installable)?;
 
   // Step 2: Copy derivation to build host
-  copy_closure_to(build_host, &drv_path, use_substitutes)?;
+  copy_to_remote(build_host, &drv_path, use_substitutes)?;
 
   // Step 3: Build on remote
   info!("Building on remote host '{}'", build_host);
@@ -1651,11 +1620,11 @@ pub fn build_remote(
 /// Returns the output path.
 fn build_on_remote(
   host: &RemoteHost,
-  drv_path: &str,
+  drv_path: &Path,
   config: &RemoteBuildConfig,
 ) -> Result<String> {
   // Build command: nix build <drv>^* --print-out-paths [extra_args...]
-  let drv_with_outputs = format!("{drv_path}^*");
+  let drv_with_outputs = format!("{}^*", drv_path.display());
 
   if config.use_nom {
     // Check that nom is available before attempting to use it
