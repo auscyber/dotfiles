@@ -74,6 +74,25 @@ Then update the lock file and rebuild using the command for your
 installation method.
 
 For a standalone Home Manager flake:
+For `nixos-unstable` or `nixpkgs-unstable`, use the `master` branch
+instead:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+    };
+  };
+}
+```
+
+Then update the lock file and rebuild using the command for your
+installation method.
+
+For a standalone Home Manager flake:
 
 ``` shell
 $ nix flake update
