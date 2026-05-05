@@ -14,15 +14,22 @@ let
     text =
       # sh
       ''
-        #!/bin/sh
-                        	  set -eu
-                        set -f # disable globbing
-                        export IFS=' '
-          			  export PATH="$PATH:${pkgs.celler}/bin"
-          			  celler login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
+                #!/bin/sh
+                                	  set -eu
+                                set -f # disable globbing
+                                export IFS=' '
+                  			  export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
+                  			  celler login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
 
-                        echo "Uploading paths" $OUT_PATHS
-                        exec celler push main $OUT_PATHS
+                                echo "Uploading paths" $OUT_PATHS
+        						if [[ -n "''${OUT_PATHS:-}" ]]; then
+           export TS_MAXFINISHED=1000
+           export TS_SLOTS=10
+
+           echo "Uploading $OUT_PATHS"
+           printf "%s" "$OUT_PATHS" \
+           | xargs ts celler push main
+        fi
 
       '';
 
