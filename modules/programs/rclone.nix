@@ -9,6 +9,7 @@ let
   iniFormat = pkgs.formats.ini { };
   replaceIllegalChars = builtins.replaceStrings [ "/" " " "$" ] [ "." "_" "" ];
   isUsingSecretProvisioner = name: config ? "${name}" && config."${name}".secrets != { };
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 
   # serve protocols that can use `Type=notify` services, this is determined from rclone source code
   serveProtocolNotifies = [
@@ -61,6 +62,84 @@ let
       '';
     };
   };
+
+  # Creates a sidecar user launchd agent (Darwin). Returns an attrset of launchd agents.
+  mkRcloneLaunchdAgents =
+    # type of the sidecar, either "mounts" or "serve" corresponding to options
+    sidecarType:
+    lib.listToAttrs (
+      lib.concatMap (
+        _remote: # remote name + remote config
+        let
+          remoteName = _remote.name;
+          remote = _remote.value;
+        in
+        lib.concatMap (
+          _sidecar: # sidecar path + sidecar config
+          let
+            sidecarPath = _sidecar.name;
+            sidecar = _sidecar.value;
+
+            isMount = sidecarType == "mounts";
+            cmdName = if isMount then "mount" else "serve";
+            label = "rclone-${cmdName}:${replaceIllegalChars sidecarPath}@${remoteName}";
+
+            # Convert options attrset to argv list for ProgramArguments.
+            optArgs = lib.cli.toGNUCommandLine { } sidecar.options;
+
+            programArguments =
+              if isMount then
+                (
+                  [
+                    (lib.getExe cfg.package)
+                    "mount"
+                  ]
+                  ++ optArgs
+                  ++ [
+                    "${remoteName}:${sidecarPath}"
+                    sidecar.mountPoint
+                  ]
+                )
+              else
+                (
+                  [
+                    (lib.getExe cfg.package)
+                    "serve"
+                    sidecar.protocol
+                  ]
+                  ++ optArgs
+                  ++ [ "${remoteName}:${sidecarPath}" ]
+                );
+
+            env = lib.optionalAttrs (sidecar.logLevel != null) {
+              RCLONE_LOG_LEVEL = sidecar.logLevel;
+            };
+
+            preStart = lib.optionalString isMount ''
+              ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg sidecar.mountPoint}
+            '';
+
+            shouldAuto = if isMount then sidecar.autoMount else sidecar.autoStart;
+          in
+          lib.optional (sidecar.enable && shouldAuto) (
+            lib.nameValuePair label {
+              enable = true;
+              config = {
+                Label = label;
+                ProgramArguments = programArguments;
+                RunAtLoad = true;
+                KeepAlive = {
+                  Crashed = true;
+                  SuccessfulExit = false;
+                };
+                EnvironmentVariables = env;
+              };
+              preStart = preStart;
+            }
+          )
+        ) (lib.attrsToList (remote.${sidecarType} or { }))
+      ) (lib.attrsToList cfg.remotes)
+    );
 
   # creates a sidecar user service. returns an attrset of systemd services
   mkRcloneSidecars =
@@ -412,6 +491,72 @@ in
 
   config =
     let
+
+      rcloneConfigLaunchdAgent =
+        let
+          safeConfig = lib.pipe cfg.remotes [
+            (lib.mapAttrs (_: v: v.config))
+            (iniFormat.generate "rclone.conf@pre-secrets")
+          ];
+
+          injectSecret =
+            remote:
+            lib.mapAttrsToList (secret: secretFile: ''
+              if [[ ! -r "${secretFile}" ]]; then
+                echo "Secret \"${secretFile}\" not found"
+                cleanup
+              fi
+
+              if ! ${lib.getExe cfg.package} config update \
+                     ${remote.name} config_refresh_token=false \
+                     ${secret}="$(cat "${secretFile}")" \
+                     --non-interactive; then
+                echo "Failed to inject secret \"${secretFile}\""
+                cleanup
+              fi
+            '') remote.value.secrets or { };
+
+          injectAllSecrets = lib.concatMap injectSecret (lib.mapAttrsToList lib.nameValuePair cfg.remotes);
+          rcloneConfigPath = "${config.xdg.configHome}/rclone/rclone.conf";
+
+          script = pkgs.writeShellApplication {
+            name = "rclone-config";
+            runtimeInputs = [ pkgs.coreutils ];
+            text = ''
+              configPath="${rcloneConfigPath}"
+              configName="$(basename $configPath)"
+              savedConfigPath="$(dirname $configPath)"/."$configName".orig
+
+              cleanup() {
+                echo "Failed to render config."
+                if [ -f "$savedConfigPath" ]; then
+                  cp -v "$savedConfigPath" "${rcloneConfigPath}"
+                fi
+                exit 1
+              }
+
+              trap cleanup SIGINT
+
+              if [ -f "${rcloneConfigPath}" ]; then
+                cp -v "${rcloneConfigPath}" "$savedConfigPath"
+              fi
+
+              install -v -D -m600 "${safeConfig}" "${rcloneConfigPath}"
+              ${lib.concatLines injectAllSecrets}
+            '';
+          };
+        in
+        lib.mkIf (cfg.remotes != { }) {
+          rclone-config = {
+            enable = true;
+            config = {
+              Label = "rclone-config";
+              ProgramArguments = [ (lib.getExe script) ];
+              RunAtLoad = true;
+            };
+          };
+        };
+
       rcloneConfigService =
         let
           safeConfig = lib.pipe cfg.remotes [
@@ -495,6 +640,13 @@ in
     in
     lib.mkIf cfg.enable {
       home.packages = [ cfg.package ];
+      launchd.agents = (
+        lib.mkMerge [
+          rcloneConfigLaunchdAgent
+          (mkRcloneLaunchdAgents "mounts")
+          (mkRcloneLaunchdAgents "serve")
+        ]
+      );
       systemd.user.services = lib.mkMerge [
         rcloneConfigService
         (mkRcloneSidecars "mounts")
