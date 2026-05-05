@@ -46,7 +46,7 @@
       inputs.rust-overlay.overlays.default
       inputs.nvfetcher.overlays.default
       #      inputs.lix-module.overlays.default
-      inputs.neovim.overlays.default
+      #      inputs.neovim.overlays.default
       (
         final: prev:
         import ./literal.nix {

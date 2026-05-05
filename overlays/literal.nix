@@ -45,6 +45,7 @@ let
 in
 (
   {
+    neovim = inputs.neovim.packages."${system}".default;
     nowplaying-cli = pkgs.nowplaying-cli.overrideAttrs (attrs: {
       src = inputs.nowplaying-cli;
     });
