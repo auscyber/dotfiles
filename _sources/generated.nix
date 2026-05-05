@@ -53,7 +53,6 @@
     src = fetchTarball {
       url = "https://github.com/imputnet/helium-linux/releases/download/0.11.7.1/helium-0.11.7.1-x86_64_linux.tar.xz";
       sha256 = "sha256-9y9vviF8iBewUSVMVpOW1dFX5GmSDQSR/kH/OlOvCKg=";
-<<<<<<< HEAD
     };
   };
   helium_macos = {
@@ -62,8 +61,6 @@
     src = fetchurl {
       url = "https://github.com/imputnet/helium-macos/releases/download/0.11.7.1/helium_0.11.7.1_arm64-macos.dmg";
       sha256 = "sha256-jbu/w3/GYC60Gs0ueeECrbeDDSLAoXFManquIpw0VvM=";
-=======
->>>>>>> 9dbf96b4b (change and update)
     };
   };
   icon_map = {
@@ -113,7 +110,6 @@
       sha256 = "sha256-lzPsYYcrp5NoT3B0WFj3o10Z7tXx7xva1wEP3edeuqM=";
     };
   };
-<<<<<<< HEAD
   sketchybar = {
     pname = "sketchybar";
     version = "v2.23.0";
@@ -131,19 +127,10 @@
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
       rev = "8fb755972514458ed86bb8130bcac01ce18a57e4";
-=======
-  slskd = {
-    pname = "slskd";
-    version = "50608eb15eaed8c951eed0599be28df2821c79b3";
-    src = fetchgit {
-      url = "https://github.com/slskd/slskd.git";
-      rev = "50608eb15eaed8c951eed0599be28df2821c79b3";
->>>>>>> 9dbf96b4b (change and update)
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-<<<<<<< HEAD
       sha256 = "sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=";
     };
     extract = {
@@ -152,13 +139,6 @@
     "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
     
     };
-=======
-      sha256 = "sha256-/bvyHcIRGBuH5eNXeisZWbL/5/J2ZFq9A5Vg2z+B9cw=";
-    };
-    extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-_bvyHcIRGBuH5eNXeisZWbL_5_J2ZFq9A5Vg2z+B9cw=/./src/web/package-lock.json";
-    };date = "2026-05-02";
->>>>>>> 9dbf96b4b (change and update)
   };
   yabai = {
     pname = "yabai";
