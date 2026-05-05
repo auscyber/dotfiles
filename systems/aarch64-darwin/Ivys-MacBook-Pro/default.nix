@@ -18,10 +18,12 @@
     substituters = [
       "https://cache.nixos.org"
       "http://10.100.0.1:8501"
+      "https://cache.ivymect.in/main"
       #"https://auscyber.cachix.org"
     ];
     trusted-public-keys = [
       "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+      "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4"
     ];
   };
   #  sops.age.plugins = with pkgs; [
