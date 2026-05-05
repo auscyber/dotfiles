@@ -28,6 +28,10 @@
       url = "path:./inputs/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    celler = {
+      url = "github:blitz/celler";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";

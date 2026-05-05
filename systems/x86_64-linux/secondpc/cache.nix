@@ -1,15 +1,17 @@
 { config, pkgs, ... }:
 {
-  age.secrets."attic_env" = {
-    rekeyFile = ./attic_env.age;
-    generator = {
-      script =
-        { pkgs, ... }:
-        ''
-          printf 'ATTIC_SERVER_TOKEN_RS256_SECRET_BASE64=%s\n' "$(${pkgs.openssl}/bin/openssl genrsa -traditional 4096 | base64 -w0)"
-        '';
-
+  age.templates."cache_key" = {
+    rekeyFile = ./cache.age;
+  };
+  age.templates."celler_env" = {
+    dependencies = {
+      cache_key = config.age.secrets."cache_key";
     };
+    content =
+      { placeholders, ... }:
+      ''
+        	CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
+        	'';
 
   };
   services.nginx.virtualHosts."cache.ivymect.in" = {
@@ -23,9 +25,9 @@
       	'';
   };
 
-  services.atticd = {
+  services.cellerd = {
     enable = true;
-    environmentFile = config.age.secrets."attic_env".path;
+    environmentFile = config.age.templates."celler_env".path;
     useFlakeCompatOverlay = false;
     settings = {
       listen = "[::]:8069";

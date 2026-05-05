@@ -25,8 +25,8 @@ in
         rekeyFile = ../../../secrets/attickey.age;
       };
     };
-    age.templates."attic-config" = {
-      path = "${config.home.homeDirectory}/.config/attic/config.toml";
+    age.templates."celler_config" = {
+      path = "${config.home.homeDirectory}/.config/celler/config.toml";
       dependencies = {
         inherit (config.age.secrets) attic_token;
       };
@@ -40,7 +40,7 @@ in
         '';
     };
     home.packages = with pkgs; [
-      attic-client
+      celler
       inputs.self.packages.${pkgs.stdenv.system}.config-helper-commands
     ];
     services.gpg-agent = {

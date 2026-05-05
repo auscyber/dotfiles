@@ -40,6 +40,7 @@
   auscybernix.secrets.configId = "${system}-${hostname}";
   #  age.rekey.localStorageDir = ../../.. + "/secrets/rekeyed/${hostname}";
   #  determinateNix.enable = true;
+  nix.settings.auto-optimise-store = true;
   nix.optimise = {
     automatic = true;
     interval = [

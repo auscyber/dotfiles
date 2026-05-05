@@ -18,11 +18,11 @@ let
                         	  set -eu
                         set -f # disable globbing
                         export IFS=' '
-          			  export PATH="$PATH:${pkgs.attic-client}/bin"
-          			  attic login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
+          			  export PATH="$PATH:${pkgs.celler}/bin"
+          			  celler login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
 
                         echo "Uploading paths" $OUT_PATHS
-                        exec attic push main $OUT_PATHS
+                        exec celler push main $OUT_PATHS
 
       '';
 

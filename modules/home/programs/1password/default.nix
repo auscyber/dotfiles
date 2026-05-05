@@ -37,6 +37,7 @@ in
       # automatically installed and configured to use shell plugins
       plugins = with pkgs; [
         gh
+        glab
 
         pkgs.awscli2
       ];

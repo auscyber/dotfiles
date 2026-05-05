@@ -55,6 +55,16 @@ in
       inherit (sources.sketchybar) src version;
       patches = [ ../packages/sketchybar-pid.patch ];
     });
+    percollate =
+      (pkgs.percollate.override {
+        chromium = self.helium;
+      }).overrideAttrs
+        (attrs: {
+          postInstall = ''
+            wrapProgram $out/bin/percollate \
+              --set PUPPETEER_EXECUTABLE_PATH ${self.helium}/bin/helium
+          '';
+        });
 
     sccacheWrapper =
       lib.makeOverridable

@@ -2,6 +2,7 @@
   stdenvNoCC,
   _7zz,
   source,
+  makeWrapper,
 }:
 stdenvNoCC.mkDerivation {
   inherit (source)
@@ -10,7 +11,10 @@ stdenvNoCC.mkDerivation {
     src
     ;
 
-  nativeBuildInputs = [ _7zz ];
+  nativeBuildInputs = [
+    _7zz
+    makeWrapper
+  ];
 
   sourceRoot = ".";
 
@@ -18,9 +22,10 @@ stdenvNoCC.mkDerivation {
   dontFixup = true;
 
   installPhase = ''
-    runHook preInstall
-    mkdir -p $out/Applications
-    cp -r Helium.app $out/Applications/
-    runHook postInstall
+    		      runHook preInstall
+    		      mkdir -p $out/Applications
+    		      cp -r Helium.app $out/Applications/
+    		      runHook postInstall
+    		    makeWrapper $out/Applications/Helium.app/Contents/MacOS/helium $out/bin/helium
   '';
 }
