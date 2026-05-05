@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  age.templates."cache_key" = {
+  age.secrets."cache_key" = {
     rekeyFile = ./cache.age;
   };
   age.templates."celler_env" = {

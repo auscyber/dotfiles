@@ -47,6 +47,7 @@ in
         ../modules/common/nix
         ../modules/common/common
         ../modules/common/nix/ccache
+        inputs.celler.nixosModules.cellerd
         inputs.nix-flatpak.nixosModules.nix-flatpak
 
         #	  ../modules/common/builders/builder.nix
