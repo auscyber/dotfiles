@@ -32,6 +32,7 @@ in
     ./hardware-configuration.nix
   ];
   programs.nix-ld.enable = true;
+  boot.zfs.package = pkgs.zfs_unstable;
   services.zfs.autoScrub.enable = true;
   hardware.openrazer.enable = true;
   services.flatpak = {
@@ -52,7 +53,7 @@ in
   programs.fish.enable = true;
   programs.kdeconnect.enable = true;
 
-  boot.initrd.compressor = "lzma";
+  boot.initrd.compressor = "zstd";
 
   auscybernix = {
     nix.flake = "/home/auscyber/dotfiles";
@@ -236,6 +237,9 @@ in
   boot.lanzaboote = {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
+    settings = {
+      configurationLimit = 2;
+    };
     #    autoEnrollKeys = {
     #      enable = true;
     #    };
@@ -302,6 +306,7 @@ in
       enable = true;
       # package = pkgs.pulseaudioFull;
     };
+    jack.enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -359,7 +364,15 @@ in
   #   enableSSHSupport = true;
   # };
 
-  services.displayManager.ly.enable = true;
+  services.displayManager.ly = {
+    enable = true;
+    settings = {
+      animation = "dur_file";
+      dur_file_path = builtins.toString ./blackhole.dur;
+      full_color = true;
+
+    };
+  };
   #  services.displayManager.sddm.enable = true;
   #  services.displayManager.sddm.wayland.enable = true;
   #  services.displayManager.sddm.enableHidpi = true;
@@ -425,7 +438,7 @@ in
         "http://192.168.0.26:8501"
       ];
       trusted-public-keys = [
-        "192.168.0.26:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+        "192.168.0.26:gPKG4+8dHIMAT36oWixEKssz4yvmoFm1AsYLGSOPXs8="
         "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       ];
@@ -472,5 +485,10 @@ in
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "23.11"; # Did you read the comment?
+  nixpkgs.config = {
+    problems.handlers = {
+      zfs.broken = "warn"; # or "ignore"
+    };
+  };
 
 }

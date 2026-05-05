@@ -100,7 +100,7 @@ rec {
     [
       obs-studio
       helium
-      #      heroic
+      heroic
       shadps4
       #      element-desktop
       tidal-hifi
@@ -110,7 +110,7 @@ rec {
       #      neovim-nightly
       #      firefox
       tmux
-      wineWowPackages.stable
+      #      wineWowPackages.stable
       #      emacs
       pcmanfm
       fzf

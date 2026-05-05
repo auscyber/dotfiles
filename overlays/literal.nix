@@ -42,6 +42,29 @@ let
     inherit (pkgs) system;
     config.allowUnfree = true;
   };
+  linux_zen = pkgs.linux_zen.override (
+    let
+      suffix = "zen1";
+    in
+    {
+      argsOverride =
+
+        rec {
+          version = "6.19.14";
+          pname = "linux-zen";
+          modDirVersion = lib.versions.pad 3 "${version}-${suffix}";
+          isZen = true;
+
+          src = pkgs.fetchFromGitHub {
+            owner = "zen-kernel";
+            repo = "zen-kernel";
+            rev = "v${version}-${suffix}";
+            sha256 = "sha256-Y28Wrcyph4qjPpGUr/e5QjgTv5Z5Yar7plrenKDRCDM=";
+          };
+
+        };
+    }
+  );
 in
 (
   {
@@ -133,7 +156,7 @@ in
         };
       in
       (pkgs.linuxPackagesFor (
-        pkgs.linux_zen.override (prev: {
+        linux_zen.override (prev: {
           #          stdenv = llvmKernelStdenv;
           inherit stdenv;
           buildPackages = pkgs.buildPackages // {
