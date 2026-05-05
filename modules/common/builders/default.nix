@@ -82,6 +82,11 @@ with lib;
   };
   config = mkIf cfg.enable (mkMerge [
     {
+      auscybernix.nix.builders.builderConfig.publicHostKey = lib.mkDefault (
+        lib.extra.toBase64 config.age.rekey.hostPubkey
+      );
+      auscybernix.nix.builders.builderConfig.ipAddress = lib.mkDefault (config.auscybernix.vpn.ipAddress);
+
       age.secrets."builder-ssh-key" = {
         generator = {
           script =
