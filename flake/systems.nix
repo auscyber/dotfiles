@@ -25,7 +25,7 @@ in
       containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
 
       importedHomeModules = [
-        inputs._1password-shell-plugins.hmModules.default
+        inputs.op-shell-plugins.hmModules.default
         inputs.zen-browser.homeModules.default
         inputs.nixvim.homeModules.default
         inputs.nix-index-database.homeModules.nix-index

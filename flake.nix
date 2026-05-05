@@ -172,7 +172,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    _1password-shell-plugins.url = "github:1Password/shell-plugins";
+    op-shell-plugins.url = "github:1Password/shell-plugins?ref=pull/594/merge";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.url = "github:nix-community/nix-index-database";

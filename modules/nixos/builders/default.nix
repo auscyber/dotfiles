@@ -16,7 +16,7 @@ in
     nix.buildMachines =
       lib.flip lib.mapAttrsToList
         (lib.filterAttrs (
-          name: x: name != systemIdentifier && (cfg.absoluteSpeedFactor * 0.75) > x.absoluteSpeedFactor
+          name: x: name != systemIdentifier && (cfg.absoluteSpeedFactor * 0.75) < (x.absoluteSpeedFactor - 1)
         ) flakeConfig.flake.auscybernix.builders.buildMachines)
         (
           name: builder: {
