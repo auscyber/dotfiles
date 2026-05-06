@@ -20,13 +20,17 @@ functionality, under the "Removed" section.
 
 ### Fixed
 
+- The regression introduced by the `Subprocess` crate upgrade causing various
+  event outputs to be printed incorrectly should now be resolved.
+
 ### Removed
 
 ## 4.3.2
 
 ### Fixed
 
-- Bumped the version of the search backend from 44 to 46 to fix outdated elasticsearch credentials.
+- Bumped the version of the search backend from 44 to 46 to fix outdated
+  elasticsearch credentials.
 
 ## 4.3.1
 
