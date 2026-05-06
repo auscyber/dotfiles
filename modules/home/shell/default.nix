@@ -49,7 +49,18 @@ in
       git.diffToolMode = true;
       jujutsu.enable = true;
     };
-    programs.jujutsu.enable = true;
+    programs.jujutsu = {
+
+      enable = true;
+
+      settings = {
+        user = {
+          name = "Ivy Pierlot";
+          email = "ivyp@outlook.com.au";
+        };
+      };
+    };
+
     services.gpg-agent = {
       extraConfig = ''
            allow-loopback-pinentry
