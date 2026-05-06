@@ -34,50 +34,52 @@ let
 
 in
 inputs.darwin.lib.darwinSystem {
-  specialArgs = common.mkSpecialArgs {
-    inherit
-      inputs
-      hostname
-      system
-      extendedLib
-      ;
- } // {
- systemIdentifier = "${hostname}-${system}";
-};
-inherit system;
-modules = [
-{ _module.args.lib = extendedLib; }
-]
-++ importedDarwinModules
-++ [
+  specialArgs =
+    common.mkSpecialArgs {
+      inherit
+        inputs
+        hostname
+        system
+        extendedLib
+        ;
+    }
+    // {
+      systemIdentifier = "${hostname}-${system}";
+    };
+  inherit system;
+  modules = [
+    { _module.args.lib = extendedLib; }
+  ]
+  ++ importedDarwinModules
+  ++ [
 
-{
-	nixpkgs = {
-		inherit system;
+    {
+      nixpkgs = {
+        inherit system;
 
-	}
-	// common.mkNixpkgsConfig flake;
+      }
+      // common.mkNixpkgsConfig flake;
 
-	auscybernix.secrets.enable = true;
+      auscybernix.secrets.enable = true;
+    }
+
+    ../../modules/common/nix
+    ../../modules/common/secrets.nix
+
+    ../../modules/common/hm
+    ../../modules/common/common
+
+    ../../modules/common/allConfigs.nix
+    ../../modules/common/kmonad
+    ../../modules/common/ssh-keys.nix
+    homeManagerConfig
+
+  ]
+  ++ (extendedLib.importModulesRecursive ../../modules/darwin)
+  ++ [
+
+    ../../systems/${system}/${hostname}
+  ]
+  ++ modules;
+
 }
-
-../../modules/common/nix
-../../modules/common/secrets.nix
-
-../../modules/common/hm
-../../modules/common/common
-
-../../modules/common/allConfigs.nix
-../../modules/common/kmonad
-../../modules/common/ssh-keys.nix
-homeManagerConfig
-
-	]
-++ (extendedLib.importModulesRecursive ../../modules/darwin)
-	++ [
-
-		../../systems/${system}/${hostname}
-	]
-	++ modules;
-
-	}

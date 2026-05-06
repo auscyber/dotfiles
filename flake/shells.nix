@@ -35,7 +35,7 @@
               with pkgs;
               [
                 sops
-				pinentry
+                pinentry
                 age
                 ssh-to-age
                 age-plugin-1p

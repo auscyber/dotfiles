@@ -21,9 +21,9 @@ stdenv.mkDerivation {
 
     	  wrapProgram $out/bin/gpg-agent --add-flags "${gnupg}/bin/gpg-agent"
     	'';
-meta = {
-platforms = lib.platforms.darwin;
+  meta = {
+    platforms = lib.platforms.darwin;
 
-};
+  };
 
 }

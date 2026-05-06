@@ -44,12 +44,12 @@ in
       inputs.self.packages.${pkgs.stdenv.system}.config-helper-commands
     ];
     programs.difftastic = {
-enable = true;
-git.enable = true;
-git.diffToolMode = true;
-jujutsu.enable = true;
-};
-programs.jujutsu.enable = true;
+      enable = true;
+      git.enable = true;
+      git.diffToolMode = true;
+      jujutsu.enable = true;
+    };
+    programs.jujutsu.enable = true;
     services.gpg-agent = {
       extraConfig = ''
            allow-loopback-pinentry

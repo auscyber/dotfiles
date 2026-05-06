@@ -1,4 +1,4 @@
 return {
-    chevron = "",
-    clock = "",
+	chevron = "",
+	clock = "",
 }

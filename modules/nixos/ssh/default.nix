@@ -28,19 +28,19 @@ in
 
       #	};
     };
-	environment.etc =
-    lib.concatMapAttrs
-      (user: value: {
-        "authorized_keys/${user}.keys" = {
-          text = builtins.concatStringsSep "\n" value.openssh.authorizedKeys.keys;
-        };
+    environment.etc =
+      lib.concatMapAttrs
+        (user: value: {
+          "authorized_keys/${user}.keys" = {
+            text = builtins.concatStringsSep "\n" value.openssh.authorizedKeys.keys;
+          };
 
-      })
-      (
-        lib.filterAttrs (
-          name: user: user.isNormalUser && user.openssh.authorizedKeys != null
-        ) config.users.users
-      );
+        })
+        (
+          lib.filterAttrs (
+            name: user: user.isNormalUser && user.openssh.authorizedKeys != null
+          ) config.users.users
+        );
 
     security.pam.services.sudo = {
       rssh = true;

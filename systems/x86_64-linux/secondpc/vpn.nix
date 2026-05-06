@@ -16,19 +16,21 @@ in
   };
   age.secrets."wg_private_key" = {
     rekeyFile = ./wg_private_key.age;
-	owner = "systemd-network";
-	group = "systemd-network";
+    owner = "systemd-network";
+    group = "systemd-network";
     generator.script =
       { pkgs, file, ... }:
       ''
-        privkey="$(${pkgs.wireguard-tools}/bin/wg genkey)"
-		echo "$privkey" | ${pkgs.wireguard-tools}/bin/wg pubkey > ${lib.escapeShellArg (lib.removeSuffix ".age" file) + ".pub"}
-		echo "$privkey"
+                privkey="$(${pkgs.wireguard-tools}/bin/wg genkey)"
+        		echo "$privkey" | ${pkgs.wireguard-tools}/bin/wg pubkey > ${
+            lib.escapeShellArg (lib.removeSuffix ".age" file) + ".pub"
+          }
+        		echo "$privkey"
       '';
   };
   networking.defaultGateway = {
-  address = "192.168.0.1";
-  interface = "br0";
+    address = "192.168.0.1";
+    interface = "br0";
   };
   systemd.network.wait-online.ignoredInterfaces = [ "br0" ];
   networking.useNetworkd = true;
@@ -43,16 +45,16 @@ in
           MTUBytes = "1500";
         };
         wireguardConfig = {
-		RouteTable = "main";
+          RouteTable = "main";
 
-        PrivateKeyFile = config.age.secrets."wg_private_key".path;
+          PrivateKeyFile = config.age.secrets."wg_private_key".path;
           ListenPort = 51820;
         };
 
-wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (
+        wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.configMap (
           name: peerConfig: {
             PublicKey = peerConfig.pubkey;
-#            Name = peerConfig.description;
+            #            Name = peerConfig.description;
             AllowedIPs = [ "${peerConfig.ipAddress}/32" ];
           }
         );
@@ -60,19 +62,19 @@ wireguardPeers = lib.flip lib.mapAttrsToList flakeConfig.flake.auscybernix.vpn.c
     };
     networks.wg0 = {
       matchConfig.Name = "wg0";
-      address = ["10.100.0.1/24"];
+      address = [ "10.100.0.1/24" ];
       networkConfig = {
         IPMasquerade = "ipv4";
         IPv4Forwarding = true;
       };
     };
-	networks."40-br0" = {
-	extraConfig = ''
-	[Link]
-	RequiredForOnline=routable
-	'';
+    networks."40-br0" = {
+      extraConfig = ''
+        	[Link]
+        	RequiredForOnline=routable
+        	'';
 
-	};
+    };
 
   };
-  }
+}

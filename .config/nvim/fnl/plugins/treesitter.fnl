@@ -21,8 +21,7 @@
                                                       (require :treesitter_compiler)))]
                             (if status res))])
 
-(treesitter.setup {
-                   :highlight {:enable true}
+(treesitter.setup {:highlight {:enable true}
                    :autopairs {:enable true}
                    :playground {:enable true}
                    :query_linter {:enable true}
@@ -64,40 +63,45 @@
 ;                                                                                        (not (vim.tbl_contains already-installed parser))))
 ;                                                                     (: :totable))]
 ;                                  ((. (require :nvim-treesitter) :install) parsers-to-install))
-(tree-sitter-language-injection.setup
-  {
-   :nix {
-         :comment {
-;                   :query "
-;                   ((comment) @comment .
-;          (lexical_declaration
-;            (variable_declarator
-;              value: [
-;                (string(string_fragment)@injection.content)
-;                (template_string(string_fragment)@injection.content)
-;              ]@injection.content)
-;          )
-;          (#match? @comment \"{match}\")
-;          (#set! injection.language \"{name}\")
-;        )
-;                   "
-                   :langs [
-                            {:name :bash :match  "^(\r\n|\r|\n)#( )*{lang}"}
-                            {:name :sh :match  "^(\r\n|\r|\n)#( )*{lang}"}
-                            {:name :fish :match  "^(\r\n|\r|\n)#( )*{lang}"}
-                            {:name :commonlisp :match  "^(\r\n|\r|\n)#( )*{lang}"}]}
-
-
-         :string {
-;                   :query  "
-;                              ((string_fragment) @injection.content
-;                                              (#match? @injection.content \"{match}\")
-;                                              (#set! injection.language \"{name}\"))
-;                              "
-
-                  :langs [
-                          {:name :bash :match  "^(\r\n|\r|\n)#( )*{lang}"}
-                          {:name :sh :match  "^(\r\n|\r|\n)#( )*{lang}"}]}}})
-
-
-
+(tree-sitter-language-injection.setup {:nix {:comment {;                   :query "
+                                                       ;                   ((comment) @comment .
+                                                       ;          (lexical_declaration
+                                                       ;            (variable_declarator
+                                                       ;              value: [
+                                                       ;                (string(string_fragment)@injection.content)
+                                                       ;                (template_string(string_fragment)@injection.content)
+                                                       ;              ]@injection.content)
+                                                       ;          )
+                                                       ;          (#match? @comment \"{match}\")
+                                                       ;          (#set! injection.language \"{name}\")
+                                                       ;        )
+                                                       ;                   "
+                                                       :langs [{:name :bash
+                                                                :match "^(\r
+|\r|
+)#( )*{lang}"}
+                                                               {:name :sh
+                                                                :match "^(\r
+|\r|
+)#( )*{lang}"}
+                                                               {:name :fish
+                                                                :match "^(\r
+|\r|
+)#( )*{lang}"}
+                                                               {:name :commonlisp
+                                                                :match "^(\r
+|\r|
+)#( )*{lang}"}]}
+                                             :string {;                   :query  "
+                                                      ;                              ((string_fragment) @injection.content
+                                                      ;                                              (#match? @injection.content \"{match}\")
+                                                      ;                                              (#set! injection.language \"{name}\"))
+                                                      ;                              "
+                                                      :langs [{:name :bash
+                                                               :match "^(\r
+|\r|
+)#( )*{lang}"}
+                                                              {:name :sh
+                                                               :match "^(\r
+|\r|
+)#( )*{lang}"}]}}})

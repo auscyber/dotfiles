@@ -11,7 +11,11 @@ in
 
   flake.auscybernix.vpn.configMap =
     let
-	filteredConfigs = self.lib.extra.filterDummy (lib.filterAttrs (name: value: if value.config.auscybernix ? vpn then value.config.auscybernix.vpn.enable else false) config.flake.auscybernix.systems);
+      filteredConfigs = self.lib.extra.filterDummy (
+        lib.filterAttrs (
+          name: value: if value.config.auscybernix ? vpn then value.config.auscybernix.vpn.enable else false
+        ) config.flake.auscybernix.systems
+      );
       folded =
         builtins.foldl'
           (out: config: {
@@ -19,7 +23,7 @@ in
             configs = out.configs // {
               "${config.name}" = {
                 pubkey = lib.removeSuffix "\n" (builtins.readFile config.pubkey);
-				description = config.description;
+                description = config.description;
                 ipAddress = "10.100.0.${builtins.toString out.num}";
               };
 
@@ -31,9 +35,9 @@ in
           }
           (
             lib.mapAttrsToList (name: value: {
-			  name = value._module.specialArgs.systemIdentifier;
-			  description = "${name}";
-                pubkey = value.config.auscybernix.vpn.clientpubkey;
+              name = value._module.specialArgs.systemIdentifier;
+              description = "${name}";
+              pubkey = value.config.auscybernix.vpn.clientpubkey;
             }) filteredConfigs
           );
     in

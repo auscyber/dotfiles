@@ -20,7 +20,8 @@
             ; :mod feline}
             :akinsho/nvim-bufferline.lua
             {:config #(require :plugins.bufferline)} ;
-            :stevearc/conform.nvim {:config #(require :plugins.conform)} ;:mod conform}
+            :stevearc/conform.nvim {:config #(require :plugins.conform)}
+            ;:mod conform}
             :nvim-telescope/telescope.nvim
             {:cmd :Telescope
              :keys [:<C-f> :<C-b>]
@@ -140,7 +141,8 @@
             :esensar/nvim-dev-container
             {:config (fn []
                        ((. (require :devcontainer) :setup) {}))}
-            :jmbuhr/otter.nvim {:dependencies [:nvim-treesitter/nvim-treesitter]}
+            :jmbuhr/otter.nvim
+            {:dependencies [:nvim-treesitter/nvim-treesitter]}
             :neovim/nvim-lspconfig
             {:ft [:scss
                   :htmldjango

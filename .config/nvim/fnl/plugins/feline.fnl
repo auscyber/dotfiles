@@ -48,8 +48,7 @@
   (each [_ msg (ipairs buf_messages)]
     (let [client_name (.. "[" msg.name "]")]
       (table.insert msgs (nc " "
-                             (if msg.progress
-                                 ; add spinner if the spinner exists
+                             (if msg.progress ; add spinner if the spinner exists
                                  (nc (when msg.spinner
                                        (.. (. spinner_frames
                                               (+ 1

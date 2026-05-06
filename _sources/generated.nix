@@ -98,7 +98,7 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-7rGV0nfI_ntvByz3NQs_2Sa2q_Ml8O3XRD14Mbt5fIU=/Cargo.lock";
       outputHashes = {
-        
+
       };
     };
   };
@@ -134,10 +134,13 @@
       sha256 = "sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=/./src/web/package-lock.json";
-    };date = "2026-05-03";prefetch = {
-    "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
-    
+      "./src/web/package-lock.json" =
+        ./. + "/sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=/./src/web/package-lock.json";
+    };
+    date = "2026-05-03";
+    prefetch = {
+      "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
+
     };
   };
   yabai = {
