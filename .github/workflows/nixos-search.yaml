@@ -21,7 +21,7 @@ jobs:
 
           # NOTE: this number and the version number in src/search.rs have
           # to be updated when nixos-search updates it's version number.
-          VERSION_NUMBER=46
+          VERSION_NUMBER=48
 
           echo "Found VERSION: $VERSION_CONTENT"
 

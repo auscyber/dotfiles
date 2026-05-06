@@ -170,7 +170,7 @@ impl args::SearchArgs {
             // this file and the corresponding workflow called
             // nixos-search.yaml have to be updated accordingly.
             .post(format!(
-                "https://search.nixos.org/backend/latest-46-{channel}/_search"
+                "https://search.nixos.org/backend/latest-48-{channel}/_search"
             ))
             .json(&query)
             .header("User-Agent", format!("nh/{NH_VERSION}"))
