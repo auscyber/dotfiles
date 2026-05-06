@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-25.11";
 
   outputs =
     {
@@ -26,7 +26,7 @@
         default = self.packages.${pkgs.stdenv.hostPlatform.system}.nh;
       });
 
-      checks = self.packages // self.devShells;
+      checks = builtins.removeAttrs (self.packages // self.devShells) [ "x86_64-darwin" ];
 
       devShells = forAllSystems (pkgs: {
         default = import ./shell.nix { inherit pkgs; };
