@@ -87,7 +87,6 @@
             "url": "https://github.com/imputnet/helium-linux/releases/download/0.11.7.1/helium-0.11.7.1-x86_64_linux.tar.xz"
         },
         "version": "0.11.7.1"
-<<<<<<< HEAD
     },
     "helium_macos": {
         "cargoLock": null,
@@ -104,8 +103,6 @@
             "url": "https://github.com/imputnet/helium-macos/releases/download/0.11.7.1/helium_0.11.7.1_arm64-macos.dmg"
         },
         "version": "0.11.7.1"
-=======
->>>>>>> 9dbf96b4b (change and update)
     },
     "icon_map": {
         "cargoLock": null,
@@ -186,7 +183,6 @@
         },
         "version": "GE-Proton10-34"
     },
-<<<<<<< HEAD
     "sketchybar": {
         "cargoLock": null,
         "date": null,
@@ -214,13 +210,6 @@
         "date": "2026-05-03",
         "extract": {
             "./src/web/package-lock.json": "sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=/./src/web/package-lock.json"
-=======
-    "slskd": {
-        "cargoLock": null,
-        "date": "2026-05-02",
-        "extract": {
-            "./src/web/package-lock.json": "sha256-_bvyHcIRGBuH5eNXeisZWbL_5_J2ZFq9A5Vg2z+B9cw=/./src/web/package-lock.json"
->>>>>>> 9dbf96b4b (change and update)
         },
         "name": "slskd",
         "passthru": null,
@@ -233,22 +222,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-<<<<<<< HEAD
             "rev": "8fb755972514458ed86bb8130bcac01ce18a57e4",
             "sha256": "sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=",
-=======
-            "rev": "50608eb15eaed8c951eed0599be28df2821c79b3",
-            "sha256": "sha256-/bvyHcIRGBuH5eNXeisZWbL/5/J2ZFq9A5Vg2z+B9cw=",
->>>>>>> 9dbf96b4b (change and update)
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-<<<<<<< HEAD
         "version": "8fb755972514458ed86bb8130bcac01ce18a57e4"
-=======
-        "version": "50608eb15eaed8c951eed0599be28df2821c79b3"
->>>>>>> 9dbf96b4b (change and update)
     },
     "yabai": {
         "cargoLock": null,
