@@ -1227,7 +1227,7 @@ fn list_generations() -> Result<Vec<generations::GenerationInfo>> {
     if let Some(name) = path.file_name().and_then(|s| s.to_str())
       && name.starts_with("system-")
       && name.ends_with("-link")
-      && let Some(gen_info) = generations::describe(&path)
+      && let Some(gen_info) = generations::describe(&path, None)
     {
       generations.push(gen_info);
     }
@@ -1376,9 +1376,16 @@ impl OsGenerationsArgs {
       })
       .collect();
 
+    let gen_dir_refs: Vec<&std::path::Path> =
+      generations.iter().map(PathBuf::as_path).collect();
+    let closure_sizes = generations::get_closure_sizes_batch(&gen_dir_refs);
+
     let descriptions: Vec<generations::GenerationInfo> = generations
       .iter()
-      .filter_map(|gen_dir| generations::describe(gen_dir))
+      .filter_map(|gen_dir| {
+        let size = closure_sizes.get(gen_dir).cloned();
+        generations::describe(gen_dir, size)
+      })
       .collect();
 
     generations::print_info(descriptions, self.fields.as_deref())?;

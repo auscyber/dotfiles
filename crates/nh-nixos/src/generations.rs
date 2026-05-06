@@ -1,4 +1,9 @@
-use std::{collections::HashMap, fs, path::Path, process};
+use std::{
+  collections::HashMap,
+  fs,
+  path::{Path, PathBuf},
+  process,
+};
 
 use chrono::{DateTime, Local, TimeZone, Utc};
 use clap::ValueEnum;
@@ -95,41 +100,11 @@ pub fn from_dir(generation_dir: &Path) -> Option<u64> {
     })
 }
 
-#[must_use]
-pub fn get_closure_size(generation_dir: &Path) -> String {
-  let store_path = generation_dir
-    .read_link()
-    .unwrap_or_else(|_| generation_dir.to_path_buf());
-  let store_path_str = store_path.to_string_lossy();
-
-  let output = match process::Command::new("nix")
-    .args(["path-info", "-Sh", "--json"])
-    .arg(generation_dir)
-    .output()
-  {
-    Ok(out) => out,
-
-    Err(e) => {
-      debug!("get_closure_size: failed to run nix path-info: {e:?}");
-      return "Unknown".to_string();
-    },
-  };
-
-  let output_str = String::from_utf8_lossy(&output.stdout);
-
-  let json: serde_json::Value =
-    match serde_json::from_str::<serde_json::Value>(&output_str) {
-      Ok(j) => j,
-
-      Err(e) => {
-        debug!(
-          "get_closure_size: failed to parse JSON: {e} output: {output_str}"
-        );
-        return "Unknown".to_string();
-      },
-    };
-
-  let closure_size = json.as_array().map_or_else(
+fn closure_size_from_json(
+  json: &serde_json::Value,
+  store_path_str: &str,
+) -> Option<u64> {
+  json.as_array().map_or_else(
     || {
       json.as_object().and_then(|obj| {
         obj
@@ -146,40 +121,124 @@ pub fn get_closure_size(generation_dir: &Path) -> String {
         (path == store_path_str).then_some(size)
       })
     },
-  );
+  )
+}
 
-  closure_size.map_or_else(
+#[expect(clippy::cast_precision_loss)]
+fn bytes_to_gb_string(bytes: u64) -> String {
+  format!("{:.1} GB", bytes as f64 / 1_073_741_824.0)
+}
+
+/// Get closure sizes for all given generation directories in a single
+/// `nix path-info` invocation.
+///
+/// # Returns
+///
+/// A map from generation directory path to formatted closure size
+/// string.
+#[must_use]
+pub fn get_closure_sizes_batch(
+  generation_dirs: &[&Path],
+) -> HashMap<PathBuf, String> {
+  if generation_dirs.is_empty() {
+    return HashMap::new();
+  }
+
+  let store_paths: Vec<PathBuf> = generation_dirs
+    .iter()
+    .map(|p| p.read_link().unwrap_or_else(|_| p.to_path_buf()))
+    .collect();
+
+  let output = match process::Command::new("nix")
+    .args(["path-info", "-Sh", "--json"])
+    .args(generation_dirs)
+    .output()
+  {
+    Ok(out) => out,
+    Err(e) => {
+      debug!("get_closure_sizes_batch: failed to run nix path-info: {e:?}");
+      return HashMap::new();
+    },
+  };
+
+  let output_str = String::from_utf8_lossy(&output.stdout);
+
+  let json: serde_json::Value =
+    match serde_json::from_str::<serde_json::Value>(&output_str) {
+      Ok(j) => j,
+      Err(e) => {
+        debug!(
+          "get_closure_sizes_batch: failed to parse JSON: {e} output: \
+           {output_str}"
+        );
+        return HashMap::new();
+      },
+    };
+
+  generation_dirs
+    .iter()
+    .zip(store_paths.iter())
+    .map(|(gen_dir, store_path)| {
+      let store_path_str = store_path.to_string_lossy();
+      let size_str = closure_size_from_json(&json, &store_path_str)
+        .map_or_else(|| "Unknown".to_string(), bytes_to_gb_string);
+      (gen_dir.to_path_buf(), size_str)
+    })
+    .collect()
+}
+
+#[must_use]
+pub fn get_closure_size(generation_dir: &Path) -> String {
+  let store_path = generation_dir
+    .read_link()
+    .unwrap_or_else(|_| generation_dir.to_path_buf());
+  let store_path_str = store_path.to_string_lossy();
+
+  let output = match process::Command::new("nix")
+    .args(["path-info", "-Sh", "--json"])
+    .arg(generation_dir)
+    .output()
+  {
+    Ok(out) => out,
+    Err(e) => {
+      debug!("get_closure_size: failed to run nix path-info: {e:?}");
+      return "Unknown".to_string();
+    },
+  };
+
+  let output_str = String::from_utf8_lossy(&output.stdout);
+
+  let json: serde_json::Value =
+    match serde_json::from_str::<serde_json::Value>(&output_str) {
+      Ok(j) => j,
+      Err(e) => {
+        debug!(
+          "get_closure_size: failed to parse JSON: {e} output: {output_str}"
+        );
+        return "Unknown".to_string();
+      },
+    };
+
+  closure_size_from_json(&json, &store_path_str).map_or_else(
     || {
-      let paths: Vec<String> = json.as_array().map_or_else(
-        || {
-          json
-            .as_object()
-            .map_or_else(Vec::new, |obj| obj.keys().cloned().collect())
-        },
-        |arr| {
-          arr
-            .iter()
-            .filter_map(|e| e.get("path")?.as_str().map(ToString::to_string))
-            .collect()
-        },
-      );
-
       debug!(
         "get_closure_size: store_path not found or closureSize missing. \
-         store_path: {store_path_str}, json paths: {:?}, output: {}",
-        paths, output_str
+         store_path: {store_path_str}, output: {output_str}"
       );
       "Unknown".to_string()
     },
-    #[expect(clippy::cast_precision_loss)]
-    |bytes| format!("{:.1} GB", bytes as f64 / 1_073_741_824.0),
+    bytes_to_gb_string,
   )
 }
 
 #[must_use]
-pub fn describe(generation_dir: &Path) -> Option<GenerationInfo> {
+pub fn describe(
+  generation_dir: &Path,
+  closure_size: Option<String>,
+) -> Option<GenerationInfo> {
   let generation_number = from_dir(generation_dir)?;
-  let closure_size = get_closure_size(generation_dir);
+  let closure_size =
+    closure_size.unwrap_or_else(|| get_closure_size(generation_dir));
   // Get metadata once and reuse for both date and existence checks
   let metadata = fs::metadata(generation_dir).ok()?;
   let build_date = metadata
