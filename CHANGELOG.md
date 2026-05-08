@@ -18,10 +18,22 @@ functionality, under the "Removed" section.
 
 ### Changed
 
+- `nh search` now uses search backend version 48 (previously 46) to track the
+  current Elasticsearch endpoint.
+
 ### Fixed
 
 - The regression introduced by the `Subprocess` crate upgrade causing various
   event outputs to be printed incorrectly should now be resolved.
+- `nh os info` now batches `nix path-info` calls into a single invocation
+  instead of spawning one process per generation. On systems with hundreds of
+  generations this reduces runtime from over a minute to a few seconds.
+  ([#636](https://github.com/nix-community/nh/issues/636))
+  - `nh os info` now uses a direct map lookup when extracting closure sizes from
+    `nix path-info` JSON output, replacing an O(N) key scan with an O(1) lookup.
+- The `indicatif` spinner shown during remote closure copying has been fixed so
+  it renders correctly again. Hooray.
+  ([#635](https://github.com/nix-community/nh/pull/635))
 
 ### Removed
 
@@ -39,6 +51,7 @@ functionality, under the "Removed" section.
 - The host used to select the `nixosConfiguration` now defaults to the
   `--target-host` for remote deployments instead of the local hostname, unless
   the hostname is explicitly specified via the `-H|--hostname` flag.
+- `nh os rollback` performance has been improved.
 
 ### Fixed
 
