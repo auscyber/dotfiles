@@ -297,6 +297,46 @@ pub fn open_ssh_control_master(host: &RemoteHost) -> Result<()> {
   Ok(())
 }
 
+/// Probe the effective uid on the remote host after SSH login.
+///
+/// This runs `id -u` over the already-opened `ControlMaster` connection and
+/// returns the parsed value. Callers use this to decide whether elevation is
+/// needed without trusting the username convention.
+///
+/// This must be called after [`open_ssh_control_master`] so the multiplexed
+/// connection is already up.
+///
+/// # Errors
+///
+/// Returns an error if the SSH connection fails, `id -u` exits non-zero, or
+/// its stdout cannot be parsed as a `u32`.
+pub fn probe_remote_uid(host: &RemoteHost) -> Result<u32> {
+  let ssh_opts = get_ssh_opts();
+  let mut cmd = Exec::cmd("ssh");
+  for opt in &ssh_opts {
+    cmd = cmd.arg(opt);
+  }
+  cmd = cmd.arg("-T").arg(host.ssh_host()).arg("id -u");
+
+  let capture = cmd
+    .capture()
+    .wrap_err_with(|| format!("Failed to probe remote uid on '{host}'"))?;
+
+  if !capture.exit_status.success() {
+    bail!(
+      "Remote uid probe on '{}' failed:\n{}",
+      host,
+      capture.stderr_str().trim()
+    );
+  }
+
+  capture
+    .stdout_str()
+    .trim()
+    .parse::<u32>()
+    .wrap_err_with(|| format!("Unexpected `id -u` output from '{host}'"))
+}
+
 /// Cache for the SSH control socket directory.
 static SSH_CONTROL_DIR: OnceLock<PathBuf> = OnceLock::new();
 
