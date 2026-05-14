@@ -23,6 +23,12 @@ functionality, under the "Removed" section.
 
 ### Fixed
 
+- `nh os switch --target-host root@host` no longer wraps the activation in
+  `sudo --prompt= --stdin` when the SSH user is already uid 0. The elevation
+  decision now probes `id -u` over the established ControlMaster instead of
+  reading the local process uid, matching `nixos-rebuild` behaviour and
+  unblocking sudo shims that don't accept stdin passwords (e.g.
+  `run0-sudo-shim`).
 - The regression introduced by the `Subprocess` crate upgrade causing various
   event outputs to be printed incorrectly should now be resolved.
 - `nh os info` now batches `nix path-info` calls into a single invocation
