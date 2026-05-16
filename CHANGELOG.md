@@ -16,10 +16,30 @@ functionality, under the "Removed" section.
 
 ## Unreleased
 
+### Added
+
+- `nh clean --keep-one` preserves all active direnv gcroots regardless of
+  `--keep-since`, preventing projects from being collected when they haven't
+  been activated recently. Orphaned and broken gcroots are still removed.
+- `nh clean --cross-filesystems` / `-x` allows the gcroot scan to cross
+  filesystem boundaries. By default the walk stays on the same filesystem as
+  `/nix/var/nix/gcroots`.
+
 ### Changed
 
 - `nh search` now uses search backend version 48 (previously 46) to track the
   current Elasticsearch endpoint.
+- gcroot scanning now walks all of `/nix/var/nix/gcroots` recursively instead of
+  only the flat `/nix/var/nix/gcroots/auto` directory.
+- Orphaned gcroots where entries in `/nix/var/nix/gcroots` whose target symlink
+  no longer exists on disk were silently skipped. They are now detected and
+  tagged for removal.
+- Broken gcroots where symlinks whose `/nix/store` target has already been
+  collected were also silently skipped. They are now tagged for removal
+  unconditionally, bypassing `--keep-since`.
+- `RESULT_REGEX` (`.*result.*`) matched any path containing the word "result",
+  including unrelated files. It is replaced by a structural check that only
+  matches direct children of `/nix/store`.
 
 ### Fixed
 

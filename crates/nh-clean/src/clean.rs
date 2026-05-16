@@ -252,6 +252,10 @@ impl args::CleanMode {
             if dst.metadata().is_err() {
               debug!(?dst, "gcroot target already GC'd, tagging for removal");
               gcroots_tagged.insert(dst, true);
+            } else if args.keep_one
+              && DIRENV_REGEX.is_match(&dst.to_string_lossy())
+            {
+              gcroots_tagged.insert(dst, false);
             } else {
               let dur = now.duration_since(
                 dst
@@ -304,6 +308,9 @@ impl args::CleanMode {
       "Keeping paths newer than {}",
       Paint::new(args.keep_since).fg(Color::Green)
     );
+    if args.keep_one {
+      println!("Keeping all active direnv gcroots");
+    }
     println!();
     println!("legend:");
     println!(
