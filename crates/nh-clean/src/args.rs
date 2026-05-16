@@ -55,6 +55,10 @@ pub struct CleanArgs {
   /// Pass --max to nix store gc
   #[arg(long)]
   pub max: Option<String>,
+
+  /// Cross filesystem boundaries when scanning gcroots
+  #[arg(long, short = 'x')]
+  pub cross_filesystems: bool,
 }
 
 #[derive(Debug, Clone, Args)]

@@ -57,6 +57,7 @@ thiserror = "2.0.17"
 tracing = "0.1.41"
 tracing-subscriber = { features = [ "env-filter", "registry", "std" ], version = "0.3.20" }
 urlencoding = "2.1.3"
+walkdir = "2.5.0"
 which = "8.0.0"
 yansi = "1.0.1"
 
