@@ -1357,7 +1357,9 @@ dependencies = [
  "nh-core",
  "nix",
  "regex",
+ "tempfile",
  "tracing",
+ "walkdir",
  "yansi",
 ]
 

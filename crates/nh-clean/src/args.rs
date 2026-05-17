@@ -55,6 +55,14 @@ pub struct CleanArgs {
   /// Pass --max to nix store gc
   #[arg(long)]
   pub max: Option<String>,
+
+  /// Keep at least one gcroot per direnv project
+  #[arg(long)]
+  pub keep_one: bool,
+
+  /// Cross filesystem boundaries when scanning gcroots
+  #[arg(long, short = 'x')]
+  pub cross_filesystems: bool,
 }
 
 #[derive(Debug, Clone, Args)]
