@@ -38,6 +38,8 @@ static GENERATION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
   Regex::new(r"^(.*)-(\d+)-link$").expect("Failed to compile generation regex")
 });
 
+const AUTO_GCROOTS_DIR: &str = "/nix/var/nix/gcroots/auto";
+
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct Generation {
   number:        u32,
@@ -234,17 +236,7 @@ impl args::CleanMode {
           continue;
         }
 
-        let resolved_dst = if dst.is_symlink() {
-          dst.read_link().unwrap_or_else(|_| dst.clone())
-        } else {
-          dst.clone()
-        };
-
-        if !regexes
-          .iter()
-          .any(|next| next.is_match(&dst.to_string_lossy()))
-          && !is_nix_store_direct_child(&resolved_dst)
-        {
+        if !gcroot_matches_filter(&src, &dst, &regexes) {
           debug!("dst doesn't match any gcroot filter, skipping");
           continue;
         }
@@ -585,6 +577,23 @@ fn is_nix_store_direct_child(path: &Path) -> bool {
     .unwrap_or(false)
 }
 
+fn gcroot_matches_filter(src: &Path, dst: &Path, regexes: &[&Regex]) -> bool {
+  let resolved_dst = if dst.is_symlink() {
+    dst.read_link().unwrap_or_else(|_| dst.to_path_buf())
+  } else {
+    dst.to_path_buf()
+  };
+
+  regexes
+    .iter()
+    .any(|next| next.is_match(&dst.to_string_lossy()))
+    || (is_auto_gcroot_entry(src) && is_nix_store_direct_child(&resolved_dst))
+}
+
+fn is_auto_gcroot_entry(path: &Path) -> bool {
+  path.starts_with(AUTO_GCROOTS_DIR)
+}
+
 fn gcroot_path_to_remove(gcroot: &GcRootTagged) -> &Path {
   &gcroot.src
 }
@@ -649,24 +658,54 @@ mod tests {
 
   #[test]
   fn gcroot_filter_passes_direnv_path() {
-    let path = Path::new("/home/user/project/.direnv/something");
+    let src = Path::new("/nix/var/nix/gcroots/project-direnv");
+    let dst = Path::new("/home/user/project/.direnv/something");
     let regexes = [&*DIRENV_REGEX];
-    let passes = regexes
-      .iter()
-      .any(|re| re.is_match(&path.to_string_lossy()))
-      || is_nix_store_direct_child(path);
-    assert!(passes);
+    assert!(gcroot_matches_filter(src, dst, &regexes));
   }
 
   #[test]
-  fn gcroot_filter_passes_store_direct_child() {
-    let path = Path::new("/nix/store/abc123zzz-foo-1.0");
+  fn gcroot_filter_passes_auto_store_direct_child() {
+    let src = Path::new("/nix/var/nix/gcroots/auto/example");
+    let dst = Path::new("/nix/store/abc123zzz-foo-1.0");
     let regexes = [&*DIRENV_REGEX];
-    let passes = regexes
-      .iter()
-      .any(|re| re.is_match(&path.to_string_lossy()))
-      || is_nix_store_direct_child(path);
-    assert!(passes);
+    assert!(gcroot_matches_filter(src, dst, &regexes));
+  }
+
+  #[test]
+  fn gcroot_filter_rejects_non_auto_store_direct_child() {
+    let src = Path::new("/nix/var/nix/gcroots/current-system");
+    let dst = Path::new("/nix/store/abc123zzz-foo-1.0");
+    let regexes = [&*DIRENV_REGEX];
+    assert!(!gcroot_matches_filter(src, dst, &regexes));
+  }
+
+  #[test]
+  fn gcroot_filter_passes_auto_symlink_to_store_direct_child() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let link = dir.path().join("result");
+    std::os::unix::fs::symlink("/nix/store/abc123zzz-foo-1.0", &link)
+      .expect("symlink");
+
+    let src = Path::new("/nix/var/nix/gcroots/auto/example");
+    let regexes = [&*DIRENV_REGEX];
+    assert!(gcroot_matches_filter(src, &link, &regexes));
+  }
+
+  #[test]
+  fn direct_store_filter_is_limited_to_auto_gcroots() {
+    assert!(is_auto_gcroot_entry(Path::new(
+      "/nix/var/nix/gcroots/auto/example"
+    )));
+    assert!(!is_auto_gcroot_entry(Path::new(
+      "/nix/var/nix/gcroots/current-system"
+    )));
+    assert!(!is_auto_gcroot_entry(Path::new(
+      "/nix/var/nix/gcroots/booted-system"
+    )));
+    assert!(!is_auto_gcroot_entry(Path::new(
+      "/nix/var/nix/gcroots/profiles/system"
+    )));
   }
 
   #[test]
@@ -701,13 +740,10 @@ mod tests {
 
   #[test]
   fn gcroot_filter_rejects_arbitrary_path() {
-    let path = Path::new("/home/user/some-random-link");
+    let src = Path::new("/nix/var/nix/gcroots/auto/example");
+    let dst = Path::new("/home/user/some-random-link");
     let regexes = [&*DIRENV_REGEX];
-    let passes = regexes
-      .iter()
-      .any(|re| re.is_match(&path.to_string_lossy()))
-      || is_nix_store_direct_child(path);
-    assert!(!passes);
+    assert!(!gcroot_matches_filter(src, dst, &regexes));
   }
 
   #[test]
