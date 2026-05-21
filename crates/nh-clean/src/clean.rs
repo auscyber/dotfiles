@@ -50,6 +50,13 @@ type ToBeRemoved = bool;
 type GenerationsTagged = BTreeMap<Generation, ToBeRemoved>;
 type ProfilesTagged = HashMap<PathBuf, GenerationsTagged>;
 
+#[derive(Debug)]
+struct GcRootTagged {
+  src: PathBuf,
+  dst: PathBuf,
+  tbr: ToBeRemoved,
+}
+
 /// Filter paths to only include existing directories, logging warnings for
 /// missing ones
 fn filter_existing_dirs<I>(paths: I) -> impl Iterator<Item = PathBuf>
@@ -79,7 +86,7 @@ impl args::CleanMode {
   /// example, if  `User::from_uid(uid)` returns `None`.
   pub fn run(&self, elevate: ElevationStrategy) -> Result<()> {
     let mut profiles = Vec::new();
-    let mut gcroots_tagged: HashMap<PathBuf, ToBeRemoved> = HashMap::new();
+    let mut gcroots_tagged = Vec::new();
     let now = SystemTime::now();
     let mut is_profile_clean = false;
 
@@ -251,11 +258,19 @@ impl args::CleanMode {
           Ok(()) => {
             if dst.metadata().is_err() {
               debug!(?dst, "gcroot target already GC'd, tagging for removal");
-              gcroots_tagged.insert(dst, true);
+              gcroots_tagged.push(GcRootTagged {
+                src,
+                dst,
+                tbr: true,
+              });
             } else if args.keep_one
               && DIRENV_REGEX.is_match(&dst.to_string_lossy())
             {
-              gcroots_tagged.insert(dst, false);
+              gcroots_tagged.push(GcRootTagged {
+                src,
+                dst,
+                tbr: false,
+              });
             } else {
               let dur = now.duration_since(
                 dst
@@ -269,10 +284,18 @@ impl args::CleanMode {
                   warn!(?err, ?now, "Failed to compare time!");
                 },
                 Ok(val) if val <= args.keep_since.into() => {
-                  gcroots_tagged.insert(dst, false);
+                  gcroots_tagged.push(GcRootTagged {
+                    src,
+                    dst,
+                    tbr: false,
+                  });
                 },
                 Ok(_) => {
-                  gcroots_tagged.insert(dst, true);
+                  gcroots_tagged.push(GcRootTagged {
+                    src,
+                    dst,
+                    tbr: true,
+                  });
                 },
               }
             }
@@ -340,18 +363,18 @@ impl args::CleanMode {
         "- {}  /nix/store direct children",
         Paint::new("RE").fg(Color::Magenta)
       );
-      for (path, tbr) in &gcroots_tagged {
-        if *tbr {
+      for gcroot in &gcroots_tagged {
+        if gcroot.tbr {
           println!(
             "- {} {}",
             Paint::new("DEL").fg(Color::Red),
-            path.to_string_lossy()
+            gcroot.dst.to_string_lossy()
           );
         } else {
           println!(
             "- {} {}",
             Paint::new("OK ").fg(Color::Green),
-            path.to_string_lossy()
+            gcroot.dst.to_string_lossy()
           );
         }
       }
@@ -390,9 +413,9 @@ impl args::CleanMode {
     }
 
     if !args.dry {
-      for (path, tbr) in &gcroots_tagged {
-        if *tbr {
-          remove_path_nofail(path);
+      for gcroot in &gcroots_tagged {
+        if gcroot.tbr {
+          remove_path_nofail(gcroot_path_to_remove(gcroot));
         }
       }
 
@@ -562,6 +585,10 @@ fn is_nix_store_direct_child(path: &Path) -> bool {
     .unwrap_or(false)
 }
 
+fn gcroot_path_to_remove(gcroot: &GcRootTagged) -> &Path {
+  &gcroot.src
+}
+
 fn remove_path_nofail(path: &Path) {
   info!("Removing {}", path.to_string_lossy());
   if let Err(err) = std::fs::remove_file(path) {
@@ -640,6 +667,36 @@ mod tests {
       .any(|re| re.is_match(&path.to_string_lossy()))
       || is_nix_store_direct_child(path);
     assert!(passes);
+  }
+
+  #[test]
+  fn gcroot_cleanup_removes_source_not_system_destination() {
+    let gcroot = GcRootTagged {
+      src: PathBuf::from("/nix/var/nix/gcroots/auto/example"),
+      dst: PathBuf::from("/run/current-system"),
+      tbr: true,
+    };
+
+    assert_eq!(
+      gcroot_path_to_remove(&gcroot),
+      Path::new("/nix/var/nix/gcroots/auto/example")
+    );
+    assert_ne!(gcroot_path_to_remove(&gcroot), gcroot.dst.as_path());
+  }
+
+  #[test]
+  fn gcroot_cleanup_removes_source_not_profile_destination() {
+    let gcroot = GcRootTagged {
+      src: PathBuf::from("/nix/var/nix/gcroots/auto/example"),
+      dst: PathBuf::from("/nix/var/nix/profiles/system-2-link"),
+      tbr: true,
+    };
+
+    assert_eq!(
+      gcroot_path_to_remove(&gcroot),
+      Path::new("/nix/var/nix/gcroots/auto/example")
+    );
+    assert_ne!(gcroot_path_to_remove(&gcroot), gcroot.dst.as_path());
   }
 
   #[test]
