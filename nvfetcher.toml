@@ -45,3 +45,21 @@ fetch.url = "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releas
 [sketchybar]
 src.github = "felixkratz/sketchybar"
 fetch.github = "felixkratz/sketchybar"
+[eagle-nvim]
+src.git =   "https://github.com/soulis-1256/eagle.nvim.git"
+src.git_branch = "main"
+fetch.github = "soulis-1256/eagle.nvim"
+[jujutsu-nvim]
+src.git = "https://github.com/yannvanhalewyn/jujutsu.nvim.git"
+src.git_branch = "main"
+fetch.github = "yannvanhalewyn/jujutsu.nvim"
+[difftastic-nvim]
+src.git = "https://github.com/clabby/difftastic.nvim.git"
+src.git_branch = "main"
+cargo_lock = ["Cargo.lock"]
+fetch.github = "clabby/difftastic.nvim"
+[difftastic]
+src.git = "https://github.com/wilfred/difftastic.git"
+fetch.github = "wilfred/difftastic"
+cargo_locl = ["Cargo.lock"]
+

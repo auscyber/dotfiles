@@ -69,7 +69,32 @@ in
 (
   {
     #    karabiner-dk = inputs.my-nur.packages."${system}".karabiner-dk;
-#    _1password-gui = builtins.trace "update 1password when unstable does" pkgsUnstableSmall._1password-gui;
+    #    _1password-gui = builtins.trace "update 1password when unstable does" pkgsUnstableSmall._1password-gui;
+    inherit (pkgs) rift nh celler;
+    vimPlugins = pkgs.vimPlugins.extend (
+      self: super: {
+        conform-nvim = super.conform-nvim.overrideAttrs (attrs: {
+          src = inputs.conform;
+        });
+        eagle-nvim = pkgs.vimUtils.buildVimPlugin {
+          name = "eagle-nvim";
+          inherit (sources.eagle-nvim) src version;
+        };
+        jujutsu-nvim = pkgs.vimUtils.buildVimPlugin {
+          name = "jujutsu-nvim";
+          inherit (sources.jujutsu-nvim) src version;
+        };
+        difftastic-nvim = pkgs.callPackage ../packages/difftastic-nvim/default.nix {
+          source = sources.difftastic-nvim;
+        };
+
+      }
+    );
+    #    difftastic = pkgs.difftastic.overrideAttrs (attrs: {
+    #      cargoHash = null;
+    #      inherit (sources.difftastic) src version;
+    #      cargoDeps = pkgs.rustPlatform.importCargoLock sources.difftastic.cargoLock."Cargo.lock";
+    #    });
     neovim = inputs.neovim.packages."${system}".default;
     nowplaying-cli = pkgs.nowplaying-cli.overrideAttrs (attrs: {
       src = inputs.nowplaying-cli;
@@ -88,7 +113,7 @@ in
         (attrs: {
           postInstall = ''
             wrapProgram $out/bin/percollate \
-              --set PUPPETEER_EXECUTABLE_PATH ${self.helium}/bin/helium
+            	--set PUPPETEER_EXECUTABLE_PATH ${self.helium}/bin/helium
           '';
         });
 
@@ -195,16 +220,15 @@ in
             };
           }
         );
-    inherit (pkgsSwift) swift swiftPackages;
     helium = helium."${system}";
     nil = inputs.nil.packages."${system}".default;
-    attic = pkgs.attic;
+    #    attic = pkgs.attic;
     direnv = pkgs.direnv.overrideAttrs (attrs: {
       postPatch = ''
         substituteInPlace GNUmakefile --replace-fail " -linkmode=external" ""
       '';
     });
-    attic-server = pkgs.attic-server;
+    #    attic-server = pkgs.attic-server;
     #    kmonad = inputs.kmonad.packages."${system}".default;
     kanata = inputs.my-nur.packages."${system}".kanata;
     kanata-tray = inputs.my-nur.packages."${system}".kanata-tray;
@@ -216,33 +240,14 @@ in
     #	  ];
     #	};
 
-    lix = pkgs.lix.overrideAttrs (attrs: {
-      doCheck = false;
-    });
+    #lix = pkgs.lix.overrideAttrs (attrs: {
+    #  doCheck = false;
+    #});
     age-plugin-gpg = inputs.age-plugin-gpg.packages."${system}".default.overrideAttrs (attrs: {
       postInstall = (attrs.postInstall or "") + ''
         	  ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
         	  '';
     });
-    rift = pkgs.callPackage ../packages/rift.nix {
-
-      source = {
-        src = ../inputs/rift;
-        version = "0.8.3";
-        cargoLock = ../inputs/rift/Cargo.lock;
-        pname = "rift";
-      };
-
-    };
-    #.overrideAttrs
-    # (attrs: {
-    #   version = "5.0.0";
-    #   src = pkgs.fetchurl {
-    #     url = "https://github.com/pqrs-org/Karabiner-DriverKit-VirtualHIDDevice/releases/download/v5.0.0/Karabiner-DriverKit-VirtualHIDDevice-5.0.0.pkg";
-    #     hash = "sha256-hKi2gmIdtjl/ZaS7RPpkpSjb+7eT0259sbUUbrn5mMc=";
-    #   };
-    # })
-
     yabai = inputs.my-nur.packages."${system}".yabai;
     jankyborders = pkgs.jankyborders.overrideAttrs (attrs: {
       inherit (sources.jankyborders) src version;
@@ -319,11 +324,11 @@ in
     deadlock-mod-manager = inputs.deadlock.packages."${system}".default.overrideAttrs (attrs: {
       preFixup = ''
         gappsWrapperArgs+=(
-          --set FONTCONFIG_FILE "${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
-          --set TAURI_DIST_DIR "$out/share/deadlock-modmanager/dist"
-          --set DISABLE_UPDATE_DESKTOP_DATABASE 1
-          --prefix PATH : ${lib.makeBinPath [ pkgs.desktop-file-utils ]}
-          --add-flags "--disable-auto-update"
+        	--set FONTCONFIG_FILE "${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+        	--set TAURI_DIST_DIR "$out/share/deadlock-modmanager/dist"
+        	--set DISABLE_UPDATE_DESKTOP_DATABASE 1
+        	--prefix PATH : ${lib.makeBinPath [ pkgs.desktop-file-utils ]}
+        	--add-flags "--disable-auto-update"
         )
       '';
       env.VITE_API_URL = "https://api.deadlockmods.app";

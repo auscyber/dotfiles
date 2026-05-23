@@ -1,6 +1,21 @@
 { pkgs, lib, ... }:
 {
-  imports = [ ./lsp.nix ];
+  imports = [
+  ];
+  autoGroups.filetypedetect.clear = false;
+  autoCmd = [
+    {
+      command = "setfiletype lisp";
+      group = "filetypedetect";
+      event = [
+        "BufRead"
+        "BufNewFile"
+      ];
+      pattern = [
+        "*.kbd"
+      ];
+    }
+  ];
 
   # Match existing config: leader is "\\".
   globals = {
@@ -24,9 +39,12 @@
     strip_whitespace_confirm = 0;
     strip_whitespace_on_save = 1;
   };
+  withPython3 = true;
+  withRuby = false;
 
   opts = {
     mouse = "a";
+    mousemoveevent = true;
     termguicolors = true;
     showmode = false;
 
@@ -188,6 +206,20 @@
   withNodeJs = true;
 
   plugins = {
+    difftastic.enable = true;
+    jujutsu = {
+      enable = true;
+      settings = {
+        diff_preset = "difftastic";
+      };
+    };
+    lz-n = {
+      enable = true;
+    };
+
+    lzn-auto-require = {
+      enable = true;
+    };
     mini = {
       enable = true;
       mockDevIcons = true;
@@ -254,7 +286,7 @@
             	           end
             	         end
 
-            	         return { timeout_ms = 200, lsp_fallback = true }, on_format 
+            	         return { timeout_ms = 200, lsp_fallback = true }, on_format
             	        end
           '';
         formatters = {
@@ -264,6 +296,10 @@
               lang_to_ft = {
                 bash = "sh";
               };
+              interpolation_queries = {
+                nix = "((interpolation) @interp)";
+              };
+
             };
           };
           shellcheck = {
@@ -278,6 +314,15 @@
           };
           rustfmt = {
             command = lib.getExe pkgs.rustfmt;
+          };
+          codespell = {
+            command = lib.getExe pkgs.codespell;
+          };
+          nixfmt = {
+            command = lib.getExe pkgs.nixfmt;
+          };
+          prettier = {
+            command = lib.getExe pkgs.prettier;
           };
         };
         formatters_by_ft = {
@@ -326,6 +371,28 @@
         "ps1"
       ];
     };
+    snacks = {
+      enable = true;
+      settings = {
+        bigfile = {
+          enabled = true;
+        };
+        notifier = {
+          enabled = true;
+          timeout = 3000;
+        };
+        quickfile = {
+          enabled = false;
+        };
+        statuscolumn = {
+          enabled = false;
+        };
+        words = {
+          debounce = 100;
+          enabled = true;
+        };
+      };
+    };
     indent-blankline = {
       enable = true;
       settings = {
@@ -362,6 +429,7 @@
           { name = "buffer"; }
           { name = "path"; }
           { name = "nvim_lua"; }
+          { name = "copilot"; }
         ];
         #    formatting.format.__raw = "require('lspkind').cmp_format({ with_text = true, menu = { buffer = '[buf]', nvim_lsp = '[lsp]', nvim_lua = '[api]', luasnip = '[snip]', copilot = '[copilot]' } })";
       };
@@ -465,34 +533,34 @@
             }
           ];
 
-          lualine_c = [
-            {
-              __unkeyed-1 = {
-                __raw = ''
-                  function()
-                    local clients = vim.lsp.get_clients({ bufnr = 0 })
-
-                    if #clients == 0 then
-                      return ""
-                    end
-
-                    local names = {}
-
-                    for _, client in ipairs(clients) do
-                      table.insert(names, client.name)
-                    end
-
-                    return "  " .. table.concat(names, ", ")
-                  end
-                '';
-              };
-
-              separator = {
-                left = "";
-                right = "";
-              };
-            }
-          ];
+          #          lualine_c = [
+          #            {
+          #              __unkeyed-1 = {
+          #                __raw = ''
+          #                  function()
+          #                    local clients = vim.lsp.get_clients({ bufnr = 0 })
+          #
+          #                    if #clients == 0 then
+          #                      return ""
+          #                    end
+          #
+          #                    local names = {}
+          #
+          #                    for _, client in ipairs(clients) do
+          #                      table.insert(names, client.name)
+          #                    end
+          #
+          #                    return "  " .. table.concat(names, ", ")
+          #                  end
+          #                '';
+          #              };
+          #
+          #              separator = {
+          #                left = "";
+          #                right = "";
+          #              };
+          #            }
+          #          ];
 
           lualine_x = [
             {
@@ -584,11 +652,24 @@
     nvim-lightbulb.enable = true;
     rustaceanvim.enable = true;
 
-    dap.enable = true;
-    dap-ui.enable = true;
+    dap = {
+      enable = true;
+      #      lazyLoad = {
+      #        enable = true;
+      #        settings.filetypes = [ "rust" ];
+      #      };
+    };
+    dap-ui = {
+      enable = true;
+      #      lazyLoad = {
+      #        enable = true;
+      #        settings.filetypes = [ "rust" ];
+      #      };
+    };
     #    lspconfig.enable = true;
     lsp.enable = true;
   };
+  luaLoader.enable = true;
 
   # Plugins not (yet) covered by nixvim modules, or where your config is custom.
   extraPlugins = with pkgs.vimPlugins; [
@@ -612,12 +693,13 @@
     # misc
     vim-better-whitespace
     mkdir-nvim
-    copilot-vim
+    copilot-lua
     vim-wakatime
 
     # languages
     vim-nix
     vim-fish
+    #    difftastic-nvim
     vim-glsl
     yuck-vim
     purescript-vim
@@ -637,8 +719,8 @@
   extraConfigLua = ''
     -- Keep fold settings aligned with previous treesitter config
     vim.wo.foldmethod = "expr"
-    vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
-    vim.wo.foldlevel = 1
+    vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+    vim.wo.foldlevel = 3
 
     -- Match previous guifont behavior (Windows vs other)
     if vim.fn.has("win32") > 0 then
@@ -651,14 +733,15 @@
     -- Conform: keep :Format user command with range support
 
     -- DAP UI setup (your config calls dapui.setup())
-    pcall(function()
-    	require("dapui").setup()
-    end)
+
   '';
 
   extraFiles = {
     # Custom colorscheme
-    "colors/pink_ocean.vim".source = ../.config/nvim/colors/pink_ocean.vim;
+    "colors/pink_ocean.vim".source = builtins.path {
+      path = ../../../.config/nvim/colors/pink_ocean.vim;
+      name = "pink_ocean.vim";
+    };
 
     # Treesitter injections
   };

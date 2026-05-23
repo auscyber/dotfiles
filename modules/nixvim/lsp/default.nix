@@ -2,8 +2,6 @@
 {
 
   plugins = {
-    lsp-status.enable = true;
-
     lsp = {
       enable = true;
       servers = {
@@ -33,16 +31,16 @@
           ];
         };
 
-        denols = {
-          enable = true;
-          autostart = false;
-          filetypes = [ "typescript" ];
-        };
-
+        #      denols = {
+        #        enable = true;
+        #        autostart = false;
+        #        filetypes = [ "typescript" ];
+        #      };
+        #
         hls = {
           enable = true;
           filetypes = [ "haskell" ];
-installGhc = true;
+          installGhc = false;
 
           settings = {
             haskell = {
@@ -56,6 +54,18 @@ installGhc = true;
         lua_ls = {
           enable = true;
           filetypes = [ "lua" ];
+          settings = {
+            runtime = {
+              version = "LuaJIT";
+            };
+            workspace = {
+              preloadFileSize = 10000;
+              library = [
+                { __raw = "vim.env.VIMRUNTIME"; }
+                { __raw = ''vim.api.nvim_get_runtime_file("lua/lspconfig", true)''; }
+              ];
+            };
+          };
         };
 
         clangd = {
@@ -102,6 +112,7 @@ installGhc = true;
             };
           };
         };
+        rust_analyzer.packageFallback = true;
 
         docker_compose_language_service.enable = true;
         zls.enable = true;
@@ -110,7 +121,7 @@ installGhc = true;
         #        purescriptls.enable = true;
         #        powershell_es.enable = true;
         kotlin_language_server.enable = true;
-#        omnisharp.enable = true;
+        #        omnisharp.enable = true;
         #        als.enable = true;
 
         jdtls = {
@@ -129,7 +140,6 @@ installGhc = true;
           #            '';
         };
       };
-
       inlayHints = true;
 
       keymaps = {
@@ -143,57 +153,64 @@ installGhc = true;
           "gD" = "declaration";
           "gi" = "implementation";
           "K" = "signature_help";
+          "KK" = "hover";
           "<space>r" = "references";
           "<leader>qf" = "code_action";
+          "<leader>rn" = "rename";
         };
-        extra = [
-          {
-            key = "<leader>rn";
-            action = {
-              __raw = "require('renamer').rename";
-            };
-          }
-        ];
+
       };
 
-      onAttach =
-        # lua
-        ''
-                      require("renamer").setup({})
-
-
-
-
-                      if client.server_capabilities.documentHighlightProvider then
-                        vim.api.nvim_create_augroup(
-                          "lsp_document_highlight",
-                          { clear = true }
-                        )
-
-                        vim.api.nvim_create_autocmd(
-                          "CursorHold",
-                          {
-                            buffer = bufnr,
-                            callback = vim.lsp.buf.document_highlight
-                          }
-                        )
-
-                        vim.api.nvim_create_autocmd(
-                          "CursorMoved",
-                          {
-                            buffer = bufnr,
-                            callback = vim.lsp.buf.clear_references
-                          }
-                        )
-                      end
-        '';
-
     };
+    otter.enable = true;
+
+    lsp-status.enable = true;
+    lsp-progress.enable = true;
 
     cmp = {
       enable = true;
+      autoEnableSources = true;
 
       settings = {
+        mapping = {
+          "<C-Space>" = # lua
+            "cmp.mapping.complete()";
+          "<C-d>" =
+            # lua
+            "cmp.mapping.scroll_docs(-4)";
+          "<C-e>" = "cmp.mapping.close()";
+          "<C-f>" = "cmp.mapping.scroll_docs(4)";
+          "<Up>" = # lua
+            "cmp.mapping.select_prev_item()";
+          "<Down>" = "cmp.mapping.select_next_item()";
+          "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace,  select = true })";
+          "<S-Tab>" = # lua
+            ''
+                function (fallback)
+              local luasnip = require("luasnip")
+                if cmp.visible() then
+                  cmp.select_prev_item()
+                elseif luasnip.jumpable(-1) then
+                  luasnip.jump(-1)
+                else
+                  fallback()
+                end
+                end
+            '';
+          "<Tab>" = # lua
+            ''
+              function (fallback)
+              local luasnip = require("luasnip")
+                if cmp.visible() then
+                  cmp.select_next_item()
+                elseif luasnip.expand_or_jumpable() then
+                  luasnip.expand_or_jump()
+                else
+                  fallback()
+              end
+              end
+            '';
+        };
         completion = {
           completeopt = "menu,menuone,noselect";
         };
@@ -203,6 +220,10 @@ installGhc = true;
             name = "nvim_lsp";
             max_item_count = 1000;
           }
+          { name = "path"; }
+          { name = "nvim_lsp_signature_help"; }
+          { name = "nvim_lsp_document_symbol"; }
+          { name = "buffer"; }
         ];
       };
     };
@@ -215,6 +236,12 @@ installGhc = true;
     which-key.enable = true;
 
     lsp-signature.enable = true;
+    eagle = {
+      enable = true;
+      settings = {
+        keyboard_mode = true;
+      };
+    };
 
     rustaceanvim = {
       enable = true;
@@ -223,7 +250,15 @@ installGhc = true;
         server = {
           default_settings = {
             rust-analyzer = {
-              checkOnSave.command = "clippy";
+              files = {
+                excludeDirs = [ ".direnv" ];
+              };
+              inlayHints = {
+                lifetimeElisionHints = {
+                  enable = "always";
+                };
+              };
+              #              checkOnSave.command = "clippy";
 
               procMacro.enable = true;
             };
@@ -238,26 +273,23 @@ installGhc = true;
   extraPlugins = with pkgs.vimPlugins; [
     renamer-nvim
     #    virtualtypes-nvim
-    lsp-status-nvim
     nvim-lightbulb
   ];
 
-  extraConfigLua = ''
-    vim.lsp.set_log_level("debug")
+  extraConfigLua = # lua
+    ''
+      -- lua
+      vim.lsp.handlers["window/showMessage"] = function(err, result, ctx, config)
+      	local MessageType = vim.lsp.protocol.MessageType
 
-        vim.lsp.handlers["window/showMessage"] = function(err, result, ctx, config)
-    	local MessageType = vim.lsp.protocol.MessageType
+      	local map = {
+      		[MessageType.Error] = vim.log.levels.ERROR,
+      		[MessageType.Warning] = vim.log.levels.WARN,
+      		[MessageType.Info] = vim.log.levels.INFO,
+      		[MessageType.Log] = vim.log.levels.TRACE,
+      	}
 
-    	local map = {
-    		[MessageType.Error] = vim.log.levels.ERROR,
-    		[MessageType.Warning] = vim.log.levels.WARN,
-    		[MessageType.Info] = vim.log.levels.INFO,
-    		[MessageType.Log] = vim.log.levels.TRACE,
-    	}
-
-    	vim.notify(result.message, map[result.type])
-    end
-
-
-  '';
+      	vim.notify(result.message, map[result.type])
+      end
+    '';
 }

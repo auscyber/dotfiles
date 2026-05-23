@@ -39,9 +39,11 @@
       #        };
       #
       #      })
+
+      inputs.rust-overlay.overlays.default
+      inputs.rift.overlays.default
       inputs.nh.overlays.default
       inputs.sccache.overlays.default
-      inputs.attic.overlays.default
       inputs.celler.overlays.default
       inputs.hyprland-plugins.overlays.default
       inputs.niri.overlays.niri

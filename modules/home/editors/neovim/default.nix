@@ -23,24 +23,14 @@ in
       rekeyFile = ../../../../secrets/wakatime_config.age;
       path = "${config.home.homeDirectory}/.wakatime.cfg";
     };
+    stylix.targets.nixvim.enable = false;
 
     # Nixvim is already imported via flake importedHomeModules.
     # We keep this module as the toggle point, and source the actual editor config from ./nixvim.
-    programs.nixvim = {
-      enable = true;
-      imports = [ ../../../../nixvim ];
-      nixpkgs = {
-      inherit pkgs;
-      };
-          };
-
-    home.sessionVariables = {
-      vim = "nvim";
-      EDITOR = "nvim";
-      editor = "$EDITOR";
-    };
+    auscybernix.nixvim.nixvim.enable = true;
 
     # Old config wrote a treesitter compiler shim for local compilation.
+    home.sessionVaribles.EDITOR = "vim";
     # nixvim's treesitter build is handled declaratively; keep the file removed.
   };
 }
