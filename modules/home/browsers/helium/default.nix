@@ -22,6 +22,9 @@ in
       enable = true;
       extensions = [
         {
+          id = "ldipcbpaocekfooobnbcddclnhejkcpn";
+        }
+        {
           id = "cdglnehniifkbagbbombnjghhcihifij";
         }
         {

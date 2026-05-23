@@ -38,7 +38,7 @@ in
       plugins = with pkgs; [
         gh
         glab
-        wrangler
+#        wrangler
 
         pkgs.awscli2
       ];

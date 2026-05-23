@@ -77,6 +77,17 @@ in
       };
       overlay = import ./overlay.nix { inherit inputs; };
       extra = import ./extra.nix { inherit inputs; };
+      extraModules = {
+
+        inherit (inputs.nixpkgs.lib)
+          mapAttrs
+          mkOption
+          mkEnableOption
+          types
+          ;
+        inherit (inputs.flake-parts.lib) mkSubmoduleOptions;
+
+      };
     };
   };
   options = {

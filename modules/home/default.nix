@@ -92,9 +92,9 @@
       ripgrep
       nil
       nh
-      vim
+#      vim
       nil
-      neovim
+#      neovim
       starship
       nixfmt
       treefmt

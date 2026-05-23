@@ -8,6 +8,7 @@
   ...
 }:
 rec {
+  mkNixVim = import ./mk-nvim.nix { inherit inputs common; };
   mkDarwin = import ./mk-darwin.nix { inherit inputs importedDarwinModules common; };
   mkNixos = import ./mk-nixos.nix { inherit inputs importedNixosModules common; };
   rpi =

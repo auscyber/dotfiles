@@ -17,12 +17,10 @@
 [submodule "inputs/age-plugin-gpg"]
 	path = inputs/age-plugin-gpg
 	url = https://github.com/auscyber/dotfiles.git
-[submodule "inputs/rift"]
-	path = inputs/rift
-	url = https://github.com/auscyber/rift.git
 [submodule "inputs/attic"]
 	path = inputs/attic
 	url = https://github.com/auscyber/dotfiles.git
 [submodule "inputs/nh"]
 	path = inputs/nh
 	url = https://github.com/auscyber/dotfiles.git
+

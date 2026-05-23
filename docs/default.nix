@@ -96,19 +96,19 @@ in
 
           # Prefer nixos-option-docs if present, otherwise synthesize markdown from JSON.
           if [ -n "${nixosOptionDocsBin}" ] && [ -x "${nixosOptionDocsBin}" ]; then
-            if "${nixosOptionDocsBin}" --help >/dev/null 2>&1; then
-              if "${nixosOptionDocsBin}" "$out/options.json" > "$out/options.md" 2>/dev/null; then
-                exit 0
-              fi
-            fi
+          	if "${nixosOptionDocsBin}" --help >/dev/null 2>&1; then
+          		if "${nixosOptionDocsBin}" "$out/options.json" >"$out/options.md" 2>/dev/null; then
+          			exit 0
+          		fi
+          	fi
           fi
 
           {
-            echo "# Options"
-            echo
-            echo "Generated from options.json (CommonMark renderer bypassed)."
-            echo
-            ${pkgs.jq}/bin/jq -r '
+          	echo "# Options"
+          	echo
+          	echo "Generated from options.json (CommonMark renderer bypassed)."
+          	echo
+          	${pkgs.jq}/bin/jq -r '
               def asText:
                 if . == null then
                   "n/a"
@@ -147,7 +147,7 @@ in
                 ]
               | join("\n")
             ' "$out/options.json"
-          } > "$out/options.md"
+          } >"$out/options.md"
         '';
 
       homeOptionsModules = [
@@ -234,6 +234,7 @@ in
 
       # Darwin-specific options documentation
       packages.options-doc-darwin = buildOptionsDocs {
+
         name = "options-doc-darwin";
         modules = darwinOptionsModules;
       };
@@ -241,10 +242,11 @@ in
       # Combined options documentation package (for backward compatibility)
       # Contains NixOS, Darwin, and Home documentation
       packages.options-doc-home = buildOptionsDocs {
+
         name = "options-doc-home";
         modules = homeOptionsModules;
         class = "homeManager";
-        includePoison = false;
+        includePoison = true;
       };
 
       packages.options-doc = pkgs.runCommand "options-doc" { } ''
@@ -317,7 +319,7 @@ in
         {
           type = "app";
           program = "${pkgs.writeShellScript "create-docs" ''
-            cat ${input} | ${pkgs.mustache-go}/bin/mustache ${./README.md.mustache} > README.md
+            cat ${input} | ${pkgs.mustache-go}/bin/mustache ${./README.md.mustache} >README.md
           ''}";
         };
 

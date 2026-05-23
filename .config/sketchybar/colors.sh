@@ -1,1 +1,1 @@
-/nix/store/gdk25azp6np3lxs05sxn9iga6w6nrkkz-home-manager-files/dotfiles/.config/sketchybar/colors.sh
+/nix/store/mv4gawwkjrxfz20qm6ggjprc3ghp9b5k-home-manager-files/dotfiles/.config/sketchybar/colors.sh

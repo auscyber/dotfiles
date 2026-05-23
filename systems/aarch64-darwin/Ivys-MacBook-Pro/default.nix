@@ -24,7 +24,6 @@
     trusted-public-keys = [
       "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
       "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
-      "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4"
     ];
   };
   #  sops.age.plugins = with pkgs; [
@@ -92,8 +91,15 @@
         wms.rift.enable = lib.mkForce false;
         keybinds.kanata.enable = lib.mkForce false;
         programs.sketchybar.enable = lib.mkForce false;
+
       };
 
+    };
+    services.jankyborders.enable = lib.mkForce false;
+
+    auscybernix = {
+      keybinds.karabiner-driver-kit.enable = lib.mkForce false;
+      vpn.enable = lib.mkForce false;
     };
 
   };

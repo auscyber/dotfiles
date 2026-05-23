@@ -6,7 +6,9 @@
 }:
 let
   cfg = config.services.rift;
-  configFile = pkgs.writers.writeTOML "rift-settings" cfg.settings;
+  configFile = pkgs.writers.writeTOML "rift-settings" {
+    inherit (cfg) settings virtual_workspaces keys;
+  };
 
 in
 {
@@ -41,10 +43,27 @@ in
       description = "Settings for rift window manager";
 
     };
+    virtual_workspaces = lib.mkOption {
+      type = with lib.types; attrs;
+      default = { };
+      description = "Virtual workspaces for rift window manager. Each entry should have a 'name' field.";
+    };
+    keys = lib.mkOption {
+      type = with lib.types; attrs;
+      default = { };
+      description = "Keybindings for rift window manager. Each entry should have a 'key' and an 'action' field.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     home.packages = [ cfg.package ];
+    home.checks = [
+      (pkgs.runCommandLocal "check-rift" { } ''
+        set -e
+          ${cfg.package}/bin/rift-cli verify ${configFile}
+          echo "Rift configuration is valid." > $out
+      '')
+    ];
     launchd.agents.rift = {
       enable = true;
       config = {

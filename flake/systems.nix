@@ -20,6 +20,7 @@ let
   allSystems = parseSystemConfigurations systemsPath;
 in
 {
+
   flake = {
     auscybernix = rec {
       containerModules = importedNixosModules ++ self.lib.importModulesRecursive ../modules/nixos;
@@ -60,7 +61,7 @@ in
         inputs.agenix.nixosModules.default
         inputs.agenix-rekey.nixosModules.default
         inputs.sops-nix.nixosModules.sops
-        inputs.attic.nixosModules.atticd
+        #        inputs.attic.nixosModules.atticd
 
       ];
       importedDarwinModules = [
@@ -77,6 +78,7 @@ in
         inputs.sops-nix.darwinModules.sops
         inputs.agenix.darwinModules.default
         inputs.agenix-rekey.nixosModules.default
+        inputs.nixvim.nixDarwinModules.default
 
       ];
     };

@@ -31,8 +31,9 @@ in
         ''
                               (defalias
                     		  enable_spaces (t! runasuser "rift-cli execute window toggle-space-activated ")
-                              toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a Discord")
+                              toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a ~/Nix\ Apps/Discord.app")
                               toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
+                              toggle_music_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name music || open -a 'Tidal'")
                               minimise (t! runasuser "yabai -m window --minimize")
                               toggle_1password_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name 1password  || open -a '1Password'")
                               switch-focus (t! runasuser "yabai -m window --focus next")
@@ -80,70 +81,73 @@ in
         rift
         sketchybar
       ];
+
       settings = {
+        ui.mission_control.enabled = true;
+        run_on_start = [
+          # sh
+          "rift-cli subscribe cli --event workspace_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_workspace_changed FOCUSED_WORKSPACE=\\\"$RIFT_WORKSPACE_NAME\\\"'"
+          # sh
+          "rift-cli subscribe cli --event windows_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\\\"$RIFT_WORKSPACE_NAME\\\" RIFT_WINDOW_COUNT=\\\"$RIFT_WINDOW_COUNT\\\"'"
+          # sh
 
-        settings = {
-          run_on_start = [
-            # sh
-            "rift-cli subscribe cli --event workspace_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_workspace_changed FOCUSED_WORKSPACE=\\\"$RIFT_WORKSPACE_NAME\\\"'"
-            # sh
-            "rift-cli subscribe cli --event windows_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\\\"$RIFT_WORKSPACE_NAME\\\" RIFT_WINDOW_COUNT=\\\"$RIFT_WINDOW_COUNT\\\"'"
-            # sh
+          "rift-cli subscribe cli --event window_title_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_title'"
+        ];
 
-            "rift-cli subscribe cli --event window_title_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_title'"
-          ];
-
-          default_disable = false;
-          layout.gaps.outer = {
-            top = 15;
-            left = 10;
-            right = 10;
-            bottom = 5;
-          };
-          layout.mode = "bsp";
-          focus_follows_mouse = false;
-          mouse_follows_focus = false;
-          gestures = {
-            enabled = true;
-            fingers = 3;
-
-          };
+        default_disable = false;
+        layout.gaps.outer = {
+          top = 15;
+          left = 20;
+          right = 10;
+          bottom = 5;
         };
-        virtual_workspaces = {
+        layout.mode = "bsp";
+        focus_follows_mouse = false;
+        mouse_follows_focus = false;
+        gestures = {
           enabled = true;
-          default_workspace_count = 7;
-          workspace_names = [
-            "Main"
-            "Dev"
-            "Chat"
-            "Media"
-            "Misc"
-          ];
-          app_rules = [
-            {
-              app_id = "org.zotero.zotero";
-              title_substring = "Citation Dialog";
-              floating = true;
-            }
-            {
-              app_id = "com.hnc.Discord";
-              scratchpad = "discord";
-            }
-            {
-              app_id = "com.automattic.beeper.desktop";
-              scratchpad = "beeper";
-            }
-            {
-              app_id = "com.agilebits.onepassword7";
-              scratchpad = "1password";
-            }
-
-          ];
+          fingers = 3;
 
         };
-        keys = {
-          "Alt + Z" = "toggle_space_activated";
-        };
+      };
+      virtual_workspaces = {
+        enabled = true;
+        default_workspace_count = 7;
+        workspace_names = [
+          "Main"
+          "Dev"
+          "Chat"
+          "Media"
+          "Misc"
+        ];
+        app_rules = [
+          {
+            app_id = "org.zotero.zotero";
+            title_substring = "Citation Dialog";
+            floating = true;
+          }
+          {
+            app_id = "com.hnc.Discord";
+            scratchpad = "discord";
+          }
+          {
+            app_id = "com.automattic.beeper.desktop";
+            scratchpad = "beeper";
+          }
+          {
+            app_id = "com.agilebits.onepassword7";
+            scratchpad = "1password";
+          }
+          {
+            app_id = "com.tidal.desktop";
+            scratchpad = "music";
+          }
+
+        ];
+
+      };
+      keys = {
+        "Alt + Z" = "toggle_space_activated";
       };
     };
   };

@@ -22,7 +22,7 @@ in
   mkSpecialArgs =
     {
       inputs,
-      hostname,
+      hostname ? "",
       username ? "ivypierlot",
       system,
       extendedLib,
