@@ -49,18 +49,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.11.7.1";
+    version = "0.12.3.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.11.7.1/helium-0.11.7.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-9y9vviF8iBewUSVMVpOW1dFX5GmSDQSR/kH/OlOvCKg=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.12.3.1/helium-0.12.3.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-gi96TmGdqBN2t1YC3KRzbWcNP7s2dTc3bcoVC3WQt/I=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.11.7.1";
+    version = "0.12.3.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.11.7.1/helium_0.11.7.1_arm64-macos.dmg";
-      sha256 = "sha256-jbu/w3/GYC60Gs0ueeECrbeDDSLAoXFManquIpw0VvM=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.12.3.1/helium_0.12.3.1_arm64-macos.dmg";
+      sha256 = "sha256-BrbexBlCQh9htQEy4Wiul/oNSn2MVERoqpLT8VRLENM=";
     };
   };
   icon_map = {
@@ -73,17 +73,17 @@
   };
   jankyborders = {
     pname = "jankyborders";
-    version = "a56a76a8a6ed77325f03655b23fcf525144d120b";
+    version = "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e";
     src = fetchgit {
       url = "https://github.com/felixkratz/jankyborders";
-      rev = "a56a76a8a6ed77325f03655b23fcf525144d120b";
+      rev = "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-odhoKy+aABfv19fxaINWtmY6hbmYyeQzWzxgOlD8ONE=";
+      sha256 = "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=";
     };
-    date = "2026-01-10";
+    date = "2026-05-14";
   };
   kanata = {
     pname = "kanata";
@@ -123,35 +123,35 @@
   };
   slskd = {
     pname = "slskd";
-    version = "8fb755972514458ed86bb8130bcac01ce18a57e4";
+    version = "9bb822122182b88579b0498bb0ebfca94282e9b4";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "8fb755972514458ed86bb8130bcac01ce18a57e4";
+      rev = "9bb822122182b88579b0498bb0ebfca94282e9b4";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=";
+      sha256 = "sha256-UHgil9BWzDPz/Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-jqkeUuk0F+U7FggWtOAWUXFrF5op9F+u77iW2DRpXvA=/./src/web/package-lock.json";
-    };date = "2026-05-03";prefetch = {
+      "./src/web/package-lock.json" = ./. + "/sha256-UHgil9BWzDPz_Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=/./src/web/package-lock.json";
+    };date = "2026-05-14";prefetch = {
     "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
     
     };
   };
   yabai = {
     pname = "yabai";
-    version = "f17ef88116b0d988b834bb2801c3caad952cc49d";
+    version = "02de172f8706c3e2eaa679478897d7346e82b564";
     src = fetchgit {
       url = "https://github.com/koekeishiya/yabai";
-      rev = "f17ef88116b0d988b834bb2801c3caad952cc49d";
+      rev = "02de172f8706c3e2eaa679478897d7346e82b564";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-26SXci4u42ztlgfIBFO+US9cETNnQ+/O44C227c3x8w=";
+      sha256 = "sha256-61knfbahxxlJnVZy47347slsjUGiQUJyZh58G97SDkE=";
     };
-    date = "2026-04-26";
+    date = "2026-05-08";
   };
 }
