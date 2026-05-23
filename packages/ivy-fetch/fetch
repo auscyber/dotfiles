@@ -91,7 +91,7 @@ then
 			;;
 	esac
 	os="macOS $os"
-	cpu="$(system_profiler SPHardwareDataType | grep Chip | awk -F ":" '{print $2}' )"
+	cpu="$(system_profiler SPHardwareDataType 2>/dev/null | grep Chip | awk -F ":" '{print $2}' 2>/dev/null )"
 else
 os="$(. /etc/os-release && printf "%s" "$PRETTY_NAME")"
 

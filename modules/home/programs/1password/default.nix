@@ -24,7 +24,7 @@ in
 
     programs.fish.interactiveShellInit = ''
       function nixpkgs-review --wraps nixpkgs-review --description "1Password Shell Plugin for nixpkgs-review"
-              export GITHUB_TOKEN=$(cat ${config.age.secrets."github_token".path})
+              export GITHUB_TOKEN="op://Employee/github.com/Security/token"
               op run -- nixpkgs-review $argv
           end
 
@@ -38,6 +38,7 @@ in
       plugins = with pkgs; [
         gh
         glab
+        wrangler
 
         pkgs.awscli2
       ];

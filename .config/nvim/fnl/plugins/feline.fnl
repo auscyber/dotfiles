@@ -92,7 +92,7 @@
       [{:provider :lsp_client_names
         :hl {:fg :white :bg "#3f3f3f"}
         ;        :enabled (vim.lsp.buf.server_ready)
-        :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
+        :enabled #(> (length (vim.lsp.get_clients)) 0)
         :right_sep [{:str :right_rounded :hl {:fg "#3f3f3f" :bg :NONE}}]
         :left_sep [{:str :left_rounded :hl {:fg "#3f3f3f" :bg :NONE}}]}])
 
@@ -145,7 +145,7 @@
                             :hl {:fg :skyblue :bg :black}}
                            {:provider #(lsp-statusline)
                             :short_provider #(lsp-statusline-short)
-                            :enabled #(> (length (vim.lsp.buf_get_clients)) 0)
+                            :enabled #(> (length (vim.lsp.get_clients)) 0)
                             :hl {:bg :black}
                             :right_sep {:str " " :hl {:bg :black}}}
                            {:provider :scroll_bar

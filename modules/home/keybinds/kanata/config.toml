@@ -1,4 +1,6 @@
 ["com.microsoft.Word"]
 "Language" = { command = "osascript -e 'tell application \"Microsoft Word\" to return language id of (character before text object of selection)'", mappings = { "french" = "french" } }
+["com.microsoft.Powerpoint"]
+"Language" = { command = "osascript -e 'tell application \"Microsoft Powerpoint\" to return language id of (character before text object of selection)'", mappings = { "french" = "french" } }
 ["notion.id"]
 

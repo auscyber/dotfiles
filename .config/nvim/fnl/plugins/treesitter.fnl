@@ -23,10 +23,7 @@
 
 (treesitter.setup {:highlight {:enable true}
                    :autopairs {:enable true}
-                   :playground {:enable true}
                    :query_linter {:enable true}
-                   :refactor {;                              :highlight_current_scope {:enable true}}
-                              :highlight_definitions {:enable true}}
                    :textobjects {:enable true
                                  :lookahead true
                                  :keymaps {:af "@function.outer"

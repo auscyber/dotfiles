@@ -66,6 +66,20 @@
     signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
 
   };
+  programs.jujutsu.settings = {
+    signing = {
+      behavior = "own";
+      backend = "ssh";
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
+
+      backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+
+    };
+    git = {
+      sign-on-push = true;
+    };
+  };
+
   #  services.ollama = {
   #    enable = true;
   #    environmentVariables = {
@@ -132,6 +146,7 @@
               };
               # kanata_executable = ''
             };
+
           };
         };
         # layer_icons = {  }
@@ -235,6 +250,7 @@
   };
   home.packages = with pkgs; [
     nodejs
+    opencode
     desktoppr
     vscode
     pandoc

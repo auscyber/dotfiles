@@ -10,12 +10,12 @@
             :MunifTanjim/nui.nvim {:module :nui} ; Startup and typical operation
             :Olical/aniseed {} :rktjmp/hotpot.nvim {}
             ;  :lewis6991/impatient.nvim {:require :sqlite.lua :config #(require "impatient")}
-            :wbthomason/packer.nvim {} :kyazdani42/nvim-web-devicons
-            {:config #(require :plugins.devicons)} :lucidph3nx/nvim-sops
+            :wbthomason/packer.nvim {}
+            :kyazdani42/nvim-web-devicons {:config #(require :plugins.devicons)} :lucidph3nx/nvim-sops
             {:event [:BufEnter]} :grafana/vim-alloy {} ;; gui features
             :ellisonleao/glow.nvim {} :rktjmp/lush.nvim {}
-            :camspiers/animate.vim {:module :animate} :kyazdani42/nvim-tree.lua
-            {:config #(require :plugins.tree)} ; :keys :<C-n>} ;:mod tree}
+            :camspiers/animate.vim {:module :animate}
+            :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)} ; :keys :<C-n>} ;:mod tree}
             :famiu/feline.nvim {:config #(require :plugins.feline)}
             ; :mod feline}
             :akinsho/nvim-bufferline.lua
@@ -104,9 +104,7 @@
             {:do :TSUpdate
              :branch :main
              :dependencies [:JoosepAlviste/nvim-ts-context-commentstring
-                            :nvim-treesitter/nvim-treesitter-refactor
-                            :DariusCorvus/tree-sitter-language-injection.nvim
-                            :nvim-treesitter/playground]
+                            :DariusCorvus/tree-sitter-language-injection.nvim]
              :config #(require :plugins.treesitter)}
             ; :mod treesitter}
             :folke/twilight.nvim {:cmd :Twilight :dependencies :nvim-treesitter}
