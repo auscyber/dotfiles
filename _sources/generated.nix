@@ -22,11 +22,53 @@
   };
   deadlock-mod-manager = {
     pname = "deadlock-mod-manager";
-    version = "v0.18.0";
+    version = "v1.0.0";
     src = fetchurl {
-      url = "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/v0.18.0/deadlock-mod-manager.flatpak";
-      sha256 = "sha256-azZfebt3mHhiasssSCBtB95pvLianjwbLYB+vhV1DYU=";
+      url = "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/v1.0.0/deadlock-mod-manager.flatpak";
+      sha256 = "sha256-LWdcF2DTh8fZDqEygmG58nIekVpEHXTFb4Eekb5PlY8=";
     };
+  };
+  difftastic = {
+    pname = "difftastic";
+    version = "7ccfcb315f7e46fd015809416c7d7dffa5be7078";
+    src = fetchFromGitHub {
+      owner = "wilfred";
+      repo = "difftastic";
+      rev = "7ccfcb315f7e46fd015809416c7d7dffa5be7078";
+      fetchSubmodules = false;
+      sha256 = "sha256-BxJ36OGsec3TPO2QyljtN11HU/aWVBaXaQySAtmG8Q8=";
+    };
+    date = "2026-05-10";
+  };
+  difftastic-nvim = {
+    pname = "difftastic-nvim";
+    version = "6041ef0244b3fecf3b7f07de9af8cfbf8dbc4945";
+    src = fetchFromGitHub {
+      owner = "clabby";
+      repo = "difftastic.nvim";
+      rev = "6041ef0244b3fecf3b7f07de9af8cfbf8dbc4945";
+      fetchSubmodules = false;
+      sha256 = "sha256-23NGKhytF3OsLJgdrC51IH/sIGoqe/yBfmPsZKHOMSk=";
+    };
+    cargoLock."Cargo.lock" = {
+      lockFile = ./. + "/sha256-23NGKhytF3OsLJgdrC51IH_sIGoqe_yBfmPsZKHOMSk=/Cargo.lock";
+      outputHashes = {
+        
+      };
+    };
+    date = "2026-03-14";
+  };
+  eagle-nvim = {
+    pname = "eagle-nvim";
+    version = "d503b168932160b07d4d09551d90d5fbb388b641";
+    src = fetchFromGitHub {
+      owner = "soulis-1256";
+      repo = "eagle.nvim";
+      rev = "d503b168932160b07d4d09551d90d5fbb388b641";
+      fetchSubmodules = false;
+      sha256 = "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=";
+    };
+    date = "2026-02-10";
   };
   game-devices-udev-rules = {
     pname = "game-devices-udev-rules";
@@ -49,26 +91,26 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.12.4.1";
+    version = "0.12.5.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.12.4.1/helium-0.12.4.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-+kAs9vev0H7H40JWnpf0s5hI8NdX16BbRapmuY5Do38=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.12.5.1/helium-0.12.5.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-C/Z0VE1Au0+6Me/1S5pPa7xeGQatM6QJYM55HtLu7ck=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.12.4.1";
+    version = "0.12.5.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.12.4.1/helium_0.12.4.1_arm64-macos.dmg";
-      sha256 = "sha256-0cpES40UjQqUmdmZqEx37SUKJ1F2L4X+91t8+IQ6y5g=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.12.5.1/helium_0.12.5.1_arm64-macos.dmg";
+      sha256 = "sha256-uws6OUTyV6/Ejo1FqFnpNSG3tTUGFMNelrex2m1Ymd0=";
     };
   };
   icon_map = {
     pname = "icon_map";
-    version = "v2.0.60";
+    version = "v2.0.62";
     src = fetchurl {
-      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.60/icon_map.sh";
-      sha256 = "sha256-seYKDv4fFmxryBk9j+RLk3WA3LFPG9zN/ULMvIDNAlQ=";
+      url = "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.62/icon_map.sh";
+      sha256 = "sha256-1OG57eY/5DZTiMDUt+YqTT6aUvQJ/qd0PpefNrTPBpI=";
     };
   };
   jankyborders = {
@@ -82,6 +124,18 @@
       leaveDotGit = false;
       sparseCheckout = [ ];
       sha256 = "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=";
+    };
+    date = "2026-05-14";
+  };
+  jujutsu-nvim = {
+    pname = "jujutsu-nvim";
+    version = "17ab008d71cbcd31f8c2891e11cb758579f597c0";
+    src = fetchFromGitHub {
+      owner = "yannvanhalewyn";
+      repo = "jujutsu.nvim";
+      rev = "17ab008d71cbcd31f8c2891e11cb758579f597c0";
+      fetchSubmodules = false;
+      sha256 = "sha256-KygJ73YZNPtTfECWyrwK86AfO7jXDEfIMFia3yvorM0=";
     };
     date = "2026-05-14";
   };
@@ -123,19 +177,19 @@
   };
   slskd = {
     pname = "slskd";
-    version = "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee";
+    version = "0c25a725360ba67a12ed07eee056256eec408f27";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee";
+      rev = "0c25a725360ba67a12ed07eee056256eec408f27";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-1AgWFa/K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=";
+      sha256 = "sha256-ELS9iI7OmhSiymWIY6TNxSYpZFlluI8s+7XCGxrsiTs=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-1AgWFa_K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=/./src/web/package-lock.json";
-    };date = "2026-05-21";prefetch = {
+      "./src/web/package-lock.json" = ./. + "/sha256-ELS9iI7OmhSiymWIY6TNxSYpZFlluI8s+7XCGxrsiTs=/./src/web/package-lock.json";
+    };date = "2026-05-24";prefetch = {
     "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
     
     };

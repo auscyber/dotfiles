@@ -30,11 +30,82 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-azZfebt3mHhiasssSCBtB95pvLianjwbLYB+vhV1DYU=",
+            "sha256": "sha256-LWdcF2DTh8fZDqEygmG58nIekVpEHXTFb4Eekb5PlY8=",
             "type": "url",
-            "url": "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/v0.18.0/deadlock-mod-manager.flatpak"
+            "url": "https://github.com/deadlock-mod-manager/deadlock-mod-manager/releases/download/v1.0.0/deadlock-mod-manager.flatpak"
         },
-        "version": "v0.18.0"
+        "version": "v1.0.0"
+    },
+    "difftastic": {
+        "cargoLock": null,
+        "date": "2026-05-10",
+        "extract": null,
+        "name": "difftastic",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "wilfred",
+            "repo": "difftastic",
+            "rev": "7ccfcb315f7e46fd015809416c7d7dffa5be7078",
+            "sha256": "sha256-BxJ36OGsec3TPO2QyljtN11HU/aWVBaXaQySAtmG8Q8=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "7ccfcb315f7e46fd015809416c7d7dffa5be7078"
+    },
+    "difftastic-nvim": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-23NGKhytF3OsLJgdrC51IH_sIGoqe_yBfmPsZKHOMSk=/Cargo.lock",
+                {}
+            ]
+        },
+        "date": "2026-03-14",
+        "extract": null,
+        "name": "difftastic-nvim",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "clabby",
+            "repo": "difftastic.nvim",
+            "rev": "6041ef0244b3fecf3b7f07de9af8cfbf8dbc4945",
+            "sha256": "sha256-23NGKhytF3OsLJgdrC51IH/sIGoqe/yBfmPsZKHOMSk=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "6041ef0244b3fecf3b7f07de9af8cfbf8dbc4945"
+    },
+    "eagle-nvim": {
+        "cargoLock": null,
+        "date": "2026-02-10",
+        "extract": null,
+        "name": "eagle-nvim",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "soulis-1256",
+            "repo": "eagle.nvim",
+            "rev": "d503b168932160b07d4d09551d90d5fbb388b641",
+            "sha256": "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "d503b168932160b07d4d09551d90d5fbb388b641"
     },
     "game-devices-udev-rules": {
         "cargoLock": null,
@@ -82,11 +153,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-+kAs9vev0H7H40JWnpf0s5hI8NdX16BbRapmuY5Do38=",
+            "sha256": "sha256-C/Z0VE1Au0+6Me/1S5pPa7xeGQatM6QJYM55HtLu7ck=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.12.4.1/helium-0.12.4.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.12.5.1/helium-0.12.5.1-x86_64_linux.tar.xz"
         },
-        "version": "0.12.4.1"
+        "version": "0.12.5.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -98,11 +169,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-0cpES40UjQqUmdmZqEx37SUKJ1F2L4X+91t8+IQ6y5g=",
+            "sha256": "sha256-uws6OUTyV6/Ejo1FqFnpNSG3tTUGFMNelrex2m1Ymd0=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.12.4.1/helium_0.12.4.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.12.5.1/helium_0.12.5.1_arm64-macos.dmg"
         },
-        "version": "0.12.4.1"
+        "version": "0.12.5.1"
     },
     "icon_map": {
         "cargoLock": null,
@@ -114,11 +185,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-seYKDv4fFmxryBk9j+RLk3WA3LFPG9zN/ULMvIDNAlQ=",
+            "sha256": "sha256-1OG57eY/5DZTiMDUt+YqTT6aUvQJ/qd0PpefNrTPBpI=",
             "type": "url",
-            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.60/icon_map.sh"
+            "url": "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.62/icon_map.sh"
         },
-        "version": "v2.0.60"
+        "version": "v2.0.62"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -140,6 +211,28 @@
             "url": "https://github.com/felixkratz/jankyborders"
         },
         "version": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e"
+    },
+    "jujutsu-nvim": {
+        "cargoLock": null,
+        "date": "2026-05-14",
+        "extract": null,
+        "name": "jujutsu-nvim",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "yannvanhalewyn",
+            "repo": "jujutsu.nvim",
+            "rev": "17ab008d71cbcd31f8c2891e11cb758579f597c0",
+            "sha256": "sha256-KygJ73YZNPtTfECWyrwK86AfO7jXDEfIMFia3yvorM0=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "17ab008d71cbcd31f8c2891e11cb758579f597c0"
     },
     "kanata": {
         "cargoLock": {
@@ -207,9 +300,9 @@
     },
     "slskd": {
         "cargoLock": null,
-        "date": "2026-05-21",
+        "date": "2026-05-24",
         "extract": {
-            "./src/web/package-lock.json": "sha256-1AgWFa_K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=/./src/web/package-lock.json"
+            "./src/web/package-lock.json": "sha256-ELS9iI7OmhSiymWIY6TNxSYpZFlluI8s+7XCGxrsiTs=/./src/web/package-lock.json"
         },
         "name": "slskd",
         "passthru": null,
@@ -222,13 +315,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee",
-            "sha256": "sha256-1AgWFa/K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=",
+            "rev": "0c25a725360ba67a12ed07eee056256eec408f27",
+            "sha256": "sha256-ELS9iI7OmhSiymWIY6TNxSYpZFlluI8s+7XCGxrsiTs=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-        "version": "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee"
+        "version": "0c25a725360ba67a12ed07eee056256eec408f27"
     },
     "yabai": {
         "cargoLock": null,

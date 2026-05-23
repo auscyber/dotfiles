@@ -7,8 +7,14 @@
       url = "github:deadlock-mod-manager/deadlock-mod-manager";
       flake = false;
     };
+    rift.url = "github:auscyber/rift";
+    rift.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nix.url = "github:nixos/nix/latest-release";
+    conform = {
+      url = "github:stevearc/conform.nvim?ref=pull/881/merge";
+      flake = false;
+    };
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "path:./inputs/agenix";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
@@ -24,12 +30,8 @@
       flake = false;
     };
     nix-topology.url = "github:oddlama/nix-topology";
-    attic = {
-      url = "path:./inputs/attic";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     celler = {
-      url = "github:blitz/celler";
+      url = "github:blitz/celler/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
@@ -46,7 +48,7 @@
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     deadlock.url = "github:deadlock-mod-manager/deadlock-mod-manager";
 
-    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
+    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     nixos-images = {
       # url = "github:nix-community/nixos-images";
       url = "github:nvmd/nixos-images/sdimage-installer";
@@ -75,16 +77,16 @@
     kmonad = {
       url = "git+https://github.com/kmonad/kmonad?submodules=1&dir=nix";
     };
-    lix = {
-      url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
-      flake = false;
-    };
-
-    lix-module = {
-      url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-      #  inputs.lix.follows = "lix";
-    };
+    #    lix = {
+    #      url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
+    #      flake = false;
+    #    };
+    #
+    #    lix-module = {
+    #      url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
+    #      inputs.nixpkgs.follows = "nixpkgs";
+    #      #  inputs.lix.follows = "lix";
+    #    };
     ghostty-shaders = {
       url = "github:hackr-sh/ghostty-shaders";
       flake = false;
@@ -144,7 +146,6 @@
     opnix.url = "github:brizzbuzz/opnix";
     nh.url = "path:./inputs/nh";
     nh.inputs.nixpkgs.follows = "nixpkgs";
-    nh.inputs.rust-overlay.follows = "rust-overlay";
 
     nur = {
       url = "github:nix-community/NUR";
@@ -172,7 +173,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    op-shell-plugins.url = "github:1Password/shell-plugins?ref=pull/594/merge";
+    op-shell-plugins.url = "github:1Password/shell-plugins";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.url = "github:nix-community/nix-index-database";
