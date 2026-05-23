@@ -23,6 +23,7 @@
     ];
     trusted-public-keys = [
       "secondpc:cac96M9YXnt/U1UEQuu+g/Pfgblsqo+Q1ewcr3AuGr4="
+      "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
       "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4"
     ];
   };

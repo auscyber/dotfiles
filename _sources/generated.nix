@@ -49,18 +49,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.12.3.1";
+    version = "0.12.4.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.12.3.1/helium-0.12.3.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-gi96TmGdqBN2t1YC3KRzbWcNP7s2dTc3bcoVC3WQt/I=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.12.4.1/helium-0.12.4.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-+kAs9vev0H7H40JWnpf0s5hI8NdX16BbRapmuY5Do38=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.12.3.1";
+    version = "0.12.4.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.12.3.1/helium_0.12.3.1_arm64-macos.dmg";
-      sha256 = "sha256-BrbexBlCQh9htQEy4Wiul/oNSn2MVERoqpLT8VRLENM=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.12.4.1/helium_0.12.4.1_arm64-macos.dmg";
+      sha256 = "sha256-0cpES40UjQqUmdmZqEx37SUKJ1F2L4X+91t8+IQ6y5g=";
     };
   };
   icon_map = {
@@ -123,35 +123,35 @@
   };
   slskd = {
     pname = "slskd";
-    version = "9bb822122182b88579b0498bb0ebfca94282e9b4";
+    version = "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee";
     src = fetchgit {
       url = "https://github.com/slskd/slskd.git";
-      rev = "9bb822122182b88579b0498bb0ebfca94282e9b4";
+      rev = "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-UHgil9BWzDPz/Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=";
+      sha256 = "sha256-1AgWFa/K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=";
     };
     extract = {
-      "./src/web/package-lock.json" = ./. + "/sha256-UHgil9BWzDPz_Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=/./src/web/package-lock.json";
-    };date = "2026-05-14";prefetch = {
+      "./src/web/package-lock.json" = ./. + "/sha256-1AgWFa_K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=/./src/web/package-lock.json";
+    };date = "2026-05-21";prefetch = {
     "./src/web/package-lock.json" = "sha256-ta9emcPPPiNrPI0a89UxDdS3aymQU/VobRsjWLod6NQ=";
     
     };
   };
   yabai = {
     pname = "yabai";
-    version = "02de172f8706c3e2eaa679478897d7346e82b564";
+    version = "2d743f4bea98b650ae7dec9f459db600323ca29d";
     src = fetchgit {
       url = "https://github.com/koekeishiya/yabai";
-      rev = "02de172f8706c3e2eaa679478897d7346e82b564";
+      rev = "2d743f4bea98b650ae7dec9f459db600323ca29d";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-61knfbahxxlJnVZy47347slsjUGiQUJyZh58G97SDkE=";
+      sha256 = "sha256-+zWVILacHL+JkddknY29DCMowVpOeR+nDelt2EHYEfw=";
     };
-    date = "2026-05-08";
+    date = "2026-05-18";
   };
 }

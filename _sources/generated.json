@@ -82,11 +82,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-gi96TmGdqBN2t1YC3KRzbWcNP7s2dTc3bcoVC3WQt/I=",
+            "sha256": "sha256-+kAs9vev0H7H40JWnpf0s5hI8NdX16BbRapmuY5Do38=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.12.3.1/helium-0.12.3.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.12.4.1/helium-0.12.4.1-x86_64_linux.tar.xz"
         },
-        "version": "0.12.3.1"
+        "version": "0.12.4.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -98,11 +98,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-BrbexBlCQh9htQEy4Wiul/oNSn2MVERoqpLT8VRLENM=",
+            "sha256": "sha256-0cpES40UjQqUmdmZqEx37SUKJ1F2L4X+91t8+IQ6y5g=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.12.3.1/helium_0.12.3.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.12.4.1/helium_0.12.4.1_arm64-macos.dmg"
         },
-        "version": "0.12.3.1"
+        "version": "0.12.4.1"
     },
     "icon_map": {
         "cargoLock": null,
@@ -207,9 +207,9 @@
     },
     "slskd": {
         "cargoLock": null,
-        "date": "2026-05-14",
+        "date": "2026-05-21",
         "extract": {
-            "./src/web/package-lock.json": "sha256-UHgil9BWzDPz_Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=/./src/web/package-lock.json"
+            "./src/web/package-lock.json": "sha256-1AgWFa_K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=/./src/web/package-lock.json"
         },
         "name": "slskd",
         "passthru": null,
@@ -222,17 +222,17 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "9bb822122182b88579b0498bb0ebfca94282e9b4",
-            "sha256": "sha256-UHgil9BWzDPz/Q5ylFcvrmmeIEUBhwMTBtbHWOV4XJo=",
+            "rev": "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee",
+            "sha256": "sha256-1AgWFa/K+pMYuexk2LSitnPYVfsnIGfYUGbDs9vUVB4=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/slskd/slskd.git"
         },
-        "version": "9bb822122182b88579b0498bb0ebfca94282e9b4"
+        "version": "0bc3f2e327d8ae9a8a0bd1058cb90c59c58933ee"
     },
     "yabai": {
         "cargoLock": null,
-        "date": "2026-05-08",
+        "date": "2026-05-18",
         "extract": null,
         "name": "yabai",
         "passthru": null,
@@ -243,12 +243,12 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "02de172f8706c3e2eaa679478897d7346e82b564",
-            "sha256": "sha256-61knfbahxxlJnVZy47347slsjUGiQUJyZh58G97SDkE=",
+            "rev": "2d743f4bea98b650ae7dec9f459db600323ca29d",
+            "sha256": "sha256-+zWVILacHL+JkddknY29DCMowVpOeR+nDelt2EHYEfw=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/koekeishiya/yabai"
         },
-        "version": "02de172f8706c3e2eaa679478897d7346e82b564"
+        "version": "2d743f4bea98b650ae7dec9f459db600323ca29d"
     }
 }

@@ -10,6 +10,9 @@
     {
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
+        config = {
+          allowUnfree = true;
+        };
         overlays = [
           inputs.sops-nix.overlays.default
           self.overlays.default

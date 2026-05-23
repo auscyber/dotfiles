@@ -24,32 +24,23 @@ in
       path = "${config.home.homeDirectory}/.wakatime.cfg";
     };
 
-    home.file = {
-      ".config/nvim" = {
-        source = config.lib.file.linkLocalPath ../../../../.config/nvim;
-        #    recursive = true;
+    # Nixvim is already imported via flake importedHomeModules.
+    # We keep this module as the toggle point, and source the actual editor config from ./nixvim.
+    programs.nixvim = {
+      enable = true;
+      imports = [ ../../../../nixvim ];
+      nixpkgs = {
+      inherit pkgs;
       };
-    };
-    home.packages = with pkgs; [
-      (wrapNeovimUnstable neovim {
-        wrapRc = false;
-        vimAlias = true;
-        withNodeJs = true;
-      })
-      #      (neovim.override {
-      #        vimAlias = true;
-      #        withNodeJs = true;
-      #      })
-    ];
+          };
 
     home.sessionVariables = {
       vim = "nvim";
       EDITOR = "nvim";
       editor = "$EDITOR";
     };
-    home.file."${config.auscybernix.flakeConfig.flakeFolder}/.config/nvim/lua/treesitter_compiler.lua".text =
-      ''
-        			return "${pkgs.stdenv.cc}/bin/cc"
-              	'';
+
+    # Old config wrote a treesitter compiler shim for local compilation.
+    # nixvim's treesitter build is handled declaratively; keep the file removed.
   };
 }

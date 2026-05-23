@@ -16,7 +16,7 @@
             :ellisonleao/glow.nvim {} :rktjmp/lush.nvim {}
             :camspiers/animate.vim {:module :animate}
             :kyazdani42/nvim-tree.lua {:config #(require :plugins.tree)} ; :keys :<C-n>} ;:mod tree}
-            :famiu/feline.nvim {:config #(require :plugins.feline)}
+            :angalexik/feline.nvim {:config #(require :plugins.feline)}
             ; :mod feline}
             :akinsho/nvim-bufferline.lua
             {:config #(require :plugins.bufferline)} ;
@@ -124,10 +124,8 @@
             :dag/vim-fish {:ft :fish} :purescript-contrib/purescript-vim
             {:ft :purescript} :eraserhd/parinfer-rust
             {:ft [:fennel :racket :scheme :lisp]
-             :build (fn []
-                      (if (> (vim.fn.exists :/nix/) 0)
-                          "nix-shell --run 'cargo build --release'"
-                          "cargo build --release"))}
+             :build 
+                          "nix develop --command 'cargo build --release'"}
             ;  :gpanders/nvim-parinfer {:ft [:fennel :racket :scheme :lisp]}
             :elkowar/yuck.vim {:ft :yuck} ;  :elkowar/nvim-gehzu {:ft :fnl}
             ; :vhyrro/neorg {:after [:nvim-cmp :nvim-treesitter]  :ft :norg :require [:plenary.nvim] :config #(require :plugins.neorg)} ;:mod neorg}

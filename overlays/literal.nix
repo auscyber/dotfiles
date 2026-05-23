@@ -69,6 +69,7 @@ in
 (
   {
     #    karabiner-dk = inputs.my-nur.packages."${system}".karabiner-dk;
+#    _1password-gui = builtins.trace "update 1password when unstable does" pkgsUnstableSmall._1password-gui;
     neovim = inputs.neovim.packages."${system}".default;
     nowplaying-cli = pkgs.nowplaying-cli.overrideAttrs (attrs: {
       src = inputs.nowplaying-cli;

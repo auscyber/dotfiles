@@ -17,7 +17,7 @@
   "crates.nvim": { "branch": "main", "commit": "694357861ec9ebf12475ddcdd04ea45a0923c32d" },
   "dhall-vim": { "branch": "master", "commit": "bd9fd99f21dbc7174fb728a21d04e073ef7dd930" },
   "distant.nvim": { "branch": "v0.3", "commit": "67d6b066e8490725718b79f643966f4eafc7da3c" },
-  "feline.nvim": { "branch": "master", "commit": "3587f57480b88e8009df7b36dc84e9c7ff8f2c49" },
+  "feline.nvim": { "branch": "main", "commit": "9e71b9189789edd5dc8d20c86b4d43ca110c88b7" },
   "gitsigns.nvim": { "branch": "main", "commit": "dd3f588bacbeb041be6facf1742e42097f62165d" },
   "glow.nvim": { "branch": "main", "commit": "5d5954b2f22e109d4a6eba8b2618c5b96e4ee7a2" },
   "hotpot.nvim": { "branch": "main", "commit": "bfca1c460d3781d548a226fb232bf7e71a6f5b4f" },
