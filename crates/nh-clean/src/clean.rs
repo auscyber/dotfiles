@@ -199,7 +199,7 @@ impl args::CleanMode {
     }
 
     // Query gcroots
-    let regexes = [&*DIRENV_REGEX];
+    let regexes = &[&*DIRENV_REGEX][..(!args.no_direnv as usize)];
     let mut orphan_gcroots: Vec<PathBuf> = Vec::new();
 
     if !is_profile_clean && !args.no_gcroots {
@@ -236,7 +236,7 @@ impl args::CleanMode {
           continue;
         }
 
-        if !gcroot_matches_filter(&src, &dst, &regexes) {
+        if !gcroot_matches_filter(&src, &dst, regexes) {
           debug!("dst doesn't match any gcroot filter, skipping");
           continue;
         }
@@ -325,6 +325,9 @@ impl args::CleanMode {
     );
     if args.keep_one {
       println!("Keeping all active direnv gcroots");
+    }
+    if args.no_direnv {
+      println!("Skipping all direnv gcroots");
     }
     println!();
     println!("legend:");
