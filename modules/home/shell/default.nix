@@ -99,7 +99,7 @@ in
 
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks = {
+        settings = {
           "imflo.pet" = {
             forwardAgent = true;
           };

@@ -1,6 +1,7 @@
 { inputs, ... }:
 {
   input-branches = {
+    vcs = "jj";
     inputs = {
       nh = {
         upstream = {

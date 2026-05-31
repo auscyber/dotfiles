@@ -71,6 +71,7 @@ in
     #    karabiner-dk = inputs.my-nur.packages."${system}".karabiner-dk;
     #    _1password-gui = builtins.trace "update 1password when unstable does" pkgsUnstableSmall._1password-gui;
     inherit (pkgs) rift nh celler;
+    discord = pkgs.discord.override { withOpenASAR = true; };
     vimPlugins = pkgs.vimPlugins.extend (
       self: super: {
         conform-nvim = super.conform-nvim.overrideAttrs (attrs: {

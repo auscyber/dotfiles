@@ -16,13 +16,28 @@
       flake = false;
     };
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix.url = "path:./inputs/agenix";
+    agenix = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/agenix";
+
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
-    agenix-rekey.url = "path:./inputs/agenix-rekey";
+    agenix-rekey = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/agenix-rekey";
+
+      inputs.rust-overlay.follows = "rust-overlay";
+      inputs.agenix.follows = "agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
-    agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     nowplaying-cli = {
@@ -34,7 +49,15 @@
       url = "github:blitz/celler/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
+    age-plugin-gpg = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/age-plugin-gpg";
+
+      inputs.rust-overlay.follows = "rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
@@ -133,7 +156,11 @@
       url = "github:ibhagwan/picom";
       flake = false;
     };
-    input-branches.url = "path:./inputs/input-branches";
+    input-branches = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/input-branches";
+    };
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:nix-community/stylix";
@@ -144,8 +171,13 @@
       flake = false;
     };
     opnix.url = "github:brizzbuzz/opnix";
-    nh.url = "path:./inputs/nh";
-    nh.inputs.nixpkgs.follows = "nixpkgs";
+    nh = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/nh";
+
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nur = {
       url = "github:nix-community/NUR";
@@ -165,8 +197,13 @@
     sops-nix.url = "github:auscyber/sops-nix/age-plugin";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin.url = "path:./inputs/darwin/";
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    darwin = {
+      type = "git";
+      url = "./.";
+      ref = "inputs/darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     eww.url = "github:elkowar/eww";
     nix-openclaw = {
       url = "github:openclaw/nix-openclaw";
@@ -191,7 +228,9 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "path:./inputs/home-manager";
+      type = "git";
+      url = "./.";
+      ref = "inputs/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     arion.url = "github:hercules-ci/arion";

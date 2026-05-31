@@ -46,7 +46,7 @@ in
 
   #  programs._1password.enable = true;
   programs.ssh = {
-    matchBlocks = {
+    settings = {
       "*" = {
         identityAgent = "${onePassPath}";
       };

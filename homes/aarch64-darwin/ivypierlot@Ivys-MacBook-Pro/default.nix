@@ -284,7 +284,7 @@
   programs.ssh = {
     enable = true;
     package = pkgs.openssh;
-    matchBlocks = {
+    settings = {
       "faggot.sh" = {
         forwardAgent = true;
         #        identityFile = "~/.ssh/id_ed25519.pub";
