@@ -1,10 +1,14 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-25.11";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-25.11";
+    crane.url = "github:ipetkov/crane";
+  };
 
   outputs =
     {
       self,
       nixpkgs,
+      crane,
     }:
     let
       forAllSystems =
@@ -19,10 +23,18 @@
       rev = self.shortRev or self.dirtyShortRev or "dirty";
     in
     {
-      overlays.default = final: _: { nh = final.callPackage ./package.nix { inherit rev; }; };
+      overlays.default = final: _: {
+        nh = final.callPackage ./package.nix {
+          inherit crane rev;
+          pkgs = final;
+        };
+      };
 
       packages = forAllSystems (pkgs: {
-        nh = pkgs.callPackage ./package.nix { inherit rev; };
+        nh = pkgs.callPackage ./package.nix {
+          inherit crane rev;
+          pkgs = pkgs;
+        };
         default = self.packages.${pkgs.stdenv.hostPlatform.system}.nh;
       });
 
@@ -41,7 +53,7 @@
           name = "nix3-fmt-wrapper";
 
           runtimeInputs = [
-            pkgs.nixfmt-rfc-style
+            pkgs.nixfmt
             pkgs.fd
           ];
 
