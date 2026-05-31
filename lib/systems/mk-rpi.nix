@@ -93,6 +93,7 @@ in
       inputs.agenix-rekey.nixosModules.default
       inputs.sops-nix.nixosModules.sops
 
+      ../../modules/common/allConfigs.nix
       ../../modules/common/secrets.nix
 
       ../../modules/common/nix
@@ -121,6 +122,7 @@ in
 
     modules = [
       { _module.args.lib = extendedLib; }
+      ../../modules/common/allConfigs.nix
       stylixConfig
       inputs.stylix.nixosModules.stylix
       inputs.agenix.nixosModules.default

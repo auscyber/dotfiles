@@ -12,11 +12,13 @@
   home-manager.sharedModules = [
     {
       auscybernix.nix.flake = config.auscybernix.nix.flake;
+      auscybernix.reloadProgram = config.auscybernix.reloadProgram;
     }
   ];
+  auscybernix.reloadProgram = "nh darwin switch";
 
   environment.shellAliases = {
-    "${config.auscybernix.nix.reloadProgram}" = "nh darwin switch";
+    "${config.auscybernix.reloadAlias}" = "${config.auscybernix.reloadProgram}";
 
   };
   system.systemBuilderCommands =

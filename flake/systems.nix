@@ -42,6 +42,8 @@ in
         inputs.stylix.homeModules.stylix
       ];
       importedNixosModules = [
+
+        ../modules/common/allConfigs.nix
         ../modules/common/vpn.nix
         ../modules/common/builders
         ../modules/common/secrets.nix

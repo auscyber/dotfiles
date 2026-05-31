@@ -28,6 +28,9 @@
         '';
 
     };
+    home.shellAliases = {
+      "${config.auscybernix.reloadAlias}" = "${config.auscybernix.reloadProgram}";
+    };
     home.extraBuilderCommands =
       let
         packagelist = pkgs.writeText "extra-builder-commands" (
@@ -92,9 +95,9 @@
       ripgrep
       nil
       nh
-#      vim
+      #      vim
       nil
-#      neovim
+      #      neovim
       starship
       nixfmt
       treefmt

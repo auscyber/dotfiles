@@ -17,7 +17,7 @@ in
   };
   config = lib.mkIf cfg.enable {
     programs.ssh = {
-      matchBlocks = {
+      settings = {
         "faggot.sh" = {
           hostname = "faggot.sh";
           user = "ivy";

@@ -30,7 +30,7 @@ in
     auscybernix.nixvim.nixvim.enable = true;
 
     # Old config wrote a treesitter compiler shim for local compilation.
-    home.sessionVaribles.EDITOR = "vim";
+    home.sessionVariables.EDITOR = "vim";
     # nixvim's treesitter build is handled declaratively; keep the file removed.
   };
 }

@@ -61,8 +61,8 @@ inputs.nixpkgs.lib.nixosSystem {
       }
       // common.mkNixpkgsConfig flake;
     }
-
     ../../modules/common/allConfigs.nix
+
     ../../modules/common/hm
     ../../modules/common/ssh-keys.nix
     (

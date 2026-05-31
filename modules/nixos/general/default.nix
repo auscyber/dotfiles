@@ -1,4 +1,7 @@
 { config, pkgs, ... }:
+let
+  reloadProgram = "nh os switch";
+in
 {
   environment.sessionVariables.NH_OS_FLAKE = "${config.auscybernix.nix.flake}";
 
@@ -33,9 +36,12 @@
   home-manager.sharedModules = [
     {
       auscybernix.nix.flake = config.auscybernix.nix.flake;
+      auscybernix.reloadProgram = reloadProgram;
     }
   ];
+  auscybernix.reloadProgram = reloadProgram;
+
   environment.shellAliases = {
-    "${config.auscybernix.nix.reloadProgram}" = "nh os switch";
+    "${config.auscybernix.nix.reloadAlias}" = "${config.auscybernix.reloadProgram}";
   };
 }

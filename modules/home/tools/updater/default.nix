@@ -16,7 +16,6 @@ let
       PWD=${lib.escapeShellArg config.auscybernix.nix.flake}
       nix flake update
       nvfetcher -k ${lib.escapeShellArg config.age.templates."nvchecker.toml".path}
-      ${config.home.shellAliases.${config.auscybernix.nix.reloadProgram}}
     '';
   };
 in

@@ -12,9 +12,12 @@
       default = "/home/auscyber/dotfiles";
 
     };
-    nix.reloadProgram = lib.mkOption {
+    reloadAlias = lib.mkOption {
       type = lib.types.str;
       default = "re";
+    };
+    reloadProgram = lib.mkOption {
+      type = lib.types.str;
     };
     meta = {
       userFriendlyName = lib.mkOption {

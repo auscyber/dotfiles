@@ -95,6 +95,7 @@ in
     #      inherit (sources.difftastic) src version;
     #      cargoDeps = pkgs.rustPlatform.importCargoLock sources.difftastic.cargoLock."Cargo.lock";
     #    });
+    nvfetcher = inputs.nvfetcher.packages."${system}".default;
     neovim = inputs.neovim.packages."${system}".default;
     nowplaying-cli = pkgs.nowplaying-cli.overrideAttrs (attrs: {
       src = inputs.nowplaying-cli;
