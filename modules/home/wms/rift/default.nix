@@ -32,6 +32,7 @@ in
                               (defalias
                     		  enable_spaces (t! runasuser "rift-cli execute window toggle-space-activated ")
                               toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a ~/Nix\ Apps/Discord.app")
+                              toggle_fantastical_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name fantastical || open -a Fantastical.app")
                               toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
                               toggle_music_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name music || open -a 'Tidal'")
                               minimise (t! runasuser "yabai -m window --minimize")
@@ -137,6 +138,10 @@ in
           {
             app_id = "com.agilebits.onepassword7";
             scratchpad = "1password";
+          }
+          {
+            app_id = "com.flexibits.fantastical2.mac";
+            scratchpad = "fantastical";
           }
           {
             app_id = "com.tidal.desktop";

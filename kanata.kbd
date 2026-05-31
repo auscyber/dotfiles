@@ -91,6 +91,7 @@
   d (fork _ @toggle_discord_scratchpad (lshift))
   b (fork _ @toggle_beeper_scratchpad (lshift))
   p (fork _ @toggle_1password_scratchpad (lshift))
+  f (fork _ @toggle_fantastical_scratchpad (lshift))
   s (fork _ @toggle_music_scratchpad (lshift))
   m (fork _ (push-msg "raycast:extensions/SeoFood/typewhisper/start-dictation") (lshift))
   )

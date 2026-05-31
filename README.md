@@ -17,7 +17,7 @@
 |:------------:|:--------|:------|
 | [Ivys-MacBook-Pro](#system-Ivys-MacBook-Pro-aarch64-darwin) |  aarch64-darwin | M4 Macbook Pro 2024 |
 | [auspc](#system-auspc-x86_64-linux) |  x86_64-linux | Main Gaming desktop |
-| [lora-pi](#system-lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi |  |
+| [lora-pi](#system-lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi | &lt;nil&gt; |
 | [macmini](#system-macmini-aarch64-darwin) |  aarch64-darwin | &lt;nil&gt; |
 | [pentestvm](#system-pentestvm-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [secondpc](#system-secondpc-x86_64-linux) |  x86_64-linux | Home server |
@@ -30,6 +30,7 @@
 | [auscyber@auspc](#home-auscyber@auspc-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [auscyber@laptop](#home-auscyber@laptop-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [auscyber@secondpc](#home-auscyber@secondpc-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
+| [auscyber@surfacelaptop](#home-auscyber@surfacelaptop-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [ivy@imflopet](#home-ivy@imflopet-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
 | [ivy@lora-pi](#home-ivy@lora-pi-aarch64-linux-rpi) |  aarch64-linux-rpi | &lt;nil&gt; |
 | [ivy@vmi1472413.contaboserver.net](#home-ivy@vmi1472413.contaboserver.net-x86_64-linux) |  x86_64-linux | &lt;nil&gt; |
@@ -50,10 +51,14 @@
 │    ├── nix  : enabled
 │    ├── programs
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 ```
 <h3 id="home-auscyber@auspc-x86_64-linux">🏠 auscyber@auspc </h3>
@@ -64,24 +69,31 @@
 ```
 ├── config
 │    ├── browsers
+│    │    ├── helium  : enabled
 │    │    ├── zen-browser  : enabled
 │    ├── flakeConfig
 │    │    ├── flakeFolder : /home/auscyber/dotfiles
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
 │    ├── programs
 │    │    ├── _1password-cli  : enabled
 │    │    ├── neovim  : enabled
 │    │    ├── ssh  : enabled
 │    │    ├── zotero  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
 │    ├── terms
 │    │    ├── ghostty  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── wakatime_config : wakatime_config
 ```
@@ -99,10 +111,14 @@
 │    ├── nix  : enabled
 │    ├── programs
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 ```
 <h3 id="home-auscyber@secondpc-x86_64-linux">🏠 auscyber@secondpc </h3>
@@ -117,14 +133,49 @@
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
 │    ├── programs
 │    │    ├── neovim  : enabled
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
+│    ├── github_token : github_token
+│    ├── wakatime_config : wakatime_config
+```
+<h3 id="home-auscyber@surfacelaptop-x86_64-linux">🏠 auscyber@surfacelaptop </h3>
+
+&lt;nil&gt;
+* [config](/homes/x86_64-linux/auscyber@surfacelaptop)
+
+```
+├── config
+│    ├── flakeConfig
+│    │    ├── flakeFolder : /home/auscyber/dotfiles
+│    ├── meta
+
+│    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
+│    ├── programs
+│    │    ├── neovim  : enabled
+│    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
+│    ├── secrets  : enabled
+│    ├── shell  : enabled
+│    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
+├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── wakatime_config : wakatime_config
 ```
@@ -140,14 +191,20 @@
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
 │    ├── programs
 │    │    ├── neovim  : enabled
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── wakatime_config : wakatime_config
 ```
@@ -165,11 +222,15 @@
 │    ├── nix  : enabled
 │    ├── programs
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 ```
 <h3 id="home-ivy@vmi1472413.contaboserver.net-x86_64-linux">🏠 ivy@vmi1472413.contaboserver.net </h3>
@@ -184,14 +245,20 @@
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
 │    ├── programs
 │    │    ├── neovim  : enabled
 │    │    ├── ssh  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── wakatime_config : wakatime_config
 ```
@@ -203,9 +270,8 @@ Home configuration for Ivys-MacBook-Pro
 ```
 ├── config
 │    ├── browsers
+│    │    ├── helium  : enabled
 │    │    ├── zen-browser  : enabled
-│    ├── editors
-│    │    ├── zed  : enabled
 │    ├── flakeConfig
 │    │    ├── flakeFolder : /Users/ivypierlot/dotfiles
 │    ├── keybinds
@@ -213,21 +279,27 @@ Home configuration for Ivys-MacBook-Pro
 │    ├── meta
 │    │    ├── description : Home configuration for Ivys-MacBook-Pro
 │    ├── nix  : enabled
+│    ├── nixvim
+│    │    ├── nixvim  : enabled
 │    ├── programs
 │    │    ├── _1password-cli  : enabled
 │    │    ├── neovim  : enabled
 │    │    ├── sketchybar  : enabled
 │    │    ├── ssh  : enabled
 │    │    ├── zotero  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh home switch
 │    ├── secrets  : enabled
 │    ├── shell  : enabled
 │    ├── standalone  : enabled
 │    ├── terms
 │    │    ├── ghostty  : enabled
+│    ├── tools
+│    │    ├── updater  : enabled
 │    ├── wms
-│    │    ├── yabai  : enabled
+│    │    ├── rift  : enabled
 ├── secrets
-│    ├── extra-nix-conf : extra-nix-conf
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── wakatime_config : wakatime_config
 ```
@@ -248,14 +320,20 @@ M4 Macbook Pro 2024
 │    ├── nix  : enabled
 │    ├── programs
 │    │    ├── finder  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh darwin switch
 │    ├── secrets  : enabled
 │    ├── sudo
 │    │    ├── agents  : enabled
 │    │    ├── pam  : enabled
 │    ├── user
 │    │    ├── username : ivypierlot
+│    ├── vpn  : enabled
 ├── secrets
+│    ├── attic_token : attic_token
+│    ├── builder-ssh-key : builder-ssh-key
 │    ├── github_token : github_token
+│    ├── wireguard_key : wireguard_key
 ```
 <h3 id="system-auspc-x86_64-linux"> auspc </h3>
 Main Gaming desktop
@@ -270,24 +348,36 @@ Main Gaming desktop
 │    ├── nix  : enabled
 │    ├── nixos
 │    │    ├── games  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
+│    ├── ssh  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+│    ├── vpn  : enabled
 ├── secrets
+│    ├── attic_token : attic_token
+│    ├── builder-ssh-key : builder-ssh-key
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash
+│    ├── wireguard_key : wireguard_key
 ```
 <h3 id="system-lora-pi-aarch64-linux-rpi"> lora-pi </h3>
-
+&lt;nil&gt;
 
 * [config](/systems/aarch64-linux-rpi/lora-pi)
 
 ```
 ├── config
+│    ├── meta
+
 │    ├── nix  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
 ├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash
@@ -306,10 +396,13 @@ Main Gaming desktop
 │    ├── nix  : enabled
 │    ├── programs
 │    │    ├── finder  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh darwin switch
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : ivypierlot
 ├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 ```
 <h3 id="system-pentestvm-x86_64-linux"> pentestvm </h3>
@@ -322,10 +415,13 @@ Main Gaming desktop
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
 ├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash
@@ -340,19 +436,22 @@ Home server
 │    ├── meta
 │    │    ├── description : Home server
 │    ├── nix  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
+│    ├── ssh  : enabled
 │    ├── user
 │    │    ├── username : auscyber
 ├── secrets
 │    ├── acme_cloudflare.env : acme_cloudflare.env
+│    ├── attic_token : attic_token
+│    ├── builder-ssh-key : builder-ssh-key
+│    ├── cache_key : cache_key
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash
-│    ├── navidrome_env : navidrome_env
-│    ├── slskd.env : slskd.env
-│    ├── slskd_secrets_env : slskd_secrets_env
-│    ├── soularr : soularr
-│    ├── soularr_api_key : soularr_api_key
+│    ├── tailscale/auth_key : tailscale/auth_key
+│    ├── wg_private_key : wg_private_key
 ```
 <h3 id="system-surfacelaptop-x86_64-linux"> surfacelaptop </h3>
 &lt;nil&gt;
@@ -364,13 +463,19 @@ Home server
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
+│    ├── ssh  : enabled
 │    ├── user
 │    │    ├── username : auscyber
+│    ├── vpn  : enabled
 ├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash
+│    ├── wireguard_key : wireguard_key
 ```
 <h3 id="system-wsl-nixos-x86_64-linux"> wsl-nixos </h3>
 &lt;nil&gt;
@@ -382,10 +487,13 @@ Home server
 │    ├── meta
 
 │    ├── nix  : enabled
+│    ├── reloadAlias : re
+│    ├── reloadProgram : nh os switch
 │    ├── secrets  : enabled
 │    ├── user
 │    │    ├── username : auscyber
 ├── secrets
+│    ├── attic_token : attic_token
 │    ├── github_token : github_token
 │    ├── ivy-password : ivy-password
 │    ├── ivy-pwd-hash : ivy-pwd-hash

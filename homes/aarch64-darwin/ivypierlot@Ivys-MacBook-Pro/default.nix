@@ -240,6 +240,7 @@
 
     shell = {
       enable = true;
+      nu.enable = true;
       fish = {
         enable = true;
       };
@@ -249,6 +250,8 @@
 
   };
   home.packages = with pkgs; [
+    cotabby
+    claude-code
     nodejs
     opencode
     desktoppr
@@ -288,24 +291,18 @@
       "faggot.sh" = {
         forwardAgent = true;
         #        identityFile = "~/.ssh/id_ed25519.pub";
-        extraOptions = {
-          "RemoteForward" = " /run/user/1001/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
-        };
+        "RemoteForward" = " /run/user/1001/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
 
       };
       "auspc" = {
         forwardAgent = true;
         host = "192.168.0.24";
         user = "auscyber";
-        extraOptions = {
-          "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
-        };
+        "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
       };
       "secondpc" = {
 
-        extraOptions = {
-          "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
-        };
+        "RemoteForward" = " /run/user/1000/gnupg/S.gpg-agent ${config.services.gpg-agent.socketAddress} ";
       };
     };
   };

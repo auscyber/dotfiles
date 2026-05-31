@@ -62,4 +62,9 @@ fetch.github = "clabby/difftastic.nvim"
 src.git = "https://github.com/wilfred/difftastic.git"
 fetch.github = "wilfred/difftastic"
 cargo_locl = ["Cargo.lock"]
-
+[cotabby-bin]
+src.github = "fujacob/cotabby"
+fetch.url = "https://github.com/fujacob/cotabby/releases/download/$ver/Cotabby.dmg"
+[cotabby]
+src.github = "fujacob/cotabby"
+fetch.github = "fujacob/cotabby"

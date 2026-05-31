@@ -6,6 +6,25 @@
   dockerTools,
 }:
 {
+  cotabby = {
+    pname = "cotabby";
+    version = "v0.4.1-beta";
+    src = fetchFromGitHub {
+      owner = "fujacob";
+      repo = "cotabby";
+      rev = "v0.4.1-beta";
+      fetchSubmodules = false;
+      sha256 = "sha256-JM13uibtdnJrnCy7M8KXkm/7cnrgKUGSljHcAISxZHg=";
+    };
+  };
+  cotabby-bin = {
+    pname = "cotabby-bin";
+    version = "v0.4.1-beta";
+    src = fetchurl {
+      url = "https://github.com/fujacob/cotabby/releases/download/v0.4.1-beta/Cotabby.dmg";
+      sha256 = "sha256-/1r12CjPWmemn4vECPkUzX/EsU0jErcIq1IH0BLlL90=";
+    };
+  };
   cursor_shader = {
     pname = "cursor_shader";
     version = "fb494d124d6b16a2472ae1815f70c48ece38f9e4";

@@ -103,7 +103,7 @@ in
   filterNixOSSystems =
     systems:
     filterAttrs (
-      _name: { system, ... }: hasPrefix "x86_64-linux" system || hasPrefix "aarch64-linux" system
+      _name: { system, ... }: hasPrefix "x86_64-linux" system || "aarch64-linux" == system
     ) systems;
 
   filterRpiSystems = systems: filterAttrs (_name: { system, ... }: hasSuffix "rpi" system) systems;

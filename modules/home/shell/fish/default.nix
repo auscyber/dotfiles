@@ -25,27 +25,10 @@ in
       bat
       starship
     ];
-    home.sessionVariables = {
-      BROWSER = "zen";
-    };
 
     programs.fish = {
       enable = true;
 
-      shellAliases = {
-        #      ghc = "stack exec -- ghc";
-        fzf = "fzf --reverse --height 40%";
-        vim = "nvim";
-        cat = "bat";
-        e = "vim";
-        #alias ng="nvim -c ':Neogit'"
-        ls = "eza --icons --git";
-        ll = "ls -la";
-        t = "tmux";
-        grep = "grep --color=auto";
-        hm = "home-manager ";
-
-      };
       interactiveShellInit =
         # fish
         ''
@@ -74,8 +57,8 @@ in
           end
           set fish_greeting
           fetch -s
-          starship init fish | source
-                                          	'';
+          #          starship init fish | source
+                                                    	'';
     };
   };
 }

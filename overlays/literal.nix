@@ -71,6 +71,10 @@ in
     #    karabiner-dk = inputs.my-nur.packages."${system}".karabiner-dk;
     #    _1password-gui = builtins.trace "update 1password when unstable does" pkgsUnstableSmall._1password-gui;
     inherit (pkgs) rift nh celler;
+    cotabby = pkgs.callPackage ../packages/cotabby.nix {
+      source = sources.cotabby-bin;
+      sourceRoot = "Cotabby";
+    };
     discord = pkgs.discord.override { withOpenASAR = true; };
     vimPlugins = pkgs.vimPlugins.extend (
       self: super: {
@@ -81,10 +85,10 @@ in
           name = "eagle-nvim";
           inherit (sources.eagle-nvim) src version;
         };
-        jujutsu-nvim = pkgs.vimUtils.buildVimPlugin {
-          name = "jujutsu-nvim";
-          inherit (sources.jujutsu-nvim) src version;
-        };
+          jujutsu-nvim = pkgs.vimUtils.buildVimPlugin {
+            name = "jujutsu-nvim";
+            inherit (sources.jujutsu-nvim) src version;
+          };
         difftastic-nvim = pkgs.callPackage ../packages/difftastic-nvim/default.nix {
           source = sources.difftastic-nvim;
         };

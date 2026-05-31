@@ -23,6 +23,7 @@ in
       rekeyFile = ../../../../secrets/wakatime_config.age;
       path = "${config.home.homeDirectory}/.wakatime.cfg";
     };
+    home.packages = with pkgs; [ tree-sitter ];
     stylix.targets.nixvim.enable = false;
 
     # Nixvim is already imported via flake importedHomeModules.
