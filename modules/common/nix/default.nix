@@ -14,21 +14,21 @@ let
     text =
       # sh
       ''
-                #!/bin/sh
-                                	  set -eu
-                                set -f # disable globbing
-                                export IFS=' '
-                  			  export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
-                  			  celler login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
+        #!/bin/sh
+        set -eu
+        set -f # disable globbing
+        export IFS=' '
+        export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
+        celler login central https://cache.ivymect.in "$(cat ${config.age.secrets.attic_token.path})"
 
-                                echo "Uploading paths" $OUT_PATHS
-        						if [[ -n "''${OUT_PATHS:-}" ]]; then
-           export TS_MAXFINISHED=1000
-           export TS_SLOTS=10
+        echo "Uploading paths" $OUT_PATHS
+        if [[ -n "''${OUT_PATHS:-}" ]]; then
+        	export TS_MAXFINISHED=1000
+        	export TS_SLOTS=10
 
-           echo "Uploading $OUT_PATHS"
-           printf "%s" "$OUT_PATHS" \
-           | xargs ts celler push main
+        	echo "Uploading $OUT_PATHS"
+        	printf "%s" "$OUT_PATHS" |
+        		xargs ts celler push main
         fi
 
       '';
@@ -66,7 +66,7 @@ in
           trusted-public-keys = [
             "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
             "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-	    "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
+            "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
             "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
             "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
           ];
@@ -80,7 +80,7 @@ in
       package = pkgs.nixVersions.latest;
 
       extraOptions = ''
-                        experimental-features = nix-command flakes ca-derivations
+                        experimental-features = nix-command flakes ca-derivations pipe-operators
                 		netrc-file = ${config.age.templates.netrc.path}
         				post-build-hook = ${build-hook}/bin/build-hook
       '';

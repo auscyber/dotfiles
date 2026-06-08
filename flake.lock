@@ -633,6 +633,21 @@
         "type": "github"
       }
     },
+    "den": {
+      "locked": {
+        "lastModified": 1780803601,
+        "narHash": "sha256-0lheZgtxP6Bk2IY0p5NQXlevUwgtHvfF2jaFXyCoJu0=",
+        "owner": "denful",
+        "repo": "den",
+        "rev": "79048eb2bdb02732932b7f9292a8e930915d5ab4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "denful",
+        "repo": "den",
+        "type": "github"
+      }
+    },
     "devenv": {
       "inputs": {
         "cachix": "cachix",
@@ -2974,6 +2989,21 @@
         "type": "github"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1778781969,
+        "narHash": "sha256-Jjuz5CmSkur8KvLDoGa+vylEp+RkQtv4mt/qcMznpH0=",
+        "owner": "denful",
+        "repo": "import-tree",
+        "rev": "d321337efd0f23a9eb14a42adb7b2c29313ab274",
+        "type": "github"
+      },
+      "original": {
+        "owner": "denful",
+        "repo": "import-tree",
+        "type": "github"
+      }
+    },
     "indexed": {
       "flake": false,
       "locked": {
@@ -5189,11 +5219,11 @@
         "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
-        "lastModified": 1780901587,
-        "narHash": "sha256-+xsF6hj0Oey+3tjEpMhpIvnm+tBHDDpJLC13V0sJNqI=",
+        "lastModified": 1780922687,
+        "narHash": "sha256-QLxw00juVsWxoP5Q/vLdp+e/tw+mWHrzcPBfeanGw8o=",
         "owner": "auscyber",
         "repo": "rift",
-        "rev": "7ef0de670a46699d78c9c373ab7a4b3a9afec063",
+        "rev": "c1fc74c78e118819143ae72fc23861fdeb3bee4f",
         "type": "github"
       },
       "original": {
@@ -5233,6 +5263,7 @@
         "darwin": "darwin_2",
         "deadlock": "deadlock",
         "deadlock-mod-manager": "deadlock-mod-manager",
+        "den": "den",
         "devenv": "devenv",
         "emacs": "emacs",
         "eww": "eww",
@@ -5251,6 +5282,7 @@
         "idris2": "idris2",
         "idris2-pkgs": "idris2-pkgs",
         "impermanence": "impermanence",
+        "import-tree": "import-tree",
         "input-branches": "input-branches",
         "input-leap": "input-leap",
         "kmonad": "kmonad",

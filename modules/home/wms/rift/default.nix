@@ -84,6 +84,9 @@ in
       ];
 
       settings = {
+        animate = true;
+        animation_duration = 0.35;
+        animation_fps = 100;
         ui.mission_control.enabled = true;
         run_on_start = [
           # sh
@@ -91,7 +94,6 @@ in
           # sh
           "rift-cli subscribe cli --event windows_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\\\"$RIFT_WORKSPACE_NAME\\\" RIFT_WINDOW_COUNT=\\\"$RIFT_WINDOW_COUNT\\\"'"
           # sh
-
           "rift-cli subscribe cli --event window_title_changed --command /bin/sh --args -c --args 'sketchybar --trigger rift_windows_title'"
         ];
 
@@ -101,6 +103,15 @@ in
           left = 20;
           right = 10;
           bottom = 5;
+        };
+        layout.gaps.per_display."76A2F5EA-BC15-4387-899A-1114979A6D5C" = {
+          outer = {
+            top = 40;
+            left = 20;
+            right = 10;
+            bottom = 5;
+          };
+
         };
         layout.mode = "bsp";
         focus_follows_mouse = false;

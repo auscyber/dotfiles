@@ -19,6 +19,7 @@ local menus_visible = false
 
 local apple_menu = sbar.add("item", "apple_menu", {
 	position = "left",
+	display = "1",
 	padding_left = settings.paddings,
 	padding_right = settings.paddings,
 	drawing = true,
@@ -30,6 +31,7 @@ local apple_menu = sbar.add("item", "apple_menu", {
 for i = 1, max_items, 1 do
 	local menu = sbar.add("item", "menu." .. i, {
 		position = "left",
+		display = "1",
 		padding_left = settings.paddings,
 		padding_right = settings.paddings,
 		drawing = false,

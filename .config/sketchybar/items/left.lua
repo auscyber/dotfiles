@@ -19,6 +19,7 @@ _G.reorder_left_items = reorder_left_items
 
 sbar.add("item", "chevron", {
 	position = "left",
+	display = "1",
 	icon = { string = icons.chevron },
 	label = { drawing = false },
 	padding_left = 0,
@@ -28,6 +29,7 @@ sbar.add("item", "chevron", {
 
 local front_app = sbar.add("item", "front_app", {
 	position = "left",
+	display = "1",
 	icon = { drawing = false },
 	script = plugin_dir .. "/front_app.sh",
 	click_script = "sketchybar --trigger swap_menus_and_spaces",
