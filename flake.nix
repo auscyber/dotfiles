@@ -5,7 +5,11 @@
     self.submodules = true;
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix.url = "path:./inputs/agenix";
+    agenix = {
+      type = "git";
+      url = "./.";
+      rev = "inputs/agenix";
+    };
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     agenix-rekey.url = "path:./inputs/agenix-rekey";
     nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
@@ -14,7 +18,9 @@
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     nix-topology.url = "github:oddlama/nix-topology";
     attic = {
-      url = "path:./inputs/attic";
+      type = "git";
+      url = "./.";
+      rev = "/inputs/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";

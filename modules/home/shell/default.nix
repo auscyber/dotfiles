@@ -53,9 +53,75 @@ in
       '';
       enableScDaemon = true;
     };
-    home.file = {
-      ".config/starship.toml" = {
-        source = ../../../.config/starship.toml;
+    programs.starship = {
+      enable = true;
+      settings = {
+        format = ''
+          $username$hostname$status$directory$shell$rust$package$cmd_duration$git_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel
+          $character'';
+
+        scan_timeout = 10;
+
+        shell = {
+          disabled = false;
+          powershell_indicator = "[pwsh](blue)";
+          zsh_indicator = "[zsh](#8BB2C1)";
+        };
+
+        character = {
+          success_symbol = "[λ](bold 195)";
+          error_symbol = "[λ](bold white)";
+        };
+
+        hostname = {
+          format = "[$hostname](bold green) ";
+          ssh_only = true;
+        };
+
+        username = {
+          style_user = "white";
+          style_root = "red bold";
+          format = "[$user]($style) ";
+          disabled = false;
+          show_always = false;
+        };
+
+        aws.symbol = " ";
+
+        battery = {
+          full_symbol = "";
+          charging_symbol = "";
+          discharging_symbol = "";
+        };
+
+        conda.symbol = " ";
+        dart.symbol = " ";
+        directory.read_only = " ";
+        elixir.symbol = " ";
+        elm.symbol = " ";
+        git_branch.symbol = " ";
+        golang.symbol = " ";
+        hg_branch.symbol = " ";
+        java.symbol = " ";
+        julia.symbol = " ";
+        memory_usage.symbol = " ";
+        nim.symbol = " ";
+
+        nix_shell = {
+          symbol = "❄️ ";
+          impure_msg = "[impure](bold red)";
+          pure_msg = "[pure](bold green)";
+          format = "via [$symbol$state( \\($name\\))](bold blue) ";
+        };
+
+        nodejs.symbol = " ";
+        package.symbol = " ";
+        perl.symbol = " ";
+        php.symbol = " ";
+        python.symbol = " ";
+        ruby.symbol = " ";
+        rust.symbol = " ";
+        swift.symbol = "ﯣ ";
       };
     };
     programs.gh = {
@@ -95,8 +161,8 @@ in
       home-manager.enable = true;
       gpg = {
 
-	  enable = true;
-	  };
+        enable = true;
+      };
 
       git = {
         enable = true;
