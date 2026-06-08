@@ -24,7 +24,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    agenix.url = "path:./inputs/agenix";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
     agenix-rekey = {
@@ -57,11 +56,6 @@
       inputs.rust-overlay.follows = "rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    attic = {
-      url = "path:./inputs/attic";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    age-plugin-gpg.url = "path:./inputs/age-plugin-gpg";
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
     #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
