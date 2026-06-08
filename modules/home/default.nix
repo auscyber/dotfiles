@@ -100,6 +100,8 @@
       #      neovim
       starship
       nixfmt
+      neovim
+      nixfmt
       treefmt
       coreutils
     ];
