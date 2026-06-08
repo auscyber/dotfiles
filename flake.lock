@@ -2329,10 +2329,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1780887911,
-        "narHash": "sha256-BfohrU2alTUSDYDWKtNLWjMxAmKAcUxXf169tfMLZSw=",
+        "lastModified": 1780899282,
+        "narHash": "sha256-yby4E8tR74ugSxb9SUCwZbTT6bZqBPI6YpVo5V7gSRw=",
         "ref": "inputs/home-manager",
-        "rev": "2bddabfe71731c843d6167b95b7515bf93f24b91",
+        "rev": "40297b9a815b36e8250942ab1c94a1d3b39f2d60",
         "revCount": 6868,
         "type": "git",
         "url": "file:./."
@@ -5189,11 +5189,11 @@
         "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
-        "lastModified": 1779721300,
-        "narHash": "sha256-wXO5I2mIoysS+umBeNMXsQ76oiXoNyvOQPJYpooV0iw=",
+        "lastModified": 1780901587,
+        "narHash": "sha256-+xsF6hj0Oey+3tjEpMhpIvnm+tBHDDpJLC13V0sJNqI=",
         "owner": "auscyber",
         "repo": "rift",
-        "rev": "039694f8a22d3b508358d78327764dd1dfa3bbc4",
+        "rev": "7ef0de670a46699d78c9c373ab7a4b3a9afec063",
         "type": "github"
       },
       "original": {

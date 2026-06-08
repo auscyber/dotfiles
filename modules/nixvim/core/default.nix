@@ -85,7 +85,7 @@
     {
       mode = "n";
       key = "<C-n>";
-      action = "<Cmd>NvimTreeToggle<CR>";
+      action = "<Cmd>NeoTree toggle<CR>";
       options = {
         noremap = true;
         silent = true;
@@ -211,13 +211,16 @@
   withNodeJs = true;
 
   plugins = {
+    neo-tree.enable = true;
     difftastic.enable = true;
     jujutsu = {
       enable = true;
       settings = {
         diff_preset = "difftastic";
         keymap = {
-          "<leader>jd" = { cmd = "show_help";};
+          "<leader>jd" = {
+            cmd = "show_help";
+          };
         };
       };
     };
@@ -235,7 +238,6 @@
         style = "glyph";
       };
     };
-    nvim-tree.enable = true;
 
     telescope = {
       enable = true;

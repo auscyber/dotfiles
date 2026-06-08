@@ -257,7 +257,7 @@
       "/System/Applications/System Settings.app"
       #      "/System/Applications/Home.app"
       #      "/Applications/Nix Apps/Zed.App"
-      "/Applications/Visual Studio Code.app"
+      "/Applications/Nix Apps/Visual Studio Code.app"
       "/Applications/Zotero.app"
       "/Applications/Nix Apps/Ghostty.app"
       "/Applications/Todoist.app"

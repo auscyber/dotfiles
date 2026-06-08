@@ -27,6 +27,7 @@
     }
 
   ];
+  programs.discord.enable = true;
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -97,6 +98,7 @@
   };
 
   auscybernix = {
+    services.rclone.enable = true;
     services.mopidy.enable = false;
     wms.rift.enable = true;
     programs.sketchybar.enable = true;

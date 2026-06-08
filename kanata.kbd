@@ -176,7 +176,7 @@
 )
 
 (platform (macos) (defalias
-terminal_app (cmd "open" -a "Ghostty.app")
+terminal_app (cmd "open" -na "Ghostty.app")
 launcher_app (cmd "open" -a "Raycast.app")
 search_windows (cmd "open" -a "Raycast.app" -u "raycast://extensions/krzysztoff1/yabai/search-windows")
 ))

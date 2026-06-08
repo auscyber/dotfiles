@@ -14,43 +14,24 @@ end
 local home_dir = os.getenv("HOME") or ""
 local icon_map_path = home_dir .. "/.config/icon_map.sh"
 
-local workspace_cache_json = nil
-local workspace_cache_ts = 0
-local workspace_cache_ttl = 1
-
 local function trim(value)
 	return (value or ""):gsub("^%s+", ""):gsub("%s+$", "")
 end
+
 local function get_background_style(selected)
 	if selected then
 		return {
 			color = colors.with_alpha(colors.selection, 0.75),
 			border_color = colors.with_alpha(colors.selection, 0.75),
 			corner_radius = 30,
-			--            height = 21,
 		}
 	else
 		return {
 			color = colors.with_alpha(colors.background or colors.black, 0.45),
 			border_color = colors.with_alpha(colors.background or colors.black, 0.25),
 			corner_radius = 30,
-			--           height = 31,
 		}
 	end
-end
-
-local function get_workspace_json(callback)
-	--    local now = os.time()
-	--    if workspace_cache_json and (now - workspace_cache_ts) < workspace_cache_ttl then
-	--        callback(workspace_cache_json)
-	--        return
-	--    end
-	--
-	sbar.exec("rift-cli query workspaces 2>/dev/null", function(output)
-		local data = output or {}
-
-		callback(data)
-	end)
 end
 
 local function icon_for_app(app_name, callback)
@@ -100,69 +81,6 @@ local function build_icon_strip(apps, callback)
 	next_icon()
 end
 
-local function update_space_item(space_name, item_name, sender, space_id)
-	if sender == "mouse.clicked" then
-		print("Switching to workspace " .. space_name .. " with ID " .. tostring(space_id))
-		sbar.exec("rift-cli execute workspace switch " .. shell_quote(space_id - 1))
-		return
-	end
-
-	if sender == "mouse.entered" or sender == "mouse.exited" then
-		return
-	end
-
-	get_workspace_json(function(workspace_json)
-		if type(workspace_json) ~= "table" then
-			return
-		end
-
-		local apps = {}
-		local focused_workspace = ""
-
-		for _, workspace in ipairs(workspace_json) do
-			if type(workspace) == "table" then
-				if workspace.is_active == true and type(workspace.name) == "string" then
-					focused_workspace = workspace.name
-				end
-
-				if workspace.name == space_name and type(workspace.windows) == "table" then
-					local seen = {}
-					for _, window in ipairs(workspace.windows) do
-						if
-							type(window) == "table"
-							and type(window.app_name) == "string"
-							and not seen[window.app_name]
-						then
-							seen[window.app_name] = true
-							table.insert(apps, window.app_name)
-						end
-					end
-				end
-			end
-		end
-
-		build_icon_strip(apps, function(icon_strip)
-			local selected = focused_workspace == space_name
-			local has_apps = icon_strip ~= ""
-
-			sbar.set(item_name, {
-				background = get_background_style(selected),
-				icon = {
-					string = has_apps and space_name or space_name,
-					drawing = not has_apps,
-				},
-				label = {
-					string = has_apps and (" " .. icon_strip) or "",
-					drawing = has_apps,
-					border_color = colors.foreground,
-					padding_left = 1,
-					border_width = 1,
-				},
-			})
-		end)
-	end)
-end
-
 local dummy_space = {
 	icon = {
 		padding_left = 7,
@@ -187,17 +105,87 @@ local dummy_space = {
 	},
 }
 
-local function sanitize_space_id(name)
-	return name:gsub(" ", "__")
+-- display_state[arrangement_id] = {
+--   space_id      = number,       -- current active macOS space on this display
+--   workspaces    = { name,... }, -- ordered workspace names
+--   item_names    = { ... },      -- sketchybar item names matching workspaces
+--   last_item     = "space.X.N",  -- last item (for reorder hook)
+-- }
+local display_state = {}
+
+local function update_items_for_display(arrangement_id)
+	local state = display_state[arrangement_id]
+	if not state or not state.space_id then
+		return
+	end
+
+	sbar.exec("rift-cli query workspaces --space-id " .. state.space_id .. " 2>/dev/null", function(workspaces)
+		if type(workspaces) ~= "table" then
+			return
+		end
+
+		local focused = ""
+		for _, ws in ipairs(workspaces) do
+			if type(ws) == "table" and ws.is_active == true and type(ws.name) == "string" then
+				focused = ws.name
+			end
+		end
+
+		for i, ws in ipairs(workspaces) do
+			if type(ws) == "table" and type(ws.name) == "string" then
+				local item_name = state.item_names[i]
+				if item_name then
+					local apps = {}
+					local seen = {}
+					if type(ws.windows) == "table" then
+						for _, window in ipairs(ws.windows) do
+							if
+								type(window) == "table"
+								and type(window.app_name) == "string"
+								and not seen[window.app_name]
+							then
+								seen[window.app_name] = true
+								table.insert(apps, window.app_name)
+							end
+						end
+					end
+
+					local space_name = ws.name
+					build_icon_strip(apps, function(icon_strip)
+						local selected = focused == space_name
+						local has_apps = icon_strip ~= ""
+
+						sbar.set(item_name, {
+							background = get_background_style(selected),
+							icon = {
+								string = space_name,
+								drawing = not has_apps,
+							},
+							label = {
+								string = has_apps and (" " .. icon_strip) or "",
+								drawing = has_apps,
+								border_color = colors.foreground,
+								padding_left = 1,
+								border_width = 1,
+							},
+						})
+					end)
+				end
+			end
+		end
+	end)
 end
 
-local function add_space_items(space_names)
-	local item_names = {}
+local function add_items_for_display(arrangement_id, workspace_names)
+	local state = display_state[arrangement_id]
+	state.workspaces = workspace_names
+	state.item_names = {}
 
-	for space_id, space_name in ipairs(space_names) do
-		local item_name = "space." .. space_id
+	for index, space_name in ipairs(workspace_names) do
+		local item_name = "space." .. arrangement_id .. "." .. index
 
 		local space = sbar.add("item", item_name, {
+			display = tostring(arrangement_id),
 			icon = {
 				string = space_name,
 				padding_left = dummy_space.icon.padding_left,
@@ -213,80 +201,116 @@ local function add_space_items(space_names)
 			drawing = true,
 		})
 
-		table.insert(item_names, item_name)
+		table.insert(state.item_names, item_name)
 
+		local workspace_index = index - 1
 		space:subscribe(
-			{ "mouse.clicked", "mouse.exited", "rift_workspace_changed", "rift_windows_changed" },
+			{ "mouse.clicked", "mouse.exited", "rift_workspace_changed", "rift_windows_changed", "space_change" },
 			function(env)
 				local sender = ""
 				if type(env) == "table" then
 					sender = env.SENDER or env.sender or ""
 				end
-				update_space_item(space_name, item_name, sender, space_id)
+
+				if sender == "mouse.clicked" then
+					print("Switching to workspace " .. space_name .. " (index " .. workspace_index .. ")")
+					sbar.exec("rift-cli execute workspace switch " .. shell_quote(workspace_index))
+					return
+				end
+
+				if sender == "mouse.entered" or sender == "mouse.exited" then
+					return
+				end
+
+				update_items_for_display(arrangement_id)
 			end
 		)
-
-		--        space:subscribe({ "mouse.entered", "mouse.exited" }, function(env)
-		--            if type(env) ~= "table" then
-		--                return
-		--            end
-		--            if env.sender == "mouse.exited" then
-		--                sbar.set(item_name, {
-		--                    popup = {
-		--                        drawing = false,
-		--                    }
-		--                })
-		--                return
-		--            end
-		--            sbar.set(item_name, {
-		--                popup = {
-		--                    drawing = true,
-		--                    background = {
-		--                        color = colors.with_alpha(colors.selection, 0.75),
-		--                        border_color = colors.with_alpha(colors.selection, 0.75),
-		--                        corner_radius = 10,
-		--                        padding_left = 5,
-		--                        padding_right = 5,
-		--                    },
-		--                },
-		--            })
-		--        end)
-
-		update_space_item(space_name, item_name, "", space_id)
 	end
 
-	if #item_names > 0 then
-		sbar.add("bracket", "spaces", item_names, {
-			background = {
-				color = colors.with_alpha(colors.yellow, 0.25),
-				corner_radius = 20,
-				border_color = colors.with_alpha(colors.yellow, 0.25),
-				border_width = 1,
-				height = 31,
-			},
-			padding_left = 0,
-			padding_right = 0,
-		})
+	local bracket_name = "spaces." .. arrangement_id
+	sbar.add("bracket", bracket_name, state.item_names, {
+		display = tostring(arrangement_id),
+		background = {
+			color = colors.with_alpha(colors.yellow, 0.25),
+			corner_radius = 20,
+			border_color = colors.with_alpha(colors.yellow, 0.25),
+			border_width = 1,
+			height = 31,
+		},
+		padding_left = 0,
+		padding_right = 0,
+	})
 
-		_G.last_space_item = item_names[#item_names]
+	state.last_item = state.item_names[#state.item_names]
+	_G.last_space_item = state.last_item
+	if _G.reorder_left_items then
+		_G.reorder_left_items(state.last_item)
+	end
+
+	update_items_for_display(arrangement_id)
+end
+
+local function refresh_display_spaces()
+	sbar.exec("sketchybar -m --query displays", function(sbar_displays)
+		if type(sbar_displays) ~= "table" then
+			return
+		end
+		sbar.exec("rift-cli query displays 2>/dev/null", function(rift_displays)
+			if type(rift_displays) ~= "table" then
+				return
+			end
+
+			for _, sd in ipairs(sbar_displays) do
+				local arrangement_id = sd["arrangement-id"]
+				local uuid = sd.UUID
+				if arrangement_id and uuid then
+					for _, rd in ipairs(rift_displays) do
+						if type(rd) == "table" and rd.uuid == uuid then
+							local active_space = rd.space or (rd.active_space_ids and rd.active_space_ids[1])
+							if active_space then
+								local existing = display_state[arrangement_id]
+								if not existing then
+									display_state[arrangement_id] = { space_id = active_space }
+									sbar.exec(
+										"rift-cli query workspaces --space-id "
+											.. active_space
+											.. " 2>/dev/null | jq -r '.[].name'",
+										function(output)
+											local names = {}
+											for line in (output or ""):gmatch("[^\r\n]+") do
+												if line ~= "" then
+													table.insert(names, line)
+												end
+											end
+											if #names > 0 then
+												add_items_for_display(arrangement_id, names)
+											end
+										end
+									)
+								else
+									existing.space_id = active_space
+									update_items_for_display(arrangement_id)
+								end
+							end
+							break
+						end
+					end
+				end
+			end
+		end)
+	end)
+end
+
+refresh_display_spaces()
+
+sbar.subscribe({ "rift_workspace_changed", "front_app_switched" }, function()
+	if _G.last_space_item then
 		if _G.reorder_left_items then
 			_G.reorder_left_items(_G.last_space_item)
 		end
 	end
-end
-
-sbar.exec("rift-cli query workspaces 2>/dev/null | jq -r '.[].name'", function(output)
-	local names = {}
-	for line in output:gmatch("[^\r\n]+") do
-		if line ~= "" then
-			table.insert(names, line)
-		end
-	end
-	add_space_items(names)
 end)
 
-sbar.subscribe({ "rift_workspace_changed", "front_app_switched" }, function()
-	if _G.reorder_left_items then
-		_G.reorder_left_items(_G.last_space_item)
-	end
+sbar.subscribe({ "space_change", "display_change" }, function()
+	refresh_display_spaces()
 end)
