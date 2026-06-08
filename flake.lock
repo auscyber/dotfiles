@@ -2449,16 +2449,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1780205050,
-        "narHash": "sha256-AwLap6vr+oSsgNHZiRD+MdFCY/TAP2rkuq7oQ+wgcvw=",
-        "ref": "inputs/master/home-manager",
-        "rev": "382a81e61374ec9bd484c474f1af043c54201657",
+        "lastModified": 1780208724,
+        "narHash": "sha256-Ql68lrV1iZSfLuDA16O2OcTIguqdsnZfUf4nBrmy180=",
+        "ref": "inputs/home-manager",
+        "rev": "ecf5464608ea92f39f16ef3f9d35bd685bbc48e8",
         "revCount": 6808,
         "type": "git",
         "url": "file:./."
       },
       "original": {
-        "ref": "inputs/master/home-manager",
+        "ref": "inputs/home-manager",
         "type": "git",
         "url": "file:./."
       }
@@ -3132,16 +3132,16 @@
         "nixpkgs-lib": "nixpkgs-lib_2"
       },
       "locked": {
-        "lastModified": 1780216692,
-        "narHash": "sha256-pgS1T/LBrILHvnMlQrHG3RIQQPLAwWzyQ43tIFPx+wY=",
-        "ref": "inputs/master/input-branches",
-        "rev": "a8454dd97bc48c2901b34b7891e65988544bda66",
-        "revCount": 89,
+        "lastModified": 1780225162,
+        "narHash": "sha256-w2dzJr1Fl88YXpszSzwwkLBRBFICKn7Ocx6JGw05H1Y=",
+        "ref": "inputs/input-branches",
+        "rev": "85a247bb5352b9975cbbe8e94468cc48ee558317",
+        "revCount": 88,
         "type": "git",
         "url": "file:./."
       },
       "original": {
-        "ref": "inputs/master/input-branches",
+        "ref": "inputs/input-branches",
         "type": "git",
         "url": "file:./."
       }
