@@ -17,9 +17,8 @@
           ];
           text = ''
             set -e
-            nvfetcher -k "$HOME/.config/nvchecker.toml"
-
-'';
+            nvfetcher -k "$HOME/.config/nvchecker.toml" "$@"
+          '';
         };
 
       };

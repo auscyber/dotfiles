@@ -160,6 +160,21 @@ in
     };
     programs.nh.enable = true;
 
+    home.shellAliases = {
+      #      ghc = "stack exec -- ghc";
+      fzf = "fzf --reverse --height 40%";
+      vim = "nvim";
+      cat = "bat";
+      e = "vim";
+      #alias ng="nvim -c ':Neogit'"
+      ls = "eza --icons --git";
+      ll = "ls -la";
+      t = "tmux";
+      grep = "grep --color=auto";
+      hm = "home-manager ";
+
+    };
+
     programs = {
       ssh = {
 

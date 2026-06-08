@@ -159,7 +159,7 @@
       url = "./.";
       ref = "inputs/input-branches";
     };
-    nixvim.url = "github:nix-community/nixvim";
+    nixvim.url = "github:auscyber/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";

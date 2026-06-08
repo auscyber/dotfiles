@@ -1,4 +1,42 @@
 {
+    "cotabby": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "cotabby",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "fujacob",
+            "repo": "cotabby",
+            "rev": "v0.4.1-beta",
+            "sha256": "sha256-JM13uibtdnJrnCy7M8KXkm/7cnrgKUGSljHcAISxZHg=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.4.1-beta"
+    },
+    "cotabby-bin": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "cotabby-bin",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-/1r12CjPWmemn4vECPkUzX/EsU0jErcIq1IH0BLlL90=",
+            "type": "url",
+            "url": "https://github.com/fujacob/cotabby/releases/download/v0.4.1-beta/Cotabby.dmg"
+        },
+        "version": "v0.4.1-beta"
+    },
     "cursor_shader": {
         "cargoLock": null,
         "date": "2025-06-29",

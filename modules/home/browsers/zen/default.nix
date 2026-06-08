@@ -29,6 +29,7 @@ in
 
   };
   config = lib.mkIf cfg.enable {
+    home.sessionVariables.BROWSER = "zen";
     stylix.targets.zen-browser.profileNames = [ cfg.profileName ];
     programs.zen-browser = {
       enable = true;

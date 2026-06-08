@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 {
   imports = [
   ];
@@ -211,6 +216,9 @@
       enable = true;
       settings = {
         diff_preset = "difftastic";
+        keymap = {
+          "<leader>jd" = { cmd = "show_help";};
+        };
       };
     };
     lz-n = {
@@ -437,6 +445,10 @@
 
     treesitter = {
       enable = true;
+
+      languageRegister = {
+        "commonlisp" = [ "lisp" ];
+      };
       settings = {
         highlight.enable = true;
         autopairs.enable = true;
@@ -733,7 +745,6 @@
     -- Conform: keep :Format user command with range support
 
     -- DAP UI setup (your config calls dapui.setup())
-
   '';
 
   extraFiles = {

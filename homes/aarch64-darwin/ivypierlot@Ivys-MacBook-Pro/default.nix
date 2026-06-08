@@ -240,6 +240,7 @@
 
     shell = {
       enable = true;
+      nu.enable = true;
       fish = {
         enable = true;
       };
@@ -249,6 +250,8 @@
 
   };
   home.packages = with pkgs; [
+    cotabby
+    claude-code
     nodejs
     opencode
     desktoppr
