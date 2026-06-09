@@ -1,246 +1,15 @@
 {
+  description = "A very basic flake";
 
-  description = "AusCyber nix flake config";
   inputs = {
-    self.submodules = true;
-    deadlock-mod-manager = {
-      url = "github:deadlock-mod-manager/deadlock-mod-manager";
-      flake = false;
-    };
-    rift.url = "github:auscyber/rift";
-    rift.inputs.nixpkgs.follows = "nixpkgs";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    nix.url = "github:nixos/nix/latest-release";
-    conform = {
-      url = "github:stevearc/conform.nvim?ref=pull/881/merge";
-      flake = false;
-    };
-    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/agenix";
+    #    self.submodules = true;
+    den.url = "github:denful/den";
 
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/";
-    agenix-rekey = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/agenix-rekey";
-
-      inputs.rust-overlay.follows = "rust-overlay";
-      inputs.agenix.follows = "agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixpkgs-swift.url = "github:NixOS/nixpkgs/70801e06d9730c4f1704fbd3bbf5b8e11c03a2a7";
-    vscode-server.url = "github:nix-community/nixos-vscode-server";
-    vscode-server.inputs.nixpkgs.follows = "nixpkgs";
-    nowplaying-cli = {
-      url = "github:auscyber/nowplaying-cli";
-      flake = false;
-    };
-    nix-topology.url = "github:oddlama/nix-topology";
-    celler = {
-      url = "github:blitz/celler/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    age-plugin-gpg = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/age-plugin-gpg";
-
-      inputs.rust-overlay.follows = "rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    niri.url = "github:sodiboo/niri-flake";
-    niri.inputs.nixpkgs.follows = "nixpkgs";
-    #	age-plugin-gpg.inputs.nixpkgs.follows = "nixpkgs";
-
-    nvfetcher.url = "github:auscyber/nvfetcher/customfetcher";
-    searchix.url = "git+https://codeberg.org/alanpearce/searchix";
-    nil = {
-      url = "github:oxalica/nil";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
-    deadlock.url = "github:deadlock-mod-manager/deadlock-mod-manager";
-
-    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
-    nixos-images = {
-      # url = "github:nix-community/nixos-images";
-      url = "github:nvmd/nixos-images/sdimage-installer";
-      # url = "git+file:../nixos-images?shallow=1";
-      inputs.nixos-stable.follows = "nixpkgs-nvmd";
-      inputs.nixos-unstable.follows = "nixpkgs-nvmd";
-    };
-    impermanence.url = "github:nix-community/impermanence";
-    nixcord = {
-      url = "github:kaylorben/nixcord";
-    };
-    qwerty-fr = {
-      url = "github:qwerty-fr/qwerty-fr";
-      flake = false;
-    };
-    qanata.url = "github:veyxov/qanata";
-    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-compat = {
-      url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
-      # Optional:
-      flake = false;
-    };
-    devenv.url = "github:cachix/devenv";
-
-    kmonad = {
-      url = "git+https://github.com/kmonad/kmonad?submodules=1&dir=nix";
-    };
-    #    lix = {
-    #      url = "https://git.lix.systems/lix-project/lix/archive/main.tar.gz";
-    #      flake = false;
-    #    };
-    #
-    #    lix-module = {
-    #      url = "https://git.lix.systems/lix-project/nixos-module/archive/main.tar.gz";
-    #      inputs.nixpkgs.follows = "nixpkgs";
-    #      #  inputs.lix.follows = "lix";
-    #    };
-    ghostty-shaders = {
-      url = "github:hackr-sh/ghostty-shaders";
-      flake = false;
-    };
-    nix-colors.url = "github:misterio77/nix-colors";
-    #Non flakes
-    nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
-    hyprpanel.url = "github:jas-singhfsu/hyprpanel";
-    hyprpanel.inputs.nixpkgs.follows = "nixpkgs";
-    nixpkgs-master = {
-      url = "github:nixos/nixpkgs/master";
-    };
-    hyprland = {
-      url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
-
-    };
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-
-    # Optional: Declarative tap management
-    homebrew-core = {
-      url = "github:homebrew/homebrew-core";
-      flake = false;
-    };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
-    homebrew-speedtest = {
-      url = "github:teamookla/homebrew-speedtest";
-      flake = false;
-    };
-    homebrew-whisper = {
-      url = "github:typewhisper/homebrew-tap";
-      flake = false;
-    };
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-    zen-browser.inputs.home-manager.follows = "home-manager";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
-    };
-    picom = {
-      url = "github:ibhagwan/picom";
-      flake = false;
-    };
-    input-branches = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/input-branches";
-    };
-    nixvim.url = "github:auscyber/nixvim";
-    nixvim.inputs.nixpkgs.follows = "nixpkgs";
-    stylix.url = "github:nix-community/stylix";
-    stylix.inputs.nixpkgs.follows = "nixpkgs";
-    stylix.inputs.nur.follows = "nur";
-    wezterm = {
-      url = "git+https://github.com/wezterm/wezterm?submodules=1";
-      flake = false;
-    };
-    opnix.url = "github:brizzbuzz/opnix";
-    nh = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/nh";
-
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nur = {
-      url = "github:nix-community/NUR";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    my-nur = {
-      url = "github:auscyber/nur-packages";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    sccache.url = "github:mozilla/sccache";
-
-    input-leap = {
-      url = "git+https://github.com/input-leap/input-leap?submodules=1";
-      flake = false;
-    };
-    #flakes
-    sops-nix.url = "github:auscyber/sops-nix/age-plugin";
-    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
-    staging-next.url = "github:nixos/nixpkgs/staging-next";
-    darwin = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    eww.url = "github:elkowar/eww";
-    nix-openclaw = {
-      url = "github:openclaw/nix-openclaw";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-    op-shell-plugins.url = "github:1Password/shell-plugins";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    nix-index-database.url = "github:nix-community/nix-index-database";
-    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.2";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
-
-    };
-
-    nix-doom-emacs.url = "github:vlaci/nix-doom-emacs";
-    idris2-pkgs.url = "github:claymager/idris2-pkgs";
-    #local-nixpkgs.url = "github:auscyberman/nixpkgs";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-
-    home-manager = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    arion.url = "github:hercules-ci/arion";
-
-    #idris2-pkgs.url = " github:claymager/idris2-pkgs ";
-    idris2.url = "github:idris-lang/Idris2";
-    rnix.url = "github:nix-community/rnix-lsp";
-    neovim.url = "github:nix-community/neovim-nightly-overlay";
-    neovim.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+    darwin.url = "github:nix-darwin/nix-darwin";
     emacs.url = "github:/nix-community/emacs-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     #nixpkgs
@@ -249,46 +18,21 @@
     stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     nixpkgs.follows = "unstable";
+    flake-file.url = "github:denful/flake-file";
 
   };
+
   outputs =
-    inputs@{
-      self,
-      flake-parts,
-      ...
-    }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      top@{
-        config,
-        withSystem,
-        moduleWithSystem,
-        ...
-      }:
-      {
-        imports = [
-          # Optional: use external flake logic, e.g.
-          # inputs.foo.flakeModules.default
-          ./flake
-          inputs.nix-topology.flakeModule
-        ];
-        systems = [
-          # systems for which you want to build the `perSystem` attributes
-          "aarch64-darwin"
-          "x86_64-linux"
-          "aarch64-linux"
-          # ...
-        ];
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      # Import all *.nix files in the ./aspects directory
+      # Except ones that start with '_'
+      imports =
+        with inputs.nixpkgs.lib;
+        ./aspects
+        |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
+        |> fileset.toList;
 
-      }
-    );
-  nixConfig = {
-    extra-substituters = [
-      "https://nixos-raspberrypi.cachix.org"
-      "https://cache.ivymect.in/main"
-    ];
-    extra-trusted-public-keys = [
-      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
-      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
-    ];
-  };
+      _module.args.rootPath = ./.;
+    };
 }

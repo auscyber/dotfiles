@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-cabal build my-xmonad
-cabal install my-xmonad --installdir bin/
-mv bin/my-xmonad "$1"
