@@ -9,6 +9,7 @@ use age_plugin::recipient::RecipientPluginV1;
 use age_plugin::{PluginHandler, run_state_machine};
 use bech32::Variant;
 use clap::{CommandFactory, Parser};
+use dialoguer::{Select, theme::ColorfulTheme};
 use sequoia_gpg_agent::{Agent, KeyPair};
 use sequoia_ipc::Keygrip;
 use sequoia_ipc::sexp::{Sexp, String_};
@@ -36,6 +37,8 @@ enum Command {
 		/// GPG keygrip for encryption key, can be seen with `gpg --list-keys --with-keygrip`
 		keygrip: String,
 	},
+	/// Generate age identity file
+	Generate,
 }
 
 #[derive(Parser)]
@@ -78,18 +81,18 @@ fn find_string(v: &[Sexp], k: &[u8]) -> Option<String_> {
 
 fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 	let e = get(&e, b"public-key")
-		.expect("todo: not a public key")
+		.with_context(|| "todo: not a public key")?
 		.iter()
 		.next()
-		.expect("todo: not a public key");
+		.with_context(|| "todo: not a public key")?;
 
 	if let Some(e) = get(e, b"rsa") {
-		let n = find_string(e, b"n").expect("todo: not a public key");
-		let e = find_string(e, b"e").expect("todo: not a public key");
+		let n = find_string(e, b"n").with_context(|| "todo: not a public key")?;
+		let e = find_string(e, b"e").with_context(|| "todo: not a public key")?;
 		Ok(Key::V6(Key6::import_public_rsa(&e, &n, None)?))
 	} else if let Some(e) = get(e, b"ecc") {
-		let curve = find_string(e, b"curve").expect("todo: not a public key");
-		let q = find_string(e, b"q").expect("todo: not a public key");
+		let curve = find_string(e, b"curve").with_context(|| "todo: not a public key")?;
+		let q = find_string(e, b"q").with_context(|| "todo: not a public key")?;
 
 		if let Some(flags) = find_string(e, b"flags")
 			&& &*flags != b"djb-tweak"
@@ -122,7 +125,7 @@ fn parse_public_key(e: Sexp) -> Result<Key<PublicParts, UnspecifiedRole>> {
 			},
 		)?))
 	} else {
-		todo!()
+		bail!("unsupported key type")
 	}
 }
 
@@ -132,6 +135,7 @@ fn gpg_to_age(gpg: SessionKey) -> FileKey {
 
 struct IdentityV1 {
 	agent: Agent,
+	identities: Vec<Keygrip>,
 }
 impl IdentityPluginV1 for IdentityV1 {
 	fn add_identity(
@@ -143,12 +147,15 @@ impl IdentityPluginV1 for IdentityV1 {
 		if plugin_name != "gpg" {
 			return Ok(());
 		}
-		if !bytes.is_empty() {
-			return Err(IdentityError::Identity {
-				index,
-				message: "only default identity supported for gpg plugin".to_owned(),
-			});
+		if bytes.is_empty() {
+			return Ok(());
 		}
+		let keygripstring = hex::encode(bytes);
+		let keygrip: Keygrip = keygripstring.parse().map_err(|e| IdentityError::Identity {
+			index,
+			message: format!("invalid keygrip: {e}"),
+		})?;
+		self.identities.push(keygrip);
 		Ok(())
 	}
 
@@ -181,6 +188,10 @@ impl IdentityPluginV1 for IdentityV1 {
 						continue;
 					}
 				};
+
+				if !self.identities.is_empty() && !self.identities.contains(&stanza.keygrip) {
+					continue;
+				}
 
 				let mut keypair = match Handle::current()
 					.block_on(fetch_keypair(&mut self.agent, stanza.keygrip))
@@ -217,7 +228,8 @@ impl IdentityPluginV1 for IdentityV1 {
 
 struct RecipientV1 {
 	agent: Agent,
-	keys: HashMap<usize, Key<PublicParts, UnspecifiedRole>>,
+	recipients: HashMap<usize, Key<PublicParts, UnspecifiedRole>>,
+	identities: HashMap<usize, Key<PublicParts, UnspecifiedRole>>,
 }
 impl RecipientPluginV1 for RecipientV1 {
 	fn add_recipient(
@@ -244,7 +256,7 @@ impl RecipientPluginV1 for RecipientV1 {
 				message: format!("failed to fetch recipient key by keygrip: {e}"),
 			})?;
 
-		self.keys.insert(index, v);
+		self.recipients.insert(index, v);
 		Ok(())
 	}
 
@@ -252,15 +264,28 @@ impl RecipientPluginV1 for RecipientV1 {
 		&mut self,
 		index: usize,
 		plugin_name: &str,
-		_bytes: &[u8],
+		bytes: &[u8],
 	) -> std::result::Result<(), RecipientError> {
 		if plugin_name != "gpg" {
 			return Ok(());
 		}
-		Err(RecipientError::Identity {
-			index,
-			message: "gpg plugin doesn't use age own identity management".to_string(),
-		})
+		let keygripstring = hex::encode(bytes);
+		let keygrip: Keygrip = keygripstring
+			.parse()
+			.map_err(|e| RecipientError::Identity {
+				index,
+				message: format!("invalid keygrip: {e}"),
+			})?;
+
+		let v = Handle::current()
+			.block_on(fetch_key(&mut self.agent, keygrip))
+			.map_err(|e| RecipientError::Identity {
+				index,
+				message: format!("failed to fetch recipient key by keygrip: {e}"),
+			})?;
+
+		self.identities.insert(index, v);
+		Ok(())
 	}
 
 	fn labels(&mut self) -> std::collections::HashSet<String> {
@@ -277,7 +302,8 @@ impl RecipientPluginV1 for RecipientV1 {
 		for file_key in file_keys {
 			let mut stanzas = vec![];
 			let session_key = SessionKey::from(file_key.expose_secret().as_slice());
-			for (index, recipient) in &self.keys {
+
+			for (index, recipient) in &self.recipients {
 				let mut add_err = |message| {
 					errs.push(RecipientError::Recipient {
 						index: *index,
@@ -298,6 +324,29 @@ impl RecipientPluginV1 for RecipientV1 {
 				};
 				stanzas.push(stanza.into());
 			}
+
+			for (index, identity) in &self.identities {
+				let mut add_err = |message| {
+					errs.push(RecipientError::Identity {
+						index: *index,
+						message,
+					});
+				};
+				let ciphertext = match identity.encrypt(&session_key) {
+					Ok(c) => c,
+					Err(e) => {
+						add_err(e.to_string());
+						continue;
+					}
+				};
+				let keygrip = Keygrip::of(identity.mpis()).expect("can get keygrip back");
+				let stanza = GpgStanza {
+					keygrip,
+					ciphertext,
+				};
+				stanzas.push(stanza.into());
+			}
+
 			out.push(stanzas);
 		}
 		if !errs.is_empty() {
@@ -316,12 +365,16 @@ impl PluginHandler for Plugin {
 	type IdentityV1 = IdentityV1;
 
 	fn identity_v1(self) -> std::io::Result<Self::IdentityV1> {
-		Ok(IdentityV1 { agent: self.agent })
+		Ok(IdentityV1 {
+			agent: self.agent,
+			identities: vec![],
+		})
 	}
 	fn recipient_v1(self) -> std::io::Result<Self::RecipientV1> {
 		Ok(RecipientV1 {
 			agent: self.agent,
-			keys: HashMap::new(),
+			recipients: HashMap::new(),
+			identities: HashMap::new(),
 		})
 	}
 }
@@ -346,6 +399,85 @@ async fn fetch_keypair(agent: &mut Agent, keygrip: Keygrip) -> Result<KeyPair> {
 
 	let pair = agent.keypair(&key)?;
 	Ok(pair)
+}
+struct OptionItem {
+	label: String,
+	keygrip: String,
+}
+
+fn generate_identity(agent: &mut Agent) -> Result<()> {
+	let list = Handle::current().block_on(agent.list_keys())?;
+
+	// gpg-agent returns percent-encoded data for this command
+
+	let mut options = Vec::new();
+
+	for key in &list {
+		let key_info = match Handle::current().block_on(fetch_key(agent, key.keygrip().clone())) {
+			Ok(k) => k,
+			Err(_) => continue,
+		};
+
+		let algo_str = match key_info {
+			Key::V6(k) => match k.mpis() {
+				PublicKey::RSA { .. } => "RSA".to_string(),
+				PublicKey::ECDH { curve, .. } => format!("{:?}", curve),
+				PublicKey::EdDSA { curve, .. } => format!("{:?}", curve),
+				_ => "Unknown".to_string(),
+			},
+			_ => "Unknown".to_string(),
+		};
+
+		let is_smartcard = key.keytype() == sequoia_gpg_agent::keyinfo::KeyType::Smartcard;
+		let stub_mark = if is_smartcard { " (Card)" } else { "" };
+		let serial = if is_smartcard {
+			key.serialno().unwrap_or("")
+		} else {
+			""
+		};
+
+		let serial_info = if !serial.is_empty() && serial != "-" {
+			format!(" S/N: {}", serial)
+		} else {
+			String::new()
+		};
+
+		options.push(OptionItem {
+			label: format!(
+				"{} - {}{}{}",
+				algo_str,
+				key.keygrip(),
+				stub_mark,
+				serial_info
+			),
+			keygrip: key.keygrip().to_string(),
+		});
+	}
+	if options.is_empty() {
+		bail!("No keys found in GPG agent directory");
+	}
+
+	let labels: Vec<&String> = options.iter().map(|o| &o.label).collect();
+	let selection = Select::with_theme(&ColorfulTheme::default())
+		.with_prompt("Select a key")
+		.default(0)
+		.items(&labels)
+		.interact()
+		.context("Failed to read selection")?;
+
+	let selected = &options[selection];
+	let keygripbytes = hex::decode(&selected.keygrip).expect("hex valid");
+
+	use bech32::ToBase32;
+	let identity = bech32::encode("AGE-PLUGIN-GPG-", keygripbytes.to_base32(), Variant::Bech32)
+		.unwrap()
+		.to_uppercase();
+	let recipient = bech32::encode("age1gpg", keygripbytes.to_base32(), Variant::Bech32).unwrap();
+
+	println!("# recipient: {}", recipient);
+	println!("{}", identity);
+
+	Ok(())
 }
 
 fn main() -> Result<()> {
@@ -376,6 +508,7 @@ fn main() -> Result<()> {
 						.expect("hrp is valid")
 				);
 			}
+			Command::Generate => generate_identity(&mut agent)?,
 		}
 	} else {
 		let _ = Opts::command().print_help();
