@@ -212,6 +212,7 @@
 
   plugins = {
     neo-tree.enable = true;
+
     difftastic.enable = true;
     jujutsu = {
       enable = true;
