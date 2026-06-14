@@ -85,7 +85,7 @@
     {
       mode = "n";
       key = "<C-n>";
-      action = "<Cmd>NeoTree toggle<CR>";
+      action = "<Cmd>Neotree toggle<CR>";
       options = {
         noremap = true;
         silent = true;
@@ -211,14 +211,17 @@
   withNodeJs = true;
 
   plugins = {
-    neo-tree.enable = true;
+     neo-tree.enable = true;
+
     difftastic.enable = true;
     jujutsu = {
       enable = true;
       settings = {
         diff_preset = "difftastic";
         keymap = {
-          "<leader>jd" = { cmd = "show_help";};
+          "<leader>jd" = {
+            cmd = "show_help";
+          };
         };
       };
     };

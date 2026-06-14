@@ -61,12 +61,12 @@ in
             "https://iohk.cachix.org"
             "https://cache.nixos.org"
             "https://devenv.cachix.org"
-            "https://cache.ivymect.in/main"
+            #            "https://cache.ivymect.in/main"
           ];
           trusted-public-keys = [
             "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
             "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-            "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
+            #            "main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4="
             "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo="
             "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
           ];

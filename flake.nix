@@ -284,10 +284,10 @@
       }
     );
   nixConfig = {
-    extra-substituters = [
-      "https://nixos-raspberrypi.cachix.org"
-      "https://cache.ivymect.in/main"
-    ];
+    #    extra-substituters = [
+    #      #      "https://nixos-raspberrypi.cachix.org"
+    #      #      "https://cache.ivymect.in/main"
+    #    ];
     extra-trusted-public-keys = [
       "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
