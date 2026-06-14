@@ -218,9 +218,7 @@
       settings = {
         diff_preset = "difftastic";
         keymap = {
-          "<leader>jd" = {
-            cmd = "show_help";
-          };
+          "<leader>jd" = { cmd = "show_help";};
         };
       };
     };
