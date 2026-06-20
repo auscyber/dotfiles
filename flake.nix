@@ -21,21 +21,12 @@
     };
 
   nixConfig = {
-    experimental-features = [
-      "nix-command"
-      "flakes"
-      "pipe-operators"
-    ];
     extra-substituters = [
-      "https://cache.ivymect.in/main"
-      "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
-      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -48,24 +39,55 @@
       url = "./.";
       ref = "inputs/age-plugin-gpg";
       inputs = {
+        crane.follows = "crane";
+        flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
         rust-overlay.follows = "rust-overlay";
       };
     };
     agenix = {
       url = "github:auscyber/agenix?ref=add-templates";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        darwin.follows = "darwin";
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
-    agenix-rekey.url = "github:auscyber/agenix-rekey?ref=add-template-support";
-    allfollow.url = "github:spikespaz/allfollow";
+    agenix-rekey = {
+      url = "github:auscyber/agenix-rekey?ref=add-template-support";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     celler = {
       url = "github:blitz/celler/main";
+      inputs = {
+        crane.follows = "crane";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    crane = {
+      url = "github:ipetkov/crane";
+      inputs = { };
+    };
+    darwin = {
+      url = "github:auscyber/nix-darwin?ref=inputs/darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    darwin.url = "github:auscyber/nix-darwin?ref=inputs/darwin";
-    den.url = "github:denful/den";
-    den-diagram.url = "github:denful/den-diagram";
-    flake-file.url = "github:denful/flake-file";
+    den = {
+      url = "github:denful/den";
+      inputs = { };
+    };
+    den-diagram = {
+      url = "github:denful/den-diagram";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flake-file = {
+      url = "github:denful/flake-file";
+      inputs = { };
+    };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -90,25 +112,67 @@
       url = "github:typewhisper/homebrew-tap";
       flake = false;
     };
-    import-tree.url = "github:vic/import-tree";
-    nh.url = "github:auscyber/nh?ref=inputs/nh";
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
+    import-tree = {
+      url = "github:vic/import-tree";
+      inputs = { };
+    };
+    nh = {
+      url = "github:auscyber/nh?ref=inputs/nh";
+      inputs = {
+        crane.follows = "crane";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    nix-homebrew = {
+      url = "github:zhaofengli/nix-homebrew";
+      inputs = { };
+    };
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs = {
+      url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
+      inputs = { };
+    };
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     nur = {
       url = "github:nix-community/NUR";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    op-shell-plugins = {
+      url = "github:1Password/shell-plugins";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    op-shell-plugins.url = "github:1Password/shell-plugins";
-    rift.url = "github:auscyber/rift";
+    rift = {
+      url = "github:auscyber/rift";
+      inputs = {
+        crane.follows = "crane";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix.url = "github:nix-community/stylix";
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        nur.follows = "nur";
+      };
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

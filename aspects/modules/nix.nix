@@ -48,34 +48,22 @@ in
       forwarded
       nixClass
     ];
+    os.nix.settings.trusted-users = [ "@wheel" ];
     nix.settings.experimental-features = [
       "nix-command"
       "flakes"
       "pipe-operators"
     ];
-    #nixDarwin.optimise = {
-    #  automatic = true;
-    #  interval = [
-    #    {
-    #      Hour = 4;
-    #      Minute = 15;
-    #      Weekday = 7;
-    #    }
-    #  ];
-    #};
-  };
-  flake-file.nixConfig = {
-    experimental-features = [
-      "nix-command"
-      "flakes"
-      "pipe-operators"
-    ];
-    extra-substituters = [
-      "https://cache.ivymect.in/main"
-    ];
-    extra-trusted-public-keys = [
-      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
-    ];
+    nixDarwin.optimise = {
+      automatic = true;
+      interval = [
+        {
+          Hour = 4;
+          Minute = 15;
+          Weekday = 7;
+        }
+      ];
+    };
   };
 
 }

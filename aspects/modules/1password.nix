@@ -1,28 +1,46 @@
-{ inputs, ... }:
+{
+  den,
+  inputs,
+  lib,
+  ...
+}:
 {
 
   ff.op-shell-plugins.url = "github:1Password/shell-plugins";
 
   den.aspects.onepassword = {
+    includes = [ (den.batteries.unfree [ "onepassword-password-manager" ]) ];
     gui = {
       darwin.programs._1password-gui.enable = true;
-      hm = { pkgs, ... }: {
-        imports = [ inputs.op-shell-plugins.homeModules.default ];
-        programs._1password-shell-plugins = {
-          # enable 1Password shell plugins for bash, zsh, and fish shell
-          enable = true;
-          # the specified packages as well as 1Password CLI will be
-          # automatically installed and configured to use shell plugins
-          plugins = with pkgs; [
-            gh
-            glab
-            #        wrangler
+      hm =
+        { pkgs, config, ... }:
+        lib.mkMerge [
+          {
+            imports = [ inputs.op-shell-plugins.homeModules.default ];
+            programs._1password-shell-plugins = {
+              # enable 1Password shell plugins for bash, zsh, and fish shell
+              enable = true;
+              # the specified packages as well as 1Password CLI will be
+              # automatically installed and configured to use shell plugins
+              plugins = with pkgs; [
+                gh
+                glab
+                #        wrangler
 
-            awscli2
-          ];
-        };
+                awscli2
+              ];
+            };
 
-      };
+          }
+          (lib.mkIf config.programs.zen.enable {
+            programs.zen-browser.profiles."${config.zen.profileName}".extensions.packages =
+              with pkgs.firefox-addons; [
+                onepassword-password-manager
+              ];
+
+          })
+
+        ];
       hmDarwin = {
         programs = {
           git.signing = {

@@ -12,7 +12,6 @@
   ];
   imports = [
     inputs.flake-file.flakeModules.default
-    inputs.flake-file.flakeModules.allfollow
     (lib.mkAliasOptionModule [ "ff" ] [ "flake-file" "inputs" ])
   ];
   den = {
@@ -71,6 +70,29 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    preProcess =
+      serialized:
+      let
+        isFlake = name: ((serialized.${name}.flake or true) != false);
+        autoFollow =
+          name:
+          let
+            top = lib.attrNames serialized;
+            sub = lib.attrNames (inputs.${name}.inputs or { });
+            shared = lib.filter (n: n != name && isFlake n) (lib.intersectLists top sub);
+          in
+          lib.genAttrs shared (s: { follows = s; });
+      in
+      lib.mapAttrs (
+        name: spec:
+        if !(isFlake name) then
+          spec
+        else
+          spec
+          // {
+            inputs = lib.recursiveUpdate (autoFollow name) (spec.inputs or { });
+          }
+      ) serialized;
     do-not-edit = ''
       #                                _
       #  __ _ _   _ ___  ___ _   _| |__   ___ _ __
