@@ -1,0 +1,310 @@
+#!/bin/sh
+set +x
+LC_ALL=C
+LANG=C
+COLS=$(tput cols)
+
+fg_c() {
+    tput setaf "$1"
+}
+bg_c(){
+    tput setab "$1"
+}
+fg_t(){
+    printf  '\e[38;2;%s;%s;%s'"m" "$@"
+}
+bg_t(){
+    printf '\e[48;2;%1;%2;%3'"m" "$@"
+}
+
+up () {
+    printf "\e[%dA" "$1"
+#    line=$((line-$1))
+}
+down () {
+    printf "\e[%dB" "$1"
+#    line=$((line+$1))
+}
+
+left () {
+    printf "\e[%dD" "$1"
+}
+right () {
+    printf "\e[%dC" "$1"
+}
+
+
+BOLD=$(tput bold)
+ITALIC=$(tput sitm)
+BLACK=239
+WHITE=15
+
+B_BG=$(bg_c $BLACK)
+B_FG=$(fg_c $BLACK)
+NORMAL="$(printf "\e[m")"
+W_BG=$(bg_c $WHITE)
+W_FG=$(fg_c $WHITE)
+
+get_packages () {
+
+	start="$(date '+%s.%N')"
+    if command -v apt 1> /dev/null
+        then
+            package_data="${package_data}$(apt list --installed 2>&- | wc -l) (apt) "
+    fi
+    if command -v nix 1> /dev/null
+        then
+            _package_count=0
+            if command -v home-manager 1>/dev/null
+            then
+                _package_count="$((_package_count+$(cat ~/.local/state/home-manager/gcroots/current-home/packagelist| wc -l)))"
+            fi
+            if command -v nixos-rebuild 1> /dev/null || command -v darwin-rebuild 1> /dev/null
+            then
+                _package_count="$((_package_count+$(cat /run/current-system/packagelist | wc -l)))"
+            fi
+            package_data="${package_data}$_package_count (nix) "
+    #        package_data="${packages+ }$(wc -l < /etc/current-system-packages) (nix)"
+    fi
+    if command -v pacman 1> /dev/null
+    then
+        package_data="${package_data}$(pacman -Q | wc -l) (pacman) "
+    fi
+	if command -v brew 1> /dev/null
+	then
+		package_data="${package_data}$(brew list | wc -l) (brew) "
+	fi
+        printf "%s" "$package_data"
+
+		stop="$(date '+%s.%N')"
+
+}
+
+if [[ $OSTYPE == "darwin"* ]]
+then
+	os="$(sw_vers | grep "ProductVersion" | awk -F ":" '{print $2}' | uniq)"
+
+	os="${os#"${os%%[![:space:]]*}"}"
+	case $os in
+		15*)
+			os="Sequoia $os"
+			;;
+	esac
+	os="macOS $os"
+	cpu="$(system_profiler SPHardwareDataType 2>/dev/null | grep Chip | awk -F ":" '{print $2}' 2>/dev/null )"
+else
+os="$(. /etc/os-release && printf "%s" "$PRETTY_NAME")"
+
+
+cpu="$(grep "model name" /proc/cpuinfo | awk -F ":" '{ print $2}' | uniq)"
+command -v lspci >/dev/null && {
+		gpu=$(lspci -mm | grep -i 'vga\|display')
+		gpu=${gpu##*Corporation\"}
+		gpu=${gpu#*\[AMD/ATI\]}
+		gpu=${gpu%%\]*}
+		gpu=${gpu##*\[}
+		gpu=" ${gpu#*\"}"
+#		set -- "${gpu%%\"*}"
+#		case $* in
+#			*/*Mobile*) gpu=" $1 $2 Mobile";;
+#			*/*) gpu=" $1 $2";;
+#			*) gpu=" $*";;
+#		esac
+}
+fi
+
+
+get_kernel () {
+	case $OSTYPE in
+		darwin*)
+			echo ""
+			;;
+		linux*)
+			uname -r
+			;;
+	esac
+}
+cpu="${cpu#"${cpu%%[![:space:]]*}"}"
+lyric="$( shuf -n 1 < ~/Music/phoebe/lyricslist 2>&- )"
+lyric=${lyric:-"phoebe bridgers"}
+
+case $OSTYPE in
+	darwin*)
+		 hw_pagesize="$(sysctl -n hw.pagesize)"
+            memtotal="$(($(sysctl -n hw.memsize) / 1024 / 1024))"
+            pages_app="$(($(sysctl -n vm.page_pageable_internal_count) - $(sysctl -n vm.page_purgeable_count)))"
+            pages_wired="$(vm_stat | awk '/ wired/ { print $4 }')"
+            pages_compressed="$(vm_stat | awk '/ occupied/ { printf $5 }')"
+            pages_compressed="${pages_compressed:-0}"
+            memused="$(((${pages_app} + ${pages_wired//.} + ${pages_compressed//.}) * hw_pagesize / 1024 / 1024))"
+		;;
+		linux*)
+memused="$(free -m | awk '/Mem/ {print $3}')"
+memtotal="$(free -m | awk '/Mem/ {print $2}')"
+;;
+esac
+
+#main_color="$(fg_t 255 216 158)"
+main_color="$(fg_t 158 203 219 )"
+category="$main_color$BOLD"
+
+
+eye_color="$(fg_c 236)"
+if song=$(playerctl metadata --format "{{title}} - {{artist}}" 2>/dev/null) && [ -n "$song" ]; then
+    :
+elif song=$(nowplaying-cli get title artist 2>/dev/null | paste -sd ' - ' -) && [ -n "$song" ]; then
+    :
+else
+    song="${ITALIC}always listening to phoebe bridgers${NORMAL}"
+fi
+
+if [[ $OSTYPE == "darwin"* ]]
+then
+ps_line=$(ps -e | grep -o \
+                       -e "[S]pectacle" \
+                       -e "[A]methyst" \
+                       -e "[k]wm" \
+                       -e "[c]hun[k]wm" \
+                       -e "[y]abai" \
+                       -e "[R]ectangle")
+
+case $ps_line in
+                       *chunkwm*)   wm=chunkwm ;;
+                       *kwm*)       wm=Kwm ;;
+                       *yabai*)     wm=yabai ;;
+                       *Amethyst*)  wm=Amethyst ;;
+                       *Spectacle*) wm=Spectacle ;;
+                       *Rectangle*) wm=Rectangle ;;
+                       *)           wm="Quartz Compositor" ;;
+esac
+else
+
+wm=$DESKTOP_SESSION
+fi
+time=$(date "+%I:%M %p")
+date=$(date "+%a %d %b %G")
+uptime="$(uptime | awk -F ',' '{print $1}' | awk -F 'up' '{print $2}')"
+
+
+
+small () {
+    _small=""
+    HEIGHT=6
+    WIDTH=14
+    cat <<EOF
+      ${W_FG}▄▄▄▄▄${NORMAL}
+     ${W_BG}       ${NORMAL}
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}         ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} ,   , , ${NORMAL}
+EOF
+}
+
+large () {
+    HEIGHT=14
+    WIDTH=15
+down 1
+cat << EOF
+      ${W_FG}▄▄▄▄▄${NORMAL}
+     ${W_BG}       ${NORMAL}
+    ${W_BG}  ${eye_color} ${W_BG} ${eye_color} ${W_BG}  ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}  ,  ,   ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} ,   , , ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}   ,   , ${NORMAL}
+    ${W_BG}${B_FG} |       ${NORMAL}
+    ${W_BG}${B_FG}  ,  | , ${NORMAL}
+    ${W_BG}${B_FG} ,  ,    ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG}         ${NORMAL}
+    ${W_BG}${B_FG} |  |  | ${NORMAL}
+EOF
+down 1
+}
+
+
+
+print_phoebe () {
+    down 1
+    right 1
+    WIDTH=27
+#    HEIGHT=50
+#    wezterm imgcat --width $WIDTH ~/backgrounds/phoeb.png
+    HEIGHT=14
+	if [ -n "$(nowplaying-cli get artworkData 2>&-)" ]
+	then
+		nowplaying-cli get artworkData | base64 -d | viu --width $WIDTH
+	else
+	    viu --width $WIDTH ~/backgrounds/sadbridgers.png
+	fi
+#    wezterm imgcat --height $HEIGHT ~/backgrounds/sadbridgers.png
+
+}
+
+case $1 in
+	-s)
+		small
+		;;
+	-p)
+		print_phoebe;;
+	*)
+		large
+		;;
+esac
+line=$HEIGHT
+up_c () {
+    up "$1"
+    line=$((line-$1))
+}
+down_c() {
+    down "$1"
+    line=$((line+$1))
+}
+
+offset () {
+    printf '\e[%dG' "$((WIDTH+7))"
+}
+
+segment () {
+    offset
+    printf "%s" "$1"
+    down_c 1
+}
+data () {
+    _variable="$1"
+    _variable_value=${2:-" $(eval "get_$1")"}
+#	echo "fetching $1"
+    if [ -n "${_variable_value# }" ]
+    then
+        segment "$category$_variable:$NORMAL$_variable_value"
+    fi
+}
+
+up_c $HEIGHT
+
+segment "$ITALIC$main_color$lyric$NORMAL"
+
+if [ -z ${_small+x} ];
+then
+    data "date" " $date"
+else
+    segment "${category}$time"
+fi
+data "os" " $os"
+data "cpu" " $cpu"
+data "mem" " ${memused}MB / ${memtotal}MB"
+if [ -z ${_small+x} ]; then
+    data "packages"
+    data "gpu" " $gpu"
+    data "kernel"
+    data "wm" " $wm"
+    data "song" " $song"
+    data "uptime" " $uptime"
+fi
+
+down $((HEIGHT-line))
+printf "\n"
