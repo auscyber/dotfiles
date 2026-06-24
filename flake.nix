@@ -7,7 +7,7 @@
       url = "github:deadlock-mod-manager/deadlock-mod-manager";
       flake = false;
     };
-    rift.url = "github:auscyber/rift";
+    rift.url = "github:auscyber/rift?ref=main";
     rift.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nix.url = "github:nixos/nix/latest-release";

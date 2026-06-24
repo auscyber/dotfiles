@@ -19,6 +19,7 @@
   #    config.launchd.agents.gpg-agent.config.Sockets.Extra.SockPathName;
 
   services.yubikey-agent.enable = true;
+  services.sccache.enable = true;
   age.rekey.masterIdentities = [
     {
       identity = ../../../modules/common/age-yubikey.pub;

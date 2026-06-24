@@ -26,7 +26,7 @@ in
       };
     };
     age.templates."celler_config" = {
-      path = "${config.home.homeDirectory}/.config/celler/config.toml";
+      path = "${config.home.homedirectory}/.config/celler/config.toml";
       dependencies = {
         inherit (config.age.secrets) attic_token;
       };

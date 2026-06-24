@@ -53,14 +53,14 @@
 
               option_path="''${1:-}"
               if [ -z "''${option_path}" ]; then
-                echo "Usage: system-option <option.path>"
-                exit 1
+              	echo "Usage: system-option <option.path>"
+              	exit 1
               fi
 
               if nix eval --raw --impure --expr 'builtins.currentSystem' | grep -q 'darwin'; then
-                target="options-doc-darwin"
+              	target="options-doc-darwin"
               else
-                target="options-doc-nixos"
+              	target="options-doc-nixos"
               fi
 
               out_link="$(mktemp -u)"
@@ -112,11 +112,11 @@
               flake_root="$(${detectFlakeScript})"
 
               if nix eval --raw --impure --expr 'builtins.currentSystem' | grep -q 'darwin'; then
-                cfg_kind="darwinConfigurations"
-                target="options-doc-darwin"
+              	cfg_kind="darwinConfigurations"
+              	target="options-doc-darwin"
               else
-                cfg_kind="nixosConfigurations"
-                target="options-doc-nixos"
+              	cfg_kind="nixosConfigurations"
+              	target="options-doc-nixos"
               fi
 
               out_link="$(mktemp -u)"
@@ -130,23 +130,23 @@
 
               open_cmd=""
               if command -v xdg-open >/dev/null 2>&1; then
-                open_cmd="xdg-open"
+              	open_cmd="xdg-open"
               elif command -v open >/dev/null 2>&1; then
-                open_cmd="open"
+              	open_cmd="open"
               fi
 
               if [ -n "''${NO_OPEN:-}" ] || [ -z "''${open_cmd}" ]; then
-                echo "Detected system config: ''${cfg_kind}.''${current_hostname}"
-                echo "Flake root: ''${flake_root}"
-                echo "HTML docs: ''${html_path}"
-                exit 0
+              	echo "Detected system config: ''${cfg_kind}.''${current_hostname}"
+              	echo "Flake root: ''${flake_root}"
+              	echo "HTML docs: ''${html_path}"
+              	exit 0
               fi
 
               if "''${open_cmd}" "''${html_path}" >/dev/null 2>&1; then
-                echo "Opened: ''${html_path}"
+              	echo "Opened: ''${html_path}"
               else
-                echo "Unable to launch browser automatically."
-                echo "Open this file manually: ''${html_path}"
+              	echo "Unable to launch browser automatically."
+              	echo "Open this file manually: ''${html_path}"
               fi
             '';
           };
@@ -162,8 +162,8 @@
 
               option_path="''${1:-}"
               if [ -z "''${option_path}" ]; then
-                echo "Usage: home-option <option.path>"
-                exit 1
+              	echo "Usage: home-option <option.path>"
+              	exit 1
               fi
 
               out_link="$(mktemp -u)"
@@ -225,20 +225,20 @@
 
               open_cmd=""
               if command -v xdg-open >/dev/null 2>&1; then
-                open_cmd="xdg-open"
+              	open_cmd="xdg-open"
               elif command -v open >/dev/null 2>&1; then
-                open_cmd="open"
+              	open_cmd="open"
               fi
 
               if [ -n "''${NO_OPEN:-}" ] || [ -z "''${open_cmd}" ]; then
-                exit 0
+              	exit 0
               fi
 
               if "''${open_cmd}" "''${html_path}" >/dev/null 2>&1; then
-                echo "Opened: ''${html_path}"
+              	echo "Opened: ''${html_path}"
               else
-                echo "Unable to launch browser automatically."
-                echo "Open this file manually: ''${html_path}"
+              	echo "Unable to launch browser automatically."
+              	echo "Open this file manually: ''${html_path}"
               fi
             '';
           };
@@ -278,7 +278,11 @@
           };
 
         in
-        (pkgs.lib.filterAttrs (_: p: p ? meta && p.meta ? platforms) packages) // extraPackages;
+        (pkgs.lib.filterAttrs (_: p: p ? meta && p.meta ? platforms) packages)
+        // extraPackages
+        // {
+          rift = pkgs.rift;
+        };
 
     };
 }

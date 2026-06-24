@@ -5219,15 +5219,16 @@
         "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
-        "lastModified": 1782276317,
-        "narHash": "sha256-EZ9cF49a2Puy2NRgP95yBjn9nnx1Vb2N0mb2W9AzrIc=",
+        "lastModified": 1782290283,
+        "narHash": "sha256-TI7V6FxYxPHB2y2Zqc8jti7knzr21L4nQh3N5qAdEho=",
         "owner": "auscyber",
         "repo": "rift",
-        "rev": "fbbfc17338dfb9137b9af4c80d6ff00a173e759a",
+        "rev": "b7e69e4cef27ed835a88ff58ec6b276de91e6885",
         "type": "github"
       },
       "original": {
         "owner": "auscyber",
+        "ref": "main",
         "repo": "rift",
         "type": "github"
       }
