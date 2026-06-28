@@ -1,0 +1,507 @@
+From 937c840059f3b3229eb87c7fbd38287bab17b85f Mon Sep 17 00:00:00 2001
+From: Ivy Pierlot <ivyp@outlook.com.au>
+Date: Sat, 6 Dec 2025 14:54:40 +1100
+Subject: [PATCH] karabiner-elements: fix on macos
+
+karabiner-dk: add module
+
+system: add application support linking using new option
+`environment.extraAppPaths`
+---
+ modules/environment/default.nix               |  78 +++++++-----
+ modules/module-list.nix                       |   1 +
+ modules/services/karabiner-dk/default.nix     |  55 +++++++++
+ .../services/karabiner-elements/default.nix   |  91 ++++++--------
+ modules/system/applications.nix               | 115 +++++++++++-------
+ 5 files changed, 219 insertions(+), 121 deletions(-)
+ create mode 100644 modules/services/karabiner-dk/default.nix
+
+diff --git a/modules/environment/default.nix b/modules/environment/default.nix
+index 5368306af..ac0b61843 100644
+--- a/modules/environment/default.nix
++++ b/modules/environment/default.nix
+@@ -1,16 +1,21 @@
+-{ options, config, lib, pkgs, ... }:
++{
++  options,
++  config,
++  lib,
++  pkgs,
++  ...
++}:
+ 
+ with lib;
+ 
+ let
+   cfg = config.environment;
+ 
+-  exportVariables =
+-    mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
++  exportVariables = mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
+ 
+-  aliasCommands =
+-    mapAttrsToList (n: v: ''alias ${n}=${escapeShellArg v}'')
+-      (filterAttrs (k: v: v != null) cfg.shellAliases);
++  aliasCommands = mapAttrsToList (n: v: ''alias ${n}=${escapeShellArg v}'') (
++    filterAttrs (k: v: v != null) cfg.shellAliases
++  );
+ in
+ 
+ {
+@@ -59,8 +64,11 @@ in
+ 
+     environment.variables = mkOption {
+       type = types.attrsOf (types.either types.str (types.listOf types.str));
+-      default = {};
+-      example = { EDITOR = "vim"; LANG = "nl_NL.UTF-8"; };
++      default = { };
++      example = {
++        EDITOR = "vim";
++        LANG = "nl_NL.UTF-8";
++      };
+       description = ''
+         A set of environment variables used in the global environment.
+         These variables will be set on shell initialisation.
+@@ -73,8 +81,10 @@ in
+ 
+     environment.shellAliases = mkOption {
+       type = types.attrsOf types.str;
+-      default = {};
+-      example = { ll = "ls -l"; };
++      default = { };
++      example = {
++        ll = "ls -l";
++      };
+       description = ''
+         An attribute set that maps aliases (the top level attribute names in
+         this option) to command strings or directly to build outputs. The
+@@ -122,19 +132,29 @@ in
+       '';
+       type = types.lines;
+     };
++    environment.extraAppPaths = mkOption {
++      type = types.listOf types.str;
++      default = [ ];
++      description = ''
++        		A list of extra paths to link
++        	  '';
++    };
+   };
+ 
+   config = {
+ 
+     # This is horrible, sorry.
+-    system.requiresPrimaryUser = mkIf (
+-      config.nix.enable
+-      && !config.nixpkgs.flake.setNixPath
+-      && config.system.stateVersion < 6
+-      && options.environment.darwinConfig.highestPrio == (mkOptionDefault {}).priority
+-    ) [
+-      "environment.darwinConfig"
+-    ];
++    system.requiresPrimaryUser =
++      mkIf
++        (
++          config.nix.enable
++          && !config.nixpkgs.flake.setNixPath
++          && config.system.stateVersion < 6
++          && options.environment.darwinConfig.highestPrio == (mkOptionDefault { }).priority
++        )
++        [
++          "environment.darwinConfig"
++        ];
+ 
+     environment.systemPath = mkMerge [
+       [ (makeBinPath cfg.profiles) ]
+@@ -144,21 +164,23 @@ in
+     # Use user, default and system profiles.
+     environment.profiles = mkMerge [
+       (mkOrder 800 [ "$HOME/.nix-profile" ])
+-      [ "/run/current-system/sw" "/nix/var/nix/profiles/default" ]
++      [
++        "/run/current-system/sw"
++        "/nix/var/nix/profiles/default"
++      ]
+     ];
+ 
+     environment.extraInit = ''
+-       export NIX_USER_PROFILE_DIR="/nix/var/nix/profiles/per-user/$USER"
+-       export NIX_PROFILES="${concatStringsSep " " (reverseList cfg.profiles)}"
++      export NIX_USER_PROFILE_DIR="/nix/var/nix/profiles/per-user/$USER"
++      export NIX_PROFILES="${concatStringsSep " " (reverseList cfg.profiles)}"
+     '';
+ 
+-    environment.variables =
+-      {
+-        XDG_CONFIG_DIRS = map (path: path + "/etc/xdg") cfg.profiles;
+-        XDG_DATA_DIRS = map (path: path + "/share") cfg.profiles;
+-        EDITOR = mkDefault "nano";
+-        PAGER = mkDefault "less -R";
+-      };
++    environment.variables = {
++      XDG_CONFIG_DIRS = map (path: path + "/etc/xdg") cfg.profiles;
++      XDG_DATA_DIRS = map (path: path + "/share") cfg.profiles;
++      EDITOR = mkDefault "nano";
++      PAGER = mkDefault "less -R";
++    };
+ 
+     system.build.setEnvironment = pkgs.writeText "set-environment" ''
+       # Prevent this file from being sourced by child shells.
+diff --git a/modules/module-list.nix b/modules/module-list.nix
+index 79c877c92..4eb92cd98 100644
+--- a/modules/module-list.nix
++++ b/modules/module-list.nix
+@@ -75,6 +75,7 @@
+   ./services/hercules-ci-agent
+   ./services/ipfs.nix
+   ./services/karabiner-elements
++  ./services/karabiner-dk
+   ./services/khd
+   ./services/kwm
+   ./services/lorri.nix
+diff --git a/modules/services/karabiner-dk/default.nix b/modules/services/karabiner-dk/default.nix
+new file mode 100644
+index 000000000..038489e33
+--- /dev/null
++++ b/modules/services/karabiner-dk/default.nix
+@@ -0,0 +1,55 @@
++{
++  config,
++  lib,
++  pkgs,
++  ...
++}:
++with lib;
++let
++  cfg = config.services.karabiner-dk;
++
++  parentAppDir = "/Applications/Nix Apps";
++in
++{
++  meta.maintainers = [ lib.maintainers.auscyber or "auscyber" ];
++  options.services.karabiner-dk = {
++    enable = mkEnableOption "Karabiner-DK";
++    package = mkPackageOption pkgs "karabiner-dk" { };
++  };
++  config = mkIf cfg.enable {
++    environment.systemPackages = [
++      cfg.package
++    ];
++    environment.extraAppPaths = [
++      "/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice"
++    ];
++    launchd.daemons.Karabiner-DriverKit-VirtualHIDDevice-Daemon = {
++      serviceConfig.ProgramArguments = [
++        "/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-VirtualHIDDevice-Daemon.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Daemon"
++      ];
++      serviceConfig.ProcessType = "Interactive";
++      serviceConfig.Label = "org.pqrs.Karabiner-DriverKit-VirtualHIDDevice-Daemon";
++      serviceConfig.RunAtLoad = true;
++      serviceConfig.KeepAlive = true;
++    };
++    launchd.daemons.start-karabiner-dk = {
++      script = ''
++        		spctl -a -vvv -t install "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
++                "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager" activate
++      '';
++      serviceConfig.Label = "org.nixos.start-karabiner-dk";
++      serviceConfig.RunAtLoad = true;
++    };
++    launchd.user.agents.activate_karabiner_system_ext = {
++      serviceConfig.ProgramArguments = [
++        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
++        "activate"
++      ];
++      serviceConfig.RunAtLoad = true;
++      managedBy = "services.karabiner-dk.enable";
++    };
++    system.activationScripts.postActivation.text = ''
++      		launchctl kickstart -k system/org.pqrs.Karabiner-DriverKit-VirtualHIDDevice-Daemon
++      	'';
++  };
++}
+diff --git a/modules/services/karabiner-elements/default.nix b/modules/services/karabiner-elements/default.nix
+index 4bcb7a6cf..6b001460e 100644
+--- a/modules/services/karabiner-elements/default.nix
++++ b/modules/services/karabiner-elements/default.nix
+@@ -1,28 +1,34 @@
+-{ config, lib, pkgs, ... }:
++{
++  config,
++  lib,
++  pkgs,
++  ...
++}:
+ 
+ with lib;
+ 
+ let
+   cfg = config.services.karabiner-elements;
+-
+-  parentAppDir = "/Applications/.Nix-Karabiner";
+ in
+ 
+ {
+   options.services.karabiner-elements = {
+     enable = mkEnableOption "Karabiner-Elements";
+     package = mkPackageOption pkgs "karabiner-elements" { };
++
+   };
+ 
+   config = mkIf cfg.enable {
+-    environment.systemPackages = [ cfg.package ];
+-
+-    system.activationScripts.preActivation.text = ''
+-      rm -rf ${parentAppDir}
+-      mkdir -p ${parentAppDir}
+-      # Kernel extensions must reside inside of /Applications, they cannot be symlinks
+-      cp -r ${cfg.package.driver}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
+-    '';
++    environment.systemPackages = [
++      cfg.package
++    ];
++    environment.extraAppPaths = [
++      "/Library/Application Support/org.pqrs/Karabiner-Elements"
++    ];
++    services.karabiner-dk = {
++      enable = true;
++      package = cfg.package.driver;
++    };
+ 
+     system.activationScripts.postActivation.text = ''
+       echo "attempt to activate karabiner system extension and start daemons" >&2
+@@ -40,9 +46,9 @@ in
+     # which will block until the system extension is activated.
+     launchd.daemons.start_karabiner_daemons = {
+       script = ''
+-          ${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager activate
+-          launchctl kickstart system/org.pqrs.karabiner.karabiner_grabber
+-          launchctl kickstart system/org.pqrs.karabiner.karabiner_observer
++        launchctl kickstart -k system/org.nixos.start-karabiner-dk
++        launchctl kickstart -k system/org.pqrs.service.daemon.karabiner_grabber
++        launchctl kickstart -k system/org.pqrs.Karabiner-DriverKit-VirtualHIDDevice-Daemon
+       '';
+       serviceConfig.Label = "org.nixos.start_karabiner_daemons";
+       serviceConfig.RunAtLoad = true;
+@@ -50,67 +56,50 @@ in
+ 
+     launchd.daemons.karabiner_grabber = {
+       serviceConfig.ProgramArguments = [
+-        "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_grabber"
++        "/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_grabber"
+       ];
+       serviceConfig.ProcessType = "Interactive";
+-      serviceConfig.Label = "org.pqrs.karabiner.karabiner_grabber";
+-      serviceConfig.KeepAlive.SuccessfulExit = true;
+-      serviceConfig.KeepAlive.Crashed = true;
+-      serviceConfig.KeepAlive.AfterInitialDemand = true;
+-    };
+-
+-    launchd.daemons.karabiner_observer = {
+-      serviceConfig.ProgramArguments = [
+-        "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_observer"
+-      ];
+-
+-      serviceConfig.Label = "org.pqrs.karabiner.karabiner_observer";
++      serviceConfig.Label = "org.pqrs.service.daemon.karabiner_grabber";
+       serviceConfig.KeepAlive.SuccessfulExit = true;
+       serviceConfig.KeepAlive.Crashed = true;
+       serviceConfig.KeepAlive.AfterInitialDemand = true;
+     };
+ 
+-    launchd.daemons.Karabiner-DriverKit-VirtualHIDDeviceClient = {
+-      command = "\"${cfg.package.driver}/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-DriverKit-VirtualHIDDeviceClient.app/Contents/MacOS/Karabiner-DriverKit-VirtualHIDDeviceClient\"";
+-      serviceConfig.ProcessType = "Interactive";
+-      serviceConfig.Label = "org.pqrs.Karabiner-DriverKit-VirtualHIDDeviceClient";
+-      serviceConfig.KeepAlive = true;
+-    };
+-
+     # Normally karabiner_console_user_server calls activate on the manager but
+     # because we use a custom location we need to call activate manually.
+-    launchd.user.agents.activate_karabiner_system_ext = {
+-      serviceConfig.ProgramArguments = [
+-        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager" "activate"
+-      ];
+-      serviceConfig.RunAtLoad = true;
+-      managedBy = "services.karabiner-elements.enable";
+-    };
+-
+     # We need this to run every reboot as /run gets nuked so we can't put this
+     # inside the preActivation script as it only gets run on darwin-rebuild switch.
+     launchd.daemons.setsuid_karabiner_session_monitor = {
+       script = ''
+-          rm -rf /run/wrappers
+-          mkdir -p /run/wrappers/bin
+-          install -m4555 "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
++        rm -rf /run/wrappers
++        mkdir -p /run/wrappers/bin
++        install -m4555 "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
+       '';
+       serviceConfig.RunAtLoad = true;
+       serviceConfig.KeepAlive.SuccessfulExit = false;
+     };
+-
+     launchd.user.agents.karabiner_session_monitor = {
+       serviceConfig.ProgramArguments = [
+-        "/bin/sh" "-c"
++        "/bin/sh"
++        "-c"
+         "/bin/wait4path /run/wrappers/bin && /run/wrappers/bin/karabiner_session_monitor"
+       ];
+-      serviceConfig.Label = "org.pqrs.karabiner.karabiner_session_monitor";
++      serviceConfig.Label = "org.pqrs.service.agent.karabiner_session_monitor";
+       serviceConfig.KeepAlive = true;
+       managedBy = "services.karabiner-elements.enable";
+     };
+ 
+-    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_grabber.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_grabber.plist";
+-    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_observer.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_observer.plist";
+-    environment.userLaunchAgents."org.pqrs.karabiner.karabiner_console_user_server.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.karabiner_console_user_server.plist";
++    # from launch agents folder in karabiner elements executable
++    environment.userLaunchAgents."org.pqrs.service.agent.karabiner_grabber.plist".source =
++      "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/Karabiner-Elements Non-Privileged Agents.app/Contents/Library/LaunchAgents/org.pqrs.service.agent.karabiner_grabber.plist";
++    environment.userLaunchAgents."org.pqrs.service.agent.karabiner_console_user_server.plist".source =
++      "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/Karabiner-Elements Non-Privileged Agents.app/Contents/Library/LaunchAgents/org.pqrs.service.agent.karabiner_console_user_server.plist";
++    environment.userLaunchAgents."org.pqrs.service.agent.Karabiner-Menu.plist".source =
++      "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/Karabiner-Elements Non-Privileged Agents.app/Contents/Library/LaunchAgents/org.pqrs.service.agent.Karabiner-Menu.plist";
++    environment.userLaunchAgents."org.pqrs.service.agent.Karabiner-MultitouchExtension.plist".source =
++      "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/Karabiner-Elements Non-Privileged Agents.app/Contents/Library/LaunchAgents/org.pqrs.service.agent.Karabiner-MultitouchExtension.plist";
++    environment.userLaunchAgents."org.pqrs.service.agent.Karabiner-NotificationWindow.plist".source =
++      "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/Karabiner-Elements Non-Privileged Agents.app/Contents/Library/LaunchAgents/org.pqrs.service.agent.Karabiner-NotificationWindow.plist";
++
+   };
+ }
+diff --git a/modules/system/applications.nix b/modules/system/applications.nix
+index 6d3dafabb..4e9b1c5bb 100644
+--- a/modules/system/applications.nix
++++ b/modules/system/applications.nix
+@@ -59,56 +59,87 @@
+     system.build.applications = pkgs.buildEnv {
+       name = "system-applications";
+       paths = config.environment.systemPackages;
+-      pathsToLink = [ "/Applications" ];
++      pathsToLink = [
++        "/Applications"
++      ]
++      ++ config.environment.extraAppPaths;
+     };
+ 
+     system.activationScripts.applications.text = ''
+-      # Set up applications.
+-      echo "setting up /Applications/Nix Apps..." >&2
++              # Set up applications.
++              echo "setting up /Applications/Nix Apps..." >&2
+ 
+-      ourLink () {
+-        local link
+-        link=$(readlink "$1")
+-        [ -L "$1" ] && [ "''${link#*-}" = 'system-applications/Applications' ]
+-      }
++              ourLink () {
++                local link
++                link=$(readlink "$1")
++                [ -L "$1" ] && [ "''${link#*-}" = 'system-applications/Applications' ]
++              }
+ 
+-      ${lib.optionalString (config.system.primaryUser != null) ''
+-        # Clean up for links created at the old location in HOME
+-        # TODO: Remove this in 25.11.
+-        if ourLink ~${config.system.primaryUser}/Applications; then
+-          rm ~${config.system.primaryUser}/Applications
+-        elif ourLink ~${config.system.primaryUser}/Applications/'Nix Apps'; then
+-          rm ~${config.system.primaryUser}/Applications/'Nix Apps'
+-        fi
+-      ''}
++              ${lib.optionalString (config.system.primaryUser != null) ''
++                # Clean up for links created at the old location in HOME
++                # TODO: Remove this in 25.11.
++                if ourLink ~${config.system.primaryUser}/Applications; then
++                  rm ~${config.system.primaryUser}/Applications
++                elif ourLink ~${config.system.primaryUser}/Applications/'Nix Apps'; then
++                  rm ~${config.system.primaryUser}/Applications/'Nix Apps'
++                fi
++              ''}
+ 
+-      targetFolder='/Applications/Nix Apps'
++              targetFolder='/Applications/Nix Apps'
+ 
+-      # Clean up old style symlink to nix store
+-      if [ -e "$targetFolder" ] && ourLink "$targetFolder"; then
+-        rm "$targetFolder"
+-      fi
++              # Clean up old style symlink to nix store
++              if [ -e "$targetFolder" ] && ourLink "$targetFolder"; then
++                rm "$targetFolder"
++              fi
++
++              mkdir -p "$targetFolder"
++
++              rsyncFlags=(
++                # mtime is standardized in the nix store, which would leave only file size to distinguish files.
++                # Thus we need checksums, despite the speed penalty.
++                --checksum
++                # Converts all symlinks pointing outside of the copied tree (thus unsafe) into real files and directories.
++                # This neatly converts all the symlinks pointing to application bundles in the nix store into
++                # real directories, without breaking any relative symlinks inside of application bundles.
++                # This is good enough, because the make-symlinks-relative.sh setup hook converts all $out internal
++                # symlinks to relative ones.
++                --copy-unsafe-links
++                --archive
++                --delete
++                --chmod=-w
++                --no-group
++                --no-owner
++              )
++
++
++            ${lib.getExe pkgs.rsync} "''${rsyncFlags[@]}" ${config.system.build.applications}/Applications/ "$targetFolder"
++              rsyncFlags=(
++                # mtime is standardized in the nix store, which would leave only file size to distinguish files.
++                # Thus we need checksums, despite the speed penalty.
++                --checksum
++                # Converts all symlinks pointing outside of the copied tree (thus unsafe) into real files and directories.
++                # This neatly converts all the symlinks pointing to application bundles in the nix store into
++                # real directories, without breaking any relative symlinks inside of application bundles.
++                # This is good enough, because the make-symlinks-relative.sh setup hook converts all $out internal
++                # symlinks to relative ones.
++                --copy-unsafe-links
++                --archive
++                --delete
++                --chmod=-w
++                --no-group
++                --no-owner
++              )
++      		''
++    + lib.concatStringsSep "\n" (
++      builtins.map (path: ''
++        ${lib.getExe pkgs.rsync} "''${rsyncFlags[@]}" "${config.system.build.applications}${path}/" "${path}"
++
++        		'') config.environment.extraAppPaths
++    )
++    + ''
++
++      	  echo "done setting up /Applications/Nix Apps." >&2
+ 
+-      mkdir -p "$targetFolder"
+-
+-      rsyncFlags=(
+-        # mtime is standardized in the nix store, which would leave only file size to distinguish files.
+-        # Thus we need checksums, despite the speed penalty.
+-        --checksum
+-        # Converts all symlinks pointing outside of the copied tree (thus unsafe) into real files and directories.
+-        # This neatly converts all the symlinks pointing to application bundles in the nix store into
+-        # real directories, without breaking any relative symlinks inside of application bundles.
+-        # This is good enough, because the make-symlinks-relative.sh setup hook converts all $out internal
+-        # symlinks to relative ones.
+-        --copy-unsafe-links
+-        --archive
+-        --delete
+-        --chmod=-w
+-        --no-group
+-        --no-owner
+-      )
+-
+-      ${lib.getExe pkgs.rsync} "''${rsyncFlags[@]}" ${config.system.build.applications}/Applications/ "$targetFolder"
+     '';
+   };
+ }

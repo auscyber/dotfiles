@@ -1,0 +1,12 @@
+diff --git a/modules/launchd/launchd.nix b/modules/launchd/launchd.nix
+index a093f99..08622b4 100644
+--- a/modules/launchd/launchd.nix
++++ b/modules/launchd/launchd.nix
+@@ -852,6 +852,7 @@ in
+                   types.enum [
+                     "stream"
+                     "dgram"
++                    "unix"
+                     "seqpacket"
+                   ]
+                 );

@@ -1,0 +1,2621 @@
+From 175cebc346346c09e2aa6570de83eb66099475e2 Mon Sep 17 00:00:00 2001
+From: Ivy Pierlot <ivyp@outlook.com.au>
+Date: Mon, 16 Mar 2026 19:13:58 +1100
+Subject: [PATCH] custom fetcher
+
+---
+ app/Config.hs                     | 162 ++++----
+ nvfetcher.cabal                   |   1 +
+ shell.nix                         |  21 +
+ src/NvFetcher/Core.hs             |  65 ++-
+ src/NvFetcher/CustomPreFetcher.hs |  98 +++++
+ src/NvFetcher/ExtractSrc.hs       |  43 +-
+ src/NvFetcher/GetGitCommitDate.hs |  37 +-
+ src/NvFetcher/NixExpr.hs          | 252 +++++++-----
+ src/NvFetcher/PackageSet.hs       | 544 ++++++++++++------------
+ src/NvFetcher/Types.hs            | 659 ++++++++++++++++--------------
+ 10 files changed, 1088 insertions(+), 794 deletions(-)
+ create mode 100644 shell.nix
+ create mode 100644 src/NvFetcher/CustomPreFetcher.hs
+
+diff --git a/app/Config.hs b/app/Config.hs
+index ef9e55c..08f5bd4 100644
+--- a/app/Config.hs
++++ b/app/Config.hs
+@@ -39,66 +39,66 @@ parseConfig :: Text -> Either [PackageConfigValidateError] [Package]
+ parseConfig raw = runExcept $ case decodeWith tableDecoder raw of
+   Right (Map.toList -> x) -> mapM (uncurry eachP) x
+   Left err -> throwE [TomlError err]
+-  where
+-    tableDecoder =
+-      makeDecoder $ \case
+-        (Table t) -> pure t
+-        v -> typeMismatch v
+-    eachP pkg v@(Table _) = do
+-      let keys = myKeyToText <$> allKeys [] v
+-      checkConflicts pkg keys
+-      checkUnexpected pkg keys
+-      case unDecodeM (runDecoder (packageConfigDecoder pkg) v) [] of
+-        Left e -> throwE [TomlError $ uncurry DecodeError e]
+-        Right x -> pure x
+-    eachP pkg _ = throwE [KeyUnexpected pkg [pkg]]
+-    allKeys prefix (Table t) =
+-      mconcat
+-        [ case x of
+-            (Table _) -> []
+-            _ -> [MyKey $ prefix <> [k]]
+-          | (k, x) <- Map.toList t
+-        ]
+-        <> Map.foldrWithKey (\k v acc -> allKeys (prefix <> [k]) v <> acc) [] t
+-    allKeys _ _ = []
+-    checkConflicts pkg keys =
+-      throwN
+-        [ KeyConflicts pkg [intersection]
+-          | k <-
+-              [ ("src." <>) <$> versionSourceKeys,
+-                ("fetch." <>) <$> fetcherKeys
+-              ],
+-            let intersection = keys `intersect` k,
+-            length intersection > 1
+-        ]
+-    checkUnexpected pkg keys =
+-      throwN $
+-        -- git
+-        [ KeyUnexpected pkg gk
+-          | let gk = filter (T.isPrefixOf "git.") keys,
+-            not $ null gk,
+-            "fetch.git" `notElem` keys && "fetch.github" `notElem` keys
+-        ]
+-          <>
+-          -- url
+-          [KeyUnexpected pkg uk | let uk = filter ("url.name" ==) keys, not $ null uk, "fetch.url" `notElem` keys]
+-          -- docker
+-          <> [ KeyUnexpected pkg dk
+-               | let dk = filter (T.isPrefixOf "docker.") keys,
+-                 not $ null dk,
+-                 "fetch.docker" `notElem` keys
+-             ]
+-          -- list options
+-          <> [ KeyUnexpected pkg lk
+-               | let lk = listOptionsKeys `intersect` keys,
+-                 not $ null lk,
+-                 "src.docker" `notElem` keys
+-                   && "src.httpheader" `notElem` keys
+-                   && "src.container" `notElem` keys
+-                   && "src.github_tag" `notElem` keys
+-             ]
+-    throwN [] = pure ()
+-    throwN xs = throwE xs
++ where
++  tableDecoder =
++    makeDecoder $ \case
++      (Table t) -> pure t
++      v -> typeMismatch v
++  eachP pkg v@(Table _) = do
++    let keys = myKeyToText <$> allKeys [] v
++    checkConflicts pkg keys
++    checkUnexpected pkg keys
++    case unDecodeM (runDecoder (packageConfigDecoder pkg) v) [] of
++      Left e -> throwE [TomlError $ uncurry DecodeError e]
++      Right x -> pure x
++  eachP pkg _ = throwE [KeyUnexpected pkg [pkg]]
++  allKeys prefix (Table t) =
++    mconcat
++      [ case x of
++          (Table _) -> []
++          _ -> [MyKey $ prefix <> [k]]
++      | (k, x) <- Map.toList t
++      ]
++      <> Map.foldrWithKey (\k v acc -> allKeys (prefix <> [k]) v <> acc) [] t
++  allKeys _ _ = []
++  checkConflicts pkg keys =
++    throwN
++      [ KeyConflicts pkg [intersection]
++      | k <-
++          [ ("src." <>) <$> versionSourceKeys
++          , ("fetch." <>) <$> fetcherKeys
++          ]
++      , let intersection = keys `intersect` k
++      , length intersection > 1
++      ]
++  checkUnexpected pkg keys =
++    throwN $
++      -- git
++      [ KeyUnexpected pkg gk
++      | let gk = filter (T.isPrefixOf "git.") keys
++      , not $ null gk
++      , "fetch.git" `notElem` keys && "fetch.github" `notElem` keys
++      ]
++        <>
++        -- url
++        [KeyUnexpected pkg uk | let uk = filter ("url.name" ==) keys, not $ null uk, "fetch.url" `notElem` keys]
++        -- docker
++        <> [ KeyUnexpected pkg dk
++           | let dk = filter (T.isPrefixOf "docker.") keys
++           , not $ null dk
++           , "fetch.docker" `notElem` keys
++           ]
++        -- list options
++        <> [ KeyUnexpected pkg lk
++           | let lk = listOptionsKeys `intersect` keys
++           , not $ null lk
++           , "src.docker" `notElem` keys
++               && "src.httpheader" `notElem` keys
++               && "src.container" `notElem` keys
++               && "src.github_tag" `notElem` keys
++           ]
++  throwN [] = pure ()
++  throwN xs = throwE xs
+ 
+ --------------------------------------------------------------------------------
+ 
+@@ -109,6 +109,7 @@ packageConfigDecoder name =
+     <*> fetcherDecoder
+     <*> extractFilesDecoder
+     <*> cargoLockPathDecoder
++    <*> prefetchFilesDecoder
+     <*> passthruDecoder
+     <*> pinnedDecoder
+     <*> ((,) <$> gitDateFormatDecoder <*> gitTimeZoneDecoder)
+@@ -122,6 +123,29 @@ extractFilesDecoder = fmap (PackageExtractSrc . fmap Glob) <$> getFieldOpt @(NE.
+ cargoLockPathDecoder :: Decoder (Maybe PackageCargoLockFiles)
+ cargoLockPathDecoder = fmap (PackageCargoLockFiles . fmap Glob) <$> getFieldOpt @(NE.NonEmpty String) "cargo_lock"
+ 
++prefetchFilesDecoder :: Decoder (Maybe PackagePrefetchFiles)
++prefetchFilesDecoder =
++  getFieldOpt @Value "prefetch" >>= \case
++    Just (Table t) -> do
++      xs <-
++        sequenceA
++          [ case v of
++              String s -> pure (T.unpack k, pure $ Glob $ T.unpack s)
++              Array a -> do
++                strs <- traverse parseString a
++                case NE.nonEmpty strs of
++                  Just ne -> pure (T.unpack k, Glob <$> ne)
++                  Nothing -> makeDecoder $ \_ -> invalidValue "non-empty list of strings" v
++              _ -> makeDecoder $ \_ -> invalidValue "string or list of strings" v
++          | (k, v) <- Map.toList t
++          ]
++      pure $ Just $ PackagePreFetchFiles $ HMap.fromList xs
++    Just v -> makeDecoder $ \_ -> invalidValue "table" v
++    Nothing -> pure Nothing
++ where
++  parseString (String s) = pure (T.unpack s)
++  parseString v = makeDecoder $ \_ -> invalidValue "string" v
++
+ nvcheckerOptionsDecoder :: Decoder NvcheckerOptions
+ nvcheckerOptionsDecoder =
+   NvcheckerOptions
+@@ -135,15 +159,15 @@ passthruDecoder =
+     Just (Table t) -> go [] t >>= \(mconcat -> fs) -> pure $ PackagePassthru $ foldl' (flip ($)) HMap.empty fs
+     Just _ -> makeDecoder typeMismatch
+     Nothing -> pure $ PackagePassthru HMap.empty
+-  where
+-    go prefix x =
+-      sequenceA
+-        [ case v of
+-            (String text) -> pure [HMap.insert (myKeyToText $ MyKey $ prefix <> [k]) text]
+-            Table t -> mconcat <$> go (prefix <> [k]) t
+-            _ -> makeDecoder (\_ -> invalidValue "passthru value must be string for now" v)
+-          | (k, v) <- Map.toList x
+-        ]
++ where
++  go prefix x =
++    sequenceA
++      [ case v of
++          (String text) -> pure [HMap.insert (myKeyToText $ MyKey $ prefix <> [k]) text]
++          Table t -> mconcat <$> go (prefix <> [k]) t
++          _ -> makeDecoder (\_ -> invalidValue "passthru value must be string for now" v)
++      | (k, v) <- Map.toList x
++      ]
+ 
+ pinnedDecoder :: Decoder UseStaleVersion
+ pinnedDecoder =
+diff --git a/nvfetcher.cabal b/nvfetcher.cabal
+index a7193b6..b2cecc9 100644
+--- a/nvfetcher.cabal
++++ b/nvfetcher.cabal
+@@ -68,6 +68,7 @@ library
+     NvFetcher.Core
+     NvFetcher.ExtractSrc
+     NvFetcher.FetchRustGitDeps
++    NvFetcher.CustomPrefetcher
+     NvFetcher.GetGitCommitDate
+     NvFetcher.NixExpr
+     NvFetcher.NixFetcher
+diff --git a/shell.nix b/shell.nix
+new file mode 100644
+index 0000000..0b0aa23
+--- /dev/null
++++ b/shell.nix
+@@ -0,0 +1,21 @@
++{
++  pkgs ? import <nixpkgs> { },
++}:
++
++pkgs.mkShell {
++
++  buildInputs = [
++    pkgs.cabal-install
++    pkgs.prefetch-npm-deps
++    pkgs.fourmolu
++    pkgs.ghc
++    pkgs.haskell-language-server
++    pkgs.nvchecker
++    pkgs.nix-prefetch-git
++    pkgs.nix-prefetch-docker
++
++    pkgs.openssl
++    pkgs.zlib
++  ];
++
++}
+diff --git a/src/NvFetcher/Core.hs b/src/NvFetcher/Core.hs
+index ebaea57..55fe314 100644
+--- a/src/NvFetcher/Core.hs
++++ b/src/NvFetcher/Core.hs
+@@ -3,22 +3,26 @@
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE RecordWildCards #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+-module NvFetcher.Core
+-  ( Core (..),
+-    coreRules,
+-    runPackage,
+-  )
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
++-}
++module NvFetcher.Core (
++  Core (..),
++  coreRules,
++  runPackage,
++)
+ where
+ 
+ import Data.Coerce (coerce)
+ import qualified Data.HashMap.Strict as HMap
++import Data.Text.Prettyprint.Doc.Render.Tutorials.TreeRenderingTutorial (paragraph)
+ import Development.Shake
+ import Development.Shake.Rule
++import NvFetcher.CustomPrefetcher
++import NvFetcher.CustomPrefetcher (customPrefetcherRule)
+ import NvFetcher.ExtractSrc
+ import NvFetcher.FetchRustGitDeps
+ import NvFetcher.GetGitCommitDate
+@@ -27,14 +31,16 @@ import NvFetcher.Nvchecker
+ import NvFetcher.Types
+ import NvFetcher.Types.ShakeExtras
+ 
+--- | The core rule of nvchecker.
+--- all rules are wired here.
++{- | The core rule of nvchecker.
++all rules are wired here.
++-}
+ coreRules :: Rules ()
+ coreRules = do
+   nvcheckerRule
+   prefetchRule
+   extractSrcRule
+   fetchRustGitDepsRule
++  customPrefetcherRule
+   getGitCommitDateRule
+   addBuiltinRule noLint noIdentity $ \(WithPackageKey (Core, pkg)) _ _ -> do
+     -- It's important to always rerun since the package definition is not tracked at all
+@@ -44,9 +50,9 @@ coreRules = do
+       Nothing -> fail $ "Unknown package key: " <> show pkg
+       Just
+         Package
+-          { _pversion = CheckVersion versionSource options,
+-            _ppassthru = (PackagePassthru passthru),
+-            ..
++          { _pversion = CheckVersion versionSource options
++          , _ppassthru = (PackagePassthru passthru)
++          , ..
+           } -> do
+           _prversion@(NvcheckerResult version _mOldV _isStale) <- checkVersion versionSource options pkg
+           _prfetched <- prefetch (_pfetcher version) _pforcefetch
+@@ -60,6 +66,31 @@ coreRules = do
+                     result <- extractSrcs _prfetched extract
+                     pure $ Just result
+                   _ -> pure Nothing
++              _prprefetchFiles <- case _pprefetchFiles of
++                Just (PackagePreFetchFiles prefetchFiles) -> do
++                  liftIO $ print prefetchFiles
++                  result <-
++                    parallel $
++                      flip fmap (HMap.toList prefetchFiles) $ \(command, glob) ->
++                        do
++                          sources <-
++                            HMap.toList
++                              <$> extractSrcs
++                                _prfetched
++                                glob
++                          parallel $
++                            flip fmap sources $
++                              \(srcPath, dstPath) -> do
++                                prefetchResult <- runCustomPrefetcher _prfetched command srcPath
++
++                                pure (srcPath, prefetchResult)
++                  pure
++                    . Just
++                    . HMap.fromList
++                    . concat
++                    $ result
++                _ -> pure Nothing
++
+               -- cargo locks
+               _prcargolock <-
+                 case _pcargo of
+@@ -74,7 +105,7 @@ coreRules = do
+ 
+               -- Only git version source supports git commit date
+               _prgitdate <- case versionSource of
+-                Git {..} -> Just <$> getGitCommitDate _vurl (coerce version) _pgitdate
++                Git{..} -> Just <$> getGitCommitDate _vurl (coerce version) _pgitdate
+                 _ -> pure Nothing
+ 
+               -- update changelog
+@@ -93,7 +124,7 @@ coreRules = do
+                   _prpinned = _ppinned
+               -- Since we don't save the previous result, we are not able to know if the result changes
+               -- Depending on this rule leads to RunDependenciesChanged
+-              pure $ RunResult ChangedRecomputeDiff mempty $ Just PackageResult {..}
++              pure $ RunResult ChangedRecomputeDiff mempty $ Just PackageResult{..}
+             _ -> pure $ RunResult ChangedRecomputeDiff mempty Nothing
+ 
+ -- | 'Core' rule take a 'PackageKey', find the corresponding 'Package', and run all needed rules to get 'PackageResult'
+diff --git a/src/NvFetcher/CustomPreFetcher.hs b/src/NvFetcher/CustomPreFetcher.hs
+new file mode 100644
+index 0000000..3e6cb37
+--- /dev/null
++++ b/src/NvFetcher/CustomPreFetcher.hs
+@@ -0,0 +1,98 @@
++{-# LANGUAGE ConstraintKinds #-}
++{-# LANGUAGE DataKinds #-}
++{-# LANGUAGE DeriveAnyClass #-}
++{-# LANGUAGE DeriveGeneric #-}
++{-# LANGUAGE DerivingVia #-}
++{-# LANGUAGE ExistentialQuantification #-}
++{-# LANGUAGE FlexibleContexts #-}
++{-# LANGUAGE FlexibleInstances #-}
++{-# LANGUAGE GeneralizedNewtypeDeriving #-}
++{-# LANGUAGE LambdaCase #-}
++{-# LANGUAGE MultiParamTypeClasses #-}
++{-# LANGUAGE OverloadedStrings #-}
++{-# LANGUAGE PolyKinds #-}
++{-# LANGUAGE RecordWildCards #-}
++{-# LANGUAGE ScopedTypeVariables #-}
++{-# LANGUAGE StandaloneDeriving #-}
++{-# LANGUAGE TypeFamilies #-}
++{-# LANGUAGE TypeOperators #-}
++{-# LANGUAGE UndecidableInstances #-}
++{-# LANGUAGE UndecidableSuperClasses #-}
++
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
++
++This module provides function that extracts files contents from package sources.
++Because we use @nix-instantiate@ to build drv, so @<nixpkgs>@ (@NIX_PATH@) is required.
++-}
++module NvFetcher.CustomPrefetcher (
++    -- * Types
++    FetchCustomFetcherQ (..),
++
++    -- * Rules
++    customPrefetcherRule,
++
++    -- * Functions
++    runCustomPrefetcher,
++)
++where
++
++import qualified Data.HashMap.Strict as HMap
++
++import Control.Exception (ErrorCall)
++import Control.Monad (void)
++import qualified Data.Text as T
++import qualified Data.Text.IO as T
++
++import Development.Shake
++import Development.Shake.Command
++import Development.Shake.FilePath ((</>))
++import NvFetcher.Config (Config (keepGoing))
++import NvFetcher.ExtractSrc (extractSrc)
++import NvFetcher.NixExpr (fetcherToExtractDrv)
++import NvFetcher.Types
++import NvFetcher.Types.ShakeExtras (getBuildDir, withRetry)
++import NvFetcher.Utils (quote, quoteAndEscape, quoteIfNeeds)
++import qualified NvFetcher.Utils as T
++import Prettyprinter (pretty, (<+>))
++
++getFile :: NixFetcher Fetched -> FilePath -> Action (Maybe FilePath)
++getFile fetcher file = do
++    buildDir <- getBuildDir
++    result <- extractSrc fetcher (Glob file)
++    case HMap.toList result of
++        [(s, fp)] -> pure $ Just s
++        _ -> pure Nothing
++
++customPrefetcherRule :: Rules ()
++customPrefetcherRule = void $
++    addOracle $ \q@(FetchCustomFetcherQ fetcher command file) -> do
++        path <- getFile fetcher file
++        case path of
++            Nothing -> do
++                putInfo . show $ "#" <+> pretty q
++                putWarn $ "File " <> file <> " not found in the source. Skipping custom prefetcher."
++                pure Nothing
++            Just path -> do
++                putInfo . show $ "#" <+> pretty q
++                withTempFile $ \fp -> withRetry $ do
++                    putInfo . show $ "#" <+> pretty q
++                    let nixExpr = T.unpack $ fetcherToExtractDrv fetcher (T.pack command) path
++                    putVerbose $ "Generated nix expr:\n" <> nixExpr
++                    writeFile' fp nixExpr
++                    (CmdTime t, StdoutTrim out, CmdLine c, Stdouterr err) <- quietly $ cmd $ "nix-build --no-out-link " <> fp
++                    putVerbose $ "Finishing running " <> c <> ", took " <> show t <> "s"
++                    putVerbose $ "Output from stdout: " <> out
++                    putVerbose $ "Output from stderr: " <> err
++                    stdout <- liftIO $ T.readFile out
++                    if T.null stdout
++                        then do
++                            putWarn $ "Custom prefetcher " <> command <> " did not return any output. Skipping."
++                            pure Nothing
++                        else pure . Just $ T.strip stdout
++
++runCustomPrefetcher :: NixFetcher Fetched -> String -> FilePath -> Action (Maybe T.Text)
++runCustomPrefetcher fetcher command fp = askOracle $ FetchCustomFetcherQ fetcher command fp
+diff --git a/src/NvFetcher/ExtractSrc.hs b/src/NvFetcher/ExtractSrc.hs
+index a92568d..60cd43b 100644
+--- a/src/NvFetcher/ExtractSrc.hs
++++ b/src/NvFetcher/ExtractSrc.hs
+@@ -2,38 +2,43 @@
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE ScopedTypeVariables #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+---
+--- This module provides function that extracts files contents from package sources.
+--- Because we use @nix-instantiate@ to build drv, so @<nixpkgs>@ (@NIX_PATH@) is required.
+-module NvFetcher.ExtractSrc
+-  ( -- * Types
+-    ExtractSrcQ (..),
+-    Glob (..),
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
+ 
+-    -- * Rules
+-    extractSrcRule,
++This module provides function that extracts files contents from package sources.
++Because we use @nix-instantiate@ to build drv, so @<nixpkgs>@ (@NIX_PATH@) is required.
++-}
++module NvFetcher.ExtractSrc (
++  -- * Types
++  ExtractSrcQ (..),
++  Glob (..),
+ 
+-    -- * Functions
+-    extractSrc,
+-    extractSrcs,
+-  )
++  -- * Rules
++  extractSrcRule,
++
++  -- * Functions
++  extractSrc,
++  extractSrcs,
++)
+ where
+ 
++import Control.Exception (ErrorCall)
+ import Control.Monad (filterM, forM, join, void, when)
+ import Control.Monad.Extra (unlessM)
+ import Data.Binary.Instances ()
+ import Data.Coerce (coerce)
++import Data.HashMap.Internal.Array (run)
+ import Data.HashMap.Strict (HashMap)
+ import qualified Data.HashMap.Strict as HM
+ import Data.List (intercalate)
+ import qualified Data.List.NonEmpty as NE
+ import qualified Data.Text as T
++import Data.Text.Internal.Read (IParser (runP))
+ import Development.Shake
++import Development.Shake.Command (CmdArguments, IsCmdArgument)
+ import Development.Shake.FilePath (makeRelative, (</>))
+ import NvFetcher.NixExpr
+ import NvFetcher.Types
+@@ -76,7 +81,7 @@ extractSrcRule = void $
+                     let dst = (T.unpack . T.replace "/" "_" . coerce $ _sha256 fetcher) </> file
+                     copyFile' (out </> file) (buildDir </> dst)
+                     pure (file, dst)
+-                | glob <- NE.toList files
++              | glob <- NE.toList files
+               ]
+           )
+ 
+diff --git a/src/NvFetcher/GetGitCommitDate.hs b/src/NvFetcher/GetGitCommitDate.hs
+index de34402..e262e0e 100644
+--- a/src/NvFetcher/GetGitCommitDate.hs
++++ b/src/NvFetcher/GetGitCommitDate.hs
+@@ -1,26 +1,27 @@
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE ViewPatterns #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+---
+--- This module provides mechanisms for obtaining the git commit date.
+--- The cloned repo will not be preserved.
+-module NvFetcher.GetGitCommitDate
+-  ( -- * Types
+-    GitDateFormat (..),
+-    GetGitCommitDate (..),
+-    GitTimeZone (..),
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
+ 
+-    -- * Rules
+-    getGitCommitDateRule,
++This module provides mechanisms for obtaining the git commit date.
++The cloned repo will not be preserved.
++-}
++module NvFetcher.GetGitCommitDate (
++  -- * Types
++  GitDateFormat (..),
++  GetGitCommitDate (..),
++  GitTimeZone (..),
+ 
+-    -- * Functions
+-    getGitCommitDate,
+-  )
++  -- * Rules
++  getGitCommitDateRule,
++
++  -- * Functions
++  getGitCommitDate,
++)
+ where
+ 
+ import Control.Monad (void)
+diff --git a/src/NvFetcher/NixExpr.hs b/src/NvFetcher/NixExpr.hs
+index 392cd3b..2957d79 100644
+--- a/src/NvFetcher/NixExpr.hs
++++ b/src/NvFetcher/NixExpr.hs
+@@ -7,19 +7,21 @@
+ {-# LANGUAGE ScopedTypeVariables #-}
+ {-# LANGUAGE ViewPatterns #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+---
+--- This module contains a type class 'ToNixExpr' and some its instances associated with either Haskell
+--- primitive types or our "NvFetcher.Types".
+-module NvFetcher.NixExpr
+-  ( NixExpr,
+-    ToNixExpr (..),
+-    fetcherToDrv,
+-  )
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
++
++This module contains a type class 'ToNixExpr' and some its instances associated with either Haskell
++primitive types or our "NvFetcher.Types".
++-}
++module NvFetcher.NixExpr (
++  NixExpr,
++  ToNixExpr (..),
++  fetcherToDrv,
++  fetcherToExtractDrv,
++)
+ where
+ 
+ import Data.Coerce (coerce)
+@@ -62,14 +64,14 @@ instance ToNixExpr Version where
+ nixFetcher :: NixFetcher Fetched -> NixExpr
+ nixFetcher = \case
+   FetchGit
+-    { _sha256 = coerce quote -> sha256,
+-      _rev = quote . toNixExpr -> rev,
+-      _fetchSubmodules = toNixExpr -> fetchSubmodules,
+-      _deepClone = toNixExpr -> deepClone,
+-      _leaveDotGit = toNixExpr -> leaveDotGit,
+-      _sparseCheckout = toNixExpr . map quote -> sparseCheckout,
+-      _furl = quote -> url,
+-      _name = nameField -> n
++    { _sha256 = coerce quote -> sha256
++    , _rev = quote . toNixExpr -> rev
++    , _fetchSubmodules = toNixExpr -> fetchSubmodules
++    , _deepClone = toNixExpr -> deepClone
++    , _leaveDotGit = toNixExpr -> leaveDotGit
++    , _sparseCheckout = toNixExpr . map quote -> sparseCheckout
++    , _furl = quote -> url
++    , _name = nameField -> n
+     } ->
+       [trimming|
+           fetchgit {
+@@ -83,15 +85,15 @@ nixFetcher = \case
+           }
+     |]
+   FetchGitHub
+-    { _sha256 = coerce quote -> sha256,
+-      _rev = quote . toNixExpr -> rev,
+-      _fetchSubmodules = toNixExpr -> fetchSubmodules,
+-      _deepClone = toNixExpr -> deepClone,
+-      _leaveDotGit = toNixExpr -> leaveDotGit,
+-      _sparseCheckout = toNixExpr . map quote -> sparseCheckout,
+-      _fowner = quote -> owner,
+-      _frepo = quote -> repo,
+-      _name = nameField -> n
++    { _sha256 = coerce quote -> sha256
++    , _rev = quote . toNixExpr -> rev
++    , _fetchSubmodules = toNixExpr -> fetchSubmodules
++    , _deepClone = toNixExpr -> deepClone
++    , _leaveDotGit = toNixExpr -> leaveDotGit
++    , _sparseCheckout = toNixExpr . map quote -> sparseCheckout
++    , _fowner = quote -> owner
++    , _frepo = quote -> repo
++    , _name = nameField -> n
+     } ->
+       -- TODO: fix fetchFromGitHub in Nixpkgs so that deepClone, leaveDotGit
+       -- and sparseCheckout won't get passed to fetchzip
+@@ -134,15 +136,15 @@ nixFetcher = \case
+           }
+     |]
+   FetchDocker
+-    { _imageName = quote . toNixExpr -> imageName,
+-      _imageTag = quote . toNixExpr -> imageTag,
+-      _imageDigest = ContainerDigest (quote . toNixExpr -> imageDigest),
+-      _sha256 = coerce quote -> sha256,
+-      _fos = optionalStr "os" -> os,
+-      _farch = optionalStr "arch" -> arch,
+-      _finalImageName = optionalStr "finalImageName" -> finalImageName,
+-      _finalImageTag = maybe imageTag (quote . toNixExpr) -> finalImageTag,
+-      _tlsVerify = optionalField "tlsVerify" -> tlsVerify
++    { _imageName = quote . toNixExpr -> imageName
++    , _imageTag = quote . toNixExpr -> imageTag
++    , _imageDigest = ContainerDigest (quote . toNixExpr -> imageDigest)
++    , _sha256 = coerce quote -> sha256
++    , _fos = optionalStr "os" -> os
++    , _farch = optionalStr "arch" -> arch
++    , _finalImageName = optionalStr "finalImageName" -> finalImageName
++    , _finalImageTag = maybe imageTag (quote . toNixExpr) -> finalImageTag
++    , _tlsVerify = optionalField "tlsVerify" -> tlsVerify
+     } ->
+       [trimming|
+             dockerTools.pullImage {
+@@ -152,13 +154,14 @@ nixFetcher = \case
+               finalImageTag = $finalImageTag;$os$arch$finalImageName$tlsVerify
+             }
+       |]
+-  where
+-    optionalField n = maybe "" (\x -> "\n" <> n <> " = " <> toNixExpr x <> ";")
+-    optionalStr n = optionalField n . fmap quote
+-    nameField = optionalStr "name"
++ where
++  optionalField n = maybe "" (\x -> "\n" <> n <> " = " <> toNixExpr x <> ";")
++  optionalStr n = optionalField n . fmap quote
++  nameField = optionalStr "name"
+ 
+--- | Create a trivial drv that extracts the source from a fetcher
+--- TODO: Avoid using @NIX_PATH@
++{- | Create a trivial drv that extracts the source from a fetcher
++TODO: Avoid using @NIX_PATH@
++-}
+ fetcherToDrv :: NixFetcher Fetched -> Text -> NixExpr
+ fetcherToDrv (toNixExpr -> fetcherExpr) (quote -> drvName) =
+   [trimming|
+@@ -175,21 +178,43 @@ fetcherToDrv (toNixExpr -> fetcherExpr) (quote -> drvName) =
+     }
+   |]
+ 
+--- | nix expr snippet like:
+---
+--- @
+--- feeluown-core = {
+---     pname = "feeluown-core";
+---     version = "3.7.7";
+---     src = fetchurl {
+---       sha256 = "06d3j39ff9znqxkhp9ly81lcgajkhg30hyqxy2809yn23xixg3x2";
+---       url = "https://pypi.io/packages/source/f/feeluown/feeluown-3.7.7.tar.gz";
+---     };
+---     a = "B";
+---   };
+--- @
++-- | Create a trivial nix derivation that runs the fetcher and extracts the source. This is used in 'NvFetcher.ExtractSrc' to extract files from the source.
++fetcherToExtractDrv :: NixFetcher Fetched -> Text -> FilePath -> NixExpr
++fetcherToExtractDrv (toNixExpr -> fetcherExpr) (appName) (fileExpr) =
++  [trimming|
++    with import <nixpkgs> { };
++    stdenv.mkDerivation {
++      name = "extract-app-name";
++      src = $fetcherExpr;
++      nativeBuildInputs = [ $appNameExpr cacert  unzip ];
++      dontBuild = true;
++      installPhase = ''
++        echo $file
++        $appNameQuoted $file > $$out
++      '';
++    }
++  |]
++ where
++  file = quote . T.pack $ fileExpr
++  appNameQuoted = quoteIfNeeds appName
++  appNameExpr = toNixExpr appName
++
++{- | nix expr snippet like:
++
++@
++feeluown-core = {
++    pname = "feeluown-core";
++    version = "3.7.7";
++    src = fetchurl {
++      sha256 = "06d3j39ff9znqxkhp9ly81lcgajkhg30hyqxy2809yn23xixg3x2";
++      url = "https://pypi.io/packages/source/f/feeluown/feeluown-3.7.7.tar.gz";
++    };
++    a = "B";
++  };
++@
++-}
+ instance ToNixExpr PackageResult where
+-  toNixExpr PackageResult {..} =
++  toNixExpr PackageResult{..} =
+     [trimming|
+         $name = {
+           pname = $nameString;
+@@ -197,46 +222,49 @@ instance ToNixExpr PackageResult where
+           src = $src;$appending
+         };
+     |]
+-    where
+-      name = quoteIfNeeds _prname
+-      nameString = quote _prname
+-      version = quote . coerce . nvNow $ _prversion
+-      src = toNixExpr _prfetched
+-      extract =
+-        maybe
+-          ""
+-          ( \ex ->
+-              T.unlines
+-                [ quoteIfNeeds (T.pack src)
+-                    <> " = ./. + "
+-                    <> quote ("/" <> T.pack dst)
+-                    <> ";"
+-                  | (src, dst) <- HMap.toList ex
+-                ]
+-          )
+-          _prextract
+-      extracted' =
+-        if T.null extract
+-          then ""
+-          else
+-            [trimming|
++   where
++    name = quoteIfNeeds _prname
++    nameString = quote _prname
++    version = quote . coerce . nvNow $ _prversion
++    src = toNixExpr _prfetched
++    extract =
++      maybe
++        ""
++        ( \ex ->
++            T.unlines
++              [ quoteIfNeeds (T.pack src)
++                  <> " = ./. + "
++                  <> quote ("/" <> T.pack dst)
++                  <> ";"
++              | (src, dst) <- HMap.toList ex
++              ]
++        )
++        _prextract
++    extracted' =
++      if T.null extract
++        then ""
++        else
++          [trimming|
+               extract = {
+                 $extract
+               };
+             |]
+-      cargo = fromMaybe "" $ do
+-        cargoLocks <- _prcargolock
+-        let depsSnippet (deps :: HashMap Text Checksum) =
+-              T.unlines
+-                [ quoteIfNeeds name
+-                    <> " = "
+-                    <> quote (coerce sum)
+-                    <> ";"
+-                  | (name, sum) <- HMap.toList deps
+-                ]
+-            lockSnippet ((T.pack -> src) :: FilePath, ((T.pack -> dst) :: FilePath, deps :: HashMap Text Checksum)) =
+-              let hashes = depsSnippet deps
+-               in [trimming|
++    prefetched = maybe "" (\pf -> "prefetch = {\n" <> pf' pf <> "\n};") _prprefetchFiles
++     where
++      pf' pf = T.unlines [quoteIfNeeds (T.pack src) <> " = " <> quote v <> ";" | (src, Just v) <- HMap.toList pf]
++    cargo = fromMaybe "" $ do
++      cargoLocks <- _prcargolock
++      let depsSnippet (deps :: HashMap Text Checksum) =
++            T.unlines
++              [ quoteIfNeeds name
++                  <> " = "
++                  <> quote (coerce sum)
++                  <> ";"
++              | (name, sum) <- HMap.toList deps
++              ]
++          lockSnippet ((T.pack -> src) :: FilePath, ((T.pack -> dst) :: FilePath, deps :: HashMap Text Checksum)) =
++            let hashes = depsSnippet deps
++             in [trimming|
+                     cargoLock."$src" = {
+                       lockFile = ./. + "/$dst";
+                       outputHashes = {
+@@ -244,20 +272,20 @@ instance ToNixExpr PackageResult where
+                       };
+                     };
+                 |]
+-        pure . T.unlines $ lockSnippet <$> HMap.toList cargoLocks
+-      passthru =
+-        maybe
+-          ""
+-          ( \pt ->
+-              T.unlines
+-                [ quoteIfNeeds k
+-                    <> " = "
+-                    <> v
+-                    <> ";"
+-                  | (k, quote -> v) <- HMap.toList pt
+-                ]
+-          )
+-          _prpassthru
+-      date = maybe "" (\d -> "date = " <> quote d <> ";") _prgitdate
+-      joined = extracted' <> cargo <> passthru <> date
+-      appending = if T.null joined then "" else "\n" <> joined
++      pure . T.unlines $ lockSnippet <$> HMap.toList cargoLocks
++    passthru =
++      maybe
++        ""
++        ( \pt ->
++            T.unlines
++              [ quoteIfNeeds k
++                  <> " = "
++                  <> v
++                  <> ";"
++              | (k, quote -> v) <- HMap.toList pt
++              ]
++        )
++        _prpassthru
++    date = maybe "" (\d -> "date = " <> quote d <> ";") _prgitdate
++    joined = extracted' <> cargo <> passthru <> date <> prefetched
++    appending = if T.null joined then "" else "\n" <> joined
+diff --git a/src/NvFetcher/PackageSet.hs b/src/NvFetcher/PackageSet.hs
+index 4034682..3908e98 100644
+--- a/src/NvFetcher/PackageSet.hs
++++ b/src/NvFetcher/PackageSet.hs
+@@ -13,105 +13,106 @@
+ {-# LANGUAGE UndecidableInstances #-}
+ {-# LANGUAGE ViewPatterns #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+---
+--- This module mainly contains two things: 'PackageSet' and 'PkgDSL'.
+--- NvFetcher accepts the former one -- a set of packages to produce nix sources expr;
+--- the later one is used to construct a single package.
+---
+--- There are many combinators for defining packages. See the documentation of 'define' for example.
+-module NvFetcher.PackageSet
+-  ( -- * Package set
+-    PackageSetF,
+-    PackageSet,
+-    newPackage,
+-    purePackageSet,
+-    runPackageSet,
+-
+-    -- * Package DSL
+-
+-    -- ** Primitives
+-    PkgDSL (..),
+-    define,
+-    package,
+-    src,
+-    fetch,
+-
+-    -- ** Two-in-one functions
+-    fromGitHub,
+-    fromGitHub',
+-    fromGitHubTag,
+-    fromGitHubTag',
+-    fromPypi,
+-    fromOpenVsx,
+-    fromVscodeMarketplace,
+-
+-    -- ** Version sources
+-    sourceGitHub,
+-    sourceGitHub',
+-    sourceGitHubTag,
+-    sourceGit,
+-    sourceGit',
+-    sourcePypi,
+-    sourceAur,
+-    sourceArchLinux,
+-    sourceManual,
+-    sourceRepology,
+-    sourceWebpage,
+-    sourceHttpHeader,
+-    sourceOpenVsx,
+-    sourceVscodeMarketplace,
+-    sourceCmd,
+-
+-    -- ** Fetchers
+-    fetchGitHub,
+-    fetchGitHub',
+-    fetchGitHubRelease,
+-    fetchGitHubRelease',
+-    fetchPypi,
+-    fetchGit,
+-    fetchGit',
+-    fetchUrl,
+-    fetchUrl',
+-    fetchOpenVsx,
+-    fetchVscodeMarketplace,
+-    fetchTarball,
+-
+-    -- * Addons
+-    extractSource,
+-    hasCargoLock,
+-    tweakVersion,
+-    passthru,
+-    pinned,
+-    gitDateFormat,
+-    gitTimeZone,
+-    forceFetch,
+-
+-    -- ** Miscellaneous
+-    Prod,
+-    Append,
+-    Member,
+-    OptionalMember,
+-    NotElem,
+-    Members,
+-    OptionalMembers,
+-    Attach,
+-    AttachMany,
+-    coerce,
+-    liftIO,
+-
+-    -- * Lenses
+-    (&),
+-    (.~),
+-    (%~),
+-    (^.),
+-    (?~),
+-    module NvFetcher.Types.Lens,
+-  )
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
++
++This module mainly contains two things: 'PackageSet' and 'PkgDSL'.
++NvFetcher accepts the former one -- a set of packages to produce nix sources expr;
++the later one is used to construct a single package.
++
++There are many combinators for defining packages. See the documentation of 'define' for example.
++-}
++module NvFetcher.PackageSet (
++  -- * Package set
++  PackageSetF,
++  PackageSet,
++  newPackage,
++  purePackageSet,
++  runPackageSet,
++
++  -- * Package DSL
++
++  -- ** Primitives
++  PkgDSL (..),
++  define,
++  package,
++  src,
++  fetch,
++
++  -- ** Two-in-one functions
++  fromGitHub,
++  fromGitHub',
++  fromGitHubTag,
++  fromGitHubTag',
++  fromPypi,
++  fromOpenVsx,
++  fromVscodeMarketplace,
++
++  -- ** Version sources
++  sourceGitHub,
++  sourceGitHub',
++  sourceGitHubTag,
++  sourceGit,
++  sourceGit',
++  sourcePypi,
++  sourceAur,
++  sourceArchLinux,
++  sourceManual,
++  sourceRepology,
++  sourceWebpage,
++  sourceHttpHeader,
++  sourceOpenVsx,
++  sourceVscodeMarketplace,
++  sourceCmd,
++
++  -- ** Fetchers
++  fetchGitHub,
++  fetchGitHub',
++  fetchGitHubRelease,
++  fetchGitHubRelease',
++  fetchPypi,
++  fetchGit,
++  fetchGit',
++  fetchUrl,
++  fetchUrl',
++  fetchOpenVsx,
++  fetchVscodeMarketplace,
++  fetchTarball,
++
++  -- * Addons
++  extractSource,
++  hasCargoLock,
++  tweakVersion,
++  passthru,
++  pinned,
++  gitDateFormat,
++  gitTimeZone,
++  forceFetch,
++
++  -- ** Miscellaneous
++  Prod,
++  Append,
++  Member,
++  OptionalMember,
++  NotElem,
++  Members,
++  OptionalMembers,
++  Attach,
++  AttachMany,
++  coerce,
++  liftIO,
++
++  -- * Lenses
++  (&),
++  (.~),
++  (%~),
++  (^.),
++  (?~),
++  module NvFetcher.Types.Lens,
++)
+ where
+ 
+ import Control.Monad.Free
+@@ -141,13 +142,14 @@ instance Functor PackageSetF where
+   fmap f (NewPackage p g) = NewPackage p $ f g
+   fmap f (EmbedIO action g) = EmbedIO action $ f <$> g
+ 
+--- | Package set is a monad equipped with two capabilities:
+---
+--- 1. Carry defined packages
+--- 2. Run IO actions
+---
+--- Package set is evaluated before shake runs.
+--- Use 'newPackage' to add a new package, 'liftIO' to run an IO action.
++{- | Package set is a monad equipped with two capabilities:
++
++1. Carry defined packages
++2. Run IO actions
++
++Package set is evaluated before shake runs.
++Use 'newPackage' to add a new package, 'liftIO' to run an IO action.
++-}
+ type PackageSet = Free PackageSetF
+ 
+ instance MonadIO PackageSet where
+@@ -159,23 +161,25 @@ newPackage ::
+   CheckVersion ->
+   PackageFetcher ->
+   Maybe PackageExtractSrc ->
++  Maybe PackagePrefetchFiles ->
+   Maybe PackageCargoLockFiles ->
+   PackagePassthru ->
+   UseStaleVersion ->
+   (GitDateFormat, GitTimeZone) ->
+   ForceFetch ->
+   PackageSet ()
+-newPackage name source fetcher extract cargo pasthru useStale (format, tz) force =
+-  liftF $ NewPackage (Package name source fetcher extract cargo pasthru useStale (format, tz) force) ()
++newPackage name source fetcher extract prefetch cargo pasthru useStale (format, tz) force =
++  liftF $ NewPackage (Package name source fetcher extract cargo prefetch pasthru useStale (format, tz) force) ()
+ 
+ -- | Add a list of packages into package set
+ purePackageSet :: [Package] -> PackageSet ()
+ purePackageSet = mapM_ (liftF . flip NewPackage ())
+ 
+--- | Run package set into a set of packages
+---
+--- Throws exception as more then one packages with the same name
+--- are defined
++{- | Run package set into a set of packages
++
++Throws exception as more then one packages with the same name
++are defined
++-}
+ runPackageSet :: PackageSet () -> IO (Map PackageKey Package)
+ runPackageSet = \case
+   Free (NewPackage p g) ->
+@@ -254,20 +258,21 @@ class PkgDSL f where
+   andThen :: f (Prod r) -> f a -> f (Prod (a ': r))
+   end ::
+     ( Members
+-        '[ PackageName,
+-           VersionSource,
+-           PackageFetcher
++        '[ PackageName
++         , VersionSource
++         , PackageFetcher
+          ]
+-        r,
+-      OptionalMembers
+-        '[ PackageExtractSrc,
+-           PackageCargoLockFiles,
+-           NvcheckerOptions,
+-           PackagePassthru,
+-           UseStaleVersion,
+-           GitDateFormat,
+-           GitTimeZone,
+-           ForceFetch
++        r
++    , OptionalMembers
++        '[ PackageExtractSrc
++         , PackageCargoLockFiles
++         , PackagePrefetchFiles
++         , NvcheckerOptions
++         , PackagePassthru
++         , UseStaleVersion
++         , GitDateFormat
++         , GitTimeZone
++         , ForceFetch
+          ]
+         r
+     ) =>
+@@ -290,34 +295,37 @@ instance PkgDSL PackageSet where
+       (proj p)
+       (projMaybe p)
+       (projMaybe p)
++      (projMaybe p)
+       (fromMaybe mempty (projMaybe p))
+       (fromMaybe NoStale (projMaybe p))
+       (fromMaybe (GitDateFormat Nothing) (projMaybe p), fromMaybe (GitTimeZone Nothing) (projMaybe p))
+       (fromMaybe NoForceFetch (projMaybe p))
+ 
+--- | 'PkgDSL' version of 'newPackage'
+---
+--- Example:
+---
+--- @
+--- define $ package "nvfetcher-git" `sourceGit` "https://github.com/berberman/nvfetcher" `fetchGitHub` ("berberman", "nvfetcher")
+--- @
++{- | 'PkgDSL' version of 'newPackage'
++
++Example:
++
++@
++define $ package "nvfetcher-git" `sourceGit` "https://github.com/berberman/nvfetcher" `fetchGitHub` ("berberman", "nvfetcher")
++@
++-}
+ define ::
+   ( Members
+-      '[ PackageName,
+-         VersionSource,
+-         PackageFetcher
++      '[ PackageName
++       , VersionSource
++       , PackageFetcher
+        ]
+-      r,
+-    OptionalMembers
+-      '[ PackageExtractSrc,
+-         PackageCargoLockFiles,
+-         PackagePassthru,
+-         NvcheckerOptions,
+-         UseStaleVersion,
+-         GitDateFormat,
+-         GitTimeZone,
+-         ForceFetch
++      r
++  , OptionalMembers
++      '[ PackageExtractSrc
++       , PackageCargoLockFiles
++       , PackagePrefetchFiles
++       , PackagePassthru
++       , NvcheckerOptions
++       , UseStaleVersion
++       , GitDateFormat
++       , GitTimeZone
++       , ForceFetch
+        ]
+       r
+   ) =>
+@@ -367,8 +375,8 @@ fromOpenVsx :: AttachMany '[PackagePassthru, PackageFetcher, VersionSource] (Tex
+ fromOpenVsx e x@(publisher, extName) =
+   passthru
+     (fetchOpenVsx (sourceOpenVsx e x) x)
+-    [ ("name", extName),
+-      ("publisher", publisher)
++    [ ("name", extName)
++    , ("publisher", publisher)
+     ]
+ 
+ -- | A synonym of 'fetchVscodeMarketplace', 'sourceVscodeMarketplace', and 'passthru' extension's publisher with name
+@@ -376,8 +384,8 @@ fromVscodeMarketplace :: AttachMany '[PackagePassthru, PackageFetcher, VersionSo
+ fromVscodeMarketplace e x@(publisher, extName) =
+   passthru
+     (fetchVscodeMarketplace (sourceVscodeMarketplace e x) x)
+-    [ ("name", extName),
+-      ("publisher", publisher)
++    [ ("name", extName)
++    , ("publisher", publisher)
+     ]
+ 
+ --------------------------------------------------------------------------------
+@@ -390,161 +398,186 @@ sourceGitHub e (owner, repo) = src e $ GitHubRelease owner repo False
+ sourceGitHub' :: Attach VersionSource (Text, Text, Bool)
+ sourceGitHub' e (owner, repo, prerelease) = src e $ GitHubRelease owner repo prerelease
+ 
+--- | This package follows the a tag from github
+---
+--- Args are owner, repo, and nvchecker list options to find the target tag
++{- | This package follows the a tag from github
++
++Args are owner, repo, and nvchecker list options to find the target tag
++-}
+ sourceGitHubTag :: Attach VersionSource (Text, Text, ListOptions -> ListOptions)
+ sourceGitHubTag e (owner, repo, f) = src e $ GitHubTag owner repo $ f def
+ 
+--- | This package follows the latest git commit
+---
+--- Arg is git url
++{- | This package follows the latest git commit
++
++Arg is git url
++-}
+ sourceGit :: Attach VersionSource Text
+ sourceGit e _vurl = src e $ Git _vurl def
+ 
+--- | Similar to 'sourceGit', but allows to specify branch
+---
+--- Args are git url and branch
++{- | Similar to 'sourceGit', but allows to specify branch
++
++Args are git url and branch
++-}
+ sourceGit' :: Attach VersionSource (Text, Text)
+-sourceGit' e (_vurl, coerce . Just -> _vbranch) = src e $ Git {..}
++sourceGit' e (_vurl, coerce . Just -> _vbranch) = src e $ Git{..}
++
++{- | This package follows the latest pypi release
+ 
+--- | This package follows the latest pypi release
+---
+--- Arg is pypi name
++Arg is pypi name
++-}
+ sourcePypi :: Attach VersionSource Text
+-sourcePypi e _pypi = src e Pypi {..}
++sourcePypi e _pypi = src e Pypi{..}
++
++{- | This package follows the version of an Arch Linux package
+ 
+--- | This package follows the version of an Arch Linux package
+---
+--- Arg is package name in Arch Linux repo
++Arg is package name in Arch Linux repo
++-}
+ sourceArchLinux :: Attach VersionSource Text
+-sourceArchLinux e _archpkg = src e ArchLinux {..}
++sourceArchLinux e _archpkg = src e ArchLinux{..}
+ 
+--- | This package follows the version of an Aur package
+---
+--- Arg is package name in Aur
++{- | This package follows the version of an Aur package
++
++Arg is package name in Aur
++-}
+ sourceAur :: Attach VersionSource Text
+-sourceAur e _aur = src e Aur {..}
++sourceAur e _aur = src e Aur{..}
++
++{- | This package follows a pinned version
+ 
+--- | This package follows a pinned version
+---
+--- Arg is manual version
++Arg is manual version
++-}
+ sourceManual :: Attach VersionSource Text
+-sourceManual e _manual = src e Manual {..}
++sourceManual e _manual = src e Manual{..}
+ 
+--- | This package follows the version of a repology package
+---
+--- Args are repology project name and repo
++{- | This package follows the version of a repology package
++
++Args are repology project name and repo
++-}
+ sourceRepology :: Attach VersionSource (Text, Text)
+ sourceRepology e (project, repo) = src e $ Repology project repo
+ 
+--- | This package follows a version extracted from web page
+---
+--- Args are web page url, regex, and list options
++{- | This package follows a version extracted from web page
++
++Args are web page url, regex, and list options
++-}
+ sourceWebpage :: Attach VersionSource (Text, Text, ListOptions -> ListOptions)
+ sourceWebpage e (_vurl, _regex, f) = src e $ Webpage _vurl _regex $ f def
+ 
+--- | This package follows a version extracted from http header
+---
+--- Args are the url of the http request, regex, and list options
++{- | This package follows a version extracted from http header
++
++Args are the url of the http request, regex, and list options
++-}
+ sourceHttpHeader :: Attach VersionSource (Text, Text, ListOptions -> ListOptions)
+ sourceHttpHeader e (_vurl, _regex, f) = src e $ HttpHeader _vurl _regex $ f def
+ 
+--- | This package follows a version in Open VSX
+---
+--- Args are publisher and extension name
++{- | This package follows a version in Open VSX
++
++Args are publisher and extension name
++-}
+ sourceOpenVsx :: Attach VersionSource (Text, Text)
+-sourceOpenVsx e (_ovPublisher, _ovExtName) = src e OpenVsx {..}
++sourceOpenVsx e (_ovPublisher, _ovExtName) = src e OpenVsx{..}
++
++{- | This package follows a version in Vscode Marketplace
+ 
+--- | This package follows a version in Vscode Marketplace
+---
+--- Args are publisher and extension name
++Args are publisher and extension name
++-}
+ sourceVscodeMarketplace :: Attach VersionSource (Text, Text)
+-sourceVscodeMarketplace e (_vsmPublisher, _vsmExtName) = src e VscodeMarketplace {..}
++sourceVscodeMarketplace e (_vsmPublisher, _vsmExtName) = src e VscodeMarketplace{..}
+ 
+--- | This package follows a version from a shell command
+---
+--- Arg is the command to run
++{- | This package follows a version from a shell command
++
++Arg is the command to run
++-}
+ sourceCmd :: Attach VersionSource Text
+-sourceCmd e _vcmd = src e Cmd {..}
++sourceCmd e _vcmd = src e Cmd{..}
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | This package is fetched from a github repo
+---
+--- Args are owner and repo
++{- | This package is fetched from a github repo
++
++Args are owner and repo
++-}
+ fetchGitHub :: Attach PackageFetcher (Text, Text)
+ fetchGitHub e (owner, repo) = fetchGitHub' e (owner, repo, id)
+ 
+--- | This package is fetched from a github repo
+---
+--- Similar to 'fetchGitHub', but allows a modifier to the fetcher.
+--- For example, you can enable fetch submodules like:
+---
+--- @
+--- define $ package "qliveplayer" `sourceGitHub` ("THMonster", "QLivePlayer") `fetchGitHub'` ("THMonster", "QLivePlayer", fetchSubmodules .~ True)
+--- @
++{- | This package is fetched from a github repo
++
++Similar to 'fetchGitHub', but allows a modifier to the fetcher.
++For example, you can enable fetch submodules like:
++
++@
++define $ package "qliveplayer" `sourceGitHub` ("THMonster", "QLivePlayer") `fetchGitHub'` ("THMonster", "QLivePlayer", fetchSubmodules .~ True)
++@
++-}
+ fetchGitHub' :: Attach PackageFetcher (Text, Text, NixFetcher Fresh -> NixFetcher Fresh)
+ fetchGitHub' e (owner, repo, f) = fetch e $ f . gitHubFetcher (owner, repo)
+ 
+--- | This package is fetched from a file in github release
+---
+--- Args are owner, repo, and file name
++{- | This package is fetched from a file in github release
++
++Args are owner, repo, and file name
++-}
+ fetchGitHubRelease :: Attach PackageFetcher (Text, Text, Text)
+ fetchGitHubRelease e (owner, repo, fp) = fetch e $ gitHubReleaseFetcher (owner, repo) fp
+ 
+--- | This package is fetched from a file in github release
+---
+--- Args are owner, repo, and file name computed from version
++{- | This package is fetched from a file in github release
++
++Args are owner, repo, and file name computed from version
++-}
+ fetchGitHubRelease' :: Attach PackageFetcher (Text, Text, Version -> Text)
+ fetchGitHubRelease' e (owner, repo, f) = fetch e $ gitHubReleaseFetcher' (owner, repo) f
+ 
+--- | This package is fetched from pypi
+---
+--- Arg is pypi name
++{- | This package is fetched from pypi
++
++Arg is pypi name
++-}
+ fetchPypi :: Attach PackageFetcher Text
+ fetchPypi e = fetch e . pypiFetcher
+ 
+--- | This package is fetched from git
+---
+--- Arg is git url
++{- | This package is fetched from git
++
++Arg is git url
++-}
+ fetchGit :: Attach PackageFetcher Text
+ fetchGit e u = fetchGit' e (u, id)
+ 
+--- | This package is fetched from git
+---
+--- Similar to 'fetchGit', but allows a modifier to the fetcher.
+--- See 'fetchGitHub'' for a concret example.
++{- | This package is fetched from git
++
++Similar to 'fetchGit', but allows a modifier to the fetcher.
++See 'fetchGitHub'' for a concret example.
++-}
+ fetchGit' :: Attach PackageFetcher (Text, NixFetcher Fresh -> NixFetcher Fresh)
+ fetchGit' e (u, f) = fetch e $ f . gitFetcher u
+ 
+--- | This package is fetched from url
+---
+--- Arg is a function which constructs the url from a version
++{- | This package is fetched from url
++
++Arg is a function which constructs the url from a version
++-}
+ fetchUrl :: Attach PackageFetcher (Version -> Text)
+ fetchUrl e f = fetch e (urlFetcher . f)
+ 
+--- | This package is fetched from url
+---
+--- Args are a function which constructs the url from a version and a file name
++{- | This package is fetched from url
++
++Args are a function which constructs the url from a version and a file name
++-}
+ fetchUrl' :: Attach PackageFetcher (Text, Version -> Text)
+ fetchUrl' e (name, f) = fetch e (\v -> FetchUrl (f v) (Just name) ())
+ 
+--- | This package is fetched from Open VSX
+---
+--- Args are publisher and extension name
++{- | This package is fetched from Open VSX
++
++Args are publisher and extension name
++-}
+ fetchOpenVsx :: Attach PackageFetcher (Text, Text)
+ fetchOpenVsx e = fetch e . vscodeMarketplaceFetcher
+ 
+--- | This package is fetched from Vscode Marketplace
+---
+--- Args are publisher and extension name
++{- | This package is fetched from Vscode Marketplace
++
++Args are publisher and extension name
++-}
+ fetchVscodeMarketplace :: Attach PackageFetcher (Text, Text)
+ fetchVscodeMarketplace e = fetch e . vscodeMarketplaceFetcher
+ 
+--- | This package is a tarball, fetched from url
+---
+--- Arg is a function which constructs the url from a version
++{- | This package is a tarball, fetched from url
++
++Arg is a function which constructs the url from a version
++-}
+ fetchTarball :: Attach PackageFetcher (Version -> Text)
+ fetchTarball e f = fetch e (tarballFetcher . f)
+ 
+@@ -554,9 +587,10 @@ fetchTarball e f = fetch e (tarballFetcher . f)
+ extractSource :: Attach PackageExtractSrc [Glob]
+ extractSource = (. pure . PackageExtractSrc . NE.fromList) . andThen
+ 
+--- | Run 'FetchRustGitDependencies' given the path to @Cargo.lock@ files
+---
+--- The lock files will be extracted as well.
++{- | Run 'FetchRustGitDependencies' given the path to @Cargo.lock@ files
++
++The lock files will be extracted as well.
++-}
+ hasCargoLock :: Attach PackageCargoLockFiles [Glob]
+ hasCargoLock = (. pure . PackageCargoLockFiles . NE.fromList) . andThen
+ 
+@@ -564,27 +598,31 @@ hasCargoLock = (. pure . PackageCargoLockFiles . NE.fromList) . andThen
+ tweakVersion :: Attach NvcheckerOptions (NvcheckerOptions -> NvcheckerOptions)
+ tweakVersion = (. pure . ($ def)) . andThen
+ 
+--- | An attrs set to pass through
+---
+--- Arg is a list of kv pairs
++{- | An attrs set to pass through
++
++Arg is a list of kv pairs
++-}
+ passthru :: Attach PackagePassthru [(Text, Text)]
+ passthru = (. pure . PackagePassthru . HMap.fromList) . andThen
+ 
+--- | Pin a package
+---
+--- new version won't be checked if we have a stale version
++{- | Pin a package
++
++new version won't be checked if we have a stale version
++-}
+ pinned :: PackageSet (Prod r) -> PackageSet (Prod (UseStaleVersion : r))
+ pinned = flip andThen . pure $ PermanentStale
+ 
+--- | Specify the date format for getting git commit date
+---
+--- Available only for git version source
++{- | Specify the date format for getting git commit date
++
++Available only for git version source
++-}
+ gitDateFormat :: Attach GitDateFormat (Maybe Text)
+ gitDateFormat = (. pure . GitDateFormat) . andThen
+ 
+--- | Specify the time zone for getting git commit date
+---
+--- Available only for git version source
++{- | Specify the time zone for getting git commit date
++
++Available only for git version source
++-}
+ gitTimeZone :: Attach GitTimeZone (Maybe Text)
+ gitTimeZone = (. pure . GitTimeZone) . andThen
+ 
+diff --git a/src/NvFetcher/Types.hs b/src/NvFetcher/Types.hs
+index c35d171..9aa3a39 100644
+--- a/src/NvFetcher/Types.hs
++++ b/src/NvFetcher/Types.hs
+@@ -3,6 +3,7 @@
+ {-# LANGUAGE DeriveAnyClass #-}
+ {-# LANGUAGE DeriveGeneric #-}
+ {-# LANGUAGE DerivingVia #-}
++{-# LANGUAGE ExistentialQuantification #-}
+ {-# LANGUAGE FlexibleContexts #-}
+ {-# LANGUAGE FlexibleInstances #-}
+ {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+@@ -18,65 +19,70 @@
+ {-# LANGUAGE UndecidableInstances #-}
+ {-# LANGUAGE UndecidableSuperClasses #-}
+ 
+--- | Copyright: (c) 2021-2025 berberman
+--- SPDX-License-Identifier: MIT
+--- Maintainer: berberman <berberman@yandex.com>
+--- Stability: experimental
+--- Portability: portable
+---
+--- Types used in this program.
+-module NvFetcher.Types
+-  ( -- * Common types
+-    Version (..),
+-    Checksum (..),
+-    ContainerDigest (..),
+-    Branch (..),
+-    NixExpr,
+-    VersionChange (..),
+-    WithPackageKey (..),
+-    Glob (..),
+-
+-    -- * Nvchecker types
+-    VersionSortMethod (..),
+-    ListOptions (..),
+-    VersionSource (..),
+-    NvcheckerResult (..),
+-    NvcheckerRaw (..),
+-    CheckVersion (..),
+-    NvcheckerOptions (..),
+-    UseStaleVersion (..),
+-
+-    -- * Nix fetcher types
+-    RunFetch (..),
+-    ForceFetch (..),
+-    NixFetcher (..),
+-    FetchResult,
+-    FetchStatus (..),
+-
+-    -- * ExtractSrc Types
+-    ExtractSrcQ (..),
+-
+-    -- * FetchRustGitDeps types
+-    FetchRustGitDepsQ (..),
+-
+-    -- * GetGitCommitDate types
+-    GitDateFormat (..),
+-    GetGitCommitDate (..),
+-    GitTimeZone (..),
+-
+-    -- * Core types
+-    Core (..),
+-
+-    -- * Package types
+-    PackageName,
+-    PackageFetcher,
+-    PackageExtractSrc (..),
+-    PackageCargoLockFiles (..),
+-    PackagePassthru (..),
+-    Package (..),
+-    PackageKey (..),
+-    PackageResult (..),
+-  )
++{- | Copyright: (c) 2021-2025 berberman
++SPDX-License-Identifier: MIT
++Maintainer: berberman <berberman@yandex.com>
++Stability: experimental
++Portability: portable
++
++Types used in this program.
++-}
++module NvFetcher.Types (
++  -- * Common types
++  Version (..),
++  Checksum (..),
++  ContainerDigest (..),
++  Branch (..),
++  NixExpr,
++  VersionChange (..),
++  WithPackageKey (..),
++  Glob (..),
++
++  -- * Nvchecker types
++  VersionSortMethod (..),
++  ListOptions (..),
++  VersionSource (..),
++  NvcheckerResult (..),
++  NvcheckerRaw (..),
++  CheckVersion (..),
++  NvcheckerOptions (..),
++  UseStaleVersion (..),
++
++  -- * Nix fetcher types
++  RunFetch (..),
++  ForceFetch (..),
++  NixFetcher (..),
++  FetchResult,
++  FetchStatus (..),
++
++  -- * ExtractSrc Types
++  ExtractSrcQ (..),
++
++  -- * FetchRustGitDeps types
++  FetchRustGitDepsQ (..),
++
++  -- * Custom Prefetcher types
++  FetchCustomFetcherQ (..),
++
++  -- * GetGitCommitDate types
++  GitDateFormat (..),
++  GetGitCommitDate (..),
++  GitTimeZone (..),
++
++  -- * Core types
++  Core (..),
++
++  -- * Package types
++  PackageName,
++  PackageFetcher,
++  PackageExtractSrc (..),
++  PackageCargoLockFiles (..),
++  PackagePrefetchFiles (..),
++  PackagePassthru (..),
++  Package (..),
++  PackageKey (..),
++  PackageResult (..),
++)
+ where
+ 
+ import qualified Data.Aeson as A
+@@ -91,14 +97,16 @@ import Data.Text (Text)
+ import qualified Data.Text as T
+ import Development.Shake
+ import Development.Shake.Classes
++import Development.Shake.Command (IsCmdArgument)
+ import GHC.Generics (Generic)
+ import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
+ import Prettyprinter
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | Helper type for generating 'Show' and 'Pretty' instances
+--- Type level string @d@ denotes the string used for the default value 'Nothing'
++{- | Helper type for generating 'Show' and 'Pretty' instances
++Type level string @d@ denotes the string used for the default value 'Nothing'
++-}
+ newtype DefaultableText (d :: Symbol) = DefaultableText (Maybe Text)
+ 
+ instance (KnownSymbol d) => Show (DefaultableText d) where
+@@ -134,22 +142,23 @@ newtype Branch = Branch (Maybe Text)
+   deriving anyclass (Hashable, Binary, NFData)
+   deriving (Pretty, Show) via DefaultableText "master"
+ 
+--- | Version change of a package
+---
+--- >>> VersionChange "foo" Nothing "2.3.3"
+--- foo: ∅ → 2.3.3
+---
+--- >>> VersionChange "bar" (Just "2.2.2") "2.3.3"
+--- bar: 2.2.2 → 2.3.3
++{- | Version change of a package
++
++>>> VersionChange "foo" Nothing "2.3.3"
++foo: ∅ → 2.3.3
++
++>>> VersionChange "bar" (Just "2.2.2") "2.3.3"
++bar: 2.2.2 → 2.3.3
++-}
+ data VersionChange = VersionChange
+-  { vcName :: PackageName,
+-    vcOld :: Maybe Version,
+-    vcNew :: Version
++  { vcName :: PackageName
++  , vcOld :: Maybe Version
++  , vcNew :: Version
+   }
+   deriving (Eq)
+ 
+ instance Show VersionChange where
+-  show VersionChange {..} =
++  show VersionChange{..} =
+     T.unpack $ vcName <> ": " <> fromMaybe "∅" (coerce vcOld) <> " → " <> coerce vcNew
+ 
+ -- | Nix expression
+@@ -174,63 +183,65 @@ instance Pretty VersionSortMethod where
+ instance Default VersionSortMethod where
+   def = ParseVersion
+ 
+--- | Filter-like configuration for some version sources.
+--- See <https://nvchecker.readthedocs.io/en/latest/usage.html#list-options> for details.
++{- | Filter-like configuration for some version sources.
++See <https://nvchecker.readthedocs.io/en/latest/usage.html#list-options> for details.
++-}
+ data ListOptions = ListOptions
+-  { _includeRegex :: Maybe Text,
+-    _excludeRegex :: Maybe Text,
+-    _sortVersionKey :: Maybe VersionSortMethod,
+-    _ignored :: Maybe Text
++  { _includeRegex :: Maybe Text
++  , _excludeRegex :: Maybe Text
++  , _sortVersionKey :: Maybe VersionSortMethod
++  , _ignored :: Maybe Text
+   }
+   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData, Default)
+ 
+ isEmptyListOptions :: ListOptions -> Bool
+-isEmptyListOptions ListOptions {..} =
++isEmptyListOptions ListOptions{..} =
+   isNothing _includeRegex
+     && isNothing _excludeRegex
+     && isNothing _sortVersionKey
+     && isNothing _includeRegex
+ 
+ instance Pretty ListOptions where
+-  pretty ListOptions {..} =
++  pretty ListOptions{..} =
+     "ListOptions"
+       <> indent
+         2
+         ( vsep $
+             concat
+-              [ ppField "includeRegex" _includeRegex,
+-                ppField "excludeRegex" _excludeRegex,
+-                ppField "sortVersionKey" _sortVersionKey,
+-                ppField "ignored" _includeRegex
++              [ ppField "includeRegex" _includeRegex
++              , ppField "excludeRegex" _excludeRegex
++              , ppField "sortVersionKey" _sortVersionKey
++              , ppField "ignored" _includeRegex
+               ]
+         )
+ 
+--- | Configuration available for evey version sourece.
+--- See <https://nvchecker.readthedocs.io/en/latest/usage.html#global-options> for details.
++{- | Configuration available for evey version sourece.
++See <https://nvchecker.readthedocs.io/en/latest/usage.html#global-options> for details.
++-}
+ data NvcheckerOptions = NvcheckerOptions
+-  { _stripPrefix :: Maybe Text,
+-    _fromPattern :: Maybe Text,
+-    _toPattern :: Maybe Text
++  { _stripPrefix :: Maybe Text
++  , _fromPattern :: Maybe Text
++  , _toPattern :: Maybe Text
+   }
+   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData, Default)
+ 
+ isEmptyNvcheckerOptions :: NvcheckerOptions -> Bool
+-isEmptyNvcheckerOptions NvcheckerOptions {..} =
++isEmptyNvcheckerOptions NvcheckerOptions{..} =
+   isNothing _stripPrefix
+     && isNothing _fromPattern
+     && isNothing _toPattern
+ 
+ instance Pretty NvcheckerOptions where
+-  pretty NvcheckerOptions {..} =
++  pretty NvcheckerOptions{..} =
+     "NvcheckerOptions"
+       <> line
+       <> indent
+         2
+         ( vsep $
+             concat
+-              [ ppField "stripPrefix" _stripPrefix,
+-                ppField "fromPattern" _fromPattern,
+-                ppField "toPattern" _toPattern
++              [ ppField "stripPrefix" _stripPrefix
++              , ppField "fromPattern" _fromPattern
++              , ppField "toPattern" _toPattern
+               ]
+         )
+ 
+@@ -257,100 +268,100 @@ data VersionSource
+   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData)
+ 
+ instance Pretty VersionSource where
+-  pretty GitHubRelease {..} =
++  pretty GitHubRelease{..} =
+     "CheckGitHubRelease"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "owner" <> colon <+> pretty _owner,
+-              "repo" <> colon <+> pretty _repo
++            [ "owner" <> colon <+> pretty _owner
++            , "repo" <> colon <+> pretty _repo
+             ]
+         )
+-  pretty GitHubTag {..} =
++  pretty GitHubTag{..} =
+     "CheckGitHubTag"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "owner" <> colon <+> pretty _owner,
+-              "repo" <> colon <+> pretty _repo
++            [ "owner" <> colon <+> pretty _owner
++            , "repo" <> colon <+> pretty _repo
+             ]
+               <> ["listOptions" <> colon <+> pretty _listOptions | not $ isEmptyListOptions _listOptions]
+         )
+-  pretty Git {..} =
++  pretty Git{..} =
+     "CheckGit"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "url" <> colon <+> pretty _vurl,
+-              "branch" <> colon <+> pretty _vbranch
++            [ "url" <> colon <+> pretty _vurl
++            , "branch" <> colon <+> pretty _vbranch
+             ]
+         )
+-  pretty Pypi {..} =
++  pretty Pypi{..} =
+     "CheckPypi" <> colon <+> pretty _pypi
+-  pretty ArchLinux {..} =
++  pretty ArchLinux{..} =
+     "CheckArchLinux" <> colon <+> pretty _archpkg
+-  pretty Aur {..} =
++  pretty Aur{..} =
+     "CheckAur" <> colon <+> pretty _aur
+-  pretty Manual {..} =
++  pretty Manual{..} =
+     "CheckManual" <> colon <+> pretty _manual
+-  pretty Repology {..} =
++  pretty Repology{..} =
+     "CheckRepology"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "repology" <> colon <+> pretty _repology,
+-              "repo" <> colon <+> pretty _repo
++            [ "repology" <> colon <+> pretty _repology
++            , "repo" <> colon <+> pretty _repo
+             ]
+         )
+-  pretty Webpage {..} =
++  pretty Webpage{..} =
+     "CheckWebpage"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "url" <> colon <+> pretty _vurl,
+-              "regex" <> colon <+> pretty _regex
++            [ "url" <> colon <+> pretty _vurl
++            , "regex" <> colon <+> pretty _regex
+             ]
+               <> ["listOptions" <> colon <+> pretty _listOptions | not $ isEmptyListOptions _listOptions]
+         )
+-  pretty HttpHeader {..} =
++  pretty HttpHeader{..} =
+     "CheckHttpHeader"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "url" <> colon <+> pretty _vurl,
+-              "regex" <> colon <+> pretty _regex
++            [ "url" <> colon <+> pretty _vurl
++            , "regex" <> colon <+> pretty _regex
+             ]
+               <> ["listOptions" <> colon <+> pretty _listOptions | not $ isEmptyListOptions _listOptions]
+         )
+-  pretty OpenVsx {..} =
++  pretty OpenVsx{..} =
+     "CheckOpenVsx"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "publisher" <> colon <+> pretty _ovPublisher,
+-              "extName" <> colon <+> pretty _ovExtName
++            [ "publisher" <> colon <+> pretty _ovPublisher
++            , "extName" <> colon <+> pretty _ovExtName
+             ]
+         )
+-  pretty VscodeMarketplace {..} =
++  pretty VscodeMarketplace{..} =
+     "CheckVscodeMarketplace"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "publisher" <> colon <+> pretty _vsmPublisher,
+-              "extName" <> colon <+> pretty _vsmExtName
++            [ "publisher" <> colon <+> pretty _vsmPublisher
++            , "extName" <> colon <+> pretty _vsmExtName
+             ]
+         )
+-  pretty Cmd {..} =
++  pretty Cmd{..} =
+     "CheckCmd" <> colon <+> pretty _vcmd
+-  pretty Container {..} =
++  pretty Container{..} =
+     "CheckContainer" <> colon <+> pretty _vcontainer
+ 
+ -- | The input of nvchecker
+@@ -362,13 +373,15 @@ instance Pretty CheckVersion where
+ 
+ -- | The result of nvchecker rule
+ data NvcheckerResult = NvcheckerResult
+-  { nvNow :: Version,
+-    -- | last result of this nvchecker rule
+-    -- TODO: consider removing this field
+-    nvOld :: Maybe Version,
+-    -- | stale means even 'nvNow' comes from json file (last run)
+-    -- and we actually didn't run nvchecker this time. 'nvOld' will be 'Nothing' in this case.
+-    nvStale :: Bool
++  { nvNow :: Version
++  , nvOld :: Maybe Version
++  {- ^ last result of this nvchecker rule
++  TODO: consider removing this field
++  -}
++  , nvStale :: Bool
++  {- ^ stale means even 'nvNow' comes from json file (last run)
++  and we actually didn't run nvchecker this time. 'nvOld' will be 'Nothing' in this case.
++  -}
+   }
+   deriving (Show, Typeable, Eq, Generic, Hashable, Binary, NFData)
+ 
+@@ -387,9 +400,10 @@ type instance RuleResult CheckVersion = NvcheckerResult
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | Whether to cache the fetched sha256
+---
+--- @ForceFetch@ indicates @alwaysRerun@ the fetcher rule
++{- | Whether to cache the fetched sha256
++
++@ForceFetch@ indicates @alwaysRerun@ the fetcher rule
++-}
+ data ForceFetch = ForceFetch | NoForceFetch
+   deriving (Show, Eq, Ord, Hashable, NFData, Binary, Typeable, Generic)
+ 
+@@ -410,45 +424,45 @@ type instance RuleResult RunFetch = Maybe (NixFetcher Fetched)
+ -- | If the package is prefetched, then we can obtain the SHA256
+ data NixFetcher (k :: FetchStatus)
+   = FetchGit
+-      { _furl :: Text,
+-        _rev :: Version,
+-        _deepClone :: Bool,
+-        _fetchSubmodules :: Bool,
+-        _leaveDotGit :: Bool,
+-        _sparseCheckout :: [Text],
+-        _name :: Maybe Text,
+-        _sha256 :: FetchResult Checksum k
++      { _furl :: Text
++      , _rev :: Version
++      , _deepClone :: Bool
++      , _fetchSubmodules :: Bool
++      , _leaveDotGit :: Bool
++      , _sparseCheckout :: [Text]
++      , _name :: Maybe Text
++      , _sha256 :: FetchResult Checksum k
+       }
+   | FetchGitHub
+-      { _fowner :: Text,
+-        _frepo :: Text,
+-        _rev :: Version,
+-        _deepClone :: Bool,
+-        _fetchSubmodules :: Bool,
+-        _leaveDotGit :: Bool,
+-        _sparseCheckout :: [Text],
+-        _name :: Maybe Text,
+-        _sha256 :: FetchResult Checksum k
++      { _fowner :: Text
++      , _frepo :: Text
++      , _rev :: Version
++      , _deepClone :: Bool
++      , _fetchSubmodules :: Bool
++      , _leaveDotGit :: Bool
++      , _sparseCheckout :: [Text]
++      , _name :: Maybe Text
++      , _sha256 :: FetchResult Checksum k
+       }
+   | FetchUrl
+-      { _furl :: Text,
+-        _name :: Maybe Text,
+-        _sha256 :: FetchResult Checksum k
++      { _furl :: Text
++      , _name :: Maybe Text
++      , _sha256 :: FetchResult Checksum k
+       }
+   | FetchTarball
+-      { _furl :: Text,
+-        _sha256 :: FetchResult Checksum k
++      { _furl :: Text
++      , _sha256 :: FetchResult Checksum k
+       }
+   | FetchDocker
+-      { _imageName :: Text,
+-        _imageTag :: Text,
+-        _imageDigest :: FetchResult ContainerDigest k,
+-        _sha256 :: FetchResult Checksum k,
+-        _fos :: Maybe Text,
+-        _farch :: Maybe Text,
+-        _finalImageName :: Maybe Text,
+-        _finalImageTag :: Maybe Text,
+-        _tlsVerify :: Maybe Bool
++      { _imageName :: Text
++      , _imageTag :: Text
++      , _imageDigest :: FetchResult ContainerDigest k
++      , _sha256 :: FetchResult Checksum k
++      , _fos :: Maybe Text
++      , _farch :: Maybe Text
++      , _finalImageName :: Maybe Text
++      , _finalImageTag :: Maybe Text
++      , _tlsVerify :: Maybe Bool
+       }
+   deriving (Typeable, Generic)
+ 
+@@ -477,90 +491,90 @@ type family FetchResult a (k :: FetchStatus) where
+   FetchResult a Fetched = a
+ 
+ instance A.ToJSON (NixFetcher Fetched) where
+-  toJSON FetchGit {..} =
++  toJSON FetchGit{..} =
+     A.object
+-      [ "url" A..= _furl,
+-        "rev" A..= _rev,
+-        "deepClone" A..= _deepClone,
+-        "fetchSubmodules" A..= _fetchSubmodules,
+-        "leaveDotGit" A..= _leaveDotGit,
+-        "sparseCheckout" A..= _sparseCheckout,
+-        "name" A..= _name,
+-        "sha256" A..= _sha256,
+-        "type" A..= A.String "git"
++      [ "url" A..= _furl
++      , "rev" A..= _rev
++      , "deepClone" A..= _deepClone
++      , "fetchSubmodules" A..= _fetchSubmodules
++      , "leaveDotGit" A..= _leaveDotGit
++      , "sparseCheckout" A..= _sparseCheckout
++      , "name" A..= _name
++      , "sha256" A..= _sha256
++      , "type" A..= A.String "git"
+       ]
+-  toJSON FetchGitHub {..} =
++  toJSON FetchGitHub{..} =
+     A.object
+-      [ "owner" A..= _fowner,
+-        "repo" A..= _frepo,
+-        "rev" A..= _rev,
+-        "deepClone" A..= _deepClone,
+-        "fetchSubmodules" A..= _fetchSubmodules,
+-        "leaveDotGit" A..= _leaveDotGit,
+-        "sparseCheckout" A..= _sparseCheckout,
+-        "name" A..= _name,
+-        "sha256" A..= _sha256,
+-        "type" A..= A.String "github"
++      [ "owner" A..= _fowner
++      , "repo" A..= _frepo
++      , "rev" A..= _rev
++      , "deepClone" A..= _deepClone
++      , "fetchSubmodules" A..= _fetchSubmodules
++      , "leaveDotGit" A..= _leaveDotGit
++      , "sparseCheckout" A..= _sparseCheckout
++      , "name" A..= _name
++      , "sha256" A..= _sha256
++      , "type" A..= A.String "github"
+       ]
+-  toJSON FetchUrl {..} =
++  toJSON FetchUrl{..} =
+     A.object
+-      [ "url" A..= _furl,
+-        "name" A..= _name,
+-        "sha256" A..= _sha256,
+-        "type" A..= A.String "url"
++      [ "url" A..= _furl
++      , "name" A..= _name
++      , "sha256" A..= _sha256
++      , "type" A..= A.String "url"
+       ]
+-  toJSON FetchTarball {..} =
++  toJSON FetchTarball{..} =
+     A.object
+-      [ "url" A..= _furl,
+-        "sha256" A..= _sha256,
+-        "type" A..= A.String "tarball"
++      [ "url" A..= _furl
++      , "sha256" A..= _sha256
++      , "type" A..= A.String "tarball"
+       ]
+-  toJSON FetchDocker {..} =
++  toJSON FetchDocker{..} =
+     A.object
+-      [ "imageName" A..= _imageName,
+-        "imageTag" A..= _imageTag,
+-        "imageDigest" A..= _imageDigest,
+-        "sha256" A..= _sha256,
+-        "os" A..= _fos,
+-        "arch" A..= _farch,
+-        "finalImageName" A..= _finalImageName,
+-        "finalImageTag" A..= _finalImageTag,
+-        "tlsVerify" A..= _tlsVerify
++      [ "imageName" A..= _imageName
++      , "imageTag" A..= _imageTag
++      , "imageDigest" A..= _imageDigest
++      , "sha256" A..= _sha256
++      , "os" A..= _fos
++      , "arch" A..= _farch
++      , "finalImageName" A..= _finalImageName
++      , "finalImageTag" A..= _finalImageTag
++      , "tlsVerify" A..= _tlsVerify
+       ]
+ 
+ instance Pretty (NixFetcher k) where
+-  pretty FetchGit {..} =
++  pretty FetchGit{..} =
+     "FetchGit"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "url" <> colon <+> pretty _furl,
+-              "rev" <> colon <+> pretty _rev,
+-              "deepClone" <> colon <+> pretty _deepClone,
+-              "fetchSubmodules" <> colon <+> pretty _fetchSubmodules,
+-              "leaveDotGit" <> colon <+> pretty _leaveDotGit,
+-              "sparseCheckout" <> colon <+> pretty _sparseCheckout
++            [ "url" <> colon <+> pretty _furl
++            , "rev" <> colon <+> pretty _rev
++            , "deepClone" <> colon <+> pretty _deepClone
++            , "fetchSubmodules" <> colon <+> pretty _fetchSubmodules
++            , "leaveDotGit" <> colon <+> pretty _leaveDotGit
++            , "sparseCheckout" <> colon <+> pretty _sparseCheckout
+             ]
+               <> ppField "name" _name
+         )
+-  pretty FetchGitHub {..} =
++  pretty FetchGitHub{..} =
+     "FetchGitHub"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "owner" <> colon <+> pretty _fowner,
+-              "repo" <> colon <+> pretty _frepo,
+-              "rev" <> colon <+> pretty _rev,
+-              "deepClone" <> colon <+> pretty _deepClone,
+-              "fetchSubmodules" <> colon <+> pretty _fetchSubmodules,
+-              "leaveDotGit" <> colon <+> pretty _leaveDotGit,
+-              "sparseCheckout" <> colon <+> pretty _sparseCheckout
++            [ "owner" <> colon <+> pretty _fowner
++            , "repo" <> colon <+> pretty _frepo
++            , "rev" <> colon <+> pretty _rev
++            , "deepClone" <> colon <+> pretty _deepClone
++            , "fetchSubmodules" <> colon <+> pretty _fetchSubmodules
++            , "leaveDotGit" <> colon <+> pretty _leaveDotGit
++            , "sparseCheckout" <> colon <+> pretty _sparseCheckout
+             ]
+               <> ppField "name" _name
+         )
+-  pretty FetchUrl {..} =
++  pretty FetchUrl{..} =
+     "FetchUrl"
+       <> line
+       <> indent
+@@ -569,16 +583,16 @@ instance Pretty (NixFetcher k) where
+             ["url" <> colon <+> pretty _furl]
+               <> ppField "name" _name
+         )
+-  pretty FetchTarball {..} =
++  pretty FetchTarball{..} =
+     "FetchTarball" <> colon <+> pretty _furl
+-  pretty FetchDocker {..} =
++  pretty FetchDocker{..} =
+     "FetchDocker"
+       <> line
+       <> indent
+         2
+         ( vsep $
+-            [ "imageName" <> colon <+> pretty _imageName,
+-              "imageTag" <> colon <+> pretty _finalImageTag
++            [ "imageName" <> colon <+> pretty _imageName
++            , "imageTag" <> colon <+> pretty _finalImageTag
+             ]
+               <> ppField "os" _fos
+               <> ppField "arch" _farch
+@@ -589,23 +603,26 @@ instance Pretty (NixFetcher k) where
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | Zsh style glob pattern
+--- Notably, recursive wildcards like @**/@ are supported.
++{- | Zsh style glob pattern
++Notably, recursive wildcards like @**/@ are supported.
++-}
+ newtype Glob = Glob FilePath
+   deriving newtype (Show, Eq, Ord, IsString, Pretty)
+   deriving stock (Typeable, Generic)
+   deriving anyclass (Hashable, Binary, NFData)
+ 
+--- | Extract file contents from package source
+--- Matched files will be copied to build dir.
+--- All matched directories are ignored. Only files will be processed.
++{- | Extract file contents from package source
++Matched files will be copied to build dir.
++All matched directories are ignored. Only files will be processed.
++-}
+ data ExtractSrcQ = ExtractSrcQ (NixFetcher Fetched) (NE.NonEmpty Glob)
+   deriving (Show, Eq, Ord, Hashable, NFData, Binary, Typeable, Generic)
+ 
+--- | Rule result for extracting source files. 'Text' is the file contents,
+--- only available if the second element of the tuple in 'ExtractSrcQ' is @True@.
+--- The key of the result map is the file path relative to the package source,
+--- and the value is the file path relative to the build directory.
++{- | Rule result for extracting source files. 'Text' is the file contents,
++only available if the second element of the tuple in 'ExtractSrcQ' is @True@.
++The key of the result map is the file path relative to the package source,
++and the value is the file path relative to the build directory.
++-}
+ type instance RuleResult ExtractSrcQ = HashMap FilePath FilePath
+ 
+ instance Pretty ExtractSrcQ where
+@@ -615,16 +632,17 @@ instance Pretty ExtractSrcQ where
+       <> indent
+         2
+         ( vsep
+-            [ "fetcher" <> colon <+> pretty f,
+-              "files" <> colon <+> pretty n
++            [ "fetcher" <> colon <+> pretty f
++            , "files" <> colon <+> pretty n
+             ]
+         )
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | Fetch @outputHashes@ for git dependencies in @Cargo.lock@.
+--- See <https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md#importing-a-cargolock-file> for details.
+--- We need fetched source and the file path to @Cargo.lock@.
++{- | Fetch @outputHashes@ for git dependencies in @Cargo.lock@.
++See <https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md#importing-a-cargolock-file> for details.
++We need fetched source and the file path to @Cargo.lock@.
++-}
+ data FetchRustGitDepsQ = FetchRustGitDepsQ (NixFetcher Fetched) FilePath
+   deriving (Show, Eq, Ord, Hashable, NFData, Binary, Typeable, Generic)
+ 
+@@ -638,53 +656,74 @@ instance Pretty FetchRustGitDepsQ where
+       <> indent
+         2
+         ( vsep
+-            [ "fetcher" <> colon <+> pretty f,
+-              "cargoLock" <> colon <+> pretty n
++            [ "fetcher" <> colon <+> pretty f
++            , "cargoLock" <> colon <+> pretty n
+             ]
+         )
+ 
+ --------------------------------------------------------------------------------
+ 
+--- | @strftime@ format
+--- Defaults to @%Y-%m-%d@
++data FetchCustomFetcherQ = FetchCustomFetcherQ (NixFetcher Fetched) String FilePath
++  deriving (Show, Eq, Ord, Hashable, NFData, Binary, Typeable, Generic)
++
++type instance RuleResult FetchCustomFetcherQ = Maybe T.Text
++
++instance Pretty FetchCustomFetcherQ where
++  pretty (FetchCustomFetcherQ f n p) =
++    "FetchCustomFetcher"
++      <> line
++      <> indent
++        2
++        ( vsep
++            [ "fetcher" <> colon <+> pretty f
++            , "name" <> colon <+> pretty n
++            , "filePath" <> colon <+> pretty p
++            ]
++        )
++
++{- | @strftime@ format
++Defaults to @%Y-%m-%d@
++-}
+ newtype GitDateFormat = GitDateFormat (Maybe Text)
+   deriving newtype (Eq, Ord, Default)
+   deriving stock (Typeable, Generic)
+   deriving anyclass (Hashable, Binary, NFData)
+   deriving (Pretty, Show) via DefaultableText "%Y-%m-%d"
+ 
+--- | Defaults to commit's time zone.
+--- When set to @local@, current local time zone is used.
+--- Only used in 'GetGitCommitDate'.
++{- | Defaults to commit's time zone.
++When set to @local@, current local time zone is used.
++Only used in 'GetGitCommitDate'.
++-}
+ newtype GitTimeZone = GitTimeZone (Maybe Text)
+   deriving newtype (Eq, Ord, Default)
+   deriving stock (Typeable, Generic)
+   deriving anyclass (Hashable, Binary, NFData)
+   deriving (Pretty, Show) via DefaultableText "commit's time zone"
+ 
+--- | Get the commit date by using shallow clone
+---
+--- @_gformat@ is in.
+--- Note: Requires git >= 2.5
++{- | Get the commit date by using shallow clone
++
++@_gformat@ is in.
++Note: Requires git >= 2.5
++-}
+ data GetGitCommitDate = GetGitCommitDate
+-  { _gurl :: Text,
+-    _grev :: Text,
+-    _gformat :: (GitDateFormat, GitTimeZone)
++  { _gurl :: Text
++  , _grev :: Text
++  , _gformat :: (GitDateFormat, GitTimeZone)
+   }
+   deriving (Show, Eq, Ord, Hashable, NFData, Binary, Typeable, Generic)
+ 
+ type instance RuleResult GetGitCommitDate = Text
+ 
+ instance Pretty GetGitCommitDate where
+-  pretty GetGitCommitDate {..} =
++  pretty GetGitCommitDate{..} =
+     "GetGitCommitDate"
+       <> line
+       <> indent
+         2
+         ( vsep
+-            [ "url" <> colon <+> pretty _gurl,
+-              "rev" <> colon <+> pretty _grev,
+-              "format" <> colon <+> pretty _gformat
++            [ "url" <> colon <+> pretty _gurl
++            , "rev" <> colon <+> pretty _grev
++            , "format" <> colon <+> pretty _gformat
+             ]
+         )
+ 
+@@ -698,15 +737,18 @@ type PackageFetcher = Version -> NixFetcher Fresh
+ 
+ newtype PackageExtractSrc = PackageExtractSrc (NE.NonEmpty Glob)
+ 
++newtype PackagePrefetchFiles = PackagePreFetchFiles (HashMap String (NE.NonEmpty Glob))
++
+ newtype PackageCargoLockFiles = PackageCargoLockFiles (NE.NonEmpty Glob)
+ 
+ newtype PackagePassthru = PackagePassthru (HashMap Text Text)
+   deriving newtype (Semigroup, Monoid)
+ 
+--- | Using stale value indicates that we will /NOT/ check for new versions if
+--- there is a known version recovered from json file or last use of the rule.
+--- Normally you don't want a stale version
+--- unless you need pin a package.
++{- | Using stale value indicates that we will /NOT/ check for new versions if
++there is a known version recovered from json file or last use of the rule.
++Normally you don't want a stale version
++unless you need pin a package.
++-}
+ data UseStaleVersion
+   = -- | Specified in configuration file
+     PermanentStale
+@@ -716,34 +758,37 @@ data UseStaleVersion
+   deriving stock (Eq, Show, Ord, Typeable, Generic)
+   deriving anyclass (Hashable, Binary, NFData)
+ 
+--- | A package is defined with:
+---
+--- 1. its name
+--- 2. how to track its version
+--- 3. how to fetch it as we have the version
+--- 4. optional file paths to extract (dump to build dir)
+--- 5. optional @Cargo.lock@ paths (if it's a rust package)
+--- 6. an optional pass through map
+--- 7. if the package version was pinned
+--- 8. optional git date format with time zone (if the version source is git)
+--- 9. whether to always fetch a package regardless of the version changing
+--- /INVARIANT: 'Version' passed to 'PackageFetcher' MUST be used textually,/
+--- /i.e. can only be concatenated with other strings,/
+--- /in case we can't check the equality between fetcher functions./
++{- | A package is defined with:
++
++1. its name
++2. how to track its version
++3. how to fetch it as we have the version
++4. optional file paths to extract (dump to build dir)
++5. optional @Cargo.lock@ paths (if it's a rust package)
++6. an optional pass through map
++7. if the package version was pinned
++8. optional git date format with time zone (if the version source is git)
++9. whether to always fetch a package regardless of the version changing
++/INVARIANT: 'Version' passed to 'PackageFetcher' MUST be used textually,/
++/i.e. can only be concatenated with other strings,/
++/in case we can't check the equality between fetcher functions./
++-}
+ data Package = Package
+-  { _pname :: PackageName,
+-    _pversion :: CheckVersion,
+-    _pfetcher :: PackageFetcher,
+-    _pextract :: Maybe PackageExtractSrc,
+-    _pcargo :: Maybe PackageCargoLockFiles,
+-    _ppassthru :: PackagePassthru,
+-    _ppinned :: UseStaleVersion,
+-    _pgitdate :: (GitDateFormat, GitTimeZone),
+-    _pforcefetch :: ForceFetch
++  { _pname :: PackageName
++  , _pversion :: CheckVersion
++  , _pfetcher :: PackageFetcher
++  , _pextract :: Maybe PackageExtractSrc
++  , _pcargo :: Maybe PackageCargoLockFiles
++  , _pprefetchFiles :: Maybe PackagePrefetchFiles
++  , _ppassthru :: PackagePassthru
++  , _ppinned :: UseStaleVersion
++  , _pgitdate :: (GitDateFormat, GitTimeZone)
++  , _pforcefetch :: ForceFetch
+   }
+ 
+--- | Package key is the name of a package.
+--- We use this type to index packages.
++{- | Package key is the name of a package.
++We use this type to index packages.
++-}
+ newtype PackageKey = PackageKey PackageName
+   deriving newtype (Eq, Show, Ord, Pretty)
+   deriving stock (Typeable, Generic)
+@@ -769,30 +814,32 @@ type instance RuleResult (WithPackageKey k) = RuleResult k
+ 
+ -- | Result type of 'Core'
+ data PackageResult = PackageResult
+-  { _prname :: PackageName,
+-    _prversion :: NvcheckerResult,
+-    _prfetched :: NixFetcher 'Fetched,
+-    _prpassthru :: Maybe (HashMap Text Text),
+-    -- | file path relative to package source -> file path relative to build dir
+-    _prextract :: Maybe (HashMap FilePath FilePath),
+-    -- | cargo lock file path relative to package source -> (lock file path relative to build dir, git dependencies)
+-    _prcargolock :: Maybe (HashMap FilePath (FilePath, HashMap Text Checksum)),
+-    _prpinned :: UseStaleVersion,
+-    _prgitdate :: Maybe Text
++  { _prname :: PackageName
++  , _prversion :: NvcheckerResult
++  , _prfetched :: NixFetcher 'Fetched
++  , _prpassthru :: Maybe (HashMap Text Text)
++  , _prextract :: Maybe (HashMap FilePath FilePath)
++  -- ^ file path relative to package source -> file path relative to build dir
++  , _prcargolock :: Maybe (HashMap FilePath (FilePath, HashMap Text Checksum))
++  -- ^ cargo lock file path relative to package source -> (lock file path relative to build dir, git dependencies)
++  , _prprefetchFiles :: Maybe (HashMap FilePath (Maybe Text))
++  , _prpinned :: UseStaleVersion
++  , _prgitdate :: Maybe Text
+   }
+   deriving (Show, Typeable, Generic, NFData)
+ 
+ instance A.ToJSON PackageResult where
+-  toJSON PackageResult {..} =
++  toJSON PackageResult{..} =
+     A.object
+-      [ "name" A..= _prname,
+-        "version" A..= nvNow _prversion,
+-        "src" A..= _prfetched,
+-        "extract" A..= _prextract,
+-        "passthru" A..= _prpassthru,
+-        "cargoLock" A..= _prcargolock,
+-        "pinned" A..= case _prpinned of
++      [ "name" A..= _prname
++      , "version" A..= nvNow _prversion
++      , "src" A..= _prfetched
++      , "extract" A..= _prextract
++      , "passthru" A..= _prpassthru
++      , "prefetch" A..= _prprefetchFiles
++      , "cargoLock" A..= _prcargolock
++      , "pinned" A..= case _prpinned of
+           PermanentStale -> True
+-          _ -> False,
+-        "date" A..= _prgitdate
++          _ -> False
++      , "date" A..= _prgitdate
+       ]

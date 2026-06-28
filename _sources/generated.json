@@ -1,0 +1,193 @@
+{
+    "alx-wol": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "alx-wol",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "AndiWeiss",
+            "repo": "alx-wol",
+            "rev": "alx-wol-3.1",
+            "sha256": "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "alx-wol-3.1"
+    },
+    "app_font": {
+        "cargoLock": null,
+        "date": "2026-06-26",
+        "extract": null,
+        "name": "app_font",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "cd124e644f61cbd51f4a85db77c4aeb6a90685f1",
+            "sha256": "sha256-UEOZUfLPXQIyb9j3xNvleAiPiVXUonACZnRepj2eGMg=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/kvndrsslr/sketchybar-app-font"
+        },
+        "version": "cd124e644f61cbd51f4a85db77c4aeb6a90685f1"
+    },
+    "cotabby": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "cotabby",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-IatbRCHuyv1Y+HH5B6W6QSt1A3+v5vBbYqnpw5TlVPU=",
+            "type": "url",
+            "url": "https://github.com/fujacob/cotabby/releases/download/v0.6.0-beta/Cotabby.dmg"
+        },
+        "version": "v0.6.0-beta"
+    },
+    "eagle-nvim": {
+        "cargoLock": null,
+        "date": "2026-02-10",
+        "extract": null,
+        "name": "eagle-nvim",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "soulis-1256",
+            "repo": "eagle.nvim",
+            "rev": "d503b168932160b07d4d09551d90d5fbb388b641",
+            "sha256": "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "d503b168932160b07d4d09551d90d5fbb388b641"
+    },
+    "helium_linux": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "helium_linux",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "sha256": "sha256-nIA9ehIrqb6A+E8AOhI8qptwiTRJNxMOgq+qOTrnlp4=",
+            "type": "tarball",
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.13.6.1/helium-0.13.6.1-x86_64_linux.tar.xz"
+        },
+        "version": "0.13.6.1"
+    },
+    "helium_macos": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "helium_macos",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-YSYTfUJMRGtSsMiYNmIyEzdkxvvns6ZpgD1qKdL1p0Y=",
+            "type": "url",
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.13.6.1/helium_0.13.6.1_arm64-macos.dmg"
+        },
+        "version": "0.13.6.1"
+    },
+    "jankyborders": {
+        "cargoLock": null,
+        "date": "2026-05-14",
+        "extract": null,
+        "name": "jankyborders",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e",
+            "sha256": "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/felixkratz/jankyborders"
+        },
+        "version": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e"
+    },
+    "proton-ge-bin": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "proton-ge-bin",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "sha256": "sha256-I7SSvzQQ/NqdvwjpJ9IFFtAaTS+rgHUyXx0us1vIOnw=",
+            "type": "tarball",
+            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-1/GE-Proton11-1.tar.gz"
+        },
+        "version": "GE-Proton11-1"
+    },
+    "sketchybar": {
+        "cargoLock": null,
+        "date": "2026-06-04",
+        "extract": null,
+        "name": "sketchybar",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "felixkratz",
+            "repo": "sketchybar",
+            "rev": "6284ee816601486ace33ca48a0271832eec6de35",
+            "sha256": "sha256-5tyc/yYzdV/3JTtujuj7le/14XkC7TlN/nZg7tOZsNg=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "6284ee816601486ace33ca48a0271832eec6de35"
+    },
+    "zotero-attanger": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-attanger",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-F80o1/2VW5KFssIrWhlhKl9dcsAqxFNHmwn8L08KMnY=",
+            "type": "url",
+            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.7/zotero-attanger.xpi"
+        },
+        "version": "1.4.7"
+    },
+    "zotero-better-bibtex": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-better-bibtex",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-xgJOAJmH0rS8DEUFs6lpXYJ5CpC0fr5ZRxBp7HjSr9Y=",
+            "type": "url",
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.36/zotero-better-bibtex-9.0.36.xpi"
+        },
+        "version": "9.0.36"
+    }
+}

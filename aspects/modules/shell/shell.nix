@@ -1,8 +1,10 @@
 { den, ... }:
 {
-
   den.aspects.shell = {
-    includes = [ den.aspects.starship ];
+    includes = [
+      den.aspects.starship
+      den.aspects.jujutsu
+    ];
     os = { pkgs, ... }: {
       environment.systemPackages = with pkgs; [
         git
@@ -10,13 +12,15 @@
         neovim
         wget
         htop
+        fzf
         curl
       ];
     };
 
-    homeManager = {
+    homeManager = { pkgs, ... }: {
       programs.zoxide.enable = true;
       programs.fzf.enable = true;
+      programs.bat.enable = true;
       programs = {
         ssh = {
           enable = true;
@@ -61,6 +65,7 @@
         };
         nh.enable = true;
       };
+      home.packages = with pkgs; [ ivy-fetch ];
       home.shellAliases = {
         #      ghc = "stack exec -- ghc";
         fzf = "fzf --reverse --height 40%";

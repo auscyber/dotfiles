@@ -3,6 +3,7 @@ set +x
 LC_ALL=C
 LANG=C
 COLS=$(tput cols)
+LYRICSLIST=${LYRICSLIST:-~/Music/phoebe/lyricslist}
 
 fg_c() {
     tput setaf "$1"
@@ -125,7 +126,7 @@ get_kernel () {
 	esac
 }
 cpu="${cpu#"${cpu%%[![:space:]]*}"}"
-lyric="$( shuf -n 1 < ~/Music/phoebe/lyricslist 2>&- )"
+lyric="$( shuf -n 1 < $LYRICSLIST 2>&- )"
 lyric=${lyric:-"phoebe bridgers"}
 
 case $OSTYPE in

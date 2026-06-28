@@ -1,0 +1,1088 @@
+diff --git a/.gitignore b/.gitignore
+index aebef6fb47..df54ed3bc9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,3 +4,4 @@
+ compile_commands.json
+ *.wiki
+ *.sh
++.workspaces/
+diff --git a/borders.patch b/borders.patch
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/makefile b/makefile
+index 992d3e6a33..9636e9c33a 100644
+--- a/makefile
++++ b/makefile
+@@ -1,4 +1,4 @@
+-FILES = src/main.c src/parse.c src/mach.c src/hashtable.c src/events.c src/windows.c src/border.c src/animation.c 
++FILES = src/main.c src/parse.c src/mach.c src/hashtable.c src/events.c src/windows.c src/border.c src/animation.c  src/misc/screen.m
+ LIBS = -framework AppKit -framework CoreVideo -F/System/Library/PrivateFrameworks/ -framework SkyLight
+ 
+ all: | bin
+diff --git a/src/border.c b/src/border.c
+index 0c0a28e912..24fe9b53c0 100644
+--- a/src/border.c
++++ b/src/border.c
+@@ -1,39 +1,51 @@
+ #include "border.h"
+ #include "hashtable.h"
+ #include "misc/extern.h"
++#include "misc/screen.h"
+ #include "windows.h"
+ #include <pthread.h>
+ #include <time.h>
+ 
+ extern struct settings g_settings;
+ 
+-struct settings* border_get_settings(struct border* border) {
++struct settings *border_get_settings(struct border *border) {
+   assert(pthread_main_np() != 0);
+-  return border->setting_override.enabled
+-         ? &border->setting_override
+-         : &g_settings;
++  return border->setting_override.enabled ? &border->setting_override
++                                          : &g_settings;
+ }
+ 
+-static void border_destroy_window(struct border* border) {
+-  if (border->context) CGContextRelease(border->context);
+-  if (border->wid) SLSReleaseWindow(border->cid, border->wid);
++static void border_destroy_window(struct border *border) {
++  if (border->context)
++    CGContextRelease(border->context);
++  if (border->wid)
++    SLSReleaseWindow(border->cid, border->wid);
+   border->wid = 0;
+   border->context = NULL;
+ }
+ 
+-static bool border_check_too_small(struct border* border, CGRect window_frame) {
++static bool border_check_too_small(struct border *border, CGRect window_frame) {
+   CGRect smallest_rect = CGRectInset(window_frame, 1.0, 1.0);
+-  if (smallest_rect.size.width < 2.f * border->inner_radius
+-      || smallest_rect.size.height < 2.f * border->inner_radius) {
++  if (smallest_rect.size.width < 2.f * border->inner_radius ||
++      smallest_rect.size.height < 2.f * border->inner_radius) {
+     return true;
+   }
++
++  // Don't show borders for windows that are mostly offscreen -- window
++  // managers emulating virtual workspaces hide windows by moving them
++  // (almost) entirely beyond the visible desktop.
++  if (screen_window_mostly_offscreen(window_frame))
++    return true;
++
+   return false;
+ }
+ 
+-static bool border_calculate_bounds(struct border* border, CGRect* frame, struct settings* settings) {
++static bool border_calculate_bounds(struct border *border, CGRect *frame,
++                                    struct settings *settings) {
+   CGRect window_frame;
+-  if (border->is_proxy) window_frame = border->target_bounds;
+-  else SLSGetWindowBounds(border->cid, border->target_wid, &window_frame);
++  if (border->is_proxy)
++    window_frame = border->target_bounds;
++  else
++    SLSGetWindowBounds(border->cid, border->target_wid, &window_frame);
+ 
+   border->target_bounds = window_frame;
+   border->too_small = border_check_too_small(border, window_frame);
+@@ -42,38 +54,36 @@
+     return false;
+   }
+ 
+-  float border_offset = - settings->border_width - BORDER_PADDING;
++  float border_offset = -settings->border_width - BORDER_PADDING;
+   *frame = CGRectInset(window_frame, border_offset, border_offset);
+ 
+   border->origin = frame->origin;
+   frame->origin = CGPointZero;
+ 
+-
+-  window_frame.origin = (CGPoint){ -border_offset, -border_offset };
++  window_frame.origin = (CGPoint){-border_offset, -border_offset};
+   border->drawing_bounds = window_frame;
+ 
+   return true;
+ }
+ 
+-static void border_draw(struct border* border, CGRect frame, struct settings* settings) {
++static void border_draw(struct border *border, CGRect frame,
++                        struct settings *settings) {
+   CGContextSaveGState(border->context);
+   border->needs_redraw = false;
+-  struct color_style color_style = border->focused
+-                                   ? settings->active_window
+-                                   : settings->inactive_window;
++  struct color_style color_style =
++      border->focused ? settings->active_window : settings->inactive_window;
+ 
+   CGGradientRef gradient = NULL;
+   CGPoint gradient_dir[2];
+-  if (color_style.stype == COLOR_STYLE_SOLID
+-     || color_style.stype == COLOR_STYLE_GLOW) {
++  if (color_style.stype == COLOR_STYLE_SOLID ||
++      color_style.stype == COLOR_STYLE_GLOW) {
+     bool glow = color_style.stype == COLOR_STYLE_GLOW;
+     drawing_set_stroke_and_fill(border->context, color_style.color, glow);
+   } else if (color_style.stype == COLOR_STYLE_GRADIENT) {
+-    CGAffineTransform trans = CGAffineTransformMakeScale(frame.size.width,
+-                                                         frame.size.height);
+-    gradient = drawing_create_gradient(&color_style.gradient,
+-                                       trans,
+-                                       gradient_dir          );
++    CGAffineTransform trans =
++        CGAffineTransformMakeScale(frame.size.width, frame.size.height);
++    gradient =
++        drawing_create_gradient(&color_style.gradient, trans, gradient_dir);
+   }
+ 
+   CGContextSetLineWidth(border->context, settings->border_width);
+@@ -81,61 +91,48 @@
+ 
+   CGRect path_rect = border->drawing_bounds;
+   CGMutablePathRef inner_clip_path = CGPathCreateMutable();
+-  if (settings->border_style == BORDER_STYLE_SQUARE
+-      && settings->border_order == BORDER_ORDER_ABOVE
+-      && settings->border_width >= BORDER_TSMW) {
++  if (settings->border_style == BORDER_STYLE_SQUARE &&
++      settings->border_order == BORDER_ORDER_ABOVE &&
++      settings->border_width >= BORDER_TSMW) {
+     // Inset the frame to overlap the rounding of macOS windows to create a
+     // truly square border
+-    path_rect = CGRectInset(border->drawing_bounds,
+-                            BORDER_TSMN,
+-                            BORDER_TSMN            );
++    path_rect = CGRectInset(border->drawing_bounds, BORDER_TSMN, BORDER_TSMN);
+ 
+     CGPathAddRect(inner_clip_path, NULL, path_rect);
+   } else {
+-    CGPathAddRoundedRect(inner_clip_path,
+-                         NULL,
+-                         CGRectInset(path_rect, 1.0, 1.0),
+-                         border->inner_radius,
+-                         border->inner_radius             );
++    CGPathAddRoundedRect(inner_clip_path, NULL,
++                         CGRectInset(path_rect, 1.0, 1.0), border->inner_radius,
++                         border->inner_radius);
+   }
+   drawing_clip_between_rect_and_path(border->context, frame, inner_clip_path);
+ 
+   if (settings->border_style == BORDER_STYLE_SQUARE) {
+-    if (color_style.stype == COLOR_STYLE_SOLID
+-       || color_style.stype == COLOR_STYLE_GLOW) {
+-      drawing_draw_square_with_inset(border->context,
+-                                     path_rect,
++    if (color_style.stype == COLOR_STYLE_SOLID ||
++        color_style.stype == COLOR_STYLE_GLOW) {
++      drawing_draw_square_with_inset(border->context, path_rect,
+                                      -settings->border_width / 2.f);
+-    }
+-    else if (color_style.stype == COLOR_STYLE_GRADIENT) {
+-      drawing_draw_square_gradient_with_inset(border->context,
+-                                              gradient,
+-                                              gradient_dir,
+-                                              path_rect,
++    } else if (color_style.stype == COLOR_STYLE_GRADIENT) {
++      drawing_draw_square_gradient_with_inset(border->context, gradient,
++                                              gradient_dir, path_rect,
+                                               -settings->border_width / 2.f);
+     }
+   } else {
+-    float corner_radius = settings->border_style == BORDER_STYLE_ROUND_UNIFORM ? 9.0 : border->radius;
++    float corner_radius = settings->border_style == BORDER_STYLE_ROUND_UNIFORM
++                              ? 9.0
++                              : border->radius;
+ 
+     if (settings->border_style == BORDER_STYLE_ROUND_UNIFORM) {
+-      drawing_draw_rounded_rect_with_inset(border->context,
+-                                           path_rect,
+-                                           corner_radius,
+-                                           true            );
++      drawing_draw_rounded_rect_with_inset(border->context, path_rect,
++                                           corner_radius, true);
+     }
+ 
+-    if (color_style.stype == COLOR_STYLE_SOLID
+-       || color_style.stype == COLOR_STYLE_GLOW) {
+-      drawing_draw_rounded_rect_with_inset(border->context,
+-                                           path_rect,
+-                                           corner_radius,
+-                                           false           );
++    if (color_style.stype == COLOR_STYLE_SOLID ||
++        color_style.stype == COLOR_STYLE_GLOW) {
++      drawing_draw_rounded_rect_with_inset(border->context, path_rect,
++                                           corner_radius, false);
+     } else if (color_style.stype == COLOR_STYLE_GRADIENT) {
+-      drawing_draw_rounded_gradient_with_inset(border->context,
+-                                               gradient,
+-                                               gradient_dir,
+-                                               path_rect,
+-                                               corner_radius  );
++      drawing_draw_rounded_gradient_with_inset(
++          border->context, gradient, gradient_dir, path_rect, corner_radius);
+     }
+   }
+   CGGradientRelease(gradient);
+@@ -144,10 +141,9 @@
+     CGContextRestoreGState(border->context);
+     CGContextSaveGState(border->context);
+     color_style = settings->background;
+-    if (color_style.stype == COLOR_STYLE_SOLID
+-       || color_style.stype == COLOR_STYLE_GLOW) {
+-      drawing_draw_filled_path(border->context,
+-                               inner_clip_path,
++    if (color_style.stype == COLOR_STYLE_SOLID ||
++        color_style.stype == COLOR_STYLE_GLOW) {
++      drawing_draw_filled_path(border->context, inner_clip_path,
+                                color_style.color);
+     }
+   }
+@@ -158,7 +154,8 @@
+   SLSWindowThaw(border->cid, border->wid);
+ }
+ 
+-void border_create_window(struct border* border, CGRect frame, bool unmanaged, bool hidpi) {
++void border_create_window(struct border *border, CGRect frame, bool unmanaged,
++                          bool hidpi) {
+   pthread_mutex_lock(&border->mutex);
+   int cid = border->cid;
+   border->wid = window_create(cid, frame, hidpi, unmanaged);
+@@ -168,38 +165,38 @@
+   border->context = SLWindowContextCreate(cid, border->wid, NULL);
+   CGContextSetInterpolationQuality(border->context, kCGInterpolationNone);
+ 
+-  if (!border->sid) border->sid = window_space_id(cid, border->target_wid);
++  if (!border->sid)
++    border->sid = window_space_id(cid, border->target_wid);
+   window_send_to_space(cid, border->wid, border->sid);
+   pthread_mutex_unlock(&border->mutex);
+ }
+ 
+-void border_update_internal(struct border* border, struct settings* settings) {
+-  if (border->external_proxy_wid) return;
++void border_update_internal(struct border *border, struct settings *settings) {
++  if (border->external_proxy_wid)
++    return;
+ 
+   int cid = border->cid;
+   CGRect frame;
+-  if (!border_calculate_bounds(border, &frame, settings)) return;
++  if (!border_calculate_bounds(border, &frame, settings))
++    return;
+ 
+   uint64_t tags = window_tags(cid, border->target_wid);
+   border->sticky = tags & WINDOW_TAG_STICKY;
+-  if (!border->sticky && !is_space_visible(cid, border->sid)) return;
+-
++  if (!border->sticky && !is_space_visible(cid, border->sid))
++    return;
+ 
+   bool shown = false;
+   SLSWindowIsOrderedIn(cid, border->target_wid, &shown);
+   if (!shown && !border->is_proxy) {
+     border_hide(border);
+     return;
+-  } 
++  }
+ 
+   int level = window_level(cid, border->target_wid);
+   int sub_level = window_sub_level(cid, border->target_wid);
+ 
+   if (!border->wid) {
+-    border_create_window(border,
+-                         frame,
+-                         border->is_proxy,
+-                         settings->hidpi  );
++    border_create_window(border, frame, border->is_proxy, settings->hidpi);
+   }
+ 
+   bool disabled_update = false;
+@@ -211,35 +208,32 @@
+     CGSNewRegionWithRect(&frame, &frame_region);
+ 
+     SLSWindowFreezeWithOptions(border->cid, border->wid, NULL);
+-    SLSSetWindowShape(border->cid, border->wid, border->origin.x, border->origin.y, frame_region);
++    SLSSetWindowShape(border->cid, border->wid, border->origin.x,
++                      border->origin.y, frame_region);
+     CFRelease(frame_region);
+ 
+     border->needs_redraw = true;
+     border->frame = frame;
+   }
+ 
+-  if (border->needs_redraw) border_draw(border, frame, settings);
++  if (border->needs_redraw)
++    border_draw(border, frame, settings);
+ 
+   CFTypeRef transaction = SLSTransactionCreate(cid);
+-  if(!transaction) return;
++  if (!transaction)
++    return;
+   SLSTransactionMoveWindowWithGroup(transaction, border->wid, border->origin);
+ 
+   if (!border->is_proxy) {
+     CGAffineTransform transform = CGAffineTransformIdentity;
+     transform.tx = -border->origin.x;
+     transform.ty = -border->origin.y;
+-    SLSTransactionSetWindowTransform(transaction,
+-                                     border->wid,
+-                                     0,
+-                                     0,
+-                                     transform   );
++    SLSTransactionSetWindowTransform(transaction, border->wid, 0, 0, transform);
+   }
+   SLSTransactionSetWindowLevel(transaction, border->wid, level);
+   SLSTransactionSetWindowSubLevel(transaction, border->wid, sub_level);
+-  SLSTransactionOrderWindow(transaction,
+-                            border->wid,
+-                            settings->border_order,
+-                            border->target_wid      );
++  SLSTransactionOrderWindow(transaction, border->wid, settings->border_order,
++                            border->target_wid);
+   SLSTransactionCommit(transaction, 0);
+   CFRelease(transaction);
+ 
+@@ -254,14 +248,15 @@
+   SLSSetWindowTags(cid, border->wid, &set_tags, 0x40);
+   SLSClearWindowTags(cid, border->wid, &clear_tags, 0x40);
+ 
+-  if (disabled_update) SLSReenableUpdate(cid);
++  if (disabled_update)
++    SLSReenableUpdate(cid);
+ }
+ 
+-static void* border_update_async_proc(void* context) {
++static void *border_update_async_proc(void *context) {
+   struct {
+-    struct border* border;
++    struct border *border;
+     struct settings settings;
+-  }* payload = context;
++  } *payload = context;
+ 
+   pthread_mutex_lock(&payload->border->mutex);
+   border_update_internal(payload->border, &payload->settings);
+@@ -270,31 +265,34 @@
+   return NULL;
+ }
+ 
+-void border_init(struct border* border, int cid) {
++void border_init(struct border *border, int cid) {
+   memset(border, 0, sizeof(struct border));
+   pthread_mutexattr_t mattr;
+   pthread_mutexattr_init(&mattr);
+   pthread_mutexattr_settype(&mattr, PTHREAD_MUTEX_RECURSIVE);
+   pthread_mutex_init(&border->mutex, &mattr);
+   animation_init(&border->animation);
+-  if (cid) border->cid = cid;
+-  else border->cid = SLSMainConnectionID();
++  if (cid)
++    border->cid = cid;
++  else
++    border->cid = SLSMainConnectionID();
+ }
+ 
+-struct border* border_create() {
+-  struct border* border = malloc(sizeof(struct border));
++struct border *border_create() {
++  struct border *border = malloc(sizeof(struct border));
+   int cid = 0;
+   SLSNewConnection(0, &cid);
+   border_init(border, cid);
+   return border;
+ }
+ 
+-void border_destroy(struct border* border) {
++void border_destroy(struct border *border) {
+   border_hide(border);
+   dispatch_async(dispatch_get_main_queue(), ^{
+     pthread_mutex_lock(&border->mutex);
+     border_destroy_window(border);
+-    if (border->proxy) border_destroy(border->proxy);
++    if (border->proxy)
++      border_destroy(border->proxy);
+     animation_stop(&border->animation);
+     if (!border->is_proxy && border->cid != SLSMainConnectionID())
+       SLSReleaseConnection(border->cid);
+@@ -303,7 +301,7 @@
+   });
+ }
+ 
+-void border_move(struct border* border) {
++void border_move(struct border *border) {
+   pthread_mutex_lock(&border->mutex);
+   if (border->external_proxy_wid) {
+     pthread_mutex_unlock(&border->mutex);
+@@ -311,17 +309,14 @@
+   }
+   pthread_mutex_unlock(&border->mutex);
+ 
+-  struct settings* settings = border_get_settings(border);
++  struct settings *settings = border_get_settings(border);
+   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+     pthread_mutex_lock(&border->mutex);
+     CGRect window_frame;
+     SLSGetWindowBounds(border->cid, border->target_wid, &window_frame);
+-    CGPoint origin = { .x = window_frame.origin.x
+-                            - settings->border_width
+-                            - BORDER_PADDING,
+-                       .y = window_frame.origin.y
+-                            - settings->border_width
+-                            - BORDER_PADDING          };
++    CGPoint origin = {
++        .x = window_frame.origin.x - settings->border_width - BORDER_PADDING,
++        .y = window_frame.origin.y - settings->border_width - BORDER_PADDING};
+ 
+     CFTypeRef transaction = SLSTransactionCreate(border->cid);
+     if (transaction) {
+@@ -335,9 +330,9 @@
+   });
+ }
+ 
+-void border_update(struct border* border, bool try_async) {
++void border_update(struct border *border, bool try_async) {
+   pthread_mutex_lock(&border->mutex);
+-  struct settings* settings = border_get_settings(border);
++  struct settings *settings = border_get_settings(border);
+   border_update_internal(border, settings);
+   pthread_mutex_unlock(&border->mutex);
+   return;
+@@ -349,9 +344,9 @@
+   }
+ 
+   struct payload {
+-    struct border* border;
++    struct border *border;
+     struct settings settings;
+-  }* payload = malloc(sizeof(struct payload));
++  } *payload = malloc(sizeof(struct payload));
+ 
+   payload->border = border;
+   payload->settings = *settings;
+@@ -362,14 +357,12 @@
+   pthread_mutex_unlock(&border->mutex);
+ }
+ 
+-void border_hide(struct border* border) {
++void border_hide(struct border *border) {
+   pthread_mutex_lock(&border->mutex);
+   if (border->wid) {
+     CFTypeRef transaction = SLSTransactionCreate(border->cid);
+     if (transaction) {
+-      SLSTransactionOrderWindow(transaction,
+-                                border->wid,
+-                                0,
++      SLSTransactionOrderWindow(transaction, border->wid, 0,
+                                 border->target_wid);
+       SLSTransactionCommit(transaction, 0);
+       CFRelease(transaction);
+@@ -378,23 +371,20 @@
+   pthread_mutex_unlock(&border->mutex);
+ }
+ 
+-void border_unhide(struct border* border) {
++void border_unhide(struct border *border) {
+   pthread_mutex_lock(&border->mutex);
+-  if (border->too_small
+-      || border->external_proxy_wid
+-      || (!border->sticky && !is_space_visible(border->cid, border->sid))) {
++  if (border->too_small || border->external_proxy_wid ||
++      (!border->sticky && !is_space_visible(border->cid, border->sid))) {
+     pthread_mutex_unlock(&border->mutex);
+     return;
+   }
+ 
+   if (border->wid) {
+-    struct settings* settings = border_get_settings(border);
++    struct settings *settings = border_get_settings(border);
+     CFTypeRef transaction = SLSTransactionCreate(border->cid);
+     if (transaction) {
+-      SLSTransactionOrderWindow(transaction,
+-                                border->wid,
+-                                settings->border_order,
+-                                border->target_wid      );
++      SLSTransactionOrderWindow(transaction, border->wid,
++                                settings->border_order, border->target_wid);
+       SLSTransactionCommit(transaction, 0);
+       CFRelease(transaction);
+     }
+diff --git a/src/events.c b/src/events.c
+index a9bfe1b6eb..c5777e479e 100644
+--- a/src/events.c
++++ b/src/events.c
+@@ -1,21 +1,22 @@
+ #include "events.h"
++#include "border.h"
+ #include "misc/extern.h"
++#include "misc/window.h"
+ #include "windows.h"
+-#include "border.h"
+-#include "misc/window.h"
+ 
+ extern struct table g_windows;
+ extern pid_t g_pid;
+ 
+ #ifdef DEBUG
+-static void dump_event(void* data, size_t data_length) {
++static void dump_event(void *data, size_t data_length) {
+   for (int i = 0; i < data_length; i++) {
+-    printf("%02x ", *((unsigned char*)data + i));
++    printf("%02x ", *((unsigned char *)data + i));
+   }
+   printf("\n");
+ }
+ 
+-static void event_watcher(uint32_t event, void* data, size_t data_length, void* context) {
++static void event_watcher(uint32_t event, void *data, size_t data_length,
++                          void *context) {
+   static int count = 0;
+   printf("(%d) Event: %d; Payload:\n", ++count, event);
+   dump_event(data, data_length);
+@@ -35,12 +36,14 @@
+   return pid == g_pid;
+ }
+ 
+-static void window_spawn_handler(uint32_t event, struct window_spawn_data* data, size_t _, int cid) {
+-  struct table* windows = &g_windows;
++static void window_spawn_handler(uint32_t event, struct window_spawn_data *data,
++                                 size_t _, int cid) {
++  struct table *windows = &g_windows;
+   uint32_t wid = data->wid;
+   uint64_t sid = data->sid;
+ 
+-  if (!wid || !sid || is_own_window(cid, wid)) return;
++  if (!wid || !sid || is_own_window(cid, wid))
++    return;
+ 
+   if (event == EVENT_WINDOW_CREATE) {
+     if (windows_window_create(windows, wid, sid)) {
+@@ -55,11 +58,13 @@
+   }
+ }
+ 
+-static void window_modify_handler(uint32_t event, uint32_t* window_id, size_t _, int cid) {
++static void window_modify_handler(uint32_t event, uint32_t *window_id, size_t _,
++                                  int cid) {
+   uint32_t wid = *window_id;
+-  struct table* windows = &g_windows;
++  struct table *windows = &g_windows;
+ 
+-  if (is_own_window(cid, wid)) return;
++  if (is_own_window(cid, wid))
++    return;
+ 
+   if (event == EVENT_WINDOW_MOVE) {
+     debug("Window Move: %d\n", wid);
+@@ -70,17 +75,15 @@
+   } else if (event == EVENT_WINDOW_REORDER) {
+     debug("Window Reorder (and focus): %d\n", wid);
+     windows_window_update(windows, wid);
+-    DELAY_ASYNC_EXEC_ON_MAIN_THREAD(10000, {
+-      windows_determine_and_focus_active_window(windows);
+-    });
++    DELAY_ASYNC_EXEC_ON_MAIN_THREAD(
++        10000, { windows_determine_and_focus_active_window(windows); });
+   } else if (event == EVENT_WINDOW_LEVEL) {
+     debug("Window Level: %d\n", wid);
+     windows_window_update(windows, wid);
+   } else if (event == EVENT_WINDOW_TITLE || event == EVENT_WINDOW_UPDATE) {
+     debug("Window Focus\n");
+-    DELAY_ASYNC_EXEC_ON_MAIN_THREAD(50000, {
+-      windows_determine_and_focus_active_window(windows);
+-    });
++    DELAY_ASYNC_EXEC_ON_MAIN_THREAD(
++        50000, { windows_determine_and_focus_active_window(windows); });
+   } else if (event == EVENT_WINDOW_UNHIDE) {
+     debug("Window Unhide: %d\n", wid);
+     windows_window_unhide(windows, wid);
+@@ -95,20 +98,18 @@
+ 
+ static void front_app_handler() {
+   debug("Window Focus\n");
+-  DELAY_ASYNC_EXEC_ON_MAIN_THREAD(50000, {
+-    windows_determine_and_focus_active_window(&g_windows);
+-  });
++  DELAY_ASYNC_EXEC_ON_MAIN_THREAD(
++      50000, { windows_determine_and_focus_active_window(&g_windows); });
+ }
+ 
+ static void space_handler() {
+   // Not all native-fullscreen windows have yet updated their space id...
+-  DELAY_ASYNC_EXEC_ON_MAIN_THREAD(20000, {
+-    windows_draw_borders_on_current_spaces(&g_windows);
+-  });
++  DELAY_ASYNC_EXEC_ON_MAIN_THREAD(
++      20000, { windows_draw_borders_on_current_spaces(&g_windows); });
+ }
+ 
+ void events_register(int cid) {
+-  void* cid_ctx = (void*)(intptr_t)cid;
++  void *cid_ctx = (void *)(intptr_t)cid;
+ 
+   SLSRegisterNotifyProc(window_modify_handler, EVENT_WINDOW_CLOSE, cid_ctx);
+   SLSRegisterNotifyProc(window_modify_handler, EVENT_WINDOW_MOVE, cid_ctx);
+diff --git a/src/main.c b/src/main.c
+index 55918f8164..d1672be2a6 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1,15 +1,16 @@
+ #include "border.h"
++#include "events.h"
+ #include "hashtable.h"
+-#include "events.h"
+-#include "misc/extern.h"
+-#include "windows.h"
+ #include "mach.h"
+-#include "parse.h"
++#include "misc/ax.h"
+ #include "misc/connection.h"
+-#include "misc/ax.h"
++#include "misc/extern.h"
++#include "misc/screen.h"
+ #include "misc/yabai.h"
++#include "parse.h"
++#include "windows.h"
++#include <dlfcn.h>
+ #include <stdio.h>
+-#include <dlfcn.h>
+ 
+ #define VERSION_OPT_LONG "--version"
+ #define VERSION_OPT_SHRT "-v"
+@@ -22,63 +23,59 @@
+ #define PATCH 0
+ 
+ // Resolved via dlsym because of availability
+-CFArrayRef (* JBSLSWindowIteratorGetCornerRadii)(CFTypeRef) = NULL;
++CFArrayRef (*JBSLSWindowIteratorGetCornerRadii)(CFTypeRef) = NULL;
+ 
+ pid_t g_pid;
+ mach_port_t g_server_port;
+ struct table g_windows;
+ struct mach_server g_mach_server;
+-struct settings g_settings = { .enabled = true,
+-                               .active_window = { .stype = COLOR_STYLE_SOLID,
+-                                                  .color = 0xffe1e3e4 },
+-                               .inactive_window = { .stype = COLOR_STYLE_SOLID,
+-                                                    .color =  0x00000000 },
+-                               .background = { .stype = COLOR_STYLE_SOLID,
+-                                               .color = 0x00000000         },
+-                               .border_width = 4.f,
+-                               .blur_radius = 0,
+-                               .border_style = BORDER_STYLE_ROUND,
+-                               .hidpi = false,
+-                               .show_background = false,
+-                               .border_order = BORDER_ORDER_BELOW,
+-                               .ax_focus = false,
+-                               .blacklist_enabled = false,
+-                               .whitelist_enabled = false                    };
++struct settings g_settings = {
++    .enabled = true,
++    .active_window = {.stype = COLOR_STYLE_SOLID, .color = 0xffe1e3e4},
++    .inactive_window = {.stype = COLOR_STYLE_SOLID, .color = 0x00000000},
++    .background = {.stype = COLOR_STYLE_SOLID, .color = 0x00000000},
++    .border_width = 4.f,
++    .blur_radius = 0,
++    .border_style = BORDER_STYLE_ROUND,
++    .hidpi = false,
++    .show_background = false,
++    .border_order = BORDER_ORDER_BELOW,
++    .ax_focus = false,
++    .blacklist_enabled = false,
++    .whitelist_enabled = false};
+ 
+-static TABLE_HASH_FUNC(hash_windows) {
+-  return *(uint32_t *) key;
+-}
++static TABLE_HASH_FUNC(hash_windows) { return *(uint32_t *)key; }
+ 
+ static TABLE_COMPARE_FUNC(cmp_windows) {
+-  return *(uint32_t *) key_a == *(uint32_t *) key_b;
++  return *(uint32_t *)key_a == *(uint32_t *)key_b;
+ }
+ 
+ static TABLE_HASH_FUNC(hash_blacklist) {
+   // djb2 by Dan Bernstein
+   unsigned long hash = 5381;
+   char c;
+-  while((c = *((char*)key++))) {
++  while ((c = *((char *)key++))) {
+     hash = ((hash << 5) + hash) + c;
+   }
+   return hash;
+ }
+ 
+ static TABLE_COMPARE_FUNC(cmp_blacklist) {
+-  return strcmp((char*)key_a, (char*)key_b) == 0;
++  return strcmp((char *)key_a, (char *)key_b) == 0;
+ }
+ 
+-static void message_handler(void* data, uint32_t len) {
+-  char* message = data;
++static void message_handler(void *data, uint32_t len) {
++  char *message = data;
+   uint32_t update_mask = 0;
+   struct settings settings = g_settings;
+ 
+-  while(message && *message) {
++  while (message && *message) {
+     update_mask |= parse_settings(&settings, 1, &message);
+     message += strlen(message) + 1;
+   }
+ 
+   if (settings.apply_to > 0) {
+-    struct border* border = table_find(&g_windows, &settings.apply_to);
++    struct border *border = table_find(&g_windows, &settings.apply_to);
+     if (border) {
+       border->setting_override = settings;
+       border->setting_override.enabled = true;
+@@ -89,23 +86,22 @@
+   } else {
+     g_settings = settings;
+     for (int i = 0; i < g_windows.capacity; ++i) {
+-      struct bucket* bucket = g_windows.buckets[i];
++      struct bucket *bucket = g_windows.buckets[i];
+       while (bucket) {
+         if (bucket->value) {
+-          struct border* border = bucket->value;
++          struct border *border = bucket->value;
+           if (border->setting_override.enabled) {
+-            char* message = data;
++            char *message = data;
+             uint32_t window_update_mask = 0;
+-            while(message && *message) {
+-              window_update_mask |= parse_settings(&border->setting_override,
+-                                                   1,
+-                                                   &message                  );
++            while (message && *message) {
++              window_update_mask |=
++                  parse_settings(&border->setting_override, 1, &message);
+               message += strlen(message) + 1;
+             }
+ 
+-            if (window_update_mask
+-                && !((update_mask & BORDER_UPDATE_MASK_ALL)
+-                     || (update_mask & BORDER_UPDATE_MASK_RECREATE_ALL))) {
++            if (window_update_mask &&
++                !((update_mask & BORDER_UPDATE_MASK_ALL) ||
++                  (update_mask & BORDER_UPDATE_MASK_RECREATE_ALL))) {
+               border->needs_redraw = true;
+               border_update(border, true);
+             }
+@@ -127,7 +123,7 @@
+   }
+ }
+ 
+-static void send_args_to_server(mach_port_t port, int argc, char** argv) {
++static void send_args_to_server(mach_port_t port, int argc, char **argv) {
+   int message_length = argc;
+   int argl[argc];
+ 
+@@ -137,7 +133,7 @@
+   }
+ 
+   char message[(sizeof(char) * message_length)];
+-  char* temp = message;
++  char *temp = message;
+ 
+   for (int i = 1; i < argc; i++) {
+     memcpy(temp, argv[i], argl[i]);
+@@ -149,10 +145,12 @@
+   mach_send_message(port, message, message_length);
+ }
+ 
+-static void event_callback(CFMachPortRef port, void* message, CFIndex size, void* context) {
++static void event_callback(CFMachPortRef port, void *message, CFIndex size,
++                           void *context) {
+   int cid = SLSMainConnectionID();
+   CGEventRef event = SLEventCreateNextEvent(cid);
+-  if (!event) return;
++  if (!event)
++    return;
+   do {
+     CFRelease(event);
+     event = SLEventCreateNextEvent(cid);
+@@ -161,22 +159,25 @@
+ 
+ void load_symbols() {
+   if (__builtin_available(macOS 26.0, *)) {
+-    void* lib = dlopen("/System/Library/PrivateFrameworks/SkyLight.framework/SkyLight", RTLD_LAZY | RTLD_LOCAL);
++    void *lib =
++        dlopen("/System/Library/PrivateFrameworks/SkyLight.framework/SkyLight",
++               RTLD_LAZY | RTLD_LOCAL);
+     if (lib) {
+-      JBSLSWindowIteratorGetCornerRadii = dlsym(lib, "SLSWindowIteratorGetCornerRadii");
++      JBSLSWindowIteratorGetCornerRadii =
++          dlsym(lib, "SLSWindowIteratorGetCornerRadii");
+     }
+   }
+ }
+ 
+-int main(int argc, char** argv) {
+-  if (argc > 1 && ((strcmp(argv[1], VERSION_OPT_LONG) == 0)
+-                   || (strcmp(argv[1], VERSION_OPT_SHRT) == 0))) {
++int main(int argc, char **argv) {
++  if (argc > 1 && ((strcmp(argv[1], VERSION_OPT_LONG) == 0) ||
++                   (strcmp(argv[1], VERSION_OPT_SHRT) == 0))) {
+     fprintf(stdout, "borders-v%d.%d.%d\n", MAJOR, MINOR, PATCH);
+     exit(EXIT_SUCCESS);
+   }
+ 
+-  if (argc > 1 && ((strcmp(argv[1], HELP_OPT_LONG) == 0)
+-                   || (strcmp(argv[1], HELP_OPT_SHRT) == 0))) {
++  if (argc > 1 && ((strcmp(argv[1], HELP_OPT_LONG) == 0) ||
++                   (strcmp(argv[1], HELP_OPT_SHRT) == 0))) {
+     fprintf(stdout, "Refer to the man page for help: man borders\n");
+     exit(EXIT_SUCCESS);
+   }
+@@ -208,16 +209,12 @@
+   mach_port_t port;
+   CGError err = SLSGetEventPort(cid, &port);
+   if (err == kCGErrorSuccess) {
+-    CFMachPortRef cf_mach_port = CFMachPortCreateWithPort(NULL,
+-                                                          port,
+-                                                          event_callback,
+-                                                          NULL,
+-                                                          false          );
++    CFMachPortRef cf_mach_port =
++        CFMachPortCreateWithPort(NULL, port, event_callback, NULL, false);
+ 
+     _CFMachPortSetOptions(cf_mach_port, 0x40);
+-    CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(NULL,
+-                                                              cf_mach_port,
+-                                                              0            );
++    CFRunLoopSourceRef source =
++        CFMachPortCreateRunLoopSource(NULL, cf_mach_port, 0);
+ 
+     CFRunLoopAddSource(CFRunLoopGetCurrent(), source, kCFRunLoopDefaultMode);
+     CFRelease(cf_mach_port);
+@@ -227,11 +224,12 @@
+   windows_add_existing_windows(&g_windows);
+ 
+   mach_server_begin(&g_mach_server, message_handler);
+-  if (!update_mask) execute_config_file("borders", "bordersrc");
++  if (!update_mask)
++    execute_config_file("borders", "bordersrc");
+ 
+-  #ifdef _YABAI_INTEGRATION
++#ifdef _YABAI_INTEGRATION
+   yabai_register_mach_port(&g_windows);
+-  #endif
++#endif
+   CFRunLoopRun();
+   return 0;
+ }
+diff --git a/src/misc/extern.h b/src/misc/extern.h
+index b41137bc88..7c298092df 100644
+--- a/src/misc/extern.h
++++ b/src/misc/extern.h
+@@ -1,70 +1,108 @@
+ #pragma once
+ #include <CoreGraphics/CoreGraphics.h>
+-extern mach_port_t SLSServerPort(void* zero);
++extern mach_port_t SLSServerPort(void *zero);
+ extern mach_port_t mig_get_special_reply_port(void);
+ extern mach_port_t mig_dealloc_special_reply_port(mach_port_t port);
+ extern CFTypeRef CGRegionCreateEmptyRegion(void);
+ extern int SLSMainConnectionID();
+-extern CGError SLSWindowManagementBridgeSetDelegate(void* delegate);
+-extern CGError SLSGetEventPort(int cid, mach_port_t* port_out);
++extern CGError SLSWindowManagementBridgeSetDelegate(void *delegate);
++extern CGError SLSGetEventPort(int cid, mach_port_t *port_out);
+ extern CGEventRef SLEventCreateNextEvent(int cid);
+ extern void _CFMachPortSetOptions(CFMachPortRef mach_port, int options);
+ 
+-extern CGError SLSRegisterNotifyProc(void* handler, uint32_t event, void* context);
+-extern CGError SLSGetWindowOwner(int cid, uint32_t wid, int* out_cid);
++extern CGError SLSRegisterNotifyProc(void *handler, uint32_t event,
++                                     void *context);
++extern CGError SLSGetWindowOwner(int cid, uint32_t wid, int *out_cid);
+ extern CGError SLSConnectionGetPID(int cid, pid_t *pid);
+-extern CGError SLSRequestNotificationsForWindows(int cid, uint32_t *window_list, int window_count);
++extern CGError SLSRequestNotificationsForWindows(int cid, uint32_t *window_list,
++                                                 int window_count);
+ 
+ extern CGError SLSNewConnection(int zero, int *cid);
+ extern CGError SLSReleaseConnection(int cid);
+-extern CGError SLSWindowIsOrderedIn(int cid, uint32_t wid, bool* shown);
++extern CGError SLSWindowIsOrderedIn(int cid, uint32_t wid, bool *shown);
+ extern CGError SLSGetWindowBounds(int cid, uint32_t wid, CGRect *frame);
+ extern CGError CGSNewRegionWithRect(CGRect *rect, CFTypeRef *outRegion);
+-extern CGError SLSNewWindow(int cid, int type, float x, float y, CFTypeRef region, uint32_t *wid);
+-extern CGError SLSNewWindowWithOpaqueShapeAndContext(int cid, int type, CFTypeRef region, CFTypeRef opaque_shape, int options, uint64_t *tags, float x, float y, int tag_size, uint32_t *wid, void *context);
++extern CGError SLSNewWindow(int cid, int type, float x, float y,
++                            CFTypeRef region, uint32_t *wid);
++extern CGError SLSNewWindowWithOpaqueShapeAndContext(
++    int cid, int type, CFTypeRef region, CFTypeRef opaque_shape, int options,
++    uint64_t *tags, float x, float y, int tag_size, uint32_t *wid,
++    void *context);
+ extern CGError SLSReleaseWindow(int cid, uint32_t wid);
+-extern CGError SLSSetWindowTags(int cid, uint32_t wid, uint64_t* tags, int tag_size);
+-extern CGError SLSClearWindowTags(int cid, uint32_t wid, uint64_t* tags, int tag_size);
+-extern CGError SLSSetWindowShape(int cid, uint32_t wid, float x_offset, float y_offset, CFTypeRef shape);
++extern CGError SLSSetWindowTags(int cid, uint32_t wid, uint64_t *tags,
++                                int tag_size);
++extern CGError SLSClearWindowTags(int cid, uint32_t wid, uint64_t *tags,
++                                  int tag_size);
++extern CGError SLSSetWindowShape(int cid, uint32_t wid, float x_offset,
++                                 float y_offset, CFTypeRef shape);
+ extern CGError SLSSetWindowResolution(int cid, uint32_t wid, double res);
+ extern CGError SLSSetWindowOpacity(int cid, uint32_t wid, bool isOpaque);
+ extern CGError SLSSetWindowAlpha(int cid, uint32_t wid, float alpha);
+-extern CGError SLSSetWindowBackgroundBlurRadius(int cid, uint32_t wid, uint32_t radius);
+-extern CGError SLSSetWindowShadowParameters(int cid, uint32_t wid, float std, float density, int x_offset, int y_offset);
+-extern CGError SLSGetWindowTransform(int cid, uint32_t wid, CGAffineTransform* transform);
+-extern CGError SLSSetWindowTransform(int cid, uint32_t wid, CGAffineTransform transform);
++extern CGError SLSSetWindowBackgroundBlurRadius(int cid, uint32_t wid,
++                                                uint32_t radius);
++extern CGError SLSSetWindowShadowParameters(int cid, uint32_t wid, float std,
++                                            float density, int x_offset,
++                                            int y_offset);
++extern CGError SLSGetWindowTransform(int cid, uint32_t wid,
++                                     CGAffineTransform *transform);
++extern CGError SLSSetWindowTransform(int cid, uint32_t wid,
++                                     CGAffineTransform transform);
+ 
+-extern CGError SLSWindowSetShadowProperties(uint32_t wid, CFDictionaryRef properties);
+-extern CGError SLSGetWindowLevel(int cid, uint32_t wid, int64_t* level_out);
++extern CGError SLSWindowSetShadowProperties(uint32_t wid,
++                                            CFDictionaryRef properties);
++extern CGError SLSGetWindowLevel(int cid, uint32_t wid, int64_t *level_out);
+ extern int32_t SLSGetWindowSubLevel(int cid, uint32_t wid);
+-extern CGError SLSMoveWindowsToManagedSpace(int cid, CFArrayRef window_list, uint64_t sid);
+-extern CGContextRef SLWindowContextCreate(int cid, uint32_t wid, CFDictionaryRef options);
++extern CGError SLSMoveWindowsToManagedSpace(int cid, CFArrayRef window_list,
++                                            uint64_t sid);
++extern CGContextRef SLWindowContextCreate(int cid, uint32_t wid,
++                                          CFDictionaryRef options);
+ 
+ extern CFTypeRef SLSTransactionCreate(int cid);
+-extern CGError SLSTransactionSetWindowLevel(CFTypeRef transaction, uint32_t wid, int level);
+-extern CGError SLSTransactionSetWindowSubLevel(CFTypeRef transaction, uint32_t wid, int level);
+-extern CGError SLSTransactionSetWindowShape(CFTypeRef transaction, uint32_t wid, float x_offset, float y_offset, CFTypeRef shape);
+-extern CGError SLSTransactionMoveWindowWithGroup(CFTypeRef transaction, uint32_t wid, CGPoint point);
+-extern CGError SLSTransactionOrderWindow(CFTypeRef transaction, uint32_t wid, int order, uint32_t rel_wid);
+-extern CGError SLSTransactionSetWindowAlpha(CFTypeRef transaction, uint32_t wid, float alpha);
+-extern CGError SLSTransactionSetWindowSystemAlpha(CFTypeRef transaction, uint32_t wid, float alpha);
+-extern CGError SLSTransactionSetWindowTransform(CFTypeRef transaction, uint32_t wid, int not, int important, CGAffineTransform transform);
++extern CGError SLSTransactionSetWindowLevel(CFTypeRef transaction, uint32_t wid,
++                                            int level);
++extern CGError SLSTransactionSetWindowSubLevel(CFTypeRef transaction,
++                                               uint32_t wid, int level);
++extern CGError SLSTransactionSetWindowShape(CFTypeRef transaction, uint32_t wid,
++                                            float x_offset, float y_offset,
++                                            CFTypeRef shape);
++extern CGError SLSTransactionMoveWindowWithGroup(CFTypeRef transaction,
++                                                 uint32_t wid, CGPoint point);
++extern CGError SLSTransactionOrderWindow(CFTypeRef transaction, uint32_t wid,
++                                         int order, uint32_t rel_wid);
++extern CGError SLSTransactionSetWindowAlpha(CFTypeRef transaction, uint32_t wid,
++                                            float alpha);
++extern CGError SLSTransactionSetWindowSystemAlpha(CFTypeRef transaction,
++                                                  uint32_t wid, float alpha);
++extern CGError SLSTransactionSetWindowTransform(CFTypeRef transaction,
++                                                uint32_t wid, int not,
++                                                int important,
++                                                CGAffineTransform transform);
+ extern CGError SLSTransactionCommit(CFTypeRef transaction, int synchronous);
+-extern CGError SLSTransactionCommitUsingMethod(CFTypeRef transaction, uint32_t method);
++extern CGError SLSTransactionCommitUsingMethod(CFTypeRef transaction,
++                                               uint32_t method);
+ 
+-extern CGError SLSWindowFreezeWithOptions(int cid, uint32_t wid, CFTypeRef options);
++extern CGError SLSWindowFreezeWithOptions(int cid, uint32_t wid,
++                                          CFTypeRef options);
+ extern CGError SLSWindowThaw(int cid, uint32_t wid);
+-extern CFArrayRef SLSCopySpacesForWindows(int cid, int selector, CFArrayRef window_list);
++extern CFArrayRef SLSCopySpacesForWindows(int cid, int selector,
++                                          CFArrayRef window_list);
+ extern CGError SLSDisableUpdate(int cid);
+ extern CGError SLSReenableUpdate(int cid);
+ 
+ extern OSStatus _SLPSGetFrontProcess(ProcessSerialNumber *psn);
+-extern CGError SLSGetConnectionIDForPSN(int cid, ProcessSerialNumber *psn, int *psn_cid);
+-extern CGError SLSCopyConnectionProperty(int cid, int target_cid, CFStringRef key, CFTypeRef* value);
++extern CGError SLSGetConnectionIDForPSN(int cid, ProcessSerialNumber *psn,
++                                        int *psn_cid);
++extern CGError SLSCopyConnectionProperty(int cid, int target_cid,
++                                         CFStringRef key, CFTypeRef *value);
+ 
+-extern CFArrayRef SLSCopyWindowsWithOptionsAndTags(int cid, uint32_t owner, CFArrayRef spaces, uint32_t options, uint64_t *set_tags, uint64_t *clear_tags);
++extern CFArrayRef SLSCopyWindowsWithOptionsAndTags(int cid, uint32_t owner,
++                                                   CFArrayRef spaces,
++                                                   uint32_t options,
++                                                   uint64_t *set_tags,
++                                                   uint64_t *clear_tags);
+ 
+-extern CFTypeRef SLSWindowQueryWindows(int cid, CFArrayRef windows, uint32_t options);
++extern CFTypeRef SLSWindowQueryWindows(int cid, CFArrayRef windows,
++                                       uint32_t options);
+ extern CFTypeRef SLSWindowQueryResultCopyWindows(CFTypeRef window_query);
+ extern int SLSWindowIteratorGetCount(CFTypeRef iterator);
+ extern bool SLSWindowIteratorAdvance(CFTypeRef iterator);
+@@ -80,4 +118,4 @@
+ extern uint64_t SLSManagedDisplayGetCurrentSpace(int cid, CFStringRef uuid);
+ extern CFStringRef SLSCopyActiveMenuBarDisplayIdentifier(int cid);
+ 
+-extern CGError SLSFlushWindowContentRegion(int cid, uint32_t wid, void* dirty);
++extern CGError SLSFlushWindowContentRegion(int cid, uint32_t wid, void *dirty);
+diff --git a/src/misc/screen.h b/src/misc/screen.h
+new file mode 100644
+index 0000000000..4e73fd67f2
+--- /dev/null
++++ b/src/misc/screen.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include <CoreGraphics/CoreGraphics.h>
++
++// Returns true when less than half of the window's area overlaps the visible
++// desktop (the union of all active displays). Window managers that emulate
++// virtual workspaces hide windows by shoving them (almost) entirely offscreen.
++extern bool screen_window_mostly_offscreen(CGRect window_frame);
+diff --git a/src/misc/screen.m b/src/misc/screen.m
+new file mode 100644
+index 0000000000..43cd8988e5
+--- /dev/null
++++ b/src/misc/screen.m
+@@ -0,0 +1,39 @@
++#include "screen.h"
++
++// Fraction of a window's area that must overlap the visible desktop for the
++// window to be considered onscreen. Below this it is treated as hidden.
++#define SCREEN_MIN_VISIBLE_FRACTION 0.5f
++
++// Union of all active display bounds, in CoreGraphics global coordinates
++// (top-left origin) -- the same coordinate space as SLSGetWindowBounds.
++static CGRect screen_total_bounds(void) {
++  uint32_t count = 0;
++  if (CGGetActiveDisplayList(0, NULL, &count) != kCGErrorSuccess || count == 0)
++    return CGRectNull;
++
++  CGDirectDisplayID displays[count];
++  if (CGGetActiveDisplayList(count, displays, &count) != kCGErrorSuccess)
++    return CGRectNull;
++
++  CGRect total = CGRectNull;
++  for (uint32_t i = 0; i < count; i++)
++    total = CGRectUnion(total, CGDisplayBounds(displays[i]));
++
++  return total;
++}
++
++bool screen_window_mostly_offscreen(CGRect window_frame) {
++  float window_area = window_frame.size.width * window_frame.size.height;
++  if (window_area <= 0.f)
++    return false;
++
++  CGRect total = screen_total_bounds();
++  if (CGRectIsNull(total))
++    return false;
++
++  CGRect visible = CGRectIntersection(window_frame, total);
++  float visible_area =
++      CGRectIsNull(visible) ? 0.f : visible.size.width * visible.size.height;
++
++  return (visible_area / window_area) < SCREEN_MIN_VISIBLE_FRACTION;
++}

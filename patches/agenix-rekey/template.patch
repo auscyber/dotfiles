@@ -1,0 +1,163 @@
+From e77b15e446afb09fb8fea99ac5c486a5d9980dc8 Mon Sep 17 00:00:00 2001
+From: Ivy Pierlot <ivyp@outlook.com.au>
+Date: Fri, 9 Jan 2026 21:13:57 +1100
+Subject: [PATCH 1/2] generate better
+
+---
+ apps/generate.nix        | 16 +++++++++++++-
+ modules/agenix-rekey.nix | 46 ++++++++++++++++++++++------------------
+ 2 files changed, 40 insertions(+), 22 deletions(-)
+
+diff --git a/apps/generate.nix b/apps/generate.nix
+index c3da7d2..d5dfc17 100644
+--- a/apps/generate.nix
++++ b/apps/generate.nix
+@@ -73,17 +73,31 @@ let
+           secret.rekeyFile != null
+         ) "Host ${host}: age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
+         relativeToFlake secret.rekeyFile;
++      shahHash = v: builtins.hashString "sha256" (toString v);
++      placeholderFunc =
++        dep:
++        "<AGENIX_REKEY_PLACEHOLDER:${shahHash dep.id}:${shahHash (toString (relativeToFlake dep.rekeyFile))}:${shahHash (toString (findHost dep))}>";
++
+       script = secret.generator._script {
+         inherit secret pkgs;
+         inherit (pkgs) lib;
+         file = sourceFile;
+         name = secretName;
+         decrypt = ageMasterDecrypt;
+-        deps = flip mapListOrAttrs secret.generator.dependencies (dep: {
++        value =
++          if secret.generator.value != null then
++            secret.generator.value {
++              placeholders = mapListOrAttrs placeholderFunc secret.generator.dependencies;
++            }
++          else
++            null;
++        deps = flip mapListOrAttrs secret.generator.dependencies (dep: rec {
+           host = findHost dep;
+           name = dep.id;
+           file = relativeToFlake dep.rekeyFile;
++          placeholder = "${placeholderFunc dep}";
+         });
++
+       };
+     in
+     # Filter secrets that don't need to be generated
+diff --git a/modules/agenix-rekey.nix b/modules/agenix-rekey.nix
+index 7f86ffa..f43ace0 100644
+--- a/modules/agenix-rekey.nix
++++ b/modules/agenix-rekey.nix
+@@ -125,6 +125,11 @@ let
+           are rekeyed via the same flake.
+         '';
+       };
++      value = mkOption {
++        type = types.nullOr (types.functionTo types.anything);
++        default = null;
++        description = "This function will take deps and pass it to the script as 'value' parameter.";
++      };
+ 
+       script = mkOption {
+         type = types.either types.str (types.functionTo types.str);
+@@ -198,27 +203,26 @@ let
+ in
+ {
+   config = {
+-    assertions =
+-      [
+-        {
+-          assertion = config.age.rekey.masterIdentities != [ ];
+-          message = "rekey.masterIdentities must be set.";
+-        }
+-      ]
+-      ++ flatten (
+-        flip mapAttrsToList config.age.secrets (
+-          secretName: secretCfg: [
+-            {
+-              assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
+-              message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
+-            }
+-            {
+-              assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
+-              message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
+-            }
+-          ]
+-        )
+-      );
++    assertions = [
++      {
++        assertion = config.age.rekey.masterIdentities != [ ];
++        message = "rekey.masterIdentities must be set.";
++      }
++    ]
++    ++ flatten (
++      flip mapAttrsToList config.age.secrets (
++        secretName: secretCfg: [
++          {
++            assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
++            message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
++          }
++          {
++            assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
++            message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
++          }
++        ]
++      )
++    );
+ 
+     warnings =
+       let
+
+From 88d006d55d9f941a670192511628ce9542d0ce78 Mon Sep 17 00:00:00 2001
+From: Ivy Pierlot <ivyp@outlook.com.au>
+Date: Tue, 13 Jan 2026 17:06:16 +1100
+Subject: [PATCH 2/2] add template support
+
+---
+ apps/rekey.nix | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/apps/rekey.nix b/apps/rekey.nix
+index c53db08..c0a31dc 100644
+--- a/apps/rekey.nix
++++ b/apps/rekey.nix
+@@ -12,6 +12,8 @@ let
+     escapeShellArg
+     escapeShellArgs
+     filterAttrs
++    concatMapAttrs
++    mapAttrs'
+     flip
+     hasPrefix
+     makeBinPath
+@@ -34,6 +36,8 @@ let
+       hostConfig = hostCfg.config;
+     };
+ 
++  concatMapListOrAttrsToAttrs =
++    f: x: if builtins.isList x then builtins.listToAttrs (map (f x.name x)) else mapAttrs' f x;
+   # Returns the outPath/drvPath for the secrets of a given host, without
+   # triggering a build of the derivation.
+   outPathFor =
+@@ -64,8 +68,17 @@ let
+   rekeyCommandsForHost =
+     hostName: hostCfg:
+     let
+-      # All secrets that have rekeyFile set. These will be rekeyed.
+-      secretsToRekey = flip filterAttrs hostCfg.config.age.secrets (
++
++      # get all secrets from dependencies of templates
++      templateSecrets = flip concatMapAttrs (hostCfg.config.age.templates) (
++        templateName: template:
++        concatMapListOrAttrsToAttrs (secretName: secret: {
++          name = "${templateName}-${secretName}";
++          value = secret;
++        }) template.dependencies
++      );
++
++      secretsToRekey = flip filterAttrs (hostCfg.config.age.secrets // templateSecrets) (
+         name: secret:
+         let
+           hint =

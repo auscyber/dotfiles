@@ -1,0 +1,12 @@
+diff --git a/flake.nix b/flake.nix
+index ee8340b..a0eb35c 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -21,6 +21,7 @@
+       darwin,
+       home-manager,
+       systems,
++      ...
+     }:
+     let
+       eachSystem = nixpkgs.lib.genAttrs (import systems);

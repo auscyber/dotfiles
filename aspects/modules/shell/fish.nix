@@ -7,11 +7,13 @@
       den.aspects.shell
     ];
     homeManager = {
-      programs.fish.enable = true;
 
+      stylix.targets.fish.enable = false;
+      programs.fish.enable = true;
     };
     provides.to-host = { pkgs, ... }: {
       os.environment.shells = [ pkgs.fish ];
+      os.programs.fish.enable = true;
     };
   };
 

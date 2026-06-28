@@ -1,5 +1,6 @@
 {
   writeShellApplication,
+  lyricsList,
   viu,
   lib,
   nowplaying-cli,
@@ -9,9 +10,8 @@ writeShellApplication {
   name = "fetch";
   checkPhase = "";
   bashOptions = [ ];
-  runtimeInputs =
-    [ viu ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ nowplaying-cli ];
+  runtimeEnv.LYRICSLIST = lyricsList;
+  runtimeInputs = [ viu ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ nowplaying-cli ];
   text = builtins.readFile ./fetch;
   meta.platforms = lib.platforms.unix;
 }

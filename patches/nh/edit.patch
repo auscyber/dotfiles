@@ -1,0 +1,381 @@
+diff --git a/crates/nh-darwin/src/args.rs b/crates/nh-darwin/src/args.rs
+index 22babd9..492020b 100644
+--- a/crates/nh-darwin/src/args.rs
++++ b/crates/nh-darwin/src/args.rs
+@@ -78,6 +78,17 @@ pub struct DarwinRebuildArgs {
+   /// Build the configuration on a different host over SSH
+   #[arg(long)]
+   pub build_host: Option<RemoteHost>,
++
++
++  /// Explicitly select some specialisation
++  #[arg(long, short)]
++  pub specialisation: Option<String>,
++
++  /// Ignore specialisations
++  #[arg(long, short = 'S')]
++  pub no_specialisation: bool,
++
++
+ }
+ 
+ impl DarwinRebuildArgs {
+diff --git a/crates/nh-darwin/src/darwin.rs b/crates/nh-darwin/src/darwin.rs
+index 1c565a5..bdaf47d 100644
+--- a/crates/nh-darwin/src/darwin.rs
++++ b/crates/nh-darwin/src/darwin.rs
+@@ -20,6 +20,9 @@ use tracing::{debug, info, warn};
+ const SYSTEM_PROFILE: &str = "/nix/var/nix/profiles/system";
+ const CURRENT_PROFILE: &str = "/run/current-system";
+ 
++
++const SPEC_LOCATION: &str = "/etc/specialisation";
++
+ impl DarwinArgs {
+   /// Run the `darwin` subcommand.
+   ///
+@@ -84,7 +87,7 @@ impl DarwinRebuildArgs {
+         (dir.as_ref().join("result"), Some(dir))
+       };
+ 
+-    debug!("Output path: {out_path:?}");
++        debug!("Output path: {out_path:?}");
+ 
+     let installable = self
+       .common
+@@ -146,6 +149,26 @@ impl DarwinRebuildArgs {
+     let target_profile = out_path.clone();
+ 
+     target_profile.try_exists().context("Doesn't exist")?;
++  let current_specialisation = std::fs::read_to_string(SPEC_LOCATION)
++      .ok()
++      .map(|s| s.trim().to_owned()).filter(|s| !s.is_empty());
++
++
++    let target_specialisation = if self.no_specialisation {
++      None
++    } else {
++      self.specialisation.or(current_specialisation)
++    };
++
++    let target_profile = if let Some(ref specialisation) = target_specialisation {
++      target_profile.join("specialisation").join(specialisation)
++    } else {
++      target_profile.clone()
++    };
++
++    debug!("target_specialisation: {target_specialisation:?}");
++
++  
+ 
+     debug!(
+       "Comparing with target profile: {}",
+@@ -182,9 +205,14 @@ impl DarwinRebuildArgs {
+         .with_required_env()
+         .run()
+         .wrap_err("Failed to set Darwin system profile")?;
++      
++
++
++
++      let darwin_rebuild = target_profile.join("sw/bin/darwin-rebuild");
++      let activate_user = target_profile.join("activate-user");
+ 
+-      let darwin_rebuild = out_path.join("sw/bin/darwin-rebuild");
+-      let activate_user = out_path.join("activate-user");
++      debug!("Darwin rebuild path: {}", darwin_rebuild.display());
+ 
+       // Determine if we need to elevate privileges
+       let needs_elevation = !activate_user
+diff --git a/flake.lock b/flake.lock
+index f2e2e70..d564e1e 100644
+--- a/flake.lock
++++ b/flake.lock
+@@ -1,5 +1,20 @@
+ {
+   "nodes": {
++    "crane": {
++      "locked": {
++        "lastModified": 1781825982,
++        "narHash": "sha256-SlXKwIRIhrOSAcTjCB3ftPLzJWZStQIPS7J1FlZPnKk=",
++        "owner": "ipetkov",
++        "repo": "crane",
++        "rev": "469fd08d0bcf6926321fa973c6777fbc87785dd7",
++        "type": "github"
++      },
++      "original": {
++        "owner": "ipetkov",
++        "repo": "crane",
++        "type": "github"
++      }
++    },
+     "nixpkgs": {
+       "locked": {
+         "lastModified": 1780243769,
+@@ -15,6 +30,7 @@
+     },
+     "root": {
+       "inputs": {
++        "crane": "crane",
+         "nixpkgs": "nixpkgs"
+       }
+     }
+diff --git a/flake.nix b/flake.nix
+index e631d5c..c134ad9 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -1,10 +1,14 @@
+ {
+-  inputs.nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
++  inputs = {
++    nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
+ 
++    crane.url = "github:ipetkov/crane";
++  };
+   outputs =
+     {
+       self,
+       nixpkgs,
++      crane,...
+     }:
+     let
+       inherit (nixpkgs) lib;
+@@ -26,10 +30,18 @@
+       rev = self.shortRev or self.dirtyShortRev or "dirty";
+     in
+     {
+-      overlays.default = final: _: { nh = final.callPackage ./package.nix { inherit rev; }; };
++      overlays.default = final: _: {
++        nh = final.callPackage ./package.nix {
++          inherit crane rev;
++          pkgs = final;
++        };
++      };
+ 
+       packages = forAllSystems (pkgs: {
+-        nh = pkgs.callPackage ./package.nix { inherit rev; };
++        nh = pkgs.callPackage ./package.nix {
++          inherit crane rev;
++          pkgs = pkgs;
++        };
+         default = self.packages.${pkgs.stdenv.hostPlatform.system}.nh;
+       });
+ 
+@@ -48,7 +60,7 @@
+           name = "nix3-fmt-wrapper";
+ 
+           runtimeInputs = [
+-            pkgs.nixfmt-rfc-style
++            pkgs.nixfmt
+             pkgs.taplo
+             pkgs.deno
+             pkgs.fd
+diff --git a/package.nix b/package.nix
+index b01fa8c..e46faec 100644
+--- a/package.nix
++++ b/package.nix
+@@ -1,24 +1,16 @@
+ {
+-  lib,
+-  stdenv,
+-  rustPlatform,
+-  makeBinaryWrapper,
+-  installShellFiles,
+-  versionCheckHook,
+-  sudo,
++  pkgs,
++  crane,
++  rev ? "dirty",
+   use-nom ? true,
+   nix-output-monitor ? null,
+-  rev ? "dirty",
+ }:
+ assert use-nom -> nix-output-monitor != null;
+ let
++  lib = pkgs.lib;
++  craneLib = crane.mkLib pkgs;
+   runtimeDeps = lib.optionals use-nom [ nix-output-monitor ];
+   cargoToml = lib.importTOML ./Cargo.toml;
+-in
+-rustPlatform.buildRustPackage (finalAttrs: {
+-  pname = "nh";
+-  version = "${cargoToml.workspace.package.version}-${rev}";
+-
+   src = lib.fileset.toSource {
+     root = ./.;
+     fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource ./.)) (
+@@ -31,105 +23,83 @@ rustPlatform.buildRustPackage (finalAttrs: {
+         ./Cargo.lock
+       ]
+     );
++
+   };
++  skipTests = lib.concatStringsSep " " (
++    [
++      "--skip test_get_build_image_variants_expression"
++      "--skip test_get_build_image_variants_file"
++      "--skip test_get_build_image_variants_flake"
++    ]
++    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
++      "--skip test_build_sudo_cmd_basic"
++      "--skip test_build_sudo_cmd_with_preserve_vars"
++      "--skip test_build_sudo_cmd_with_preserve_vars_disabled"
++      "--skip test_build_sudo_cmd_with_set_vars"
++      "--skip test_build_sudo_cmd_force_no_stdin"
++      "--skip test_build_sudo_cmd_with_remove_vars"
++      "--skip test_build_sudo_cmd_with_askpass"
++      "--skip test_build_sudo_cmd_env_added_once"
++      "--skip test_elevation_strategy_passwordless_resolves"
++      "--skip test_build_sudo_cmd_with_nix_config_spaces"
++    ]
++  );
++  commonArgs = {
++    inherit src;
++    pname = "nh";
++    version = "${cargoToml.workspace.package.version}-${rev}";
++    strictDeps = true;
++    cargoExtraArgs = "--workspace";
++    buildInputs = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.libiconv ];
++    nativeCheckInputs = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.sudo ];
++    env.NH_REV = rev;
++  };
++  cargoArtifacts = craneLib.buildDepsOnly commonArgs;
++in
++craneLib.buildPackage (
++  commonArgs
++  // {
++    inherit cargoArtifacts;
+ 
+-  strictDeps = true;
+-  nativeBuildInputs = [
+-    installShellFiles
+-    makeBinaryWrapper
+-  ];
++    nativeBuildInputs = [
++      pkgs.installShellFiles
++      pkgs.makeBinaryWrapper
++    ];
+ 
+-  cargoLock.lockFile = ./Cargo.lock;
++    cargoTestExtraArgs = "-- ${skipTests}";
+ 
+-  postInstall =
+-    lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+-      # Run both shell completion and manpage generation tasks. Unlike the
+-      # fine-grained variants, the 'dist' command doesn't allow specifying the
+-      # path but that's fine, because we can simply install them from the implicit
+-      # output directories.
++    postInstall = ''
++      # Generate shell completions and the man page using the installed xtask.
+       $out/bin/xtask dist
+ 
+-      # The dist task above should've created
+-      #  1. Shell completions in comp/
+-      #  2. The NH manpage (nh.1) in man/
+-      # Let's install those.
+-      # The important thing to note here is that installShellCompletion cannot
+-      # actually load *all* shell completions we generate with 'xtask dist'.
+-      # Elvish, for example isn't supported. So we have to be very explicit
+-      # about what we're installing, or this will fail.
+-      installShellCompletion --cmd ${finalAttrs.meta.mainProgram} ./comp/*.{bash,fish,zsh,nu}
+-      installManPage ./man/nh.1
+-    ''
+-    + ''
+-      # Avoid populating PATH with an 'xtask' cmd
++      # Remove xtask from the final output; it is only needed during install.
+       rm $out/bin/xtask
+-    '';
+-
+-  postFixup = ''
+-    wrapProgram $out/bin/nh \
+-      --prefix PATH : ${lib.makeBinPath runtimeDeps}
+-  '';
+ 
+-  nativeInstallCheckInputs = [ versionCheckHook ];
+-  doInstallCheck = false; # FIXME: --version includes 'dirty' and the hook doesn't let us change the assertion
+-  versionCheckProgram = "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}";
+-  versionCheckProgramArg = "--version";
+-
+-  # pkgs.sudo is not available on the Darwin platform, and thus breaks build
+-  # if added to nativeCheckInputs. We must manually disable the tests that
+-  # *require* it, because they will fail when sudo is missing.
+-  nativeCheckInputs = lib.optionals (!stdenv.hostPlatform.isDarwin) [ sudo ];
+-  checkFlags = [
+-    # These do not work in Nix's sandbox
+-    "--skip"
+-    "test_get_build_image_variants_expression"
+-    "--skip"
+-    "test_get_build_image_variants_file"
+-    "--skip"
+-    "test_get_build_image_variants_flake"
+-  ]
+-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+-    # Tests that require sudo in PATH (not available on Darwin)
+-    "--skip"
+-    "test_build_sudo_cmd_basic"
+-    "--skip"
+-    "test_build_sudo_cmd_with_preserve_vars"
+-    "--skip"
+-    "test_build_sudo_cmd_with_preserve_vars_disabled"
+-    "--skip"
+-    "test_build_sudo_cmd_with_set_vars"
+-    "--skip"
+-    "test_build_sudo_cmd_force_no_stdin"
+-    "--skip"
+-    "test_build_sudo_cmd_with_remove_vars"
+-    "--skip"
+-    "test_build_sudo_cmd_with_askpass"
+-    "--skip"
+-    "test_build_sudo_cmd_env_added_once"
+-    "--skip"
+-    "test_elevation_strategy_passwordless_resolves"
+-    "--skip"
+-    "test_build_sudo_cmd_with_nix_config_spaces"
+-  ];
++      installShellCompletion --cmd nh ./comp/*.{bash,fish,zsh,nu}
++      installManPage ./man/nh.1
++    '';
+ 
+-  # Besides the install check, we have a bunch of tests to run. Nextest is
+-  # the fastest way of running those since it's significantly faster than
+-  # `cargo test`, and has a nicer UI with CI-friendly characteristics.
+-  useNextest = true;
+-  cargoTestFlags = [ "--workspace" ];
++    postFixup = ''
++      wrapProgram $out/bin/nh \
++        --prefix PATH : ${lib.makeBinPath runtimeDeps}
++    '';
+ 
+-  env.NH_REV = rev;
++    nativeInstallCheckInputs = [ pkgs.versionCheckHook ];
++    doInstallCheck = false;
++    versionCheckProgram = "${placeholder "out"}/bin/nh";
++    versionCheckProgramArg = "--version";
+ 
+-  meta = {
+-    description = "Yet another nix cli helper";
+-    homepage = "https://github.com/nix-community/nh";
+-    license = lib.licenses.eupl12;
+-    mainProgram = "nh";
+-    maintainers = with lib.maintainers; [
+-      drupol
+-      faukah
+-      NotAShelf
+-      viperML
+-    ];
+-  };
+-})
++    meta = {
++      description = "Yet another nix cli helper";
++      homepage = "https://github.com/nix-community/nh";
++      license = lib.licenses.eupl12;
++      mainProgram = "nh";
++      maintainers = with lib.maintainers; [
++        drupol
++        faukah
++        NotAShelf
++        viperML
++      ];
++    };
++  }
++)

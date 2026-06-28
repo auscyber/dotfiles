@@ -8,17 +8,40 @@
 {
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      # Import all *.nix files in the ./aspects directory
-      # Except ones that start with '_'
-      imports =
-        with inputs.nixpkgs.lib;
-        ./aspects
-        |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
-        |> fileset.toList;
+    let
+      # Flake-LEVEL input overrides. ./patched-inputs.nix returns an attrset
+      # that is merged over `inputs`, so the result is what every module
+      # (and flake-level import) sees as `inputs`. Patched sources are built
+      # with the pinned system below; empty patched-inputs.nix is a no-op
+      # (pkgs is only forced when an override actually uses it).
+      inputsFn =
+        finalInputs:
+        inputs.flake-parts.lib.mkFlake
+          {
+            inputs = finalInputs;
+            specialArgs = {
+              realInputs = inputs;
+              lib = inputs.nixpkgs.lib;
+            };
+          }
+          {
+            # Import all *.nix files in the ./aspects directory
+            # Except ones that start with '_'
+            imports =
+              with finalInputs.nixpkgs.lib;
+              ./aspects
+              |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
+              |> fileset.toList;
 
-      _module.args.rootPath = ./.;
-    };
+            _module.args.rootPath = ./.;
+          };
+      output =
+        let
+          patchedInputs = (inputsFn inputs).newInputs;
+        in
+        inputsFn (patchedInputs);
+    in
+    builtins.removeAttrs output [ "newInputs" ];
 
   nixConfig = {
     extra-substituters = [
@@ -35,9 +58,7 @@
 
   inputs = {
     age-plugin-gpg = {
-      type = "git";
-      url = "./.";
-      ref = "inputs/age-plugin-gpg";
+      url = "github:certainlach/age-plugin-gpg";
       inputs = {
         crane.follows = "crane";
         flake-parts.follows = "flake-parts";
@@ -46,7 +67,7 @@
       };
     };
     agenix = {
-      url = "github:auscyber/agenix?ref=add-templates";
+      url = "github:ryantm/agenix";
       inputs = {
         darwin.follows = "darwin";
         home-manager.follows = "home-manager";
@@ -54,7 +75,14 @@
       };
     };
     agenix-rekey = {
-      url = "github:auscyber/agenix-rekey?ref=add-template-support";
+      url = "github:oddlama/agenix-rekey";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    arion = {
+      url = "github:hercules-ci/arion";
       inputs = {
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
@@ -73,7 +101,7 @@
       inputs = { };
     };
     darwin = {
-      url = "github:auscyber/nix-darwin?ref=inputs/darwin";
+      url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     den = {
@@ -84,6 +112,14 @@
       url = "github:denful/den-diagram";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    emacs = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flake-compat = {
+      url = "github:nixos/flake-compat";
+      flake = false;
+    };
     flake-file = {
       url = "github:denful/flake-file";
       inputs = { };
@@ -93,7 +129,7 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:auscyber/home-manager?ref=inputs/home-manager";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     homebrew-cask = {
@@ -112,27 +148,86 @@
       url = "github:typewhisper/homebrew-tap";
       flake = false;
     };
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     import-tree = {
       url = "github:vic/import-tree";
       inputs = { };
     };
-    nh = {
-      url = "github:auscyber/nh?ref=inputs/nh";
+    my-nur = {
+      url = "github:auscyber/nur-packages";
       inputs = {
-        crane.follows = "crane";
         nixpkgs.follows = "nixpkgs";
+        nvfetcher.follows = "nvfetcher";
       };
+    };
+    nh = {
+      url = "github:nix-community/nh";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-flatpak = {
+      url = "github:gmodena/nix-flatpak/";
+      inputs = { };
     };
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
       inputs = { };
     };
+    nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    nixcord = {
+      url = "github:kaylorben/nixcord";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-images = {
+      url = "github:nvmd/nixos-images/sdimage-installer";
+      inputs = {
+        nixos-stable.follows = "nixpkgs-nvmd";
+        nixos-unstable.follows = "nixpkgs-nvmd";
+      };
+    };
+    nixos-mailserver = {
+      url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+      inputs = {
+        nixos-images.follows = "nixos-images";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs = {
       url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
+      inputs = { };
+    };
+    nixpkgs-nvmd = {
+      url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
       inputs = { };
     };
     nixvim = {
@@ -148,6 +243,10 @@
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
       };
+    };
+    nvfetcher = {
+      url = "github:berberman/nvfetcher";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     op-shell-plugins = {
       url = "github:1Password/shell-plugins";

@@ -1,0 +1,206 @@
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.programs.kanata;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
+  outputFile = pkgs.writeText "kanata-config.kbd" ''
+    (include ${cfg.config})
+    ${lib.concatStringsSep "\n" (map (path: "(include " + path + ")") cfg.extraConfigPaths)}
+  '';
+  defaultConfigFile = (
+    pkgs.writers.writeTOML "kanata-tray-config" (
+      lib.recursiveUpdate cfg.tray.config {
+        defaults.kanata_config = "~/.config/kanata/kanata.kbd";
+        defaults.autorestart_on_crash = true;
+        defaults.autorun = true;
+
+      }
+    )
+  );
+in
+{
+  options.programs.kanata = with lib.types; {
+    enable = lib.mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable kanata service";
+    };
+    extraPackages = lib.mkOption {
+      type = listOf package;
+      default = [ ];
+      description = "Extra packages to install when kanata is enabled";
+    };
+    kanataPort = lib.mkOption {
+      type = int;
+      default = 5829;
+    };
+    appBundleIds = lib.mkOption {
+      type = listOf str;
+      default = [ ];
+    };
+    package = lib.mkOption {
+      type = package;
+      default = pkgs.kanata-with-cmd;
+      description = "kanata package to use";
+    };
+    config = lib.mkOption {
+      type = str;
+      default = "${pkgs.kanata}/share/kanata/kanata.kbd";
+      description = "kanata config file content";
+    };
+    extraConfigPaths = lib.mkOption {
+      type = listOf path;
+      default = [ ];
+      description = "Extra config file paths to include";
+    };
+
+    kanataCommand = lib.mkOption {
+      type = listOf str;
+      default = [ "" ];
+      description = "kanata command to run";
+    };
+    tray = {
+      package = lib.mkPackageOption pkgs "kanata-tray" { };
+      command = lib.mkOption {
+        type = listOf str;
+        default = [ "" ];
+        description = "kanata tray command to run";
+      };
+      config = lib.mkOption {
+        type = types.attrs;
+        default = { };
+        description = "kanata tray config file path";
+      };
+      configFile = lib.mkOption {
+        type = types.path;
+        default = defaultConfigFile;
+        description = "kanata tray config file ";
+      };
+
+    };
+
+    extraCommandPiping = lib.mkOption {
+      type = nullOr path;
+      default = null;
+      description = "Extra virtual command keys";
+    };
+  };
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
+      (lib.mkIf isLinux {
+        systemd.user.services.kanata = {
+          Unit = {
+            Description = "Kanata keyboard remapper";
+
+            PartOf = [ config.wayland.systemd.target ];
+            After = [
+              "network.target"
+              "dbus.service"
+              config.wayland.systemd.target
+            ];
+          };
+          Install = {
+            WantedBy = [ config.wayland.systemd.target ];
+          };
+
+          Service = {
+            ExecStart = "${cfg.package}/bin/kanata -c '${cfg.config}' -p ${builtins.toString cfg.kanataPort}";
+            Restart = "no";
+            #            Environment = "PATH=$PATH:${lib.makeBinPath ([ cfg.package ] ++ cfg.extraPackages)}";
+          };
+        };
+        home.packages = with pkgs; [ cfg.package ] ++ cfg.extraPackages;
+      })
+      (lib.mkIf isDarwin {
+        # enable karabiner driver
+        programs.kanata.kanataCommand = lib.mkDefault [
+          "${cfg.package}/bin/kanata"
+          "-p"
+          "${builtins.toString cfg.kanataPort}"
+          "-c"
+          "${outputFile}"
+        ];
+        programs.kanata.tray.command = lib.mkDefault [
+          "${cfg.tray.package}/bin/kanata-tray"
+        ];
+        home.file.".config/kanata/kanata.kbd".source = outputFile;
+        home.file."Library/Application Support/kanata-tray/kanata-tray.toml".source = cfg.tray.configFile;
+
+        launchd.agents.kanata-vk-agent = {
+          enable = true;
+          config = {
+            Label = "org.nixos.kanata-vk-agent";
+            ProgramArguments = [
+              "${pkgs.kanata-vk-agent}/bin/kanata-vk-agent"
+              "-p"
+              "${builtins.toString cfg.kanataPort}"
+              "-b"
+              "${builtins.concatStringsSep "," cfg.appBundleIds}"
+            ]
+            ++ (lib.optionals (cfg.extraCommandPiping != null) [
+              "-e"
+              (builtins.toString cfg.extraCommandPiping)
+            ]);
+            RunAtLoad = true;
+            KeepAlive = {
+              Crashed = true;
+              SuccessfulExit = false;
+            };
+            StandardErrorPath = "/tmp/kanata-vk-agent.err";
+            StandardOutPath = "/tmp/kanata-vk-agent.out";
+
+          };
+
+        };
+        launchd.agents.kanata_tray = {
+          enable = true;
+          config = {
+            ProgramArguments = [
+              "/usr/bin/sudo"
+              "-E"
+            ]
+            ++ cfg.tray.command;
+            StandardErrorPath = "/tmp/kanata_tray.err";
+            StandardOutPath = "/tmp/kanata_tray.out";
+            RunAtLoad = true;
+            KeepAlive = true;
+            EnvironmentVariables = {
+              KANATA_TRAY_LOG_DIR = "/tmp";
+              PATH =
+                "/usr/bin/:/sbin:/bin:/usr/local/bin:"
+                + lib.makeBinPath (with pkgs; [ cfg.package ] ++ cfg.extraPackages);
+            };
+          };
+        };
+
+        launchd.agents.kanata = {
+          enable = false;
+          config = {
+            ProgramArguments = [
+              "/usr/bin/sudo"
+              "-E"
+            ]
+            ++ cfg.kanataCommand;
+            StandardErrorPath = "/tmp/kanata_tray.err";
+            StandardOutPath = "/tmp/kanata_tray.out";
+            RunAtLoad = true;
+            KeepAlive = true;
+            EnvironmentVariables = {
+              PATH =
+                "/usr/bin/:/sbin:/bin:/usr/local/bin:"
+                + lib.makeBinPath (with pkgs; [ cfg.package ] ++ cfg.extraPackages);
+            };
+          };
+        };
+        home.packages = [ cfg.package ];
+        #          auscybernix.keybinds.karabiner-driver-kit.karabinerPackage = pkgs.karabiner-elements;
+      })
+
+    ]
+  );
+
+}
