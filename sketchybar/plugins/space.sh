@@ -18,19 +18,17 @@ fi
 # the space invoking this script (with name: $NAME) is currently selected:
 # https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
 
-source "$HOME/.config/icon_map.sh"
-
 ITEM_NAME=${2:-${NAME}}
 
 case "$SENDER" in
-	"mouse.clicked")
-		rift-cli execute workspace switch "${ITEM_NAME#space.}"
-		exit 0
-		;;
-	"mouse.entered"|"mouse.exited")
-		# Hover events do not need full workspace refreshes.
-		exit 0
-		;;
+"mouse.clicked")
+	rift-cli execute workspace switch "${ITEM_NAME#space.}"
+	exit 0
+	;;
+"mouse.entered" | "mouse.exited")
+	# Hover events do not need full workspace refreshes.
+	exit 0
+	;;
 esac
 
 WORKSPACE_ID=${1:-${ITEM_NAME#space.}}
@@ -89,6 +87,4 @@ sketchybar --set "$ITEM_NAME" \
 	icon.drawing=off \
 	label="$icon_strip" \
 	label.drawing="$LABEL_DRAWING" \
-	label.border_color=0xff$color_foreground \
-	label.padding_left=1 \
-	label.border_width=1
+	label.padding_left=1

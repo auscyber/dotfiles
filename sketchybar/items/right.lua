@@ -99,11 +99,9 @@ local overflow = sbar.add("item", "overflow", {
 		height = 0,
 		background = {
 			color = 0xcc000000,
-			border_color = colors.with_alpha(colors.yellow, 0.35),
+			border_color = colors.yellow,
 			border_width = 1,
 			corner_radius = 8,
-			padding_left = 6,
-			padding_right = 6,
 		},
 	},
 })
@@ -223,11 +221,9 @@ sbar.add("bracket", "all_utils", {
 	"Control Centre,FocusModes",
 }, {
 	background = {
-		color = colors.with_alpha(colors.yellow, 0.25),
+		color = colors.yellow,
 		height = 30,
 		corner_radius = 20,
-		padding_right = 10,
-		padding_left = 10,
 	},
 })
 
@@ -237,9 +233,8 @@ sbar.add("bracket", "utils", {
 	"volume",
 }, {
 	background = {
-		color = colors.with_alpha(colors.yellow, 0.25),
+		color = colors.yellow,
 		height = 30,
 		corner_radius = 15,
-		padding = 10,
 	},
 })

@@ -1,4 +1,0 @@
-return {
-	chevron = "",
-	clock = "",
-}

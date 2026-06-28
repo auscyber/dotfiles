@@ -1,12 +1,12 @@
 local colors = require("colors")
 local settings = require("settings")
 
-local menu_watcher = sbar.add("item", {
+local menu_watcher = sbar.add("item", "menu_watcher", {
 	drawing = false,
 	updates = false,
 })
 
-local space_menu_swap = sbar.add("item", {
+local space_menu_swap = sbar.add("item", "space_menu_swap", {
 	drawing = false,
 	updates = true,
 })
@@ -51,7 +51,7 @@ end
 
 sbar.add("bracket", { "/menu\\..*/" }, {
 	background = {
-		color = colors.with_alpha(colors.background or colors.black, 0.65),
+		color = colors.background or colors.black,
 	},
 })
 

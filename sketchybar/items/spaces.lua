@@ -5,30 +5,33 @@ local function shell_quote(value)
 	return "'" .. string.gsub(value, "'", "'\\''") .. "'"
 end
 
-_G.icon_map = {}
+_G.icon_map = require("icon_map")
 
 local function config_dir()
 	return os.getenv("CONFIG_DIR") or ((os.getenv("HOME") or "") .. "/.config/sketchybar")
 end
-
-local home_dir = os.getenv("HOME") or ""
-local icon_map_path = home_dir .. "/.config/icon_map.sh"
 
 local function trim(value)
 	return (value or ""):gsub("^%s+", ""):gsub("%s+$", "")
 end
 
 local function get_background_style(selected)
+	print(colors.with_alpha(colors.selection, 0.75))
+
+	print(colors.with_alpha(colors.background or colors.black, 0.45))
 	if selected then
 		return {
+			drawing = true,
 			color = colors.with_alpha(colors.selection, 0.75),
 			border_color = colors.with_alpha(colors.selection, 0.75),
 			corner_radius = 30,
+			height = 21,
 		}
 	else
 		return {
+			drawing = false,
 			color = colors.with_alpha(colors.background or colors.black, 0.45),
-			border_color = colors.with_alpha(colors.background or colors.black, 0.25),
+			border_color = colors.with_alpha(colors.background or colors.black, 0.15),
 			corner_radius = 30,
 		}
 	end
@@ -43,15 +46,6 @@ local function icon_for_app(app_name, callback)
 		callback(_G.icon_map[app_name])
 		return
 	end
-	local icon_cmd = "bash -lc "
-		.. shell_quote(
-			'. "' .. icon_map_path .. '"; __icon_map ' .. shell_quote(app_name) .. '; printf "%s" "$icon_result"'
-		)
-
-	sbar.exec(icon_cmd, function(output)
-		_G.icon_map[app_name] = trim(output)
-		callback(trim(output))
-	end)
 end
 
 local function build_icon_strip(apps, callback)
@@ -164,9 +158,7 @@ local function update_items_for_display(arrangement_id)
 							label = {
 								string = has_apps and (" " .. icon_strip) or "",
 								drawing = has_apps,
-								border_color = colors.foreground,
 								padding_left = 1,
-								border_width = 1,
 							},
 						})
 					end)
@@ -303,7 +295,11 @@ end
 
 refresh_display_spaces()
 
-sbar.subscribe({ "rift_workspace_changed", "front_app_switched" }, function()
+local spaces_observer = sbar.add("item", "spaces_observer", {
+	drawing = false,
+})
+
+spaces_observer:subscribe({ "rift_workspace_changed", "front_app_switched" }, function()
 	if _G.last_space_item then
 		if _G.reorder_left_items then
 			_G.reorder_left_items(_G.last_space_item)
@@ -311,6 +307,6 @@ sbar.subscribe({ "rift_workspace_changed", "front_app_switched" }, function()
 	end
 end)
 
-sbar.subscribe({ "space_change", "display_change" }, function()
+spaces_observer:subscribe({ "space_change", "display_change" }, function()
 	refresh_display_spaces()
 end)
