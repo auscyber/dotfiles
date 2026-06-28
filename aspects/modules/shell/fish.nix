@@ -1,4 +1,4 @@
-{ den, ... }:
+{ den, inputs, ... }:
 {
 
   den.aspects.fish = {
@@ -7,8 +7,8 @@
       den.aspects.shell
     ];
     homeManager = {
+      disabledModules = [ "${inputs.stylix}/modules/fish/hm.nix" ];
 
-      stylix.targets.fish.enable = false;
       programs.fish.enable = true;
     };
     provides.to-host = { pkgs, ... }: {

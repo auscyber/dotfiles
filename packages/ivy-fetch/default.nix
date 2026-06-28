@@ -7,7 +7,7 @@
         ivy-fetch = super.callPackage ./package.nix {
           lyricsList = builtins.path {
             name = "lyricslist";
-            path = rootPath + "phoebelyrics/lyricslist";
+            path = rootPath + "/phoebelyrics/lyricslist";
           };
         };
       };

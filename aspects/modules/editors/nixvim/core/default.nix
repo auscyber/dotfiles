@@ -22,6 +22,7 @@
       ...
     }:
     {
+      extraPackages = with pkgs; [ fd ];
 
       globals = {
         mapleader = "\\";
@@ -664,7 +665,7 @@
 
       extraFiles = {
         "colors/pink_ocean.vim".source = builtins.path {
-          path = ../../../../.config/nvim/colors/pink_ocean.vim;
+          path = ../../../../../.config/nvim/colors/pink_ocean.vim;
           name = "pink_ocean.vim";
         };
       };

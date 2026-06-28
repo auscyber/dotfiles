@@ -1,4 +1,3 @@
-}
 {
   den,
   lib,
@@ -23,7 +22,7 @@ in
 {
   ff.nh.url = "github:nix-community/nh";
   patchedInputs.nh = {
-    patches = [ ../../patches/nh/edit.patch ];
+    patches = [ ../../../patches/nh/edit.patch ];
   };
 
   den.default = {
@@ -51,7 +50,8 @@ in
             key = "den:nh-env";
             home.sessionVariables = {
               FLAKE = flakeFolder;
-            } // lib.optionalAttrs (isStandalone ctx) {
+            }
+            // lib.optionalAttrs (isStandalone ctx) {
               NH_HOME_FLAKE = flakeFolder;
             };
             home.shellAliases = lib.optionalAttrs (isStandalone ctx) {

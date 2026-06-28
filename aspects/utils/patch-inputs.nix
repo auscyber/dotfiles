@@ -158,7 +158,7 @@ let
           postPatch
           ;
       };
-      passedInputs = inputs // extraInputs;
+      passedInputs = realInputs // inputs // extraInputs;
 
       backupLockFile = builtins.fromJSON (builtins.readFile "${patchedSrc}/flake.lock");
 
@@ -412,6 +412,7 @@ in
     # re-eval — only the names actually in `patchedInputs` enter the patch path.
     # `buildPatched pkgs` stays a single shared thunk, so patched inputs that
     # reference each other still resolve through the one `allInputs` fixpoint.
+    flake.age-plugin-gpg = inputs.age-plugin-gpg;
     flake.newInputs = withSystem "aarch64-darwin" (
       { pkgs, ... }:
       let

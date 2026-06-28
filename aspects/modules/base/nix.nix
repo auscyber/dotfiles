@@ -2,6 +2,7 @@
   lib,
   den,
   __find_file,
+  rootPath,
   ...
 }:
 let
@@ -58,6 +59,7 @@ in
   den.default.includes = [ den.aspects.nix ];
 
   den.aspects.nix = {
+
     includes = [
       forwarded
       nixClass

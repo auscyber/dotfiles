@@ -41,7 +41,7 @@
         in
         inputsFn (patchedInputs);
     in
-    builtins.removeAttrs output [ "newInputs" ];
+    output;
 
   nixConfig = {
     extra-substituters = [

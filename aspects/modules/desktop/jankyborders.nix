@@ -2,7 +2,7 @@
 {
   den.aspects.jankyborders = {
     includes = [ <packages/jankyborders> ];
-    homeDarwin = { config, ... }: {
+    hmDarwin = { config, ... }: {
       services.jankyborders = {
         enable = true;
         settings = {

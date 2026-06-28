@@ -8,7 +8,7 @@
 let
   stylixDefaults = {
     enable = true;
-    image = ../../backgrounds/phoebebridgers-2.jpg;
+    image = ../../../backgrounds/phoebebridgers-2.jpg;
     polarity = "dark";
   };
 
@@ -21,10 +21,10 @@ let
   # Check if user is standalone (no darwin/nixos classes on host)
   isStandalone =
     ctx:
-    let
-      hostClasses = (ctx.host or { }).classes or [ ];
-    in
-    !builtins.elem "darwin" hostClasses && !builtins.elem "nixos" hostClasses;
+    if (ctx ? host) && ctx.host ? class then
+      ctx.host.class != "darwin" && ctx.host.class != "nixos"
+    else
+      true;
 in
 {
 
@@ -65,3 +65,4 @@ in
   den.schema.user.includes = [
     den.policies.stylix-standalone-hm
   ];
+}

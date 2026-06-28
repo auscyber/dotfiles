@@ -37,7 +37,7 @@ let
             "age"
             p.kind
           ]; # age.secrets / age.templates
-      adaptArgs = lib.id;
+      adaptArgs = args: args // { secrets = args.config.age.secrets; };
       fromAspect = _item: lib.head aspect-chain;
     };
 in
@@ -83,6 +83,7 @@ in
             inputs.agenix.homeManagerModules.default
             (lib.mkAliasOptionModule [ "age" "rekey" "warnings" ] [ "warnings" ])
           ];
+          age.rekey.storageMode = "local";
           age.rekey.hostPubkey = lib.mkIf (user.hostPublicKey != null) user.hostPublicKey;
           age.rekey.generatedSecretsDir = ../../secrets/generated + "/${host.name}/${user.name}";
           age.rekey.localStorageDir = ../../secrets/rekeyed + "/${host.name}/${user.name}";
@@ -118,6 +119,13 @@ in
 
     ];
 
+    hmDarwin = { config, ... }: {
+      age.secretsDir = "${config.home.homeDirectory}/Library/agenix/secrets";
+      age.ageMountPoint = "${config.home.homeDirectory}/Library/agenix/secrets";
+      age.templateDir = "${config.home.homeDirectory}/Library/agenix/templates";
+
+    };
+
     rekey = { inputs', host, ... }: {
 
       masterIdentities = [ { identity = ./gpg-yubikey.pub; } ];
@@ -130,12 +138,13 @@ in
     {
       inputs',
       pkgs,
+      system,
       config,
       ...
     }:
     let
       agePlugins = [
-        (inputs'.age-plugin-gpg.packages.default.overrideAttrs (attrs: {
+        (inputs.age-plugin-gpg.packages.${system}.age-plugin-gpg.overrideAttrs (attrs: {
           postInstall = (attrs.postInstall or "") + ''
             ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
           '';
@@ -144,21 +153,24 @@ in
     in
     {
 
-      packages.rekey = config.agenix-rekey.package;
-      apps.rekey.program = lib.getExe (
-        pkgs.writeShellApplication {
-          name = "rekey";
-          runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
-          text = ''exec agenix rekey -a "$@"'';
-        }
-      );
-      apps.gen-secrets.program = lib.getExe (
-        pkgs.writeShellApplication {
-          name = "gen-secrets";
-          runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
-          text = ''exec agenix generate -a "$@"'';
-        }
-      );
+      packages.rekey = pkgs.writeShellApplication {
+        name = "rekey";
+        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        text = ''exec agenix rekey -a "$@"'';
+      };
+      devShells.default = pkgs.mkShell {
+        buildInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+      };
+      packages.secret-edit = pkgs.writeShellApplication {
+        name = "secret-edit";
+        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        text = ''exec agenix edit "$@"'';
+      };
+      packages.gen-secrets = pkgs.writeShellApplication {
+        name = "gen-secrets";
+        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        text = ''exec agenix generate -a "$@"'';
+      };
     };
 
 }

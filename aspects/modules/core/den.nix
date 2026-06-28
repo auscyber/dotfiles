@@ -32,11 +32,5 @@
       den.batteries.hostname
     ];
   };
-  perSystem = { pkgs, ... }: {
-    devShells.default = den.lib.nh.denShell {
-      fromFlake = true;
-      outPrefix = [ "flake" ];
-    } pkgs;
-  };
 
 }

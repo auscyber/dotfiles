@@ -3,7 +3,6 @@ set +x
 LC_ALL=C
 LANG=C
 COLS=$(tput cols)
-LYRICSLIST=${LYRICSLIST:-~/Music/phoebe/lyricslist}
 
 fg_c() {
     tput setaf "$1"
