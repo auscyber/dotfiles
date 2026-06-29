@@ -11,7 +11,7 @@
       den.aspects.stylix
     ];
 
-    homeManager =
+    provides.to-users.homeManager =
       { pkgs, options, ... }:
       {
 

@@ -46,7 +46,7 @@ let
     ) (lib.attrNames overlays);
 
   overlay-class =
-    { aspect-chain, ... }:
+    { aspect-chain, host, ... }:
     den.batteries.forward {
       each = [
         { sys = "nixos"; }
@@ -61,7 +61,11 @@ let
     };
 
   overlay-apply =
-    { config, ... }:
+    {
+      config,
+      osConfig ? null,
+      ...
+    }:
     {
       options._overlays = lib.mkOption {
         type = lib.types.attrsOf (lib.types.either overlayFn (lib.types.listOf overlayFn));
@@ -69,7 +73,7 @@ let
         apply = tagOverlaySet;
         description = "Named overlays collected from aspects; each derivation gets meta.overlayName set to the entry name.";
       };
-      config.nixpkgs.overlays = config._overlays;
+      config.nixpkgs.overlays = lib.mkIf (osConfig == null) config._overlays;
     };
 
   # Filter den-internal attrs (`_`, `__functor`, `name`, etc.) so we only iterate
@@ -155,7 +159,6 @@ in
     let
       basePkgs = import inputs.nixpkgs {
         inherit system;
-
       };
       sources = basePkgs.callPackage ../../_sources/generated.nix { };
       packageOverlays = collectPackageOverlays sources system basePkgs;

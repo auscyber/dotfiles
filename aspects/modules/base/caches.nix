@@ -88,14 +88,16 @@ in
         };
 
         secrets.cache_key.rekeyFile = ./cache.age;
-        templates.celler_env = {
-          dependencies.cache_key = config.secrets.cache_key;
-          content =
-            { placeholders, ... }:
-            ''
-              	CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
-              	'';
+        templates = { config, ... }: {
+          celler_env = {
+            dependencies.cache_key = config.secrets.cache_key;
+            content =
+              { placeholders, ... }:
+              ''
+                	CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
+                	'';
 
+          };
         };
       };
       den.aspects.nix = {

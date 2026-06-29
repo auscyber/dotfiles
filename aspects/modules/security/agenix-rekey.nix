@@ -1,49 +1,73 @@
 {
   inputs,
+  realInputs,
   lib,
   den,
   ...
 }:
 let
+  pF =
+    p:
+    if p.kind == "age" then
+      [ p.kind ]
+    else
+      [
+        "age"
+        p.kind
+      ];
+  rename = [
+    #    (lib.mkAliasOptionModule ([
+    #      "age"
+    #      "warnings"
+    #    ]) [ "warnings" ])
+    #    (lib.mkAliasOptionModule ([
+    #      "age"
+    #      "warnings"
+    #    ]) [ "warnings" ])
 
-  agenix-class =
-    {
-      class,
-      aspect-chain,
-      ...
-    }:
-    den.batteries.forward {
-      each = lib.cartesianProduct {
-        kind = [
-          "secrets"
-          "templates"
-          "rekey"
-          "age"
-        ];
-        system = [
-          "nixos"
-          "homeManager"
-          "darwin"
-        ];
-      };
-      fromClass = p: p.kind; # source class: secrets / templates
-      intoClass = p: p.system; # target class
-      intoPath =
-        p:
-        if p.kind == "age" then
-          [ p.kind ]
-        else
-          [
-            "age"
-            p.kind
-          ]; # age.secrets / age.templates
-      adaptArgs = args: args // { secrets = args.config.age.secrets; };
-      fromAspect = _item: lib.head aspect-chain;
+  ];
+  # Register your custom classes
+  # Create routing policies for each kind → system combination
+  makeRoute =
+    kind: system:
+    den.lib.policy.route {
+      fromClass = kind;
+      intoClass = system;
+      adaptArgs =
+        { config, ... }:
+        config
+        // rec {
+          age = config.age;
+          secrets = age.secrets;
+        };
+      path = pF { inherit kind system; }; # Your existing intoPath function
     };
+
+  # Generate all routes via cartesian product
+  allRoutes = lib.flatten (
+    lib.mapCartesianProduct ({ kind, system }: makeRoute kind system) {
+      kind = [
+        "secrets"
+        "templates"
+        "rekey"
+        "age"
+      ];
+      system = [
+        "nixos"
+        "darwin"
+        "homeManager"
+      ];
+    }
+  );
 in
 {
+  den.classes.secrets = { };
+  den.classes.templates = { };
+  den.classes.rekey = { };
+  den.policies.kind-system-routes = _: allRoutes;
+
   flake-file.inputs = {
-    agenix-rekey.url = "github:oddllama/agenix-rekey";
+    agenix-rekey.url = "github:oddlama/agenix-rekey";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
@@ -69,6 +93,7 @@ in
 
   den.aspects.agenix-rekey = {
 
+    meta.collisionPolicy = "den-wins";
     provides.to-users =
       {
         host,
@@ -76,64 +101,62 @@ in
         ...
       }:
       {
+        hmDarwin = { config, ... }: {
+          age.secretsDir = "${config.home.homeDirectory}/Library/agenix/secrets";
+          age.ageMountPoint = "${config.home.homeDirectory}/Library/agenix/secrets";
+          age.templateDir = "${config.home.homeDirectory}/Library/agenix/templates";
+
+        };
+
         homeManager = {
           imports = [
 
             (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
             inputs.agenix.homeManagerModules.default
-            (lib.mkAliasOptionModule [ "age" "rekey" "warnings" ] [ "warnings" ])
-          ];
+          ]
+          ++ rename;
           age.rekey.storageMode = "local";
           age.rekey.hostPubkey = lib.mkIf (user.hostPublicKey != null) user.hostPublicKey;
-          age.rekey.generatedSecretsDir = ../../secrets/generated + "/${host.name}/${user.name}";
-          age.rekey.localStorageDir = ../../secrets/rekeyed + "/${host.name}/${user.name}";
+          age.rekey.generatedSecretsDir = ../../../secrets/generated + "/${host.name}/${user.name}";
+          age.rekey.localStorageDir = ../../../secrets/rekeyed + "/${host.name}/${user.name}";
 
         };
       };
     nixos = {
       imports = [
         inputs.agenix.nixosModules.default
-
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-        (lib.mkAliasOptionModule [ "age" "rekey" "warnings" ] [ "warnings" ])
       ];
     };
     darwin.imports = [
       #      inputs.agenix-rekey.nixosModules.default
-
       (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
       inputs.agenix.darwinModules.default
-      (lib.mkAliasOptionModule [ "age" "rekey" "warnings" ] [ "warnings" ])
     ];
     os =
       { host, inputs', ... }:
       {
+        imports = rename;
+        age.rekey = {
 
-        age.rekey.hostPubkey = lib.mkIf (host.hostPublicKey != null) host.hostPublicKey;
-        age.rekey.generatedSecretsDir = ../../secrets/generated + "/${host.name}/";
-        age.rekey.localStorageDir = ../../secrets/rekeyed + "/${host.name}/";
+          hostPubkey = lib.mkIf (host.hostPublicKey != null) host.hostPublicKey;
+          generatedSecretsDir = ../../../secrets/generated + "/${host.name}/";
+          localStorageDir = ../../../secrets/rekeyed + "/${host.name}/";
+        };
       };
 
     includes = [
-      agenix-class
-
+      den.policies.kind-system-routes
     ];
 
-    hmDarwin = { config, ... }: {
-      age.secretsDir = "${config.home.homeDirectory}/Library/agenix/secrets";
-      age.ageMountPoint = "${config.home.homeDirectory}/Library/agenix/secrets";
-      age.templateDir = "${config.home.homeDirectory}/Library/agenix/templates";
-
-    };
-
-    rekey = { inputs', host, ... }: {
+    rekey = {
 
       masterIdentities = [ { identity = ./gpg-yubikey.pub; } ];
       storageMode = "local";
     };
 
   };
-  den.schema.host.includes = [ den.aspects.agenix-rekey ];
+  den.default.includes = [ den.aspects.agenix-rekey ];
   perSystem =
     {
       inputs',
@@ -143,6 +166,9 @@ in
       ...
     }:
     let
+      # Use the agenix-rekey package directly from inputs to avoid forcing
+      # full fleet evaluation through config.agenix-rekey.package
+      agenixRekeyPkg = inputs'.agenix-rekey.packages.default;
       agePlugins = [
         (inputs.age-plugin-gpg.packages.${system}.age-plugin-gpg.overrideAttrs (attrs: {
           postInstall = (attrs.postInstall or "") + ''
@@ -155,20 +181,20 @@ in
 
       packages.rekey = pkgs.writeShellApplication {
         name = "rekey";
-        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins;
         text = ''exec agenix rekey -a "$@"'';
       };
-      devShells.default = pkgs.mkShell {
-        buildInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+      devshells.default = {
+        packages = [ agenixRekeyPkg ] ++ agePlugins;
       };
       packages.secret-edit = pkgs.writeShellApplication {
         name = "secret-edit";
-        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins;
         text = ''exec agenix edit "$@"'';
       };
       packages.gen-secrets = pkgs.writeShellApplication {
         name = "gen-secrets";
-        runtimeInputs = [ config.agenix-rekey.package ] ++ agePlugins;
+        runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins;
         text = ''exec agenix generate -a "$@"'';
       };
     };

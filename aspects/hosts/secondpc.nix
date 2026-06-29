@@ -394,6 +394,5 @@
       den.batteries.primary-user
     ];
 
-    secrets."bob".generator.script = "alnum";
   };
 }

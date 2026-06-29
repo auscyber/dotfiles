@@ -413,15 +413,19 @@ in
     # `buildPatched pkgs` stays a single shared thunk, so patched inputs that
     # reference each other still resolve through the one `allInputs` fixpoint.
     flake.age-plugin-gpg = inputs.age-plugin-gpg;
-    flake.newInputs = withSystem "aarch64-darwin" (
-      { pkgs, ... }:
+    # Get pkgs directly from realInputs to avoid forcing perSystem evaluation.
+    # Using withSystem would trigger full perSystem module evaluation just to
+    # compute newInputs, which adds significant eval overhead.
+    flake.newInputs =
       let
+        pkgs = realInputs.nixpkgs.legacyPackages.aarch64-darwin;
         patched = buildPatched pkgs;
       in
       lib.mapAttrs (
         name: realInput: if config.patchedInputs ? ${name} then patched.${name} else realInput
-      ) realInputs
-    );
+      ) realInputs;
+
+    flake.inputs = inputs;
 
     perSystem =
       { pkgs, ... }:

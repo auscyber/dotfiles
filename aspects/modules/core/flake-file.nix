@@ -122,6 +122,11 @@
         # (and flake-level import) sees as `inputs`. Patched sources are built
         # with the pinned system below; empty patched-inputs.nix is a no-op
         # (pkgs is only forced when an override actually uses it).
+        imports = with inputs.nixpkgs.lib;
+                ./aspects
+                |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
+                |> fileset.toList;
+
         inputsFn =
           finalInputs:
           inputs.flake-parts.lib.mkFlake
@@ -135,11 +140,7 @@
             {
               # Import all *.nix files in the ./aspects directory
               # Except ones that start with '_'
-              imports =
-                with finalInputs.nixpkgs.lib;
-                ./aspects
-                |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
-                |> fileset.toList;
+              inherit imports;
 
               _module.args.rootPath = ./.;
             };

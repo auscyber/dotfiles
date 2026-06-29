@@ -11,11 +11,10 @@
           roboto-mono
         ]);
     };
-    homeManager =
+    hmDarwin =
       {
         config,
         pkgs,
-        sources,
         lib,
         ...
       }:
@@ -56,7 +55,7 @@
       in
       {
         home.file.".config/sketchybar" = {
-          source = config.lib.file.linkLocalPath "${rootPath}/sketchybar";
+          source = config.lib.file.linkLocalPath ../../../../sketchybar;
           recursive = true;
         };
 

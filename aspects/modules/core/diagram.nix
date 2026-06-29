@@ -14,7 +14,6 @@ in
       captured = den.lib.capture.captureWithPathsWith {
         classes = [
           "darwin"
-          "vpn"
           "homeManager"
         ];
         root = den.lib.resolveEntity "host" { inherit host; };

@@ -12,7 +12,7 @@
     includes = [ (den.batteries.unfree [ "onepassword-password-manager" ]) ];
     gui = {
       darwin.programs._1password-gui.enable = true;
-      hm =
+      provides.to-users.hm =
         { pkgs, config, ... }:
         lib.mkMerge [
           {
@@ -42,7 +42,7 @@
           })
 
         ];
-      hmDarwin = {
+      provides.to-users.hmDarwin = {
         programs = {
           git.signing = {
             format = "ssh";

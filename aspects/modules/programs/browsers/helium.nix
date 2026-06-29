@@ -49,7 +49,7 @@ in
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  den.aspects.browsers.helium = {
+  den.aspects.browsers.helium = { user, ... }: {
     includes = [
       den.aspects.stylix
       den.aspects.packages.helium

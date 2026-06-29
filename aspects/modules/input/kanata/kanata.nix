@@ -5,7 +5,7 @@
   ...
 }:
 {
-  den.aspects.kanata = {
+  den.aspects.kanata = { user, ... }: {
     nvim = {
       autoGroups.filetypedetect.clear = false;
       autoCmd = [
@@ -35,7 +35,7 @@
       lib.optionalAttrs (nurPkgs ? kanata-tray) { kanata-tray = nurPkgs.kanata-tray; }
       // lib.optionalAttrs (nurPkgs ? kanata-vk-agent) { kanata-vk-agent = nurPkgs.kanata-vk-agent; };
 
-    provides.to-hosts =
+    provides.to-host =
       {
         user,
         host,

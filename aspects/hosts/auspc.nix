@@ -127,7 +127,7 @@
         den.aspects.dev
       ];
 
-      homeManager =
+      provides.to-users.homeManager =
         { pkgs, ... }:
         {
           home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";

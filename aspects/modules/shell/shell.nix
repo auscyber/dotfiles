@@ -1,4 +1,4 @@
-{ den, ... }:
+{ den, __findFile, ... }:
 {
   den.aspects.shell = {
     includes = [
@@ -17,7 +17,7 @@
       ];
     };
 
-    homeManager = { pkgs, ... }: {
+    provides.to-users.homeManager = { pkgs, ... }: {
       programs.zoxide.enable = true;
       programs.fzf.enable = true;
       programs.bat.enable = true;

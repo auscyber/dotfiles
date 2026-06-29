@@ -6,26 +6,12 @@
   ...
 }:
 let
-  forwarded =
-    { class, aspect-chain }:
-    den.provides.forward {
-      each = [
-        "Linux"
-        "Darwin"
-      ];
-      fromClass = platform: "nix${platform}";
-      intoClass = _: "nix";
-      intoPath = _: [ ];
-      fromAspect = _: lib.head aspect-chain;
-      guard = { pkgs, ... }: platform: lib.mkIf pkgs.stdenv."is${platform}";
-    };
 
   nixClass =
     { class, aspect-chain, ... }:
     den.provides.forward {
       each = [
         "nixos"
-        "homeManager"
         "darwin"
       ];
       fromClass = _: "nix";
@@ -33,7 +19,7 @@ let
       intoPath = _: [
         "nix"
       ];
-      fromAspect = _: lib.head aspect-chain;
+      #      fromAspect = _: lib.head aspect-chain;
       adaptArgs = lib.id;
     };
   caches = {
@@ -61,7 +47,6 @@ in
   den.aspects.nix = {
 
     includes = [
-      forwarded
       nixClass
     ];
     nixos.nix.settings.trusted-users = [ "@wheel" ];

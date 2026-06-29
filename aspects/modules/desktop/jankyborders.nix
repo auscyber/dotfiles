@@ -1,6 +1,6 @@
 { den, __findFile, ... }:
 {
-  den.aspects.jankyborders = {
+  den.aspects.jankyborders = { user, ... }: {
     includes = [ <packages/jankyborders> ];
     hmDarwin = { config, ... }: {
       services.jankyborders = {

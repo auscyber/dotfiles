@@ -1,0 +1,19 @@
+diff --git a/nix/lib/aspects/fx/spawn-node.nix b/nix/lib/aspects/fx/spawn-node.nix
+index be79702..dc863da 100644
+--- a/nix/lib/aspects/fx/spawn-node.nix
++++ b/nix/lib/aspects/fx/spawn-node.nix
+@@ -52,11 +52,12 @@ in
+       # (spawnRoot == from) collapses policyBoundAncestor to null -> zero peers,
+       # silently reproducing the single-host bug. Throw with context (not a bare
+       # assert) so a future regression names the collapsed scope and its cause.
+-      _assertRoot =
++      _assertRoot = builtins.trace { inherit class spawnRoot ; } (
+         if spawnRoot != from then
+           null
+         else
+-          throw "den: spawnNode spawn root equals its parent scope '${from}' — a self-parent edge collapses policyBoundAncestor to null and yields zero fleet peers. The seed ctx likely lost its child binding (e.g. `user`).";
++          throw "den: spawnNode spawn root equals its parent scope '${from}' — a self-parent edge collapses policyBoundAncestor to null and yields zero fleet peers. The seed ctx likely lost its child binding (e.g. `user`)."
++      );
+ 
+       mergedPipeEffects = parentState.scopedPipeEffects // (result.state.scopedPipeEffects null);
+ 

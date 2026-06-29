@@ -59,7 +59,7 @@ in
         allowUnsupportedSystem = true;
       };
     };
-    homeManager = { unfreeAllowed, ... }: {
+    hmStandalone = { unfreeAllowed, ... }: {
       nixpkgs.config = {
 
         allowUnfreePredicate = predicate (allowed ++ unfreeAllowed);

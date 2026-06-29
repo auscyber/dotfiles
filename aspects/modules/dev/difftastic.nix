@@ -1,6 +1,6 @@
 { den, ... }:
 {
-  den.aspects.difftastic = {
+  den.aspects.difftastic = { user, ... }: {
     homeManager.programs.difftastic = {
       enable = true;
       git.enable = true;

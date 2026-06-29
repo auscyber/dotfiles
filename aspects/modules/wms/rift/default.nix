@@ -18,6 +18,7 @@
         options,
         pkgs,
         lib,
+        user,
         ...
       }:
 

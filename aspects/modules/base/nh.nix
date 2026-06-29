@@ -33,6 +33,13 @@ in
 
   perSystem = { pkgs, ... }: {
     packages = den.lib.nh.denPackages { fromFlake = true; } (pkgs.extend inputs.nh.overlays.default);
+
+    devshells.default.packages = builtins.attrValues (
+      den.lib.nh.denPackages {
+        fromFlake = true;
+      } (pkgs.extend inputs.nh.overlays.default)
+    );
+
   };
 
   # Policy: set nh environment variables based on user's flakeFolder

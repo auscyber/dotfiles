@@ -16,7 +16,7 @@
       den.batteries.primary-user
     ];
 
-    homeManager = {
+    provides.to-users.homeManager = {
       programs.git.extraConfig.safe.directory = [
         "/nixos-config"
         "/nixos-config/services/loft"

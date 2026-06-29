@@ -1,6 +1,6 @@
 { den, ... }:
 {
-  den.aspects.zsh = {
+  den.aspects.zsh = { user, ... }: {
     includes = [ den.aspects.shell ];
 
     homeManager =
@@ -18,16 +18,22 @@
             EDITOR = "nvim";
             GTK2_RC_FILES = "$HOME/.gtkrc-2.0";
           };
-          plugins = builtins.map (package: {
-            name = package.pname;
-            inherit (package) src;
-          }) (with pkgs; [
-            zsh-autosuggestions
-            nix-zsh-completions
-            zsh-completions
-            zsh-nix-shell
-            zsh-syntax-highlighting
-          ]);
+          plugins =
+            builtins.map
+              (package: {
+                name = package.pname;
+                inherit (package) src;
+              })
+              (
+                with pkgs;
+                [
+                  zsh-autosuggestions
+                  nix-zsh-completions
+                  zsh-completions
+                  zsh-nix-shell
+                  zsh-syntax-highlighting
+                ]
+              );
           initContent = ''
             export PATH=$PATH:~/.cabal/bin:~/go/bin:~/.local/bin:~/.dotnet/tools:/usr/local/go/bin
           '';

@@ -6,31 +6,49 @@
 }:
 let
   hmPlatforms =
-    { class, aspect-chain }:
-    den.batteries.forward {
+    {
+      class,
+      aspect-chain,
+      host,
+      user,
+    }:
+    den.provides.forward {
       each = [
-        "Linux"
+        #        "Linux"
         "Darwin"
-        "Aarch64"
-        "64bit"
       ];
       fromClass = platform: "hm${platform}";
       intoClass = _: "homeManager";
       intoPath = _: [ ];
       fromAspect = _: lib.head aspect-chain;
       guard = { pkgs, ... }: platform: lib.mkIf pkgs.stdenv."is${platform}";
+      adaptArgs = lib.id;
+    };
+
+  hmAlias =
+    { class, aspect-chain }:
+    den.batteries.forward {
+      each = lib.singleton class;
+      fromClass = _: "hm";
+      intoClass = _: "homeManager";
+      intoPath = _: [ ];
+      fromAspect = _: lib.head aspect-chain;
       adaptArgs = { config, ... }: { osConfig = config; };
     };
 
   standaloneForward =
-    { aspect-chain, ... }:
+    {
+      aspect-chain,
+      class,
+      user,
+    }:
     den.batteries.forward {
       each = [ "standalone" ];
-      fromClass = _: "standaloneHome";
+      fromClass = _: "hmStandalone";
       intoClass = _: "homeManager";
       intoPath = _: [ ];
       adaptArgs = lib.id;
-      fromAspect = _: lib.head aspect-chain;
+      fromAspect = _: user.aspect;
       guard =
         {
           osConfig ? null,
@@ -52,9 +70,13 @@ in
     #    ];
 
   };
-  den.default.os.home-manager.extraSpecialArgs.inputs = inputs;
+  den.default.os.home-manager = {
+    useGlobalPkgs = true;
+    extraSpecialArgs.inputs = inputs;
+  };
   den.default.includes = [
     hmPlatforms
-    standaloneForward
+    #    hmAlias
+    #    standaloneForward
   ];
 }

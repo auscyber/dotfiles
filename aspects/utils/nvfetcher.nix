@@ -112,7 +112,7 @@ in
     den.default.includes = [ den.batteries.sources ];
 
     perSystem =
-      {
+      args@{
         pkgs,
         inputs',
         ...
@@ -122,41 +122,39 @@ in
         configFile = pkgs.writers.writeTOML "nvfetcher.toml" nvFetcherConfig;
       in
       {
+        devshells.default.packages = [ args.config.packages.update-sources ];
         _module.args.sources = pkgs.callPackage ../../_sources/generated.nix { };
 
-        apps.update-sources = {
-          type = "app";
-          program = pkgs.writeShellApplication {
-            name = "update-sources";
-            text = ''
-              set -eu
-              # nvchecker key file: matches the agenix-rendered template the
-              # home-base aspect writes to $HOME/.config/nvchecker.toml.
-              # Override with NVCHECKER_KEYS=/path or `--keyfile <path>`.
-              KEY_FILE="''${NVCHECKER_KEYS:-$HOME/.config/nvchecker.toml}"
-              while [ "$#" -gt 0 ]; do
-              	case "$1" in
-              	--keyfile | -k)
-              		KEY_FILE="$2"
-              		shift 2
-              		;;
-              	*)
-              		shift
-              		;;
-              	esac
-              done
+        packages.update-sources = pkgs.writeShellApplication {
+          name = "update-sources";
+          text = ''
+            set -eu
+            # nvchecker key file: matches the agenix-rendered template the
+            # home-base aspect writes to $HOME/.config/nvchecker.toml.
+            # Override with NVCHECKER_KEYS=/path or `--keyfile <path>`.
+            KEY_FILE="''${NVCHECKER_KEYS:-$HOME/.config/nvchecker.toml}"
+            while [ "$#" -gt 0 ]; do
+            	case "$1" in
+            	--keyfile | -k)
+            		KEY_FILE="$2"
+            		shift 2
+            		;;
+            	*)
+            		shift
+            		;;
+            	esac
+            done
 
-              echo "Updating nvfetcher source code..."
-              if [ -r "$KEY_FILE" ]; then
-              	echo "Using key file: $KEY_FILE"
-              	${lib.getExe inputs'.nvfetcher.packages.default} -c ${configFile} -k "$KEY_FILE"
-              else
-              	echo "Note: $KEY_FILE not readable; running without -k (github API may rate-limit)" >&2
-              	${lib.getExe inputs'.nvfetcher.packages.default} -c ${configFile}
-              fi
-              echo "Source code updated successfully."
-            '';
-          };
+            echo "Updating nvfetcher source code..."
+            if [ -r "$KEY_FILE" ]; then
+            	echo "Using key file: $KEY_FILE"
+            	${lib.getExe inputs'.nvfetcher.packages.default} -c ${configFile} -k "$KEY_FILE"
+            else
+            	echo "Note: $KEY_FILE not readable; running without -k (github API may rate-limit)" >&2
+            	${lib.getExe inputs'.nvfetcher.packages.default} -c ${configFile}
+            fi
+            echo "Source code updated successfully."
+          '';
         };
       };
   };

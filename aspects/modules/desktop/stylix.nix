@@ -32,9 +32,10 @@ in
 
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =
-    ctx:
+    ctx@{ user, host }:
     if isHMUser ctx && isStandalone ctx then
       [
+        builtins.break
         (den.lib.policy.provide {
           class = "homeManager";
           module = {
@@ -62,7 +63,7 @@ in
   };
 
   # Register the policy on user schema
-  den.schema.user.includes = [
+  den.schema.default.includes = [
     den.policies.stylix-standalone-hm
   ];
 }

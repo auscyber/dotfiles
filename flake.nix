@@ -14,6 +14,12 @@
       # (and flake-level import) sees as `inputs`. Patched sources are built
       # with the pinned system below; empty patched-inputs.nix is a no-op
       # (pkgs is only forced when an override actually uses it).
+      imports =
+        with inputs.nixpkgs.lib;
+        ./aspects
+        |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
+        |> fileset.toList;
+
       inputsFn =
         finalInputs:
         inputs.flake-parts.lib.mkFlake
@@ -27,11 +33,7 @@
           {
             # Import all *.nix files in the ./aspects directory
             # Except ones that start with '_'
-            imports =
-              with finalInputs.nixpkgs.lib;
-              ./aspects
-              |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
-              |> fileset.toList;
+            inherit imports;
 
             _module.args.rootPath = ./.;
           };
@@ -41,7 +43,7 @@
         in
         inputsFn (patchedInputs);
     in
-    output;
+    builtins.removeAttrs output [ "newInputs" ];
 
   nixConfig = {
     extra-substituters = [
@@ -77,6 +79,7 @@
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
       inputs = {
+        devshell.follows = "devshell";
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
       };
@@ -105,11 +108,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     den = {
-      url = "github:denful/den";
+      url = "github:denful/den/latest";
       inputs = { };
     };
     den-diagram = {
       url = "github:denful/den-diagram";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    devshell = {
+      url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     emacs = {

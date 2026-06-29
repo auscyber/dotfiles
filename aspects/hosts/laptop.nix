@@ -39,12 +39,7 @@
     darwin =
       { pkgs, lib, ... }:
       {
-        system.primaryUser = "ivypierlot";
-        stylix = {
-          enable = true;
-          polarity = "dark";
-        };
-        stylix.targets.jankyborders.enable = false;
+                stylix.targets.jankyborders.enable = false;
         programs._1password-gui.enable = true;
         services.karabiner-elements.enable = false;
         users.users.ivypierlot = {
@@ -102,31 +97,25 @@
         "speedtest"
       ];
       casks = [
-        "jordanbaird-ice"
         "typewhisper"
-        "mark-text"
         "craft"
         "raycast"
         "calibre"
         "sf-symbols"
-        "font-sketchybar-app-font"
         "font-sf-pro"
         "todoist-app"
         "dockdoor"
         "beeper"
         "amethyst"
         "steam"
-        "google-drive"
         "tailscale"
         "affinity-designer"
         "zotero"
         "affinity-publisher"
-        "helium-browser"
         "plover"
         "postman"
         "tidal"
         "zoom"
-        "microsoft-teams"
       ];
     };
   };
@@ -154,7 +143,7 @@
       #      <zen>
     ];
 
-    provides.Ivys-MacBook-Pro.homeManager =
+    provides.Ivys-MacBook-Pro.provides.to-users.homeManager =
       { pkgs, ... }:
       {
         home.packages = with pkgs; [

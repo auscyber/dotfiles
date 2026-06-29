@@ -6,15 +6,14 @@
 }:
 let
   # Check if user has homeManager class
-  isHMUser =
-    ctx:
-    (ctx.__entityKind or null) == "user"
-    && builtins.elem "homeManager" ((ctx.user or { }).classes or [ ]);
-
   # Forward nvim class content into homeManager at programs.nixvim
   nvimForward =
-    { host, user }:
-    den.batteries.forward {
+    {
+      host,
+      user,
+      aspect-chain,
+    }:
+    den.provides.forward {
       each = lib.singleton true;
       fromClass = _: "nvim";
       intoClass = _: "homeManager";
@@ -22,7 +21,8 @@ let
         "programs"
         "nixvim"
       ];
-      fromAspect = _: den.lib.resolveEntity "user" { inherit host user; };
+      adaptArgs = lib.id;
+      fromAspect = _: lib.head aspect-chain;
     };
 in
 {
@@ -90,42 +90,36 @@ in
 
   # Provide nixvim HM module to users with homeManager class
   den.policies.nixvim-hm-module =
-    ctx:
-    if isHMUser ctx then
-      [
-        (den.lib.policy.provide {
-          class = "homeManager";
-          module = {
-            key = "den:nixvim-hm-module";
-            imports = [ inputs.nixvim.homeModules.nixvim ];
-            programs.nixvim.enable = lib.mkDefault true;
-          };
-        })
-      ]
-    else
-      [ ];
+    { host, user, ... }:
+
+    (den.lib.policy.provide {
+      class = "homeManager";
+      module = {
+        key = "den:nixvim-hm-module";
+        imports = [ inputs.nixvim.homeModules.nixvim ];
+        programs.nixvim.enable = lib.mkDefault true;
+      };
+    });
 
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
-    ctx:
-    let
-      host = ctx.host or null;
-      user = ctx.user or null;
-    in
-    if isHMUser ctx && host != null && user != null then
-      [
-        (den.lib.policy.include (nvimForward {
-          inherit host user;
-        }))
-      ]
-    else
-      [ ];
+    {
+      host,
+      user,
+      aspect-chain,
+      ...
+    }:
+    (den.lib.policy.include (nvimForward {
+      inherit host user aspect-chain;
+    }));
 
   # ---------------------------------------------------------------------------
   # Schema includes
   # ---------------------------------------------------------------------------
 
-  den.schema.user.includes = [
+  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module ];
+
+  den.default.includes = [
     den.policies.nixvim-hm-module
     den.policies.nixvim-user-forward
   ];
