@@ -3,24 +3,91 @@
 
 ## Systems
 
-| System | Architecture | Roles |
-|--------|--------------|-------|
-| [Ivys-MacBook-Pro](#Ivys-MacBook-Pro) | aarch64-darwin | study, gui, dev |
-| [auspc](#auspc) | x86_64-linux | gui, gaming, dev |
-| [contabo](#contabo) | x86_64-linux |  |
-| [imflopet](#imflopet) | x86_64-linux |  |
-| [macmini](#macmini) | aarch64-darwin | gui |
-| [pentestvm](#pentestvm) | x86_64-linux |  |
-| [secondpc](#secondpc) | x86_64-linux |  |
-| [surfacelaptop](#surfacelaptop) | x86_64-linux | gui, dev |
-| [wsl-nixos](#wsl-nixos) | x86_64-linux |  |
+| System | Class | Architecture | Roles |
+|--------|-------|--------------|-------|
+| [Ivys-MacBook-Pro](#Ivys-MacBook-Pro) | darwin | aarch64-darwin | study, gui, dev |
+| [auspc](#auspc) | nixos | x86_64-linux | gui, gaming, dev |
+| [contabo](#contabo) | nixos | x86_64-linux |  |
+| [imflopet](#imflopet) | nixos | x86_64-linux |  |
+| [macmini](#macmini) | darwin | aarch64-darwin | gui |
+| [pentestvm](#pentestvm) | nixos | x86_64-linux |  |
+| [secondpc](#secondpc) | nixos | x86_64-linux |  |
+| [surfacelaptop](#surfacelaptop) | nixos | x86_64-linux | gui, dev |
+| [wsl-nixos](#wsl-nixos) | nixos | x86_64-linux |  |
 
 ## Ivys-MacBook-Pro
 
-**Architecture:** `aarch64-darwin`
-**Roles:** study, gui, dev
+| | |
+|---|---|
+| **Class** | `darwin` |
+| **Architecture** | `aarch64-darwin` |
+| **Roles** | study, gui, dev |
 
-### Aspect Graph
+### Aspects
+
+```
+├── Ivys-MacBook-Pro
+│   ├── vpn
+│   │   ├── vpn-secrets
+│   │   │   └── agenix-rekey
+│   │   │       └── kind-system-routes
+│   │   └── [definition 1-entry 2]
+│   ├── homebrew
+│   ├── karabiner-driver
+│   ├── sudoagents
+│   └── builders
+└── ivypierlot
+    ├── agenix-rekey
+    │   └── kind-system-routes
+    ├── nixvim
+    │   ├── nixvim-hm-module
+    │   ├── unfree(cmp-nvim-lsp-document-symbol)
+    │   ├── eagle-nvim
+    │   └── eagle-nvim
+    ├── neovim
+    │   ├── nixvim
+    │   │   ├── nixvim-hm-module
+    │   │   ├── unfree(cmp-nvim-lsp-document-symbol)
+    │   │   ├── eagle-nvim
+    │   │   └── eagle-nvim
+    │   └── stylix
+    ├── fish
+    │   └── [definition 1-entry 1]
+    ├── nushell
+    │   └── shell
+    │       ├── starship
+    │       └── jujutsu
+    │           └── difftastic
+    │               └── [definition 1-entry 1] ...
+    ├── ghostty
+    │   └── ghostty (circular)
+    ├── sketchybar
+    │   ├── sketchybar (circular)
+    │   └── sketchybar_app_font
+    ├── zotero
+    ├── [definition 1-entry 9]
+    ├── gui
+    │   ├── onepassword
+    │   │   └── unfree(onepassword-password-manager)
+    │   └── ghostty
+    │       └── ghostty (circular)
+    ├── gpg
+    ├── rift
+    │   └── jankyborders
+    │       └── [definition 1-entry 1]
+    ├── kanata
+    │   └── [definition 1-entry 1]
+    ├── dev
+    │   ├── dev-nix
+    │   │   └── [definition 1-entry 1]
+    │   └── dev-cli
+    ├── file-local
+    ├── primary-user
+    └── cotabby
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -414,10 +481,33 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## auspc
 
-**Architecture:** `x86_64-linux`
-**Roles:** gui, gaming, dev
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** | gui, gaming, dev |
 
-### Aspect Graph
+### Aspects
+
+```
+├── auscyber
+│   ├── fish
+│   │   └── [definition 1-entry 1]
+│   └── agenix-rekey
+│       └── kind-system-routes
+└── auspc
+    ├── vpn
+    │   ├── vpn-secrets
+    │   │   └── agenix-rekey
+    │   │       └── kind-system-routes
+    │   └── [definition 1-entry 2]
+    ├── bootlogo
+    ├── builders
+    └── builder-server
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -776,9 +866,21 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## contabo
 
-**Architecture:** `x86_64-linux`
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** |  |
 
-### Aspect Graph
+### Aspects
+
+```
+├── contabo
+└── ivy
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -1065,9 +1167,21 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## imflopet
 
-**Architecture:** `x86_64-linux`
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** |  |
 
-### Aspect Graph
+### Aspects
+
+```
+├── imflopet
+└── ivy
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -1360,10 +1474,69 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## macmini
 
-**Architecture:** `aarch64-darwin`
-**Roles:** gui
+| | |
+|---|---|
+| **Class** | `darwin` |
+| **Architecture** | `aarch64-darwin` |
+| **Roles** | gui |
 
-### Aspect Graph
+### Aspects
+
+```
+├── ivypierlot
+│   ├── agenix-rekey
+│   │   └── kind-system-routes
+│   ├── nixvim
+│   │   ├── nixvim-hm-module
+│   │   ├── unfree(cmp-nvim-lsp-document-symbol)
+│   │   ├── eagle-nvim
+│   │   └── eagle-nvim
+│   ├── neovim
+│   │   ├── nixvim
+│   │   │   ├── nixvim-hm-module
+│   │   │   ├── unfree(cmp-nvim-lsp-document-symbol)
+│   │   │   ├── eagle-nvim
+│   │   │   └── eagle-nvim
+│   │   └── stylix
+│   ├── fish
+│   │   └── [definition 1-entry 1]
+│   ├── nushell
+│   │   └── shell
+│   │       ├── starship
+│   │       └── jujutsu
+│   │           └── difftastic
+│   │               └── [definition 1-entry 1] ...
+│   ├── ghostty
+│   │   └── ghostty (circular)
+│   ├── sketchybar
+│   │   ├── sketchybar (circular)
+│   │   └── sketchybar_app_font
+│   ├── zotero
+│   ├── [definition 1-entry 9]
+│   ├── gui
+│   │   ├── onepassword
+│   │   │   └── unfree(onepassword-password-manager)
+│   │   └── ghostty
+│   │       └── ghostty (circular)
+│   ├── gpg
+│   ├── rift
+│   │   └── jankyborders
+│   │       └── [definition 1-entry 1]
+│   ├── kanata
+│   │   └── [definition 1-entry 1]
+│   ├── dev
+│   │   ├── dev-nix
+│   │   │   └── [definition 1-entry 1]
+│   │   └── dev-cli
+│   ├── file-local
+│   ├── primary-user
+│   └── cotabby
+└── macmini
+    └── homebrew
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -1736,9 +1909,20 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## pentestvm
 
-**Architecture:** `x86_64-linux`
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** |  |
 
-### Aspect Graph
+### Aspects
+
+```
+└── pentestvm
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -1992,9 +2176,38 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## secondpc
 
-**Architecture:** `x86_64-linux`
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** |  |
 
-### Aspect Graph
+### Aspects
+
+```
+├── auscyber
+│   ├── fish
+│   │   └── [definition 1-entry 1]
+│   └── agenix-rekey
+│       └── kind-system-routes
+└── secondpc
+    ├── nginx
+    │   └── [definition 1-entry 1]
+    ├── nix
+    │   └── [definition 1-entry 1]
+    ├── local
+    ├── vpn-server
+    │   └── vpn
+    │       ├── vpn-secrets
+    │       │   └── agenix-rekey
+    │       │       └── kind-system-routes ...
+    │       └── [definition 1-entry 2]
+    ├── builders
+    └── builder-server
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -2318,10 +2531,25 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## surfacelaptop
 
-**Architecture:** `x86_64-linux`
-**Roles:** gui, dev
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** | gui, dev |
 
-### Aspect Graph
+### Aspects
+
+```
+├── auscyber
+│   ├── fish
+│   │   └── [definition 1-entry 1]
+│   └── agenix-rekey
+│       └── kind-system-routes
+└── surfacelaptop
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
@@ -2617,9 +2845,20 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ## wsl-nixos
 
-**Architecture:** `x86_64-linux`
+| | |
+|---|---|
+| **Class** | `nixos` |
+| **Architecture** | `x86_64-linux` |
+| **Roles** |  |
 
-### Aspect Graph
+### Aspects
+
+```
+└── wsl-nixos
+
+```
+
+### Graph
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#4d2d00","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%

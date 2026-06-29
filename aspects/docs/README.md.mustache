@@ -3,21 +3,28 @@
 
 ## Systems
 
-| System | Architecture | Roles |
-|--------|--------------|-------|
+| System | Class | Architecture | Roles |
+|--------|-------|--------------|-------|
 {{#systems}}
-| [{{name}}](#{{name}}) | {{system}} | {{roles}} |
+| [{{name}}](#{{name}}) | {{class}} | {{system}} | {{roles}} |
 {{/systems}}
 
 {{#systems}}
 ## {{name}}
 
-**Architecture:** `{{system}}`
-{{#roles}}
-**Roles:** {{roles}}
-{{/roles}}
+| | |
+|---|---|
+| **Class** | `{{class}}` |
+| **Architecture** | `{{system}}` |
+| **Roles** | {{roles}} |
 
-### Aspect Graph
+### Aspects
+
+```
+{{{tree}}}
+```
+
+### Graph
 
 ```mermaid
 {{{mermaid}}}
