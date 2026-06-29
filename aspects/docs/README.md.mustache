@@ -6,40 +6,27 @@
 | System | Architecture | Roles |
 |--------|--------------|-------|
 {{#systems}}
-| {{name}} | {{system}} | {{roles}} |
+| [{{name}}](#{{name}}) | {{system}} | {{roles}} |
 {{/systems}}
 
-## Aspect Graph
-
-```mermaid
-graph LR
-{{#edges}}
-  {{from}} --> {{to}}
-{{/edges}}
-```
-
 {{#systems}}
-### {{name}}
+## {{name}}
 
-**Architecture:** {{system}}
+**Architecture:** `{{system}}`
 {{#roles}}
 **Roles:** {{roles}}
 {{/roles}}
 
-**Aspects:**
-{{#aspects}}
-- {{name}}
-{{/aspects}}
-{{^aspects}}
-_No aspects directly provide to this host_
-{{/aspects}}
+### Aspect Graph
+
+```mermaid
+{{{mermaid}}}
+```
 
 {{/systems}}
 
 ## Other Projects
 - [xmonad](https://github.com/xmonad/xmonad)
-- [xmonad-contrib](https://github.com/xmonad/xmonad-contrib)
-- [alacritty](https://github.com/alacritty/alacritty)
 - [ghostty](https://github.com/ghostty-org/ghostty)
 - [neovim](https://github.com/neovim/neovim)
 - [starship](https://github.com/starship/starship)
