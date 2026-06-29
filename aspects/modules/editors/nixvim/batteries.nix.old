@@ -11,6 +11,7 @@ let
     {
       host,
       user,
+      aspect-chain,
     }:
     den.provides.forward {
       each = lib.singleton true;
@@ -20,7 +21,8 @@ let
         "programs"
         "nixvim"
       ];
-      fromAspect = _: den.lib.resolveEntity "user" { inherit host user; };
+      adaptArgs = lib.id;
+      fromAspect = _: lib.head aspect-chain;
     };
 in
 {
@@ -99,32 +101,26 @@ in
       };
     });
 
-den.policies.nixvim-include-global-pkgs = ctx: den.lib.policy.provide { class = "nvim"; 
-module = { 
-key = "den:nixvim"; 
-
-nixpkgs.useGlobalPackages = true; }; };
-
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
     {
       host,
       user,
+      aspect-chain,
       ...
     }:
     (den.lib.policy.include (nvimForward {
-      inherit host user;
+      inherit host user aspect-chain;
     }));
 
   # ---------------------------------------------------------------------------
   # Schema includes
   # ---------------------------------------------------------------------------
 
-#  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module den.policies.nixvim-user-forward ];
+  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module ];
 
   den.default.includes = [
     den.policies.nixvim-hm-module
-    den.policies.nixvim-include-global-pkgs
     den.policies.nixvim-user-forward
   ];
 }

@@ -12,12 +12,13 @@
     ];
 
     provides.to-users.homeManager =
-      { pkgs,  ... }:
+      { pkgs, options, ... }:
       {
 
         stylix.targets.nixvim.enable = false;
         programs.nixvim = {
           enable = true;
+          nixpkgs.useGlobalPackages = true;
         };
         home.packages = with pkgs; [ tree-sitter ];
         home.sessionVariables.EDITOR = "vim";

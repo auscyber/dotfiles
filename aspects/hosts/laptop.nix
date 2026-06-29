@@ -14,6 +14,7 @@
       "dev"
     ];
     users.ivypierlot = {
+      wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
       flakeFolder = "/Users/ivypierlot/dendritic";
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H";
       roles = [
@@ -39,7 +40,7 @@
     darwin =
       { pkgs, lib, ... }:
       {
-                stylix.targets.jankyborders.enable = false;
+        stylix.targets.jankyborders.enable = false;
         programs._1password-gui.enable = true;
         services.karabiner-elements.enable = false;
         users.users.ivypierlot = {

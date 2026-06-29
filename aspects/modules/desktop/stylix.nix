@@ -6,9 +6,9 @@
 }:
 
 let
-  stylixDefaults = {
+  stylixDefaults = user: {
     enable = true;
-    image = ../../../backgrounds/phoebebridgers-2.jpg;
+    image = user.wallpaper;
     polarity = "dark";
   };
 
@@ -35,13 +35,12 @@ in
     ctx@{ user, host }:
     if isHMUser ctx && isStandalone ctx then
       [
-        builtins.break
         (den.lib.policy.provide {
           class = "homeManager";
           module = {
             key = "den:stylix-standalone-hm";
             imports = lib.optional (inputs ? stylix) inputs.stylix.homeModules.default;
-            stylix = stylixDefaults;
+            stylix = stylixDefaults user;
           };
         })
       ]
@@ -58,7 +57,9 @@ in
       imports = lib.optional (inputs ? stylix) inputs.stylix.nixosModules.default;
     };
 
-    os.stylix = stylixDefaults;
+    os = { user, ... }: {
+      stylix = stylixDefaults user;
+    };
 
   };
 

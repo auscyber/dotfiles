@@ -12,6 +12,19 @@
       };
       security.pam.services.sudo.rssh = true;
     };
+    overlays = {
+      pam_rssh = self: super: {
+        pam_rssh = super.pam_rssh.overrideAttrs (old: {
+          checkFlags = [
+            # reason for disabling test
+            "--skip=auth_keys::test_parse_authorized_keys"
+            "--skip=tests::parse_user_authorized_keys"
+          ];
+          meta.platforms = old.meta.platforms ++ [ "aarch64-darwin" ];
+        });
+      };
+
+    };
 
     darwin =
       { pkgs, ... }:

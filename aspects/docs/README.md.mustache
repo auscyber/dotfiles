@@ -3,28 +3,21 @@
 
 ## Systems
 
-| System | Class | Architecture | Roles |
-|--------|-------|--------------|-------|
+| System | Architecture | Roles |
+|--------|--------------|-------|
 {{#systems}}
-| [{{name}}](#{{name}}) | {{class}} | {{system}} | {{roles}} |
+| {{name}} | {{system}} | {{roles}} |
 {{/systems}}
 
 {{#systems}}
 ## {{name}}
 
-| | |
-|---|---|
-| **Class** | `{{class}}` |
-| **Architecture** | `{{system}}` |
-| **Roles** | {{roles}} |
+**Architecture:** `{{system}}`
+{{#roles}}
+**Roles:** {{roles}}
+{{/roles}}
 
-### Aspects
-
-```
-{{{tree}}}
-```
-
-### Graph
+### Aspect Graph
 
 ```mermaid
 {{{mermaid}}}
@@ -32,8 +25,18 @@
 
 {{/systems}}
 
+## My Packages
+
+| Package | Version | Description |
+|---------|---------|-------------|
+{{#packages}}
+| {{name}} | `{{version}}` | {{description}} |
+{{/packages}}
+
 ## Other Projects
 - [xmonad](https://github.com/xmonad/xmonad)
+- [xmonad-contrib](https://github.com/xmonad/xmonad-contrib)
+- [alacritty](https://github.com/alacritty/alacritty)
 - [ghostty](https://github.com/ghostty-org/ghostty)
 - [neovim](https://github.com/neovim/neovim)
 - [starship](https://github.com/starship/starship)

@@ -6,7 +6,7 @@
       packages.nvim = den.lib.nixvim.mkPackage { inherit pkgs; };
     };
 
-  den.aspects.nixvim.includes = [ (den.batteries.unfree [ "cmp-nvim-lsp-document-symbol" ]) ];
+  den.aspects.nixvim.includes = [ (den.batteries.unfree [ "cmp-nvim-lsp-document-symbol" "cmp-copilot" ]) ];
   den.aspects.nixvim.unfreeAllowed = [
     "cmp-copilot"
     "copilot.vim"

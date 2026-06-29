@@ -4,6 +4,10 @@ let
   # Add a name here when something legitimately needs unfree status; avoid
   # turning on blanket allowUnfree so accidental unfree pulls stay visible.
   allowed = [
+  "copilot.vim"
+  "idris2-vim"
+  "presence.nvim"
+  "cmp-copilot"
     "1password"
     "1password-cli"
     "1password-gui"
@@ -56,7 +60,6 @@ in
         # pam_rssh's meta.platforms is linux-only; we still want the .dylib build
         # on darwin since it works in practice. Same story for a handful of
         # cross-arch dev tools. Flip off if a real unsupported package sneaks in.
-        allowUnsupportedSystem = true;
       };
     };
     hmStandalone = { unfreeAllowed, ... }: {

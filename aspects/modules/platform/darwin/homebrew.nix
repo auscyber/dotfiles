@@ -35,20 +35,20 @@ in
     };
     flake-file = { brew, ... }: {
       inputs = lib.listToAttrs (
-            lib.concatMap (
-              x:
-              if x ? taps then
-                lib.mapAttrsToList (_: value: {
-                  name = value.input-name;
-                  value = {
-                    url = value.url;
-                    flake = false;
-                  };
-                }) (tapChanged x.taps)
-              else
-                [ ]
-            ) brew
-          );
+        lib.concatMap (
+          x:
+          if x ? taps then
+            lib.mapAttrsToList (_: value: {
+              name = value.input-name;
+              value = {
+                url = value.url;
+                flake = false;
+              };
+            }) (tapChanged x.taps)
+          else
+            [ ]
+        ) brew
+      );
     };
 
     darwin =
@@ -90,7 +90,7 @@ in
             autoUpdate = true; # Fetch the newest stable branch of Homebrew's git repo
             upgrade = true; # Upgrade outdated casks, formulae, and App Store apps
             # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
-#            cleanup = "uninstall";
+            cleanup = "uninstall";
           };
         };
       };

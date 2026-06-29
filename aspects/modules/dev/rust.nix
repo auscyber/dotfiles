@@ -1,9 +1,15 @@
+{ den, ... }:
 {
   ff.crane.url = "github:ipetkov/crane";
 
+  den.aspects.nixvim.includes = [ den.aspects.lspmux ];
   den.aspects.nixvim.nvim = { pkgs, lib, ... }: {
     plugins = {
       lsp.servers.rust_analyzer.packageFallback = true;
+      lsp.servers.rust_analyzer.cmd = [
+        "${pkgs.lspmux}"
+        "client"
+      ];
       rustaceanvim = {
         enable = true;
 
