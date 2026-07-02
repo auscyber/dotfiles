@@ -117,8 +117,8 @@ in
           ++ rename;
           age.rekey.storageMode = "local";
           age.rekey.hostPubkey = lib.mkIf (user.hostPublicKey != null) user.hostPublicKey;
-          age.rekey.generatedSecretsDir = ../../../secrets/generated + "/${host.name}/${user.name}";
-          age.rekey.localStorageDir = ../../../secrets/rekeyed + "/${host.name}/${user.name}";
+          age.rekey.generatedSecretsDir = ../../../secrets/generated + "/${host.name}-${user.name}";
+          age.rekey.localStorageDir = ../../../secrets/rekeyed + "/${host.name}-${user.name}";
 
         };
       };
