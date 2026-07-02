@@ -24,6 +24,7 @@
       sshUser = "builder";
     };
     users.auscyber = {
+      wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
       roles = [
         "gui"
         "gaming"
@@ -39,6 +40,8 @@
       den.aspects.bootlogo
       den.aspects.builders
       den.aspects.builder-server
+      den.aspects.secure-boot
+      (den.batteries.unfree [ "castlabs-electron" ])
       # gaming content is delivered via the `gaming` role (see gaming.nix +
       # roles.nix); no explicit include needed.
     ];
@@ -59,6 +62,7 @@
           "zfs"
           "ntfs"
         ];
+        nixpkgs.config.allowUnfree = true;
         boot.zfs.requestEncryptionCredentials = true;
         boot.zfs.forceImportRoot = true;
 
@@ -79,7 +83,6 @@
 
         programs.dconf.enable = true;
         programs.zsh.enable = true;
-        programs.fish.enable = true;
         programs.kdeconnect.enable = true;
         programs._1password.enable = true;
         programs._1password-gui = {
@@ -93,7 +96,6 @@
         users.users.auscyber = {
           isNormalUser = true;
           description = "Ivy";
-          shell = pkgs.fish;
           extraGroups = [
             "video"
             "wheel"
@@ -105,13 +107,49 @@
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H"
           ];
         };
+        fileSystems = {
+          "/" = {
+            device = "zpool/root";
+            fsType = "zfs";
+          };
 
+          "/nix" = {
+            device = "zpool/nix";
+            fsType = "zfs";
+          };
+
+          "/var" = {
+            device = "zpool/var";
+            fsType = "zfs";
+          };
+
+          "/home" = {
+            device = "zpool/home";
+            fsType = "zfs";
+          };
+
+          "/boot" = {
+            device = "/dev/disk/by-uuid/2BFB-8C7C";
+            fsType = "vfat";
+            options = [
+              "fmask=0022"
+              "dmask=0022"
+            ];
+          };
+          "/mnt/hdd" = {
+            device = "/dev/disk/by-uuid/112e9d72-3f90-4936-988b-521d50371d09";
+            fsType = "ext4";
+          };
+        };
+
+        swapDevices = [ ];
       };
   };
 
   den.aspects.auscyber = {
     includes = [
       den.aspects.fish
+      (den.batteries.unfree [ "castlabs-electron" ])
     ];
 
     provides.auspc = {

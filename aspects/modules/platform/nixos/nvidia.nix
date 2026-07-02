@@ -1,8 +1,13 @@
-{ lib, inputs, ... }:
+{
+  lib,
+  inputs,
+  den,
+  ...
+}:
 {
 
   ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
-  den.aspects.ivyperlot.includes = [
+  den.aspects.gpus.includes = [
     (
       { host, ... }:
       lib.optionalAttrs (host ? gpu && host == "nvidia" && inputs ? nixos-hardware) {
@@ -71,5 +76,6 @@
       }
     )
   ];
+  den.aspects.auspc.includes = [ den.aspects.gpus ];
 
 }

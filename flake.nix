@@ -166,6 +166,10 @@
       url = "github:vic/import-tree";
       inputs = { };
     };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     my-nur = {
       url = "github:auscyber/nur-packages";
       inputs = {
