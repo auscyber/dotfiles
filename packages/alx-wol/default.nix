@@ -5,20 +5,22 @@
   };
 
   den.aspects.packages.alx-wol = {
-    overlays = { sources, ... }: {
-      alx-wol = self: super: {
-        kernelPackageExtensions = super.kernelPackageExtensions ++ [
+    overlays =
+      { sources, ... }:
+      {
+        alx-wol = self: super: {
+          kernelPackagesExtensions = super.kernelPackagesExtensions ++ [
 
-          (self: super: {
+            (self: super: {
 
-            alx-wol = (super.callPackage ./package.nix).overrideAttrs ({
-              inherit (sources.alx-wol) src version;
-            });
+              alx-wol = (super.callPackage ./package.nix { }).overrideAttrs ({
+                inherit (sources.alx-wol) src version;
+              });
 
-          })
-        ];
+            })
+          ];
 
+        };
       };
-    };
   };
 }

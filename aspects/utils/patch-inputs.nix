@@ -419,8 +419,7 @@ in
     # compute newInputs, which adds significant eval overhead.
     flake.newInputs =
       let
-        pkgs = realInputs.nixpkgs.legacyPackages.${builtins.currentSystem or "aarch64-darwin"};
-        pkgs = realInputs.nixpkgs.legacyPackages.aarch64-darwin;
+        pkgs = realInputs.nixpkgs.legacyPackages.${builtins.currentSystem or "x86_64-linux"};
         patched = buildPatched pkgs;
       in
       lib.mapAttrs (

@@ -23,6 +23,22 @@
           in
           (super.linuxPackagesFor (
             super.linux_zen.override (prev: {
+              argsOverride =
+                let
+                  kernelVersion = "7.0.14";
+                in
+                {
+                  src = super.fetchFromGitHub {
+                    owner = "zen-kernel";
+                    repo = "zen-kernel";
+                    rev = "v${kernelVersion}-zen1";
+                    hash = "sha256-VLFKayp+ugmmo+L9aC2QwxgZ/wghkCIud5BF6H/Mnbk=";
+                  };
+
+                  version = kernelVersion;
+                  modDirVersion = kernelVersion;
+
+                };
               #          stdenv = llvmKernelStdenv;
               inherit stdenv;
               buildPackages = super.buildPackages // {
@@ -52,13 +68,18 @@
                 }
               ];
             })
-          ));
+          ))
+        # .extend
+        #   (lib.composeManyExtensions super.kernelPackagesExtensions)
+        ;
       };
     };
 
-    nixos = { pkgs, config, ... }: {
+    nixos =
+      { pkgs, config, ... }:
+      {
 
-      boot.kernelPackages = pkgs.linuxZenWMuQSS;
-    };
+        boot.kernelPackages = pkgs.linuxZenWMuQSS;
+      };
   };
 }

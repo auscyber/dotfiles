@@ -37,6 +37,7 @@
   den.aspects.auspc = {
     includes = [
       den.aspects.vpn
+      den.aspects.packages.alx-wol
       den.aspects.bootlogo
       den.aspects.builders
       den.aspects.builder-server
