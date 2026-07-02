@@ -68,10 +68,13 @@ in
       system = pkgs.stdenv.hostPlatform.system;
       resolved = den.lib.nixvim.module nvimAspect ctx;
     in
-    inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
-      inherit pkgs;
-      module = resolved;
-    };
+    (inputs.nixvim.lib.evalNixvim {
+      inherit system;
+      modules = [
+        resolved
+        { nixpkgs.pkgs = pkgs; }
+      ];
+    }).config.build.package;
 
   # Flexible package builder for perSystem
   den.lib.nixvim.mkPackage =
@@ -99,11 +102,16 @@ in
       };
     });
 
-den.policies.nixvim-include-global-pkgs = ctx: den.lib.policy.provide { class = "nvim"; 
-module = { 
-key = "den:nixvim"; 
+  den.policies.nixvim-include-global-pkgs =
+    ctx:
+    den.lib.policy.provide {
+      class = "nvim";
+      module = {
+        key = "den:nixvim";
 
-nixpkgs.useGlobalPackages = true; }; };
+        nixpkgs.useGlobalPackages = true;
+      };
+    };
 
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
@@ -120,7 +128,7 @@ nixpkgs.useGlobalPackages = true; }; };
   # Schema includes
   # ---------------------------------------------------------------------------
 
-#  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module den.policies.nixvim-user-forward ];
+  #  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module den.policies.nixvim-user-forward ];
 
   den.default.includes = [
     den.policies.nixvim-hm-module

@@ -4,7 +4,7 @@
   den.schema.user = {
     options.wallpaper = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
-      default = null;
+      default = lib.mkDefault ../../../backgrounds/phoebebridgers-2.jpg;
       description = "Wallpaper image path";
     };
 

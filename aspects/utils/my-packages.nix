@@ -14,6 +14,12 @@ let
   isBuildable = pkg: lib.isDerivation pkg;
 in
 {
+  systems = [
+    "x86_64-freebsd"
+    "x86_64-linux"
+    "aarch64-linux"
+    "aarch64-darwin"
+  ];
   perSystem =
     { pkgs, ... }:
     let

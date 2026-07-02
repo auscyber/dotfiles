@@ -153,6 +153,7 @@ in
 
       masterIdentities = [ { identity = ./gpg-yubikey.pub; } ];
       storageMode = "local";
+      agePlugins = [ ];
     };
 
   };
@@ -170,11 +171,16 @@ in
       # full fleet evaluation through config.agenix-rekey.package
       agenixRekeyPkg = inputs'.agenix-rekey.packages.default;
       agePlugins = [
+
         (inputs.age-plugin-gpg.packages.${system}.age-plugin-gpg.overrideAttrs (attrs: {
           postInstall = (attrs.postInstall or "") + ''
             ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
           '';
         }))
+        pkgs.rage
+      ]
+      ++ lib.optionals pkgs.stdenv.isDarwin [
+        pkgs.age-plugin-se
       ];
     in
     {
