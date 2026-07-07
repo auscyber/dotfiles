@@ -12,7 +12,7 @@
     includes = [ (den.batteries.unfree [ "onepassword-password-manager" ]) ];
     gui = {
       darwin.programs._1password-gui.enable = true;
-      provides.to-users.hm =
+      provides.to-users.homeManager =
         { pkgs, config, ... }:
         lib.mkMerge [
           {

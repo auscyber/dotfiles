@@ -13,14 +13,20 @@ let
     "https://devenv.cachix.org" = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
     #    "https://auscyber.cachix.org" =
     #      "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c=";
-    #  "https://cache.ivymect.in/main" = "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0=";
-    ##    "https://attic.xuyh0120.win/lantian" = "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=";
+    "https://cache.ivymect.in/main" = "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0=";
+    #    "https://attic.xuyh0120.win/lantian" = "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=";
 
   };
   vhost = "cache.ivymect.in";
 
 in
 {
+
+  den.aspects.nix.nix.settings = {
+    trusted-substituters = builtins.attrNames caches;
+    trusted-public-keys = builtins.attrValues caches;
+
+  };
 
   den.aspects.celler =
     {

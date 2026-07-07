@@ -24,7 +24,7 @@
 
           ts_ls = {
             enable = true;
-            autostart = false;
+            autostart = true;
             filetypes = [
               "typescriptreact"
               "typescript"

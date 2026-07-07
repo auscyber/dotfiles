@@ -21,10 +21,10 @@ index 22babd9..492020b 100644
  
  impl DarwinRebuildArgs {
 diff --git a/crates/nh-darwin/src/darwin.rs b/crates/nh-darwin/src/darwin.rs
-index 1c565a5..bdaf47d 100644
+index cab3abd..0ff1687 100644
 --- a/crates/nh-darwin/src/darwin.rs
 +++ b/crates/nh-darwin/src/darwin.rs
-@@ -20,6 +20,9 @@ use tracing::{debug, info, warn};
+@@ -21,6 +21,9 @@ use tracing::{debug, info, warn};
  const SYSTEM_PROFILE: &str = "/nix/var/nix/profiles/system";
  const CURRENT_PROFILE: &str = "/run/current-system";
  
@@ -34,7 +34,7 @@ index 1c565a5..bdaf47d 100644
  impl DarwinArgs {
    /// Run the `darwin` subcommand.
    ///
-@@ -84,7 +87,7 @@ impl DarwinRebuildArgs {
+@@ -85,7 +88,7 @@ impl DarwinRebuildArgs {
          (dir.as_ref().join("result"), Some(dir))
        };
  
@@ -43,7 +43,7 @@ index 1c565a5..bdaf47d 100644
  
      let installable = self
        .common
-@@ -146,6 +149,26 @@ impl DarwinRebuildArgs {
+@@ -147,6 +150,26 @@ impl DarwinRebuildArgs {
      let target_profile = out_path.clone();
  
      target_profile.try_exists().context("Doesn't exist")?;
@@ -70,7 +70,7 @@ index 1c565a5..bdaf47d 100644
  
      debug!(
        "Comparing with target profile: {}",
-@@ -182,9 +205,14 @@ impl DarwinRebuildArgs {
+@@ -183,9 +206,14 @@ impl DarwinRebuildArgs {
          .with_required_env()
          .run()
          .wrap_err("Failed to set Darwin system profile")?;
@@ -88,19 +88,19 @@ index 1c565a5..bdaf47d 100644
        // Determine if we need to elevate privileges
        let needs_elevation = !activate_user
 diff --git a/flake.lock b/flake.lock
-index f2e2e70..d564e1e 100644
+index 6ae73db..8df95d4 100644
 --- a/flake.lock
 +++ b/flake.lock
-@@ -1,5 +1,20 @@
+@@ -1,12 +1,27 @@
  {
    "nodes": {
 +    "crane": {
 +      "locked": {
-+        "lastModified": 1781825982,
-+        "narHash": "sha256-SlXKwIRIhrOSAcTjCB3ftPLzJWZStQIPS7J1FlZPnKk=",
++        "lastModified": 1783203018,
++        "narHash": "sha256-G6R9IT/xwFuu+CYBWDUAok6AdC4ERC4ZfPPFtEpxnZE=",
 +        "owner": "ipetkov",
 +        "repo": "crane",
-+        "rev": "469fd08d0bcf6926321fa973c6777fbc87785dd7",
++        "rev": "80db5bdc391be8a1794f6d8a2d56e3a84ebcede2",
 +        "type": "github"
 +      },
 +      "original": {
@@ -111,7 +111,18 @@ index f2e2e70..d564e1e 100644
 +    },
      "nixpkgs": {
        "locked": {
-         "lastModified": 1780243769,
+-        "lastModified": 1782723713,
+-        "narHash": "sha256-T6OhkwGyyGHer1lr4GkbOp//7ii23xLE7HuMmjrdkXI=",
+-        "rev": "b5aa0fbd538984f6e3d201be0005b4463d8b09f8",
++        "lastModified": 1783224372,
++        "narHash": "sha256-FGQ8TfSm9WviNE/fQAWsKs+y4GkX8fU4EScewpw54Y8=",
++        "rev": "d407951447dcd00442e97087bf374aad70c04cea",
+         "type": "tarball",
+-        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1024265.b5aa0fbd5389/nixexprs.tar.xz"
++        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1027867.d407951447dc/nixexprs.tar.xz"
+       },
+       "original": {
+         "type": "tarball",
 @@ -15,6 +30,7 @@
      },
      "root": {
@@ -121,7 +132,7 @@ index f2e2e70..d564e1e 100644
        }
      }
 diff --git a/flake.nix b/flake.nix
-index e631d5c..c134ad9 100644
+index c4d7998..19d3b52 100644
 --- a/flake.nix
 +++ b/flake.nix
 @@ -1,10 +1,14 @@
@@ -140,7 +151,7 @@ index e631d5c..c134ad9 100644
      }:
      let
        inherit (nixpkgs) lib;
-@@ -26,10 +30,18 @@
+@@ -24,10 +28,18 @@
        rev = self.shortRev or self.dirtyShortRev or "dirty";
      in
      {
@@ -161,17 +172,8 @@ index e631d5c..c134ad9 100644
          default = self.packages.${pkgs.stdenv.hostPlatform.system}.nh;
        });
  
-@@ -48,7 +60,7 @@
-           name = "nix3-fmt-wrapper";
- 
-           runtimeInputs = [
--            pkgs.nixfmt-rfc-style
-+            pkgs.nixfmt
-             pkgs.taplo
-             pkgs.deno
-             pkgs.fd
 diff --git a/package.nix b/package.nix
-index b01fa8c..e46faec 100644
+index 4428ff4..c152089 100644
 --- a/package.nix
 +++ b/package.nix
 @@ -1,24 +1,16 @@
@@ -204,7 +206,7 @@ index b01fa8c..e46faec 100644
    src = lib.fileset.toSource {
      root = ./.;
      fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource ./.)) (
-@@ -31,105 +23,83 @@ rustPlatform.buildRustPackage (finalAttrs: {
+@@ -30,105 +22,83 @@ rustPlatform.buildRustPackage (finalAttrs: {
          ./Cargo.lock
        ]
      );

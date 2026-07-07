@@ -47,11 +47,13 @@
 
   nixConfig = {
     extra-substituters = [
+      "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
+      "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -118,6 +120,18 @@
     devshell = {
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    disko-zfs = {
+      url = "github:numtide/disko-zfs";
+      inputs = {
+        disko.follows = "disko";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     emacs = {
       url = "github:nix-community/emacs-overlay";
