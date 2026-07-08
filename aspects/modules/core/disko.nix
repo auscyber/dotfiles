@@ -18,5 +18,6 @@
       # (option `disko.zfs`). Inert unless `disko.zfs.enable = true`.
       inputs.disko-zfs.nixosModules.default
     ];
+
   };
 }

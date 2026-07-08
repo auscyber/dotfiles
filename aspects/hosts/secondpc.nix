@@ -39,6 +39,8 @@
       den.aspects.vpn-server
       den.aspects.builders
       den.aspects.builder-server
+      den.aspects.disko
+      den.aspects.facter
     ];
 
     nixos =
@@ -47,15 +49,19 @@
         # Host identity / boot
         networking.hostId = "4f6f802e";
 
+        # Hardware detection (kernel modules, microcode, ...) comes from the
+        # `facter` aspect reading this report instead of a hand-written
+        # hardware-configuration.nix.
+        hardware.facter.reportPath = ./secondpc/facter.json;
+
         boot.loader.systemd-boot.enable = true;
         boot.loader.efi.canTouchEfiVariables = true;
         boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
         boot.supportedFilesystems = [ "zfs" ];
-        boot.zfs.extraPools = [
-          "zroot"
-          "zpool"
-        ];
+        # `zroot` (root pool) is imported automatically because `/` lives on it;
+        # only the data pool needs to be listed here.
+        boot.zfs.extraPools = [ "zpool" ];
 
         boot.kernel.sysctl = {
           "net.ipv6.conf.all.forwarding" = 1;
@@ -64,9 +70,85 @@
           "net.ipv6.conf.all.accept_source_route" = 1;
         };
 
-        fileSystems."/mnt/hdd" = {
-          device = "zpool/root";
-          fsType = "zfs";
+        # Disk layout (disko + disko-zfs). Two SATA disks:
+        #   ssd  → ESP (/boot/efi) + zpool `zroot`  (root)
+        #   hdd  → zpool `zpool`                    (/mnt/hdd data)
+        # fileSystems for `/`, `/boot/efi` and `/mnt/hdd` are generated from
+        # this layout — do not also declare them by hand.
+        disko.devices = {
+          disk = {
+            ssd = {
+              type = "disk";
+              device = "/dev/disk/by-id/ata-ADATA_SP900_2F2020013141";
+              content = {
+                type = "gpt";
+                partitions = {
+                  ESP = {
+                    size = "512M";
+                    type = "EF00";
+                    content = {
+                      type = "filesystem";
+                      format = "vfat";
+                      mountpoint = "/boot/efi";
+                      mountOptions = [ "umask=0077" ];
+                    };
+                  };
+                  zroot = {
+                    size = "100%";
+                    content = {
+                      type = "zfs";
+                      pool = "zroot";
+                    };
+                  };
+                };
+              };
+            };
+            hdd = {
+              type = "disk";
+              device = "/dev/disk/by-id/ata-ST4000VN006-3CW104_WW67DVN6";
+              content = {
+                type = "gpt";
+                partitions = {
+                  zpool = {
+                    size = "100%";
+                    content = {
+                      type = "zfs";
+                      pool = "zpool";
+                    };
+                  };
+                };
+              };
+            };
+          };
+          zpool = {
+            zroot = {
+              type = "zpool";
+              options.ashift = "12";
+              rootFsOptions = {
+                compression = "zstd";
+                acltype = "posixacl";
+                xattr = "sa";
+                "com.sun:auto-snapshot" = "false";
+                mountpoint = "none";
+              };
+              datasets.nixos = {
+                type = "zfs_fs";
+                mountpoint = "/";
+              };
+            };
+            zpool = {
+              type = "zpool";
+              options.ashift = "12";
+              rootFsOptions = {
+                compression = "zstd";
+                mountpoint = "none";
+              };
+              datasets.root = {
+                type = "zfs_fs";
+                mountpoint = "/mnt/hdd";
+              };
+            };
+          };
         };
 
         # Networking: bridge + static ipv4

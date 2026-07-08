@@ -221,6 +221,10 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    nixos-facter-modules = {
+      url = "github:nix-community/nixos-facter-modules";
+      inputs = { };
+    };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
