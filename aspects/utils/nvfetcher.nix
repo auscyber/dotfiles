@@ -2,7 +2,7 @@
   den,
   lib,
   config,
-  withSystem,
+  inputs,
   ...
 }:
 let
@@ -51,14 +51,17 @@ let
     corresponding Home Manager configuration.
   '';
 
+  # Build `sources` from a bare `inputs.nixpkgs` rather than `withSystem system`
+  # (the final perSystem pkgs). nvfetcher sources are plain fetcher derivations —
+  # overlays never affect them — and `withSystem` creates a host -> perSystem
+  # back-edge that infinite-loops when a host is resolved *inside* the
+  # flake-parts/perSystem scope (e.g. by `flake-parts-to-host` overlay collection).
   mkAspect =
     class: system:
-    withSystem system (
-      { pkgs, ... }:
-      {
-        ${class}._module.args.sources = pkgs.callPackage ../../_sources/generated.nix { };
-      }
-    );
+    {
+      ${class}._module.args.sources =
+        (import inputs.nixpkgs { inherit system; }).callPackage ../../_sources/generated.nix { };
+    };
 
   osAspect =
     { host }:

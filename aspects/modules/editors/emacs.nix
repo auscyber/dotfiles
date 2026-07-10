@@ -1,9 +1,9 @@
-{ den, ... }:
+{ den, inputs, ... }:
 {
   flake-file.inputs.emacs.url = "github:nix-community/emacs-overlay";
 
   den.aspects.emacs = {
-    overlays.emacs = inputs: inputs.emacs.overlays.default or (_: _: { });
+    overlays.emacs = inputs.emacs.overlays.default or (_: _: { });
 
     homeManager =
       { pkgs, ... }:

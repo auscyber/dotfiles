@@ -24,16 +24,20 @@ in
 
   den.aspects.lspmux = { user, ... }: {
     overlays = {
-      lspmux = self: super: {
-        wrapLspMux =
-          pkg:
+      lspmux = [
+        (
+          self: super: {
+            wrapLspMux =
+              pkg:
 
-          super.writeShellScriptBin "wrap-lspmux" ''
-            #!${super.runtimeShell}/bin/sh
-            exec ${super.lspmux}/bin/lspmux client --server-path "${lib.getExe pkg} $@"
-          '';
+              super.writeShellScriptBin "wrap-lspmux" ''
+                #!${super.runtimeShell}/bin/sh
+                exec ${super.lspmux}/bin/lspmux client --server-path "${lib.getExe pkg} $@"
+              '';
 
-      };
+          }
+        )
+      ];
     };
 
     homeManager = { pkgs, ... }: {

@@ -49,6 +49,7 @@
       den.policies.sources-to-flake-parts
       den.policies.flake-parts-to-host
     ];
+
     schema.host.include = [ den.policies.inputs-to-flake-parts ];
   };
   flake.den = den;

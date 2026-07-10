@@ -26,14 +26,17 @@
     # (kanata / kanata-with-cmd / kanata.darwinDriver come from nixpkgs).
     # Guarded so non-darwin pkgs sets (e.g. the linux-builder) don't force
     # packages my-nur may not expose for that system.
-    overlays.kanata =
-      _final: prev:
-      let
-        sys = prev.stdenv.hostPlatform.system;
-        nurPkgs = inputs.my-nur.packages.${sys} or { };
-      in
-      lib.optionalAttrs (nurPkgs ? kanata-tray) { kanata-tray = nurPkgs.kanata-tray; }
-      // lib.optionalAttrs (nurPkgs ? kanata-vk-agent) { kanata-vk-agent = nurPkgs.kanata-vk-agent; };
+    overlays.kanata = [
+      (
+        _final: prev:
+        let
+          sys = prev.stdenv.hostPlatform.system;
+          nurPkgs = inputs.my-nur.packages.${sys} or { };
+        in
+        lib.optionalAttrs (nurPkgs ? kanata-tray) { kanata-tray = nurPkgs.kanata-tray; }
+        // lib.optionalAttrs (nurPkgs ? kanata-vk-agent) { kanata-vk-agent = nurPkgs.kanata-vk-agent; }
+      )
+    ];
 
     provides.to-host =
       {

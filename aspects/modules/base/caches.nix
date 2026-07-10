@@ -1,6 +1,7 @@
 {
   inputs,
   den,
+  self,
   lib,
   ...
 }:
@@ -43,20 +44,9 @@ let
       ...
     }:
     let
-      tokenConfig = (pkgs.formats.toml { }).generate "celler-token.toml" {
-        database.url = "sqlite://:memory:";
-        storage = {
-          type = "local";
-          path = "/tmp";
-        };
-        chunking = {
-          nar-size-threshold = 64 * 1024;
-          min-size = 16 * 1024;
-          avg-size = 64 * 1024;
-          max-size = 256 * 1024;
-        };
-        jwt = { };
-      };
+      tokenConfig =
+        (pkgs.formats.toml { }).generate "celler-token.toml"
+          self.nixosConfigurations.secondpc.config.services.cellerd.settings;
       patternArgs = flag: lib.concatMapStringsSep " " (p: "${flag} ${lib.escapeShellArg p}");
     in
     ''
@@ -168,8 +158,11 @@ in
   # in the repo for the generator, but never rekeyed/deployed onto the host --
   # only the minted `celler_token` lands there.
   den.aspects.celler-push = {
-    includes = [ den.aspects.agenix-rekey ];
+    includes = [
+      den.aspects.agenix-rekey
+    ];
     overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
+
     secrets = { secrets, host, ... }: {
 
       cache_key = {
@@ -177,10 +170,29 @@ in
         intermediary = lib.mkDefault true;
       };
       celler_token.generator = {
+        tags = [ "celler_token" ];
         dependencies = [ secrets.cache_key ];
         script = cellerTokenScript { sub = host.name; };
       };
     };
+    templates = { secrets, ... }: {
+      netrc = {
+        dependencies = {
+          inherit (secrets) celler_token;
+        };
+        content =
+          {
+            pkgs,
+            placeholders,
+            ...
+          }:
+          ''
+                    machine ${vhost}
+            		password ${placeholders.attic_token}
+            	  '';
+      };
+    };
+
     os =
       {
         config,
@@ -220,7 +232,10 @@ in
       in
 
       {
-        nix.settings.post-build-hook = "${build-hook}";
+        nix.settings = {
+          post-build-hook = "${build-hook}";
+          netrc-file = config.age.templates.netrc.path;
+        };
 
       };
   };
