@@ -160,21 +160,24 @@ in
   # what *builds* the perSystem `pkgs`, so feeding the final (overlaid) pkgs
   # back into their configurators would be an infinite recursion.
   den.classes.overlays = { };
-  den.policies.overlays-to-_overlays = { aspect-chain, ... }: [
-
-    (den.lib.policy.route {
-      each = [
+  den.policies.overlays-to-_overlays =
+    { ... }:
+    builtins.map
+      (
+        p:
+        den.lib.policy.route {
+          fromClass = "overlays";
+          intoClass = p.sys;
+          intoPath = [ "_overlays" ];
+          adaptArgs = args: args // { system = args.pkgs.stdenv.hostPlatform.system; };
+        }
+      )
+      [
         { sys = "nixos"; }
         { sys = "darwin"; }
         { sys = "homeManager"; }
       ];
-      fromClass = _: "overlays";
-      intoClass = p: p.sys;
-      intoPath = _: [ "_overlays" ];
-      fromAspect = _item: lib.head aspect-chain;
-      adaptArgs = args: args // { system = args.pkgs.stdenv.hostPlatform.system; };
-    })
-  ];
+
   den.policies.overlays-to-flake-parts = _: [
     (route {
       fromClass = "overlays";
@@ -240,13 +243,15 @@ in
       };
 
       config = {
-        _module.args.pkgs = lib.mkForce (import inputs.nixpkgs {
-          inherit system;
-          overlays = tagOverlaySet allOverlays;
-          config = {
-            allowUnfree = true;
-          };
-        });
+        _module.args.pkgs = lib.mkForce (
+          import inputs.nixpkgs {
+            inherit system;
+            overlays = tagOverlaySet allOverlays;
+            config = {
+              allowUnfree = true;
+            };
+          }
+        );
         _module.args.overlays = tagOverlaySet allOverlays;
       };
     };

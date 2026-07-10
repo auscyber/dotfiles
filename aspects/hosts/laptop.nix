@@ -128,7 +128,7 @@
       den.aspects.nixvim
       den.aspects.neovim
       den.aspects.fish
-      den.aspects.celler-push
+      #      den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.sketchybar

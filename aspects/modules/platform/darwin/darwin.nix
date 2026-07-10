@@ -7,7 +7,7 @@
     #      ../../../patches/darwin/specialisation.patch
     #    ];
   };
-  flake.aspects.darwin.darwin = {
+  den.aspects.nix.darwin = {
 
     nix.distributedBuilds = true;
 
@@ -15,7 +15,7 @@
       enable = true;
       ephemeral = true;
       systems = [
-        #  "x86_64-linux"
+        "x86_64-linux"
         "aarch64-linux"
       ];
       config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
