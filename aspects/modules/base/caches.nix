@@ -19,9 +19,59 @@ let
   };
   vhost = "cache.ivymect.in";
 
+  # Mint a scoped celler JWT with an agenix-rekey generator, replacing the
+  # runtime `celleradm` systemd wrapper. The RS256 signing key is handed in as
+  # the `cache_key` dependency and decrypted with the master identity at
+  # `agenix generate` time, so the private key never leaves the admin host --
+  # only the resulting per-host token is rekeyed onto the target.
+  #
+  # `celleradm make-token` reads only the [jwt] block; database/storage/chunking
+  # merely have to parse, so they are stubbed. Empty [jwt] matches the server
+  # (no bound issuer/audience).
+  cellerTokenScript =
+    {
+      sub,
+      pull ? [ "main" ],
+      push ? [ "main" ],
+      validity ? "10y",
+    }:
+    {
+      pkgs,
+      lib,
+      decrypt,
+      deps,
+      ...
+    }:
+    let
+      tokenConfig = (pkgs.formats.toml { }).generate "celler-token.toml" {
+        database.url = "sqlite://:memory:";
+        storage = {
+          type = "local";
+          path = "/tmp";
+        };
+        chunking = {
+          nar-size-threshold = 64 * 1024;
+          min-size = 16 * 1024;
+          avg-size = 64 * 1024;
+          max-size = 256 * 1024;
+        };
+        jwt = { };
+      };
+      patternArgs = flag: lib.concatMapStringsSep " " (p: "${flag} ${lib.escapeShellArg p}");
+    in
+    ''
+      export CELLER_SERVER_TOKEN_RS256_SECRET_BASE64="$(${decrypt} ${lib.escapeShellArg (lib.head deps).file})"
+      ${lib.getExe' pkgs.celler "celleradm"} -f ${tokenConfig} make-token \
+        --sub ${lib.escapeShellArg sub} \
+        --validity ${lib.escapeShellArg validity} \
+        ${patternArgs "--pull" pull} \
+        ${patternArgs "--push" push}
+    '';
+
 in
 {
 
+  debug = true;
   den.aspects.nix.nix.settings = {
     trusted-substituters = builtins.attrNames caches;
     trusted-public-keys = builtins.attrValues caches;
@@ -60,7 +110,7 @@ in
     {
       overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
 
-      vhosts."cache.ivymect.in" = {
+      vhosts.${vhost} = {
         useACMEHost = "ivymect.in";
         forceSSL = true;
         locations."/" = {
@@ -111,6 +161,69 @@ in
           };
         };
     };
+
+  # Opt-in per-host cache credentials. A host that includes this aspect gets its
+  # own scoped push/pull token for cache.ivymect.in, generated from the shared
+  # signing key. The key is declared here as an *intermediary* secret: present
+  # in the repo for the generator, but never rekeyed/deployed onto the host --
+  # only the minted `celler_token` lands there.
+  den.aspects.celler-push = {
+    includes = [ den.aspects.agenix-rekey ];
+    overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
+    secrets = { secrets, host, ... }: {
+
+      cache_key = {
+        rekeyFile = ./cache.age;
+        intermediary = lib.mkDefault true;
+      };
+      celler_token.generator = {
+        dependencies = [ secrets.cache_key ];
+        script = cellerTokenScript { sub = host.name; };
+      };
+    };
+    os =
+      {
+        config,
+        pkgs,
+        host,
+        ...
+      }:
+      let
+        build-hook = pkgs.writeTextFile {
+          name = "build-hook";
+          executable = true;
+          destination = "/bin/build-hook";
+          text =
+            # sh
+            ''
+              #!/bin/sh
+              set -eu
+              set -f # disable globbing
+              export IFS=' '
+              export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
+              celler login central https://${vhost} "$(cat ${config.age.secrets.celler_token.path})"
+
+              echo "Uploading paths" $OUT_PATHS
+              if [[ -n "''${OUT_PATHS:-}" ]]; then
+              	export TS_MAXFINISHED=1000
+              	export TS_SLOTS=10
+
+              	echo "Uploading $OUT_PATHS"
+              	printf "%s" "$OUT_PATHS" |
+              		xargs ts celler push main
+              fi
+
+            '';
+
+          meta.mainProgram = "build-hook";
+        };
+      in
+
+      {
+        nix.settings.post-build-hook = "${build-hook}";
+
+      };
+  };
 
   ff.celler = {
     url = "github:blitz/celler/main";

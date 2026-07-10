@@ -171,5 +171,6 @@ in
           allowUnfree = true;
         };
       };
+      _module.args.overlays = tagOverlaySet packageOverlays;
     };
 }
