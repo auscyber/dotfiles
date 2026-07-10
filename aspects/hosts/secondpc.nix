@@ -42,7 +42,6 @@
       den.aspects.disko
       den.aspects.facter
       den.aspects.secondpc-web
-      den.aspects.secondpc-media
     ];
 
     nixos =

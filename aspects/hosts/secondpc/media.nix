@@ -5,8 +5,11 @@
 # to the same option). Generated/rekeyed secrets all need `nix run .#rekey` and
 # `nix run .#gen-secrets` before deploy.
 {
-  den.aspects.secondpc-media = {
-    includes = [ den.aspects.agenix-rekey ];
+  den.aspects.secondpc = {
+    includes = [
+      den.aspects.agenix-rekey
+      den.aspects.user-pwd
+    ];
 
     nixos =
       {
@@ -50,26 +53,6 @@
 
         # --- user password: ivy-password (source, intermediary) hashed into
         #     ivy-pwd-hash (generated via openssl passwd -6). ---
-        age.secrets.ivy-password = {
-          rekeyFile = ./ivy-password.age;
-          intermediary = true;
-        };
-        age.secrets.ivy-pwd-hash.generator = {
-          dependencies = [ config.age.secrets.ivy-password ];
-          script =
-            {
-              pkgs,
-              lib,
-              decrypt,
-              deps,
-              ...
-            }:
-            ''
-              ${decrypt} ${lib.escapeShellArg (lib.head deps).file} | \
-                  ${pkgs.openssl}/bin/openssl passwd -6 -stdin
-            '';
-        };
-        users.users.auscyber.hashedPasswordFile = config.age.secrets."ivy-pwd-hash".path;
 
         # --- vaultwarden admin token: regenerated as an agenix secret (the
         #     original used sops). Fresh random token on gen-secrets. ---

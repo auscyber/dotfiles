@@ -133,19 +133,6 @@
         };
 
         # ESP + data disk kept on their existing UUIDs (see NOTE above).
-        fileSystems."/boot" = {
-          device = "/dev/disk/by-uuid/2BFB-8C7C";
-          fsType = "vfat";
-          options = [
-            "fmask=0022"
-            "dmask=0022"
-          ];
-        };
-        fileSystems."/mnt/hdd" = {
-          device = "/dev/disk/by-uuid/112e9d72-3f90-4936-988b-521d50371d09";
-          fsType = "ext4";
-        };
-
         hardware.bluetooth = {
           enable = true;
           powerOnBoot = true;
