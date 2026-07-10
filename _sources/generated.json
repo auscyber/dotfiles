@@ -22,7 +22,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-06-26",
+        "date": "2026-07-08",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -32,13 +32,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "cd124e644f61cbd51f4a85db77c4aeb6a90685f1",
-            "sha256": "sha256-UEOZUfLPXQIyb9j3xNvleAiPiVXUonACZnRepj2eGMg=",
+            "rev": "11b080e4211038114746c8423abac7557e0b7a86",
+            "sha256": "sha256-viC7YOls1eYLnv6B12OWmqlGtlWNFB/6mqjYT+ELCYs=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "cd124e644f61cbd51f4a85db77c4aeb6a90685f1"
+        "version": "11b080e4211038114746c8423abac7557e0b7a86"
     },
     "cotabby": {
         "cargoLock": null,
@@ -84,11 +84,11 @@
         "passthru": null,
         "pinned": false,
         "src": {
-            "sha256": "sha256-nIA9ehIrqb6A+E8AOhI8qptwiTRJNxMOgq+qOTrnlp4=",
+            "sha256": "sha256-RC9b91W1/vXkgkgfpgexOkv79W6B2pV1kYjvDkRa7fg=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.13.6.1/helium-0.13.6.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.14.5.1/helium-0.14.5.1-x86_64_linux.tar.xz"
         },
-        "version": "0.13.6.1"
+        "version": "0.14.5.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -99,11 +99,11 @@
         "pinned": false,
         "src": {
             "name": null,
-            "sha256": "sha256-YSYTfUJMRGtSsMiYNmIyEzdkxvvns6ZpgD1qKdL1p0Y=",
+            "sha256": "sha256-bcGrKKY32xVSfe7YNPMeEmVn3LyOThOGmdaQkNocmXw=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.13.6.1/helium_0.13.6.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.14.5.1/helium_0.14.5.1_arm64-macos.dmg"
         },
-        "version": "0.13.6.1"
+        "version": "0.14.5.1"
     },
     "jankyborders": {
         "cargoLock": null,

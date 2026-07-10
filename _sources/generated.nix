@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "cd124e644f61cbd51f4a85db77c4aeb6a90685f1";
+    version = "11b080e4211038114746c8423abac7557e0b7a86";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "cd124e644f61cbd51f4a85db77c4aeb6a90685f1";
+      rev = "11b080e4211038114746c8423abac7557e0b7a86";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-UEOZUfLPXQIyb9j3xNvleAiPiVXUonACZnRepj2eGMg=";
+      sha256 = "sha256-viC7YOls1eYLnv6B12OWmqlGtlWNFB/6mqjYT+ELCYs=";
     };
-    date = "2026-06-26";
+    date = "2026-07-08";
   };
   cotabby = {
     pname = "cotabby";
@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.13.6.1";
+    version = "0.14.5.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.13.6.1/helium-0.13.6.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-nIA9ehIrqb6A+E8AOhI8qptwiTRJNxMOgq+qOTrnlp4=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.14.5.1/helium-0.14.5.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-RC9b91W1/vXkgkgfpgexOkv79W6B2pV1kYjvDkRa7fg=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.13.6.1";
+    version = "0.14.5.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.13.6.1/helium_0.13.6.1_arm64-macos.dmg";
-      sha256 = "sha256-YSYTfUJMRGtSsMiYNmIyEzdkxvvns6ZpgD1qKdL1p0Y=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.14.5.1/helium_0.14.5.1_arm64-macos.dmg";
+      sha256 = "sha256-bcGrKKY32xVSfe7YNPMeEmVn3LyOThOGmdaQkNocmXw=";
     };
   };
   jankyborders = {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="100" viewBox="0 0 720 100">
+  <rect width="720" height="100" fill="#fff8e1" stroke="#b08930" stroke-width="2"/>
+  <text x="20" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#b05060">
+    Mermaid render unavailable
+  </text>
+  <text x="20" y="64" font-family="sans-serif" font-size="12" fill="#5a5a5a">
+    This diagram type may require a newer mermaid than available.
+  </text>
+  <text x="20" y="82" font-family="monospace" font-size="11" fill="#666">
+    See source in the accompanying .md file.
+  </text>
+</svg>
