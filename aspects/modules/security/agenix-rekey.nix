@@ -151,7 +151,20 @@ in
 
     rekey = {
 
-      masterIdentities = [ { identity = ./gpg-yubikey.pub; } ];
+      masterIdentities = [
+        { identity = ./gpg-yubikey.pub; }
+        {
+          # Apple Secure Enclave master key — usable only on this Mac, and
+          # decryption is gated by Touch ID (any-biometry). The identity is the
+          # enclave-bound private-key reference, so it is kept OUT of the repo
+          # (at an absolute path) and only the recipient below is committed.
+          # An explicit pubkey keeps eval independent of the file's presence
+          # (host builds never read it) and avoids an extra biometry prompt when
+          # encrypting; the file is read only by the rekey CLI on this Mac.
+          identity = "/Users/ivypierlot/Library/agenix/se-identity.txt";
+          pubkey = "age1se1qgnzav6c967adnfme32lr827v0vp8ddus96l78s4h4yqtnc0tuydyqee780";
+        }
+      ];
       storageMode = "local";
       agePlugins = [ ];
     };
@@ -202,6 +215,11 @@ in
         name = "gen-secrets";
         runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins;
         text = ''exec agenix generate -a "$@"'';
+      };
+      packages.update-masterkeys = pkgs.writeShellApplication {
+        name = "update-masterkeys";
+        runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins;
+        text = ''exec agenix update-masterkeys "$@"'';
       };
     };
 
