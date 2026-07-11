@@ -140,9 +140,9 @@ in
             };
           };
 
-          age.secrets.cache_key.rekeyFile = ./cache.age;
+          age.secrets.cache_keyy.rekeyFile = ./cache.age;
           age.templates.celler_env = {
-            dependencies.cache_key = config.age.secrets.cache_key;
+            dependencies.cache_key = config.age.secrets.cache_keyy;
             content =
               { placeholders, ... }:
               ''

@@ -273,7 +273,7 @@ index 54695aeb..fa51b159 100644
 +          type = types.path;
 +          internal = true;
 +          readOnly = true;
-+          default = pkgs.writeTextFile {
++          default = "${pkgs.writeTextFile {
 +            name = "agenix-template-${config.name}-content";
 +            text = config.content {
 +              pkgs = pkgs;
@@ -281,7 +281,7 @@ index 54695aeb..fa51b159 100644
 +              placeholders = mapListOrAttrs (dep: dep.placeholder) config.placeholderMap;
 +              deps = mapListOrAttrsToList (dep: dep.path) config.dependencies;
 +            };
-+          };
++          }}";
 +          description = "The path where the generated file will be written to.";
 +        };
 +        symlink = mkEnableOption "symlinking templates to their destination" // {
@@ -762,14 +762,14 @@ index acae79fe..aed7a1e1 100644
 +          type = types.path;
 +          readOnly = true;
 +          internal = true;
-+          default = pkgs.writeTextFile {
++          default = "${pkgs.writeTextFile {
 +            name = "agenix-template-${config.name}-content";
 +            text = config.content {
 +              pkgs = pkgs;
 +              lib = lib;
 +              placeholders = mapListOrAttrs (dep: dep.placeholder) config.placeholderMap;
 +            };
-+          };
++          }}";
 +          defaultText = literalExpression ''
 +                pkgs.writeTextFile {
 +                  name = "agenix-template-''${config.name}-content";
