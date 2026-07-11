@@ -4,7 +4,14 @@ let
   hexToInt = s: (builtins.fromTOML "v=0x${s}").v;
   hostOctet =
     name: 2 + lib.mod (hexToInt (lib.substring 0 6 (builtins.hashString "sha256" name))) 253;
-  clientPubKey = name: ../../secrets/generated + "/${name}/wireguard_key.pub";
+  pubKeyFile = name: ../../../../secrets/generated + "/${name}/wireguard_key.pub";
+  pubKey = name: lib.removeSuffix "\n" (builtins.readFile (pubKeyFile name));
+
+  # A host peers over wireguard iff the generator has produced a host-level
+  # keypair for it. Hosts without the vpn aspect have no such file.
+  hasKey = name: builtins.pathExists (pubKeyFile name);
+  allHostNames = lib.concatMap lib.attrNames (lib.attrValues (den.hosts or { }));
+  clientNames = name: lib.filter (n: n != name && hasKey n) allHostNames;
 
   vpn-class =
     {
@@ -46,7 +53,7 @@ let
       };
       endpoint = lib.mkOption {
         type = lib.types.str;
-        default = "pierlot.com.au:51820";
+        default = "121.200.22.213:51820";
       };
       serverHost = lib.mkOption {
         type = lib.types.str;
@@ -98,6 +105,25 @@ in
             "10.100.0.1"
           else
             "10.100.0.${toString (hostOctet host.name)}";
+
+        # The server routes each client on its hash-derived address. A client
+        # that overrides vpn.ipAddress would desync from this; the server has no
+        # view into another host's module config, only its name.
+        peers =
+          if cfg.role == "server" then
+            map (name: {
+              publicKey = pubKey name;
+              allowedIPs = [ "10.100.0.${toString (hostOctet name)}/32" ];
+            }) (clientNames host.name)
+          else
+            [
+              {
+                publicKey = pubKey cfg.serverHost;
+                endpoint = cfg.endpoint;
+                allowedIPs = cfg.allowedIPs;
+                persistentKeepalive = 25;
+              }
+            ];
       in
       {
         options.vpn = lib.mkOption {
@@ -107,6 +133,7 @@ in
         config.networking.wg-quick.interfaces.${cfg.interface} = {
           address = [ "${ip}/24" ];
           privateKeyFile = config.age.secrets.wireguard_key.path;
+          inherit peers;
         };
       };
   };
