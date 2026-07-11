@@ -6,7 +6,12 @@
       packages.nvim = den.lib.nixvim.mkPackage { inherit pkgs; };
     };
 
-  den.aspects.nixvim.includes = [ (den.batteries.unfree [ "cmp-nvim-lsp-document-symbol" "cmp-copilot" ]) ];
+  den.aspects.nixvim.includes = [
+    (den.batteries.unfree [
+      "cmp-nvim-lsp-document-symbol"
+      "cmp-copilot"
+    ])
+  ];
   den.aspects.nixvim.unfreeAllowed = [
     "cmp-copilot"
     "copilot.vim"
@@ -14,6 +19,7 @@
     "presence.nvim"
     "copilot-lua"
   ];
+  #  den.aspects.nixvim.overlays.pandoca = self: super:
   den.aspects.nixvim.nvim =
     {
       pkgs,

@@ -6,6 +6,7 @@
 }:
 {
   den.aspects.kanata = { user, ... }: {
+    includes = [ den.aspects.packages.kanata-tray ];
     nvim = {
       autoGroups.filetypedetect.clear = false;
       autoCmd = [
@@ -57,15 +58,17 @@
               "kanata"
               "kanataCommand"
             ] null config;
-            sudoagents.kanataTray = lib.attrByPath [
-              "home-manager"
-              "users"
-              user.name
-              "programs"
-              "kanata"
-              "tray"
-              "command"
-            ] null config;
+            sudoagents.kanataTray = lib.mkIf config.programs.kanata.tray.enable (
+              lib.attrByPath [
+                "home-manager"
+                "users"
+                user.name
+                "programs"
+                "kanata"
+                "tray"
+                "command"
+              ] null config
+            );
           };
       };
     homeManager = { pkgs, config, ... }: {
@@ -75,7 +78,7 @@
         appBundleIds = [ "notion.id" ];
         extraPackages = [
           pkgs.jq
-          pkgs.yabai
+          #          pkgs.yabai
           pkgs.rift
         ];
         extraCommandPiping = builtins.path {

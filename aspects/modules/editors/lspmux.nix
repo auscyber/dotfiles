@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, den, ... }:
 let
   address = [
     "127.0.0.1"
@@ -15,7 +15,11 @@ let
     connect = address; # same as `listen`
     log_filters = "info";
 
-    pass_environment = [ "*" ];
+    pass_environment = [
+      "*"
+      "PATH"
+      "RUST_SRC"
+    ];
 
   };
 
@@ -23,20 +27,19 @@ in
 {
 
   den.aspects.lspmux = { user, ... }: {
+    includes = [ den.aspects.packages.lspmux ];
     overlays = {
-      lspmux = [
-        (
-          self: super: {
-            wrapLspMux =
-              pkg:
+      lspmux-wrap = [
+        (self: super: {
+          wrapLspMux =
+            pkg:
 
-              super.writeShellScriptBin "wrap-lspmux" ''
-                #!${super.runtimeShell}/bin/sh
-                exec ${super.lspmux}/bin/lspmux client --server-path "${lib.getExe pkg} $@"
-              '';
+            super.writeShellScriptBin "wrap-lspmux" ''
+              #!${super.runtimeShell}/bin/sh
+              exec ${super.lspmux}/bin/lspmux client --server-path "${lib.getExe pkg} $@"
+            '';
 
-          }
-        )
+        })
       ];
     };
 

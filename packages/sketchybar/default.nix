@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
 
   nvfetcher.sources.sketchybar = {
@@ -9,7 +10,7 @@
 
     overlays = { sources, ... }: {
       sketchybar = self: super: {
-        sketchybar = super.sketchybar.overrideAttrs ({
+        sketchybar = super.sketchybar.overrideAttrs (old: {
           inherit (sources.sketchybar) src;
           version = "2.24.0";
           patches = super.sketchybar.patches or [ ] ++ [

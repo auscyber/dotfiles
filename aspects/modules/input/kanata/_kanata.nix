@@ -64,6 +64,11 @@ in
       description = "kanata command to run";
     };
     tray = {
+      enable = lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable kanata tray service";
+      };
       package = lib.mkPackageOption pkgs "kanata-tray" { };
       command = lib.mkOption {
         type = listOf str;
@@ -157,7 +162,7 @@ in
 
         };
         launchd.agents.kanata_tray = {
-          enable = true;
+          enable = cfg.tray.enable;
           config = {
             ProgramArguments = [
               "/usr/bin/sudo"
@@ -178,7 +183,7 @@ in
         };
 
         launchd.agents.kanata = {
-          enable = false;
+          enable = !cfg.tray.enable;
           config = {
             ProgramArguments = [
               "/usr/bin/sudo"

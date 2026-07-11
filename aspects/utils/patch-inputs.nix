@@ -127,6 +127,14 @@ let
         ;
     };
 
+  callLocklessFlake =
+    flakeSrc:
+    let
+      flake = import (flakeSrc + "/flake.nix");
+      outputs = flakeSrc // (flake.outputs ({ self = outputs; }));
+    in
+    outputs;
+
   # Load a flake from a *patched* source tree.
   #
   # `builtins.getFlake` can't be used here: it refuses a store path that still
@@ -146,6 +154,7 @@ let
       extraInputs ? { },
       ...
     }:
+
     let
 
       patchedSrc = patchSource {
@@ -159,8 +168,9 @@ let
           ;
       };
       passedInputs = realInputs // inputs // extraInputs;
+      lockFilePath = "${patchedSrc}/flake.lock";
 
-      backupLockFile = builtins.fromJSON (builtins.readFile "${patchedSrc}/flake.lock");
+      backupLockFile = builtins.fromJSON (builtins.readFile lockFilePath);
 
       backupNodes = nodesFn {
         rootKey = backupLockFile.root;
@@ -197,7 +207,7 @@ let
         };
 
     in
-    res; # // { outPath = patchedSrc; };
+    if !(builtins.pathExists lockFilePath) then callLocklessFlake patchedSrc else res; # // { outPath = patchedSrc; };
   patchedDrvs =
     pkgs:
     lib.mapAttrs (

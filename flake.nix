@@ -65,66 +65,32 @@
       url = "github:certainlach/age-plugin-gpg";
       inputs = {
         crane.follows = "crane";
-        flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
         rust-overlay.follows = "rust-overlay";
       };
     };
     agenix = {
       url = "github:ryantm/agenix";
-      inputs = {
-        darwin.follows = "darwin";
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
-      inputs = {
-        devshell.follows = "devshell";
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-    arion = {
-      url = "github:hercules-ci/arion";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+    arion.url = "github:hercules-ci/arion";
     celler = {
       url = "github:blitz/celler/main";
-      inputs = {
-        crane.follows = "crane";
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs = { };
-    };
-    darwin = {
-      url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    den = {
-      url = "github:denful/den/latest";
-      inputs = { };
-    };
-    den-diagram = {
-      url = "github:denful/den-diagram";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
+    darwin.url = "github:nix-darwin/nix-darwin";
+    den.url = "github:denful/den/latest";
+    den-diagram.url = "github:denful/den-diagram";
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    devshell = {
-      url = "github:numtide/devshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    devshell.url = "github:numtide/devshell";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -137,18 +103,12 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-    emacs = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    emacs.url = "github:nix-community/emacs-overlay";
     flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
     };
-    flake-file = {
-      url = "github:denful/flake-file";
-      inputs = { };
-    };
+    flake-file.url = "github:denful/flake-file";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -173,48 +133,28 @@
       url = "github:typewhisper/homebrew-tap";
       flake = false;
     };
-    impermanence = {
-      url = "github:nix-community/impermanence";
-      inputs = {
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    import-tree = {
-      url = "github:vic/import-tree";
-      inputs = { };
-    };
+    impermanence.url = "github:nix-community/impermanence";
+    import-tree.url = "github:vic/import-tree";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
-      inputs = {
-        crane.follows = "crane";
-        nixpkgs.follows = "nixpkgs";
-        rust-overlay.follows = "rust-overlay";
-      };
-    };
-    my-nur = {
-      url = "github:auscyber/nur-packages";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nvfetcher.follows = "nvfetcher";
-      };
-    };
-    nh = {
-      url = "github:nix-community/nh";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    merged-updates.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
+    my-nur = {
+      url = "github:auscyber/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    neovim-nightly-overlay = {
+      url = "github:nix-community/neovim-nightly-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nh.url = "github:nix-community/nh";
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-flatpak = {
-      url = "github:gmodena/nix-flatpak/";
-      inputs = { };
-    };
-    nix-homebrew = {
-      url = "github:zhaofengli/nix-homebrew";
-      inputs = { };
-    };
+    nix-flatpak.url = "github:gmodena/nix-flatpak/";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nix-openclaw = {
       url = "github:openclaw/nix-openclaw";
       inputs = {
@@ -222,21 +162,9 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-    nixcord = {
-      url = "github:kaylorben/nixcord";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nixos-facter-modules = {
-      url = "github:nix-community/nixos-facter-modules";
-      inputs = { };
-    };
-    nixos-hardware = {
-      url = "github:NixOS/nixos-hardware";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixcord.url = "github:kaylorben/nixcord";
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-images = {
       url = "github:nvmd/nixos-images/sdimage-installer";
       inputs = {
@@ -244,36 +172,12 @@
         nixos-unstable.follows = "nixpkgs-nvmd";
       };
     };
-    nixos-mailserver = {
-      url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
-      inputs = {
-        nixos-images.follows = "nixos-images";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixpkgs = {
-      url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-      inputs = { };
-    };
-    nixpkgs-nvmd = {
-      url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
-      inputs = { };
-    };
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+    nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
+    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
+    nixvim.url = "github:nix-community/nixvim";
     nixvirt = {
       url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -284,39 +188,17 @@
     };
     nur = {
       url = "github:nix-community/NUR";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nvfetcher = {
-      url = "github:berberman/nvfetcher";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    op-shell-plugins = {
-      url = "github:1Password/shell-plugins";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    rift = {
-      url = "github:auscyber/rift";
-      inputs = {
-        crane.follows = "crane";
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+    nvfetcher.url = "github:berberman/nvfetcher";
+    op-shell-plugins.url = "github:1Password/shell-plugins";
+    pandoc.url = "github:srid/pandoc?ref=haskell-flake-revamp";
+    rift.url = "github:auscyber/rift";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-        nur.follows = "nur";
-      };
-    };
+    stylix.url = "github:nix-community/stylix";
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

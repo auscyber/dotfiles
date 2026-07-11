@@ -88,7 +88,7 @@
 
               settings = {
                 animate = true;
-                animation_duration = 0.35;
+                animation_duration = 0.1;
                 animation_fps = 100;
                 ui.mission_control.enabled = true;
                 run_on_start = [

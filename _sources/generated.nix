@@ -33,10 +33,10 @@
   };
   cotabby = {
     pname = "cotabby";
-    version = "v0.6.0-beta";
+    version = "v0.6.1-beta";
     src = fetchurl {
-      url = "https://github.com/fujacob/cotabby/releases/download/v0.6.0-beta/Cotabby.dmg";
-      sha256 = "sha256-IatbRCHuyv1Y+HH5B6W6QSt1A3+v5vBbYqnpw5TlVPU=";
+      url = "https://github.com/fujacob/cotabby/releases/download/v0.6.1-beta/Cotabby.dmg";
+      sha256 = "sha256-rYQIXV/dBSCD56xO+kb0qkCkuq3Uths5+KmmYOppNaU=";
     };
   };
   eagle-nvim = {
@@ -80,6 +80,37 @@
       sha256 = "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=";
     };
     date = "2026-05-14";
+  };
+  kanata-tray = {
+    pname = "kanata-tray";
+    version = "v0.8.0";
+    src = fetchFromGitHub {
+      owner = "rszyma";
+      repo = "kanata-tray";
+      rev = "v0.8.0";
+      fetchSubmodules = false;
+      sha256 = "sha256-RTLFDB/irtEhEHwarROGmS4jNdRhruU1JKen48ADzZg=";
+    };
+  };
+  lspmux = {
+    pname = "lspmux";
+    version = "18861f9d59e74ece8d867772cf07fa302c2dae98";
+    src = fetchgit {
+      url = "https://codeberg.org/p2502/lspmux.git";
+      rev = "18861f9d59e74ece8d867772cf07fa302c2dae98";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=";
+    };
+    cargoLock."Cargo.lock" = {
+      lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
+      outputHashes = {
+        
+      };
+    };
+    date = "2026-03-11";
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";

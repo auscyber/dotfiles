@@ -125,6 +125,7 @@
   den.aspects.ivypierlot = {
     includes = [
       den.aspects.agenix-rekey
+      den.aspects.onepassword
       den.aspects.nixvim
       den.aspects.neovim
       den.aspects.fish
@@ -160,7 +161,6 @@
             pandoc
             texliveFull
             mupdf
-            obsidian
             qemu
             input-leap
             pinentry_mac

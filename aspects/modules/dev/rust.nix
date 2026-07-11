@@ -6,15 +6,23 @@
   den.aspects.nixvim.nvim = { pkgs, lib, ... }: {
     plugins = {
       lsp.servers.rust_analyzer.packageFallback = true;
-      lsp.servers.rust_analyzer.cmd = [
-        "${pkgs.lspmux}"
-        "client"
-      ];
+      #      lsp.servers.rust_analyzer.cmd = [
+      #        "${pkgs.lspmux}"
+      #        "client"
+      #      ];
       rustaceanvim = {
         enable = true;
 
         settings = {
+          lsp.clientOpts.auto_attach = true;
+
           server = {
+            auto_attach = true;
+            cmd = [
+              "${lib.getExe pkgs.lspmux}"
+              "client"
+            ];
+
             default_settings = {
               rust-analyzer = {
                 files = {

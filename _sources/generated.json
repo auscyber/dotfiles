@@ -49,11 +49,11 @@
         "pinned": false,
         "src": {
             "name": null,
-            "sha256": "sha256-IatbRCHuyv1Y+HH5B6W6QSt1A3+v5vBbYqnpw5TlVPU=",
+            "sha256": "sha256-rYQIXV/dBSCD56xO+kb0qkCkuq3Uths5+KmmYOppNaU=",
             "type": "url",
-            "url": "https://github.com/fujacob/cotabby/releases/download/v0.6.0-beta/Cotabby.dmg"
+            "url": "https://github.com/fujacob/cotabby/releases/download/v0.6.1-beta/Cotabby.dmg"
         },
-        "version": "v0.6.0-beta"
+        "version": "v0.6.1-beta"
     },
     "eagle-nvim": {
         "cargoLock": null,
@@ -124,6 +124,52 @@
             "url": "https://github.com/felixkratz/jankyborders"
         },
         "version": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e"
+    },
+    "kanata-tray": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "kanata-tray",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "rszyma",
+            "repo": "kanata-tray",
+            "rev": "v0.8.0",
+            "sha256": "sha256-RTLFDB/irtEhEHwarROGmS4jNdRhruU1JKen48ADzZg=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.8.0"
+    },
+    "lspmux": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock",
+                {}
+            ]
+        },
+        "date": "2026-03-11",
+        "extract": null,
+        "name": "lspmux",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "18861f9d59e74ece8d867772cf07fa302c2dae98",
+            "sha256": "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://codeberg.org/p2502/lspmux.git"
+        },
+        "version": "18861f9d59e74ece8d867772cf07fa302c2dae98"
     },
     "proton-ge-bin": {
         "cargoLock": null,

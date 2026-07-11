@@ -169,7 +169,7 @@ in
           fromClass = "overlays";
           intoClass = p.sys;
           intoPath = [ "_overlays" ];
-          adaptArgs = args: args // { system = args.pkgs.stdenv.hostPlatform.system; };
+          adaptArgs = args: args;
         }
       )
       [
