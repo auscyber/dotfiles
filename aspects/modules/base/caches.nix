@@ -118,7 +118,7 @@ in
 
           services.cellerd = {
             enable = true;
-            environmentFile = config.age.templates."celler_env".path;
+            environmentFile = "${config.age.templates."celler_env".path}";
             useFlakeCompatOverlay = false;
             settings = {
               listen = "[::]:${toString port}";
@@ -163,35 +163,39 @@ in
     ];
     overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
 
-    secrets = { secrets, host, ... }: {
+    secrets =
+      { secrets, host, ... }:
+      {
 
-      cache_key = {
-        rekeyFile = ./cache.age;
-        intermediary = lib.mkDefault true;
-      };
-      celler_token.generator = {
-        tags = [ "celler_token" ];
-        dependencies = [ secrets.cache_key ];
-        script = cellerTokenScript { sub = host.name; };
-      };
-    };
-    templates = { secrets, ... }: {
-      netrc = {
-        dependencies = {
-          inherit (secrets) celler_token;
+        cache_key = {
+          rekeyFile = ./cache.age;
+          intermediary = lib.mkDefault true;
         };
-        content =
-          {
-            pkgs,
-            placeholders,
-            ...
-          }:
-          ''
-                    machine ${vhost}
-            		password ${placeholders.attic_token}
-            	  '';
+        celler_token.generator = {
+          tags = [ "celler_token" ];
+          dependencies = [ secrets.cache_key ];
+          script = cellerTokenScript { sub = host.name; };
+        };
       };
-    };
+    templates =
+      { secrets, ... }:
+      {
+        netrc = {
+          dependencies = {
+            inherit (secrets) celler_token;
+          };
+          content =
+            {
+              pkgs,
+              placeholders,
+              ...
+            }:
+            ''
+                      machine ${vhost}
+              		password ${placeholders.celler_token}
+              	  '';
+        };
+      };
 
     os =
       {

@@ -28,7 +28,9 @@
       sshUser = "builder";
     };
 
-    users.auscyber = { };
+    users.auscyber = {
+      hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/+SE8omiIJ7VBQKgMLsgyADUVtY37o0kn0g0uwQVKi auscyber@secondpc";
+    };
   };
 
   den.aspects.secondpc = {
@@ -42,6 +44,7 @@
       den.aspects.disko
       den.aspects.facter
       den.aspects.secondpc-web
+      (den.batteries.unfree [ "intel-ocl" ])
     ];
 
     nixos =
@@ -65,7 +68,6 @@
         boot.zfs.extraPools = [ "zpool" ];
 
         boot.kernel.sysctl = {
-          "net.ipv6.conf.all.forwarding" = 1;
           "net.ipv6.conf.all.accept_ra" = 2;
           "net.ipv6.conf.all.accept_redirects" = 1;
           "net.ipv6.conf.all.accept_source_route" = 1;
@@ -209,7 +211,6 @@
             "libvirtd"
             "docker"
           ];
-          shell = pkgs.fish;
         };
 
         # Base programs
@@ -369,7 +370,7 @@
 
         # Jitsi-meet
         services.jitsi-meet = {
-          enable = true;
+          enable = false;
           hostName = "meet.ivymect.in";
           nginx.enable = true;
           config = {
