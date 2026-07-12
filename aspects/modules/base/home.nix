@@ -63,13 +63,8 @@ in
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  patchedInputs.home-manager = {
-    #    patches = [
-    #      #      ../../patches/home-manager/edit.patch
-    #      #      ../../patches/home-manager/one.patch
-    #    ];
-
-  };
+  # Patches are auto-included from ./patches/home-manager/*.patch.
+  patchedInputs.home-manager = { };
   den.default.os.home-manager = {
     useGlobalPkgs = true;
     extraSpecialArgs.inputs = inputs;

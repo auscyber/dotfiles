@@ -9,14 +9,37 @@
   ...
 }:
 let
-  # Produce a patched source tree. `applyPatches` FAILS the build if any patch
-  # no longer applies — that's the "tell me when it breaks" guarantee.
   inherit (lib) mapAttrs;
   flipAttrs = lib.mapAttrs' (
     value: name: {
       inherit name value;
     }
   );
+
+  # Recorded SRI hashes of the patched trees, feeding each entry's `hash`
+  # default. A missing file (or a missing entry) yields `null`, which falls back
+  # to a locally-built, unsubstitutable tree — so this is safe to bootstrap from
+  # nothing: `nix run .#update-patch-hashes` writes it.
+  patchHashes =
+    let
+      file = ../../patches/hashes.json;
+
+      # Escape hatch. A recorded hash covers the patched *content*, so bumping a
+      # patched input invalidates it — and because `flake.nix` computes
+      # `newInputs` before anything else, a stale hash fails the fixed-output
+      # build and takes the whole flake's evaluation down with it, including the
+      # app that would refresh the hashes. Chicken, meet egg.
+      #
+      #   PATCH_HASHES=ignore nix run --impure .#update-patch-hashes
+      #
+      # drops back to the unhashed (non-fixed-output) path so the updater can
+      # evaluate, rebuild the trees and rewrite this file. `nix run .#update`
+      # does the same thing around a `nix flake update`.
+      #
+      # `getEnv` returns "" under pure eval, so this is inert everywhere else.
+      ignore = builtins.getEnv "PATCH_HASHES" == "ignore";
+    in
+    if ignore || !builtins.pathExists file then { } else builtins.fromJSON (builtins.readFile file);
 
   nodesFn =
 
@@ -125,6 +148,24 @@ let
     in
     allNodes;
 
+  # True when an entry actually rewrites its source tree. Entries that don't are
+  # still meaningful: listing an input re-evaluates it against the *patched*
+  # dependency graph (see `buildPatched`), even with zero diffs to apply.
+  hasPatches = p: p.patches != [ ] || p.prePatch != "" || p.postPatch != "";
+
+  # Produce a patched source tree. `applyPatches` FAILS the build if any patch
+  # no longer applies — that's the "tell me when it breaks" guarantee.
+  #
+  # With `hash` set, the tree is fixed-output: its store path derives from the
+  # content hash and name alone. That makes the path identical on every system
+  # and across nixpkgs bumps, and — crucially — makes it *substitutable*, so
+  # realising it (this is IFD; `patchFlake` imports the result) is a cache fetch
+  # rather than a build. Without that, the evaluating machine must build the
+  # tree itself, with a builder matching the derivation's `system`.
+  #
+  # `applyPatches` hardcodes `allowSubstitutes = false` / `preferLocalBuild =
+  # true` in its `extendDrvArgs`, which merges OVER caller args — passing them as
+  # arguments is silently dropped, so they can only be cleared via overrideAttrs.
   patchSource =
     {
       pkgs,
@@ -133,16 +174,32 @@ let
       name ? "patched-src",
       prePatch ? "",
       postPatch ? "",
+      hash ? null,
     }:
-    pkgs.applyPatches {
-      inherit
-        name
-        src
-        patches
-        prePatch
-        postPatch
-        ;
-    };
+    if !(hasPatches { inherit patches prePatch postPatch; }) then
+      # Nothing to apply: hand back the pristine tree. No derivation, no IFD, no
+      # hash to keep in sync.
+      src
+    else
+      (pkgs.applyPatches {
+        inherit
+          name
+          src
+          patches
+          prePatch
+          postPatch
+          ;
+      }).overrideAttrs
+        (
+          _:
+          lib.optionalAttrs (hash != null) {
+            outputHash = hash;
+            outputHashAlgo = "sha256";
+            outputHashMode = "recursive";
+            allowSubstitutes = true;
+            preferLocalBuild = false;
+          }
+        );
 
   callLocklessFlake =
     flakeSrc:
@@ -168,6 +225,7 @@ let
       patches ? [ ],
       prePatch ? "",
       postPatch ? "",
+      hash ? null,
       extraInputs ? { },
       ...
     }:
@@ -182,6 +240,7 @@ let
           patches
           prePatch
           postPatch
+          hash
           ;
       };
       passedInputs = realInputs // inputs // extraInputs;
@@ -230,7 +289,14 @@ let
 
     in
     if !(builtins.pathExists lockFilePath) then (callLocklessFlake patchedSrc) else res; # // { outPath = patchedSrc; };
-  patchedDrvs =
+  # Only entries that actually rewrite their tree produce a derivation; the rest
+  # short-circuit to the pristine source in `patchSource`, which is not a
+  # derivation and so must not reach `checks`/`patchedSources`.
+  # `hashed = false` builds the very same tree as an ordinary (non-fixed-output)
+  # derivation. `update-patch-hashes` hashes *that*, so a stale recorded hash can
+  # never poison the value used to refresh itself.
+  patchedDrvsWith =
+    { hashed }:
     pkgs:
     lib.mapAttrs (
       n: p:
@@ -242,9 +308,13 @@ let
           prePatch
           postPatch
           ;
+        hash = if hashed then p.hash else null;
         name = "${n}-patched";
       }
-    ) config.patchedInputs;
+    ) (lib.filterAttrs (_: hasPatches) config.patchedInputs);
+
+  patchedDrvs = patchedDrvsWith { hashed = true; };
+  patchedDrvsUnhashed = patchedDrvsWith { hashed = false; };
 
   buildPatched =
     pkgs:
@@ -259,6 +329,7 @@ let
             patches
             prePatch
             postPatch
+            hash
             ;
           name = "${n}";
         }
@@ -345,8 +416,81 @@ let
         echo "Add it to patchedInputs.\"$input\".patches and rebuild."
       '';
     };
+
+  # `nix run .#update-patch-hashes`
+  #
+  # Records the SRI hash of each patched tree in ./patches/hashes.json, which
+  # feeds the `hash` option and so makes the trees fixed-output. Re-run after
+  # changing a patch or bumping a patched input: the recorded hash covers the
+  # patched *content*, so any change to either invalidates it and the build then
+  # fails with a hash mismatch until refreshed.
+  #
+  # The unhashed derivations are interpolated below, so `nix run` builds them as
+  # dependencies of this script — no flake output to plumb, and no dependency on
+  # the (possibly stale) hashes already on disk.
+  updateHashesScript =
+    pkgs:
+    let
+      entries = lib.mapAttrsToList (n: drv: "${n} ${drv}") (patchedDrvsUnhashed pkgs);
+    in
+    pkgs.writeShellApplication {
+      name = "update-patch-hashes";
+      runtimeInputs = [
+        pkgs.nix
+        pkgs.jq
+        pkgs.coreutils
+      ];
+      text = ''
+        set -euo pipefail
+        repo="$PWD"
+        if [ ! -e "$repo/flake.nix" ]; then
+        	echo "error: run from the flake root (no flake.nix in $repo)" >&2
+        	exit 2
+        fi
+
+        out="$repo/patches/hashes.json"
+        tmp="$(mktemp)"
+        trap 'rm -f "$tmp" "$tmp.new"' EXIT
+        echo '{}' >"$tmp"
+
+        while read -r name path; do
+        	[ -n "$name" ] || continue
+        	hash="$(nix hash path --sri "$path")"
+        	echo "  $name  $hash"
+        	jq --arg n "$name" --arg h "$hash" '.[$n] = $h' "$tmp" >"$tmp.new"
+        	mv "$tmp.new" "$tmp"
+        done <<-'ENTRIES'
+        	${lib.concatStringsSep "\n\t" entries}
+        ENTRIES
+
+        mkdir -p "$(dirname "$out")"
+        jq -S . "$tmp" >"$out"
+        echo "wrote $out"
+      '';
+    };
 in
 {
+  options.patchSystem = lib.mkOption {
+    type = lib.types.str;
+    # No hardcoded system. Under impure eval `builtins.currentSystem` is the
+    # host, so the trees build wherever they're evaluated. Under pure eval the
+    # builtin is absent and we fall back to the flake's *own* first declared
+    # system — derived, not a magic literal.
+    #
+    # For an input with a recorded `hash` the tree is fixed-output, so this
+    # picks nothing about the resulting store path — every system produces the
+    # identical output — it only decides which host can *build* it on a cold
+    # cache (a warm cache substitutes it cross-system regardless). For an input
+    # without a hash it still determines the path, as before.
+    default = builtins.currentSystem or (builtins.head config.systems);
+    defaultText = lib.literalExpression "builtins.currentSystem or (builtins.head config.systems)";
+    description = ''
+      System whose `pkgs` *builds* the patched source trees. See the comment in
+      `patch-inputs.nix`; with a recorded `hash` this does not affect the output
+      path, only which host can build on a cold cache.
+    '';
+  };
+
   options.patchedInputs = lib.mkOption {
     default = { };
     description = ''
@@ -378,7 +522,7 @@ in
           options = {
             src = lib.mkOption {
               type = lib.types.raw;
-              default = realInputs.${name}.outPath;
+              default = realInputs.${name}.sourceInfo;
               description = "Source flake to patch (usually another `inputs.<x>`).";
             };
             autoIncludePatches = lib.mkOption {
@@ -397,6 +541,24 @@ in
               description = ''
                 If true, this patched flake is added to the `inputs` of the flake
                 module. If false, it is built but not added to `inputs`.
+              '';
+            };
+            hash = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = patchHashes.${name} or null;
+              description = ''
+                SRI hash of the *patched* source tree, making it a fixed-output
+                derivation: the store path then depends only on the content, not
+                on the system that built it, and it can be substituted from a
+                binary cache instead of rebuilt on every machine.
+
+                Defaults to the entry for this input in `./patches/hashes.json`.
+                Refresh with `nix run .#update-patch-hashes` after changing a
+                patch or bumping the upstream input — a stale hash fails the
+                build with a hash mismatch.
+
+                `null` opts out: the tree is built locally, unsubstitutable, and
+                its path varies with the building system (the old behaviour).
               '';
             };
             patches = lib.mkOption {
@@ -451,7 +613,7 @@ in
     # compute newInputs, which adds significant eval overhead.
     flake.newInputs =
       let
-        pkgs = realInputs.nixpkgs.legacyPackages.${builtins.currentSystem or "aarch64-darwin"};
+        pkgs = realInputs.nixpkgs.legacyPackages.${config.patchSystem};
         patched = buildPatched pkgs;
       in
       lib.mapAttrs (
@@ -485,11 +647,64 @@ in
             program = lib.getExe (patchInputScript pkgs);
           };
 
-          # Building these fails `nix flake check` if any declared patch is stale.
-          checks = lib.mapAttrs' (n: _: {
-            name = "patched-input-${n}";
-            value = (patchedDrvs pkgs).${n};
-          }) config.patchedInputs;
+          apps.update-patch-hashes = {
+            type = "app";
+            program = lib.getExe (updateHashesScript pkgs);
+          };
+
+          # `nix run .#update` — bump inputs, then refresh the patch hashes that
+          # the bump just invalidated. Resolved and built *before* the lock moves,
+          # so it still runs even though the flake won't evaluate in between.
+          apps.update = {
+            type = "app";
+            program = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "update";
+                runtimeInputs = [ pkgs.nix ];
+                text = ''
+                  set -euo pipefail
+                  nix flake update "$@"
+                  PATCH_HASHES=ignore nix run --impure .#update-patch-hashes
+                '';
+              }
+            );
+          };
+
+          # Building these fails `nix flake check` if a declared patch is stale
+          # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
+          # Entries with no patches are skipped: `patchSource` hands those back
+          # as the pristine source path, which is not a derivation to build.
+          checks =
+            lib.mapAttrs' (n: _: {
+              name = "patched-input-${n}";
+              value = (patchedDrvs pkgs).${n};
+            }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
+            // {
+              # Guard `buildPatched`'s fixpoint: a patched flake must resolve its
+              # own inputs to the *patched* versions of them, not the pristine
+              # ones. Today `agenix` declares `darwin` and `home-manager` and all
+              # three are patched, so severing the fixpoint shows up here rather
+              # than as a mysteriously unpatched module at rebuild time.
+              patched-inputs-intertwined =
+                let
+                  patched = lib.attrNames (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
+                  mismatches = lib.concatMap (
+                    name:
+                    let
+                      deps = lib.filter (d: lib.elem d patched) (lib.attrNames (inputs.${name}.inputs or { }));
+                    in
+                    lib.forEach (lib.filter (d: inputs.${name}.inputs.${d}.outPath != inputs.${d}.outPath) deps) (
+                      d: "  ${name} sees ${d} = ${inputs.${name}.inputs.${d}.outPath}, want ${inputs.${d}.outPath}"
+                    )
+                  ) patched;
+                in
+                assert lib.assertMsg (mismatches == [ ]) ''
+                  patched inputs are not intertwined — a patched flake is seeing an
+                  unpatched dependency:
+                  ${lib.concatStringsSep "\n" mismatches}
+                '';
+                pkgs.emptyFile;
+            };
         };
       };
   };

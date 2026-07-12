@@ -1532,22 +1532,6 @@
         "type": "github"
       }
     },
-    "merged-updates": {
-      "locked": {
-        "lastModified": 1783604885,
-        "narHash": "sha256-tzMgSkV7kljEkqIjlgV6F+n+xD+/a35Db8bs7a4BFAo=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "767b0d3ec98a143ad9ed7dfc0d5553510ac27133",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "mk-shell-bin": {
       "locked": {
         "lastModified": 1677004959,
@@ -2787,7 +2771,6 @@
         "import-tree": "import-tree",
         "kanata": "kanata",
         "lanzaboote": "lanzaboote",
-        "merged-updates": "merged-updates",
         "my-nur": "my-nur",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nh": "nh",

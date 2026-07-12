@@ -4,12 +4,8 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  patchedInputs.darwin = {
-    #    patches = [
-    ##      ../../../patches/darwin/karabiner.patch
-    #      ../../../patches/darwin/specialisation.patch
-    #    ];
-  };
+  # Patches are auto-included from ./patches/darwin/*.patch.
+  patchedInputs.darwin = { };
   den.aspects.nix.darwin = {
 
     nix.distributedBuilds = true;
