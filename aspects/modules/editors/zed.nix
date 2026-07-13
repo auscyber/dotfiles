@@ -13,12 +13,14 @@
             "lua"
             "make"
           ];
+          # The language servers are deliberately absent here: `lsp.*.binary.path` below
+          # points at the lspmux shims, and each shim resolves the real server off $PATH
+          # at runtime. Putting the pinned servers on $PATH would win that lookup over
+          # the ones a project's devshell provides.
           extraPackages = with pkgs; [
             nodejs
             yarn
-            rust-analyzer
             ripgrep
-            nil
           ];
           userSettings = {
             assistant = {
@@ -63,10 +65,24 @@
               toolbar.title = true;
               working_directory = "current_project_directory";
             };
-            lsp = {
-              rust-analyzer.binary.path_lookup = true;
-              nix.binary.path_lookup = true;
-            };
+            # Spawn the servers through the lspmux shims, so zed and nvim share one
+            # server instance per project instead of running one each. `path_lookup` is
+            # off: the shim does the $PATH lookup itself, and unlike zed it knows to
+            # skip itself and to fall back to a pinned server when the project has none.
+            lsp =
+              let
+                inherit (pkgs) lspmuxed;
+                binary = server: {
+                  binary = {
+                    path = lib.getExe server;
+                    arguments = server.passthru.lspmux.args;
+                  };
+                };
+              in
+              {
+                rust-analyzer = binary lspmuxed.rust_analyzer;
+                nix = binary lspmuxed.nil_ls;
+              };
             vim_mode = true;
             load_direnv = "shell_hook";
             base_keymap = "VSCode";

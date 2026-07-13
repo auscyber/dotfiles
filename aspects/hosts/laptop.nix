@@ -128,6 +128,10 @@
       den.aspects.onepassword
       den.aspects.nixvim
       den.aspects.neovim
+      den.aspects.zed
+      # Runs the lspmux server; nixvim and zed both spawn their servers through its
+      # shims, so without this the shims have nothing to connect to.
+      den.aspects.lspmux
       den.aspects.fish
       #      den.aspects.celler-push
       den.aspects.nushell
