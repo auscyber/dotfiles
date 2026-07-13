@@ -19,7 +19,17 @@ let
     # `PATH` matters most: it is how a server finds its own toolchain (ghc for
     # hls, the project's node/python, ...), and it is part of the instance key,
     # so two projects with different toolchains get separate server instances.
-    pass_environment = [ "*" ];
+    pass_environment = [
+      "*"
+      "!SHLVL"
+      "!GPG_TTY"
+      "!STARSHIP_SESSION_KEY"
+      "!DIRENV_DIFF"
+      "!DISPLAY"
+      "!TMPDIR"
+      "!DIRENV_WATCHES"
+      "!NVIM"
+    ];
   };
 
   # The servers we multiplex, keyed by their nixvim/lspconfig name. Kept in its own
@@ -96,6 +106,7 @@ in
                   done
 
                   [ -n "$server" ] || server=${lib.escapeShellArg fallback}
+
 
                   exec ${lib.getExe final.lspmux} client --server-path "$server" -- "$@"
                 '';

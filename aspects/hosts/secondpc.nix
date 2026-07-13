@@ -44,6 +44,7 @@
       den.aspects.disko
       den.aspects.facter
       den.aspects.secondpc-web
+      den.aspects.searchix
       (den.batteries.unfree [ "intel-ocl" ])
     ];
 

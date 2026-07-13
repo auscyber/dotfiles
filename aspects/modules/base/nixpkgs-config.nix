@@ -3,44 +3,45 @@ let
   # Explicit allowlist of unfree packages we actually want to install.
   # Add a name here when something legitimately needs unfree status; avoid
   # turning on blanket allowUnfree so accidental unfree pulls stay visible.
-  allowed = [
-    "copilot.vim"
-    "idris2-vim"
-    "presence.nvim"
-    "cmp-copilot"
-    "intel-ocl"
-    "code"
-    "1password"
-    "1password-cli"
-    "1password-gui"
-    "1password-gui-beta"
-    "claude-code"
-    "discord"
-    "google-chrome"
-    "helium"
-    "helium-bin"
-    "libkey-nomad"
-    "memorymate"
-    "minecraft-launcher"
-    "minecraft-server"
-    "nvidia-settings"
-    "nvidia-x11"
-    "obsidian"
-    "opencode"
-    "slack"
-    "spotify"
-    "steam"
-    "steam-original"
-    "steam-run"
-    "steam-runtime"
-    "steam-unwrapped"
-    "tidal-hifi"
-    "vscode"
-    "zoom"
-    "cmp-nvim-lsp-document-symbol"
-  ];
+  unfree-mod = (
+    den.batteries.unfree [
+      "copilot.vim"
+      "idris2-vim"
+      "presence.nvim"
+      "cmp-copilot"
+      "intel-ocl"
+      "code"
+      "1password"
+      "1password-cli"
+      "1password-gui"
+      "1password-gui-beta"
+      "claude-code"
+      "discord"
+      "google-chrome"
+      "helium"
+      "helium-bin"
+      "libkey-nomad"
+      "memorymate"
+      "minecraft-launcher"
+      "minecraft-server"
+      "nvidia-settings"
+      "nvidia-x11"
+      "obsidian"
+      "opencode"
+      "slack"
+      "spotify"
+      "steam"
+      "steam-original"
+      "steam-run"
+      "steam-runtime"
+      "steam-unwrapped"
+      "tidal-hifi"
+      "vscode"
+      "zoom"
+      "cmp-nvim-lsp-document-symbol"
+    ]
+  );
 
-  predicate = a: pkg: builtins.elem (lib.getName pkg) a;
 in
 {
 
@@ -55,26 +56,11 @@ in
       pipe.expose
     ];
   den.aspects.nixpkgs-config = {
-    includes = [ den.policies.pipe-unfree ];
-    os =
-      { unfreeAllowed, ... }:
-      {
-        nixpkgs.config = {
-          allowUnfreePredicate = predicate (allowed ++ unfreeAllowed);
-          # pam_rssh's meta.platforms is linux-only; we still want the .dylib build
-          # on darwin since it works in practice. Same story for a handful of
-          # cross-arch dev tools. Flip off if a real unsupported package sneaks in.
-        };
-      };
-    hmStandalone =
-      { unfreeAllowed, ... }:
-      {
-        nixpkgs.config = {
+    includes = [
+      den.policies.pipe-unfree
+      unfree-mod
+    ];
 
-          allowUnfreePredicate = predicate (allowed ++ unfreeAllowed);
-          allowUnsupportedSystem = true;
-        };
-      };
   };
 
   den.schema.host.includes = [ den.aspects.nixpkgs-config ];

@@ -135,6 +135,13 @@
     };
     impermanence.url = "github:nix-community/impermanence";
     import-tree.url = "github:vic/import-tree";
+    kanata = {
+      url = "github:auscyber/kanata";
+      inputs = {
+        crane.follows = "crane";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -163,7 +170,6 @@
       };
     };
     nixcord.url = "github:kaylorben/nixcord";
-    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-images = {
       url = "github:nvmd/nixos-images/sdimage-installer";
@@ -196,6 +202,10 @@
     rift.url = "github:auscyber/rift";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    searchix = {
+      url = "git+https://git.alin.ovh/searchix?ref=refs/tags/v0.4.4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix.url = "github:nix-community/stylix";

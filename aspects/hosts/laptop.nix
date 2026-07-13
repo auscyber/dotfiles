@@ -26,6 +26,7 @@
   };
 
   den.aspects.Ivys-MacBook-Pro = {
+
     includes = [
       den.aspects.vpn
       den.aspects.homebrew
@@ -128,7 +129,7 @@
       den.aspects.onepassword
       den.aspects.nixvim
       den.aspects.neovim
-      den.aspects.zed
+      #      den.aspects.zed
       # Runs the lspmux server; nixvim and zed both spawn their servers through its
       # shims, so without this the shims have nothing to connect to.
       den.aspects.lspmux
@@ -138,7 +139,7 @@
       den.aspects.ghostty
       den.aspects.sketchybar
       den.aspects.zotero
-      <browsers/helium>
+      <browsers/zen>
       den.aspects.gui
       den.aspects.gpg
       #      den.aspects.rclone

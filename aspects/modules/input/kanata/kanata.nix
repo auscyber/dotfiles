@@ -5,6 +5,12 @@
   ...
 }:
 {
+
+  ff.kanata = {
+    url = "github:auscyber/kanata";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.crane.follows = "crane";
+  };
   den.aspects.kanata = { user, ... }: {
     includes = [ den.aspects.packages.kanata-tray ];
     nvim = {
@@ -27,15 +33,20 @@
     # (kanata / kanata-with-cmd / kanata.darwinDriver come from nixpkgs).
     # Guarded so non-darwin pkgs sets (e.g. the linux-builder) don't force
     # packages my-nur may not expose for that system.
-    overlays.kanata = [
+    overlays.kanata-combined = [
       (
-        _final: prev:
+        final: prev:
         let
           sys = prev.stdenv.hostPlatform.system;
           nurPkgs = inputs.my-nur.packages.${sys} or { };
         in
-        lib.optionalAttrs (nurPkgs ? kanata-tray) { kanata-tray = nurPkgs.kanata-tray; }
-        // lib.optionalAttrs (nurPkgs ? kanata-vk-agent) { kanata-vk-agent = nurPkgs.kanata-vk-agent; }
+        lib.optionalAttrs (nurPkgs ? kanata-vk-agent) { kanata-vk-agent = nurPkgs.kanata-vk-agent; }
+        // {
+          #          kanata = inputs.kanata.packages.${sys}.kanata.overrideAttrs ({
+          #            passthru.darwinDriver = prev.kanata.darwinDriver;
+          #
+          #          });
+        }
       )
     ];
 

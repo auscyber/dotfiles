@@ -132,6 +132,22 @@
     };
     date = "2026-06-04";
   };
+  zotero-actions-tags = {
+    pname = "zotero-actions-tags";
+    version = "2.5.2";
+    src = fetchurl {
+      url = "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.5.2/actions-and-tags-for-zotero.xpi";
+      sha256 = "sha256-ASPnaCjkRuyLHIg1gsPQ+hFMxFnl7gNxclSfAOPCxek=";
+    };
+  };
+  zotero-aria = {
+    pname = "zotero-aria";
+    version = "v0.7.5";
+    src = fetchurl {
+      url = "https://github.com/lifan0127/ai-research-assistant/releases/download/v0.7.5/aria.xpi";
+      sha256 = "sha256-xqki7703PPYdHqUwDGyG3+nBfabYVfnGz10EJ2oeH7c=";
+    };
+  };
   zotero-attanger = {
     pname = "zotero-attanger";
     version = "1.4.7";
@@ -146,6 +162,42 @@
     src = fetchurl {
       url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.36/zotero-better-bibtex-9.0.36.xpi";
       sha256 = "sha256-xgJOAJmH0rS8DEUFs6lpXYJ5CpC0fr5ZRxBp7HjSr9Y=";
+    };
+  };
+  zotero-notero = {
+    pname = "zotero-notero";
+    version = "556359043a4b61df5802b6650cbdbec6450bf9d4";
+    src = fetchFromGitHub {
+      owner = "dvanoni";
+      repo = "notero";
+      rev = "556359043a4b61df5802b6650cbdbec6450bf9d4";
+      fetchSubmodules = false;
+      sha256 = "sha256-hl93l5W1qvW+XXSphvw8/36+xhfbajjIPNPqikWj/+k=";
+    };
+    date = "2026-05-08";
+  };
+  zotero-ocr = {
+    pname = "zotero-ocr";
+    version = "0.9.5.1";
+    src = fetchurl {
+      url = "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi";
+      sha256 = "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=";
+    };
+  };
+  zotero-papersgpt = {
+    pname = "zotero-papersgpt";
+    version = "papersgpt-v0.6.0";
+    src = fetchurl {
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.0/papersgpt-v0.6.0.xpi";
+      sha256 = "sha256-7CsNhH5iTiD2xsN3uiXg0GMhOTC7RtbMA4ReIkcHbjc=";
+    };
+  };
+  zotero-zotlit = {
+    pname = "zotero-zotlit";
+    version = "2.0.0-alpha.3";
+    src = fetchurl {
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-alpha.3/zotlit-zotero-2.0.0-alpha.3.xpi";
+      sha256 = "sha256-MHbi4AB+9Ouas19d+YhAef3zEeRWsSsVGtmW024DOwY=";
     };
   };
 }

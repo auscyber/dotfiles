@@ -206,6 +206,36 @@
         },
         "version": "6284ee816601486ace33ca48a0271832eec6de35"
     },
+    "zotero-actions-tags": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-actions-tags",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-ASPnaCjkRuyLHIg1gsPQ+hFMxFnl7gNxclSfAOPCxek=",
+            "type": "url",
+            "url": "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.5.2/actions-and-tags-for-zotero.xpi"
+        },
+        "version": "2.5.2"
+    },
+    "zotero-aria": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-aria",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-xqki7703PPYdHqUwDGyG3+nBfabYVfnGz10EJ2oeH7c=",
+            "type": "url",
+            "url": "https://github.com/lifan0127/ai-research-assistant/releases/download/v0.7.5/aria.xpi"
+        },
+        "version": "v0.7.5"
+    },
     "zotero-attanger": {
         "cargoLock": null,
         "date": null,
@@ -235,5 +265,71 @@
             "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.36/zotero-better-bibtex-9.0.36.xpi"
         },
         "version": "9.0.36"
+    },
+    "zotero-notero": {
+        "cargoLock": null,
+        "date": "2026-05-08",
+        "extract": null,
+        "name": "zotero-notero",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "dvanoni",
+            "repo": "notero",
+            "rev": "556359043a4b61df5802b6650cbdbec6450bf9d4",
+            "sha256": "sha256-hl93l5W1qvW+XXSphvw8/36+xhfbajjIPNPqikWj/+k=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "556359043a4b61df5802b6650cbdbec6450bf9d4"
+    },
+    "zotero-ocr": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-ocr",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=",
+            "type": "url",
+            "url": "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi"
+        },
+        "version": "0.9.5.1"
+    },
+    "zotero-papersgpt": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-papersgpt",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-7CsNhH5iTiD2xsN3uiXg0GMhOTC7RtbMA4ReIkcHbjc=",
+            "type": "url",
+            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.0/papersgpt-v0.6.0.xpi"
+        },
+        "version": "papersgpt-v0.6.0"
+    },
+    "zotero-zotlit": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "zotero-zotlit",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-MHbi4AB+9Ouas19d+YhAef3zEeRWsSsVGtmW024DOwY=",
+            "type": "url",
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-alpha.3/zotlit-zotero-2.0.0-alpha.3.xpi"
+        },
+        "version": "2.0.0-alpha.3"
     }
 }

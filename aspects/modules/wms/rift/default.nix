@@ -87,7 +87,7 @@
               ];
 
               settings = {
-                animate = true;
+                animate = false;
                 animation_duration = 0.1;
                 animation_fps = 100;
                 ui.mission_control.enabled = true;

@@ -26,7 +26,10 @@ in
 
     includes = [
       den.aspects.stylix
-      (den.batteries.unfree [ "libkey-nomad" ])
+      (den.batteries.unfree [
+        "libkey-nomad"
+        "onepassword-password-manager"
+      ])
     ];
     provides.to-hosts = { host, ... }: {
       nixos.environment.etc."1password/custom_allowed_browsers" = {
@@ -87,6 +90,8 @@ in
           default = "ivy (Default)";
         };
         config = {
+
+          home.packages = with pkgs; [ zen-browser ];
           home.sessionVariables.BROWSER = "zen";
           stylix.targets.zen-browser.profileNames = [ profileName ];
           programs.zen-browser = {
@@ -227,6 +232,7 @@ in
               extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
                 auto-tab-discard
                 libkey-nomad
+                onepassword-password-manager
                 zotero-connector
                 kagi-search
                 ublock-origin
