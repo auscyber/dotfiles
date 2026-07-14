@@ -42,7 +42,10 @@ in
   den.aspects.lspmux =
     { user, ... }:
     {
-      includes = [ den.aspects.packages.lspmux ];
+      includes = [
+        den.aspects.packages.lspmux
+        den.aspects.packages.kanata-ls
+      ];
 
       overlays = {
         lspmux-wrap = [
@@ -180,7 +183,7 @@ in
           # `pkgs.lspmuxed`, which also carries binary- and package-name aliases. Those
           # are not nixvim server names, and `plugins.lsp.servers.<alias>` would be an
           # unknown option.
-          plugins.lsp.servers = lib.listToAttrs (
+          lsp.servers = lib.listToAttrs (
             map (
               spec:
               let
@@ -200,7 +203,7 @@ in
                     # runtime. `package = null` keeps nixvim from prefixing the pinned
                     # server onto nvim's $PATH, where it would beat the project's own copy.
                     package = null;
-                    cmd = [ (lib.getExe server) ] ++ (spec.args or [ ]);
+                    config.cmd = [ (lib.getExe server) ] ++ (spec.args or [ ]);
                   }
               )
             ) (servers pkgs)

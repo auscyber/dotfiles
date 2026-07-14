@@ -12,27 +12,15 @@
     inputs.crane.follows = "crane";
   };
   den.aspects.kanata = { user, ... }: {
-    includes = [ den.aspects.packages.kanata-tray ];
-    nvim = {
-      autoGroups.filetypedetect.clear = false;
-      autoCmd = [
-        {
-          command = "setfiletype lisp";
-          group = "filetypedetect";
-          event = [
-            "BufRead"
-            "BufNewFile"
-          ];
-          pattern = [
-            "*.kbd"
-          ];
-        }
-      ];
-    };
+    includes = [
+      den.aspects.packages.kanata-tray
+      den.aspects.packages.kanata-ls
+    ];
     # kanata-tray and kanata-vk-agent are not in nixpkgs; pull them from my-nur
     # (kanata / kanata-with-cmd / kanata.darwinDriver come from nixpkgs).
     # Guarded so non-darwin pkgs sets (e.g. the linux-builder) don't force
     # packages my-nur may not expose for that system.
+    nvim.lsp.servers.kanata-ls.enable = true;
     overlays.kanata-combined = [
       (
         final: prev:

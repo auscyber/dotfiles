@@ -1,5 +1,8 @@
 {
-  flake-file.inputs.darwin.url = "github:nix-darwin/nix-darwin";
+  ff.darwin = {
+    url = "github:nix-darwin/nix-darwin";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   patchedInputs.darwin = {
     #    patches = [

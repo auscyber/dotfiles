@@ -1,6 +1,7 @@
 { den, ... }:
 {
   den.aspects.zotero = {
+    brew.casks = [ "zotero" ];
     homeManager =
       { pkgs, ... }:
       {

@@ -48,17 +48,7 @@ in
 
   # Resolve nvim class content using resolveImports (skips entity instantiation)
   # Don't inject pkgs here - let nixvim's makeNixvimWithModule provide it
-  den.lib.nixvim.module =
-    nvimAspect: ctx:
-    let
-      entityCtx = den.lib.resolveEntity "nvim" ctx;
-
-      aspect = {
-        includes = [ nvimAspect ];
-        __scopeHandlers = entityCtx.__scopeHandlers or { };
-      };
-    in
-    den.lib.aspects.resolveImports "nvim" aspect;
+  den.lib.nixvim.module = nvimAspect: ctx: den.lib.aspects.resolve "nvim" nvimAspect;
 
   # Build a standalone neovim package
   den.lib.nixvim.package =

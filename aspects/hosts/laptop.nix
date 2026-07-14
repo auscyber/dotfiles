@@ -42,7 +42,6 @@
       { pkgs, lib, ... }:
       {
         stylix.targets.jankyborders.enable = false;
-        programs._1password-gui.enable = true;
         services.karabiner-elements.enable = false;
         users.users.ivypierlot = {
           name = "ivypierlot";
@@ -111,9 +110,7 @@
         "beeper"
         "amethyst"
         "steam"
-        "tailscale"
         "affinity-designer"
-        "zotero"
         "affinity-publisher"
         "plover"
         "postman"
@@ -124,6 +121,7 @@
   };
 
   den.aspects.ivypierlot = {
+    study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.agenix-rekey
       den.aspects.onepassword
@@ -138,7 +136,6 @@
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.sketchybar
-      den.aspects.zotero
       <browsers/zen>
       den.aspects.gui
       den.aspects.gpg

@@ -4,10 +4,7 @@
   den,
   ...
 }:
-let
-  correct-inputs = inputs ? nur && inputs ? zen-browser;
-  ifTest = b: v: if b then v else { };
-in
+
 {
   flake-file = {
     inputs = {
@@ -21,11 +18,29 @@ in
 
     };
   };
+  patchedInputs.zen-browser = {
+    patches = [ ];
+  };
 
   den.aspects.browsers.zen = {
 
     includes = [
       den.aspects.stylix
+      (
+        { aspect-chain }:
+        den.batteries.forward {
+          each = lib.singleton true;
+          fromClass = _: "zen-browser";
+          intoClass = _: "homeManager";
+          intoPath = _: [
+            "programs"
+            "zen-browser"
+            "_internalProfile"
+          ];
+          fromAspect = _: lib.head aspect-chain;
+          adaptArgs = lib.id;
+        }
+      )
       (den.batteries.unfree [
         "libkey-nomad"
         "onepassword-password-manager"
@@ -41,6 +56,12 @@ in
         mode = "0755";
 
       };
+    };
+    study.zen-browser = { pkgs, ... }: {
+      extensions.packages = with pkgs.firefox-addons; [
+        libkey-nomad
+      ];
+
     };
 
     overlays = {
@@ -60,8 +81,8 @@ in
         };
       nur = inputs.nur.overlays.default;
 
-      firefox = self: super: {
-        firefox-addons = super.nur.repos.rycee.firefox-addons;
+      firefox = final: prev: {
+        firefox-addons = final.nur.repos.rycee.firefox-addons;
       };
     };
     homeManager =
@@ -81,10 +102,15 @@ in
         };
         profileName = config.zen.profileName;
       in
+      {
 
-      ifTest correct-inputs {
-
-        imports = [ inputs.zen-browser.homeModules.default ];
+        imports = [
+          inputs.zen-browser.homeModules.default
+          (lib.mkAliasOptionModule
+            [ "programs" "zen-browser" "_internalProfile" ]
+            [ "programs" "zen-browser" "profiles" profileName ]
+          )
+        ];
         options.zen.profileName = lib.mkOption {
           type = lib.types.str;
           default = "ivy (Default)";
@@ -229,9 +255,8 @@ in
                   id = 1;
                 };
               };
-              extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
+              extensions.packages = with pkgs.firefox-addons; [
                 auto-tab-discard
-                libkey-nomad
                 onepassword-password-manager
                 zotero-connector
                 kagi-search
@@ -261,6 +286,6 @@ in
           #          };
         };
       };
-
   };
+
 }

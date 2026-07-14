@@ -132,6 +132,20 @@
     };
     date = "2026-06-04";
   };
+  vscode-kanata = {
+    pname = "vscode-kanata";
+    version = "9a650968478b180b311c197182062edab271203d";
+    src = fetchgit {
+      url = "https://github.com/rszyma/vscode-kanata.git";
+      rev = "9a650968478b180b311c197182062edab271203d";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-Ft4r+kL8P7S0GeR+Ut6jXINJ7WTKfDuWrvCYfLL04KM=";
+    };
+    date = "2026-07-05";
+  };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
     version = "2.5.2";
@@ -158,10 +172,10 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.36";
+    version = "9.0.37";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.36/zotero-better-bibtex-9.0.36.xpi";
-      sha256 = "sha256-xgJOAJmH0rS8DEUFs6lpXYJ5CpC0fr5ZRxBp7HjSr9Y=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.37/zotero-better-bibtex-9.0.37.xpi";
+      sha256 = "sha256-9m3NZtvPP4KIDn6djhRWVAa1Jz6y4JiPSW+DT/FndHQ=";
     };
   };
   zotero-notero = {

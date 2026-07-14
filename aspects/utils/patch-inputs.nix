@@ -1,6 +1,7 @@
 {
   inputs,
   lib,
+  self,
   config,
   withSystem,
   rootPath,
@@ -11,6 +12,11 @@ let
   # Produce a patched source tree. `applyPatches` FAILS the build if any patch
   # no longer applies — that's the "tell me when it breaks" guarantee.
   inherit (lib) mapAttrs;
+  flipAttrs = lib.mapAttrs' (
+    value: name: {
+      inherit name value;
+    }
+  );
 
   nodesFn =
 
@@ -19,6 +25,8 @@ let
       rootKey,
       passedInputs ? { },
       flakePath,
+      backupNode ? null,
+      patchSrc ? null,
     }:
     let
       allNodes = mapAttrs (
@@ -27,33 +35,42 @@ let
           isRelative = node.locked.type or null == "path" && builtins.substring 0 1 node.locked.path != "/";
 
           parentNode = allNodes.${getInputByPath lockFile.root node.parent};
+          flipped = flipAttrs (lockFile.nodes.${lockFile.root}.inputs or { });
 
           sourceInfo = (
             if key == lockFile.root then
               flakePath
             else if isRelative then
               parentNode.sourceInfo
-            else if
-              lockFile.nodes.${lockFile.root}.inputs ? "${key}" && key != rootKey && passedInputs ? "${key}"
-            then
-              passedInputs.${key}
+
+            else if flipped ? "${key}" && key != rootKey && passedInputs ? "${flipped.${key}}" then
+              (passedInputs.${flipped.${key}})
             else
               fetchTree (node.info or { } // removeAttrs node.locked [ "dir" ])
+
           );
 
           subdir = if key == lockFile.root then "" else node.locked.dir or "";
 
-          outPath =
+          outPath = (
+            if key == rootKey && lockFile.root != key then
+              patchSrc
+            else
+
             if isRelative then
               parentNode.outPath + (if node.locked.path == "" then "" else "/" + node.locked.path)
             else
-              sourceInfo.outPath + (if subdir == "" then "" else "/" + subdir);
+              sourceInfo.outPath + (if subdir == "" then "" else "/" + subdir)
+          );
 
           flake = import (outPath + "/flake.nix");
+          backupInputs = if backupNode != null && key == rootKey then backupNode.result.inputs else { };
 
-          newInputs = lib.mapAttrs (_inputName: inputSpec: allNodes.${resolveInput inputSpec}.result) (
-            node.inputs or { }
-          );
+          newInputs =
+            backupInputs
+            // lib.mapAttrs (_inputName: inputSpec: allNodes.${resolveInput inputSpec}.result) (
+              node.inputs or { }
+            );
 
           # Resolve a input spec into a node name. An input spec is
           # either a node name, or a 'follows' path from the root
@@ -102,7 +119,7 @@ let
             else
               (if subdir == "" then "" else "/" + subdir);
 
-          inherit outPath sourceInfo;
+          inherit sourceInfo outPath;
         }
       ) lockFile.nodes;
     in
@@ -176,6 +193,7 @@ let
         rootKey = backupLockFile.root;
         lockFile = backupLockFile;
         flakePath = patchedSrc;
+        passedInputs = passedInputs;
       };
 
       topLockFile = builtins.fromJSON (builtins.readFile "${rootPath}/flake.lock");
@@ -184,30 +202,34 @@ let
         inherit passedInputs;
         lockFile = topLockFile;
         rootKey = name;
+        backupNode = backupNodes.${backupLockFile.root};
         flakePath = "${rootPath}";
+        patchSrc = "${patchedSrc}";
       };
 
       flakeNode = allNodes.${name};
 
       curInputs = (
-        builtins.intersectAttrs backupNodes.${backupLockFile.root}.result.inputs (
-          passedInputs // backupNodes.${backupLockFile.root}.result.inputs // flakeNode.result.inputs
-        )
+        (builtins.intersectAttrs backupLockFile.nodes.${backupLockFile.root}.inputs (
+          lib.mergeAttrsList [
+            #      flakeNode.result.inputs
+            realInputs
+            backupNodes.${backupLockFile.root}.result.inputs
+            passedInputs
+          ]
+        ))
         // {
           self = res // {
-            inputs = curInputs;
+            #inputs = curInputs;
           };
         }
       );
       res =
-        flakeNode.result
-        // ((import (patchedSrc + flakeNode.extraPathStuff + "/flake.nix")).outputs curInputs)
-        // {
-          outPath = "${patchedSrc}";
-        };
+        (lib.removeAttrs flakeNode.result [ "outputs" ])
+        // ((import (patchedSrc + flakeNode.extraPathStuff + "/flake.nix")).outputs curInputs);
 
     in
-    if !(builtins.pathExists lockFilePath) then callLocklessFlake patchedSrc else res; # // { outPath = patchedSrc; };
+    if !(builtins.pathExists lockFilePath) then (callLocklessFlake patchedSrc) else res; # // { outPath = patchedSrc; };
   patchedDrvs =
     pkgs:
     lib.mapAttrs (
@@ -423,7 +445,7 @@ in
     # re-eval — only the names actually in `patchedInputs` enter the patch path.
     # `buildPatched pkgs` stays a single shared thunk, so patched inputs that
     # reference each other still resolve through the one `allInputs` fixpoint.
-    flake.age-plugin-gpg = inputs.age-plugin-gpg;
+    flake.rahh = config.flake.newInputs;
     # Get pkgs directly from realInputs to avoid forcing perSystem evaluation.
     # Using withSystem would trigger full perSystem module evaluation just to
     # compute newInputs, which adds significant eval overhead.
@@ -436,7 +458,7 @@ in
         name: realInput: if config.patchedInputs ? ${name} then patched.${name} else realInput
       ) realInputs;
 
-    flake.inputs = inputs;
+    flake.inputsa = inputs;
 
     perSystem =
       { pkgs, ... }:

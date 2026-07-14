@@ -206,6 +206,26 @@
         },
         "version": "6284ee816601486ace33ca48a0271832eec6de35"
     },
+    "vscode-kanata": {
+        "cargoLock": null,
+        "date": "2026-07-05",
+        "extract": null,
+        "name": "vscode-kanata",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "9a650968478b180b311c197182062edab271203d",
+            "sha256": "sha256-Ft4r+kL8P7S0GeR+Ut6jXINJ7WTKfDuWrvCYfLL04KM=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/rszyma/vscode-kanata.git"
+        },
+        "version": "9a650968478b180b311c197182062edab271203d"
+    },
     "zotero-actions-tags": {
         "cargoLock": null,
         "date": null,
@@ -260,11 +280,11 @@
         "pinned": false,
         "src": {
             "name": null,
-            "sha256": "sha256-xgJOAJmH0rS8DEUFs6lpXYJ5CpC0fr5ZRxBp7HjSr9Y=",
+            "sha256": "sha256-9m3NZtvPP4KIDn6djhRWVAa1Jz6y4JiPSW+DT/FndHQ=",
             "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.36/zotero-better-bibtex-9.0.36.xpi"
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.37/zotero-better-bibtex-9.0.37.xpi"
         },
-        "version": "9.0.36"
+        "version": "9.0.37"
     },
     "zotero-notero": {
         "cargoLock": null,
