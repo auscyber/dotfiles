@@ -207,7 +207,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     searchix = {
-      url = "git+https://git.alin.ovh/searchix?ref=refs/tags/v0.4.4";
+      url = "git+https://git.sr.ht/~alanpearce/searchix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix.url = "github:nix-community/stylix";
