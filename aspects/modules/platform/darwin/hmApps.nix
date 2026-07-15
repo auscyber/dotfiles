@@ -17,9 +17,7 @@
             ];
             paths =
               config.environment.systemPackages
-              ++ (lib.concatMap (x: x.home.packages) (
-                lib.attrValues config.home-manager.users
-              ));
+              ++ (lib.concatMap (x: x.home.packages) (lib.attrValues config.home-manager.users));
           }
         );
       };

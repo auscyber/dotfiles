@@ -237,6 +237,8 @@
               isDefault = true;
               settings = {
                 "extensions.autoDisableScopes" = 0;
+                "browser.tabs.groups.enabled" = true;
+                "browser.tabs.groups.alternateMenu" = true;
                 "zen.welcome-screen.seen" = true;
               };
               containers = {

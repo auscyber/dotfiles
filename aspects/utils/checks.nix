@@ -29,8 +29,7 @@
           # disko generates the expected on-disk layout.
           secondpc-filesystems = assertCheck "secondpc-filesystems" {
             "/ is zfs zroot/nixos" =
-              secondpc.fileSystems."/".fsType == "zfs"
-              && secondpc.fileSystems."/".device == "zroot/nixos";
+              secondpc.fileSystems."/".fsType == "zfs" && secondpc.fileSystems."/".device == "zroot/nixos";
             "/mnt/hdd is zfs zpool/root" =
               secondpc.fileSystems."/mnt/hdd".fsType == "zfs"
               && secondpc.fileSystems."/mnt/hdd".device == "zpool/root";
@@ -45,8 +44,7 @@
 
           # facter report is wired and populating hardware detection.
           secondpc-facter = assertCheck "secondpc-facter" {
-            "initrd modules detected from report" =
-              secondpc.boot.initrd.availableKernelModules != [ ];
+            "initrd modules detected from report" = secondpc.boot.initrd.availableKernelModules != [ ];
             "ahci present (SATA controller from report)" =
               builtins.elem "ahci" secondpc.boot.initrd.availableKernelModules;
           };
@@ -65,17 +63,13 @@
           # stay inline (by-uuid) to avoid by-partlabel churn on the live box.
           auspc-filesystems = assertCheck "auspc-filesystems" {
             "/ is zfs zpool/root" =
-              auspc.fileSystems."/".fsType == "zfs"
-              && auspc.fileSystems."/".device == "zpool/root";
+              auspc.fileSystems."/".fsType == "zfs" && auspc.fileSystems."/".device == "zpool/root";
             "/nix is zfs zpool/nix" =
-              auspc.fileSystems."/nix".fsType == "zfs"
-              && auspc.fileSystems."/nix".device == "zpool/nix";
+              auspc.fileSystems."/nix".fsType == "zfs" && auspc.fileSystems."/nix".device == "zpool/nix";
             "/var is zfs zpool/var" =
-              auspc.fileSystems."/var".fsType == "zfs"
-              && auspc.fileSystems."/var".device == "zpool/var";
+              auspc.fileSystems."/var".fsType == "zfs" && auspc.fileSystems."/var".device == "zpool/var";
             "/home is zfs zpool/home" =
-              auspc.fileSystems."/home".fsType == "zfs"
-              && auspc.fileSystems."/home".device == "zpool/home";
+              auspc.fileSystems."/home".fsType == "zfs" && auspc.fileSystems."/home".device == "zpool/home";
             "/boot is vfat" = auspc.fileSystems."/boot".fsType == "vfat";
             "/mnt/hdd is ext4" = auspc.fileSystems."/mnt/hdd".fsType == "ext4";
           };

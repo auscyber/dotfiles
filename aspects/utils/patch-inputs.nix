@@ -271,24 +271,31 @@ let
       curInputs = (
         (builtins.intersectAttrs backupLockFile.nodes.${backupLockFile.root}.inputs (
           lib.mergeAttrsList [
-            #      flakeNode.result.inputs
             realInputs
             backupNodes.${backupLockFile.root}.result.inputs
             passedInputs
           ]
         ))
         // {
-          self = res // {
-            #inputs = curInputs;
-          };
+          self = res;
         }
       );
       res =
-        (lib.removeAttrs flakeNode.result [ "outputs" ])
+        (lib.removeAttrs flakeNode.result [
+          "outputs"
+          "inputs"
+        ])
+        # Expose the unified inputs (the same `curInputs` the flake's outputs are
+        # evaluated with, `self` included), so `inputs.<name>.inputs.<dep>` reflects
+        # the *patched* dependency graph — not the flake's own pinned nodes that
+        # nodesFn recorded.
+        // {
+          inputs = curInputs;
+        }
         // ((import (patchedSrc + flakeNode.extraPathStuff + "/flake.nix")).outputs curInputs);
 
     in
-    if !(builtins.pathExists lockFilePath) then (callLocklessFlake patchedSrc) else res; # // { outPath = patchedSrc; };
+    if !(builtins.pathExists lockFilePath) then (callLocklessFlake patchedSrc) else res;
   # Only entries that actually rewrite their tree produce a derivation; the rest
   # short-circuit to the pristine source in `patchSource`, which is not a
   # derivation and so must not reach `checks`/`patchedSources`.
@@ -316,11 +323,77 @@ let
   patchedDrvs = patchedDrvsWith { hashed = true; };
   patchedDrvsUnhashed = patchedDrvsWith { hashed = false; };
 
+  # ── Which inputs to re-evaluate ("input unification") ────────────────────────
+  #
+  # Re-evaluating a flake through `patchFlake` re-resolves its inputs against the
+  # *patched* dependency graph. That's only meaningful for a flake that actually
+  # (transitively) depends on a patched input — otherwise the re-eval reproduces
+  # the identical outputs at needless cost. So we compute, purely from the top
+  # `flake.lock` (no IFD), the set of flake inputs whose dependency closure reaches
+  # a patched input, and re-evaluate exactly those (plus any explicitly listed in
+  # `patchedInputs`, which may carry real diffs).
+  lockFile = builtins.fromJSON (builtins.readFile "${rootPath}/flake.lock");
+  rootInputs = lockFile.nodes.${lockFile.root}.inputs or { };
+
+  # Resolve an input ref (a node-key string, or a `["a" "b"]` follows-path from the
+  # root) to a node key — the same resolution nodesFn does with resolveInput/getInputByPath.
+  resolveRef = ref: if builtins.isList ref then resolvePath lockFile.root ref else ref;
+  resolvePath =
+    node: path:
+    if path == [ ] then
+      node
+    else
+      resolvePath (resolveRef lockFile.nodes.${node}.inputs.${builtins.head path}) (builtins.tail path);
+
+  isFlakeInput = name: lockFile.nodes.${resolveRef rootInputs.${name}}.flake or true;
+
+  # Root inputs that become patched inputs (isInput), and their lock node keys.
+  patchedNames = lib.attrNames (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
+  patchedKeys = map (n: resolveRef rootInputs.${n}) patchedNames;
+
+  # Reverse reachability: every node that can reach a patched node, via BFS over
+  # predecessors. genericClosure memoises by `key`, so it terminates on cycles.
+  allKeys = lib.attrNames lockFile.nodes;
+  edgesOf = key: map resolveRef (lib.attrValues (lockFile.nodes.${key}.inputs or { }));
+  reaching = map (i: i.key) (
+    builtins.genericClosure {
+      startSet = map (k: { key = k; }) patchedKeys;
+      operator = item: map (k: { key = k; }) (lib.filter (k: lib.elem item.key (edgesOf k)) allKeys);
+    }
+  );
+
+  # Root input names that (transitively) depend on a patched input — auto-unified,
+  # minus any explicit `noUnify` opt-outs. (A non-flake input has no `inputs`, so it
+  # never reaches a patched node; `isFlakeInput` is a belt-and-braces guard.)
+  autoUnify = lib.filter (
+    n: isFlakeInput n && !lib.elem n config.noUnify && lib.elem (resolveRef rootInputs.${n}) reaching
+  ) (lib.attrNames rootInputs);
+
+  # Everything to re-evaluate: explicit patchedInputs ∪ auto-unified. Explicit entries
+  # are always built (they may carry patches) and cannot be dropped via `noUnify`.
+  toBuild = lib.unique (patchedNames ++ autoUnify);
+
+  # Effective per-input config, defaulting for inputs with no `patchedInputs` entry
+  # (auto-unified inputs are re-evaluated with zero diffs against the patched graph).
+  cfgFor =
+    name:
+    config.patchedInputs.${name} or {
+      src = realInputs.${name}.sourceInfo;
+      patches = [ ];
+      prePatch = "";
+      postPatch = "";
+      hash = patchHashes.${name} or null;
+      isInput = true;
+    };
+
   buildPatched =
     pkgs:
     let
-      allInputs = lib.mapAttrs (
-        n: p:
+      allInputs = lib.genAttrs toBuild (
+        n:
+        let
+          p = cfgFor n;
+        in
         patchFlake {
           inherit pkgs;
           extraInputs = allInputs;
@@ -333,7 +406,7 @@ let
             ;
           name = "${n}";
         }
-      ) (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
+      );
     in
     allInputs;
 
@@ -491,6 +564,18 @@ in
     '';
   };
 
+  options.noUnify = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [ ];
+    description = ''
+      Input names to exclude from automatic input-unification re-eval — an escape
+      hatch for a flake that does not survive `patchFlake`'s lock-resolver. Only
+      removes AUTO-unified inputs (those pulled in because they transitively depend
+      on a patched input); an input explicitly listed in `patchedInputs` is always
+      built, since it may carry patches.
+    '';
+  };
+
   options.patchedInputs = lib.mkOption {
     default = { };
     description = ''
@@ -595,117 +680,94 @@ in
       flake = false;
     };
 
-    #    _module.args.patchFlake = patchFlake;
-    #    flake.lib.patchFlake = lib.mkDefault patchFlake;
-
-    # Per-key overlay instead of `realInputs // buildPatched pkgs`. With `//`,
-    # the patched value of EVERY listed input shares one attrset, and the merge
-    # gives no syntactic hint that un-patched inputs are untouched. Building the
-    # overlay with `mapAttrs` + an explicit `if` keeps evaluation lazy per input:
-    # reading an un-patched input (e.g. `inputs.nixpkgs`) returns `realInputs`
-    # directly and never forces `pkgs`, `applyPatches`, or the flake-compat
-    # re-eval — only the names actually in `patchedInputs` enter the patch path.
-    # `buildPatched pkgs` stays a single shared thunk, so patched inputs that
-    # reference each other still resolve through the one `allInputs` fixpoint.
-    flake.rahh = config.flake.newInputs;
-    # Get pkgs directly from realInputs to avoid forcing perSystem evaluation.
-    # Using withSystem would trigger full perSystem module evaluation just to
+    # Per-input overlay instead of `realInputs // buildPatched pkgs`. With `//`,
+    # the patched value of EVERY re-evaluated input shares one attrset, and the
+    # merge gives no syntactic hint that the rest are untouched. Building the
+    # overlay with `mapAttrs` + a `patched.${name} or realInput` fallback keeps
+    # evaluation lazy per input: reading an input not in `toBuild` (a non-flake,
+    # or a flake that touches nothing patched) returns `realInputs` directly and
+    # never forces `pkgs`, `applyPatches`, or the flake-compat re-eval — only the
+    # names in `toBuild` enter the patch path. `buildPatched pkgs` stays a single
+    # shared thunk, so re-evaluated inputs that reference each other still resolve
+    # through the one `allInputs` fixpoint.
+    #
+    # Get pkgs directly from realInputs to avoid forcing perSystem evaluation:
+    # using withSystem would trigger full perSystem module evaluation just to
     # compute newInputs, which adds significant eval overhead.
     flake.newInputs =
       let
         pkgs = realInputs.nixpkgs.legacyPackages.${config.patchSystem};
         patched = buildPatched pkgs;
       in
-      lib.mapAttrs (
-        name: realInput: if config.patchedInputs ? ${name} then patched.${name} else realInput
-      ) realInputs;
-
-    flake.inputsa = inputs;
+      lib.mapAttrs (name: realInput: patched.${name} or realInput) realInputs;
 
     perSystem =
       { pkgs, ... }:
       {
-        # Patched inputs as a per-system module arg. Because flake-parts'
-        options.patchedSources = lib.mkOption {
-          type = lib.types.attrsOf lib.types.raw;
-          default = { };
-          description = ''
-            Patched source trees for inputs listed in `patchedInputs`. Each entry
-            is a flake-compat re-eval of the patched source tree, so it can be
-            used as a flake input (e.g. `inputs.<name>`).
-          '';
+        apps.patch-input = {
+          type = "app";
+          program = lib.getExe (patchInputScript pkgs);
         };
-        config = {
-          patchedSources = patchedDrvs pkgs;
-          # withSystem returns the full perSystem arg set, this is reachable both
-          # in `perSystem = { patched, ... }: …` and
-          # `withSystem system ({ patched, ... }: …)`.
-          # Lazy + empty-safe (no IFD when `patchedInputs` is empty).
 
-          apps.patch-input = {
-            type = "app";
-            program = lib.getExe (patchInputScript pkgs);
-          };
-
-          apps.update-patch-hashes = {
-            type = "app";
-            program = lib.getExe (updateHashesScript pkgs);
-          };
-
-          # `nix run .#update` — bump inputs, then refresh the patch hashes that
-          # the bump just invalidated. Resolved and built *before* the lock moves,
-          # so it still runs even though the flake won't evaluate in between.
-          apps.update = {
-            type = "app";
-            program = lib.getExe (
-              pkgs.writeShellApplication {
-                name = "update";
-                runtimeInputs = [ pkgs.nix ];
-                text = ''
-                  set -euo pipefail
-                  nix flake update "$@"
-                  PATCH_HASHES=ignore nix run --impure .#update-patch-hashes
-                '';
-              }
-            );
-          };
-
-          # Building these fails `nix flake check` if a declared patch is stale
-          # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
-          # Entries with no patches are skipped: `patchSource` hands those back
-          # as the pristine source path, which is not a derivation to build.
-          checks =
-            lib.mapAttrs' (n: _: {
-              name = "patched-input-${n}";
-              value = (patchedDrvs pkgs).${n};
-            }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
-            // {
-              # Guard `buildPatched`'s fixpoint: a patched flake must resolve its
-              # own inputs to the *patched* versions of them, not the pristine
-              # ones. Today `agenix` declares `darwin` and `home-manager` and all
-              # three are patched, so severing the fixpoint shows up here rather
-              # than as a mysteriously unpatched module at rebuild time.
-              patched-inputs-intertwined =
-                let
-                  patched = lib.attrNames (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
-                  mismatches = lib.concatMap (
-                    name:
-                    let
-                      deps = lib.filter (d: lib.elem d patched) (lib.attrNames (inputs.${name}.inputs or { }));
-                    in
-                    lib.forEach (lib.filter (d: inputs.${name}.inputs.${d}.outPath != inputs.${d}.outPath) deps) (
-                      d: "  ${name} sees ${d} = ${inputs.${name}.inputs.${d}.outPath}, want ${inputs.${d}.outPath}"
-                    )
-                  ) patched;
-                in
-                assert lib.assertMsg (mismatches == [ ]) ''
-                  patched inputs are not intertwined — a patched flake is seeing an
-                  unpatched dependency:
-                  ${lib.concatStringsSep "\n" mismatches}
-                '';
-                pkgs.emptyFile;
-            };
+        apps.update-patch-hashes = {
+          type = "app";
+          program = lib.getExe (updateHashesScript pkgs);
         };
+
+        # `nix run .#update` — bump inputs, then refresh the patch hashes that
+        # the bump just invalidated. Resolved and built *before* the lock moves,
+        # so it still runs even though the flake won't evaluate in between.
+        apps.update = {
+          type = "app";
+          program = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "update";
+              runtimeInputs = [ pkgs.nix ];
+              text = ''
+                set -euo pipefail
+                nix flake update "$@"
+                PATCH_HASHES=ignore nix run --impure .#update-patch-hashes
+              '';
+            }
+          );
+        };
+
+        # Building these fails `nix flake check` if a declared patch is stale
+        # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
+        # Entries with no patches are skipped: `patchSource` hands those back
+        # as the pristine source path, which is not a derivation to build.
+        checks =
+          lib.mapAttrs' (n: _: {
+            name = "patched-input-${n}";
+            value = (patchedDrvs pkgs).${n};
+          }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
+          // {
+            # Guard `buildPatched`'s fixpoint: every re-evaluated input — patched or
+            # merely auto-unified — must resolve its own inputs to the *patched*
+            # versions of them, not the pristine ones. E.g. `agenix` declares
+            # `darwin` and `home-manager`, both patched, so severing the fixpoint
+            # shows up here rather than as a mysteriously unpatched module at
+            # rebuild time. Covers the whole `toBuild` set, not just declared patches.
+            patched-inputs-intertwined =
+              let
+                patched = toBuild;
+                mismatches = lib.concatMap (
+                  name:
+                  let
+                    deps = lib.filter (d: lib.elem d patched) (lib.attrNames (inputs.${name}.inputs or { }));
+                  in
+                  lib.forEach (lib.filter (d: inputs.${name}.inputs.${d}.outPath != inputs.${d}.outPath) deps) (
+                    d: "  ${name} sees ${d} = ${inputs.${name}.inputs.${d}.outPath}, want ${inputs.${d}.outPath}"
+                  )
+                ) patched;
+              in
+              assert lib.assertMsg (mismatches == [ ]) ''
+                patched inputs are not intertwined — a re-evaluated flake is seeing an
+                unpatched dependency:
+                ${lib.concatStringsSep "\n" mismatches}
+              '';
+              pkgs.emptyFile;
+          };
       };
   };
 }

@@ -12,10 +12,16 @@
       kmix.increase_microphone_volume = "Microphone Volume Up";
       kmix.increase_volume = "Volume Up";
       kmix.increase_volume_small = "Shift+Volume Up";
-      kmix.mic_mute = ["Microphone Mute" "Meta+Volume Mute"];
+      kmix.mic_mute = [
+        "Microphone Mute"
+        "Meta+Volume Mute"
+      ];
       kmix.mute = "Volume Mute";
       ksmserver."Halt Without Confirmation" = [ ];
-      ksmserver."Lock Session" = ["Meta+L" "Screensaver"];
+      ksmserver."Lock Session" = [
+        "Meta+L"
+        "Screensaver"
+      ];
       ksmserver."Log Out" = "Ctrl+Alt+Del";
       ksmserver."Log Out Without Confirmation" = [ ];
       ksmserver.LogOut = [ ];
@@ -28,7 +34,10 @@
       kwin."Decrease Opacity" = [ ];
       kwin."Edit Tiles" = "Meta+T";
       kwin.Expose = "Ctrl+F9";
-      kwin.ExposeAll = ["Ctrl+F10" "Launch (C)"];
+      kwin.ExposeAll = [
+        "Ctrl+F10"
+        "Launch (C)"
+      ];
       kwin.ExposeClass = "Ctrl+F7";
       kwin.ExposeClassCurrentDesktop = [ ];
       kwin."Grid View" = "Meta+G";
@@ -96,12 +105,24 @@
       kwin."Switch to Screen to the Right" = [ ];
       kwin."Toggle Night Color" = [ ];
       kwin."Toggle Window Raise/Lower" = [ ];
-      kwin."Walk Through Windows" = ["Meta+Tab" "Alt+Tab"];
-      kwin."Walk Through Windows (Reverse)" = ["Meta+Shift+Tab" "Alt+Shift+Tab"];
+      kwin."Walk Through Windows" = [
+        "Meta+Tab"
+        "Alt+Tab"
+      ];
+      kwin."Walk Through Windows (Reverse)" = [
+        "Meta+Shift+Tab"
+        "Alt+Shift+Tab"
+      ];
       kwin."Walk Through Windows Alternative" = [ ];
       kwin."Walk Through Windows Alternative (Reverse)" = [ ];
-      kwin."Walk Through Windows of Current Application" = ["Meta+`" "Alt+`"];
-      kwin."Walk Through Windows of Current Application (Reverse)" = ["Meta+~" "Alt+~"];
+      kwin."Walk Through Windows of Current Application" = [
+        "Meta+`"
+        "Alt+`"
+      ];
+      kwin."Walk Through Windows of Current Application (Reverse)" = [
+        "Meta+~"
+        "Alt+~"
+      ];
       kwin."Walk Through Windows of Current Application Alternative" = [ ];
       kwin."Walk Through Windows of Current Application Alternative (Reverse)" = [ ];
       kwin."Window Above Other Windows" = [ ];
@@ -188,7 +209,10 @@
       kwin."Window to Screen 7" = [ ];
       kwin.disableInputCapture = "Meta+Shift+Esc";
       kwin.view_actual_size = "Meta+0";
-      kwin.view_zoom_in = ["Meta++" "Meta+="];
+      kwin.view_zoom_in = [
+        "Meta++"
+        "Meta+="
+      ];
       kwin.view_zoom_out = "Meta+-";
       mediacontrol.mediavolumedown = [ ];
       mediacontrol.mediavolumeup = [ ];
@@ -214,9 +238,15 @@
       org_kde_powerdevil.Sleep = "Sleep";
       org_kde_powerdevil."Toggle Keyboard Backlight" = "Keyboard Light On/Off";
       org_kde_powerdevil."Turn Off Screen" = [ ];
-      org_kde_powerdevil.powerProfile = ["Battery" "Meta+B"];
+      org_kde_powerdevil.powerProfile = [
+        "Battery"
+        "Meta+B"
+      ];
       plasmashell."Slideshow Wallpaper Next Image" = [ ];
-      plasmashell."activate application launcher" = ["Meta" "Alt+F1"];
+      plasmashell."activate application launcher" = [
+        "Meta"
+        "Alt+F1"
+      ];
       plasmashell."activate task manager entry 1" = "Meta+1";
       plasmashell."activate task manager entry 10" = [ ];
       plasmashell."activate task manager entry 2" = "Meta+2";
@@ -267,7 +297,8 @@
       katerc."KTextEditor Renderer"."Line Height Multiplier" = 1;
       katerc."KTextEditor Renderer"."Show Indentation Lines" = false;
       katerc."KTextEditor Renderer"."Show Whole Bracket Expression" = false;
-      katerc."KTextEditor Renderer"."Text Font" = "DejaVu Sans Mono,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0";
+      katerc."KTextEditor Renderer"."Text Font" =
+        "DejaVu Sans Mono,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0";
       katerc."KTextEditor Renderer"."Text Font Features" = "";
       katerc."KTextEditor Renderer"."Word Wrap Marker" = false;
       katerc.filetree.editShade = "92,96,102";
@@ -315,9 +346,12 @@
       kwinrc.Desktops.Id_1 = "c74a596c-662a-4221-bbbf-ac7ba5a82b69";
       kwinrc.Desktops.Number = 1;
       kwinrc.Desktops.Rows = 1;
-      kwinrc."Tiling/74621fc8-afe4-5a98-ae5f-05640d6e4c0d".tiles = "{\"layoutDirection\":\"horizontal\",\"tiles\":[{\"width\":0.25},{\"width\":0.5},{\"width\":0.25}]}";
-      kwinrc."Tiling/c74a596c-662a-4221-bbbf-ac7ba5a82b69/8be73c53-355c-4cf0-b5ce-c35707cf5232".padding = 4;
-      kwinrc."Tiling/c74a596c-662a-4221-bbbf-ac7ba5a82b69/8be73c53-355c-4cf0-b5ce-c35707cf5232".tiles = "{\"layoutDirection\":\"horizontal\",\"tiles\":[{\"width\":0.25},{\"width\":0.5},{\"width\":0.25}]}";
+      kwinrc."Tiling/74621fc8-afe4-5a98-ae5f-05640d6e4c0d".tiles =
+        "{\"layoutDirection\":\"horizontal\",\"tiles\":[{\"width\":0.25},{\"width\":0.5},{\"width\":0.25}]}";
+      kwinrc."Tiling/c74a596c-662a-4221-bbbf-ac7ba5a82b69/8be73c53-355c-4cf0-b5ce-c35707cf5232".padding =
+        4;
+      kwinrc."Tiling/c74a596c-662a-4221-bbbf-ac7ba5a82b69/8be73c53-355c-4cf0-b5ce-c35707cf5232".tiles =
+        "{\"layoutDirection\":\"horizontal\",\"tiles\":[{\"width\":0.25},{\"width\":0.5},{\"width\":0.25}]}";
       kwinrc.Windows_HDR.MaxFrameAverage = 0;
       kwinrc.Windows_HDR.MaxLuminance = 360;
       kwinrc.Windows_HDR.Reference = 110;
@@ -332,7 +366,8 @@
       systemsettingsrc.systemsettings_sidebar_mode.HighlightNonDefaultSettings = true;
     };
     dataFile = {
-      "kate/anonymous.katesession"."Document 0".URL = "file:///home/auscyber/.config/openrazer/razer.conf";
+      "kate/anonymous.katesession"."Document 0".URL =
+        "file:///home/auscyber/.config/openrazer/razer.conf";
       "kate/anonymous.katesession"."Kate Plugins".bookmarksplugin = false;
       "kate/anonymous.katesession"."Kate Plugins".cmaketoolsplugin = false;
       "kate/anonymous.katesession"."Kate Plugins".compilerexplorer = false;
@@ -369,7 +404,8 @@
       "kate/anonymous.katesession"."Kate Plugins".textfilterplugin = true;
       "kate/anonymous.katesession".MainWindow0."Active ViewSpace" = 0;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-H-Splitter = "0,595,0";
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-0-Bar-0-TvList = "kate_private_plugin_katefiletreeplugin,kateproject,kateprojectgit,lspclient_symbol_outline";
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-0-Bar-0-TvList =
+        "kate_private_plugin_katefiletreeplugin,kateproject,kateprojectgit,lspclient_symbol_outline";
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-0-LastSize = 200;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-0-SectSizes = 0;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-0-Splitter = 372;
@@ -381,35 +417,48 @@
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-2-LastSize = 200;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-2-SectSizes = 0;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-2-Splitter = 595;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-3-Bar-0-TvList = "output,diagnostics,kate_plugin_katesearch,kateprojectinfo,kate_private_plugin_katekonsoleplugin";
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-3-Bar-0-TvList =
+        "output,diagnostics,kate_plugin_katesearch,kateprojectinfo,kate_private_plugin_katekonsoleplugin";
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-3-LastSize = 200;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-3-SectSizes = 0;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-3-Splitter = 292;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-Style = 2;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-Sidebar-Visible = true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-diagnostics-Position = 3;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-diagnostics-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-diagnostics-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-diagnostics-Visible = false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_plugin_katesearch-Position = 3;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_plugin_katesearch-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_plugin_katesearch-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_plugin_katesearch-Visible = false;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Position = 0;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Show-Button-In-Sidebar = true;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Visible = false;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Position = 3;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Show-Button-In-Sidebar = true;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Visible = false;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Position =
+        0;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Show-Button-In-Sidebar =
+        true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katefiletreeplugin-Visible =
+        false;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Position =
+        3;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Show-Button-In-Sidebar =
+        true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kate_private_plugin_katekonsoleplugin-Visible =
+        false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateproject-Position = 0;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateproject-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateproject-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateproject-Visible = false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectgit-Position = 0;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectgit-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectgit-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectgit-Visible = false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectinfo-Position = 3;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectinfo-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectinfo-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-kateprojectinfo-Visible = false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-lspclient_symbol_outline-Position = 0;
-      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-lspclient_symbol_outline-Show-Button-In-Sidebar = true;
+      "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-lspclient_symbol_outline-Show-Button-In-Sidebar =
+        true;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-lspclient_symbol_outline-Visible = false;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-output-Position = 3;
       "kate/anonymous.katesession".MainWindow0.Kate-MDI-ToolView-output-Show-Button-In-Sidebar = true;
@@ -439,8 +488,10 @@
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".Recursive = true;
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".Replaces = "";
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".Search = "";
-      "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeAllProjects = true;
-      "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeCurrentFile = true;
+      "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeAllProjects =
+        true;
+      "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeCurrentFile =
+        true;
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeFolder = true;
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeOpenFiles = true;
       "kate/anonymous.katesession"."Plugin:katesearchplugin:MainWindow:0".SearchAsYouTypeProject = true;

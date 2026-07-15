@@ -49,5 +49,6 @@ stdenvNoCC.mkDerivation {
   meta = {
     platforms = lib.platforms.all;
     sourceProvenance = [ lib.sourceTypes.binaryBytecode ];
-  } // meta;
+  }
+  // meta;
 }

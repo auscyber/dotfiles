@@ -44,7 +44,7 @@ in
     {
       includes = [
         den.aspects.packages.lspmux
-        den.aspects.packages.kanata-ls
+        #        den.aspects.packages.kanata-ls
       ];
 
       overlays = {

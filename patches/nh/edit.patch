@@ -162,7 +162,7 @@ index c4d7998..19d3b52 100644
        });
  
 diff --git a/package.nix b/package.nix
-index 4428ff4..c152089 100644
+index 4428ff4..df39407 100644
 --- a/package.nix
 +++ b/package.nix
 @@ -1,24 +1,16 @@
@@ -195,7 +195,7 @@ index 4428ff4..c152089 100644
    src = lib.fileset.toSource {
      root = ./.;
      fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource ./.)) (
-@@ -30,105 +22,83 @@ rustPlatform.buildRustPackage (finalAttrs: {
+@@ -30,105 +22,84 @@ rustPlatform.buildRustPackage (finalAttrs: {
          ./Cargo.lock
        ]
      );
@@ -258,6 +258,7 @@ index 4428ff4..c152089 100644
 -      # output directories.
 +    postInstall = ''
 +      # Generate shell completions and the man page using the installed xtask.
++      chmod +x $out/bin/xtask
        $out/bin/xtask dist
  
 -      # The dist task above should've created

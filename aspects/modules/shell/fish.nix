@@ -1,7 +1,7 @@
 { den, inputs, ... }:
 {
 
-  den.aspects.fish = { user, ... }: {
+  den.aspects.fish = { user, host, ... }: {
     includes = [
       (den.batteries.user-shell "fish")
       den.aspects.shell
@@ -11,9 +11,9 @@
 
       programs.fish.enable = true;
     };
-    provides.to-host = { pkgs, host, ... }: {
-      os.environment.shells = [ pkgs.fish ];
-      os.programs.fish.enable = true;
+    os = { pkgs, ... }: {
+      environment.shells = [ pkgs.fish ];
+      programs.fish.enable = true;
     };
   };
 

@@ -1,5 +1,12 @@
 { den, lib, ... }:
 {
+
+  nvfetcher.sources.pam_rssh = {
+    src.github = "z4yx/pam_rssh";
+    fetch.github = "z4yx/pam_rssh";
+    cargo_lock = [ "Cargo.lock" ];
+    git.fetchSubmodules = true;
+  };
   # Pure pam_rssh wiring. No key management lives here — see main-ssh-key.nix.
   # Auto-attached to every host via den.schema.host.includes so every system
   # has sudo-via-ssh-agent enabled out of the box.
@@ -12,9 +19,10 @@
       };
       security.pam.services.sudo.rssh = true;
     };
-    overlays = {
+    overlays = { sources, ... }: {
       pam_rssh = self: super: {
         pam_rssh = super.pam_rssh.overrideAttrs (old: {
+          inherit (sources.pam_rssh) src version;
           checkFlags = [
             # reason for disabling test
             "--skip=auth_keys::test_parse_authorized_keys"

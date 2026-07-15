@@ -5,7 +5,7 @@
     src.git = "https://github.com/rszyma/vscode-kanata.git";
     fetch.git = "https://github.com/rszyma/vscode-kanata.git";
   };
-  den.aspects.nixvim.includes = [ den.aspects.packages.kanata-ls ];
+  #  den.aspects.nixvim.includes = [ den.aspects.packages.kanata-ls ];
 
   den.aspects.packages.kanata-ls = {
     nvim = { pkgs, ... }: {

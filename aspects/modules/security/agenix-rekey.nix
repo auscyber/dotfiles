@@ -71,6 +71,8 @@ in
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
+    agenix.inputs.darwin.follows = "darwin";
+    agenix.inputs.home-manager.follows = "home-manager";
     age-plugin-gpg = {
       url = "github:certainlach/age-plugin-gpg";
       inputs.nixpkgs.follows = "nixpkgs";

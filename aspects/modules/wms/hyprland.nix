@@ -73,35 +73,35 @@
                 layout = dwindle
               }
             '';
-            settings = lib.foldAttrs
-              (item: acc: if builtins.isList item then acc ++ item else item)
-              [ ]
-              [
-                (lib.foldAttrs (item: acc: acc ++ item) [ ] (
-                  lib.attrsets.mapAttrsToList (name: sp: {
-                    windowrule = [
-                      "workspace special:${name}, class:${sp.windowClass}"
-                      "float, class:${sp.windowClass}"
-                    ]
-                    ++ builtins.map (rule: "${rule}, class:${sp.windowClass}") sp.extraRules;
-                    exec-once = [ ("[workspace special:${name}]" + sp.command) ];
-                  }) scratchpads
-                ))
-                {
-                  "$mod" = "SUPER";
-                  env = [
-                    "LIBVA_DRIVER_NAME,nvidia"
-                    "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-                    "NVD_BACKEND,direct"
-                    "ELECTRON_OZONE_PLATFORM_HINT,auto"
-                  ];
-                  exec-once = [
-                    "systemctl --user stop graphical-session.target && systemctl --user start hyprland-session.target"
-                    "1password"
-                    "systemctl --user start hyprpolkitagent"
-                  ];
-                }
-              ];
+            settings =
+              lib.foldAttrs (item: acc: if builtins.isList item then acc ++ item else item)
+                [ ]
+                [
+                  (lib.foldAttrs (item: acc: acc ++ item) [ ] (
+                    lib.attrsets.mapAttrsToList (name: sp: {
+                      windowrule = [
+                        "workspace special:${name}, class:${sp.windowClass}"
+                        "float, class:${sp.windowClass}"
+                      ]
+                      ++ builtins.map (rule: "${rule}, class:${sp.windowClass}") sp.extraRules;
+                      exec-once = [ ("[workspace special:${name}]" + sp.command) ];
+                    }) scratchpads
+                  ))
+                  {
+                    "$mod" = "SUPER";
+                    env = [
+                      "LIBVA_DRIVER_NAME,nvidia"
+                      "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+                      "NVD_BACKEND,direct"
+                      "ELECTRON_OZONE_PLATFORM_HINT,auto"
+                    ];
+                    exec-once = [
+                      "systemctl --user stop graphical-session.target && systemctl --user start hyprland-session.target"
+                      "1password"
+                      "systemctl --user start hyprpolkitagent"
+                    ];
+                  }
+                ];
           };
 
           programs.hyprpanel = {

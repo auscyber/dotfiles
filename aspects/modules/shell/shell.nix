@@ -3,6 +3,7 @@
   den.aspects.shell = {
     includes = [
       den.aspects.starship
+      den.aspects.nix-index
       den.aspects.jujutsu
     ];
     os = { pkgs, ... }: {
@@ -43,6 +44,7 @@
 
           enable = true;
         };
+        nix-index.enable = true;
 
         git = {
           enable = true;

@@ -15,9 +15,8 @@
 
           });
         drvs = [
-          "sketchybar"
           "input-leap"
-          "starship"
+          "sketchybar"
         ];
       in
       lib.genAttrs drvs (drv: patchLdFlags (super.${drv}));

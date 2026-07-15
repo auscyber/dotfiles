@@ -16,9 +16,7 @@
         config = {
           services.skhd = {
             enable = true;
-            config = lib.concatStringsSep "\n" (
-              lib.mapAttrsToList (k: v: "${k} : ${v}") binds
-            );
+            config = lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "${k} : ${v}") binds);
           };
           home.file."keybinds.json".text = builtins.toJSON binds;
         };

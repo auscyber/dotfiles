@@ -107,10 +107,27 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
       outputHashes = {
-        
+
       };
     };
     date = "2026-03-11";
+  };
+  pam_rssh = {
+    pname = "pam_rssh";
+    version = "v1.2.1";
+    src = fetchFromGitHub {
+      owner = "z4yx";
+      repo = "pam_rssh";
+      rev = "v1.2.1";
+      fetchSubmodules = true;
+      sha256 = "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=";
+    };
+    cargoLock."Cargo.lock" = {
+      lockFile = ./. + "/sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock";
+      outputHashes = {
+
+      };
+    };
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
@@ -164,10 +181,10 @@
   };
   zotero-attanger = {
     pname = "zotero-attanger";
-    version = "1.4.7";
+    version = "1.4.8";
     src = fetchurl {
-      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.7/zotero-attanger.xpi";
-      sha256 = "sha256-F80o1/2VW5KFssIrWhlhKl9dcsAqxFNHmwn8L08KMnY=";
+      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi";
+      sha256 = "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=";
     };
   };
   zotero-better-bibtex = {

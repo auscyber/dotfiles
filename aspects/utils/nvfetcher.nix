@@ -17,6 +17,11 @@ let
         default = null;
         description = "Function to fetch the nvfetcher source code. If not set, the default fetcher will be used.";
       };
+      git = lib.mkOption {
+        type = lib.types.nullOr (lib.types.attrs);
+        default = null;
+        description = "Git repository information for nvfetcher. If not set, the default will be used.";
+      };
       cargo_lock = lib.mkOption {
         type = lib.types.nullOr (lib.types.listOf lib.types.str);
         default = null;
@@ -56,12 +61,11 @@ let
   # overlays never affect them — and `withSystem` creates a host -> perSystem
   # back-edge that infinite-loops when a host is resolved *inside* the
   # flake-parts/perSystem scope (e.g. by `flake-parts-to-host` overlay collection).
-  mkAspect =
-    class: system:
-    {
-      ${class}._module.args.sources =
-        (import inputs.nixpkgs { inherit system; }).callPackage ../../_sources/generated.nix { };
-    };
+  mkAspect = class: system: {
+    ${class}._module.args.sources =
+      (import inputs.nixpkgs { inherit system; }).callPackage ../../_sources/generated.nix
+        { };
+  };
 
   osAspect =
     { host }:
@@ -122,7 +126,7 @@ in
       }:
       let
         nvFetcherConfig = lib.attrsets.filterAttrsRecursive (_: v: v != null) config.nvfetcher.sources;
-        configFile = pkgs.writers.writeTOML "nvfetcher.toml" nvFetcherConfig;
+        configFile = (pkgs.writers.writeTOML "nvfetcher.toml" nvFetcherConfig);
       in
       {
         devshells.default.packages = [ args.config.packages.update-sources ];
@@ -132,6 +136,7 @@ in
           name = "update-sources";
           text = ''
             set -eu
+            env -u GIT_DIR
             # nvchecker key file: matches the agenix-rendered template the
             # home-base aspect writes to $HOME/.config/nvchecker.toml.
             # Override with NVCHECKER_KEYS=/path or `--keyfile <path>`.

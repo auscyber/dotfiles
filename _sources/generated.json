@@ -171,6 +171,32 @@
         },
         "version": "18861f9d59e74ece8d867772cf07fa302c2dae98"
     },
+    "pam_rssh": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock",
+                {}
+            ]
+        },
+        "date": null,
+        "extract": null,
+        "name": "pam_rssh",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": true,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "z4yx",
+            "repo": "pam_rssh",
+            "rev": "v1.2.1",
+            "sha256": "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v1.2.1"
+    },
     "proton-ge-bin": {
         "cargoLock": null,
         "date": null,
@@ -265,11 +291,11 @@
         "pinned": false,
         "src": {
             "name": null,
-            "sha256": "sha256-F80o1/2VW5KFssIrWhlhKl9dcsAqxFNHmwn8L08KMnY=",
+            "sha256": "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=",
             "type": "url",
-            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.7/zotero-attanger.xpi"
+            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi"
         },
-        "version": "1.4.7"
+        "version": "1.4.8"
     },
     "zotero-better-bibtex": {
         "cargoLock": null,

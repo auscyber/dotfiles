@@ -20,9 +20,15 @@ in
         let
           classes =
             if lib.hasSuffix "darwin" (host.system or "") then
-              [ "darwin" "homeManager" ]
+              [
+                "darwin"
+                "homeManager"
+              ]
             else
-              [ "nixos" "homeManager" ];
+              [
+                "nixos"
+                "homeManager"
+              ];
 
           captured = den.lib.capture.captureWithPathsWith {
             inherit classes;
@@ -55,27 +61,21 @@ in
 
       # Package info from legacyPackages.my
       myPackages = config.legacyPackages.my or { };
-      packageList = lib.mapAttrsToList (
-        name: pkg:
-        {
-          inherit name;
-          version = pkg.version or "unknown";
-          description = pkg.meta.description or "";
-          homepage = pkg.meta.homepage or "";
-        }
-      ) myPackages;
+      packageList = lib.mapAttrsToList (name: pkg: {
+        inherit name;
+        version = pkg.version or "unknown";
+        description = pkg.meta.description or "";
+        homepage = pkg.meta.homepage or "";
+      }) myPackages;
 
       # Data for mustache template
       data = {
-        systems = lib.mapAttrsToList (
-          hostName: host:
-          {
-            name = hostName;
-            system = host.system or "unknown";
-            roles = lib.concatStringsSep ", " (host.roles or [ ]);
-            mermaid = hostDiagrams.${hostName}.mermaid;
-          }
-        ) allHosts;
+        systems = lib.mapAttrsToList (hostName: host: {
+          name = hostName;
+          system = host.system or "unknown";
+          roles = lib.concatStringsSep ", " (host.roles or [ ]);
+          mermaid = hostDiagrams.${hostName}.mermaid;
+        }) allHosts;
 
         packages = packageList;
       };
@@ -84,8 +84,7 @@ in
 
       # Write SVGs to files
       svgFiles = lib.mapAttrs (
-        hostName: diag:
-        pkgs.writeText "${hostName}.svg" (builtins.readFile diag.svg)
+        hostName: diag: pkgs.writeText "${hostName}.svg" (builtins.readFile diag.svg)
       ) hostDiagrams;
     in
     {
@@ -103,9 +102,7 @@ in
 
       packages.docs-diagrams = pkgs.runCommand "docs-diagrams" { } ''
         mkdir -p $out
-        ${lib.concatStringsSep "\n" (
-          lib.mapAttrsToList (name: svg: "cp ${svg} $out/${name}.svg") svgFiles
-        )}
+        ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: svg: "cp ${svg} $out/${name}.svg") svgFiles)}
       '';
     };
 }

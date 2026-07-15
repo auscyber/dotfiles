@@ -12,15 +12,11 @@ let
       allBySystem = den.hosts or { };
       keepBuilders =
         hosts:
-        lib.filterAttrs (_: host:
-          host ? builder
-          && host.builder != null
-          && (host.builder.ipAddress or "") != ""
+        lib.filterAttrs (
+          _: host: host ? builder && host.builder != null && (host.builder.ipAddress or "") != ""
         ) hosts;
     in
-    lib.foldl' lib.recursiveUpdate { } (
-      lib.attrValues (lib.mapAttrs (_: keepBuilders) allBySystem)
-    );
+    lib.foldl' lib.recursiveUpdate { } (lib.attrValues (lib.mapAttrs (_: keepBuilders) allBySystem));
 
   mkBuildMachine = host: {
     protocol = "ssh-ng";

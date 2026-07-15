@@ -21,8 +21,8 @@ let
   domain = "search.ivymect.in";
 in
 {
-  flake-file.inputs.searchix = {
-    url = "git+https://git.alin.ovh/searchix?ref=refs/tags/v0.4.4";
+  ff.searchix = {
+    url = "git+https://git.sr.ht/~alanpearce/searchix";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -43,19 +43,17 @@ in
       let
         optionSources = import ../../docs/_searchix-sources.nix { inherit lib pkgs inputs; };
 
-        mkSource =
-          _: src:
-          {
-            inherit (src) key name order;
-            enable = true;
-            fetcher = "download";
-            importer = "options";
-            url = "http://127.0.0.1:${toString sourcePort}/${src.key}";
-            # options.json is a flat { "option.name": {...} } object.
-            jsonDepth = 1;
-            timeout = "5m";
-            repo = optionSources.repo;
-          };
+        mkSource = _: src: {
+          inherit (src) key name order;
+          enable = true;
+          fetcher = "download";
+          importer = "options";
+          url = "http://127.0.0.1:${toString sourcePort}/${src.key}";
+          # options.json is a flat { "option.name": {...} } object.
+          jsonDepth = 1;
+          timeout = "5m";
+          repo = optionSources.repo;
+        };
       in
       {
         imports = [ inputs.searchix.nixosModules.web ];

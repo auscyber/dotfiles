@@ -23,7 +23,8 @@
             enable-ssh-support
             debug-level 2
           '';
-        } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+        }
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
           pinentry.package = pkgs.pinentry_mac;
           pinentry.program = "pinentry-mac";
         };

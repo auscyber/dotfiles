@@ -141,11 +141,7 @@ let
     key: options:
     pkgs.runCommand "searchix-source-${key}" { } ''
       mkdir -p "$out"
-      cp ${
-        builtins.toFile "options.json" (
-          builtins.unsafeDiscardStringContext (builtins.toJSON (withLinkableDeclarations options))
-        )
-      } "$out/options.json"
+      cp ${builtins.toFile "options.json" (builtins.unsafeDiscardStringContext (builtins.toJSON (withLinkableDeclarations options)))} "$out/options.json"
       printf '%s' ${lib.escapeShellArg revision} > "$out/revision"
     '';
 
@@ -197,8 +193,7 @@ let
   # Served as a whole by nginx: one directory per source key.
   tree = pkgs.runCommand "searchix-option-sources" { } (
     lib.concatStringsSep "\n" (
-      [ "mkdir -p $out" ]
-      ++ lib.mapAttrsToList (_: src: "ln -s ${src.source} $out/${src.key}") meta
+      [ "mkdir -p $out" ] ++ lib.mapAttrsToList (_: src: "ln -s ${src.source} $out/${src.key}") meta
     )
   );
 in

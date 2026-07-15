@@ -92,7 +92,10 @@ in
         lib.genAttrs cfg.packageNames (
           pn:
           super.${pn}.override (overrideBefore: {
-            stdenv = let newStdenv = self.ccacheStdenv.override ( { inherit (overrideBefore) stdenv; }) in
+            stdenv =
+              let
+                newStdenv = self.ccacheStdenv.override ({ inherit (overrideBefore) stdenv; });
+              in
               if cfg.trace then builtins.trace "with ccache: ${pn}" newStdenv else newStdenv;
           })
         )

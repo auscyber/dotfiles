@@ -19,19 +19,32 @@ in
     includes = [
       # System-level fonts: fires when the host advertises `gui`.
       (den.lib.policy.when
-        ({ host ? { }, ... }: lib.elem "gui" (host.roles or [ ]))
+        (
+          {
+            host ? { },
+            ...
+          }:
+          lib.elem "gui" (host.roles or [ ])
+        )
         {
           os =
             { pkgs, ... }:
             {
               fonts.packages = fontPkgs pkgs;
             };
-        })
+        }
+      )
 
       # User-level fonts: fires when the user advertises `gui`, regardless
       # of whether a host is present. This is what makes HM-only targets work.
       (den.lib.policy.when
-        ({ user ? { }, ... }: lib.elem "gui" (user.roles or [ ]))
+        (
+          {
+            user ? { },
+            ...
+          }:
+          lib.elem "gui" (user.roles or [ ])
+        )
         {
           homeManager =
             { pkgs, ... }:
@@ -39,7 +52,8 @@ in
               home.packages = fontPkgs pkgs;
               fonts.fontconfig.enable = true;
             };
-        })
+        }
+      )
     ];
   };
 

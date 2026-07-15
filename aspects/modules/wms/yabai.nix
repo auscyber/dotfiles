@@ -57,20 +57,20 @@
               window_gap = 10;
             };
             extraConfig =
-              (lib.concatMapAttrsStringSep "\n"
-                (name: sp:
-                  let
-                    rules = lib.concatStringsSep " " sp.rules;
-                    value = "${
-                      lib.concatMapAttrsStringSep " " (k: v: "${k}=\"${v}\"") sp.detectionRules
-                    } manage=off sticky=on scratchpad=${name} ${rules}";
-                  in
-                  ''
-                    # Scratchpad: ${name}
-                    yabai -m rule --add ${value}
-                    yabai -m rule --apply ${value}
-                  '')
-                scratchpads)
+              (lib.concatMapAttrsStringSep "\n" (
+                name: sp:
+                let
+                  rules = lib.concatStringsSep " " sp.rules;
+                  value = "${
+                    lib.concatMapAttrsStringSep " " (k: v: "${k}=\"${v}\"") sp.detectionRules
+                  } manage=off sticky=on scratchpad=${name} ${rules}";
+                in
+                ''
+                  # Scratchpad: ${name}
+                  yabai -m rule --add ${value}
+                  yabai -m rule --apply ${value}
+                ''
+              ) scratchpads)
               + ''
                 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
                 sudo yabai --load-sa

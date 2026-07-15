@@ -71,7 +71,11 @@
     };
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        darwin.follows = "darwin";
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
@@ -164,6 +168,10 @@
     };
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-openclaw = {
       url = "github:openclaw/nix-openclaw";
       inputs = {
@@ -211,6 +219,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix.url = "github:nix-community/stylix";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {
