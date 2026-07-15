@@ -27,6 +27,26 @@ let
         default = null;
         description = "Path to the cargo lock file for nvfetcher. If not set, the default will be used.";
       };
+      script = lib.mkOption {
+        type = lib.types.nullOr (lib.types.functionTo lib.types.lines);
+        default = null;
+        description = ''
+          Optional post-fetch hook, written as `pkgs: <shell script>`.
+
+          Run at update time by `update-sources` (and standalone by
+          `postprocess-sources`) — NOT during evaluation — so it may hit the
+          network. The fetched source tree is in `$src` and a scratch output
+          directory in `$out`; whatever the script leaves in `$out` is merged
+          into the source's committed `_sources/sha256-<srcHash>/` folder and
+          surfaced to consumers as `sources.<name>.output` and
+          `sources.extra.<name>`.
+
+          `pkgs` is the same perSystem package set `update-sources` runs in.
+          There is deliberately no separate inputs list: reference tools by full
+          store path (e.g. `''${pkgs.cargo}/bin/cargo`) or set up `PATH` yourself
+          inside the script.
+        '';
+      };
     };
   });
 
@@ -54,7 +74,49 @@ let
     Contextual — when included in a host aspect, supplies `sources` for the host's
     OS class; when included in a user/home aspect, supplies `sources` for the
     corresponding Home Manager configuration.
+
+    ## Post-fetch scripts
+
+    A source may carry a `script` (`pkgs: <shell>`). It runs at update time with
+    the fetched tree in `$src` and a scratch dir in `$out`; the `$out` contents
+    are merged into the source's `_sources/sha256-<srcHash>/` folder and
+    re-exposed as `sources.<name>.output` and under `sources.extra.<name>`.
   '';
+
+  # Non-nvfetcher option keys that must never reach the generated TOML.
+  nonTomlKeys = [ "script" ];
+
+  # Sources that declare a post-fetch `script`.
+  scriptedSources = lib.filterAttrs (_: v: v.script != null) config.nvfetcher.sources;
+
+  # Augment a `sources` set with each source's on-disk artifact folder
+  # `_sources/sha256-<srcHash>/` — where nvfetcher stores cargo_lock/extract
+  # files and where post-fetch `script`s bake their output. Hashes come from
+  # `generated.json` (a pure file read); we deliberately do NOT read
+  # `srcs.<name>.src.outputHash`, because forcing `.src` realises
+  # builtins.fetchTarball sources over the network at *eval* time. Folders are
+  # checked against disk, so `.output`/`.extra` reflect what actually exists.
+  # Verbatim twin of the helper in aspects/utils/overlays.nix.
+  withExtra =
+    srcs:
+    let
+      meta = builtins.fromJSON (builtins.readFile ../../_sources/generated.json);
+      sanitize = builtins.replaceStrings [ "/" ] [ "_" ];
+      folderOf =
+        name:
+        let
+          h = meta.${name}.src.sha256 or null;
+        in
+        if h == null then null else ../../_sources + "/${sanitize h}";
+      existing = lib.filterAttrs (_: p: p != null && builtins.pathExists p) (
+        lib.mapAttrs (name: _: folderOf name) srcs
+      );
+    in
+    srcs
+    // {
+      extra = existing;
+    }
+    // lib.mapAttrs (name: p: srcs.${name} // { output = p; }) existing;
 
   # Build `sources` from a bare `inputs.nixpkgs` rather than `withSystem system`
   # (the final perSystem pkgs). nvfetcher sources are plain fetcher derivations —
@@ -62,9 +124,9 @@ let
   # back-edge that infinite-loops when a host is resolved *inside* the
   # flake-parts/perSystem scope (e.g. by `flake-parts-to-host` overlay collection).
   mkAspect = class: system: {
-    ${class}._module.args.sources =
-      (import inputs.nixpkgs { inherit system; }).callPackage ../../_sources/generated.nix
-        { };
+    ${class}._module.args.sources = withExtra (
+      (import inputs.nixpkgs { inherit system; }).callPackage ../../_sources/generated.nix { }
+    );
   };
 
   osAspect =
@@ -125,14 +187,61 @@ in
         ...
       }:
       let
-        nvFetcherConfig = lib.attrsets.filterAttrsRecursive (_: v: v != null) config.nvfetcher.sources;
-        configFile = (pkgs.writers.writeTOML "nvfetcher.toml" nvFetcherConfig);
-      in
-      {
-        devshells.default.packages = [ args.config.packages.update-sources ];
-        _module.args.sources = pkgs.callPackage ../../_sources/generated.nix { };
+        # Strip our non-nvfetcher option keys before serialising the TOML.
+        tomlSources = lib.mapAttrs (_: v: removeAttrs v nonTomlKeys) config.nvfetcher.sources;
+        nvFetcherConfig = lib.attrsets.filterAttrsRecursive (_: v: v != null) tomlSources;
+        configFile = pkgs.writers.writeTOML "nvfetcher.toml" nvFetcherConfig;
 
-        packages.update-sources = pkgs.writeShellApplication {
+        # Raw (un-augmented) sources — used to realise each `src` for its script.
+        rawSources = pkgs.callPackage ../../_sources/generated.nix { };
+
+        # One shell fragment per scripted source: realise `$src`, run the user
+        # script against a scratch `$out`, and merge `$out` into the source's
+        # `_sources/sha256-<srcHash>/` folder (same place nvfetcher stores its own
+        # extract/cargo_lock files — so it is NOT wiped). Run relative to the repo
+        # root (cwd), matching how nvfetcher itself writes `_sources/generated.*`.
+        mkSnippet =
+          name: cfg:
+          let
+            folder = builtins.replaceStrings [ "/" ] [ "_" ] rawSources.${name}.src.outputHash;
+          in
+          ''
+            echo ">> postprocess: ${name}"
+            src="${rawSources.${name}.src}"
+            export src
+            out="$(mktemp -d)"
+            export out
+            (
+            ${cfg.script pkgs}
+            )
+            dest="_sources/${folder}"
+            mkdir -p "$dest"
+            cp -RL "$out"/. "$dest"/
+            chmod -R u+w "$dest"
+          '';
+
+        postprocessSources = (pkgs.writeShellApplication {
+          name = "postprocess-sources";
+          # Only the wrapper's own coreutils (mktemp/mkdir/cp/chmod). Script tool
+          # deps are the script's business — reference them by full store path.
+          runtimeInputs = [ pkgs.coreutils ];
+          text = ''
+            set -eu
+            if [ ! -e flake.nix ]; then
+            	echo "postprocess-sources: run from the repo root (flake.nix not found)" >&2
+            	exit 1
+            fi
+            ${lib.concatStringsSep "\n" (lib.mapAttrsToList mkSnippet scriptedSources)}
+            echo "Post-processed sources written to _sources/."
+          '';
+        }).overrideAttrs
+          (_: {
+            # `script`s are arbitrary user shell embedded verbatim; don't fail the
+            # build on shellcheck lint (e.g. SC2155) or `bash -n` over them.
+            checkPhase = ":";
+          });
+
+        updateSources = pkgs.writeShellApplication {
           name = "update-sources";
           text = ''
             set -eu
@@ -162,7 +271,29 @@ in
             	${lib.getExe inputs'.nvfetcher.packages.default} -c ${configFile}
             fi
             echo "Source code updated successfully."
+
+            echo "Post-processing sources..."
+            ${lib.getExe postprocessSources}
           '';
+        };
+      in
+      {
+        devshells.default.packages = [
+          updateSources
+          postprocessSources
+        ];
+        _module.args.sources = withExtra rawSources;
+
+        packages.update-sources = updateSources;
+        packages.postprocess-sources = postprocessSources;
+
+        apps.update-sources = {
+          type = "app";
+          program = lib.getExe updateSources;
+        };
+        apps.postprocess-sources = {
+          type = "app";
+          program = lib.getExe postprocessSources;
         };
       };
   };

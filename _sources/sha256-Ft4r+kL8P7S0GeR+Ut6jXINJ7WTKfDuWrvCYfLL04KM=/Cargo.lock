@@ -411,15 +411,6 @@ checksum = "7655c9839580ee829dfacba1d1278c2b7883e50a277ff7541299489d6bdfdc45"
 
 [[package]]
 name = "itertools"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
@@ -446,7 +437,7 @@ dependencies = [
 
 [[package]]
 name = "kanata-keyberon"
-version = "0.1110.0"
+version = "0.1120.2"
 dependencies = [
  "arraydeque",
  "heapless",
@@ -470,7 +461,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "console_error_panic_hook",
- "itertools 0.13.0",
+ "itertools",
  "js-sys",
  "kanata-parser",
  "lsp-server",
@@ -488,12 +479,11 @@ dependencies = [
 
 [[package]]
 name = "kanata-parser"
-version = "0.1110.0"
+version = "0.1120.2"
 dependencies = [
  "anyhow",
  "bitflags 2.13.0",
  "bytemuck",
- "itertools 0.12.1",
  "kanata-keyberon",
  "log",
  "miette",
@@ -675,9 +665,9 @@ dependencies = [
 
 [[package]]
 name = "patricia_tree"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31f2f4539bffe53fc4b4da301df49d114b845b077bd5727b7fe2bd9d8df2ae68"
+checksum = "edb45b6331bbdbb54c9a29413703e892ab94f83a31e4a546c778495a91e7fbca"
 dependencies = [
  "bitflags 2.13.0",
 ]
@@ -909,9 +899,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.118"
+version = "2.0.119"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9ae57f904213ebb649ce6895b8a66c66f0203b9319718f69a5612a065b1422"
+checksum = "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297"
 dependencies = [
  "proc-macro2",
  "quote",

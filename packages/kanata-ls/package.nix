@@ -19,7 +19,10 @@ rustPlatform.buildRustPackage rec {
   pname = "kanata-ls";
   sourceRoot = "${src.name}/kanata-ls";
 
-  cargoLock.lockFile = ./Cargo.lock;
+  # Lock file generated at update time by the `vscode-kanata` source's `script`
+  # (see packages/kanata-ls/default.nix) and baked into
+  # _sources/postprocess/vscode-kanata/. Regenerate with `nix run .#postprocess-sources`.
+  cargoLock.lockFile = source.output + "/Cargo.lock";
   # copy kanata.src to the build directory so that the build script can find it
   checkFlags = [
     # reason for disabling test
@@ -28,7 +31,7 @@ rustPlatform.buildRustPackage rec {
   ];
 
   postPatch = ''
-    ln -s ${./Cargo.lock} Cargo.lock
+    ln -sf ${source.output}/Cargo.lock Cargo.lock
   '';
   meta = with lib; {
     description = "Kanata Language Server";

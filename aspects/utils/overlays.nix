@@ -51,6 +51,34 @@ let
       if builtins.isList v then map (tagOverlay name) v else [ (tagOverlay name v) ]
     ) (lib.attrNames overlays);
 
+  # Verbatim twin of the helper in aspects/utils/nvfetcher.nix. Overlays are
+  # collected against a `sources` built *here*, independently of the nvfetcher
+  # module, so the same `.output`/`.extra` augmentation (each source's on-disk
+  # `_sources/sha256-<srcHash>/` folder) must be applied for overlay
+  # configurators (e.g. kanata-ls) to see `sources.<name>.output`. Hashes come
+  # from generated.json (pure read) — never `srcs.<name>.src.outputHash`, which
+  # would realise builtins.fetchTarball sources over the network at eval time.
+  withExtra =
+    srcs:
+    let
+      meta = builtins.fromJSON (builtins.readFile ../../_sources/generated.json);
+      sanitize = builtins.replaceStrings [ "/" ] [ "_" ];
+      folderOf =
+        name:
+        let
+          h = meta.${name}.src.sha256 or null;
+        in
+        if h == null then null else ../../_sources + "/${sanitize h}";
+      existing = lib.filterAttrs (_: p: p != null && builtins.pathExists p) (
+        lib.mapAttrs (name: _: folderOf name) srcs
+      );
+    in
+    srcs
+    // {
+      extra = existing;
+    }
+    // lib.mapAttrs (name: p: srcs.${name} // { output = p; }) existing;
+
   overlay-apply =
     {
       config,
@@ -196,7 +224,7 @@ in
         args
         // {
           pkgs = basePkgs;
-          sources = basePkgs.callPackage ../../_sources/generated.nix { };
+          sources = withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
         };
     })
   ];
@@ -223,7 +251,7 @@ in
       basePkgs = import inputs.nixpkgs {
         inherit system;
       };
-      sources = basePkgs.callPackage ../../_sources/generated.nix { };
+      sources = withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
 
       # Registry walk over `den.aspects.packages` (configurator shapes that are
       # not included into any entity, so the class route below never sees them).
