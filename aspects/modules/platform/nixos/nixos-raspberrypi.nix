@@ -8,7 +8,12 @@ let
 in
 {
   flake-file.inputs = {
-    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+      # Upstream pins nixos-25.11; follow root nixpkgs so stylix (which targets
+      # 26.11) can define options like services.displayManager.generic here.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     nixos-images = {
       url = "github:nvmd/nixos-images/sdimage-installer";

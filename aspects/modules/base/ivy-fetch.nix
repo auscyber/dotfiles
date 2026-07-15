@@ -16,9 +16,9 @@
 
       # Run `fetch -p` (prints the phoebe header) at every interactive shell
       # start. These options are no-ops when the shell isn't enabled.
-      programs.fish.interactiveShellInit = lib.mkAfter "fetch -p";
-      programs.zsh.initContent = lib.mkAfter "fetch -p";
-      programs.nushell.extraConfig = lib.mkAfter "fetch -p";
+      programs.fish.interactiveShellInit = lib.mkAfter "fetch -s";
+      programs.zsh.initContent = lib.mkAfter "fetch -s";
+      programs.nushell.extraConfig = lib.mkAfter "fetch -s";
     };
   };
 

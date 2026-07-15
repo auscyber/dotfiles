@@ -13,6 +13,9 @@
           path = "x3xvsrif.default";
           isDefault = true;
           settings.extensions.update.autoUpdateDefault = false;
+          # Zotero 7 local API (localhost:23119) for zotero-mcp's local mode.
+          settings.extensions.zotero.httpServer.enabled = true;
+          settings.extensions.zotero.httpServer.localAPI.enabled = true;
           extensions.packages = with pkgs.zoteroAddons; [
             better-bibtex
             attanger

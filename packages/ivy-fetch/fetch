@@ -274,8 +274,11 @@ segment () {
     printf "%s" "$1"
     down_c 1
 }
+
+declare -A rowCount
 data () {
     _variable="$1"
+	((rowCount++))
     _variable_value=${2:-" $(eval "get_$1")"}
 #	echo "fetching $1"
     if [ -n "${_variable_value# }" ]
@@ -297,8 +300,8 @@ fi
 data "os" " $os"
 data "cpu" " $cpu"
 data "mem" " ${memused}MB / ${memtotal}MB"
+data "packages"
 if [ -z ${_small+x} ]; then
-    data "packages"
     data "gpu" " $gpu"
     data "kernel"
     data "wm" " $wm"

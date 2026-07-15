@@ -41,7 +41,7 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn patchedInputs;
+        inputsFn (patchedInputs);
     in
     builtins.removeAttrs output [ "newInputs" ];
 
@@ -111,6 +111,7 @@
       };
     };
     emacs.url = "github:nix-community/emacs-overlay";
+    fenix.url = "github:nix-community/fenix";
     flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
@@ -140,6 +141,7 @@
       url = "github:typewhisper/homebrew-tap";
       flake = false;
     };
+    idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     impermanence.url = "github:nix-community/impermanence";
     import-tree.url = "github:vic/import-tree";
     kanata = {
@@ -189,7 +191,10 @@
       };
     };
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
-    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
@@ -226,6 +231,10 @@
         home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
       };
+    };
+    zeroclaw = {
+      url = "github:zeroclaw-labs/zeroclaw";
+      inputs.fenix.follows = "fenix";
     };
   };
 }

@@ -21,6 +21,7 @@
     darwin.system.stateVersion = 5;
 
     homeManager.home.stateVersion = "24.05";
+    #    hmDarwin.targets.darwin.copyApps = true;
     includes = [
       den.batteries.inputs'
       den.batteries.self'

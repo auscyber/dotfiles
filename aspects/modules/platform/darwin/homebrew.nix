@@ -19,12 +19,14 @@ in
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
   den.policies.route-casks =
-    { host, user, ... }:
+    { ... }:
     let
       inherit (den.lib.policy) pipe;
     in
     [
-      (pipe.from "casks" [
+      (pipe.from "brew" [
+        pipe.collect
+        ({ host, ... }: true)
         pipe.expose
       ])
     ];
@@ -86,6 +88,7 @@ in
                 [ ]
             ) brew
           );
+          trust.taps = builtins.attrNames config.nix-homebrew.taps;
           mutableTaps = false;
           autoMigrate = true;
         };

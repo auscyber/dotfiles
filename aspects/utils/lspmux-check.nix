@@ -7,89 +7,111 @@
 # quietly runs unmultiplexed -- or not at all. This check diffs our table against
 # lspconfig's own `lsp/<name>.lua` so that failure is loud instead.
 #
+# The server table is the `lsp-servers` den class, collected into the perSystem
+# option `_lspServers` below (declared + routed by aspects/modules/editors/lspmux).
+# `_lspServers` is keyed by lspconfig name; each entry carries `exe`/`args`/
+# `dynamicCmd` (the check ignores `package`).
+#
 # Not gated to a single system: it is a grep over a vim plugin, it can run anywhere.
-{
-  perSystem = { pkgs, ... }: {
-    checks.lspmux-server-names =
-      let
-        servers = import ../modules/editors/_lspmux-servers.nix pkgs;
-
-        # <lspconfig-name> <dynamic|static> <cmd...>  -- the cmd we believe lspconfig
-        # spawns for this server
-        spec = lib.concatStringsSep "\n" (
-          map (
-            server:
-            lib.concatStringsSep " " (
-              [
-                server.lspconfig
-                (if server.dynamicCmd or false then "dynamic" else "static")
-                server.exe
-              ]
-              ++ (server.args or [ ])
-            )
-          ) servers
-        );
-      in
-      pkgs.runCommand "check-lspmux-server-names"
-        {
-          lspconfig = pkgs.vimPlugins.nvim-lspconfig;
-          spec = pkgs.writeText "lspmux-servers" spec;
-        }
-        ''
-          fail=0
-
-          while read -r name kind exe args; do
-            lua="$lspconfig/lsp/$name.lua"
-            want="$exe''${args:+ $args}"
-
-            if [ ! -f "$lua" ]; then
-              echo "FAIL $name: nvim-lspconfig has no lsp/$name.lua (renamed or dropped upstream)" >&2
-              fail=1
-              continue
-            fi
-
-            if grep -qE "^[[:space:]]*cmd = function" "$lua"; then
-              if [ "$kind" != dynamic ]; then
-                echo "FAIL $name: lspconfig now computes cmd at runtime; mark it dynamicCmd" >&2
-                fail=1
-              elif grep -qF "'$exe'" "$lua"; then
-                echo "ok   $name -> $exe (cmd computed at runtime, shim shadows the name)"
-              else
-                echo "FAIL $name: runtime cmd never mentions '$exe'" >&2
-                fail=1
-              fi
-              continue
-            fi
-
-            if [ "$kind" = dynamic ]; then
-              echo "FAIL $name: marked dynamicCmd but lspconfig now uses a static cmd" >&2
-              fail=1
-              continue
-            fi
-
-            # `  cmd = { 'pyright-langserver', '--stdio' },` -> `pyright-langserver --stdio`
-            got=$(
-              sed -n "s/^[[:space:]]*cmd = {\(.*\)}.*/\1/p" "$lua" \
-                | head -1 \
-                | grep -o "'[^']*'" \
-                | tr -d "'" \
-                | tr '\n' ' ' \
-                | sed 's/ *$//'
-            )
-
-            if [ -z "$got" ]; then
-              echo "FAIL $name: could not read cmd out of lsp/$name.lua" >&2
-              fail=1
-            elif [ "$got" != "$want" ]; then
-              echo "FAIL $name: lspconfig spawns [$got] but we wrap [$want]" >&2
-              fail=1
-            else
-              echo "ok   $name -> $want"
-            fi
-          done < "$spec"
-
-          [ $fail -eq 0 ] || exit 1
-          echo ok > $out
-        '';
+let
+  # Entries carry a `package` selector (a function), so equality-merge throws when
+  # the same class subtree is collected from more than one host. They are the same
+  # declaration, so dedup by taking the first -- as overlays.nix does for overlayFn.
+  serverSpecType = lib.mkOptionType {
+    name = "lspmux-server-spec";
+    description = "an lsp-servers class entry";
+    check = builtins.isAttrs;
+    merge = _loc: defs: (builtins.head defs).value;
   };
+in
+{
+  perSystem =
+    { config, pkgs, ... }:
+    {
+      options._lspServers = lib.mkOption {
+        type = lib.types.attrsOf serverSpecType;
+        default = { };
+        description = "Language servers collected from the `lsp-servers` class, keyed by lspconfig name.";
+      };
+
+      config.checks.lspmux-server-names =
+        let
+          # <lspconfig-name> <dynamic|static> <cmd...>  -- the cmd we believe lspconfig
+          # spawns for this server
+          spec = lib.concatStringsSep "\n" (
+            lib.mapAttrsToList (
+              lspconfig: server:
+              lib.concatStringsSep " " (
+                [
+                  lspconfig
+                  (if server.dynamicCmd or false then "dynamic" else "static")
+                  server.exe
+                ]
+                ++ (server.args or [ ])
+              )
+            ) config._lspServers
+          );
+        in
+        pkgs.runCommand "check-lspmux-server-names"
+          {
+            lspconfig = pkgs.vimPlugins.nvim-lspconfig;
+            spec = pkgs.writeText "lsp-servers" spec;
+          }
+          ''
+            fail=0
+
+            while read -r name kind exe args; do
+              lua="$lspconfig/lsp/$name.lua"
+              want="$exe''${args:+ $args}"
+
+              if [ ! -f "$lua" ]; then
+                echo "FAIL $name: nvim-lspconfig has no lsp/$name.lua (renamed or dropped upstream)" >&2
+                fail=1
+                continue
+              fi
+
+              if grep -qE "^[[:space:]]*cmd = function" "$lua"; then
+                if [ "$kind" != dynamic ]; then
+                  echo "FAIL $name: lspconfig now computes cmd at runtime; mark it dynamicCmd" >&2
+                  fail=1
+                elif grep -qF "'$exe'" "$lua"; then
+                  echo "ok   $name -> $exe (cmd computed at runtime, shim shadows the name)"
+                else
+                  echo "FAIL $name: runtime cmd never mentions '$exe'" >&2
+                  fail=1
+                fi
+                continue
+              fi
+
+              if [ "$kind" = dynamic ]; then
+                echo "FAIL $name: marked dynamicCmd but lspconfig now uses a static cmd" >&2
+                fail=1
+                continue
+              fi
+
+              # `  cmd = { 'pyright-langserver', '--stdio' },` -> `pyright-langserver --stdio`
+              got=$(
+                sed -n "s/^[[:space:]]*cmd = {\(.*\)}.*/\1/p" "$lua" \
+                  | head -1 \
+                  | grep -o "'[^']*'" \
+                  | tr -d "'" \
+                  | tr '\n' ' ' \
+                  | sed 's/ *$//'
+              )
+
+              if [ -z "$got" ]; then
+                echo "FAIL $name: could not read cmd out of lsp/$name.lua" >&2
+                fail=1
+              elif [ "$got" != "$want" ]; then
+                echo "FAIL $name: lspconfig spawns [$got] but we wrap [$want]" >&2
+                fail=1
+              else
+                echo "ok   $name -> $want"
+              fi
+            done < "$spec"
+
+            [ $fail -eq 0 ] || exit 1
+            echo ok > $out
+          '';
+    };
 }

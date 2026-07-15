@@ -636,8 +636,6 @@
         purescript-vim
         dhall-vim
         zig-vim
-        idris2-vim
-        idris2-nvim
         kotlin-vim
         agda-vim
         conjure

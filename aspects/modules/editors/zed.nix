@@ -56,7 +56,7 @@
                 activate_script = "default";
               };
             };
-            env.TERM = "alacritty";
+            env.TERM = "ghostty";
             font_family = "FiraCode Nerd Font";
             font_size = null;
             line_height = "comfortable";
@@ -71,6 +71,11 @@
           # server instance per project instead of running one each. `path_lookup` is
           # off: the shim does the $PATH lookup itself, and unlike zed it knows to
           # skip itself and to fall back to a pinned server when the project has none.
+          #
+          # Driven off the `lsp-servers` class: every server whose entry carries a
+          # `zed` name (`nix`, `rust-analyzer`, ...) is surfaced here automatically,
+          # keyed by that zed-side name. `pkgs.lspmuxed` also holds package/exe-name
+          # aliases of each server, so we key off the lspconfig entry to hit each once.
           lsp =
             let
               inherit (pkgs) lspmuxed;
@@ -81,10 +86,14 @@
                 };
               };
             in
-            {
-              rust-analyzer = binary lspmuxed.rust_analyzer;
-              nix = binary lspmuxed.nil_ls;
-            };
+            lib.mapAttrs' (
+              _key: server: lib.nameValuePair server.passthru.lspmux.zed (binary server)
+            ) (
+              lib.filterAttrs (
+                key: server:
+                key == server.passthru.lspmux.lspconfig && server.passthru.lspmux.zed != null
+              ) lspmuxed
+            );
           vim_mode = true;
           load_direnv = "shell_hook";
           base_keymap = "VSCode";

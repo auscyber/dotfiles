@@ -1,10 +1,15 @@
 {
+  den.aspects.starship.os = { pkgs, ... }: {
+    environment.shells = [ pkgs.zsh ];
+    programs.zsh.enable = true;
+  };
   den.aspects.starship.homeManager = { user, ... }: {
+
     programs.starship = {
       enable = true;
       settings = {
         format = ''
-          $username$hostname$status$directory$shell$rust$package$cmd_duration$vcs_status$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel
+          $username$hostname$status$directory$shell$rust$package$cmd_duration''${custom.vcs_status}$nix_shell$haskell$purescript$python$julia$lua$golang$docker_context$package$fennel
           $character'';
 
         scan_timeout = 10;
@@ -16,29 +21,32 @@
           fish_indicator = "[fsh](#CF9FFF)";
         };
         custom.jj = {
-          when = true;
+          when = ''
+            jj root > /dev/null 2>&1; [[ $? -eq 0 ]]
+          '';
+          detect_files = [ ".jj" ];
 
           command = "{ jj log -r 'closest_bookmark(@)' -T '\"  \" ++ bookmarks ++ \" \"' --no-graph; jj log -r @ -T prompt --no-graph --ignore-working-copy; } | tr '\\n' ' '";
 
           format = " $output ";
+          shell = "zsh";
           ignore_timeout = true;
-          shell = "bash";
         };
 
         custom.vcs_status = {
           when = true;
 
+          shell = "zsh";
+
           command = "jj root > /dev/null 2>&1; [[ $? -eq 0 ]] && starship module custom.jj || starship module git_status";
 
-          style = "fg:#6b3d99 bg:#ffff66";
+          style = "fg:#ffff66";
           format = "[ $output ]($style)";
-          shell = "bash";
         };
         git_status = {
           style = "fg:#6b3d99 bg:#ffff66";
           # format = '[($all_status$ahead_behind)]($style)'
           format = "$all_status$ahead_behind";
-          disabled = true;
         };
 
         character = {

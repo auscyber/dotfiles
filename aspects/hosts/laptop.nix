@@ -14,7 +14,7 @@
     users.ivypierlot = {
       wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
       flakeFolder = "/Users/ivypierlot/dendritic";
-      hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H";
+      hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGtwIOzVblYtrx014SIyldn8EhdwxzSVRXGMz5LLtunc ivypierlot@Ivys-MacBook-Pro";
       roles = [
         "study"
         "gui"
@@ -93,6 +93,10 @@
         ];
       };
 
+  };
+
+  den.aspects.laptop-brew = {
+    includes = [ den.aspects.homebrew ];
     brew = {
       brews = [
         "mole"
@@ -111,12 +115,12 @@
         "beeper"
         "amethyst"
         "steam"
-        "affinity-designer"
-        "affinity-publisher"
+        #        "affinity-designer"
+        #        "affinity-publisher"
         "plover"
         "postman"
-        "tidal"
-        "zoom"
+        #        "tidal"
+        #        "zoom"
       ];
     };
   };
@@ -125,6 +129,8 @@
     study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.homebrew
+      #      den.aspects.zed
+      den.aspects.idris
       den.aspects.agenix-rekey
       den.aspects.onepassword
       den.aspects.nixvim
@@ -145,18 +151,20 @@
       den.aspects.rift
       den.aspects.kanata
       den.aspects.dev
+      den.aspects.opencode
+      den.aspects.openclaw
+      den.aspects.llama-cpp
+      #      den.aspects.zeroclaw
       den.aspects.file-local
       den.batteries.primary-user
       den.aspects.packages.cotabby
       #      <zen>
     ];
+    provides.Ivys-MacBook-Pro.includes = [ den.aspects.laptop-brew ];
     provides.Ivys-MacBook-Pro.provides.to-users = {
-      brew.casks = [ "discord" ];
-
       homeManager = { pkgs, ... }: {
         home.packages = with pkgs; [
           cotabby
-          claude-code
           nodejs
           opencode
           vscode
