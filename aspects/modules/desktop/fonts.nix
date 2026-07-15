@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   fontPkgs =
     pkgs:
@@ -27,11 +31,9 @@ in
           lib.elem "gui" (host.roles or [ ])
         )
         {
-          os =
-            { pkgs, ... }:
-            {
-              fonts.packages = fontPkgs pkgs;
-            };
+          os = { pkgs, ... }: {
+            fonts.packages = fontPkgs pkgs;
+          };
         }
       )
 
@@ -46,12 +48,10 @@ in
           lib.elem "gui" (user.roles or [ ])
         )
         {
-          homeManager =
-            { pkgs, ... }:
-            {
-              home.packages = fontPkgs pkgs;
-              fonts.fontconfig.enable = true;
-            };
+          homeManager = { pkgs, ... }: {
+            home.packages = fontPkgs pkgs;
+            fonts.fontconfig.enable = true;
+          };
         }
       )
     ];

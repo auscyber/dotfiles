@@ -1,6 +1,8 @@
 {
   den,
   lib,
+  self,
+  config,
   inputs,
   ...
 }:
@@ -58,26 +60,6 @@ let
   # configurators (e.g. kanata-ls) to see `sources.<name>.output`. Hashes come
   # from generated.json (pure read) — never `srcs.<name>.src.outputHash`, which
   # would realise builtins.fetchTarball sources over the network at eval time.
-  withExtra =
-    srcs:
-    let
-      meta = builtins.fromJSON (builtins.readFile ../../_sources/generated.json);
-      sanitize = builtins.replaceStrings [ "/" ] [ "_" ];
-      folderOf =
-        name:
-        let
-          h = meta.${name}.src.sha256 or null;
-        in
-        if h == null then null else ../../_sources + "/${sanitize h}";
-      existing = lib.filterAttrs (_: p: p != null && builtins.pathExists p) (
-        lib.mapAttrs (name: _: folderOf name) srcs
-      );
-    in
-    srcs
-    // {
-      extra = existing;
-    }
-    // lib.mapAttrs (name: p: srcs.${name} // { output = p; }) existing;
 
   overlay-apply =
     {
@@ -165,7 +147,6 @@ let
 in
 {
   den.aspects.overlays = {
-
     includes = [ den.policies.overlays-to-_overlays ];
     nixos = overlay-apply;
     darwin = overlay-apply;
@@ -224,7 +205,7 @@ in
         args
         // {
           pkgs = basePkgs;
-          sources = withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
+          sources = config.flake.lib.withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
         };
     })
   ];
@@ -246,12 +227,16 @@ in
   ];
 
   perSystem =
-    { system, config, ... }:
+    {
+      system,
+      config,
+      ...
+    }:
     let
       basePkgs = import inputs.nixpkgs {
         inherit system;
       };
-      sources = withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
+      sources = self.lib.withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
 
       # Registry walk over `den.aspects.packages` (configurator shapes that are
       # not included into any entity, so the class route below never sees them).

@@ -4,9 +4,7 @@
   inputs,
   ...
 }:
-
 {
-
   imports =
     with inputs.nixpkgs.lib;
     ../../packages
@@ -14,5 +12,4 @@
       file: file.hasExt "nix" && !hasPrefix "package" file.name && !hasPrefix "_" file.name
     )
     |> fileset.toList;
-
 }

@@ -1,6 +1,10 @@
 {
   den.aspects.nixvim.nvim =
-    { lib, pkgs, ... }:
+    {
+      lib,
+      pkgs,
+      ...
+    }:
     lib.nixvim.plugins.mkNeovimPlugin {
       name = "difftastic";
       package = "difftastic-nvim";

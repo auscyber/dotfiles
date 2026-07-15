@@ -58,49 +58,47 @@
   };
 
   den.aspects.zotero = {
-    overlays =
-      { sources, ... }:
-      {
-        zotero-addons = final: prev: {
-          fetchZoteroAddon = prev.callPackage ./_fetch-zotero-addon.nix { };
+    overlays = { sources, ... }: {
+      zotero-addons = final: prev: {
+        fetchZoteroAddon = prev.callPackage ./_fetch-zotero-addon.nix { };
 
-          # Built from source; already installs into share/zotero/extensions, so it
-          # sits alongside the fetchZoteroAddon outputs below.
+        # Built from source; already installs into share/zotero/extensions, so it
+        # sits alongside the fetchZoteroAddon outputs below.
 
-          zoteroAddons = {
-            notero = prev.callPackage ./_notero.nix { source = sources.zotero-notero; };
-          }
-          // prev.lib.mapAttrs (_: spec: final.fetchZoteroAddon spec) {
-            better-bibtex = {
-              addonId = "better-bibtex@iris-advies.com";
-              inherit (sources.zotero-better-bibtex) pname version src;
-            };
-            attanger = {
-              addonId = "zoteroattanger@polygon.org";
-              inherit (sources.zotero-attanger) pname version src;
-            };
-            actions-tags = {
-              addonId = "zoterotag@euclpts.com";
-              inherit (sources.zotero-actions-tags) pname version src;
-            };
-            ocr = {
-              addonId = "zotero-ocr@bib.uni-mannheim.de";
-              inherit (sources.zotero-ocr) pname version src;
-            };
-            aria = {
-              addonId = "aria@apex974.com";
-              inherit (sources.zotero-aria) pname version src;
-            };
-            papersgpt = {
-              addonId = "papersgpt@papersgpt.com";
-              inherit (sources.zotero-papersgpt) pname version src;
-            };
-            zotlit = {
-              addonId = "zotlit@aidenlx.site";
-              inherit (sources.zotero-zotlit) pname version src;
-            };
+        zoteroAddons = {
+          notero = prev.callPackage ./_notero.nix { source = sources.zotero-notero; };
+        }
+        // prev.lib.mapAttrs (_: spec: final.fetchZoteroAddon spec) {
+          better-bibtex = {
+            addonId = "better-bibtex@iris-advies.com";
+            inherit (sources.zotero-better-bibtex) pname version src;
+          };
+          attanger = {
+            addonId = "zoteroattanger@polygon.org";
+            inherit (sources.zotero-attanger) pname version src;
+          };
+          actions-tags = {
+            addonId = "zoterotag@euclpts.com";
+            inherit (sources.zotero-actions-tags) pname version src;
+          };
+          ocr = {
+            addonId = "zotero-ocr@bib.uni-mannheim.de";
+            inherit (sources.zotero-ocr) pname version src;
+          };
+          aria = {
+            addonId = "aria@apex974.com";
+            inherit (sources.zotero-aria) pname version src;
+          };
+          papersgpt = {
+            addonId = "papersgpt@papersgpt.com";
+            inherit (sources.zotero-papersgpt) pname version src;
+          };
+          zotlit = {
+            addonId = "zotlit@aidenlx.site";
+            inherit (sources.zotero-zotlit) pname version src;
           };
         };
       };
+    };
   };
 }

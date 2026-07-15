@@ -1,4 +1,8 @@
-{ den, inputs, ... }:
+{
+  den,
+  inputs,
+  ...
+}:
 # secondpc media stack + service secrets, ported from the old dotfiles
 # navidrome.nix / general/default.nix. Uses raw age.secrets/age.templates in the
 # nixos block (faithful to the originals; the agenix-rekey `secrets` class routes
@@ -57,7 +61,11 @@
         # --- vaultwarden admin token: regenerated as an agenix secret (the
         #     original used sops). Fresh random token on gen-secrets. ---
         age.secrets."vaultwarden.env".generator.script =
-          { pkgs, lib, ... }:
+          {
+            pkgs,
+            lib,
+            ...
+          }:
           ''
             printf 'ADMIN_TOKEN=%s\n' "$(${lib.getExe pkgs.openssl} rand -base64 48)"
           '';
@@ -70,7 +78,11 @@
           intermediary = true;
         };
         age.secrets.slskd_soularr_apikey.generator.script =
-          { pkgs, lib, ... }:
+          {
+            pkgs,
+            lib,
+            ...
+          }:
           ''
             ${lib.getExe pkgs.openssl} rand -base64 48
           '';
@@ -115,7 +127,11 @@
             slskd_api_key = config.age.secrets.slskd_soularr_apikey;
           };
           content =
-            { placeholders, pkgs, ... }:
+            {
+              placeholders,
+              pkgs,
+              ...
+            }:
             pkgs.lib.generators.toINI { } {
               Lidarr = {
                 api_key = placeholders.lidar_key;

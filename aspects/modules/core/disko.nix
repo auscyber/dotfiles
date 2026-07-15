@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   ff.disko = {
     url = "github:nix-community/disko";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -18,6 +17,5 @@
       # (option `disko.zfs`). Inert unless `disko.zfs.enable = true`.
       inputs.disko-zfs.nixosModules.default
     ];
-
   };
 }

@@ -12,7 +12,11 @@ let
 in
 {
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     let
       # Generate diagram for a single host
       hostDiagram =

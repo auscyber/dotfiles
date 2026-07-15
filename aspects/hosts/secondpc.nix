@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   flake-file.inputs = {
     celler.url = "github:blitz/celler/main";
@@ -49,7 +53,11 @@
     ];
 
     nixos =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         # Host identity / boot
         networking.hostId = "4f6f802e";
@@ -451,6 +459,5 @@
       den.aspects.stylix
       den.batteries.primary-user
     ];
-
   };
 }

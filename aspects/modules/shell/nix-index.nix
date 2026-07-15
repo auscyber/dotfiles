@@ -1,5 +1,4 @@
 { inputs, ... }:
-
 let
   extra = {
     programs.nix-index-database.comma.enable = true;
@@ -12,10 +11,8 @@ in
   };
 
   den.aspects.nix-index = {
-
     nixos = {
       imports = [ inputs.nix-index-database.nixosModules.default ];
-
     }
     // extra;
 
@@ -29,9 +26,6 @@ in
         inherit (extra.programs) nix-index-database;
         nix-index.enable = true;
       };
-
     };
-
   };
-
 }

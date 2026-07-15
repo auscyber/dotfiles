@@ -1,8 +1,16 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.hyprland = {
     homeManager =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       let
         scratchpads = config.hyprland.scratchpads or { };
       in

@@ -1,13 +1,10 @@
-{ den, ... }:
-{
-
+{ den, ... }: {
   # jujutsu starship stuff
 
   den.aspects.jujutsu = {
     includes = [ den.aspects.difftastic ];
     homeManager = {
       programs.jujutsu = {
-
         enable = true;
 
         settings = {
@@ -52,6 +49,5 @@
         };
       };
     };
-
   };
 }

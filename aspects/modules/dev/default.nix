@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.dev = {
     includes = [
       den.aspects.dev-nix

@@ -1,8 +1,16 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.darwin-general = {
     darwin =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         stylix.enableReleaseChecks = false;
 

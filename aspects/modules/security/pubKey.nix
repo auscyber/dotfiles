@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   extraOptions = {
     options = {
@@ -20,11 +24,9 @@ let
         description = "Public key (literal string or path to file) of the entity for which to generate rekey secrets.";
       };
     };
-
   };
 in
 {
   den.schema.host = extraOptions;
   den.schema.user = extraOptions;
-
 }

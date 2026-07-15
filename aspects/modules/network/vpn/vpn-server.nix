@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.vpn-server = {
     includes = [ den.aspects.vpn ];
 

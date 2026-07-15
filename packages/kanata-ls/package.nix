@@ -39,5 +39,4 @@ rustPlatform.buildRustPackage rec {
     mainProgram = "kanata-ls";
     maintainers = with maintainers; [ auscyber ];
   };
-
 }

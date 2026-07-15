@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.darwin-finder = {
     darwin = {
       system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;

@@ -5,7 +5,7 @@
   ...
 }@args:
 let
-  flakeModule = (den.lib.aspects.resolve "flake-mod" (den.lib.resolveEntity "flake-mod" { }));
+  flakeModule = den.lib.aspects.resolve "flake-mod" (den.lib.resolveEntity "flake-mod" { });
   evaled = (
     lib.evalModules {
       modules = [
@@ -19,13 +19,9 @@ let
         inputs = inputs;
       };
     }
-  )
-
-  ;
-
+  );
 in
 {
-
   options.flake-mod = lib.mkOption {
     type = lib.types.attrs;
     default = lib.types.any;
@@ -44,5 +40,4 @@ in
       #  test.url = "github:auscyber/agenix";
     };
   };
-
 }

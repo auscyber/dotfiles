@@ -7,7 +7,11 @@
 {
   den.aspects.file-local = {
     homeManager =
-      { config, user, ... }:
+      {
+        config,
+        user,
+        ...
+      }:
       {
         config.lib.file.getLocalPath =
           path:

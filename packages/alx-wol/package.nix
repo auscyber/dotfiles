@@ -6,7 +6,6 @@
   kernelModuleMakeFlags,
   kmod,
 }:
-
 stdenv.mkDerivation rec {
   pname = "alx-wol";
   version = kernel.version;
@@ -61,10 +60,7 @@ stdenv.mkDerivation rec {
   installFlags = makeFlags ++ [
     "INSTALL_MOD_PATH=${placeholder "out"}"
     "INSTALL_MOD_DIR=${modulePath}"
-
-  ]
-
-  ;
+  ];
   installTargets = [
     "modules_install"
   ];

@@ -1,4 +1,8 @@
-{ den, __findFile, ... }:
+{
+  den,
+  __findFile,
+  ...
+}:
 {
   den.hosts.x86_64-linux.auspc = {
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYM1mZ3fYfOjhyMhIiKbUOLYTQifG82P2NnGWHyIwHt root@nixos";
@@ -50,9 +54,12 @@
     ];
 
     nixos =
-      { pkgs, config, ... }:
       {
-
+        pkgs,
+        config,
+        ...
+      }:
+      {
         boot.extraModulePackages = with config.boot.kernelPackages; [ alx-wol ];
         networking.hostName = "auspc";
         networking.hostId = "230c61e9";
@@ -233,53 +240,51 @@
         den.aspects.dev
       ];
 
-      provides.to-users.homeManager =
-        { pkgs, ... }:
-        {
-          home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";
+      provides.to-users.homeManager = { pkgs, ... }: {
+        home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";
 
-          services.gpg-agent = {
-            enable = true;
-            enableSshSupport = true;
-            pinentry.program = pkgs.pinentry-qt;
-            extraConfig = "allow-loopback-pinentry";
-          };
-
-          home.packages = with pkgs; [
-            obs-studio
-            heroic
-            shadps4
-            tidal-hifi
-            tmux
-            pcmanfm
-            vscode
-            openjdk8
-            rofi
-            arandr
-            libnotify
-            stack
-            xclip
-            discord
-            playerctl
-            htop
-            polychromatic
-            fish
-            nitrogen
-            maim
-            gcc
-            dunst
-            lua
-            unzip
-            slack
-            (python3.withPackages (p: with p; [ pynvim ]))
-            nautilus
-            zoom-us
-            file
-            mitscheme
-            libreoffice
-            thunderbird
-          ];
+        services.gpg-agent = {
+          enable = true;
+          enableSshSupport = true;
+          pinentry.program = pkgs.pinentry-qt;
+          extraConfig = "allow-loopback-pinentry";
         };
+
+        home.packages = with pkgs; [
+          obs-studio
+          heroic
+          shadps4
+          tidal-hifi
+          tmux
+          pcmanfm
+          vscode
+          openjdk8
+          rofi
+          arandr
+          libnotify
+          stack
+          xclip
+          discord
+          playerctl
+          htop
+          polychromatic
+          fish
+          nitrogen
+          maim
+          gcc
+          dunst
+          lua
+          unzip
+          slack
+          (python3.withPackages (p: with p; [ pynvim ]))
+          nautilus
+          zoom-us
+          file
+          mitscheme
+          libreoffice
+          thunderbird
+        ];
+      };
     };
   };
 }

@@ -1,14 +1,20 @@
-{ inputs, den, ... }:
+{
+  inputs,
+  den,
+  ...
+}:
 let
   diagram = inputs.den-diagram.lib;
-
 in
 {
   ff.den-diagram.url = "github:denful/den-diagram";
   flake.diagram = diagram;
   perSystem =
-    { inputs', pkgs, ... }:
-
+    {
+      inputs',
+      pkgs,
+      ...
+    }:
     let
       host = den.hosts.aarch64-darwin.Ivys-MacBook-Pro;
       captured = den.lib.capture.captureWithPathsWith {

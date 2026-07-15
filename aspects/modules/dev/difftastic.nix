@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.difftastic = { user, ... }: {
     homeManager.programs.difftastic = {
       enable = true;
@@ -13,5 +12,4 @@
       jujutsu.settings.diff_preset = "difftastic";
     };
   };
-
 }

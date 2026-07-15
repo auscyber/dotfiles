@@ -21,58 +21,56 @@
         user,
         ...
       }:
-
       {
         imports = [ ./_internal.nix ];
         config = lib.mkMerge [
-
           (lib.optionalAttrs (options.programs ? kanata) {
             programs.kanata.extraConfigPaths = [
               (pkgs.writeText "rift-keybinds"
                 # commonlisp
                 ''
-                                      (defalias
-                            		  enable_spaces (t! runasuser "rift-cli execute window toggle-space-activated ")
-                                      toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a ~/Nix\ Apps/Discord.app")
-                                      toggle_fantastical_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name fantastical || open -a Fantastical.app")
-                                      toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
-                                      toggle_music_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name music || open -a 'Tidal'")
-                                      minimise (t! runasuser "yabai -m window --minimize")
-                                      toggle_1password_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name 1password  || open -a '1Password'")
-                                      switch-focus (t! runasuser "yabai -m window --focus next")
-                                      reverse-switch-focus (t! runasuser "yabai -m window --focus prev")
-                                      kill-focus (t! runasuser "rift-cli query windows | jq '.[] | select(.is_focused) | .window_server_id' | xargs -I{} rift-cli execute window close --window-id {}")
-                                        1s (t! runasuser "rift-cli execute workspace switch 0")
-                                        2s (t! runasuser "rift-cli execute workspace switch 1")
-                                        3s (t! runasuser "rift-cli execute workspace switch 2")
-                                        4s (t! runasuser "rift-cli execute workspace switch 3")
-                                        5s (t! runasuser "rift-cli execute workspace switch 4")
-                                        6s (t! runasuser "rift-cli execute workspace switch 5")
-                                        7s (t! runasuser "rift-cli execute workspace switch 6")
-                                        8s (t! runasuser "rift-cli execute workspace switch 7")
-                                        9s (t! runasuser "rift-cli execute workspace switch 8")
-                                        10s (t! runasuser "rift-cli execute workspace switch 10")
+                             (defalias
+                   		  enable_spaces (t! runasuser "rift-cli execute window toggle-space-activated ")
+                             toggle_discord_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name discord || open -a ~/Nix\ Apps/Discord.app")
+                             toggle_fantastical_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name fantastical || open -a Fantastical.app")
+                             toggle_beeper_scratchpad (t! runasuser " rift-cli execute window toggle-scratchpad --name beeper || open -a 'Beeper\ Desktop'")
+                             toggle_music_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name music || open -a 'Tidal'")
+                             minimise (t! runasuser "yabai -m window --minimize")
+                             toggle_1password_scratchpad (t! runasuser "rift-cli execute window toggle-scratchpad --name 1password  || open -a '1Password'")
+                             switch-focus (t! runasuser "yabai -m window --focus next")
+                             reverse-switch-focus (t! runasuser "yabai -m window --focus prev")
+                             kill-focus (t! runasuser "rift-cli query windows | jq '.[] | select(.is_focused) | .window_server_id' | xargs -I{} rift-cli execute window close --window-id {}")
+                               1s (t! runasuser "rift-cli execute workspace switch 0")
+                               2s (t! runasuser "rift-cli execute workspace switch 1")
+                               3s (t! runasuser "rift-cli execute workspace switch 2")
+                               4s (t! runasuser "rift-cli execute workspace switch 3")
+                               5s (t! runasuser "rift-cli execute workspace switch 4")
+                               6s (t! runasuser "rift-cli execute workspace switch 5")
+                               7s (t! runasuser "rift-cli execute workspace switch 6")
+                               8s (t! runasuser "rift-cli execute workspace switch 7")
+                               9s (t! runasuser "rift-cli execute workspace switch 8")
+                               10s (t! runasuser "rift-cli execute workspace switch 10")
 
-                                        1m (t! runasuser "rift-cli execute workspace move-window 0")
-                                        2m (t! runasuser "rift-cli execute workspace move-window 1")
-                                        3m (t! runasuser "rift-cli execute workspace move-window 2")
-                                        4m (t! runasuser "rift-cli execute workspace move-window 3")
-                                        5m (t! runasuser "rift-cli execute workspace move-window 4")
-                                        6m (t! runasuser "rift-cli execute workspace move-window 5")
-                                        7m (t! runasuser "rift-cli execute workspace move-window 6")
-                                        8m (t! runasuser "rift-cli execute workspace move-window 7")
-                                        9m (t! runasuser "rift-cli execute workspace move-window 8")
-                                        10m (t! runasuser "rift-cli execute workspace move-window 10")
+                               1m (t! runasuser "rift-cli execute workspace move-window 0")
+                               2m (t! runasuser "rift-cli execute workspace move-window 1")
+                               3m (t! runasuser "rift-cli execute workspace move-window 2")
+                               4m (t! runasuser "rift-cli execute workspace move-window 3")
+                               5m (t! runasuser "rift-cli execute workspace move-window 4")
+                               6m (t! runasuser "rift-cli execute workspace move-window 5")
+                               7m (t! runasuser "rift-cli execute workspace move-window 6")
+                               8m (t! runasuser "rift-cli execute workspace move-window 7")
+                               9m (t! runasuser "rift-cli execute workspace move-window 8")
+                               10m (t! runasuser "rift-cli execute workspace move-window 10")
 
-                  					    shiftUp (t! runasuser "rift-cli execute display move-window --direction up")
-                  					    shiftDown (t! runasuser "rift-cli execute display move-window --direction down")
-                  					    shiftLeft (t! runasuser "rift-cli execute display move-window --direction left")
-                  					    shiftRight (t! runasuser "rift-cli execute display move-window --direction right")
+                  shiftUp (t! runasuser "rift-cli execute display move-window --direction up")
+                  shiftDown (t! runasuser "rift-cli execute display move-window --direction down")
+                  shiftLeft (t! runasuser "rift-cli execute display move-window --direction left")
+                  shiftRight (t! runasuser "rift-cli execute display move-window --direction right")
 
-                  					    focusUp (t! runasuser "rift-cli execute display focus --direction up")
-                  					    focusDown (t! runasuser "rift-cli execute display focus --direction down")
-                  					    focusLeft (t! runasuser "rift-cli execute display focus --direction left")
-                  					    focusRight (t! runasuser "rift-cli execute display focus --direction right"))
+                  focusUp (t! runasuser "rift-cli execute display focus --direction up")
+                  focusDown (t! runasuser "rift-cli execute display focus --direction down")
+                  focusLeft (t! runasuser "rift-cli execute display focus --direction left")
+                  focusRight (t! runasuser "rift-cli execute display focus --direction right"))
                 ''
               )
             ];
@@ -114,7 +112,6 @@
                     right = 10;
                     bottom = 5;
                   };
-
                 };
                 layout.mode = "bsp";
                 focus_follows_mouse = false;
@@ -122,7 +119,6 @@
                 gestures = {
                   enabled = true;
                   fingers = 3;
-
                 };
               };
               virtual_workspaces = {
@@ -161,9 +157,7 @@
                     app_id = "com.tidal.desktop";
                     scratchpad = "music";
                   }
-
                 ];
-
               };
               keys = {
                 "Alt + Z" = "toggle_space_activated";

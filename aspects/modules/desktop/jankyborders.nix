@@ -1,4 +1,8 @@
-{ den, __findFile, ... }:
+{
+  den,
+  __findFile,
+  ...
+}:
 {
   den.aspects.jankyborders = { user, ... }: {
     includes = [ <packages/jankyborders> ];

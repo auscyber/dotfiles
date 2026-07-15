@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.hosts.x86_64-linux.imflopet = {
     users.ivy = {
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOwzECwhRtEus12VIOPw8UrOkBuBwH69VKodEWEuXAsX ivy@imflopet";

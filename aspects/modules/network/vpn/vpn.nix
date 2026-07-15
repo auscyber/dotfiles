@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   # 6 hex chars of sha256 → integer in 2..254. Server lives at .1.
   hexToInt = s: (builtins.fromTOML "v=0x${s}").v;
@@ -95,7 +99,11 @@ in
     vpn = { };
 
     os =
-      { config, host, ... }:
+      {
+        config,
+        host,
+        ...
+      }:
       let
         cfg = config.vpn;
         ip =

@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.home-base = {
     includes = [
@@ -7,7 +11,11 @@
     ];
 
     homeManager =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         manual.manpages.enable = true;
 

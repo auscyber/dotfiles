@@ -1,8 +1,16 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.gpg = {
     homeManager =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         programs.gpg = {
           enable = true;

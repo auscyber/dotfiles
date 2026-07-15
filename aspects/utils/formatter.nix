@@ -1,11 +1,9 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   ff.treefmt-nix.url = "github:numtide/treefmt-nix";
 
   imports = [ inputs.treefmt-nix.flakeModule ];
 
   perSystem = { pkgs, ... }: {
-
     treefmt = {
       projectRootFile = "README.md";
       settings = {
@@ -14,9 +12,6 @@
       };
       programs.nixfmt.enable = true;
       programs.alejandra.enable = true;
-
     };
-
   };
-
 }

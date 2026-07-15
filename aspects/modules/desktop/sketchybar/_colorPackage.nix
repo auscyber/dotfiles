@@ -5,7 +5,6 @@
   runCommand,
   toLuaModule,
 }:
-
 let
   inherit (lib.generators) toLua mkLuaInline;
 

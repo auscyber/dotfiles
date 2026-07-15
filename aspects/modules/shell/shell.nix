@@ -1,4 +1,8 @@
-{ den, __findFile, ... }:
+{
+  den,
+  __findFile,
+  ...
+}:
 {
   den.aspects.shell = {
     includes = [
@@ -31,7 +35,6 @@
               forwardAgent = true;
             };
           };
-
         };
         direnv = {
           enable = true;
@@ -41,7 +44,6 @@
         };
         home-manager.enable = true;
         gpg = {
-
           enable = true;
         };
         nix-index.enable = true;
@@ -83,5 +85,4 @@
       };
     };
   };
-
 }

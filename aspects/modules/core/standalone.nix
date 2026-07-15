@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   # Standalone aspect - for users on non-NixOS/Darwin hosts
   # nh environment variables are now set via den.policies.nh-env in base/nh.nix
   # based on the user's flakeFolder

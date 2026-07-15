@@ -1,13 +1,10 @@
-{ lib, ... }:
-{
-
+{ lib, ... }: {
   nvfetcher.sources.sketchybar = {
     src.git = "https://github.com/felixkratz/sketchybar";
     fetch.github = "felixkratz/sketchybar";
   };
 
   den.aspects.packages.sketchybar = {
-
     overlays = { sources, ... }: {
       sketchybar = self: super: {
         sketchybar = super.sketchybar.overrideAttrs (old: {
@@ -18,10 +15,7 @@
             ./sketchybar-pid.patch
           ];
         });
-
       };
-
     };
   };
-
 }

@@ -1,6 +1,9 @@
-{ den, lib, ... }:
 {
-
+  den,
+  lib,
+  ...
+}:
+{
   nvfetcher.sources.pam_rssh = {
     src.github = "z4yx/pam_rssh";
     fetch.github = "z4yx/pam_rssh";
@@ -31,16 +34,13 @@
           meta.platforms = old.meta.platforms ++ [ "aarch64-darwin" ];
         });
       };
-
     };
 
-    darwin =
-      { pkgs, ... }:
-      {
-        security.pam.services.sudo_local.text = lib.mkAfter ''
-          auth       sufficient     ${pkgs.pam_rssh}/lib/libpam_rssh.dylib auth_key_file=/etc/authorized_keys/%u.keys
-        '';
-      };
+    darwin = { pkgs, ... }: {
+      security.pam.services.sudo_local.text = lib.mkAfter ''
+        auth       sufficient     ${pkgs.pam_rssh}/lib/libpam_rssh.dylib auth_key_file=/etc/authorized_keys/%u.keys
+      '';
+    };
   };
 
   den.schema.host.includes = [ den.aspects.pam-rssh ];

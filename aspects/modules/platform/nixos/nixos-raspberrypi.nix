@@ -5,7 +5,6 @@
   ...
 }:
 let
-
 in
 {
   flake-file.inputs = {
@@ -46,5 +45,4 @@ in
   # than nixpkgs.lib.nixosSystem (dotfiles/lib/systems/mk-rpi.nix). den's default
   # builder is nixpkgs's nixosSystem; for any host registered under the custom
   # `aarch64-linux-rpi` system, swap the builder by overriding flake.nixosConfigurations.
-
 }

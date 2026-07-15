@@ -1,8 +1,16 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.darwin-hmApps = {
     darwin =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         home-manager.sharedModules = [
           { targets.darwin.linkApps.enable = false; }

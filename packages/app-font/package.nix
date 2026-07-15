@@ -41,5 +41,4 @@ stdenv.mkDerivation (finalAttrs: {
         ln -s ${finalAttrs.finalPackage}/lua/icon_map.lua "$out/share/lua/${lua.luaversion}/icon_map.lua"
       ''
     );
-
 })

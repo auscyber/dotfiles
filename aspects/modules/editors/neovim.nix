@@ -26,19 +26,16 @@
 
     nvim.enableMan = false;
     provides.to-users.gui.homeManager = { pkgs, ... }: { home.packages = with pkgs; [ neovide ]; };
-    provides.to-users.homeManager =
-      { pkgs, ... }:
-      {
-
-        stylix.targets.nixvim.enable = false;
-        programs.nixvim = {
-          enable = true;
-          #          package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-        };
-        home.packages = with pkgs; [ tree-sitter ];
-        home.sessionVariables.EDITOR = "vim";
-
-        # Disable stylix nixvim target if stylix is enabled
+    provides.to-users.homeManager = { pkgs, ... }: {
+      stylix.targets.nixvim.enable = false;
+      programs.nixvim = {
+        enable = true;
+        #          package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
       };
+      home.packages = with pkgs; [ tree-sitter ];
+      home.sessionVariables.EDITOR = "vim";
+
+      # Disable stylix nixvim target if stylix is enabled
+    };
   };
 }

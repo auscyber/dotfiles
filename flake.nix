@@ -41,7 +41,7 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn (patchedInputs);
+        inputsFn patchedInputs;
     in
     builtins.removeAttrs output [ "newInputs" ];
 

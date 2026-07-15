@@ -9,10 +9,8 @@ let
   configFile = pkgs.writers.writeTOML "rift-settings" {
     inherit (cfg) settings virtual_workspaces keys;
   };
-
 in
 {
-
   options.services.rift = {
     enable = lib.mkEnableOption "Enable rift window manager ";
     package = lib.mkPackageOption pkgs "rift" {
@@ -41,7 +39,6 @@ in
       type = lib.types.attrs;
       default = { };
       description = "Settings for rift window manager";
-
     };
     virtual_workspaces = lib.mkOption {
       type = with lib.types; attrs;
@@ -70,7 +67,6 @@ in
         ProccessType = "Interactive";
         EnvironmentVariables = {
           PATH = "/bin:/sbin:/usr/bin:" + (lib.makeBinPath ([ cfg.package ] ++ cfg.extraPackages));
-
         };
         ProgramArguments = [
           "${cfg.package}/bin/rift"
@@ -83,9 +79,7 @@ in
         KeepAlive = true;
         StandardOutPath = cfg.outLogFile;
         StandardErrorPath = cfg.errorLogFile;
-
       };
     };
   };
-
 }

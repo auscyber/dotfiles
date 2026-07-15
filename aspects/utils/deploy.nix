@@ -1,26 +1,23 @@
-{
-  inputs,
-  ...
-}:
-{
+{ inputs, ... }: {
   ff = {
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
-  perSystem =
-    { pkgs, ... }:
-    {
-      devshells.default = {
-        packages = [
-          pkgs.deploy-rs
-        ];
-      };
+  perSystem = { pkgs, ... }: {
+    devshells.default = {
+      packages = [
+        pkgs.deploy-rs
+      ];
     };
+  };
 
   flake =
-    { lib, config, ... }:
+    {
+      lib,
+      config,
+      ...
+    }:
     {
       deploy.nodes = lib.mapAttrs' (
         hostname: nixosConfiguration:

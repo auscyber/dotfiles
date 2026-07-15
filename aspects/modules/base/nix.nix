@@ -6,9 +6,12 @@
   ...
 }:
 let
-
   nixClass =
-    { class, aspect-chain, ... }:
+    {
+      class,
+      aspect-chain,
+      ...
+    }:
     den.provides.forward {
       each = [
         "nixos"
@@ -22,7 +25,6 @@ let
       #      fromAspect = _: lib.head aspect-chain;
       adaptArgs = lib.id;
     };
-
 in
 {
   flake-file.inputs = {
@@ -33,7 +35,6 @@ in
   den.default.includes = [ den.aspects.nix ];
 
   den.aspects.nix = {
-
     includes = [
       nixClass
     ];
@@ -65,5 +66,4 @@ in
       };
     };
   };
-
 }

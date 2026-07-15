@@ -9,12 +9,10 @@
   jq,
   source,
 }:
-
 # Notero is built from the repo rather than installed from a release xpi.
 # `pnpm create-xpi` drops a versioned xpi into ./xpi; it gets installed under the
 # same layout fetchZoteroAddon uses (share/zotero/extensions/<addon-id>.xpi), so
 # the two are interchangeable in a profile's extensions env.
-
 let
   addonId = "notero@vanoni.dev";
 in

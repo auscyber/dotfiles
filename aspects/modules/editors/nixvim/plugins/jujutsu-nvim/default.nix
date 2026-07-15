@@ -9,7 +9,6 @@
       imports = [ ./_other.nix ];
 
       settingsOptions = {
-
         #--- @class JJConfig
         #--- @field diff_preset "difftastic"|"diffview"|"codediff"|"none" Diff viewer preset
         #--- @field help_position "center"|"bottom_right" Help window position

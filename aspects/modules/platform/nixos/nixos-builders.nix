@@ -57,7 +57,11 @@ in
   # the master key authorised.
   den.aspects.builder-server = {
     nixos =
-      { host, pkgs, ... }:
+      {
+        host,
+        pkgs,
+        ...
+      }:
       let
         b = host.builder or null;
       in
@@ -78,7 +82,11 @@ in
       };
 
     darwin =
-      { host, pkgs, ... }:
+      {
+        host,
+        pkgs,
+        ...
+      }:
       let
         b = host.builder or null;
       in

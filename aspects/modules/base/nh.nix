@@ -39,7 +39,6 @@ in
         fromFlake = true;
       } (pkgs.extend inputs.nh.overlays.default)
     );
-
   };
 
   # Policy: set nh environment variables based on user's flakeFolder

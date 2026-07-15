@@ -48,7 +48,11 @@ in
   # aspect, a shared name would collide and dedup, dropping all but one aspect's
   # delivery. `config.name` scopes it per aspect.
   den.schema.aspect =
-    { config, options, ... }:
+    {
+      config,
+      options,
+      ...
+    }:
     {
       options = lib.genAttrs roles (
         role:

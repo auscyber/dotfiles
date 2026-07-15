@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-
 let
   cfg = config.plugins.jujutsu;
   possible-sources = {
@@ -19,6 +18,5 @@ in
       inherit name;
       value.enable = lib.mkIf (source == cfg.settings.diff_preset) true;
     }) possible-sources;
-
   };
 }

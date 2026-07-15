@@ -17,7 +17,6 @@ let
         defaults.kanata_config = "~/.config/kanata/kanata.kbd";
         defaults.autorestart_on_crash = true;
         defaults.autorun = true;
-
       }
     )
   );
@@ -85,7 +84,6 @@ in
         default = defaultConfigFile;
         description = "kanata tray config file ";
       };
-
     };
 
     extraCommandPiping = lib.mkOption {
@@ -157,9 +155,7 @@ in
             };
             StandardErrorPath = "/tmp/kanata-vk-agent.err";
             StandardOutPath = "/tmp/kanata-vk-agent.out";
-
           };
-
         };
         launchd.agents.kanata_tray = {
           enable = cfg.tray.enable;
@@ -204,8 +200,6 @@ in
         home.packages = [ cfg.package ];
         #          auscybernix.keybinds.karabiner-driver-kit.karabinerPackage = pkgs.karabiner-elements;
       })
-
     ]
   );
-
 }

@@ -162,10 +162,10 @@ in
   };
 
   config = {
+    flake.lib.withExtra = withExtra;
     ff.nvfetcher.url = "github:berberman/nvfetcher";
     patchedInputs.nvfetcher = {
       patches = [ ../../patches/nvfetcher/nvfetcher.patch ];
-
     };
 
     den.batteries.sources = {
@@ -220,26 +220,27 @@ in
             chmod -R u+w "$dest"
           '';
 
-        postprocessSources = (pkgs.writeShellApplication {
-          name = "postprocess-sources";
-          # Only the wrapper's own coreutils (mktemp/mkdir/cp/chmod). Script tool
-          # deps are the script's business — reference them by full store path.
-          runtimeInputs = [ pkgs.coreutils ];
-          text = ''
-            set -eu
-            if [ ! -e flake.nix ]; then
-            	echo "postprocess-sources: run from the repo root (flake.nix not found)" >&2
-            	exit 1
-            fi
-            ${lib.concatStringsSep "\n" (lib.mapAttrsToList mkSnippet scriptedSources)}
-            echo "Post-processed sources written to _sources/."
-          '';
-        }).overrideAttrs
-          (_: {
-            # `script`s are arbitrary user shell embedded verbatim; don't fail the
-            # build on shellcheck lint (e.g. SC2155) or `bash -n` over them.
-            checkPhase = ":";
-          });
+        postprocessSources =
+          (pkgs.writeShellApplication {
+            name = "postprocess-sources";
+            # Only the wrapper's own coreutils (mktemp/mkdir/cp/chmod). Script tool
+            # deps are the script's business — reference them by full store path.
+            runtimeInputs = [ pkgs.coreutils ];
+            text = ''
+              set -eu
+              if [ ! -e flake.nix ]; then
+              	echo "postprocess-sources: run from the repo root (flake.nix not found)" >&2
+              	exit 1
+              fi
+              ${lib.concatStringsSep "\n" (lib.mapAttrsToList mkSnippet scriptedSources)}
+              echo "Post-processed sources written to _sources/."
+            '';
+          }).overrideAttrs
+            (_: {
+              # `script`s are arbitrary user shell embedded verbatim; don't fail the
+              # build on shellcheck lint (e.g. SC2155) or `bash -n` over them.
+              checkPhase = ":";
+            });
 
         updateSources = pkgs.writeShellApplication {
           name = "update-sources";

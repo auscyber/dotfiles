@@ -1,7 +1,4 @@
-{
-  ...
-}:
-{
+{ ... }: {
   nvfetcher.sources.cotabby = {
     src.github = "fujacob/cotabby";
     fetch.url = "https://github.com/fujacob/cotabby/releases/download/$ver/Cotabby.dmg";

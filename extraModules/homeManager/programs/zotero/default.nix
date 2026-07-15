@@ -5,7 +5,6 @@
   inputs,
   ...
 }:
-
 let
   cfg = config.programs.zotero;
   modulePath = [
@@ -19,7 +18,6 @@ let
   mkFirefoxModule = import "${inputs.home-manager.outPath}/modules/programs/firefox/mkFirefoxModule.nix";
 in
 {
-
   imports = [
     (mkFirefoxModule {
       inherit modulePath;
@@ -83,5 +81,4 @@ in
         })) { }
     );
   };
-
 }

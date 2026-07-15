@@ -1,10 +1,13 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.zsh = { user, ... }: {
     includes = [ den.aspects.shell ];
 
     homeManager =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         programs.zsh = {
           enable = true;

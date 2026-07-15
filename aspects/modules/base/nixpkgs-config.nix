@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   # Explicit allowlist of unfree packages we actually want to install.
   # Add a name here when something legitimately needs unfree status; avoid
@@ -41,10 +45,8 @@ let
       "cmp-nvim-lsp-document-symbol"
     ]
   );
-
 in
 {
-
   den.quirks.unfreeAllowed = { };
   den.policies.pipe-unfree =
     { host, ... }:
@@ -60,7 +62,6 @@ in
       den.policies.pipe-unfree
       unfree-mod
     ];
-
   };
 
   den.schema.host.includes = [ den.aspects.nixpkgs-config ];

@@ -11,21 +11,24 @@
   };
 
   den.aspects.packages.helium = {
-
-    overlays = { sources, system, ... }: {
-      helium =
-        self: super:
-        let
-          helium = {
-            x86_64-linux = super.callPackage ./_linux.nix { source = sources.helium_linux; };
-            aarch64-darwin = super.callPackage ./_mac.nix { source = sources.helium_macos; };
+    overlays =
+      {
+        sources,
+        system,
+        ...
+      }:
+      {
+        helium =
+          self: super:
+          let
+            helium = {
+              x86_64-linux = super.callPackage ./_linux.nix { source = sources.helium_linux; };
+              aarch64-darwin = super.callPackage ./_mac.nix { source = sources.helium_macos; };
+            };
+          in
+          {
+            helium = helium.${system};
           };
-        in
-        {
-          helium = helium.${system};
-        };
-    };
-
+      };
   };
-
 }

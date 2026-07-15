@@ -1,19 +1,16 @@
 { lib, ... }:
-
 with lib;
 let
-  userFileOptions =
-    { user, ... }:
-    {
-      options = {
-        flakeFolder = lib.mkOption {
-          type = lib.types.str;
-          default = "/Users/${user.name}/dotfiles";
-          defaultText = lib.literalExpression ''"/Users/''${user.name}/dotfiles"'';
-          description = "Folder where this user's flake.nix is checked out.";
-        };
+  userFileOptions = { user, ... }: {
+    options = {
+      flakeFolder = lib.mkOption {
+        type = lib.types.str;
+        default = "/Users/${user.name}/dotfiles";
+        defaultText = lib.literalExpression ''"/Users/''${user.name}/dotfiles"'';
+        description = "Folder where this user's flake.nix is checked out.";
       };
     };
+  };
   attrsWith' =
     placeholder: elemType:
     types.attrsWith {
@@ -41,7 +38,11 @@ let
       attrsWith' "path" (
         attrsWith' "tmpfiles-type" (
           types.submodule (
-            { name, config, ... }:
+            {
+              name,
+              config,
+              ...
+            }:
             {
               options.type = mkOption {
                 type = types.str;
@@ -106,7 +107,6 @@ let
                   If set to `"-"` no automatic clean-up is done.
                 '';
               };
-
             }
           )
         )
@@ -116,5 +116,4 @@ let
 in
 {
   den.schema.user = userFileOptions;
-
 }

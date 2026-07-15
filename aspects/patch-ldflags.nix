@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{ lib, ... }: {
   den.default = {
     overlays.ldflags =
       self: super:
@@ -7,12 +6,10 @@
         patchLdFlags =
           drv:
           drv.overrideAttrs (oldAttrs: {
-
             env.NIX_CFLAGS_LINK = "-fuse-ld=lld";
             nativeBuildInputs =
               oldAttrs.nativeBuildInputs or [ ]
               ++ lib.optional super.stdenv.hostPlatform.isDarwin super.llvmPackages.lld;
-
           });
         drvs = [
           "input-leap"

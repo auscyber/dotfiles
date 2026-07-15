@@ -1,9 +1,11 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.sudoagents = {
-
     darwin =
-      { config, lib, ... }:
+      {
+        config,
+        lib,
+        ...
+      }:
       {
         options.sudoagents = lib.mkOption {
           type = lib.types.attrsOf (lib.types.nullOr (lib.types.listOf lib.types.str));
@@ -19,6 +21,5 @@
           in
           lib.concatStringsSep "\n" sudoersEntries;
       };
-
   };
 }

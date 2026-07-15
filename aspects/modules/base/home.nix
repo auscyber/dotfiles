@@ -26,7 +26,10 @@ let
     };
 
   hmAlias =
-    { class, aspect-chain }:
+    {
+      class,
+      aspect-chain,
+    }:
     den.batteries.forward {
       each = lib.singleton class;
       fromClass = _: "hm";
@@ -56,7 +59,6 @@ let
         }:
         _: lib.mkIf (osConfig == null);
     };
-
 in
 {
   flake-file.inputs.home-manager = {

@@ -4,14 +4,12 @@
   unzip,
   jq,
 }:
-
 # Zotero identifies a plugin by `manifest.applications.zotero.id` (XPIInstall.sys.mjs)
 # and, when scanning <profile>/extensions, derives the id from the *filename*
 # (XPIProvider.sys.mjs: id = leafName minus ".xpi"). So the released xpi must be
 # installed verbatim under `<id>.xpi` — repacking it (as nixpkgs' fetchFirefoxAddon
 # does) rewrites `applications` to the gecko form and destroys the id Zotero reads.
 # Signing is irrelevant: Zotero sets xpinstall.signatures.required = false.
-
 {
   pname,
   version,
@@ -19,7 +17,6 @@
   addonId,
   meta ? { },
 }:
-
 stdenvNoCC.mkDerivation {
   inherit pname version src;
 

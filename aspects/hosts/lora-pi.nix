@@ -1,4 +1,8 @@
-{ den, inputs, ... }:
+{
+  den,
+  inputs,
+  ...
+}:
 {
   den.hosts.aarch64-linux.lora-pi = {
     instantiate = den.lib.raspberry-pi-builder;
@@ -18,6 +22,5 @@
       den.aspects.gpg
       den.batteries.primary-user
     ];
-
   };
 }

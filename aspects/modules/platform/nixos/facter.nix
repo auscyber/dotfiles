@@ -1,5 +1,4 @@
-{ ... }:
-{
+{ ... }: {
   # Opt-in per host: a host that includes this aspect must set
   # `hardware.facter.reportPath` (pointing at its facter.json).
   #

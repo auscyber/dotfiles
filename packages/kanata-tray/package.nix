@@ -11,7 +11,6 @@
   source,
 }:
 buildGoModule (finalAttrs: {
-
   pname = "kanata-tray";
   inherit (source) src version;
 

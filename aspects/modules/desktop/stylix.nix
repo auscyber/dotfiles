@@ -4,7 +4,6 @@
   lib,
   ...
 }:
-
 let
   stylixDefaults = user: {
     enable = true;
@@ -27,12 +26,14 @@ let
       true;
 in
 {
-
   flake-file.inputs.stylix.url = "github:nix-community/stylix";
 
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =
-    ctx@{ user, host }:
+    ctx@{
+      user,
+      host,
+    }:
     if isHMUser ctx && isStandalone ctx then
       [
         (den.lib.policy.provide {
@@ -48,7 +49,6 @@ in
       [ ];
 
   den.aspects.stylix = {
-
     darwin = {
       imports = lib.optional (inputs ? stylix) inputs.stylix.darwinModules.default;
     };
@@ -60,7 +60,6 @@ in
     os = { user, ... }: {
       stylix = stylixDefaults user;
     };
-
   };
 
   # Register the policy on user schema

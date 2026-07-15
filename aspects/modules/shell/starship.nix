@@ -1,5 +1,4 @@
 {
-
   den.aspects.starship.homeManager = { user, ... }: {
     programs.starship = {
       enable = true;
@@ -156,7 +155,6 @@
         swift = {
           symbol = "ﯣ ";
         };
-
       };
     };
   };

@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   den.aspects.auspc = {
     overlays = {
       linuxZenMuQSS = self: super: {
@@ -37,7 +36,6 @@
 
                   version = kernelVersion;
                   modDirVersion = kernelVersion;
-
                 };
               #          stdenv = llvmKernelStdenv;
               inherit stdenv;
@@ -64,7 +62,6 @@
                     LTO_CLANG_THIN = lib.mkForce yes;
                   };
                   ignoreConfigErrors = true;
-
                 }
               ];
             })
@@ -76,9 +73,12 @@
     };
 
     nixos =
-      { pkgs, config, ... }:
       {
-
+        pkgs,
+        config,
+        ...
+      }:
+      {
         boot.kernelPackages = pkgs.linuxZenWMuQSS;
       };
   };

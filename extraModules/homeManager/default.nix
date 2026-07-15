@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-
 let
   cfg = config.services.sccache;
   sccacheBin = "${cfg.package}/bin/sccache";

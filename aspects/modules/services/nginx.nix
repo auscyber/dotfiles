@@ -1,7 +1,14 @@
-{ lib, den, ... }:
+{
+  lib,
+  den,
+  ...
+}:
 let
   nginxVhosts =
-    { class, aspect-chain }:
+    {
+      class,
+      aspect-chain,
+    }:
     den.batteries.forward {
       each = lib.singleton true; # single forward; item ignored
       fromClass = _: "vhosts"; # the custom class you write into

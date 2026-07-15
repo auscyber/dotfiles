@@ -197,5 +197,4 @@ stdenv.mkDerivation rec {
       licenses.bsd3
     ];
   };
-
 }

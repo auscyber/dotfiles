@@ -80,8 +80,11 @@ in
 
   # Provide nixvim HM module to users with homeManager class
   den.policies.nixvim-hm-module =
-    { host, user, ... }:
-
+    {
+      host,
+      user,
+      ...
+    }:
     (den.lib.policy.provide {
       class = "homeManager";
       module = {

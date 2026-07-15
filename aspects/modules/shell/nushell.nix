@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.nushell = {
     includes = [ den.aspects.shell ];
     homeManager = {

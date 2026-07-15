@@ -1,5 +1,8 @@
-{ den, rootPath, ... }:
-
+{
+  den,
+  rootPath,
+  ...
+}:
 {
   den.aspects.sketchybar = {
     darwin = { pkgs, ... }: {
@@ -18,9 +21,7 @@
         lib,
         ...
       }:
-
       let
-
         colors = config.stylix.base16Scheme;
 
         colourConfig = {
@@ -51,7 +52,6 @@
               install -Dm644 ${pkgs.sketchybar-app-font}/lib/sketchybar-app-font/icon_map.lua "$out/share/lua/${luaPs.lua.luaversion}/icon_map.lua"
             ''
           );
-
       in
       {
         home.file.".config/sketchybar" = {

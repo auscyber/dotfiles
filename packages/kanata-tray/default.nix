@@ -1,11 +1,7 @@
-{
-  ...
-}:
-{
+{ ... }: {
   nvfetcher.sources.kanata-tray = {
     src.github = "rszyma/kanata-tray";
     fetch.github = "rszyma/kanata-tray";
-
   };
 
   den.aspects.packages.kanata-tray = {

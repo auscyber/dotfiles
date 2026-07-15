@@ -5,14 +5,12 @@
   ...
 }:
 {
-
   ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
   den.aspects.gpus.includes = [
     (
       { host, ... }:
       lib.optionalAttrs (host ? gpu && host == "nvidia" && inputs ? nixos-hardware) {
         nixos =
-
           {
             config,
             lib,
@@ -59,7 +57,6 @@
             boot.extraModulePackages = with config.boot.kernelPackages; [
               nct6687d
               acpi_call
-
             ];
             hardware.enableAllFirmware = true;
             hardware.enableRedistributableFirmware = true;
@@ -70,12 +67,10 @@
             boot.kernelParams = [
               "nvidia-drm.modeset=1"
               #    "nvidia.NVreg_UsePageAttributeTable=1"
-
             ];
           };
       }
     )
   ];
   den.aspects.auspc.includes = [ den.aspects.gpus ];
-
 }

@@ -23,5 +23,4 @@ in
     })
   ];
   den.schema.flake-parts.includes = [ den.policies.devshell-to-flake-parts ];
-
 }

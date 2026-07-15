@@ -1,6 +1,4 @@
-{ rootPath, ... }:
-{
-
+{ rootPath, ... }: {
   den.aspects.packages.ivy-fetch = {
     overlays = { sources, ... }: {
       ivy-fetch = self: super: {
@@ -12,7 +10,5 @@
         };
       };
     };
-
   };
-
 }

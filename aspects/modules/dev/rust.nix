@@ -1,54 +1,58 @@
-{ den, ... }:
-{
+{ den, ... }: {
   ff.crane.url = "github:ipetkov/crane";
 
   den.aspects.nixvim.includes = [ den.aspects.lspmux ];
-  den.aspects.nixvim.nvim = { pkgs, lib, ... }: {
-    plugins = {
-      lsp.servers.rust_analyzer.packageFallback = true;
-      #      lsp.servers.rust_analyzer.cmd = [
-      #        "${pkgs.lspmux}"
-      #        "client"
-      #      ];
-      rustaceanvim = {
-        enable = true;
+  den.aspects.nixvim.nvim =
+    {
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+      plugins = {
+        lsp.servers.rust_analyzer.packageFallback = true;
+        #      lsp.servers.rust_analyzer.cmd = [
+        #        "${pkgs.lspmux}"
+        #        "client"
+        #      ];
+        rustaceanvim = {
+          enable = true;
 
-        settings = {
-          lsp.clientOpts.auto_attach = true;
+          settings = {
+            lsp.clientOpts.auto_attach = true;
 
-          server = {
-            auto_attach = true;
-            cmd = [
-              "${lib.getExe pkgs.lspmux}"
-              "client"
-            ];
+            server = {
+              auto_attach = true;
+              cmd = [
+                "${lib.getExe pkgs.lspmux}"
+                "client"
+              ];
 
-            default_settings = {
-              rust-analyzer = {
-                files = {
-                  excludeDirs = [ ".direnv" ];
-                };
-                inlayHints = {
-                  lifetimeElisionHints = {
-                    enable = "always";
+              default_settings = {
+                rust-analyzer = {
+                  files = {
+                    excludeDirs = [ ".direnv" ];
                   };
-                };
-                #              checkOnSave.command = "clippy";
+                  inlayHints = {
+                    lifetimeElisionHints = {
+                      enable = "always";
+                    };
+                  };
+                  #              checkOnSave.command = "clippy";
 
-                procMacro.enable = true;
+                  procMacro.enable = true;
+                };
               };
             };
           };
         };
-      };
 
-      conform-nvim.settings.formatters.rustfmt = {
-        command = lib.getExe pkgs.rustfmt;
+        conform-nvim.settings.formatters.rustfmt = {
+          command = lib.getExe pkgs.rustfmt;
+        };
+        conform-nvim.settings.formatters_by_ft.rust = [
+          "rustfmt"
+        ];
       };
-      conform-nvim.settings.formatters_by_ft.rust = [
-        "rustfmt"
-      ];
     };
-  };
-
 }

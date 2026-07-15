@@ -2,7 +2,6 @@
   nvfetcher.sources.jankyborders = {
     src.git = "https://github.com/felixkratz/jankyborders";
     fetch.git = "https://github.com/felixkratz/jankyborders";
-
   };
 
   den.aspects.packages.jankyborders = {
@@ -12,9 +11,7 @@
           inherit (sources.jankyborders) src version;
           patches = [ ../patches/jankyborders/offscreen.patch ];
         });
-
       };
     };
-
   };
 }

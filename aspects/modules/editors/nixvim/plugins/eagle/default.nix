@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.nixvim = {
     nvim =
       { lib, ... }:
@@ -11,5 +10,4 @@
       };
     includes = [ den.aspects.packages.eagle-nvim ];
   };
-
 }

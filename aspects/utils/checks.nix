@@ -1,10 +1,18 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  ...
+}:
 # Lightweight, eval-driven flake checks that assert on key host features
 # without forcing a full system build (no stylix IFD, no remote builders).
 # Run with `nix flake check` on an x86_64-linux machine/builder.
 {
   perSystem =
-    { pkgs, system, ... }:
+    {
+      pkgs,
+      system,
+      ...
+    }:
     lib.optionalAttrs (system == "x86_64-linux") {
       checks =
         let

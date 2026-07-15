@@ -1,5 +1,4 @@
 {
-
   den.aspects.nixvim.nvim = {
     plugins.neo-tree.enable = true;
     plugins.lsp-file-operations.enable = true;
@@ -15,5 +14,4 @@
       }
     ];
   };
-
 }

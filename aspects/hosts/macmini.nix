@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.hosts.aarch64-darwin.macmini = {
     roles = [ "gui" ];
     users.ivypierlot = {

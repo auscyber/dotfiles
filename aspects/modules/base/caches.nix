@@ -16,7 +16,6 @@ let
     #      "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c=";
     "https://cache.ivymect.in/main" = "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0=";
     #    "https://attic.xuyh0120.win/lantian" = "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=";
-
   };
   vhost = "cache.ivymect.in";
 
@@ -57,15 +56,12 @@ let
         ${patternArgs "--pull" pull} \
         ${patternArgs "--push" push}
     '';
-
 in
 {
-
   debug = true;
   den.aspects.nix.nix.settings = {
     trusted-substituters = builtins.attrNames caches;
     trusted-public-keys = builtins.attrValues caches;
-
   };
 
   # secondpc runs the ncps binary cache (served directly on :8501) plus celler
@@ -111,45 +107,41 @@ in
         '';
       };
 
-      nixos =
-        { config, ... }:
-        {
-          imports = [ inputs.celler.nixosModules.cellerd ];
+      nixos = { config, ... }: {
+        imports = [ inputs.celler.nixosModules.cellerd ];
 
-          services.cellerd = {
-            enable = true;
-            environmentFile = "${config.age.templates."celler_env".path}";
-            useFlakeCompatOverlay = false;
-            settings = {
-              listen = "[::]:${toString port}";
-              storage = {
-                type = "local";
-                path = "/mnt/hdd/attic";
-              };
+        services.cellerd = {
+          enable = true;
+          environmentFile = "${config.age.templates."celler_env".path}";
+          useFlakeCompatOverlay = false;
+          settings = {
+            listen = "[::]:${toString port}";
+            storage = {
+              type = "local";
+              path = "/mnt/hdd/attic";
+            };
 
-              jwt = { };
+            jwt = { };
 
-              # Data chunking. Changing these makes existing chunks unreusable
-              # (different cutpoints), hurting dedup until re-uploaded.
-              chunking = {
-                nar-size-threshold = 64 * 1024; # 64 KiB
-                min-size = 16 * 1024; # 16 KiB
-                avg-size = 64 * 1024; # 64 KiB
-                max-size = 256 * 1024; # 256 KiB
-              };
+            # Data chunking. Changing these makes existing chunks unreusable
+            # (different cutpoints), hurting dedup until re-uploaded.
+            chunking = {
+              nar-size-threshold = 64 * 1024; # 64 KiB
+              min-size = 16 * 1024; # 16 KiB
+              avg-size = 64 * 1024; # 64 KiB
+              max-size = 256 * 1024; # 256 KiB
             };
           };
-
-          age.secrets.cache_keyy.rekeyFile = ./cache.age;
-          age.templates.celler_env = {
-            dependencies.cache_key = config.age.secrets.cache_keyy;
-            content =
-              { placeholders, ... }:
-              ''
-                CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
-              '';
-          };
         };
+
+        age.secrets.cache_keyy.rekeyFile = ./cache.age;
+        age.templates.celler_env = {
+          dependencies.cache_key = config.age.secrets.cache_keyy;
+          content = { placeholders, ... }: ''
+            CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
+          '';
+        };
+      };
     };
 
   # Opt-in per-host cache credentials. A host that includes this aspect gets its
@@ -164,9 +156,12 @@ in
     overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
 
     secrets =
-      { secrets, host, ... }:
       {
-
+        secrets,
+        host,
+        ...
+      }:
+      {
         cache_key = {
           rekeyFile = ./cache.age;
           intermediary = lib.mkDefault true;
@@ -177,25 +172,23 @@ in
           script = cellerTokenScript { sub = host.name; };
         };
       };
-    templates =
-      { secrets, ... }:
-      {
-        netrc = {
-          dependencies = {
-            inherit (secrets) celler_token;
-          };
-          content =
-            {
-              pkgs,
-              placeholders,
-              ...
-            }:
-            ''
-                      machine ${vhost}
-              		password ${placeholders.celler_token}
-              	  '';
+    templates = { secrets, ... }: {
+      netrc = {
+        dependencies = {
+          inherit (secrets) celler_token;
         };
+        content =
+          {
+            pkgs,
+            placeholders,
+            ...
+          }:
+          ''
+                  machine ${vhost}
+            password ${placeholders.celler_token}
+          '';
       };
+    };
 
     os =
       {
@@ -234,13 +227,11 @@ in
           meta.mainProgram = "build-hook";
         };
       in
-
       {
         nix.settings = {
           post-build-hook = "${build-hook}";
           netrc-file = config.age.templates.netrc.path;
         };
-
       };
   };
 
@@ -253,5 +244,4 @@ in
     extra-substituters = builtins.attrNames caches;
     extra-trusted-public-keys = builtins.attrValues caches;
   };
-
 }

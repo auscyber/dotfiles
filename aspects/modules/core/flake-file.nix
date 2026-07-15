@@ -153,7 +153,5 @@
       in
       builtins.removeAttrs output [ "newInputs" ]
     '';
-
   };
-
 }

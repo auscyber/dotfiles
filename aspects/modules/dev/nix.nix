@@ -1,4 +1,8 @@
-{ den, rootPath, ... }:
+{
+  den,
+  rootPath,
+  ...
+}:
 {
   den.aspects.dev-nix = { user, ... }: {
     templates =
@@ -24,15 +28,24 @@
             '';
         };
       };
-    secrets = { config, user, ... }: {
-      nix_github_token = {
-        rekeyFile = rootPath + "/secrets/github_token.age";
-      };
-    };
-    homeManager =
-      { pkgs, config, ... }:
+    secrets =
       {
-
+        config,
+        user,
+        ...
+      }:
+      {
+        nix_github_token = {
+          rekeyFile = rootPath + "/secrets/github_token.age";
+        };
+      };
+    homeManager =
+      {
+        pkgs,
+        config,
+        ...
+      }:
+      {
         nix.extraOptions = ''
           !include ${config.age.templates."extra-nix-conf".path}
         '';

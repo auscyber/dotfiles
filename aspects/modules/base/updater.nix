@@ -1,8 +1,16 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.updater = {
     homeManager =
-      { pkgs, config, ... }:
+      {
+        pkgs,
+        config,
+        ...
+      }:
       let
         finalPackage = pkgs.writeShellApplication {
           name = "update-config";

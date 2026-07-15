@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.openssh = {
     nixos = {
       services.openssh = {

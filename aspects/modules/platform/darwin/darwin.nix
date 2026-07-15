@@ -7,7 +7,6 @@
   # Patches are auto-included from ./patches/darwin/*.patch.
   patchedInputs.darwin = { };
   den.aspects.nix.darwin = {
-
     nix.distributedBuilds = true;
 
     nix.linux-builder = {
@@ -20,5 +19,4 @@
       #    config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
     };
   };
-
 }

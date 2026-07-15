@@ -4,7 +4,6 @@
   den,
   ...
 }:
-
 {
   flake-file = {
     inputs = {
@@ -15,7 +14,6 @@
         url = "github:nix-community/NUR";
         inputs.nixpkgs.follows = "nixpkgs";
       };
-
     };
   };
   patchedInputs.zen-browser = {
@@ -23,7 +21,6 @@
   };
 
   den.aspects.browsers.zen = {
-
     includes = [
       den.aspects.stylix
       (
@@ -54,14 +51,12 @@
                   helium-browser
         '';
         mode = "0755";
-
       };
     };
     study.zen-browser = { pkgs, ... }: {
       extensions.packages = with pkgs.firefox-addons; [
         libkey-nomad
       ];
-
     };
 
     overlays = {
@@ -74,10 +69,8 @@
             aarch64-linux = inputs.zen-browser.packages.aarch64-linux.beta-unwrapped;
           };
         in
-
         {
           zen-browser = zen-browser.${self.stdenv.hostPlatform.system} or super.zen-browser;
-
         };
       nur = inputs.nur.overlays.default;
 
@@ -103,7 +96,6 @@
         profileName = config.zen.profileName;
       in
       {
-
         imports = [
           inputs.zen-browser.homeModules.default
           (lib.mkAliasOptionModule
@@ -116,7 +108,6 @@
           default = "ivy (Default)";
         };
         config = {
-
           home.packages = with pkgs; [ zen-browser ];
           home.sessionVariables.BROWSER = "zen";
           stylix.targets.zen-browser.profileNames = [ profileName ];
@@ -264,7 +255,6 @@
                 kagi-search
                 ublock-origin
               ];
-
             };
           };
 
@@ -289,5 +279,4 @@
         };
       };
   };
-
 }

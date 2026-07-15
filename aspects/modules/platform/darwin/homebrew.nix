@@ -5,28 +5,37 @@
   ...
 }:
 let
-
   tapChanged = lib.mapAttrs (
     name: value: rec {
       input-name = "homebrew-${name}";
       url = "github:${value}";
       tapName = value;
       input = inputs."${input-name}";
-
     }
   );
-
 in
-
 {
   flake-file.inputs = {
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
+  den.policies.route-casks =
+    { host, user, ... }:
+    let
+      inherit (den.lib.policy) pipe;
+    in
+    [
+      (pipe.from "casks" [
+        pipe.expose
+      ])
+    ];
+
+  den.default.includes = [ den.policies.route-casks ];
 
   den.quirks.brew.description = "Brew packages, casks and taps";
   den.schema.flake.include = [ den.policies.route-taps ];
 
   den.aspects.homebrew = {
+    includes = [ den.policies.route-casks ];
     brew.taps = {
       cask = "homebrew/homebrew-cask";
       core = "homebrew/homebrew-core";
@@ -79,7 +88,6 @@ in
           );
           mutableTaps = false;
           autoMigrate = true;
-
         };
         homebrew = {
           taps = builtins.attrNames config.nix-homebrew.taps;
@@ -95,5 +103,4 @@ in
         };
       };
   };
-
 }

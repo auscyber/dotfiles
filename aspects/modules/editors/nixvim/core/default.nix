@@ -1,10 +1,7 @@
-{ den, ... }:
-{
-  perSystem =
-    { pkgs, ... }:
-    {
-      packages.nvim = den.lib.nixvim.mkPackage { inherit pkgs; };
-    };
+{ den, ... }: {
+  perSystem = { pkgs, ... }: {
+    packages.nvim = den.lib.nixvim.mkPackage { inherit pkgs; };
+  };
 
   den.aspects.nixvim.includes = [
     (den.batteries.unfree [
@@ -250,29 +247,30 @@
         conform-nvim = {
           enable = true;
           settings = {
-            format_on_save = # Lua
+            format_on_save =
+              # Lua
               ''
 
-                	       function(bufnr)
-                	if not _G.slow_format_filetypes then
-                	           _G.slow_format_filetypes = {}
-                	         end
-                	         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-                	           return
-                	         end
+                       function(bufnr)
+                if not _G.slow_format_filetypes then
+                           _G.slow_format_filetypes = {}
+                         end
+                         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                           return
+                         end
 
-                	         if slow_format_filetypes[vim.bo[bufnr].filetype] then
-                	           return
-                	         end
+                         if slow_format_filetypes[vim.bo[bufnr].filetype] then
+                           return
+                         end
 
-                	         local function on_format(err)
-                	           if err and err:match("timeout$") then
-                	             slow_format_filetypes[vim.bo[bufnr].filetype] = true
-                	           end
-                	         end
+                         local function on_format(err)
+                           if err and err:match("timeout$") then
+                             slow_format_filetypes[vim.bo[bufnr].filetype] = true
+                           end
+                         end
 
-                	         return { timeout_ms = 200, lsp_fallback = true }, on_format
-                	        end
+                         return { timeout_ms = 200, lsp_fallback = true }, on_format
+                        end
               '';
             formatters = {
               injected = {
@@ -284,12 +282,10 @@
                   interpolation_queries = {
                     nix = "((interpolation) @interp)";
                   };
-
                 };
               };
               shellcheck = {
                 command = lib.getExe pkgs.shellcheck;
-
               };
               shfmt = {
                 command = lib.getExe pkgs.shfmt;

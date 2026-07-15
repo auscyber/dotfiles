@@ -4,9 +4,7 @@
   ...
 }:
 {
-
   den.hosts.aarch64-darwin.Ivys-MacBook-Pro = {
-
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
     roles = [
       "study"
@@ -26,7 +24,6 @@
   };
 
   den.aspects.Ivys-MacBook-Pro = {
-
     includes = [
       den.aspects.vpn
       den.aspects.homebrew
@@ -39,7 +36,11 @@
     vpn = { };
 
     darwin =
-      { pkgs, lib, ... }:
+      {
+        pkgs,
+        lib,
+        ...
+      }:
       {
         stylix.targets.jankyborders.enable = false;
         services.karabiner-elements.enable = false;
@@ -123,6 +124,7 @@
   den.aspects.ivypierlot = {
     study.includes = [ den.aspects.zotero ];
     includes = [
+      den.aspects.homebrew
       den.aspects.agenix-rekey
       den.aspects.onepassword
       den.aspects.nixvim
@@ -151,64 +153,62 @@
     provides.Ivys-MacBook-Pro.provides.to-users = {
       brew.casks = [ "discord" ];
 
-      homeManager =
-        { pkgs, ... }:
-        {
-          home.packages = with pkgs; [
-            cotabby
-            claude-code
-            nodejs
-            opencode
-            vscode
-            pandoc
-            texliveFull
-            mupdf
-            qemu
-            input-leap
-            pinentry_mac
-          ];
+      homeManager = { pkgs, ... }: {
+        home.packages = with pkgs; [
+          cotabby
+          claude-code
+          nodejs
+          opencode
+          vscode
+          pandoc
+          texliveFull
+          mupdf
+          qemu
+          input-leap
+          pinentry_mac
+        ];
 
-          services.yubikey-agent.enable = true;
-          #        programs.discord.enable = true;
+        services.yubikey-agent.enable = true;
+        #        programs.discord.enable = true;
 
-          # 1Password SSH-key commit signing (mirrors the old home config).
-          programs.git.signing = {
-            format = "ssh";
-            signByDefault = true;
-            key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
-            signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
-          };
-          programs.jujutsu.settings = {
-            signing = {
-              behavior = "drop";
-              backend = "ssh";
-              key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
-              backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
-            };
-            git.sign-on-push = true;
-          };
-
-          # Laptop SSH hosts + 1Password agent socket.
-          programs.ssh.settings = {
-            "*".identityAgent = "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock";
-            "auspc" = {
-              forwardAgent = true;
-              hostname = "192.168.0.24";
-              user = "auscyber";
-            };
-            "secondpc".forwardAgent = true;
-            "faggot.sh".forwardAgent = true;
-          };
-          # macOS per-user defaults carried over from the old home config.
-          targets.darwin.defaults.NSGlobalDomain = {
-            AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";
-            AppleInterfaceStyle = "Dark";
-            AppleShowAllFiles = true;
-            ApplePressAndHoldEnabled = false;
-            InitialKeyRepeat = 10;
-            KeyRepeat = 3;
-          };
+        # 1Password SSH-key commit signing (mirrors the old home config).
+        programs.git.signing = {
+          format = "ssh";
+          signByDefault = true;
+          key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
+          signer = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
         };
+        programs.jujutsu.settings = {
+          signing = {
+            behavior = "drop";
+            backend = "ssh";
+            key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuXMdca6Lz0Rxz+EmKy/cSXuBev6knlsdKzm7R5D4E1";
+            backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+          };
+          git.sign-on-push = true;
+        };
+
+        # Laptop SSH hosts + 1Password agent socket.
+        programs.ssh.settings = {
+          "*".identityAgent = "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+          "auspc" = {
+            forwardAgent = true;
+            hostname = "192.168.0.24";
+            user = "auscyber";
+          };
+          "secondpc".forwardAgent = true;
+          "faggot.sh".forwardAgent = true;
+        };
+        # macOS per-user defaults carried over from the old home config.
+        targets.darwin.defaults.NSGlobalDomain = {
+          AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";
+          AppleInterfaceStyle = "Dark";
+          AppleShowAllFiles = true;
+          ApplePressAndHoldEnabled = false;
+          InitialKeyRepeat = 10;
+          KeyRepeat = 3;
+        };
+      };
     };
   };
 }
