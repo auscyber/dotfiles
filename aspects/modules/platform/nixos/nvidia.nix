@@ -9,7 +9,7 @@
   den.aspects.gpus.includes = [
     (
       { host, ... }:
-      lib.optionalAttrs (host ? gpu && host == "nvidia" && inputs ? nixos-hardware) {
+      lib.optionalAttrs (host ? gpu && host.gpu == "nvidia" && inputs ? nixos-hardware) {
         nixos =
           {
             config,

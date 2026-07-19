@@ -52,6 +52,13 @@
       (den.batteries.unfree [ "intel-ocl" ])
     ];
 
+    # Render wg0 as a networkd netdev rather than a wg-quick unit. This host
+    # bridges and routes for the LAN, and networkd is what its working
+    # pre-dendritic config used; it also brings systemd-resolved back, without
+    # which /etc/resolv.conf is left pointing at a stub resolver that nothing
+    # is listening on.
+    vpn.backend = "networkd";
+
     nixos =
       {
         config,
@@ -143,9 +150,15 @@
                 "com.sun:auto-snapshot" = "false";
                 mountpoint = "none";
               };
+              # The installed pool has `mountpoint=legacy` on both datasets.
+              # disko only omits `-o zfsutil` from the generated fileSystems
+              # when it sees that property, and mounting a legacy dataset with
+              # zfsutil fails outright — which under systemd stage 1 (on by
+              # default now) surfaces as sysroot failing to mount.
               datasets.nixos = {
                 type = "zfs_fs";
                 mountpoint = "/";
+                options.mountpoint = "legacy";
               };
             };
             zpool = {
@@ -158,12 +171,18 @@
               datasets.root = {
                 type = "zfs_fs";
                 mountpoint = "/mnt/hdd";
+                options.mountpoint = "legacy";
               };
             };
           };
         };
 
-        # Networking: bridge + static ipv4
+        # Networking: bridge + static ipv4, rendered by systemd-networkd.
+        # `den.aspects.vpn-server` selects the networkd wireguard backend, which
+        # turns on `networking.useNetworkd`; the `networking.*` options below are
+        # translated into .network units by nixpkgs. Note that networkd asserts
+        # `defaultGateway.interface` is set, so the plain-string form is not
+        # usable here.
         networking.useDHCP = false;
         networking.enableIPv6 = true;
         networking.bridges.br0.interfaces = [ "enp2s0" ];
@@ -174,8 +193,15 @@
             prefixLength = 24;
           }
         ];
-        networking.defaultGateway = "192.168.0.1";
+        networking.defaultGateway = {
+          address = "192.168.0.1";
+          interface = "br0";
+        };
         networking.nameservers = [ "1.1.1.1" ];
+
+        # A bridge whose only member has no carrier will otherwise stall
+        # network-online.target for the full timeout on a headless box.
+        systemd.network.wait-online.ignoredInterfaces = [ "br0" ];
         networking.defaultGateway6 = {
           address = "2403:5813:cd5c:0:120c:6bff:fe12:9ab5";
           interface = "br0";

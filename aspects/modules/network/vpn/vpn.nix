@@ -36,6 +36,17 @@ let
       adaptArgs = lib.id;
     };
 
+  # networkd spells peers with capitalised keys and takes Endpoint /
+  # PersistentKeepalive only on the client side, where `peers` supplies them.
+  toNetworkdPeer =
+    p:
+    {
+      PublicKey = p.publicKey;
+      AllowedIPs = p.allowedIPs;
+    }
+    // lib.optionalAttrs (p ? endpoint) { Endpoint = p.endpoint; }
+    // lib.optionalAttrs (p ? persistentKeepalive) { PersistentKeepalive = p.persistentKeepalive; };
+
   vpnSubmodule = {
     options = {
       role = lib.mkOption {
@@ -46,9 +57,36 @@ let
         default = "client";
         description = "Whether this host is a wireguard client or the server.";
       };
+      backend = lib.mkOption {
+        type = lib.types.enum [
+          "wg-quick"
+          "networkd"
+        ];
+        default = "wg-quick";
+        description = ''
+          How to realise the tunnel. `networkd` renders it as a systemd-networkd
+          netdev + network and forces `networking.useNetworkd`, which also pulls
+          in systemd-resolved; `wg-quick` uses the standalone wg-quick unit on
+          top of scripted networking.
+        '';
+      };
       interface = lib.mkOption {
         type = lib.types.str;
         default = "wg0";
+      };
+      listenPort = lib.mkOption {
+        type = lib.types.nullOr lib.types.port;
+        default = null;
+        description = "UDP port to listen on. Servers must set this; clients dial out.";
+      };
+      natExternalInterface = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Uplink to masquerade tunnel traffic out of, for the `wg-quick` backend
+          only. The `networkd` backend uses `IPMasquerade` on the tunnel's
+          .network instead and ignores this.
+        '';
       };
       ipAddress = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
@@ -138,11 +176,53 @@ in
           type = lib.types.submodule vpnSubmodule;
           default = { };
         };
-        config.networking.wg-quick.interfaces.${cfg.interface} = {
-          address = [ "${ip}/24" ];
-          privateKeyFile = config.age.secrets.wireguard_key.path;
-          inherit peers;
-        };
+
+        config = lib.mkMerge [
+          (lib.mkIf (cfg.backend == "wg-quick") {
+            networking.wg-quick.interfaces.${cfg.interface} = {
+              address = [ "${ip}/24" ];
+              privateKeyFile = config.age.secrets.wireguard_key.path;
+              inherit peers;
+            }
+            // lib.optionalAttrs (cfg.listenPort != null) { inherit (cfg) listenPort; };
+          })
+
+          (lib.mkIf (cfg.backend == "networkd") {
+            networking.useNetworkd = true;
+
+            # networkd opens the key as the systemd-network user; wg-quick runs
+            # as root and does not care.
+            age.secrets.wireguard_key = {
+              owner = "systemd-network";
+              group = "systemd-network";
+            };
+
+            systemd.network.netdevs."50-${cfg.interface}" = {
+              netdevConfig = {
+                Kind = "wireguard";
+                Name = cfg.interface;
+                MTUBytes = "1500";
+              };
+              wireguardConfig = {
+                PrivateKeyFile = config.age.secrets.wireguard_key.path;
+                RouteTable = "main";
+              }
+              // lib.optionalAttrs (cfg.listenPort != null) { ListenPort = cfg.listenPort; };
+              wireguardPeers = map toNetworkdPeer peers;
+            };
+
+            systemd.network.networks.${cfg.interface} = {
+              matchConfig.Name = cfg.interface;
+              address = [ "${ip}/24" ];
+            }
+            // lib.optionalAttrs (cfg.role == "server") {
+              networkConfig = {
+                IPMasquerade = "ipv4";
+                IPv4Forwarding = true;
+              };
+            };
+          })
+        ];
       };
   };
 }

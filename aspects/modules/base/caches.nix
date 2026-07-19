@@ -1,7 +1,6 @@
 {
   inputs,
   den,
-  self,
   lib,
   ...
 }:
@@ -26,8 +25,28 @@ let
   # only the resulting per-host token is rekeyed onto the target.
   #
   # `celleradm make-token` reads only the [jwt] block; database/storage/chunking
-  # merely have to parse, so they are stubbed. Empty [jwt] matches the server
-  # (no bound issuer/audience).
+  # merely have to parse. Empty [jwt] matches the server (no bound
+  # issuer/audience).
+  #
+  # Settings come from evaluating the `celler` aspect's own nixos content against
+  # the upstream cellerd module in a throwaway fixpoint, so the token config
+  # tracks the aspect directly instead of dragging a whole host evaluation in for
+  # five lines of settings. `_module.check = false` lets the aspect's `age.*`
+  # definitions (and cellerd's own systemd/assertions/nixpkgs output) sit
+  # unmatched -- nothing forces them, we only pull `services.cellerd.settings`.
+  cellerdSettings =
+    pkgs:
+    (lib.evalModules {
+      modules = [
+        inputs.celler.nixosModules.cellerd
+        {
+          _module.args = { inherit pkgs; };
+          _module.check = false;
+        }
+      ]
+      ++ den.lib.aspects.fx.contentUtil.unwrapContentValuesList den.aspects.celler.nixos;
+    }).config.services.cellerd.settings;
+
   cellerTokenScript =
     {
       sub,
@@ -43,9 +62,7 @@ let
       ...
     }:
     let
-      tokenConfig =
-        (pkgs.formats.toml { }).generate "celler-token.toml"
-          self.nixosConfigurations.secondpc.config.services.cellerd.settings;
+      tokenConfig = (pkgs.formats.toml { }).generate "celler-token.toml" (cellerdSettings pkgs);
       patternArgs = flag: lib.concatMapStringsSep " " (p: "${flag} ${lib.escapeShellArg p}");
     in
     ''

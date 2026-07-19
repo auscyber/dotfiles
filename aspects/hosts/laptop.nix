@@ -140,7 +140,7 @@
       # shims, so without this the shims have nothing to connect to.
       den.aspects.lspmux
       den.aspects.fish
-      #      den.aspects.celler-push
+      den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.sketchybar
