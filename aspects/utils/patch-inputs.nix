@@ -546,7 +546,7 @@ in
     # identical output — it only decides which host can *build* it on a cold
     # cache (a warm cache substitutes it cross-system regardless). For an input
     # without a hash it still determines the path, as before.
-    default = builtins.currentSystem or (builtins.head config.systems);
+    default = builtins.currentSystem or "x86_64-linux"; # or (builtins.head config.systems);
     defaultText = lib.literalExpression "builtins.currentSystem or (builtins.head config.systems)";
     description = ''
       System whose `pkgs` *builds* the patched source trees. See the comment in

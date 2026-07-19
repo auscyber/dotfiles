@@ -170,7 +170,7 @@
           enable = true;
           polkitPolicyOwners = [ "auscyber" ];
         };
-
+        boot.initrd.compressor = "bzip2";
 
         users.users.auscyber = {
           isNormalUser = true;
