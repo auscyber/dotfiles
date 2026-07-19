@@ -123,17 +123,24 @@
               root = {
                 type = "zfs_fs";
                 mountpoint = "/";
+                options.mountpoint = "legacy";
               };
               nix = {
                 type = "zfs_fs";
+
+                options.mountpoint = "legacy";
                 mountpoint = "/nix";
               };
               var = {
+
+                options.mountpoint = "legacy";
                 type = "zfs_fs";
                 mountpoint = "/var";
               };
               home = {
                 type = "zfs_fs";
+
+                options.mountpoint = "legacy";
                 mountpoint = "/home";
               };
             };
