@@ -41,12 +41,11 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn (patchedInputs);
+        inputsFn patchedInputs;
     in
     builtins.removeAttrs output [ "newInputs" ];
 
   nixConfig = {
-    extra-experimental-features = [ "pipe-operators" ];
     extra-substituters = [
       "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
@@ -216,6 +215,13 @@
     nvfetcher.url = "github:berberman/nvfetcher";
     op-shell-plugins.url = "github:1Password/shell-plugins";
     pandoc.url = "github:srid/pandoc?ref=haskell-flake-revamp";
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     rift.url = "github:auscyber/rift";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";

@@ -26,7 +26,11 @@ let
 in
 {
   perSystem =
-    { config, pkgs, ... }:
+    {
+      config,
+      pkgs,
+      ...
+    }:
     {
       options._lspServers = lib.mkOption {
         type = lib.types.attrsOf serverSpecType;

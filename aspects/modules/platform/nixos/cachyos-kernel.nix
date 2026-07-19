@@ -1,6 +1,9 @@
-{ inputs, den, ... }:
 {
-
+  inputs,
+  den,
+  ...
+}:
+{
   ff.nix-cachyos-kernel = {
     url = "github:xddxdd/nix-cachyos-kernel/release";
   };
@@ -46,7 +49,6 @@
                     }
                   );
                 })
-
               ]
             )
           );
@@ -54,7 +56,5 @@
         boot.supportedFilesystems.zfs = true;
         boot.zfs.package = config.boot.kernelPackages.zfs_cachyos;
       };
-
   };
-
 }

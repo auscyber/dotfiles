@@ -8,6 +8,7 @@
       "cmp-nvim-lsp-document-symbol"
       "cmp-copilot"
     ])
+    den.aspects.wakatime
   ];
   den.aspects.nixvim.unfreeAllowed = [
     "cmp-copilot"

@@ -22,7 +22,11 @@
   };
 
   outputs =
-    inputs@{ flake-parts, devenv-root, ... }:
+    inputs@{
+      flake-parts,
+      devenv-root,
+      ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.devenv.flakeModule
@@ -54,7 +58,6 @@
           packages.default = pkgs.hello;
 
           treefmt.config = {
-
           };
           devenv.shells.default = {
             name = "my-project";
@@ -66,15 +69,12 @@
             ];
 
             # https://devenv.sh/reference/options/
-
           };
-
         };
       flake = {
         # The usual flake attributes can be defined here, including system-
         # agnostic ones like nixosModule and system-enumerating ones, although
         # those are more easily expressed in perSystem.
-
       };
     };
 }

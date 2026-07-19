@@ -55,7 +55,30 @@
           pkgs.fish
         ];
 
-        nix.gc.automatic = true;
+        # `gc.automatic` on its own runs `nix-collect-garbage` with no arguments,
+        # which only drops paths nothing refers to. Every system generation is a
+        # GC root, so without `--delete-older-than` the old ones pin their whole
+        # closure forever and the weekly run reclaims almost nothing.
+        nix.gc = {
+          automatic = true;
+          options = "--delete-older-than 14d";
+          interval = {
+            Hour = 3;
+            Minute = 15;
+            Weekday = 7;
+          };
+        };
+
+        # Let the daemon collect mid-build instead of only once a week: when free
+        # space drops under min-free it GCs until max-free is available again.
+        # This machine runs close to full, so the weekly timer alone is too coarse.
+        nix.settings = {
+          min-free = 5 * 1024 * 1024 * 1024;
+          max-free = 25 * 1024 * 1024 * 1024;
+          # Keeping .drv files alive costs space and only buys offline rebuilds
+          # of things already built; not worth it on a space-constrained laptop.
+          keep-derivations = false;
+        };
 
         # Local linux builder VM (ephemeral) for cross-building x86_64/aarch64-linux.
         nix.distributedBuilds = true;
@@ -92,7 +115,6 @@
           "/Applications/Todoist.app"
         ];
       };
-
   };
 
   den.aspects.laptop-brew = {
@@ -169,9 +191,14 @@
           opencode
           vscode
           pandoc
-          texliveFull
+          # Medium over Full: Full costs ~1.4 GB of closure for packages this
+          # machine never pulls in. If a document wants something Medium lacks,
+          # prefer adding that package explicitly over going back to Full.
+          texliveMedium
           mupdf
-          qemu
+          # qemu dropped: nix.linux-builder already brings qemu-host-cpu-only,
+          # which covers the aarch64-linux builder VM. Re-add the full package
+          # only if you need to run VMs for other architectures by hand.
           input-leap
           pinentry_mac
         ];

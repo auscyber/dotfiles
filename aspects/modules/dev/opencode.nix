@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   # Pulls the shared MCP registry (adds programs.mcp.servers.zotero) alongside
   # the servers declared inline below; all merge into the one registry.
   den.aspects.opencode.includes = [ den.aspects.mcp-servers ];
@@ -14,7 +13,11 @@
   # non-existent `source/fastmcp_slim`), which failed the whole system build.
 
   den.aspects.opencode.homeManager =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      ...
+    }:
     {
       home.packages = with pkgs; [
         gemini-cli

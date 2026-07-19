@@ -258,11 +258,9 @@
           # clean single-line assignment.
           age.templates."zeroclaw-env" = {
             dependencies.claude_token = config.age.secrets.claude_token;
-            content =
-              { placeholders, ... }:
-              ''
-                ANTHROPIC_TOKEN=${placeholders.claude_token}
-              '';
+            content = { placeholders, ... }: ''
+              ANTHROPIC_TOKEN=${placeholders.claude_token}
+            '';
           };
 
           # ZeroClaw applies ZEROCLAW_<dotted__path> overrides after loading the

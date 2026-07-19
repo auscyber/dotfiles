@@ -1,5 +1,4 @@
 {
-
   den.aspects.ccache = {
     provides.auspc.nixos = {
       auscybernix.nix.ccache.env.MAX_SIZE = "15G";
@@ -8,8 +7,6 @@
       auscybernix.nix.ccache = {
         enable = true;
       };
-
     };
-
   };
 }

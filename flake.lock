@@ -3177,6 +3177,29 @@
         "type": "github"
       }
     },
+    "plasma-manager": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783574839,
+        "narHash": "sha256-ICof1tV4/9XheBLBGf7dhMhfMq4dOs1zwTHrr7zGFlA=",
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "rev": "c551f0687658e4bb699cfff6015436ad7ee57a0d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "type": "github"
+      }
+    },
     "pre-commit": {
       "inputs": {
         "flake-compat": "flake-compat_5",
@@ -3350,6 +3373,7 @@
         "nvfetcher": "nvfetcher_2",
         "op-shell-plugins": "op-shell-plugins",
         "pandoc": "pandoc",
+        "plasma-manager": "plasma-manager",
         "rift": "rift",
         "rust-overlay": "rust-overlay_3",
         "searchix": "searchix",

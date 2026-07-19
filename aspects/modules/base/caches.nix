@@ -184,24 +184,33 @@ in
       den.aspects.agenix-rekey
     ];
     overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
-    homeManager = { pkgs, config, ... }: {
-
-      age.templates."celler_config" = {
-        path = "${config.home.homeDirectory}/.config/celler/config.toml";
-        dependencies = {
-          inherit (config.age.secrets) celler_token;
+    homeManager =
+      {
+        pkgs,
+        config,
+        ...
+      }:
+      {
+        age.templates."celler_config" = {
+          path = "${config.home.homeDirectory}/.config/celler/config.toml";
+          dependencies = {
+            inherit (config.age.secrets) celler_token;
+          };
+          content =
+            {
+              pkgs,
+              placeholders,
+              ...
+            }:
+            ''
+              default-server = "central"
+              [servers.central]
+              endpoint = "https://${vhost}"
+              token = "${placeholders.celler_token}"
+            '';
         };
-        content =
-          { pkgs, placeholders, ... }:
-          ''
-            default-server = "central"
-            [servers.central]
-            endpoint = "https://${vhost}"
-            token = "${placeholders.celler_token}"
-          '';
+        home.packages = [ pkgs.celler ];
       };
-      home.packages = [ pkgs.celler ];
-    };
 
     secrets =
       {
@@ -220,24 +229,29 @@ in
           script = cellerTokenScript { sub = host.name; };
         };
       };
-    templates = { secrets, config, ... }: {
-
-      netrc = {
-        dependencies = {
-          inherit (secrets) celler_token;
+    templates =
+      {
+        secrets,
+        config,
+        ...
+      }:
+      {
+        netrc = {
+          dependencies = {
+            inherit (secrets) celler_token;
+          };
+          content =
+            {
+              pkgs,
+              placeholders,
+              ...
+            }:
+            ''
+                    machine ${vhost}
+              password ${placeholders.celler_token}
+            '';
         };
-        content =
-          {
-            pkgs,
-            placeholders,
-            ...
-          }:
-          ''
-                  machine ${vhost}
-            password ${placeholders.celler_token}
-          '';
       };
-    };
 
     os =
       {

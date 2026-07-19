@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   ff.crane.url = "github:ipetkov/crane";
 
   # Rust's editor integration is its own aspect; nixvim pulls it in. That keeps the
@@ -15,17 +14,15 @@
     # below -- `nvim = false` keeps the lspmux `nvim` body from also wiring it into
     # `lsp.servers.rust_analyzer` and starting a second client. zed drives it through
     # the shim under zed's own `rust-analyzer` server name.
-    lsp-servers =
-      { pkgs, ... }:
-      {
-        rust_analyzer = {
-          package = pkgs.rust-analyzer;
-          exe = "rust-analyzer";
-          nvim = false;
-          zed = "rust-analyzer";
-          opencode = "rust";
-        };
+    lsp-servers = { pkgs, ... }: {
+      rust_analyzer = {
+        package = pkgs.rust-analyzer;
+        exe = "rust-analyzer";
+        nvim = false;
+        zed = "rust-analyzer";
+        opencode = "rust";
       };
+    };
 
     nvim =
       {

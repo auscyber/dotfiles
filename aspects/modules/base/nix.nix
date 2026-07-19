@@ -47,7 +47,6 @@ in
         "flakes"
         "pipe-operators"
       ];
-
     };
     nix.settings = {
       extra-experimental-features = [

@@ -4,7 +4,6 @@
     programs.zsh.enable = true;
   };
   den.aspects.starship.homeManager = { user, ... }: {
-
     programs.starship = {
       enable = true;
       settings = {

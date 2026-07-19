@@ -8,8 +8,7 @@ let
   # is collected into, and the element type of the `lsp.servers` (homeManager) /
   # `lspmux.servers` (nvim) registries the class is routed into.
   lspSubModule = lib.types.submodule (
-    { config, ... }:
-    {
+    { config, ... }: {
       options = {
         package = lib.mkOption {
           type = lib.types.nullOr lib.types.package;
@@ -295,95 +294,93 @@ in
     # adaptArgs). For the `overlays` forward that builds `pkgs.lspmuxed`, `pkgs` is
     # bound to the overlay's `super`/`prev` -- the pinned fallback package resolves
     # against the project's own package set rather than a bare nixpkgs.
-    lsp-servers =
-      { pkgs, ... }:
-      {
-        clangd = {
-          package = pkgs.clang-tools;
-          exe = "clangd";
-          zed = "clangd";
-        };
-        dhall_lsp_server = {
-          package = pkgs.dhall-lsp-server;
-          exe = "dhall-lsp-server";
-        };
-        docker_compose_language_service = {
-          package = pkgs.docker-compose-language-service;
-          exe = "docker-compose-langserver";
-          args = [ "--stdio" ];
-        };
-        gopls = {
-          package = pkgs.gopls;
-          exe = "gopls";
-          zed = "gopls";
-        };
-        hls = {
-          package = pkgs.haskell-language-server;
-          exe = "haskell-language-server-wrapper";
-          args = [ "--lsp" ];
-          zed = "hls";
-          opencode = "haskell-language-server";
-        };
-        jdtls = {
-          package = pkgs.jdt-language-server;
-          exe = "jdtls";
-          dynamicCmd = true;
-          zed = "jdtls";
-        };
-        kotlin_language_server = {
-          package = pkgs.kotlin-language-server;
-          exe = "kotlin-language-server";
-          zed = "kotlin-language-server";
-          opencode = "kotlin-ls";
-        };
-        lua_ls = {
-          package = pkgs.lua-language-server;
-          exe = "lua-language-server";
-          zed = "lua-language-server";
-          opencode = "lua-ls";
-        };
-        metals = {
-          package = pkgs.metals;
-          exe = "metals";
-          zed = "metals";
-        };
-        nil_ls = {
-          package = pkgs.nil;
-          exe = "nil";
-          zed = "nix";
-          opencode = "nixd";
-        };
-        ocamllsp = {
-          package = pkgs.ocamlPackages.ocaml-lsp;
-          exe = "ocamllsp";
-          zed = "ocamllsp";
-          opencode = "ocaml-lsp";
-        };
-        pyright = {
-          package = pkgs.pyright;
-          exe = "pyright-langserver";
-          args = [ "--stdio" ];
-          zed = "pyright";
-          opencode = "pyright";
-        };
-        tailwindcss = {
-          package = pkgs.tailwindcss-language-server;
-          exe = "tailwindcss-language-server";
-          dynamicCmd = true;
-          zed = "tailwindcss-language-server";
-        };
-        ts_ls = {
-          package = pkgs.typescript-language-server;
-          exe = "typescript-language-server";
-          dynamicCmd = true;
-          zed = "typescript-language-server";
-        };
-        zls = {
-          package = pkgs.zls;
-          exe = "zls";
-          zed = "zls";
-        };
+    lsp-servers = { pkgs, ... }: {
+      clangd = {
+        package = pkgs.clang-tools;
+        exe = "clangd";
+        zed = "clangd";
       };
+      dhall_lsp_server = {
+        package = pkgs.dhall-lsp-server;
+        exe = "dhall-lsp-server";
+      };
+      docker_compose_language_service = {
+        package = pkgs.docker-compose-language-service;
+        exe = "docker-compose-langserver";
+        args = [ "--stdio" ];
+      };
+      gopls = {
+        package = pkgs.gopls;
+        exe = "gopls";
+        zed = "gopls";
+      };
+      hls = {
+        package = pkgs.haskell-language-server;
+        exe = "haskell-language-server-wrapper";
+        args = [ "--lsp" ];
+        zed = "hls";
+        opencode = "haskell-language-server";
+      };
+      jdtls = {
+        package = pkgs.jdt-language-server;
+        exe = "jdtls";
+        dynamicCmd = true;
+        zed = "jdtls";
+      };
+      kotlin_language_server = {
+        package = pkgs.kotlin-language-server;
+        exe = "kotlin-language-server";
+        zed = "kotlin-language-server";
+        opencode = "kotlin-ls";
+      };
+      lua_ls = {
+        package = pkgs.lua-language-server;
+        exe = "lua-language-server";
+        zed = "lua-language-server";
+        opencode = "lua-ls";
+      };
+      metals = {
+        package = pkgs.metals;
+        exe = "metals";
+        zed = "metals";
+      };
+      nil_ls = {
+        package = pkgs.nil;
+        exe = "nil";
+        zed = "nix";
+        opencode = "nixd";
+      };
+      ocamllsp = {
+        package = pkgs.ocamlPackages.ocaml-lsp;
+        exe = "ocamllsp";
+        zed = "ocamllsp";
+        opencode = "ocaml-lsp";
+      };
+      pyright = {
+        package = pkgs.pyright;
+        exe = "pyright-langserver";
+        args = [ "--stdio" ];
+        zed = "pyright";
+        opencode = "pyright";
+      };
+      tailwindcss = {
+        package = pkgs.tailwindcss-language-server;
+        exe = "tailwindcss-language-server";
+        dynamicCmd = true;
+        zed = "tailwindcss-language-server";
+      };
+      ts_ls = {
+        package = pkgs.typescript-language-server;
+        exe = "typescript-language-server";
+        dynamicCmd = true;
+        zed = "typescript-language-server";
+      };
+      zls = {
+        package = pkgs.zls;
+        exe = "zls";
+        zed = "zls";
+      };
+    };
 
     # The shim builder, as an overlay so it is reachable as `pkgs.wrapLspMux` from
     # every consumer: the `pkgs.lspmuxed` twins (via `buildLspmuxed` above), nvim, and
@@ -591,15 +588,19 @@ in
           # `initialization` options. Lives here, gated on opencode being enabled, so
           # lspmux stays one opt-in.
           programs.opencode.settings.lsp = lib.mkIf config.programs.opencode.enable (
-            lib.mapAttrs' (
-              lspconfig: spec:
-              lib.nameValuePair spec.opencode (
-                {
-                  command = [ (lib.getExe (pkgs.wrapLspMux (spec // { inherit lspconfig; }))) ] ++ spec.args;
-                }
-                // lib.optionalAttrs (spec.server_config != { }) { initialization = spec.server_config; }
+            lib.mapAttrs'
+              (
+                lspconfig: spec:
+                lib.nameValuePair spec.opencode (
+                  {
+                    command = [ (lib.getExe (pkgs.wrapLspMux (spec // { inherit lspconfig; }))) ] ++ spec.args;
+                  }
+                  // lib.optionalAttrs (spec.server_config != { }) { initialization = spec.server_config; }
+                )
               )
-            ) (lib.filterAttrs (_lspconfig: spec: builtins.elem spec.opencode opencodeBuiltins) config.lsp.servers)
+              (
+                lib.filterAttrs (_lspconfig: spec: builtins.elem spec.opencode opencodeBuiltins) config.lsp.servers
+              )
           );
         };
       };

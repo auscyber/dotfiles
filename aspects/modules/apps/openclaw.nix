@@ -47,11 +47,9 @@
       final: prev: removeAttrs (inputs.nix-openclaw.overlays.default final prev) [ "pnpm_11" ];
 
     # openclaw is flagged insecure in nixpkgs.
-    darwin =
-      { lib, ... }:
-      {
-        nixpkgs.config.allowInsecurePredicate = pkg: lib.hasPrefix "openclaw" (lib.getName pkg);
-      };
+    darwin = { lib, ... }: {
+      nixpkgs.config.allowInsecurePredicate = pkg: lib.hasPrefix "openclaw" (lib.getName pkg);
+    };
 
     homeManager =
       {
@@ -69,11 +67,9 @@
         # ~/Library/agenix/templates.
         age.templates."openclaw-env" = {
           dependencies.openclaw-token = config.age.secrets.openclaw-token;
-          content =
-            { placeholders, ... }:
-            ''
-              OPENCLAW_GATEWAY_TOKEN=${placeholders.openclaw-token}
-            '';
+          content = { placeholders, ... }: ''
+            OPENCLAW_GATEWAY_TOKEN=${placeholders.openclaw-token}
+          '';
         };
 
         programs.openclaw = {

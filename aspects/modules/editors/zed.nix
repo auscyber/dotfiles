@@ -86,12 +86,9 @@
                 };
               };
             in
-            lib.mapAttrs' (
-              _key: server: lib.nameValuePair server.passthru.lspmux.zed (binary server)
-            ) (
+            lib.mapAttrs' (_key: server: lib.nameValuePair server.passthru.lspmux.zed (binary server)) (
               lib.filterAttrs (
-                key: server:
-                key == server.passthru.lspmux.lspconfig && server.passthru.lspmux.zed != null
+                key: server: key == server.passthru.lspmux.lspconfig && server.passthru.lspmux.zed != null
               ) lspmuxed
             );
           vim_mode = true;

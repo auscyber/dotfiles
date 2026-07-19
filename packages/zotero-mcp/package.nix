@@ -10,8 +10,12 @@ let
   python = python3.override {
     self = python;
     packageOverrides = _final: prev: {
-      pdfplumber = prev.pdfplumber.overridePythonAttrs (_: { doCheck = false; });
-      markitdown = prev.markitdown.overridePythonAttrs (_: { doCheck = false; });
+      pdfplumber = prev.pdfplumber.overridePythonAttrs (_: {
+        doCheck = false;
+      });
+      markitdown = prev.markitdown.overridePythonAttrs (_: {
+        doCheck = false;
+      });
     };
   };
   pp = python.pkgs;

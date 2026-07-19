@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{ lib, ... }: {
   flake.templates =
     builtins.readDir ../../templates
     |> builtins.attrNames

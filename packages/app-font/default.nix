@@ -1,5 +1,4 @@
-{ ... }:
-{
+{ ... }: {
   nvfetcher.sources = {
     app_font = {
       src.git = "https://github.com/kvndrsslr/sketchybar-app-font";

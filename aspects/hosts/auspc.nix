@@ -132,7 +132,6 @@
                 mountpoint = "/nix";
               };
               var = {
-
                 options.mountpoint = "legacy";
                 type = "zfs_fs";
                 mountpoint = "/var";
@@ -248,52 +247,49 @@
         den.aspects.dev
       ];
 
-      provides.to-users.homeManager =
-        { pkgs, ... }:
-        {
-
-          services.gpg-agent = {
-            enable = true;
-            enableSshSupport = true;
-            pinentry.program = pkgs.pinentry-qt;
-            extraConfig = "allow-loopback-pinentry";
-          };
-
-          home.packages = with pkgs; [
-            obs-studio
-            heroic
-            shadps4
-            tidal-hifi
-            tmux
-            pcmanfm
-            vscode
-            openjdk8
-            rofi
-            arandr
-            libnotify
-            stack
-            xclip
-            discord
-            playerctl
-            htop
-            polychromatic
-            fish
-            nitrogen
-            maim
-            gcc
-            dunst
-            lua
-            unzip
-            slack
-            (python3.withPackages (p: with p; [ pynvim ]))
-            nautilus
-            zoom-us
-            file
-            mitscheme
-            libreoffice
-            thunderbird
-          ];
+      provides.to-users.homeManager = { pkgs, ... }: {
+        services.gpg-agent = {
+          enable = true;
+          enableSshSupport = true;
+          pinentry.program = pkgs.pinentry-qt;
+          extraConfig = "allow-loopback-pinentry";
         };
+
+        home.packages = with pkgs; [
+          obs-studio
+          heroic
+          shadps4
+          tidal-hifi
+          tmux
+          pcmanfm
+          vscode
+          openjdk8
+          rofi
+          arandr
+          libnotify
+          stack
+          xclip
+          discord
+          playerctl
+          htop
+          polychromatic
+          fish
+          nitrogen
+          maim
+          gcc
+          dunst
+          lua
+          unzip
+          slack
+          (python3.withPackages (p: with p; [ pynvim ]))
+          nautilus
+          zoom-us
+          file
+          mitscheme
+          libreoffice
+          thunderbird
+        ];
+      };
     };
   };
 }
