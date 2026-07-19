@@ -19,6 +19,15 @@
         }:
         {
           imports = [ inputs.op-shell-plugins.hmModules.default ];
+          systemd.user.services.my-gui-env = {
+            Unit.PartOf = [ "graphical-session.target" ];
+            Install.WantedBy = [ "graphical-session.target" ];
+            Service = {
+              Type = "oneshot";
+              RemainAfterExit = true;
+              ExecStart = "${pkgs.systemd}/bin/systemctl --user set-environment SSH_AUTH_SOCK=${config.home.homeDirectory}/.1password/agent.sock";
+            };
+          };
           home.packages = [ pkgs._1password-cli ];
           programs._1password-shell-plugins = {
             # enable 1Password shell plugins for bash, zsh, and fish shell

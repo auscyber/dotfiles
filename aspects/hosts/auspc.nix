@@ -43,7 +43,7 @@
       den.aspects.vpn
       den.aspects.packages.alx-wol
       den.aspects.bootlogo
-      den.aspects.builders
+      #      den.aspects.builders
       den.aspects.builder-server
       den.aspects.secure-boot
       (den.batteries.unfree [ "castlabs-electron" ])
@@ -241,7 +241,6 @@
       ];
 
       provides.to-users.homeManager = { pkgs, ... }: {
-        home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";
 
         services.gpg-agent = {
           enable = true;

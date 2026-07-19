@@ -13,10 +13,23 @@ let
     "https://devenv.cachix.org" = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
     #    "https://auscyber.cachix.org" =
     #      "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c=";
-    "https://cache.ivymect.in/main" = "main:4PgSIjmT7n9adSn4hDnnKXoERhCZR1dTlvj74k+6vT0=";
     #    "https://attic.xuyh0120.win/lantian" = "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=";
-  };
+  }
+  // cellerCaches;
   vhost = "cache.ivymect.in";
+
+  # Ed25519 signing keys for the celler caches on `vhost`. The server mints the
+  # keypair when the cache is created (`celler cache create`) and only ever
+  # hands out the public half, so unlike the JWT token below there is nothing to
+  # derive offline -- it has to be read back off the server. `nix run
+  # .#update-celler-keys` does that via `celler cache info` and commits the
+  # result to celler-keys.json; this import is what feeds
+  # trusted-public-keys/nixConfig, so a stale file means substitution from
+  # cache.ivymect.in fails signature verification.
+  cellerPublicKeys = lib.importJSON ./celler-keys.json;
+  cellerCaches = lib.mapAttrs' (
+    name: key: lib.nameValuePair "https://${vhost}/${name}" key
+  ) cellerPublicKeys;
 
   # Mint a scoped celler JWT with an agenix-rekey generator, replacing the
   # runtime `celleradm` systemd wrapper. The RS256 signing key is handed in as
@@ -76,7 +89,7 @@ let
 in
 {
   debug = true;
-  den.aspects.nix.nix.settings = {
+  den.default.nix.settings = {
     trusted-substituters = builtins.attrNames caches;
     trusted-public-keys = builtins.attrValues caches;
   };
@@ -171,6 +184,24 @@ in
       den.aspects.agenix-rekey
     ];
     overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
+    homeManager = { pkgs, config, ... }: {
+
+      age.templates."celler_config" = {
+        path = "${config.home.homeDirectory}/.config/celler/config.toml";
+        dependencies = {
+          inherit (config.age.secrets) celler_token;
+        };
+        content =
+          { pkgs, placeholders, ... }:
+          ''
+            default-server = "central"
+            [servers.central]
+            endpoint = "https://${vhost}"
+            token = "${placeholders.celler_token}"
+          '';
+      };
+      home.packages = [ pkgs.celler ];
+    };
 
     secrets =
       {
@@ -189,7 +220,8 @@ in
           script = cellerTokenScript { sub = host.name; };
         };
       };
-    templates = { secrets, ... }: {
+    templates = { secrets, config, ... }: {
+
       netrc = {
         dependencies = {
           inherit (secrets) celler_token;
@@ -246,11 +278,77 @@ in
       in
       {
         nix.settings = {
-          post-build-hook = "${build-hook}";
+          post-build-hook = "${lib.getExe build-hook}";
           netrc-file = config.age.templates.netrc.path;
         };
       };
   };
+
+  # `nix run .#update-celler-keys [cache...]` -- ask the server for each cache's
+  # public signing key and refresh celler-keys.json. Defaults to the caches
+  # already in the file. Uses the caller's own `~/.config/celler/config.toml`
+  # (written by the celler-push aspect), so any host with a pull token can run
+  # it: `cache-config` only requires `pull`. Merges rather than replaces, so
+  # naming one cache never drops the others.
+  perSystem =
+    { pkgs, ... }:
+    let
+      updateCellerKeys = pkgs.writeShellApplication {
+        name = "update-celler-keys";
+        runtimeInputs = [
+          pkgs.celler
+          pkgs.jq
+          pkgs.gnused
+          pkgs.coreutils
+        ];
+        text = ''
+          set -eu
+          dest="aspects/modules/base/celler-keys.json"
+          if [ ! -e flake.nix ]; then
+          	echo "update-celler-keys: run from the repo root (flake.nix not found)" >&2
+          	exit 1
+          fi
+
+          tmp="$(mktemp)"
+          trap 'rm -f "$tmp"' EXIT
+          if [ -e "$dest" ]; then cp "$dest" "$tmp"; else echo '{}' >"$tmp"; fi
+
+          # No arguments: refresh every cache already tracked in the file.
+          if [ "$#" -eq 0 ]; then
+          	# shellcheck disable=SC2046 # cache names are never whitespace-y
+          	set -- $(jq -r 'keys[]' "$tmp")
+          fi
+          if [ "$#" -eq 0 ]; then
+          	echo "update-celler-keys: no caches tracked in $dest; pass names explicitly" >&2
+          	exit 1
+          fi
+
+          for cache in "$@"; do
+          	# `celler cache info` reports on stderr; the key line is
+          	# "           Public Key: <name>:<base64>".
+          	key="$(celler cache info "$cache" 2>&1 | sed -n 's/^ *Public Key: *//p')"
+          	if [ -z "$key" ]; then
+          		echo "update-celler-keys: no public key for cache '$cache' (not found, or token lacks pull)" >&2
+          		exit 1
+          	fi
+          	echo "$cache -> $key"
+          	jq --arg n "$cache" --arg k "$key" '.[$n] = $k' "$tmp" >"$tmp.next"
+          	mv "$tmp.next" "$tmp"
+          done
+
+          cp "$tmp" "$dest"
+          echo "Wrote $dest"
+        '';
+      };
+    in
+    {
+      devshells.default.packages = [ updateCellerKeys ];
+      packages.update-celler-keys = updateCellerKeys;
+      apps.update-celler-keys = {
+        type = "app";
+        program = lib.getExe updateCellerKeys;
+      };
+    };
 
   ff.celler = {
     url = "github:blitz/celler/main";
