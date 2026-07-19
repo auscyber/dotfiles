@@ -2,10 +2,10 @@
   "age-plugin-gpg": "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=",
   "agenix": "sha256-6Jh720QCOUYbcypjmIFcwhckE2acN13G60kk9yCLW2s=",
   "agenix-rekey": "sha256-nWtUJ2qNVZJ2lDLO04vBRCJ16r6dh4N/6HzX8hAHybE=",
-  "darwin": "sha256-nYA3ynvOorI4u2buJepH16JpLaV1UJ72iMHf9BFPhR8=",
+  "darwin": "sha256-HjkLyB7Ityj2ndH0f85GqTFrc1smN1n5E78Pz1T0tkI=",
   "den": "sha256-S/OU3ZU/KNQXpmbDWUo8A4F1Khmv7PR/dAN+/I4A9b4=",
-  "home-manager": "sha256-Ky6FJL69+rSL5g5iFIRNJlk949N52xm4qjgKH9e2jCQ=",
-  "nh": "sha256-FwXyVfPfyJuQtYckrmNCbwYtw+9ra6fqUm2PFC1IqTw=",
+  "home-manager": "sha256-D9Lh6eGIMtsyuxS45UNKC1ZPgO0fLaqULE0pd2Ttj4w=",
+  "nh": "sha256-h+ZsnNv7o3l2biNj29AcbH3I3ssnqE/OtHFh5K3kwm0=",
   "nix-openclaw": "sha256-dWGb8g1baqqKruXwfaAkqmAocour4Di2zlwE9qbLvoY=",
   "nvfetcher": "sha256-Hs0D8S8yboK/bHRe3ik5u0Iu+kpBuw+GWk7/aQxie0s="
 }

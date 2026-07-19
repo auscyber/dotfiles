@@ -11,6 +11,7 @@
     includes = [ (den.batteries.unfree [ "onepassword-password-manager" ]) ];
     gui = {
       provides.to-hosts.os.programs._1password-gui.enable = true;
+
       provides.to-users.homeManager =
         {
           pkgs,
@@ -19,7 +20,7 @@
         }:
         {
           imports = [ inputs.op-shell-plugins.hmModules.default ];
-          systemd.user.services.my-gui-env = {
+          systemd.user.services.set-1password = {
             Unit.PartOf = [ "graphical-session.target" ];
             Install.WantedBy = [ "graphical-session.target" ];
             Service = {
