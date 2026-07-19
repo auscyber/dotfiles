@@ -6,6 +6,7 @@
 }:
 {
   den.aspects.auspc = {
+    includes = [ den.aspects.ccache ];
     overlays = {
       linuxZenMuQSS = self: super: {
         linuxZenWMuQSS =
