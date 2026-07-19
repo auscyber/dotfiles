@@ -20,7 +20,7 @@
 
         programs.fish.enable = true;
       };
-      os = { pkgs, ... }: {
+      provides.to-hosts.os = { pkgs, ... }: {
         environment.shells = [ pkgs.fish ];
         programs.fish.enable = true;
       };

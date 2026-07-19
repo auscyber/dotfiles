@@ -81,7 +81,10 @@
         boot.supportedFilesystems = [ "zfs" ];
         # `zroot` (root pool) is imported automatically because `/` lives on it;
         # only the data pool needs to be listed here.
-        boot.zfs.extraPools = [ "zpool" ];
+        boot.zfs.extraPools = [
+          "zpool"
+          "zroot"
+        ];
 
         boot.kernel.sysctl = {
           "net.ipv6.conf.all.accept_ra" = 2;
@@ -98,7 +101,7 @@
           disk = {
             ssd = {
               type = "disk";
-              device = "/dev/disk/by-id/ata-ADATA_SP900_2F2020013141";
+              device = "/dev/disk/by-id/wwn-0x5707c1810016e7fa-part2";
               content = {
                 type = "gpt";
                 partitions = {
@@ -124,7 +127,7 @@
             };
             hdd = {
               type = "disk";
-              device = "/dev/disk/by-id/ata-ST4000VN006-3CW104_WW67DVN6";
+              device = "/dev/disk/by-id/ata-ST4000VN006-3CW104_WW67DVN6-part1";
               content = {
                 type = "gpt";
                 partitions = {
@@ -164,15 +167,23 @@
             zpool = {
               type = "zpool";
               options.ashift = "12";
+              mountpoint = "/mnt/hdd";
               rootFsOptions = {
                 compression = "zstd";
+
                 mountpoint = "none";
               };
-              datasets.root = {
+              datasets."root" = {
                 type = "zfs_fs";
-                mountpoint = "/mnt/hdd";
                 options.mountpoint = "legacy";
+                mountpoint = "/mnt/hdd"; # or wherever you want it mounted
               };
+              datasets.s3 = {
+                type = "zfs_fs";
+
+                mountpoint = "/mnt/hdd/s3";
+              };
+
             };
           };
         };
