@@ -5,7 +5,7 @@
   ...
 }:
 {
-  den.aspects.auspc = {
+  den.aspects.zenKernel = {
     includes = [ den.aspects.ccache ];
     overlays = {
       linuxZenMuQSS = self: super: {

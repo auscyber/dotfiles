@@ -42,9 +42,15 @@ in
     os.nix = {
       gc.automatic = true;
       channel.enable = false;
+      experimental-features = [
+        "nix-command"
+        "flakes"
+        "pipe-operators"
+      ];
+
     };
     nix.settings = {
-      experimental-features = [
+      extra-experimental-features = [
         "nix-command"
         "flakes"
         "pipe-operators"

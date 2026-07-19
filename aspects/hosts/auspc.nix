@@ -42,6 +42,7 @@
     includes = [
       den.aspects.vpn
       den.aspects.packages.alx-wol
+      den.aspects.cachyos-kernel
       den.aspects.bootlogo
       #      den.aspects.builders
       den.aspects.builder-server
@@ -230,7 +231,7 @@
     provides.auspc = {
       includes = [
         den.batteries.primary-user
-        den.aspects.zotero
+        #        den.aspects.zotero
         <browsers/helium>
         den.aspects.gui
         den.aspects.ghostty
@@ -240,50 +241,52 @@
         den.aspects.dev
       ];
 
-      provides.to-users.homeManager = { pkgs, ... }: {
+      provides.to-users.homeManager =
+        { pkgs, ... }:
+        {
 
-        services.gpg-agent = {
-          enable = true;
-          enableSshSupport = true;
-          pinentry.program = pkgs.pinentry-qt;
-          extraConfig = "allow-loopback-pinentry";
+          services.gpg-agent = {
+            enable = true;
+            enableSshSupport = true;
+            pinentry.program = pkgs.pinentry-qt;
+            extraConfig = "allow-loopback-pinentry";
+          };
+
+          home.packages = with pkgs; [
+            obs-studio
+            heroic
+            shadps4
+            tidal-hifi
+            tmux
+            pcmanfm
+            vscode
+            openjdk8
+            rofi
+            arandr
+            libnotify
+            stack
+            xclip
+            discord
+            playerctl
+            htop
+            polychromatic
+            fish
+            nitrogen
+            maim
+            gcc
+            dunst
+            lua
+            unzip
+            slack
+            (python3.withPackages (p: with p; [ pynvim ]))
+            nautilus
+            zoom-us
+            file
+            mitscheme
+            libreoffice
+            thunderbird
+          ];
         };
-
-        home.packages = with pkgs; [
-          obs-studio
-          heroic
-          shadps4
-          tidal-hifi
-          tmux
-          pcmanfm
-          vscode
-          openjdk8
-          rofi
-          arandr
-          libnotify
-          stack
-          xclip
-          discord
-          playerctl
-          htop
-          polychromatic
-          fish
-          nitrogen
-          maim
-          gcc
-          dunst
-          lua
-          unzip
-          slack
-          (python3.withPackages (p: with p; [ pynvim ]))
-          nautilus
-          zoom-us
-          file
-          mitscheme
-          libreoffice
-          thunderbird
-        ];
-      };
     };
   };
 }

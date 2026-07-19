@@ -46,6 +46,7 @@
     builtins.removeAttrs output [ "newInputs" ];
 
   nixConfig = {
+    extra-experimental-features = [ "pipe-operators" ];
     extra-substituters = [
       "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
