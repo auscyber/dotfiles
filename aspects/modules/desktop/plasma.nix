@@ -4,7 +4,11 @@
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.home-manager.follows = "home-manager";
   };
-  den.aspects.plasma.hmLinux = {
+den.aspects.plasma = {
+nixos = {
+  services.desktopManager.plasma6.enable = true;
+};
+  hmLinux = {
     imports = [
       inputs.plasma-manager.homeModules.plasma-manager
     ];
@@ -512,4 +516,5 @@
       };
     };
   };
+};
 }

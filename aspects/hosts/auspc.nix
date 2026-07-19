@@ -171,8 +171,6 @@
           polkitPolicyOwners = [ "auscyber" ];
         };
 
-        services.desktopManager.plasma6.enable = true;
-        services.displayManager.ly.enable = true;
 
         users.users.auscyber = {
           isNormalUser = true;
@@ -236,6 +234,7 @@
 
     provides.auspc = {
       includes = [
+        den.aspects.plasma
         den.batteries.primary-user
         #        den.aspects.zotero
         <browsers/helium>
