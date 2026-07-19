@@ -36,6 +36,37 @@ let
       adaptArgs = lib.id;
     };
 
+  # Shared by the `os` (wg-quick) and `nixos` (networkd) modules below, which
+  # are separate classes and so cannot share a `let`.
+  tunnelIp =
+    cfg: host:
+    if cfg.ipAddress != null then
+      cfg.ipAddress
+    else if cfg.role == "server" then
+      "10.100.0.1"
+    else
+      "10.100.0.${toString (hostOctet host.name)}";
+
+  # The server routes each client on its hash-derived address. A client that
+  # overrides vpn.ipAddress would desync from this; the server has no view into
+  # another host's module config, only its name.
+  tunnelPeers =
+    cfg: host:
+    if cfg.role == "server" then
+      map (name: {
+        publicKey = pubKey name;
+        allowedIPs = [ "10.100.0.${toString (hostOctet name)}/32" ];
+      }) (clientNames host.name)
+    else
+      [
+        {
+          publicKey = pubKey cfg.serverHost;
+          endpoint = cfg.endpoint;
+          allowedIPs = cfg.allowedIPs;
+          persistentKeepalive = 25;
+        }
+      ];
+
   # networkd spells peers with capitalised keys and takes Endpoint /
   # PersistentKeepalive only on the client side, where `peers` supplies them.
   toNetworkdPeer =
@@ -136,6 +167,8 @@ in
 
     vpn = { };
 
+    # wg-quick exists on both NixOS and nix-darwin (the latter drives it from
+    # launchd), so it is safe to declare from the shared `os` class.
     os =
       {
         config,
@@ -144,32 +177,6 @@ in
       }:
       let
         cfg = config.vpn;
-        ip =
-          if cfg.ipAddress != null then
-            cfg.ipAddress
-          else if cfg.role == "server" then
-            "10.100.0.1"
-          else
-            "10.100.0.${toString (hostOctet host.name)}";
-
-        # The server routes each client on its hash-derived address. A client
-        # that overrides vpn.ipAddress would desync from this; the server has no
-        # view into another host's module config, only its name.
-        peers =
-          if cfg.role == "server" then
-            map (name: {
-              publicKey = pubKey name;
-              allowedIPs = [ "10.100.0.${toString (hostOctet name)}/32" ];
-            }) (clientNames host.name)
-          else
-            [
-              {
-                publicKey = pubKey cfg.serverHost;
-                endpoint = cfg.endpoint;
-                allowedIPs = cfg.allowedIPs;
-                persistentKeepalive = 25;
-              }
-            ];
       in
       {
         options.vpn = lib.mkOption {
@@ -177,52 +184,67 @@ in
           default = { };
         };
 
-        config = lib.mkMerge [
-          (lib.mkIf (cfg.backend == "wg-quick") {
-            networking.wg-quick.interfaces.${cfg.interface} = {
-              address = [ "${ip}/24" ];
-              privateKeyFile = config.age.secrets.wireguard_key.path;
-              inherit peers;
+        config = lib.mkIf (cfg.backend == "wg-quick") {
+          networking.wg-quick.interfaces.${cfg.interface} = {
+            address = [ "${tunnelIp cfg host}/24" ];
+            privateKeyFile = config.age.secrets.wireguard_key.path;
+            peers = tunnelPeers cfg host;
+          }
+          // lib.optionalAttrs (cfg.listenPort != null) { inherit (cfg) listenPort; };
+        };
+      };
+
+    # networkd is NixOS-only. This cannot live in `os`: den forwards that class
+    # into nix-darwin too, and `mkIf false` does not shield an option the target
+    # module system never declares — nix-darwin rejects the mere presence of a
+    # `networking.useNetworkd` definition.
+    nixos =
+      {
+        config,
+        host,
+        ...
+      }:
+      let
+        cfg = config.vpn;
+        ip = tunnelIp cfg host;
+        peers = tunnelPeers cfg host;
+      in
+      {
+        config = lib.mkIf (cfg.backend == "networkd") {
+          networking.useNetworkd = true;
+
+          # networkd opens the key as the systemd-network user; wg-quick runs
+          # as root and does not care.
+          age.secrets.wireguard_key = {
+            owner = "systemd-network";
+            group = "systemd-network";
+          };
+
+          systemd.network.netdevs."50-${cfg.interface}" = {
+            netdevConfig = {
+              Kind = "wireguard";
+              Name = cfg.interface;
+              MTUBytes = "1500";
+            };
+            wireguardConfig = {
+              PrivateKeyFile = config.age.secrets.wireguard_key.path;
+              RouteTable = "main";
             }
-            // lib.optionalAttrs (cfg.listenPort != null) { inherit (cfg) listenPort; };
-          })
+            // lib.optionalAttrs (cfg.listenPort != null) { ListenPort = cfg.listenPort; };
+            wireguardPeers = map toNetworkdPeer peers;
+          };
 
-          (lib.mkIf (cfg.backend == "networkd") {
-            networking.useNetworkd = true;
-
-            # networkd opens the key as the systemd-network user; wg-quick runs
-            # as root and does not care.
-            age.secrets.wireguard_key = {
-              owner = "systemd-network";
-              group = "systemd-network";
+          systemd.network.networks.${cfg.interface} = {
+            matchConfig.Name = cfg.interface;
+            address = [ "${ip}/24" ];
+          }
+          // lib.optionalAttrs (cfg.role == "server") {
+            networkConfig = {
+              IPMasquerade = "ipv4";
+              IPv4Forwarding = true;
             };
-
-            systemd.network.netdevs."50-${cfg.interface}" = {
-              netdevConfig = {
-                Kind = "wireguard";
-                Name = cfg.interface;
-                MTUBytes = "1500";
-              };
-              wireguardConfig = {
-                PrivateKeyFile = config.age.secrets.wireguard_key.path;
-                RouteTable = "main";
-              }
-              // lib.optionalAttrs (cfg.listenPort != null) { ListenPort = cfg.listenPort; };
-              wireguardPeers = map toNetworkdPeer peers;
-            };
-
-            systemd.network.networks.${cfg.interface} = {
-              matchConfig.Name = cfg.interface;
-              address = [ "${ip}/24" ];
-            }
-            // lib.optionalAttrs (cfg.role == "server") {
-              networkConfig = {
-                IPMasquerade = "ipv4";
-                IPv4Forwarding = true;
-              };
-            };
-          })
-        ];
+          };
+        };
       };
   };
 }
