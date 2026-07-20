@@ -2,16 +2,11 @@
   lib,
   pkgs,
   inputs,
-  # Which evaluated configurations each option source is generated from.
-  #
-  # These must be configurations that do NOT themselves enable the searchix
-  # aspect: the docs are derived from `self.<class>Configurations.<host>.options`,
-  # so pointing this at the host that runs searchix would make that host's
-  # module evaluation depend on its own option tree (infinite recursion).
-  nixosHost ? "auspc",
-  darwinHost ? "Ivys-MacBook-Pro",
-  homeHost ? "auspc",
-  homeUser ? "auscyber",
+  # Hosts whose option trees must NOT be evaluated here. The docs are derived
+  # from `self.<class>Configurations.<host>.options`, so indexing the host that
+  # *runs* searchix would make that host's module evaluation depend on its own
+  # option tree (infinite recursion).
+  excludeHosts ? [ "secondpc" ],
 }:
 # Builds the option sources that our searchix instance indexes. Each source is a
 # directory holding `options.json` + `revision`, which is the layout searchix's
@@ -38,8 +33,21 @@ let
     repo = "dotfiles";
   };
 
-  nixosOptions = self.nixosConfigurations.${nixosHost}.options;
-  darwinOptions = self.darwinConfigurations.${darwinHost}.options;
+  # Every host this flake defines, minus the ones we must not touch. Derived from
+  # the flake rather than listed by hand so a new machine is indexed the moment
+  # it exists — the point of this source set is to cover everything our aspects
+  # *can* derive, and a hardcoded list silently stops being that.
+  hostsOf = configs: lib.subtractLists excludeHosts (lib.attrNames configs);
+  nixosHosts = hostsOf self.nixosConfigurations;
+  darwinHosts = hostsOf self.darwinConfigurations;
+
+  # A host contributes options through whichever aspects it happens to include,
+  # so the union over all of them is strictly larger than any single host's tree:
+  # nginx/celler/disko options only exist on the servers, sketchybar/rift/kanata
+  # only on darwin, and so on.
+  nixosConfigs = lib.genAttrs nixosHosts (h: self.nixosConfigurations.${h});
+  darwinConfigs = lib.genAttrs darwinHosts (h: self.darwinConfigurations.${h});
+  allConfigs = nixosConfigs // darwinConfigs;
 
   # home-manager (and therefore nixvim, which is imported from inside it) is
   # evaluated in the `home-manager.users` submodule, so its option tree is not
@@ -52,19 +60,34 @@ let
   # So re-run the submodule evaluation ourselves, with the same payload (base HM
   # modules, specialArgs, class) and the same definitions the host merges in.
   # That reproduces the option tree the user actually gets on that machine.
-  hmOption = self.nixosConfigurations.${homeHost}.options.home-manager.users;
-  hmPayload = hmOption.type.nestedTypes.elemType.functor.payload;
-  hmDefinitions = builtins.filter (m: m != null) (
-    map (def: def.${homeUser} or null) hmOption.definitions
-  );
-  homeOptions =
+  homeOptionsFor =
+    cfg: user:
+    let
+      hmOption = cfg.options.home-manager.users;
+      payload = hmOption.type.nestedTypes.elemType.functor.payload;
+      definitions = builtins.filter (m: m != null) (
+        map (def: def.${user} or null) hmOption.definitions
+      );
+    in
     (lib.evalModules {
-      inherit (hmPayload) class;
-      specialArgs = hmPayload.specialArgs // {
-        name = homeUser;
+      inherit (payload) class;
+      specialArgs = payload.specialArgs // {
+        name = user;
       };
-      modules = hmPayload.modules ++ hmDefinitions ++ [ { _module.args.name = homeUser; } ];
+      modules = payload.modules ++ definitions ++ [ { _module.args.name = user; } ];
     }).options;
+
+  # Every (host, user) pair that actually has a home-manager configuration. The
+  # same user on two hosts is two evaluations: they include different aspects.
+  homeTargets = lib.concatLists (
+    lib.mapAttrsToList (
+      host: cfg:
+      map (user: {
+        inherit host user;
+        options = homeOptionsFor cfg user;
+      }) (lib.attrNames (cfg.config.home-manager.users or { }))
+    ) allConfigs
+  );
 
   # Declaration paths are absolute store paths after evaluation. Make ours
   # repo-relative so searchix's github link generation resolves them; strip the
@@ -125,9 +148,17 @@ let
 
   nixvimPrefix = "programs.nixvim";
 
-  allNixos = optionsOf nixosOptions;
-  allDarwin = optionsOf darwinOptions;
-  allHome = optionsOf homeOptions;
+  # Union of the per-host flat option sets. Merging the rendered `name -> option`
+  # attrsets (rather than the raw option trees) keeps this sound: each host's
+  # tree comes out of its own module-system fixpoint, so they are only safely
+  # comparable once `nixosOptionsDoc` has flattened them to plain data. Where two
+  # hosts declare the same option, either rendering is equally true — they differ
+  # at most in `default`/`example`, not in what the option *is*.
+  mergeRendered = lib.foldl' (acc: opts: acc // opts) { };
+
+  allNixos = mergeRendered (map (cfg: optionsOf cfg.options) (lib.attrValues nixosConfigs));
+  allDarwin = mergeRendered (map (cfg: optionsOf cfg.options) (lib.attrValues darwinConfigs));
+  allHome = mergeRendered (map (t: optionsOf t.options) homeTargets);
 
   # Keep the sources disjoint: nixvim is thousands of options and gets its own
   # source, so drop that subtree from the home-manager one.
@@ -166,13 +197,13 @@ let
     };
     nixos = {
       key = "nixos";
-      name = "NixOS (${nixosHost})";
+      name = "NixOS (${toString (lib.length nixosHosts)} hosts)";
       order = 1;
       source = sources.nixos;
     };
     home-manager = {
       key = "home-manager";
-      name = "Home Manager (${homeUser}@${homeHost})";
+      name = "Home Manager (${toString (lib.length homeTargets)} users)";
       order = 2;
       source = sources.home;
     };
@@ -184,7 +215,7 @@ let
     };
     darwin = {
       key = "darwin";
-      name = "nix-darwin (${darwinHost})";
+      name = "nix-darwin (${toString (lib.length darwinHosts)} hosts)";
       order = 4;
       source = sources.darwin;
     };

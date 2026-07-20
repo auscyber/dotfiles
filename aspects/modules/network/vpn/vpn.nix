@@ -4,18 +4,11 @@
   ...
 }:
 let
-  # 6 hex chars of sha256 → integer in 2..254. Server lives at .1.
-  hexToInt = s: (builtins.fromTOML "v=0x${s}").v;
-  hostOctet =
-    name: 2 + lib.mod (hexToInt (lib.substring 0 6 (builtins.hashString "sha256" name))) 253;
-  pubKeyFile = name: ../../../../secrets/generated + "/${name}/wireguard_key.pub";
-  pubKey = name: lib.removeSuffix "\n" (builtins.readFile (pubKeyFile name));
-
-  # A host peers over wireguard iff the generator has produced a host-level
-  # keypair for it. Hosts without the vpn aspect have no such file.
-  hasKey = name: builtins.pathExists (pubKeyFile name);
-  allHostNames = lib.concatMap lib.attrNames (lib.attrValues (den.hosts or { }));
-  clientNames = name: lib.filter (n: n != name && hasKey n) allHostNames;
+  inherit (import ./_lib.nix { inherit lib den; })
+    pubKey
+    clientNames
+    tunnelIpByName
+    ;
 
   vpn-class =
     {
@@ -38,14 +31,7 @@ let
 
   # Shared by the `os` (wg-quick) and `nixos` (networkd) modules below, which
   # are separate classes and so cannot share a `let`.
-  tunnelIp =
-    cfg: host:
-    if cfg.ipAddress != null then
-      cfg.ipAddress
-    else if cfg.role == "server" then
-      "10.100.0.1"
-    else
-      "10.100.0.${toString (hostOctet host.name)}";
+  tunnelIp = cfg: host: if cfg.ipAddress != null then cfg.ipAddress else tunnelIpByName host.name;
 
   # The server routes each client on its hash-derived address. A client that
   # overrides vpn.ipAddress would desync from this; the server has no view into
@@ -55,7 +41,7 @@ let
     if cfg.role == "server" then
       map (name: {
         publicKey = pubKey name;
-        allowedIPs = [ "10.100.0.${toString (hostOctet name)}/32" ];
+        allowedIPs = [ "${tunnelIpByName name}/32" ];
       }) (clientNames host.name)
     else
       [

@@ -203,7 +203,7 @@
           pinentry_mac
         ];
 
-        services.yubikey-agent.enable = true;
+        services.yubikey-agent.enable = false;
         #        programs.discord.enable = true;
 
         # 1Password SSH-key commit signing (mirrors the old home config).
@@ -223,16 +223,20 @@
           git.sign-on-push = true;
         };
 
-        # Laptop SSH hosts + 1Password agent socket.
+        # Laptop SSH hosts + 1Password agent socket. auspc/secondpc come from
+        # den.aspects.vpn-ssh-config (aspects/modules/network/vpn/ssh-config.nix),
+        # pulled in automatically via den.aspects.vpn.includes.
         programs.ssh.settings = {
-          "*".identityAgent = "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock";
-          "auspc" = {
+          "faggot.sh" = {
+            hostname = "faggot.sh";
+            user = "ivy";
             forwardAgent = true;
-            hostname = "192.168.0.24";
-            user = "auscyber";
           };
-          "secondpc".forwardAgent = true;
-          "faggot.sh".forwardAgent = true;
+          "imflo.pet" = {
+            hostname = "imflo.pet";
+            user = "ivy";
+            forwardAgent = true;
+          };
         };
         # macOS per-user defaults carried over from the old home config.
         targets.darwin.defaults.NSGlobalDomain = {

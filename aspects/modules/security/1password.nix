@@ -7,6 +7,34 @@
 {
   ff.op-shell-plugins.url = "github:1Password/shell-plugins";
 
+  den.aspects.gui = {
+    homeManager = { pkgs, config, ... }: {
+      launchd.agents.set-in-gui = {
+        enable = true;
+        config = {
+          ProgramArguments = [
+            "/bin/launchctl"
+            "setenv"
+            "IN_GUI"
+            "yes"
+          ];
+          RunAtLoad = true;
+          LimitLoadToSessionType = "Aqua";
+        };
+      };
+      systemd.user.services.set-in-gui = {
+        Unit.PartOf = [ "graphical-session.target" ];
+        Install.WantedBy = [ "graphical-session.target" ];
+        Service = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.systemd}/bin/systemctl --user set-environment IN_GUI=yes";
+        };
+      };
+
+    };
+  };
+
   den.aspects.onepassword = {
     includes = [ (den.batteries.unfree [ "onepassword-password-manager" ]) ];
     gui = {
@@ -18,39 +46,54 @@
           config,
           ...
         }:
-        {
-          imports = [ inputs.op-shell-plugins.hmModules.default ];
-          systemd.user.services.set-1password = {
-            Unit.PartOf = [ "graphical-session.target" ];
-            Install.WantedBy = [ "graphical-session.target" ];
-            Service = {
-              Type = "oneshot";
-              RemainAfterExit = true;
-              ExecStart = "${pkgs.systemd}/bin/systemctl --user set-environment SSH_AUTH_SOCK=${config.home.homeDirectory}/.1password/agent.sock";
-            };
-          };
-          home.packages = [ pkgs._1password-cli ];
-          programs._1password-shell-plugins = {
-            # enable 1Password shell plugins for bash, zsh, and fish shell
-            enable = true;
-            # the specified packages as well as 1Password CLI will be
-            # automatically installed and configured to use shell plugins
-            plugins = with pkgs; [
-              gh
-              glab
-              #            wrangler
+        let
+          _1passwordSocket =
+            if pkgs.stdenv.isDarwin then
+              "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+            else
+              "${config.home.homeDirectory}/.1password/agent.sock";
+        in
 
-              awscli2
-            ];
-          };
-        };
-      #          (lib.mkIf config.programs.zen.enable {
-      #            programs.zen-browser.profiles."${config.zen.profileName}".extensions.packages =
-      #              with pkgs.firefox-addons; [
-      #                onepassword-password-manager
-      #              ];
-      #
-      #          })
+        lib.mkMerge [
+          {
+            imports = [ inputs.op-shell-plugins.hmModules.default ];
+            programs.zsh.initExtra = ''
+              [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
+            '';
+
+            programs.bash.initExtra = ''
+              [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
+            '';
+
+            programs.fish.interactiveShellInit = ''
+              if test -n "$IN_GUI"
+                set -gx SSH_AUTH_SOCK "${_1passwordSocket}"
+              end
+            '';
+
+            home.packages = [ pkgs._1password-cli ];
+            programs._1password-shell-plugins = {
+              # enable 1Password shell plugins for bash, zsh, and fish shell
+              enable = true;
+              # the specified packages as well as 1Password CLI will be
+              # automatically installed and configured to use shell plugins
+              plugins = with pkgs; [
+                gh
+                glab
+                #            wrangler
+
+                awscli2
+              ];
+            };
+          }
+          (lib.mkIf config.programs.zen.enable {
+            programs.zen-browser.profiles."${config.zen.profileName}".extensions.packages =
+              with pkgs.firefox-addons; [
+                onepassword-password-manager
+              ];
+
+          })
+        ];
 
       provides.to-users.hmDarwin = {
         programs = {
