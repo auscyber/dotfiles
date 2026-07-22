@@ -230,6 +230,7 @@
       den.aspects.fish
       (den.batteries.unfree [ "castlabs-electron" ])
       den.aspects.celler-push
+      den.aspects.lix
     ];
 
     provides.auspc = {
