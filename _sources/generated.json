@@ -1,381 +1,381 @@
 {
-    "alx-wol": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "alx-wol",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "AndiWeiss",
-            "repo": "alx-wol",
-            "rev": "alx-wol-3.1",
-            "sha256": "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "alx-wol-3.1"
+  "alx-wol": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "alx-wol",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "AndiWeiss",
+      "repo": "alx-wol",
+      "rev": "alx-wol-3.1",
+      "sha256": "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "app_font": {
-        "cargoLock": null,
-        "date": "2026-07-08",
-        "extract": null,
-        "name": "app_font",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "11b080e4211038114746c8423abac7557e0b7a86",
-            "sha256": "sha256-viC7YOls1eYLnv6B12OWmqlGtlWNFB/6mqjYT+ELCYs=",
-            "sparseCheckout": [],
-            "type": "git",
-            "url": "https://github.com/kvndrsslr/sketchybar-app-font"
-        },
-        "version": "11b080e4211038114746c8423abac7557e0b7a86"
+    "version": "alx-wol-3.1"
+  },
+  "app_font": {
+    "cargoLock": null,
+    "date": "2026-07-20",
+    "extract": null,
+    "name": "app_font",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "rev": "d52c78b73970e6343026b12092a030fb73e4bd30",
+      "sha256": "sha256-pnAFT3MaPpAHObBkrGk9pSOGZdykjTHcRLBq4hCtVf0=",
+      "sparseCheckout": [],
+      "type": "git",
+      "url": "https://github.com/kvndrsslr/sketchybar-app-font"
     },
-    "cotabby": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "cotabby",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-rYQIXV/dBSCD56xO+kb0qkCkuq3Uths5+KmmYOppNaU=",
-            "type": "url",
-            "url": "https://github.com/fujacob/cotabby/releases/download/v0.6.1-beta/Cotabby.dmg"
-        },
-        "version": "v0.6.1-beta"
+    "version": "d52c78b73970e6343026b12092a030fb73e4bd30"
+  },
+  "cotabby": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "cotabby",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-2sOqH2iI7gw5J8QnvG5PAsb4F4m1DW2uPSQHLIK81Pk=",
+      "type": "url",
+      "url": "https://github.com/fujacob/cotabby/releases/download/v0.6.2-beta/Cotabby.dmg"
     },
-    "eagle-nvim": {
-        "cargoLock": null,
-        "date": "2026-02-10",
-        "extract": null,
-        "name": "eagle-nvim",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "soulis-1256",
-            "repo": "eagle.nvim",
-            "rev": "d503b168932160b07d4d09551d90d5fbb388b641",
-            "sha256": "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "d503b168932160b07d4d09551d90d5fbb388b641"
+    "version": "v0.6.2-beta"
+  },
+  "eagle-nvim": {
+    "cargoLock": null,
+    "date": "2026-02-10",
+    "extract": null,
+    "name": "eagle-nvim",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "soulis-1256",
+      "repo": "eagle.nvim",
+      "rev": "d503b168932160b07d4d09551d90d5fbb388b641",
+      "sha256": "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "helium_linux": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "helium_linux",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "sha256": "sha256-RC9b91W1/vXkgkgfpgexOkv79W6B2pV1kYjvDkRa7fg=",
-            "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.14.5.1/helium-0.14.5.1-x86_64_linux.tar.xz"
-        },
-        "version": "0.14.5.1"
+    "version": "d503b168932160b07d4d09551d90d5fbb388b641"
+  },
+  "helium_linux": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "helium_linux",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "sha256": "sha256-fJDwfUJChM9Fl7mckDKI7oIe5rG7+P11AdEkd+MlN3o=",
+      "type": "tarball",
+      "url": "https://github.com/imputnet/helium-linux/releases/download/0.14.7.1/helium-0.14.7.1-x86_64_linux.tar.xz"
     },
-    "helium_macos": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "helium_macos",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-bcGrKKY32xVSfe7YNPMeEmVn3LyOThOGmdaQkNocmXw=",
-            "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.14.5.1/helium_0.14.5.1_arm64-macos.dmg"
-        },
-        "version": "0.14.5.1"
+    "version": "0.14.7.1"
+  },
+  "helium_macos": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "helium_macos",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-ZwIhBInDTRRDkp1xuZtoBIZMJ1ir0CKX1O2H1E15TxY=",
+      "type": "url",
+      "url": "https://github.com/imputnet/helium-macos/releases/download/0.14.7.1/helium_0.14.7.1_arm64-macos.dmg"
     },
-    "jankyborders": {
-        "cargoLock": null,
-        "date": "2026-05-14",
-        "extract": null,
-        "name": "jankyborders",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e",
-            "sha256": "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=",
-            "sparseCheckout": [],
-            "type": "git",
-            "url": "https://github.com/felixkratz/jankyborders"
-        },
-        "version": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e"
+    "version": "0.14.7.1"
+  },
+  "jankyborders": {
+    "cargoLock": null,
+    "date": "2026-05-14",
+    "extract": null,
+    "name": "jankyborders",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "rev": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e",
+      "sha256": "sha256-j4hdW7JXTmSrE4bwlOkUYxA32AD011za7dmItwwIvyg=",
+      "sparseCheckout": [],
+      "type": "git",
+      "url": "https://github.com/felixkratz/jankyborders"
     },
-    "kanata-tray": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "kanata-tray",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "rszyma",
-            "repo": "kanata-tray",
-            "rev": "v0.8.0",
-            "sha256": "sha256-RTLFDB/irtEhEHwarROGmS4jNdRhruU1JKen48ADzZg=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "v0.8.0"
+    "version": "a7297ca7d1933f3a30b12e8f10750e8d84eeee1e"
+  },
+  "kanata-tray": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "kanata-tray",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "rszyma",
+      "repo": "kanata-tray",
+      "rev": "v0.8.0",
+      "sha256": "sha256-RTLFDB/irtEhEHwarROGmS4jNdRhruU1JKen48ADzZg=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "lspmux": {
-        "cargoLock": {
-            "Cargo.lock": [
-                "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock",
-                {}
-            ]
-        },
-        "date": "2026-03-11",
-        "extract": null,
-        "name": "lspmux",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "18861f9d59e74ece8d867772cf07fa302c2dae98",
-            "sha256": "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=",
-            "sparseCheckout": [],
-            "type": "git",
-            "url": "https://codeberg.org/p2502/lspmux.git"
-        },
-        "version": "18861f9d59e74ece8d867772cf07fa302c2dae98"
+    "version": "v0.8.0"
+  },
+  "lspmux": {
+    "cargoLock": {
+      "Cargo.lock": [
+        "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock",
+        {}
+      ]
     },
-    "pam_rssh": {
-        "cargoLock": {
-            "Cargo.lock": [
-                "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock",
-                {}
-            ]
-        },
-        "date": null,
-        "extract": null,
-        "name": "pam_rssh",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": true,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "z4yx",
-            "repo": "pam_rssh",
-            "rev": "v1.2.1",
-            "sha256": "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "v1.2.1"
+    "date": "2026-03-11",
+    "extract": null,
+    "name": "lspmux",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "rev": "18861f9d59e74ece8d867772cf07fa302c2dae98",
+      "sha256": "sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=",
+      "sparseCheckout": [],
+      "type": "git",
+      "url": "https://codeberg.org/p2502/lspmux.git"
     },
-    "proton-ge-bin": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "proton-ge-bin",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "sha256": "sha256-I7SSvzQQ/NqdvwjpJ9IFFtAaTS+rgHUyXx0us1vIOnw=",
-            "type": "tarball",
-            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-1/GE-Proton11-1.tar.gz"
-        },
-        "version": "GE-Proton11-1"
+    "version": "18861f9d59e74ece8d867772cf07fa302c2dae98"
+  },
+  "pam_rssh": {
+    "cargoLock": {
+      "Cargo.lock": [
+        "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock",
+        {}
+      ]
     },
-    "sketchybar": {
-        "cargoLock": null,
-        "date": "2026-06-04",
-        "extract": null,
-        "name": "sketchybar",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "felixkratz",
-            "repo": "sketchybar",
-            "rev": "6284ee816601486ace33ca48a0271832eec6de35",
-            "sha256": "sha256-5tyc/yYzdV/3JTtujuj7le/14XkC7TlN/nZg7tOZsNg=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "6284ee816601486ace33ca48a0271832eec6de35"
+    "date": null,
+    "extract": null,
+    "name": "pam_rssh",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": true,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "z4yx",
+      "repo": "pam_rssh",
+      "rev": "v1.2.1",
+      "sha256": "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "vscode-kanata": {
-        "cargoLock": null,
-        "date": "2026-07-05",
-        "extract": null,
-        "name": "vscode-kanata",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "9a650968478b180b311c197182062edab271203d",
-            "sha256": "sha256-Ft4r+kL8P7S0GeR+Ut6jXINJ7WTKfDuWrvCYfLL04KM=",
-            "sparseCheckout": [],
-            "type": "git",
-            "url": "https://github.com/rszyma/vscode-kanata.git"
-        },
-        "version": "9a650968478b180b311c197182062edab271203d"
+    "version": "v1.2.1"
+  },
+  "proton-ge-bin": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "proton-ge-bin",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "sha256": "sha256-I7SSvzQQ/NqdvwjpJ9IFFtAaTS+rgHUyXx0us1vIOnw=",
+      "type": "tarball",
+      "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-1/GE-Proton11-1.tar.gz"
     },
-    "zotero-actions-tags": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-actions-tags",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-ASPnaCjkRuyLHIg1gsPQ+hFMxFnl7gNxclSfAOPCxek=",
-            "type": "url",
-            "url": "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.5.2/actions-and-tags-for-zotero.xpi"
-        },
-        "version": "2.5.2"
+    "version": "GE-Proton11-1"
+  },
+  "sketchybar": {
+    "cargoLock": null,
+    "date": "2026-06-04",
+    "extract": null,
+    "name": "sketchybar",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "felixkratz",
+      "repo": "sketchybar",
+      "rev": "6284ee816601486ace33ca48a0271832eec6de35",
+      "sha256": "sha256-5tyc/yYzdV/3JTtujuj7le/14XkC7TlN/nZg7tOZsNg=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "zotero-aria": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-aria",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-xqki7703PPYdHqUwDGyG3+nBfabYVfnGz10EJ2oeH7c=",
-            "type": "url",
-            "url": "https://github.com/lifan0127/ai-research-assistant/releases/download/v0.7.5/aria.xpi"
-        },
-        "version": "v0.7.5"
+    "version": "6284ee816601486ace33ca48a0271832eec6de35"
+  },
+  "vscode-kanata": {
+    "cargoLock": null,
+    "date": "2026-07-15",
+    "extract": null,
+    "name": "vscode-kanata",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "rev": "701dbf9a10a6857fe9ea72944c84475ab58c81c8",
+      "sha256": "sha256-w0hFYVAlqq9wl1xNEC/oHG32BeklP8t+++3EaU8Ximg=",
+      "sparseCheckout": [],
+      "type": "git",
+      "url": "https://github.com/rszyma/vscode-kanata.git"
     },
-    "zotero-attanger": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-attanger",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=",
-            "type": "url",
-            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi"
-        },
-        "version": "1.4.8"
+    "version": "701dbf9a10a6857fe9ea72944c84475ab58c81c8"
+  },
+  "zotero-actions-tags": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-actions-tags",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-ASPnaCjkRuyLHIg1gsPQ+hFMxFnl7gNxclSfAOPCxek=",
+      "type": "url",
+      "url": "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.5.2/actions-and-tags-for-zotero.xpi"
     },
-    "zotero-better-bibtex": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-better-bibtex",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-9m3NZtvPP4KIDn6djhRWVAa1Jz6y4JiPSW+DT/FndHQ=",
-            "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.37/zotero-better-bibtex-9.0.37.xpi"
-        },
-        "version": "9.0.37"
+    "version": "2.5.2"
+  },
+  "zotero-aria": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-aria",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-xqki7703PPYdHqUwDGyG3+nBfabYVfnGz10EJ2oeH7c=",
+      "type": "url",
+      "url": "https://github.com/lifan0127/ai-research-assistant/releases/download/v0.7.5/aria.xpi"
     },
-    "zotero-notero": {
-        "cargoLock": null,
-        "date": "2026-05-08",
-        "extract": null,
-        "name": "zotero-notero",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "dvanoni",
-            "repo": "notero",
-            "rev": "556359043a4b61df5802b6650cbdbec6450bf9d4",
-            "sha256": "sha256-hl93l5W1qvW+XXSphvw8/36+xhfbajjIPNPqikWj/+k=",
-            "sparseCheckout": [],
-            "type": "github"
-        },
-        "version": "556359043a4b61df5802b6650cbdbec6450bf9d4"
+    "version": "v0.7.5"
+  },
+  "zotero-attanger": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-attanger",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=",
+      "type": "url",
+      "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi"
     },
-    "zotero-ocr": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-ocr",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=",
-            "type": "url",
-            "url": "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi"
-        },
-        "version": "0.9.5.1"
+    "version": "1.4.8"
+  },
+  "zotero-better-bibtex": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-better-bibtex",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-yI7l5ryUoJc7RtyNEo8L7ikV8sShkWSPKsl3lzJ04AQ=",
+      "type": "url",
+      "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.47/zotero-better-bibtex-9.0.47.xpi"
     },
-    "zotero-papersgpt": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-papersgpt",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-7CsNhH5iTiD2xsN3uiXg0GMhOTC7RtbMA4ReIkcHbjc=",
-            "type": "url",
-            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.0/papersgpt-v0.6.0.xpi"
-        },
-        "version": "papersgpt-v0.6.0"
+    "version": "9.0.47"
+  },
+  "zotero-notero": {
+    "cargoLock": null,
+    "date": "2026-05-08",
+    "extract": null,
+    "name": "zotero-notero",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "dvanoni",
+      "repo": "notero",
+      "rev": "556359043a4b61df5802b6650cbdbec6450bf9d4",
+      "sha256": "sha256-hl93l5W1qvW+XXSphvw8/36+xhfbajjIPNPqikWj/+k=",
+      "sparseCheckout": [],
+      "type": "github"
     },
-    "zotero-zotlit": {
-        "cargoLock": null,
-        "date": null,
-        "extract": null,
-        "name": "zotero-zotlit",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "name": null,
-            "sha256": "sha256-MHbi4AB+9Ouas19d+YhAef3zEeRWsSsVGtmW024DOwY=",
-            "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-alpha.3/zotlit-zotero-2.0.0-alpha.3.xpi"
-        },
-        "version": "2.0.0-alpha.3"
-    }
+    "version": "556359043a4b61df5802b6650cbdbec6450bf9d4"
+  },
+  "zotero-ocr": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-ocr",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=",
+      "type": "url",
+      "url": "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi"
+    },
+    "version": "0.9.5.1"
+  },
+  "zotero-papersgpt": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-papersgpt",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-bOHWVQD+ArzpTLt2MKyRAAs9yV/P1SX2AXqaAmmULoM=",
+      "type": "url",
+      "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.1/papersgpt-v0.6.1.xpi"
+    },
+    "version": "papersgpt-v0.6.1"
+  },
+  "zotero-zotlit": {
+    "cargoLock": null,
+    "date": null,
+    "extract": null,
+    "name": "zotero-zotlit",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "name": null,
+      "sha256": "sha256-MHbi4AB+9Ouas19d+YhAef3zEeRWsSsVGtmW024DOwY=",
+      "type": "url",
+      "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-alpha.3/zotlit-zotero-2.0.0-alpha.3.xpi"
+    },
+    "version": "2.0.0-alpha.3"
+  }
 }

@@ -41,7 +41,7 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn patchedInputs;
+        inputsFn (patchedInputs);
     in
     builtins.removeAttrs output [ "newInputs" ];
 
@@ -144,6 +144,22 @@
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     impermanence.url = "github:nix-community/impermanence";
     import-tree.url = "github:vic/import-tree";
+    ivixlib = {
+      url = "github:auscyber/ivixlib";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    ivylix = {
+      url = "github:auscyber/ivylix";
+      inputs = {
+        ivixlib.follows = "ivixlib";
+        izlix.follows = "izlix";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    izlix = {
+      url = "github:isabelroses/izlix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     kanata = {
       url = "github:auscyber/kanata";
       inputs = {
@@ -212,7 +228,6 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nvfetcher.url = "github:berberman/nvfetcher";
     op-shell-plugins.url = "github:1Password/shell-plugins";
     pandoc.url = "github:srid/pandoc?ref=haskell-flake-revamp";
     plasma-manager = {

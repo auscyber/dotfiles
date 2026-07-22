@@ -92,6 +92,26 @@
       sha256 = "sha256-RTLFDB/irtEhEHwarROGmS4jNdRhruU1JKen48ADzZg=";
     };
   };
+  lix = {
+    pname = "lix";
+    version = "eb7009316b012d48a82735e36bc9485a32558658";
+    src = fetchgit {
+      url = "https://git.lix.systems/lix-project/lix.git";
+      rev = "eb7009316b012d48a82735e36bc9485a32558658";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-7qgPwwlb0d5OnO4GWS6iOSc6zXwAq7I8IlYgi+uytdo=";
+    };
+    cargoLock."Cargo.lock" = {
+      lockFile = ./. + "/sha256-7qgPwwlb0d5OnO4GWS6iOSc6zXwAq7I8IlYgi+uytdo=/Cargo.lock";
+      outputHashes = {
+        "zngur-0.10.0" = "sha256-q8mkHbZwrgLF61Esbd9nK9y8GnZqHWzSubY9ERibBEo=";
+      };
+    };
+    date = "2026-07-21";
+  };
   lspmux = {
     pname = "lspmux";
     version = "18861f9d59e74ece8d867772cf07fa302c2dae98";

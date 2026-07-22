@@ -25,6 +25,64 @@
       {
         imports = [ inputs.arion.nixosModules.arion ];
 
+        # Hardware accel (intel) — feeds jellyfin's LIBVA transcoding below.
+        hardware.graphics = {
+          enable = true;
+          extraPackages = with pkgs; [
+            intel-ocl
+            intel-vaapi-driver
+            libva-vdpau-driver
+          ];
+        };
+        systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "i965";
+        environment.sessionVariables.LIBVA_DRIVER_NAME = "i965";
+
+        # Media + downloading
+        services.jellyfin = {
+          enable = true;
+          openFirewall = true;
+        };
+        services.audiobookshelf.enable = true;
+        users.groups.music = { };
+        users.users.music = {
+          isSystemUser = true;
+          group = "music";
+        };
+        services.navidrome = {
+          enable = true;
+          group = "music";
+          settings = {
+            user = "music";
+            MusicFolder = "/mnt/hdd/Music";
+          };
+        };
+        services.lidarr = {
+          enable = true;
+          user = "music";
+        };
+        services.slskd = {
+          enable = true;
+          openFirewall = true;
+          user = "music";
+          settings = {
+            shares.directories = [ "/mnt/hdd/Music" ];
+            directories.downloads = "/mnt/hdd/Music/Downloads";
+            web.ip_address = "0.0.0.0";
+            web.logging = true;
+          };
+        };
+        services.qbittorrent = {
+          enable = true;
+          webuiPort = 9090;
+          openFirewall = true;
+        };
+
+        environment.systemPackages = with pkgs; [
+          jellyfin
+          jellyfin-web
+          jellyfin-ffmpeg
+        ];
+
         # --- soularr container (arion/docker), replaces the old compose stack ---
         virtualisation.arion = {
           backend = "docker";

@@ -29,6 +29,9 @@
       den.aspects.homebrew
       den.aspects.karabiner-driver
       den.aspects.sudoagents
+      den.aspects.ccache
+      den.aspects.sccache
+      den.aspects.lix
       #      den.aspects.builders
     ];
 
