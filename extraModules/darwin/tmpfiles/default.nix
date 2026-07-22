@@ -54,8 +54,16 @@ let
   # we treat it as `d` rather than emptying it on every rebuild -- silently
   # deleting a user's data on `darwin-rebuild switch` would be far worse than
   # under-implementing the type.
-  creates = [ "d" "D" "f" "F" ];
-  adjustsOnly = [ "z" "Z" ];
+  creates = [
+    "d"
+    "D"
+    "f"
+    "F"
+  ];
+  adjustsOnly = [
+    "z"
+    "Z"
+  ];
   supported = creates ++ adjustsOnly;
 
   recursive = e: e.type == "Z";

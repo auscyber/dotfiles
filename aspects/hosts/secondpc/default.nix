@@ -183,7 +183,6 @@
 
                 mountpoint = "/mnt/hdd/s3";
               };
-
             };
           };
         };

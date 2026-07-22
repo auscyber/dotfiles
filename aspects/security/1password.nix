@@ -8,31 +8,36 @@
   ff.op-shell-plugins.url = "github:1Password/shell-plugins";
 
   den.aspects.gui = {
-    homeManager = { pkgs, config, ... }: {
-      launchd.agents.set-in-gui = {
-        enable = true;
-        config = {
-          ProgramArguments = [
-            "/bin/launchctl"
-            "setenv"
-            "IN_GUI"
-            "yes"
-          ];
-          RunAtLoad = true;
-          LimitLoadToSessionType = "Aqua";
+    homeManager =
+      {
+        pkgs,
+        config,
+        ...
+      }:
+      {
+        launchd.agents.set-in-gui = {
+          enable = true;
+          config = {
+            ProgramArguments = [
+              "/bin/launchctl"
+              "setenv"
+              "IN_GUI"
+              "yes"
+            ];
+            RunAtLoad = true;
+            LimitLoadToSessionType = "Aqua";
+          };
+        };
+        systemd.user.services.set-in-gui = {
+          Unit.PartOf = [ "graphical-session.target" ];
+          Install.WantedBy = [ "graphical-session.target" ];
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = "${pkgs.systemd}/bin/systemctl --user set-environment IN_GUI=yes";
+          };
         };
       };
-      systemd.user.services.set-in-gui = {
-        Unit.PartOf = [ "graphical-session.target" ];
-        Install.WantedBy = [ "graphical-session.target" ];
-        Service = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = "${pkgs.systemd}/bin/systemctl --user set-environment IN_GUI=yes";
-        };
-      };
-
-    };
   };
 
   den.aspects.onepassword = {
@@ -43,13 +48,11 @@
       # dependency belongs here, not in the browser aspect. Fires only on
       # entities that actually resolved the zen aspect.
       (den.lib.whenAspect den.aspects.browsers.zen {
-        homeManager =
-          { pkgs, ... }:
-          {
-            programs.zen-browser._internalProfile.extensions.packages = [
-              pkgs.firefox-addons.onepassword-password-manager
-            ];
-          };
+        homeManager = { pkgs, ... }: {
+          programs.zen-browser._internalProfile.extensions.packages = [
+            pkgs.firefox-addons.onepassword-password-manager
+          ];
+        };
       })
     ];
     gui = {
@@ -69,42 +72,39 @@
               "${config.home.homeDirectory}/.1password/agent.sock";
         in
         {
-
           imports = [ inputs.op-shell-plugins.hmModules.default ];
-          config =
+          config = lib.mkMerge [
+            {
+              programs.zsh.initExtra = ''
+                [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
+              '';
 
-            lib.mkMerge [
-              {
-                programs.zsh.initExtra = ''
-                  [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
-                '';
+              programs.bash.initExtra = ''
+                [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
+              '';
 
-                programs.bash.initExtra = ''
-                  [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
-                '';
+              programs.fish.interactiveShellInit = ''
+                if test -n "$IN_GUI"
+                  set -gx SSH_AUTH_SOCK "${_1passwordSocket}"
+                end
+              '';
 
-                programs.fish.interactiveShellInit = ''
-                  if test -n "$IN_GUI"
-                    set -gx SSH_AUTH_SOCK "${_1passwordSocket}"
-                  end
-                '';
+              home.packages = [ pkgs._1password-cli ];
+              programs._1password-shell-plugins = {
+                # enable 1Password shell plugins for bash, zsh, and fish shell
+                enable = true;
+                # the specified packages as well as 1Password CLI will be
+                # automatically installed and configured to use shell plugins
+                plugins = with pkgs; [
+                  gh
+                  glab
+                  #            wrangler
 
-                home.packages = [ pkgs._1password-cli ];
-                programs._1password-shell-plugins = {
-                  # enable 1Password shell plugins for bash, zsh, and fish shell
-                  enable = true;
-                  # the specified packages as well as 1Password CLI will be
-                  # automatically installed and configured to use shell plugins
-                  plugins = with pkgs; [
-                    gh
-                    glab
-                    #            wrangler
-
-                    awscli2
-                  ];
-                };
-              }
-            ];
+                  awscli2
+                ];
+              };
+            }
+          ];
         };
 
       provides.to-users.hmDarwin = {

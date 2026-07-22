@@ -79,7 +79,7 @@ let
       patternArgs = flag: lib.concatMapStringsSep " " (p: "${flag} ${lib.escapeShellArg p}");
     in
     ''
-      export CELLER_SERVER_TOKEN_RS256_SECRET_BASE64="$(${decrypt} ${lib.escapeShellArg (lib.head deps).file})"
+      export CELLER_SERVER_TOKEN_RS256_SECRET_BASE64="$(${decrypt} ${lib.escapeShellArg (deps.cache_key).file})"
       ${lib.getExe' pkgs.celler "celleradm"} -f ${tokenConfig} make-token \
         --sub ${lib.escapeShellArg sub} \
         --validity ${lib.escapeShellArg validity} \
@@ -136,6 +136,34 @@ in
           client_max_body_size 15g;
         '';
       };
+      secrets = { secrets, ... }: {
+        # RS256 signing key (aspects/base/cache.age): both the input the
+        # github_cache_key generator decrypts to mint tokens AND the key
+        # cellerd reads at runtime via the celler_env template below, so on
+        # secondpc it is deployed (not intermediary). Same key celler-push
+        # hands its own generator on the client hosts.
+        cache_key = {
+          rekeyFile = ./cache.age;
+        };
+        # CI push token for GitHub Actions: scoped to sub=github, may push the
+        # `main` cache. `nix run .#sync-ci-secrets` decrypts this and uploads
+        # it as the CELLER_TOKEN GitHub Actions secret; systems.yml hands it to
+        # ryanccn/attic-action, which pushes every host it builds (celler JWTs
+        # are attic-compatible). (Previously this
+        # named `deps.cache_key` with no dependency declared, so it never
+        # generated -- hence github_cache_key.age was missing on disk.)
+        github_cache_key = {
+          rekeyFile = ./github_cache_key.age;
+          generator = {
+            tags = [ "github_cache_key" ];
+            dependencies.cache_key = secrets.cache_key;
+            script = cellerTokenScript {
+              sub = "github";
+              push = [ "main" ];
+            };
+          };
+        };
+      };
 
       nixos = { config, ... }: {
         imports = [ inputs.celler.nixosModules.cellerd ];
@@ -164,9 +192,8 @@ in
           };
         };
 
-        age.secrets.cache_keyy.rekeyFile = ./cache.age;
         age.templates.celler_env = {
-          dependencies.cache_key = config.age.secrets.cache_keyy;
+          dependencies.cache_key = config.age.secrets.cache_key;
           content = { placeholders, ... }: ''
             CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
           '';
@@ -219,13 +246,15 @@ in
         ...
       }:
       {
-        cache_key = {
+        cache_keyy = {
           rekeyFile = ./cache.age;
           intermediary = lib.mkDefault true;
         };
         celler_token.generator = {
           tags = [ "celler_token" ];
-          dependencies = [ secrets.cache_key ];
+          dependencies = {
+            cache_key = secrets.cache_keyy;
+          };
           script = cellerTokenScript { sub = host.name; };
         };
       };

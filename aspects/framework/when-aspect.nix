@@ -34,7 +34,11 @@
 # rather than fanned out. That is the same trap documented at length in
 # core/roles.nix; for provides-bearing content, gate at the class body with the
 # entity's own `hasAspect` instead (see `whenAspect` vs `hasAspect` note below).
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   toList = x: if builtins.isList x then x else [ x ];
 
@@ -54,9 +58,43 @@ let
     else
       content;
 
+  # `hasAspect` keys a probe off `identity.key ref` (den identity.nix:
+  # `meta.provider ++ [name]`). Top-level `den.aspects.X` is a full aspect
+  # submodule that carries `name`, so its key is `X`. But a NESTED reference
+  # like `den.aspects.browsers.zen` read straight off `den.aspects` is only
+  # content-wrapped: it carries provenance in `__provider` (`["browsers"
+  # "zen"]`) and has NO `name`/`meta.provider`. Its `identity.key` therefore
+  # collapses to `"<anon>"` — a key that virtually every entity's pathSet
+  # contains (any anonymous inline node registers it), so the guard fires
+  # unconditionally. (`__provider` → `name`/`meta.provider` promotion only
+  # happens when a nested aspect is *included* and passes through
+  # `unwrapContent` in den's providerType; a bare read never gets it.)
+  #
+  # Reconstruct the same identity `unwrapContent` would: last `__provider`
+  # segment is the name, the rest is the provider chain. This makes
+  # `identity.key` match the base key the resolved node registers
+  # (`browsers/zen`). Top-level refs have no `__provider`, so they pass
+  # through untouched.
+  normalizeRef =
+    ref:
+    if
+      builtins.isAttrs ref && (ref.__provider or [ ]) != [ ] && !(ref ? name && ref.name != "<anon>")
+    then
+      ref
+      // {
+        name = lib.last ref.__provider;
+        meta = (ref.meta or { }) // {
+          provider = lib.init ref.__provider;
+        };
+      }
+    else
+      ref;
+
   guard =
     pred: targets: content:
-    den.lib.policy.when ({ hasAspect, ... }: pred hasAspect (toList targets)) (asAspect content);
+    den.lib.policy.when (
+      { hasAspect, ... }: pred (ref: hasAspect (normalizeRef ref)) (toList targets)
+    ) (asAspect content);
 in
 {
   # Present: every listed aspect resolved onto this entity.

@@ -8,8 +8,7 @@
 # module-arg battery, withExtra, and the update-sources/postprocess-sources apps),
 # and drops the local `patchedInputs.nvfetcher` — ivixlib builds the forked
 # "custom fetcher" nvfetcher itself.
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   imports = [
     inputs.ivixlib.flakeModules.default
     (inputs.den.namespace "ivixlib" inputs.ivixlib)

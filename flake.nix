@@ -41,7 +41,7 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn (patchedInputs);
+        inputsFn patchedInputs;
     in
     builtins.removeAttrs output [ "newInputs" ];
 
@@ -121,6 +121,7 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
+    github-actions-nix.url = "github:synapdeck/github-actions-nix";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

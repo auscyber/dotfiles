@@ -35,7 +35,11 @@ let
   cfg = config.security;
 
   wrapperType = lib.types.submodule (
-    { name, config, ... }:
+    {
+      name,
+      config,
+      ...
+    }:
     {
       options = {
         source = lib.mkOption {
@@ -107,8 +111,7 @@ let
     '';
 
   # 0755 + setuid(+4000) + setgid(+2000), rendered as the octal chmod wants.
-  wrapperMode =
-    w: toString (755 + (if w.setuid then 4000 else 0) + (if w.setgid then 2000 else 0));
+  wrapperMode = w: toString (755 + (if w.setuid then 4000 else 0) + (if w.setgid then 2000 else 0));
 
   wrappers = lib.attrValues cfg.wrappers;
 

@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.secondpc.nixos = {
     services.minecraft-server = {
       enable = true;

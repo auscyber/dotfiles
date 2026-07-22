@@ -182,14 +182,18 @@
       #      den.aspects.zeroclaw
       den.aspects.file-local
       den.batteries.primary-user
-      den.aspects.packages.cotabby
+      den.aspects.cotabby
       #      <zen>
     ];
     provides.Ivys-MacBook-Pro.includes = [ den.aspects.laptop-brew ];
     provides.Ivys-MacBook-Pro.provides.to-users = {
       homeManager = { pkgs, ... }: {
+        # Off the 8080 default so it doesn't collide with anything else that
+        # assumes that port; cotabby (and any future local client) reads this
+        # same option rather than a hardcoded port.
+        programs.llama-cpp.port = 8090;
+
         home.packages = with pkgs; [
-          cotabby
           nodejs
           opencode
           vscode

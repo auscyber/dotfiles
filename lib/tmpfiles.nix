@@ -23,8 +23,7 @@ let
     };
 
   entryType = lib.types.submodule (
-    { name, ... }:
-    {
+    { name, ... }: {
       options.type = lib.mkOption {
         type = lib.types.str;
         default = name;
@@ -121,7 +120,8 @@ in
     lib.concatMap (
       config:
       lib.concatMap (
-        path: lib.mapAttrsToList (_type: entry: entry // { inherit config path; }) settings.${config}.${path}
+        path:
+        lib.mapAttrsToList (_type: entry: entry // { inherit config path; }) settings.${config}.${path}
       ) (lib.attrNames settings.${config})
     ) (lib.attrNames settings);
 

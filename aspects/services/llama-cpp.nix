@@ -8,8 +8,8 @@
         ...
       }:
       let
+        cfg = config.programs.llama-cpp;
         host = "127.0.0.1";
-        port = 8080;
         cacheDir = "${config.xdg.cacheHome}/llama-cpp";
 
         # Qwen3-8B Q4_K_M (4.7 GiB) is the largest sane resident model here: 16
@@ -38,7 +38,7 @@
           "--host"
           host
           "--port"
-          (toString port)
+          (toString cfg.port)
           "-hf"
           model
           "--alias"
@@ -52,52 +52,66 @@
         ];
       in
       {
-        home.file."models/.keep".text = "";
-        home.file.".cache/llama-cpp/.keep".text = "";
-        home.file."Library/Logs/llama-cpp/.keep".text = "";
-
-        launchd.agents.llama_cpp = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
-          enable = true;
-          config = {
-            Program = "${pkgs.llama-cpp}/bin/llama-server";
-            # Capitalised: the option is an enum of "Background" | "Standard" |
-            # "Adaptive" | "Interactive", so lowercase fails to type-check.
-            # Interactive keeps launchd from CPU-throttling inference the way it
-            # would a Background job.
-            ProcessType = "Interactive";
-            ProgramArguments = args;
-            EnvironmentVariables = {
-              LLAMA_CACHE = cacheDir;
-              XDG_CACHE_HOME = config.xdg.cacheHome;
-            };
-            KeepAlive = true;
-
-            # Without these launchd discards stdout/stderr, which matters most
-            # on the very first start: that run pulls ~4.7 GiB from HuggingFace,
-            # and a failure there is otherwise invisible -- KeepAlive just
-            # respawns it in a loop with nothing to show for it. Kept under the
-            # user-owned ~/Library/Logs for the reason documented at length in
-            # apps/openclaw.nix: a path a build sandbox can create first ends up
-            # unopenable by launchd, which parks the job before it ever execs.
-            StandardOutPath = "${config.home.homeDirectory}/Library/Logs/llama-cpp/server.log";
-            StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/llama-cpp/server.err.log";
-          };
+        options.programs.llama-cpp.port = lib.mkOption {
+          type = lib.types.port;
+          default = 8080;
+          description = ''
+            Port the shared llama-server (OpenAI-compatible) listens on.
+            Every consumer (this service's own launchd/systemd unit, and any
+            other aspect pointing a client at the server, e.g. cotabby) reads
+            this option rather than hardcoding the port, so it only needs
+            changing in one place.
+          '';
         };
 
-        systemd.user.services.llama-cpp = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
-          Unit = {
-            Description = "llama.cpp llama-server (OpenAI-compatible, user)";
-            After = [ "network-online.target" ];
+        config = {
+          home.file."models/.keep".text = "";
+          home.file.".cache/llama-cpp/.keep".text = "";
+          home.file."Library/Logs/llama-cpp/.keep".text = "";
+
+          launchd.agents.llama_cpp = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+            enable = true;
+            config = {
+              Program = "${pkgs.llama-cpp}/bin/llama-server";
+              # Capitalised: the option is an enum of "Background" | "Standard" |
+              # "Adaptive" | "Interactive", so lowercase fails to type-check.
+              # Interactive keeps launchd from CPU-throttling inference the way it
+              # would a Background job.
+              ProcessType = "Interactive";
+              ProgramArguments = args;
+              EnvironmentVariables = {
+                LLAMA_CACHE = cacheDir;
+                XDG_CACHE_HOME = config.xdg.cacheHome;
+              };
+              KeepAlive = true;
+
+              # Without these launchd discards stdout/stderr, which matters most
+              # on the very first start: that run pulls ~4.7 GiB from HuggingFace,
+              # and a failure there is otherwise invisible -- KeepAlive just
+              # respawns it in a loop with nothing to show for it. Kept under the
+              # user-owned ~/Library/Logs for the reason documented at length in
+              # apps/openclaw.nix: a path a build sandbox can create first ends up
+              # unopenable by launchd, which parks the job before it ever execs.
+              StandardOutPath = "${config.home.homeDirectory}/Library/Logs/llama-cpp/server.log";
+              StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/llama-cpp/server.err.log";
+            };
           };
-          Service = {
-            Type = "simple";
-            ExecStart = "${pkgs.llama-cpp}/bin/llama-server ${lib.escapeShellArgs args}";
-            Environment = [
-              "LLAMA_CACHE=${cacheDir}"
-              "XDG_CACHE_HOME=${config.xdg.cacheHome}"
-            ];
-            Restart = "on-failure";
-            RestartSec = 10;
+
+          systemd.user.services.llama-cpp = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+            Unit = {
+              Description = "llama.cpp llama-server (OpenAI-compatible, user)";
+              After = [ "network-online.target" ];
+            };
+            Service = {
+              Type = "simple";
+              ExecStart = "${pkgs.llama-cpp}/bin/llama-server ${lib.escapeShellArgs args}";
+              Environment = [
+                "LLAMA_CACHE=${cacheDir}"
+                "XDG_CACHE_HOME=${config.xdg.cacheHome}"
+              ];
+              Restart = "on-failure";
+              RestartSec = 10;
+            };
           };
         };
       };

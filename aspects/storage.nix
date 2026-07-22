@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   ff.disko.url = "github:nix-community/disko";
   ff.disko.inputs.nixpkgs.follows = "nixpkgs";
   ff.disko-zfs = {

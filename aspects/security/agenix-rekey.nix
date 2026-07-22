@@ -92,7 +92,15 @@ in
       ../../patches/agenix/templates.patch
       ../../patches/agenix/edit.patch
     ];
-    agenix-rekey.patches = [ ../../patches/agenix-rekey/template.patch ];
+    agenix-rekey.patches = [
+      ../../patches/agenix-rekey/template.patch
+      # macOS ships BSD `stat`, which rejects the GNU `-c %Y` the generate
+      # script uses for its mtime freshness check. On failure both lookups fall
+      # back to their defaults (dep→1, this→0), so `1 -gt 0` is always true and
+      # every generated secret regenerates on every run. Pin the check to GNU
+      # coreutils' stat (same style as the file's existing ${pkgs.coreutils}/bin/realpath).
+      ../../patches/agenix-rekey/stat-portable.patch
+    ];
     age-plugin-gpg.patches = [ ../../patches/age-plugin-gpg/age-plugin-gpg.patch ];
   };
 

@@ -14,7 +14,6 @@
     ivylix.inputs.ivixlib.follows = "ivixlib";
     ivixlib.url = "github:auscyber/ivixlib";
     ivixlib.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
   # The entire Lix build lives in the `ivylix` flake (sourced via nvfetcher through
@@ -24,7 +23,11 @@
   # then ccache-wrapping only `pkgs.lix` would build Lix twice: the wrapped one for
   # `nix.package`, and the plain one `nil`/etc. still depend on.)
   den.aspects.lix.os =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     let
       # ccache is host state (declared by the ccache aspect). attrByPath so the
       # option being undeclared — no ccache aspect here — reads as `false`.

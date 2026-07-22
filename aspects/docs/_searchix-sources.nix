@@ -65,9 +65,7 @@ let
     let
       hmOption = cfg.options.home-manager.users;
       payload = hmOption.type.nestedTypes.elemType.functor.payload;
-      definitions = builtins.filter (m: m != null) (
-        map (def: def.${user} or null) hmOption.definitions
-      );
+      definitions = builtins.filter (m: m != null) (map (def: def.${user} or null) hmOption.definitions);
     in
     (lib.evalModules {
       inherit (payload) class;

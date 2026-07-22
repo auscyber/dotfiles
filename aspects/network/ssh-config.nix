@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 let
   inherit (import ./_lib.nix { inherit lib den; }) clientNames tunnelIpByName;
 
@@ -25,7 +29,11 @@ let
   # sockets live under the systemd runtime dir (per-uid), Darwin's live under
   # a single fixed launchd-managed directory.
   localExtraSocket =
-    { pkgs, host, ... }:
+    {
+      pkgs,
+      host,
+      ...
+    }:
     if pkgs.stdenv.hostPlatform.isDarwin then
       "/private/var/run/org.nix-community.home.gpg-agent/S.gpg-agent.extra"
     else
@@ -35,24 +43,23 @@ in
   den.aspects.vpn.includes = [ den.aspects.vpn-ssh-config ];
 
   den.aspects.vpn-ssh-config = {
-    provides.to-users =
-      { host, ... }:
-      {
-        homeManager =
-          { pkgs, ... }:
+    provides.to-users = { host, ... }: {
+      homeManager = { pkgs, ... }: {
+        programs.ssh.settings = lib.genAttrs (clientNames host.name) (
+          peerName:
           {
-            programs.ssh.settings = lib.genAttrs (clientNames host.name) (peerName: {
-              hostname = tunnelIpByName peerName;
-              forwardAgent = true;
-              RemoteForward = {
-                bind.address = "/run/user/${toString (hostMeta.${peerName}.uid or 1000)}/gnupg/S.gpg-agent";
-                host.address = localExtraSocket { inherit pkgs host; };
-              };
-            }
-            // lib.optionalAttrs (builtins.hasAttr peerName hostMeta) {
-              user = hostMeta.${peerName}.user;
-            });
-          };
+            hostname = tunnelIpByName peerName;
+            forwardAgent = true;
+            RemoteForward = {
+              bind.address = "/run/user/${toString (hostMeta.${peerName}.uid or 1000)}/gnupg/S.gpg-agent";
+              host.address = localExtraSocket { inherit pkgs host; };
+            };
+          }
+          // lib.optionalAttrs (builtins.hasAttr peerName hostMeta) {
+            user = hostMeta.${peerName}.user;
+          }
+        );
       };
+    };
   };
 }

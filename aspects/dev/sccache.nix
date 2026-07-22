@@ -28,10 +28,7 @@
 # Cache dir + `os`-class discipline are identical to ccache: the shared
 # `auscybernix.tmpfiles` shim creates `/var/cache/sccache` `root:nixbld 0770` on
 # both platforms, and everything under `os` is an option both module systems have.
-{
-  lib,
-  ...
-}:
+{ lib, ... }:
 let
   # Cross-platform core: declares the options and wires the cache dir, sandbox
   # exposure, and the per-package sccache overlay. Delivered via `os`.
@@ -125,30 +122,26 @@ let
                   # failure (see the concurrency caveat in the header).
                   SCCACHE_IGNORE_SERVER_IO_ERROR = "1";
 
-                  preBuild =
-                    (old.preBuild or "")
-                    + ''
-                      # Strip the volatile per-build dir from the compile hash so
-                      # objects are reusable across Nix builds (sccache >= 0.14).
-                      export SCCACHE_BASEDIRS="$NIX_BUILD_TOP"
-                      # Per-build socket: avoids the default :4226 collision when
-                      # concurrent darwin builds share host loopback.
-                      export SCCACHE_SERVER_UDS="$NIX_BUILD_TOP/sccache.sock"
-                      ${sccache} --start-server
-                      # Best-effort teardown even if the build fails.
-                      trap '${sccache} --stop-server || true' EXIT
-                    '';
+                  preBuild = (old.preBuild or "") + ''
+                    # Strip the volatile per-build dir from the compile hash so
+                    # objects are reusable across Nix builds (sccache >= 0.14).
+                    export SCCACHE_BASEDIRS="$NIX_BUILD_TOP"
+                    # Per-build socket: avoids the default :4226 collision when
+                    # concurrent darwin builds share host loopback.
+                    export SCCACHE_SERVER_UDS="$NIX_BUILD_TOP/sccache.sock"
+                    ${sccache} --start-server
+                    # Best-effort teardown even if the build fails.
+                    trap '${sccache} --stop-server || true' EXIT
+                  '';
 
-                  postBuild =
-                    (old.postBuild or "")
-                    + ''
-                      # Hit/miss numbers land in the build log -- the only useful
-                      # sccache stats (they are per-server-session, not on disk).
-                      ${sccache} --show-stats || true
-                      # Explicit teardown; matters on darwin where the daemon can
-                      # otherwise linger on the host after the build.
-                      ${sccache} --stop-server || true
-                    '';
+                  postBuild = (old.postBuild or "") + ''
+                    # Hit/miss numbers land in the build log -- the only useful
+                    # sccache stats (they are per-server-session, not on disk).
+                    ${sccache} --show-stats || true
+                    # Explicit teardown; matters on darwin where the daemon can
+                    # otherwise linger on the host after the build.
+                    ${sccache} --stop-server || true
+                  '';
                 });
               in
               if cfg.trace then builtins.trace "with sccache: ${pn}" wrapped else wrapped

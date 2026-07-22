@@ -1,0 +1,67 @@
+name: "Build all systems"
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+# One machine per job. `fail-fast: false` in the build job means a machine that
+# fails to build never cancels the others -- every system keeps building and
+# pushing in parallel.
+jobs:
+  # Turn `flake.ciMatrix` (from aspects/tooling/ci.nix) into a GitHub matrix.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.set.outputs.include }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+      - id: set
+        run: |
+          echo "include=$(nix eval --json .#ciMatrix)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    name: ${{ matrix.class }}-${{ matrix.host }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:6VI0mVQzSGSA9gB81hwXWllbWrP7ybLaP1Jd3sPUBf4=
+      # Log in to celler (attic-compatible) and arrange to push everything built
+      # during this job in the action's post-step, so it must run *before* the
+      # build. Skipped on pull_request (fork PRs have no access to CELLER_TOKEN).
+      # CELLER_TOKEN is populated by `nix run .#sync-ci-secrets`.
+      - name: Setup attic cache
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: ryanccn/attic-action@v0
+        with:
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.CELLER_TOKEN }}
+          skip-use: true
+      # Always build (verifies the machine, including on PRs).
+      - name: Build ${{ matrix.class }}-${{ matrix.host }}
+        run: nix build --no-link --print-out-paths ".#${{ matrix.attr }}"
