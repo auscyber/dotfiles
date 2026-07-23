@@ -150,7 +150,8 @@ in
     {
       packages =
         toplevels "nixos" (self.nixosConfigurations or { })
-        // toplevels "darwin" (self.darwinConfigurations or { });
+        // toplevels "darwin" (self.darwinConfigurations or { })
+        // lib.optionalAttrs supported { celler = inputs'.celler.packages.celler; };
 
       apps = lib.optionalAttrs supported {
         sync-ci-secrets = {
