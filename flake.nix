@@ -41,7 +41,7 @@
         let
           patchedInputs = (inputsFn inputs).newInputs;
         in
-        inputsFn patchedInputs;
+        inputsFn (patchedInputs);
     in
     builtins.removeAttrs output [ "newInputs" ];
 
@@ -187,6 +187,10 @@
     };
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
+    nix-github-actions = {
+      url = "github:nix-community/nix-github-actions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nix-index-database = {
       url = "github:nix-community/nix-index-database";

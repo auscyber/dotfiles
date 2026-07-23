@@ -6,55 +6,65 @@
 # CI: build every host in parallel and push the results to the self-hosted
 # celler cache (cache.ivymect.in/main).
 #
-#   * `flake.ciMatrix` enumerates every host -> { host, class, system, runner,
-#     attr } so .github/workflows/systems.yml can fan out one job per machine
-#     with `fail-fast: false` -- one machine failing never stops the others.
-#   * `packages.<system>.{nixos,darwin}-<host>` exposes each toplevel so a build
-#     is `nix build .#nixos-auspc` (and is what the matrix targets).
-#   * `apps.sync-ci-secrets` mints the celler CI push token (agenix generator)
-#     and uploads it to the repo's GitHub Actions secrets as CELLER_TOKEN, so
-#     ryanccn/attic-action in the workflow can push what it builds (celler JWTs
-#     are attic-compatible).
+#   * `flake.ciMatrix` is nix-github-actions' output: `.#ciMatrix.matrix` is a
+#     GitHub matrix (one row per host, each system mapped to a runner) that
+#     .github/workflows/systems.yml evaluates AT RUN TIME (`nix eval` in a matrix
+#     job, `fromJSON` in the build job) -- a proper dynamic matrix, not baked
+#     into the YAML. `.#ciMatrix.checks.<system>."<name>"` is the buildable
+#     toplevel each row targets.
+#   * The build jobs run `nix build` against THIS flake with
+#     `accept-flake-config`, so they pick up substituters + trusted-public-keys
+#     straight from the flake's nixConfig -- everything derived from
+#     aspects/base/celler-keys.json -- with nothing hardcoded in the workflow.
+#   * `apps.sync-ci-secrets` mints + uploads the CELLER_TOKEN that
+#     ryanccn/attic-action pushes with (celler JWTs are attic-compatible).
 let
   self = inputs.self;
 
-  # Escape hatch: hosts to leave out of the CI matrix entirely. Empty by
-  # default -- a host that fails to build just goes red on its own job without
-  # affecting the rest (that is the whole point of fail-fast: false).
+  # Escape hatch: hosts to leave out of CI entirely. Empty by default -- a host
+  # that fails to build just goes red on its own job without affecting the rest
+  # (that is the whole point of fail-fast: false).
   excludeHosts = [ ];
-
-  # A GitHub-hosted runner that can build each system natively (no emulation).
-  runnerFor = {
-    "x86_64-linux" = "ubuntu-latest";
-    "aarch64-linux" = "ubuntu-24.04-arm";
-    "aarch64-darwin" = "macos-latest";
-  };
 
   systemOf = cfg: cfg.config.nixpkgs.hostPlatform.system;
   keep = configs: removeAttrs configs excludeHosts;
 
-  # One matrix row per host. `attr` is the flake attribute the workflow builds;
-  # it always exists (den emits nixosConfigurations/darwinConfigurations), so
-  # the matrix does not depend on the package aliases below.
-  matrixEntries =
-    class: configs:
-    lib.mapAttrsToList (name: cfg: {
-      host = name;
-      inherit class;
-      system = systemOf cfg;
-      runner = runnerFor.${systemOf cfg};
-      attr = "${class}Configurations.${name}.config.system.build.toplevel";
-    }) (keep configs);
+  # { <system> = { "<class>-<name>" = <toplevel>; }; } -- the exact shape
+  # nix-github-actions.lib.mkGithubMatrix consumes. Its default `platforms` maps
+  # each of our systems to a runner (x86_64-linux -> ubuntu-24.04, aarch64-linux
+  # -> ubuntu-24.04-arm, aarch64-darwin -> macos-14).
+  checksBySystem =
+    let
+      add =
+        class: acc: name: cfg:
+        let
+          s = systemOf cfg;
+        in
+        acc
+        // {
+          ${s} = (acc.${s} or { }) // {
+            "${class}-${name}" = cfg.config.system.build.toplevel;
+          };
+        };
+    in
+    lib.foldlAttrs (add "darwin") (
+      lib.foldlAttrs (add "nixos") { } (keep (self.nixosConfigurations or { }))
+    ) (keep (self.darwinConfigurations or { }));
 in
 {
-  ff.github-actions-nix.url = "github:synapdeck/github-actions-nix";
-  imports = [
-    inputs.github-actions-nix.flakeModule
-  ];
+  ff.nix-github-actions = {
+    url = "github:nix-community/nix-github-actions";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  flake.ciMatrix =
-    matrixEntries "nixos" (self.nixosConfigurations or { })
-    ++ matrixEntries "darwin" (self.darwinConfigurations or { });
+  # attrPrefix -> the flake attr each matrix row builds: since mkGithubMatrix
+  # returns `{ inherit checks; matrix = {...}; }`, assigning it to flake.ciMatrix
+  # makes `.#ciMatrix.checks.<system>."<name>"` a real buildable attribute and
+  # `.#ciMatrix.matrix` the runtime-evaluated GitHub matrix.
+  flake.ciMatrix = inputs.nix-github-actions.lib.mkGithubMatrix {
+    checks = checksBySystem;
+    attrPrefix = "ciMatrix.checks";
+  };
 
   perSystem =
     {
@@ -66,8 +76,12 @@ in
     let
       # This system has a runner (i.e. is a system we actually build for).
       # x86_64-freebsd is in the merged `systems` list but has no hosts and no
-      # celler/age-plugin build, so its dev outputs are skipped.
-      supported = runnerFor ? ${system};
+      # age-plugin build, so its dev outputs are skipped.
+      supported = builtins.elem system [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
 
       onThisSystem = lib.filterAttrs (_: cfg: systemOf cfg == system);
       toplevels =

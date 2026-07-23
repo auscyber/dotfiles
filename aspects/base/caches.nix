@@ -346,7 +346,7 @@ in
         ];
         text = ''
           set -eu
-          dest="aspects/modules/base/celler-keys.json"
+          dest="aspects/base/celler-keys.json"
           if [ ! -e flake.nix ]; then
           	echo "update-celler-keys: run from the repo root (flake.nix not found)" >&2
           	exit 1
