@@ -23,6 +23,7 @@
   den.aspects.browsers.zen = {
     includes = [
       den.aspects.stylix
+      den.aspects.zen-classes
       (
         { aspect-chain }:
         den.batteries.forward {

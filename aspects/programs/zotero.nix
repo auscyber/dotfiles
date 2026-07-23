@@ -22,8 +22,6 @@
             actions-tags
             notero
             ocr
-            aria
-            papersgpt
             zotlit
           ];
         };

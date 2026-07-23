@@ -45,7 +45,7 @@ in
       # class so it reaches both nixos and darwin `nix.settings`; list-valued
       # options merge by concatenation, so this appends to the base list below.
       (den.lib.whenAspect den.aspects.lix {
-        os.nix.settings.experimental-features = [ "pipe-operators" ];
+        os.nix.settings.experimental-features = [ "pipe-operator" ];
       })
       (den.lib.unlessAspect den.aspects.lix {
         os.nix.settings.experimental-features = [ "pipe-operators" ];
@@ -67,6 +67,7 @@ in
       ];
     };
     darwin = {
+      nix.checkConfig = false;
       nix.enable = true;
       nix.settings.trusted-users = [ "@admin" ];
       nix.settings.auto-optimise-store = true;
