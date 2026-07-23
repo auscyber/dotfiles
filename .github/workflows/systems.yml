@@ -66,7 +66,7 @@ jobs:
       # doesn't send — pushes with it fail with "X-Celler-Nar-Info must be set".
       - name: Setup celler cache
         if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@claude/celler-nar-info-header-irsrfq
+        uses: auscyber/celler-action@main
         with:
           endpoint: https://cache.ivymect.in
           cache: main
