@@ -68,6 +68,5 @@ jobs:
           endpoint: https://cache.ivymect.in
           cache: main
           token: ${{ secrets.CELLER_TOKEN }}
-          skip-use: true
       - name: Build ${{ matrix.name }}
         run: nix build --no-link --fallback --impure --print-out-paths ".#${{ matrix.attr }}"
