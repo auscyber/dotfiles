@@ -24,7 +24,7 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
-            experimental-features = nix-command flakes
+            experimental-features = nix-command flakes pipe-operators
             accept-flake-config = true
       - id: set
         run: |
