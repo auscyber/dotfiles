@@ -1,0 +1,24 @@
+From 750619081d40035777083eccea5ad1a8e86f9037 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joa=CC=83o=20Santos=20Reis?= <joaosreis@outlook.pt>
+Date: Mon, 20 Jul 2026 12:30:34 +0100
+Subject: [PATCH] vscode: update nodeModulesPath condition for Darwin platform
+
+asar was restored upstream
+https://github.com/microsoft/vscode/commit/913d5cccc1a0e97311521e7791033ce9d5c2ef2f
+---
+ pkgs/applications/editors/vscode/generic.nix | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pkgs/applications/editors/vscode/generic.nix b/pkgs/applications/editors/vscode/generic.nix
+index 8414a86a0c25a..5597743941724 100644
+--- a/pkgs/applications/editors/vscode/generic.nix
++++ b/pkgs/applications/editors/vscode/generic.nix
+@@ -419,7 +419,7 @@ stdenv.mkDerivation (
+         let
+           nodeModulesPath =
+             if stdenv.hostPlatform.isDarwin then
+-              if lib.versionAtLeast vscodeVersion "1.94.0" then
++              if lib.versionAtLeast vscodeVersion "1.94.0" && !lib.versionAtLeast vscodeVersion "1.129.0" then
+                 "Contents/Resources/app/node_modules"
+               else
+                 "Contents/Resources/app/node_modules.asar.unpacked"
