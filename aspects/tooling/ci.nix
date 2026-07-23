@@ -17,7 +17,9 @@
 #     straight from the flake's nixConfig -- everything derived from
 #     aspects/base/celler-keys.json -- with nothing hardcoded in the workflow.
 #   * `apps.sync-ci-secrets` mints + uploads the CELLER_TOKEN that
-#     ryanccn/attic-action pushes with (celler JWTs are attic-compatible).
+#     auscyber/celler-action pushes with (a fork of ryanccn/attic-action that
+#     uses the celler client instead of attic, since celler's upload protocol
+#     requires an X-Celler-Nar-Info header that upstream attic doesn't send).
 let
   self = inputs.self;
 

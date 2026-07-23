@@ -59,11 +59,14 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
-      # Push what this job builds to celler (attic-compatible). Skipped on
-      # pull_request — fork PRs have no access to CELLER_TOKEN.
-      - name: Setup attic cache
+      # Push what this job builds to celler. Skipped on pull_request — fork
+      # PRs have no access to CELLER_TOKEN. Uses auscyber/celler-action (not
+      # ryanccn/attic-action) because celler requires the NAR info to be sent
+      # via an X-Celler-Nar-Info header, which the upstream attic client
+      # doesn't send — pushes with it fail with "X-Celler-Nar-Info must be set".
+      - name: Setup celler cache
         if: ${{ github.event_name != 'pull_request' }}
-        uses: ryanccn/attic-action@v0
+        uses: auscyber/celler-action@claude/celler-nar-info-header-irsrfq
         with:
           endpoint: https://cache.ivymect.in
           cache: main

@@ -148,8 +148,10 @@ in
         # CI push token for GitHub Actions: scoped to sub=github, may push the
         # `main` cache. `nix run .#sync-ci-secrets` decrypts this and uploads
         # it as the CELLER_TOKEN GitHub Actions secret; systems.yml hands it to
-        # ryanccn/attic-action, which pushes every host it builds (celler JWTs
-        # are attic-compatible). (Previously this
+        # auscyber/celler-action, which pushes every host it builds. (Not
+        # ryanccn/attic-action -- celler's upload protocol needs an
+        # X-Celler-Nar-Info header that the upstream attic client never sends.)
+        # (Previously this
         # named `deps.cache_key` with no dependency declared, so it never
         # generated -- hence github_cache_key.age was missing on disk.)
         github_cache_key = {
