@@ -45,20 +45,27 @@ jobs:
       # doesn't send — pushes with it fail with "X-Celler-Nar-Info must be set".
       # celler's client sends the X-Celler-Nar-Info header the server requires;
       # attic-action's attic client only sends X-Attic-Nar-Info, hence the push
-      # failures. Pinned to the celler rev in flake.lock. `inputs-from: "."` so
-      # the installed version tracks this repo's own `celler` flake input/lock
-      # entry rather than always floating on `github:blitz/celler`'s default
-      # branch -- and by the time this runs, the celler-<system> gate job in
-      # systems.yml has already made sure celler is in the cache for this
-      # runner's arch, so this can substitute the install instead of building
-      # it from source.
+      # failures. Pinned to the celler rev in flake.lock.
+      #
+      # flake-ref: ".#celler" -- NOT inputs-from: "." -- so this installs the
+      # exact same installable (`.#celler`) that celler-<system> already built
+      # and verified is in the cache via ensure-celler. `inputs-from: "."`
+      # instead runs `nix profile install --inputs-from . celler#celler`,
+      # which resolves through the flake registry rather than evaluating our
+      # flake's `.#celler` attribute directly -- in practice that produced a
+      # different derivation than `.#celler.outPath`, so this install kept
+      # missing the cache and rebuilding celler (including its aws-sdk-s3 /
+      # aws-config Rust deps) from source on every host job. Pinned to the
+      # claude/celler-flake-ref-rt3xlu branch because the flake-ref input
+      # (PR auscyber/celler-action#2) hasn't merged to @main yet -- switch
+      # this to @main once that lands.
       - name: Setup celler cache
         if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@main
+        uses: auscyber/celler-action@claude/celler-flake-ref-rt3xlu
         with:
           endpoint: https://cache.ivymect.in
           cache: main
           token: ${{ secrets.CELLER_TOKEN }}
-          inputs-from: "."
+          flake-ref: ".#celler"
       - name: Build ${{ inputs.name }}
         run: nix build --no-link --fallback --impure --print-out-paths ".#${{ inputs.attr }}" | tee "$RUNNER_TEMP/out-paths"
