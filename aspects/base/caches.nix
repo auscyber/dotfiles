@@ -91,6 +91,7 @@ in
   debug = true;
   den.default.nix.settings = {
     trusted-substituters = builtins.attrNames caches;
+    substituters = builtins.attrNames caches;
     trusted-public-keys = builtins.attrValues caches;
   };
 
