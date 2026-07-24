@@ -49,9 +49,9 @@ let
           };
         };
     in
-    lib.foldlAttrs (add "darwin") (
-      lib.foldlAttrs (add "nixos") { } (keep (self.nixosConfigurations or { }))
-    ) (keep (self.darwinConfigurations or { }));
+    lib.foldlAttrs (add "darwin") (lib.foldlAttrs (add "nixos") { } (
+      keep (self.nixosConfigurations or { })
+    )) (keep (self.darwinConfigurations or { }));
 in
 {
   ff.nix-github-actions = {

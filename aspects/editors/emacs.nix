@@ -4,7 +4,7 @@
   ...
 }:
 {
-  flake-file.inputs.emacs.url = "github:nix-community/emacs-overlay";
+  ff.emacs.url = "github:nix-community/emacs-overlay";
 
   den.aspects.emacs = {
     overlays.emacs = inputs.emacs.overlays.default or (_: _: { });

@@ -20,7 +20,11 @@ in
   # `nix run .#update-zen-classes` — refresh aspects/programs/browsers/zen-classes.json
   # from the Obsidian vault (current active-term subjects + those starting within a week).
   perSystem =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      ...
+    }:
     {
       apps.update-zen-classes = {
         type = "app";

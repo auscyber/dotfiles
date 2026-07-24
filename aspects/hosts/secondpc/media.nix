@@ -1,7 +1,4 @@
-{
-  den,
-  ...
-}:
+{ den, ... }:
 # secondpc media stack + service secrets, ported from the old dotfiles
 # navidrome.nix / general/default.nix. Uses raw age.secrets/age.templates in the
 # nixos block (faithful to the originals; the agenix-rekey `secrets` class routes

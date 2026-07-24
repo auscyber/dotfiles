@@ -1,7 +1,5 @@
 {
-
   # Patches are auto-included from ./patches/darwin/*.patch.
-  patchedInputs.darwin = { };
   den.aspects.nix.darwin = {
     nix.distributedBuilds = true;
 

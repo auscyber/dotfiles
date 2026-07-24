@@ -16,8 +16,8 @@
   # But its bundled flake.lock pins a stale fenix (rust 1.93.1) that cannot build
   # the current 0.8.3 source (which requires rust 1.96.1), so override fenix to a
   # fresh rev via `follows` — verified to clear the toolchain check and compile.
-  flake-file.inputs.fenix.url = "github:nix-community/fenix";
-  flake-file.inputs.zeroclaw = {
+  ff.fenix.url = "github:nix-community/fenix";
+  ff.zeroclaw = {
     url = "github:zeroclaw-labs/zeroclaw";
     inputs.fenix.follows = "fenix";
   };
@@ -40,7 +40,7 @@
         zeroclawPkg = inputs.zeroclaw.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
         # Same fenix toolchain used to build zeroclawPkg above (see the
-        # flake-file.inputs.fenix comment: upstream's bundled fenix lock is
+        # ff.fenix comment: upstream's bundled fenix lock is
         # too stale for 0.8.3, so it's overridden to a fresh rev via follows).
         rustToolchain = inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.stable.withComponents [
           "cargo"

@@ -73,35 +73,47 @@ in
   den.classes.rekey = { };
   den.policies.kind-system-routes = _: allRoutes;
 
-  flake-file.inputs = {
-    agenix-rekey.url = "github:oddlama/agenix-rekey";
-    agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
+  ff = {
+
+    agenix.patch.enable = true;
+    agenix.patch.patches = [
+      ../../patches/agenix/templates.patch
+      ../../patches/agenix/edit.patch
+
+    ];
+
+    agenix-rekey = {
+      url = "github:oddlama/agenix-rekey";
+      patch.enable = true;
+      patch.patches = [
+        ../../patches/agenix-rekey/template.patch
+        # macOS ships BSD `stat`, which rejects the GNU `-c %Y` the generate
+        # script uses for its mtime freshness check. On failure both lookups fall
+        # back to their defaults (dep→1, this→0), so `1 -gt 0` is always true and
+        # every generated secret regenerates on every run. Pin the check to GNU
+        # coreutils' stat (same style as the file's existing ${pkgs.coreutils}/bin/realpath).
+        ../../patches/agenix-rekey/stat-portable.patch
+
+      ];
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.darwin.follows = "darwin";
     agenix.inputs.home-manager.follows = "home-manager";
     age-plugin-gpg = {
+
       url = "github:certainlach/age-plugin-gpg";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
       inputs.crane.follows = "crane";
+
+      patch.patches = [ ../../patches/age-plugin-gpg/age-plugin-gpg.patch ];
+      patch.enable = true;
     };
   };
   patchedInputs = {
-    agenix.patches = [
-      ../../patches/agenix/templates.patch
-      ../../patches/agenix/edit.patch
-    ];
-    agenix-rekey.patches = [
-      ../../patches/agenix-rekey/template.patch
-      # macOS ships BSD `stat`, which rejects the GNU `-c %Y` the generate
-      # script uses for its mtime freshness check. On failure both lookups fall
-      # back to their defaults (dep→1, this→0), so `1 -gt 0` is always true and
-      # every generated secret regenerates on every run. Pin the check to GNU
-      # coreutils' stat (same style as the file's existing ${pkgs.coreutils}/bin/realpath).
-      ../../patches/agenix-rekey/stat-portable.patch
-    ];
-    age-plugin-gpg.patches = [ ../../patches/age-plugin-gpg/age-plugin-gpg.patch ];
+
   };
 
   imports = lib.optionals (inputs ? "agenix-rekey") [

@@ -10,6 +10,87 @@
 }:
 let
   inherit (lib) mapAttrs;
+  patchedInputModule =
+    {
+      config,
+      name,
+      ...
+    }:
+    {
+      options = {
+        src = lib.mkOption {
+          type = lib.types.raw;
+          default = realInputs.${name}.sourceInfo;
+          description = "Source flake to patch (usually another `inputs.<x>`).";
+        };
+        autoIncludePatches = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = ''
+            If true, automatically include any patch files found in
+            `./patches/<name>/*.patch` (where `<name>` is the key of this input).
+            This is convenient for local development, but may be undesirable if
+            you want to control exactly which patches are applied.
+          '';
+        };
+        isInput = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = ''
+            If true, this patched flake is added to the `inputs` of the flake
+            module. If false, it is built but not added to `inputs`.
+          '';
+        };
+        hash = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = patchHashes.${name} or null;
+          description = ''
+            SRI hash of the *patched* source tree, making it a fixed-output
+            derivation: the store path then depends only on the content, not
+            on the system that built it, and it can be substituted from a
+            binary cache instead of rebuilt on every machine.
+
+            Defaults to the entry for this input in `./patches/hashes.json`.
+            Refresh with `nix run .#update-patch-hashes` after changing a
+            patch or bumping the upstream input — a stale hash fails the
+            build with a hash mismatch.
+
+            `null` opts out: the tree is built locally, unsubstitutable, and
+            its path varies with the building system (the old behaviour).
+          '';
+        };
+        patches = lib.mkOption {
+          type = lib.types.listOf lib.types.path;
+          default =
+            if config.autoIncludePatches then
+              with lib;
+              ../../patches/${name}
+              |> fileset.fileFilter (file: file.hasExt "patch" && !hasPrefix "_" file.name)
+              |> fileset.toList
+            else
+              [ ];
+
+          description = "Patch files (unified diffs) applied in order.";
+        };
+        prePatch = lib.mkOption {
+          type = lib.types.lines;
+          default = "";
+        };
+        postPatch = lib.mkOption {
+          type = lib.types.lines;
+          default = "";
+        };
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = ''
+            Enable this patched input. If false, the input is not built or
+            added to `inputs`.
+          '';
+        };
+      };
+    };
+
   flipAttrs = lib.mapAttrs' (
     value: name: {
       inherit name value;
@@ -591,86 +672,44 @@ in
         };
       }
     '';
-    type = lib.types.attrsOf (
-      lib.types.submodule (
-        {
-          config,
-          name,
-          ...
-        }:
-        {
-          options = {
-            src = lib.mkOption {
-              type = lib.types.raw;
-              default = realInputs.${name}.sourceInfo;
-              description = "Source flake to patch (usually another `inputs.<x>`).";
-            };
-            autoIncludePatches = lib.mkOption {
-              type = lib.types.bool;
-              default = true;
-              description = ''
-                If true, automatically include any patch files found in
-                `./patches/<name>/*.patch` (where `<name>` is the key of this input).
-                This is convenient for local development, but may be undesirable if
-                you want to control exactly which patches are applied.
-              '';
-            };
-            isInput = lib.mkOption {
-              type = lib.types.bool;
-              default = true;
-              description = ''
-                If true, this patched flake is added to the `inputs` of the flake
-                module. If false, it is built but not added to `inputs`.
-              '';
-            };
-            hash = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = patchHashes.${name} or null;
-              description = ''
-                SRI hash of the *patched* source tree, making it a fixed-output
-                derivation: the store path then depends only on the content, not
-                on the system that built it, and it can be substituted from a
-                binary cache instead of rebuilt on every machine.
-
-                Defaults to the entry for this input in `./patches/hashes.json`.
-                Refresh with `nix run .#update-patch-hashes` after changing a
-                patch or bumping the upstream input — a stale hash fails the
-                build with a hash mismatch.
-
-                `null` opts out: the tree is built locally, unsubstitutable, and
-                its path varies with the building system (the old behaviour).
-              '';
-            };
-            patches = lib.mkOption {
-              type = lib.types.listOf lib.types.path;
-              default =
-                if config.autoIncludePatches then
-                  with lib;
-                  ../../patches/${name}
-                  |> fileset.fileFilter (file: file.hasExt "patch" && !hasPrefix "_" file.name)
-                  |> fileset.toList
-                else
-                  [ ];
-
-              description = "Patch files (unified diffs) applied in order.";
-            };
-            prePatch = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-            };
-            postPatch = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-            };
-          };
-        }
-      )
-    );
+    type = lib.types.attrsOf (lib.types.submodule patchedInputModule);
   };
 
+  imports = [
+    (lib.inputMetaModules [
+      (lib.mkAliasOptionModule [ "patch" ] [ "meta" "patch" ])
+      ({ config, ... }: {
+        options.meta = lib.mkOption {
+          type = lib.types.submodule {
+            options.patch = lib.mkOption {
+              type = lib.types.submoduleWith {
+
+                shorthandOnlyDefinesConfig = true;
+
+                modules = [
+                  patchedInputModule
+                  {
+                    config._module.args.name = lib.mkForce config._module.args.name;
+                    config.hash = patchHashes.${config._module.args.name} or null;
+                    config.src = realInputs.${config._module.args.name};
+                    config.enable = lib.mkDefault false;
+                  }
+                ];
+              };
+            };
+          };
+        };
+
+      })
+    ])
+  ];
   config = {
     #    flake-file.nixConfig.allowUnsupportedPlatform = true;
-    flake-file.inputs.flake-compat = {
+    patchedInputs =
+      config.flake-file.inputsWithMeta
+      |> lib.filterAttrs (_: v: v.meta.patch.enable)
+      |> lib.mapAttrs (_: v: v.meta.patch);
+    ff.flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
     };

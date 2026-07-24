@@ -4,7 +4,7 @@
   ...
 }:
 {
-  flake-file.inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
+  ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
 
   den.hosts.x86_64-linux.surfacelaptop = {
     roles = [

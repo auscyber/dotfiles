@@ -4,7 +4,7 @@
   ...
 }:
 {
-  flake-file.inputs.nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+  ff.nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
   den.hosts.x86_64-linux.wsl-nixos = {
     users.nixos = { };

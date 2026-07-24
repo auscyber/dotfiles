@@ -15,7 +15,7 @@ let
   );
 in
 {
-  flake-file.inputs = {
+  ff = {
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
   den.policies.route-casks =

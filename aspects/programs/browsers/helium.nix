@@ -44,7 +44,7 @@ let
   };
 in
 {
-  flake-file.inputs.my-nur = {
+  ff.my-nur = {
     url = "github:auscyber/nur-packages";
     inputs.nixpkgs.follows = "nixpkgs";
   };

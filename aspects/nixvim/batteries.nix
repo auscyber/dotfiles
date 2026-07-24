@@ -24,7 +24,7 @@ let
     };
 in
 {
-  flake-file.inputs.nixvim = {
+  ff.nixvim = {
     url = "github:nix-community/nixvim";
   };
 

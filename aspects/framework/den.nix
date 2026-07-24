@@ -7,13 +7,12 @@
 }:
 {
   _module.args.__findFile = den.lib.__findFile;
-  flake-file.inputs.den.url = "github:denful/den/latest";
+  ff.den.url = "github:denful/den/latest";
   imports = [
     (inputs.flake-file.flakeModules.dendritic or { })
     #    inputs.den.flakeModules.strict
     (inputs.den.flakeModules.dendritic or { })
   ];
-  patchedInputs.den = { };
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.default = {

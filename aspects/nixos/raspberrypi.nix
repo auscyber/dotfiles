@@ -7,7 +7,7 @@
 let
 in
 {
-  flake-file.inputs = {
+  ff = {
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
       # Upstream pins nixos-25.11; follow root nixpkgs so stylix (which targets

@@ -4,10 +4,11 @@
   ...
 }:
 {
-  flake-file.inputs.nix-openclaw = {
+  ff.nix-openclaw = {
     url = "github:openclaw/nix-openclaw";
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.home-manager.follows = "home-manager";
+    patch.enable = true;
   };
 
   # nix-openclaw pins OpenClaw-2026.7.1.zip's hash from 07-14 05:30; upstream
@@ -16,7 +17,6 @@
   # The served zip is notarized Developer ID (OpenClaw Foundation, FWJYW4S8P8),
   # so the bytes are authentic; only the recorded hash is stale. Drop this once
   # upstream re-pins.
-  patchedInputs.nix-openclaw = { };
 
   den.aspects.openclaw = {
     includes = [

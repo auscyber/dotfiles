@@ -22,7 +22,7 @@
 
   den.aspects.browsers.zen = {
     includes = [
-      (den.lib.whenAspect den.aspects.onepassword ({
+      (den.lib.whenAspect den.aspects.onepassword {
         provides.to-hosts = { host, ... }: {
           nixos.environment.etc."1password/custom_allowed_browsers" = {
             text = lib.mkAfter ''
@@ -34,7 +34,7 @@
             mode = "0755";
           };
         };
-      }))
+      })
       den.aspects.stylix
       (
         { aspect-chain }:

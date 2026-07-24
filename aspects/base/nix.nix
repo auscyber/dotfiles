@@ -34,26 +34,22 @@ in
     (lib.inputMeta {
       addRegistry = lib.mkOption {
         type = lib.types.bool;
-        default = true;
+        default = false;
         description = "Add this input to the registry";
       };
-
     })
-
   ];
-  flake-file.inputs = {
+  ff = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     # all your other inputs
   };
 
   den.aspects.extra-registry = {
-
     includes = [ nixClass ];
     nix.registry =
       config.flake-file.inputsWithMeta
       |> lib.filterAttrs (_: v: v.meta.addRegistry)
       |> lib.mapAttrs (k: v: { flake = inputs.${k}; });
-
   };
 
   den.default.includes = [

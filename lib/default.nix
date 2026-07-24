@@ -5,15 +5,14 @@ final: prev: {
       inherit modules;
       shorthandOnlyDefinesConfig = null;
     };
-  inputMeta = opts: {
+
+  inputMetaModules = modules: {
     options.flake-file =
       let
         inputsOptions = prev.mkOption {
-          type = prev.types.lazyAttrsOf (final.extraSub [ { options.meta = opts; } ]);
-
+          type = prev.types.lazyAttrsOf (final.extraSub modules);
         };
       in
-
       prev.mkOption {
         type = final.extraSub [
           {
@@ -23,4 +22,15 @@ final: prev: {
         ];
       };
   };
+
+  inputMetaWithArgs =
+    opts:
+    final.inputMetaModules [
+      (args: {
+        options.meta = prev.mkOption { type = prev.types.submodule { options = opts args; }; };
+
+      })
+    ];
+
+  inputMeta = opts: final.inputMetaWithArgs (_: opts);
 }

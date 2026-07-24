@@ -1,4 +1,3 @@
 {
-
-  patchedInputs.nixpkgs.patches = [ ../patches/nixpkgs/fix-vscode.patch ];
+  #patchedInputs.nixpkgs.patches = [ ../patches/nixpkgs/fix-vscode.patch ];
 }

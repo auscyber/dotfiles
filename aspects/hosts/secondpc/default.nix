@@ -4,7 +4,7 @@
   ...
 }:
 {
-  flake-file.inputs = {
+  ff = {
     celler.url = "github:blitz/celler/main";
     celler.inputs.nixpkgs.follows = "nixpkgs";
     nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";

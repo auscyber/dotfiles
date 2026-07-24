@@ -8,6 +8,7 @@
     url = "github:nix-darwin/nix-darwin";
     inputs.nixpkgs.follows = "nixpkgs";
     meta.addRegistry = true;
+    patch.enable = true;
   };
   den.aspects.darwin-base = {
     includes = [

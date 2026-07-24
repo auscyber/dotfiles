@@ -26,7 +26,7 @@ let
       true;
 in
 {
-  flake-file.inputs.stylix.url = "github:nix-community/stylix";
+  ff.stylix.url = "github:nix-community/stylix";
 
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =

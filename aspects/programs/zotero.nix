@@ -43,6 +43,5 @@
             	--set PUPPETEER_EXECUTABLE_PATH ${pkgs.helium}/bin/helium
           '';
         });
-
   };
 }
