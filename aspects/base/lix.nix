@@ -37,10 +37,10 @@
       # (expensive) Lix compiles go through the shared cache. From the host `pkgs`
       # so the ccacheWrapper the ccache aspect configures is the one used.
       cxxStdenv =
-        if ccacheEnabled then
-          pkgs.ccacheStdenv.override { stdenv = pkgs.clangStdenv; }
-        else
-          pkgs.clangStdenv;
+        #        if ccacheEnabled then
+        #          pkgs.ccacheStdenv.override { stdenv = pkgs.clangStdenv; }
+        #        else
+        pkgs.clangStdenv;
 
       # Build the scope from an independent nixpkgs fixpoint: the scope's tools are
       # `<pkg>.override { nix = self.lix; }`, so routing them back into the host

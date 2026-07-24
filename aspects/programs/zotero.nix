@@ -32,4 +32,17 @@
       ];
     };
   };
+  perSystem = { pkgs, ... }: {
+    packages.percollate =
+      (pkgs.percollate.override {
+        chromium = pkgs.helium;
+      }).overrideAttrs
+        (attrs: {
+          postInstall = ''
+            wrapProgram $out/bin/percollate \
+            	--set PUPPETEER_EXECUTABLE_PATH ${pkgs.helium}/bin/helium
+          '';
+        });
+
+  };
 }

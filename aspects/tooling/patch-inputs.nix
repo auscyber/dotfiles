@@ -669,7 +669,7 @@ in
   };
 
   config = {
-    flake-file.nixConfig.allowUnsupportedPlatform = true;
+    #    flake-file.nixConfig.allowUnsupportedPlatform = true;
     flake-file.inputs.flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;

@@ -1,8 +1,4 @@
 {
-  ff.darwin = {
-    url = "github:nix-darwin/nix-darwin";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   # Patches are auto-included from ./patches/darwin/*.patch.
   patchedInputs.darwin = { };

@@ -4,6 +4,11 @@
   ...
 }:
 {
+  ff.darwin = {
+    url = "github:nix-darwin/nix-darwin";
+    inputs.nixpkgs.follows = "nixpkgs";
+    meta.addRegistry = true;
+  };
   den.aspects.darwin-base = {
     includes = [
       den.aspects.darwin-finder

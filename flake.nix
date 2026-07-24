@@ -27,7 +27,7 @@
             inputs = finalInputs;
             specialArgs = {
               realInputs = inputs;
-              lib = inputs.nixpkgs.lib;
+              lib = inputs.nixpkgs.lib.extend (import ./lib);
             };
           }
           {

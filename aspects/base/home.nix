@@ -31,7 +31,7 @@ let
       aspect-chain,
     }:
     den.batteries.forward {
-      each = lib.singleton class;
+      each = lib.singleton true;
       fromClass = _: "hm";
       intoClass = _: "homeManager";
       intoPath = _: [ ];
@@ -43,6 +43,7 @@ let
     {
       aspect-chain,
       class,
+      home,
       user,
     }:
     den.batteries.forward {
@@ -52,18 +53,13 @@ let
       intoPath = _: [ ];
       adaptArgs = lib.id;
       fromAspect = _: user.aspect;
-      guard =
-        {
-          osConfig ? null,
-          ...
-        }:
-        _: lib.mkIf (osConfig == null);
     };
 in
 {
   flake-file.inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
+    meta.addRegistry = true;
   };
   # Patches are auto-included from ./patches/home-manager/*.patch.
   patchedInputs.home-manager = { };
@@ -73,7 +69,7 @@ in
   };
   den.default.includes = [
     hmPlatforms
-    #    hmAlias
-    #    standaloneForward
+    #  hmAlias
+    standaloneForward
   ];
 }

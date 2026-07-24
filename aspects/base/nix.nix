@@ -3,6 +3,9 @@
   den,
   __find_file,
   rootPath,
+  config,
+  inputs,
+  self,
   ...
 }:
 let
@@ -27,12 +30,36 @@ let
     };
 in
 {
+  imports = [
+    (lib.inputMeta {
+      addRegistry = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Add this input to the registry";
+      };
+
+    })
+
+  ];
   flake-file.inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     # all your other inputs
   };
 
-  den.default.includes = [ den.aspects.nix ];
+  den.aspects.extra-registry = {
+
+    includes = [ nixClass ];
+    nix.registry =
+      config.flake-file.inputsWithMeta
+      |> lib.filterAttrs (_: v: v.meta.addRegistry)
+      |> lib.mapAttrs (k: v: { flake = inputs.${k}; });
+
+  };
+
+  den.default.includes = [
+    den.aspects.nix
+    den.aspects.extra-registry
+  ];
 
   den.aspects.nix = {
     includes = [
@@ -45,7 +72,10 @@ in
       # class so it reaches both nixos and darwin `nix.settings`; list-valued
       # options merge by concatenation, so this appends to the base list below.
       (den.lib.whenAspect den.aspects.lix {
-        os.nix.settings.experimental-features = [ "pipe-operator" ];
+        os.nix.settings.experimental-features = [
+          "pipe-operator"
+          "flake-self-attrs"
+        ];
       })
       (den.lib.unlessAspect den.aspects.lix {
         os.nix.settings.experimental-features = [ "pipe-operators" ];
@@ -60,6 +90,9 @@ in
         "flakes"
       ];
     };
+
+    nix.registry.dotfiles.flake = inputs.self;
+
     nix.settings = {
       extra-experimental-features = [
         "nix-command"
