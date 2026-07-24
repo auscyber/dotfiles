@@ -7,7 +7,7 @@
 
   den.aspects.packages.proton-ge-bin.overlays = { sources, ... }: {
     proton-ge-bin = self: super: {
-      wrap-proton-ge-bin =
+      wrapProtonGE =
         let
           toPySettings =
             attrs:
@@ -67,7 +67,7 @@
 
         };
         config = lib.mkIf config.programs.steam.proton-ge.enable {
-          programs.steam.proton-ge.wrappedPackage = pkgs.wrapGeProton {
+          programs.steam.proton-ge.wrappedPackage = pkgs.wrapProtonGE {
             geProton = cfg.package;
             settings = cfg.settings;
           };
