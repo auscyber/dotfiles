@@ -45,6 +45,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
+      - uses: ./.github/actions/nix-cache
       - id: set
         run: |
           set -euo pipefail
@@ -88,6 +89,7 @@ jobs:
             connect-timeout = 5
             extra-trusted-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+      - uses: ./.github/actions/nix-cache
       # Eval only -- computes the output path without building or substituting
       # anything -- then asks the cache directly whether that path already
       # exists there. Cheap, and means a re-run with nothing changed does no
@@ -143,6 +145,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
+      - uses: ./.github/actions/nix-cache
       # Push what this job builds to celler. Skipped on pull_request — fork
       # PRs have no access to CELLER_TOKEN. Uses auscyber/celler-action (not
       # ryanccn/attic-action) because celler requires the NAR info to be sent
