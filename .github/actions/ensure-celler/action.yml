@@ -1,0 +1,44 @@
+name: "Ensure celler is cached"
+description: "Build the celler client (.#celler) for this runner's system and push it to the cache, but only if it isn't there already."
+
+inputs:
+  celler-token:
+    description: "Celler token used to log in and push"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Eval only -- computes the output path without building or substituting
+    # anything -- then asks the cache directly whether that path already
+    # exists there. Cheap, and means a run where celler hasn't changed costs
+    # one query instead of a rebuild.
+    - name: Check whether celler is already cached
+      id: check
+      shell: bash
+      run: |
+        set -euo pipefail
+        out="$(nix eval --impure --raw ".#celler.outPath")"
+        echo "out=$out" | tee -a "$GITHUB_OUTPUT"
+        if nix path-info --store https://cache.ivymect.in/main "$out" >/dev/null 2>&1; then
+          echo "celler already in the cache, nothing to build" >&2
+          echo "cached=true" | tee -a "$GITHUB_OUTPUT"
+        else
+          echo "cached=false" | tee -a "$GITHUB_OUTPUT"
+        fi
+    - name: Build celler
+      if: ${{ steps.check.outputs.cached != 'true' }}
+      shell: bash
+      run: nix build --no-link --fallback --impure --print-out-paths ".#celler"
+    # Dogfood: log in and push with the celler binary we just built, rather
+    # than installing a separate copy via celler-action just to do the push.
+    - name: Push celler to cache
+      if: ${{ steps.check.outputs.cached != 'true' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        bin="${{ steps.check.outputs.out }}/bin/celler"
+        "$bin" login --set-default main https://cache.ivymect.in "$CELLER_TOKEN"
+        "$bin" push main "${{ steps.check.outputs.out }}"
+      env:
+        CELLER_TOKEN: ${{ inputs.celler-token }}

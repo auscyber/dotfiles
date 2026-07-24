@@ -1,0 +1,58 @@
+name: "Build one host"
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      attr:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: ${{ inputs.name }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+      - uses: ./.github/actions/nix-cache
+      # Push what this job builds to celler. Skipped on pull_request — fork
+      # PRs have no access to CELLER_TOKEN. Uses auscyber/celler-action (not
+      # ryanccn/attic-action) because celler requires the NAR info to be sent
+      # via an X-Celler-Nar-Info header, which the upstream attic client
+      # doesn't send — pushes with it fail with "X-Celler-Nar-Info must be set".
+      # celler's client sends the X-Celler-Nar-Info header the server requires;
+      # attic-action's attic client only sends X-Attic-Nar-Info, hence the push
+      # failures. Pinned to the celler rev in flake.lock. `inputs-from: "."` so
+      # the installed version tracks this repo's own `celler` flake input/lock
+      # entry rather than always floating on `github:blitz/celler`'s default
+      # branch -- and by the time this runs, the celler-<system> gate job in
+      # systems.yml has already made sure celler is in the cache for this
+      # runner's arch, so this can substitute the install instead of building
+      # it from source.
+      - name: Setup celler cache
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: auscyber/celler-action@main
+        with:
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.CELLER_TOKEN }}
+          inputs-from: "."
+      - name: Build ${{ inputs.name }}
+        run: nix build --no-link --fallback --impure --print-out-paths ".#${{ inputs.attr }}" | tee "$RUNNER_TEMP/out-paths"
