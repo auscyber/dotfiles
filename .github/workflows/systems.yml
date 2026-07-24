@@ -10,9 +10,21 @@ on:
 # Dynamic matrix: the `matrix` job evaluates `.#ciMatrix.matrix` (nix-github-
 # actions, from aspects/tooling/ci.nix) at run time, and `build` fans out one
 # job per host from it. fail-fast: false -> one machine failing never stops the
-# others. Both jobs `accept-flake-config`, so substituters + trusted-public-keys
+# others. All jobs `accept-flake-config`, so substituters + trusted-public-keys
 # come from the flake's nixConfig (built from aspects/base/celler-keys.json) --
 # nothing hardcoded here.
+#
+# `celler` builds and pushes the `celler` client itself (`.#celler`, exposed by
+# aspects/tooling/ci.nix) ahead of the host matrix, one leg per arch the matrix
+# can land on (mirrors `ci.nix`'s `supported` systems / nix-github-actions'
+# runner mapping). It does NOT use auscyber/celler-action -- that action itself
+# needs a working celler client, which is what this job is producing, so it
+# instead wires the cache in as a plain nix substituter and dogfoods the
+# freshly built binary to log in and push itself. `build` depends on `celler`,
+# so by the time each host job installs celler (via celler-action, with
+# `inputs-from: "."` so the version tracks this repo's own `celler` flake
+# input/lock entry) it can substitute the client from cache instead of
+# building it from source on every leg.
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -40,8 +52,61 @@ jobs:
           fi
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
+  celler:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            os: ubuntu-24.04
+          - system: aarch64-linux
+            os: ubuntu-24.04-arm
+          - system: aarch64-darwin
+            os: macos-14
+    name: celler (${{ matrix.system }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # No auscyber/celler-action here — that action itself needs a working
+      # celler client, which is exactly what this job is building. The cache
+      # is wired up as a plain substituter (so a rebuild can pull a
+      # previously-pushed celler instead of building from source again), and
+      # the client that comes out of `nix build` pushes itself to the cache
+      # below -- dogfooding celler into its own cache instead of installing a
+      # separate copy just to do the push.
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+      - name: Build celler
+        id: build
+        run: |
+          set -euo pipefail
+          out="$(nix build --no-link --fallback --impure --print-out-paths ".#celler")"
+          echo "out=$out" | tee -a "$GITHUB_OUTPUT"
+      # Dogfood: log in and push with the celler binary we just built, rather
+      # than installing a second copy via celler-action. Skipped on
+      # pull_request — fork PRs have no access to CELLER_TOKEN.
+      - name: Push celler to cache
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          set -euo pipefail
+          bin="${{ steps.build.outputs.out }}/bin/celler"
+          "$bin" login --set-default main https://cache.ivymect.in "$CELLER_TOKEN"
+          "$bin" push main "${{ steps.build.outputs.out }}"
+        env:
+          CELLER_TOKEN: ${{ secrets.CELLER_TOKEN }}
+
   build:
-    needs: matrix
+    needs: [matrix, celler]
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
@@ -75,5 +140,6 @@ jobs:
           endpoint: https://cache.ivymect.in
           cache: main
           token: ${{ secrets.CELLER_TOKEN }}
+          inputs-from: "."
       - name: Build ${{ matrix.name }}
         run: nix build --no-link --fallback --impure --print-out-paths ".#${{ matrix.attr }}" | tee "$RUNNER_TEMP/out-paths"
