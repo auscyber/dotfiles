@@ -67,7 +67,7 @@
 
         };
         config = lib.mkIf config.programs.steam.proton-ge.enable {
-          programs.steam.proton-ge.wrappedPackage = wrapGeProton {
+          programs.steam.proton-ge.wrappedPackage = pkgs.wrapGeProton {
             geProton = cfg.package;
             settings = cfg.settings;
           };
