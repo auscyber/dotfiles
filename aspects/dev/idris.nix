@@ -50,7 +50,6 @@
       home.packages = with pkgs.idris2Packages; [
         idris2
         pack
-        idris2Api
       ];
     };
   };

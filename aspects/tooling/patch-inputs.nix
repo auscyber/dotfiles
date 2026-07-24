@@ -493,7 +493,6 @@ let
       runtimeInputs = [
         pkgs.git
         pkgs.coreutils
-        pkgs.nix
       ];
       text = ''
         set -euo pipefail
@@ -581,7 +580,6 @@ let
     pkgs.writeShellApplication {
       name = "update-patch-hashes";
       runtimeInputs = [
-        pkgs.nix
         pkgs.jq
         pkgs.coreutils
       ];
@@ -755,7 +753,6 @@ in
         program = lib.getExe (
           pkgs.writeShellApplication {
             name = "update";
-            runtimeInputs = [ pkgs.nix ];
             text = ''
               set -euo pipefail
               nix flake update "$@"
