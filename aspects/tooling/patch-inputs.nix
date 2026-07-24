@@ -669,10 +669,12 @@ in
   };
 
   config = {
+    flake-file.nixConfig.allowUnsupportedPlatform = true;
     flake-file.inputs.flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
     };
+    flake.inputs = inputs;
 
     # Per-input overlay instead of `realInputs // buildPatched pkgs`. With `//`,
     # the patched value of EVERY re-evaluated input shares one attrset, and the

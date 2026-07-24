@@ -103,10 +103,9 @@
         };
 
         system.defaults.dock.persistent-apps = [
-          #          "/Applications/Nix Apps/Zen.app"
+          "/Applications/Nix Apps/Zen.app"
           "/Applications/Microsoft Outlook.app"
           "/Applications/Fantastical.app"
-          "/Applications/Notion.app"
           "/Applications/Microsoft Word.app"
           "/System/Applications/Messages.app"
           "/Applications/Beeper Desktop.app"

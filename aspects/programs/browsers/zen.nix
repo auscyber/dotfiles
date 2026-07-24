@@ -22,8 +22,20 @@
 
   den.aspects.browsers.zen = {
     includes = [
+      (den.lib.whenAspect den.aspects.onepassword ({
+        provides.to-hosts = { host, ... }: {
+          nixos.environment.etc."1password/custom_allowed_browsers" = {
+            text = lib.mkAfter ''
+              .zen
+              zen-browser
+              .zen-browser-unwrapped
+              .zen-unwrapped
+            '';
+            mode = "0755";
+          };
+        };
+      }))
       den.aspects.stylix
-      den.aspects.zen-classes
       (
         { aspect-chain }:
         den.batteries.forward {
@@ -44,16 +56,8 @@
         "onepassword-password-manager"
       ])
     ];
-    provides.to-hosts = { host, ... }: {
-      nixos.environment.etc."1password/custom_allowed_browsers" = {
-        text = lib.mkAfter ''
-          .helium-wrapped
-                  helium
-                  helium-browser
-        '';
-        mode = "0755";
-      };
-    };
+    study.includes = [ den.aspects.zen-classes ];
+
     study.zen-browser = { pkgs, ... }: {
       extensions.packages = with pkgs.firefox-addons; [
         libkey-nomad

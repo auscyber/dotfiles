@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "title": "In the Heart of the Loire Valley (FREN30018)",
+    "subjectId": "FREN30018",
+    "canvasId": "253046",
+    "url": "https://canvas.lms.unimelb.edu.au/courses/253046",
+    "term": "Winter Term 2026",
+    "kind": "current",
+    "uuid": "b54e2e7f-748b-53b8-b3a9-94d89d0a87d7"
+  },
+  {
+    "title": "Global French Studies (Advanced) (FREN30024)",
+    "subjectId": "FREN30024",
+    "canvasId": "254536",
+    "url": "https://canvas.lms.unimelb.edu.au/courses/254536",
+    "term": "Semester 2 2026",
+    "kind": "upcoming",
+    "uuid": "b6e8d973-69a6-5616-a444-1757285a73ec"
+  },
+  {
+    "title": "Democracy and Its Dilemmas (POLS30033)",
+    "subjectId": "POLS30033",
+    "canvasId": "239611",
+    "url": "https://canvas.lms.unimelb.edu.au/courses/239611",
+    "term": "Semester 2 2026",
+    "kind": "upcoming",
+    "uuid": "51e0eba9-1b99-5fa7-9496-e553103400ae"
+  },
+  {
+    "title": "Applied Political Science Project (POLS30037)",
+    "subjectId": "POLS30037",
+    "canvasId": "239610",
+    "url": "https://canvas.lms.unimelb.edu.au/courses/239610",
+    "term": "Semester 2 2026",
+    "kind": "upcoming",
+    "uuid": "cdaa70f6-997d-51ae-a017-f3e7cde9811e"
+  },
+  {
+    "title": "Work, Labour and Society (SOCI30015)",
+    "subjectId": "SOCI30015",
+    "canvasId": "239398",
+    "url": "https://canvas.lms.unimelb.edu.au/courses/239398",
+    "term": "Semester 2 2026",
+    "kind": "upcoming",
+    "uuid": "ebfd2e7d-bb79-55a0-874f-8de1fcd85924"
+  }
+]
