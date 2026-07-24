@@ -50,7 +50,7 @@
           };
           package = lib.mkOption {
             type = lib.types.package;
-            default = null;
+            default = pkgs.proton-ge-bin;
             description = "Override the Proton GE package used by Steam.";
           };
           settings = lib.mkOption {
