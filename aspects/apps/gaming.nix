@@ -1,14 +1,7 @@
+{ den, ... }:
 {
-  nvfetcher.sources.proton-ge-bin = {
-    src.github = "gloriouseggroll/proton-ge-custom";
-    fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver.tar.gz";
-  };
   den.default.gaming = {
-    overlays = { sources, ... }: {
-      proton-ge-bin = self: super: {
-        proton-ge-bin = super.proton-ge-bin.overrideAttrs { inherit (sources.proton-ge-bin) src version; };
-      };
-    };
+    includes = [ den.aspects.packages.proton-ge-bin ];
     nixos = { pkgs, ... }: {
       programs = {
         gamescope = {
@@ -17,10 +10,17 @@
         };
         gamemode.enable = true;
         steam = {
+          proton-ge = {
+            enable = true;
+            settings = {
+              PROTON_ENABLE_WAYLAND = "1";
+              PROTON_NO_ESYNC = "0";
+            };
+
+          };
           enable = true;
           extraCompatPackages = with pkgs; [
             # gamescope
-            proton-ge-bin
             vkd3d-proton
           ];
           package = pkgs.steam.override {
