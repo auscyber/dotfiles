@@ -61,7 +61,7 @@ jobs:
       # this to @main once that lands.
       - name: Setup celler cache
         if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@claude/celler-flake-ref-rt3xlu
+        uses: auscyber/celler-action@main
         with:
           endpoint: https://cache.ivymect.in
           cache: main
