@@ -84,7 +84,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
-            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
       - name: Build celler
         id: build
@@ -120,6 +120,8 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
             experimental-features = nix-command flakes pipe-operators
             accept-flake-config = true
             fallback = true
