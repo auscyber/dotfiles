@@ -142,7 +142,7 @@ jobs:
     uses: ./.github/workflows/build-host.yml
     with:
       name: ${{ matrix.name }}
-      os: ${{ matrix.os }}
+      os: ${{ toJSON(matrix.os) }}
       attr: ${{ matrix.attr }}
     secrets: inherit
 
@@ -154,6 +154,6 @@ jobs:
     uses: ./.github/workflows/build-host.yml
     with:
       name: ${{ matrix.name }}
-      os: ${{ matrix.os }}
+      os: ${{ toJSON(matrix.os) }}
       attr: ${{ matrix.attr }}
     secrets: inherit

@@ -16,7 +16,12 @@ on:
 jobs:
   build:
     name: ${{ inputs.name }}
-    runs-on: ${{ inputs.os }}
+    # inputs.os is JSON-encoded by the caller (systems.yml) because
+    # nix-github-actions' matrix rows can have `os` as a list of runner
+    # labels rather than a plain string -- workflow_call inputs are typed
+    # `string` only, so a list value fails evaluation ("A sequence was not
+    # expected") unless it's round-tripped through toJSON/fromJSON like this.
+    runs-on: ${{ fromJSON(inputs.os) }}
     steps:
       - uses: actions/checkout@v4
         with:
