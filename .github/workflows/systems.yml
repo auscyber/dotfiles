@@ -180,3 +180,35 @@ jobs:
       os: ${{ toJSON(matrix.os) }}
       attr: ${{ matrix.attr }}
     secrets: inherit
+
+  # GitHub reports one check per matrix leg (e.g. "build-x86_64-linux
+  # (nixos-auspc)"), not one for the build-<arch> job as a whole, so nothing
+  # otherwise turns the overall run red when a single host fails to build.
+  # This job runs unconditionally (if: always(), so it still runs even though
+  # some of its needs may have failed) after everything else finishes and
+  # fails loudly if anything it depends on did -- fail-fast: false above
+  # already keeps a failing host from cancelling its siblings, this job just
+  # makes that failure visible instead of leaving it buried in one leg.
+  ci:
+    name: CI
+    if: always()
+    needs:
+      - matrix
+      - celler-x86_64-linux
+      - celler-aarch64-linux
+      - celler-aarch64-darwin
+      - build-x86_64-linux
+      - build-aarch64-linux
+      - build-darwin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check whether any job failed
+        run: |
+          set -euo pipefail
+          results='${{ toJSON(needs) }}'
+          failed="$(jq -r '[to_entries[] | select(.value.result == "failure" or .value.result == "cancelled")] | map(.key) | join(", ")' <<<"$results")"
+          if [ -n "$failed" ]; then
+            echo "::error::Failed (or cancelled): $failed" >&2
+            exit 1
+          fi
+          echo "All jobs passed."
