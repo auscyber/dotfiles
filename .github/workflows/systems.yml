@@ -8,14 +8,14 @@ on:
   workflow_dispatch:
 
 # Dynamic matrix: the `matrix` job evaluates `.#ciMatrix.matrix` (nix-github-
-# actions, from aspects/tooling/ci.nix) at run time and splits it into
-# `matrix-linux` (x86_64-linux + aarch64-linux hosts) and `matrix-darwin`
-# (aarch64-darwin hosts), so the two host-build calls below can depend on
-# separate celler gate jobs. fail-fast: false -> one machine failing never
-# stops the others. All jobs `accept-flake-config`, so substituters +
-# trusted-public-keys come from the flake's nixConfig (built from
-# aspects/base/celler-keys.json) -- nothing hardcoded here, except in the jobs
-# that need celler's cache to actually be trusted before celler itself is
+# actions, from aspects/tooling/ci.nix) at run time and splits it three ways,
+# one bucket per arch (`matrix-x86_64-linux`, `matrix-aarch64-linux`,
+# `matrix-darwin`), so each of the three host-build calls below can depend on
+# exactly its own celler gate job and nothing else. fail-fast: false -> one
+# machine failing never stops the others. All jobs `accept-flake-config`, so
+# substituters + trusted-public-keys come from the flake's nixConfig (built
+# from aspects/base/celler-keys.json) -- nothing hardcoded here, except in the
+# jobs that need celler's cache to actually be trusted before celler itself is
 # installed (see extra-trusted-substituters below).
 #
 # `celler-<system>` makes sure the `celler` client itself (`.#celler`, exposed
@@ -25,19 +25,21 @@ on:
 # than per host) means it happens exactly once per arch instead of racing N
 # copies of itself across every host that shares that arch.
 #
-# `build`/`build-darwin` call the reusable ./.github/workflows/build-host.yml
+# `build-<system>` each call the reusable ./.github/workflows/build-host.yml
 # once per host (via `strategy.matrix`, which reusable-workflow calls
-# support), so the actual build/push steps are defined in one place. Splitting
-# into two callers -- one needing celler-x86_64-linux/celler-aarch64-linux,
-# the other needing only celler-aarch64-darwin -- is what lets darwin hosts
-# start as soon as the darwin celler gate is done, without waiting on the
-# Linux gates at all: Actions' `needs:` blocks on an entire job (every matrix
-# leg of it), so there's no way to depend on just one leg of a shared job.
+# support), so the actual build/push steps are defined in one place. Each
+# caller needs only its own matching celler-<system> gate -- not the other two
+# -- which is what lets e.g. darwin hosts start as soon as the darwin celler
+# gate is done, without ever waiting on the Linux gates: Actions' `needs:`
+# blocks on an entire job (every matrix leg of it), so there's no way to
+# depend on just one leg of a shared job, and a single `build` job covering
+# multiple arches would have forced exactly that kind of cross-arch wait.
 jobs:
   matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix-linux: ${{ steps.set.outputs.matrix-linux }}
+      matrix-x86_64-linux: ${{ steps.set.outputs.matrix-x86_64-linux }}
+      matrix-aarch64-linux: ${{ steps.set.outputs.matrix-aarch64-linux }}
       matrix-darwin: ${{ steps.set.outputs.matrix-darwin }}
     steps:
       - uses: actions/checkout@v4
@@ -60,9 +62,16 @@ jobs:
             echo "::error::.#ciMatrix.matrix produced nothing — flake eval failed above" >&2
             exit 1
           fi
-          linux="$(jq -c '{include: [.include[] | select(.os != "macos-14")]}' <<<"$matrix")"
-          darwin="$(jq -c '{include: [.include[] | select(.os == "macos-14")]}' <<<"$matrix")"
-          echo "matrix-linux=$linux" >> "$GITHUB_OUTPUT"
+          # .os can be either a plain runner-label string or a list of labels
+          # (nix-github-actions emits either), so normalize to a list before
+          # matching -- a bare string == comparison would silently miss every
+          # row if .os happens to come back as a list.
+          filter='def osIs(x): (.os | if type == "array" then . else [.] end) | contains([x]); {include: [.include[] | select(osIs($os))]}'
+          x8664="$(jq -c --arg os ubuntu-24.04 "$filter" <<<"$matrix")"
+          aarch64linux="$(jq -c --arg os ubuntu-24.04-arm "$filter" <<<"$matrix")"
+          darwin="$(jq -c --arg os macos-14 "$filter" <<<"$matrix")"
+          echo "matrix-x86_64-linux=$x8664" >> "$GITHUB_OUTPUT"
+          echo "matrix-aarch64-linux=$aarch64linux" >> "$GITHUB_OUTPUT"
           echo "matrix-darwin=$darwin" >> "$GITHUB_OUTPUT"
 
   celler-x86_64-linux:
@@ -80,6 +89,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
+            extra-substituters = https://cache.ivymect.in/main
             extra-trusted-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
       - uses: ./.github/actions/nix-cache
@@ -103,6 +113,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
+            extra-substituters = https://cache.ivymect.in/main
             extra-trusted-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
       - uses: ./.github/actions/nix-cache
@@ -126,6 +137,7 @@ jobs:
             accept-flake-config = true
             fallback = true
             connect-timeout = 5
+            extra-substituters = https://cache.ivymect.in/main
             extra-trusted-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
       - uses: ./.github/actions/nix-cache
@@ -134,11 +146,23 @@ jobs:
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
 
-  build:
-    needs: [matrix, celler-x86_64-linux, celler-aarch64-linux]
+  build-x86_64-linux:
+    needs: [matrix, celler-x86_64-linux]
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-linux) }}
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-x86_64-linux) }}
+    uses: ./.github/workflows/build-host.yml
+    with:
+      name: ${{ matrix.name }}
+      os: ${{ toJSON(matrix.os) }}
+      attr: ${{ matrix.attr }}
+    secrets: inherit
+
+  build-aarch64-linux:
+    needs: [matrix, celler-aarch64-linux]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-aarch64-linux) }}
     uses: ./.github/workflows/build-host.yml
     with:
       name: ${{ matrix.name }}
