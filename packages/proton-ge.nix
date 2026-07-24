@@ -8,8 +8,9 @@
   den.aspects.packages.proton-ge-bin = {
 
     overlays = { sources, ... }: {
-      proton-ge-bin = self: super: {
+      proton-ge-bin = final: prev: {
         wrapProtonGE =
+
           let
             toPySettings =
               attrs:
@@ -24,18 +25,25 @@
                 geProton,
                 settings ? { },
               }:
-              super.runCommand "${geProton.name}-with-settings" { } ''
-                mkdir -p $out
-                cp -r ${geProton}/* $out/
-                chmod -R u+w $out
-                cat >$out/user_settings.py <<'EOF'
-                ${toPySettings settings}
-                EOF
-              '';
+              let
+                settingsDrv = prev.linkFarm "${geProton.name}-user-settings" [
+                  {
+                    name = "user_settings.py";
+                    path = prev.writeText "user_settings.py" (toPySettings settings);
+                  }
+                ];
+              in
+              prev.symlinkJoin {
+                name = "${geProton.name}-with-settings";
+                paths = [
+                  settingsDrv
+                  geProton
+                ];
+                ignoreCollisions = true;
+              };
           in
           lib.makeOverridable build;
-
-        proton-ge-bin = super.proton-ge-bin.overrideAttrs { inherit (sources.proton-ge-bin) src version; };
+        proton-ge-bin = prev.proton-ge-bin.overrideAttrs { inherit (sources.proton-ge-bin) src version; };
       };
     };
 
