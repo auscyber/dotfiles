@@ -25,6 +25,19 @@ let
     #      "warnings"
     #    ]) [ "warnings" ])
   ];
+
+  # homeManager rekey content as a function of the resolved identity (`anyUser`).
+  mkHmRekey = anyUser: {
+    imports = [
+      (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+      inputs.agenix.homeManagerModules.default
+    ]
+    ++ rename;
+    age.rekey.storageMode = "local";
+    age.rekey.hostPubkey = lib.mkIf (anyUser.hostPublicKey != null) anyUser.hostPublicKey;
+    age.rekey.generatedSecretsDir = ../../secrets/generated + "/${anyUser.host.name}-${anyUser.name}";
+    age.rekey.localStorageDir = ../../secrets/rekeyed + "/${anyUser.host.name}-${anyUser.name}";
+  };
   # Register your custom classes
   # Create routing policies for each kind → system combination
   makeRoute =
@@ -121,32 +134,18 @@ in
   ];
 
   den.aspects.agenix-rekey = {
-    meta.collisionPolicy = "den-wins";
-    provides.to-users =
-      {
-        host,
-        user,
-        ...
-      }:
-      {
-        hmDarwin = { config, ... }: {
-          age.secretsDir = "${config.home.homeDirectory}/Library/agenix/secrets";
-          age.ageMountPoint = "${config.home.homeDirectory}/Library/agenix.d";
-          age.templateDir = "${config.home.homeDirectory}/Library/agenix/templates";
-        };
+    #    meta.collisionPolicy = "den-wins";
 
-        homeManager = {
-          imports = [
-            (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-            inputs.agenix.homeManagerModules.default
-          ]
-          ++ rename;
-          age.rekey.storageMode = "local";
-          age.rekey.hostPubkey = lib.mkIf (user.hostPublicKey != null) user.hostPublicKey;
-          age.rekey.generatedSecretsDir = ../../secrets/generated + "/${host.name}-${user.name}";
-          age.rekey.localStorageDir = ../../secrets/rekeyed + "/${host.name}-${user.name}";
-        };
-      };
+    hmDarwin = { config, ... }: {
+      age.secretsDir = "${config.home.homeDirectory}/Library/agenix/secrets";
+      age.ageMountPoint = "${config.home.homeDirectory}/Library/agenix.d";
+      age.templateDir = "${config.home.homeDirectory}/Library/agenix/templates";
+    };
+
+    # homeManager rekey config is keyed on `anyUser` — a context arg carrying the
+    # resolved identity (name + host{name,system} + hostPublicKey), bound for both a
+    # standalone home and a host-managed user (see aspects/base/anyuser.nix).
+    homeManager = { anyUser, ... }: mkHmRekey anyUser;
     nixos = {
       imports = [
         inputs.agenix.nixosModules.default

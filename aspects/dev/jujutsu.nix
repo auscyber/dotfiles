@@ -95,6 +95,7 @@
         };
       };
     };
+
     nvim.plugins.jujutsu = {
       enable = true;
       settings = {

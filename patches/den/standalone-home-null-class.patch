@@ -1,0 +1,121 @@
+diff --git a/modules/aspects/batteries/os-user.nix b/modules/aspects/batteries/os-user.nix
+index fdd564e..f48ac17 100644
+--- a/modules/aspects/batteries/os-user.nix
++++ b/modules/aspects/batteries/os-user.nix
+@@ -1,4 +1,4 @@
+-{ den, ... }:
++{ den, lib, ... }:
+ let
+ 
+   description = ''
+@@ -40,9 +40,13 @@ in
+   # when no user-class content exists (home-manager references the entry).
+   den.default.includes = [ den.policies.user-to-host ];
+ 
++  # A hostless standalone home (`user@host` with no declared host) binds a
++  # synthetic host with `class = null` — it has no OS to route `users.users`
++  # into. Skip the route when the host carries no OS class (null or absent);
++  # real nixos/darwin hosts are unaffected.
+   den.policies.user-to-host =
+     { user, host, ... }:
+-    [
++    lib.optionals ((host.class or null) != null) [
+       (den.lib.policy.route {
+         fromClass = "user";
+         intoClass = host.class;
+diff --git a/nix/lib/entities/host.nix b/nix/lib/entities/host.nix
+index 8d76d1d..d80b941 100644
+--- a/nix/lib/entities/host.nix
++++ b/nix/lib/entities/host.nix
+@@ -62,16 +62,25 @@ let
+             options = {
+               hostName = strOpt "Network hostname" config.name;
+               system = strOpt "platform system" system;
+-              class = strOpt "os-configuration nix class for host" (
+-                if lib.hasSuffix "darwin" config.system then "darwin" else "nixos"
+-              );
++              # `null` = no OS class. A hostless standalone home (`user@host` with
++              # no declared host) binds a synthetic host with `class = null`, so
++              # `user.host.class` resolves (to null) and the OS-class user batteries
++              # (user-to-host, inputs' osAspect, …) stay inert. Real hosts default to
++              # nixos/darwin as before.
++              class = lib.mkOption {
++                type = lib.types.nullOr lib.types.str;
++                description = "os-configuration nix class for host (null = no OS class)";
++                default = if lib.hasSuffix "darwin" config.system then "darwin" else "nixos";
++              };
+               aspect = lib.mkOption {
+                 description = "Aspect that configures this host.";
+                 type = lib.types.raw; # no merging
+                 defaultText = "den.aspects.<name>";
+                 default = lookupAspect den config;
+               };
+-              description = strOpt "host description" "${config.class}.${config.hostName}@${config.system}";
++              description = strOpt "host description" "${
++                if config.class == null then "home" else config.class
++              }.${config.hostName}@${config.system}";
+               users = lib.mkOption {
+                 description = "user accounts";
+                 default = { };
+@@ -96,12 +105,15 @@ let
+                 type = lib.types.raw;
+                 defaultText = lib.literalExpression "inputs.nixpkgs.lib.nixosSystem";
+                 default =
+-                  {
+-                    nixos = inputs.nixpkgs.lib.nixosSystem;
+-                    darwin = inputs.darwin.lib.darwinSystem;
+-                    systemManager = inputs.system-manager.lib.makeSystemConfig;
+-                  }
+-                  .${config.class};
++                  if config.class == null then
++                    null
++                  else
++                    {
++                      nixos = inputs.nixpkgs.lib.nixosSystem;
++                      darwin = inputs.darwin.lib.darwinSystem;
++                      systemManager = inputs.system-manager.lib.makeSystemConfig;
++                    }
++                    .${config.class};
+               };
+               intoAttr = lib.mkOption {
+                 description = ''
+@@ -117,21 +129,24 @@ let
+                 type = lib.types.listOf lib.types.str;
+                 defaultText = lib.literalExpression ''[  "nixosConfigurations" hostName ]'';
+                 default =
+-                  {
+-                    nixos = [
+-                      "nixosConfigurations"
+-                      config.name
+-                    ];
+-                    darwin = [
+-                      "darwinConfigurations"
+-                      config.name
+-                    ];
+-                    systemManager = [
+-                      "systemConfigs"
+-                      config.name
+-                    ];
+-                  }
+-                  .${config.class};
++                  if config.class == null then
++                    [ ] # no OS class → nothing to instantiate as a host output
++                  else
++                    {
++                      nixos = [
++                        "nixosConfigurations"
++                        config.name
++                      ];
++                      darwin = [
++                        "darwinConfigurations"
++                        config.name
++                      ];
++                      systemManager = [
++                        "systemConfigs"
++                        config.name
++                      ];
++                    }
++                    .${config.class};
+               };
+               mainModule = mainModuleOption den config;
+               __resolveResult = resolveResultOption den config;

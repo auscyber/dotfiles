@@ -64,8 +64,12 @@ jobs:
           # .os can be either a plain runner-label string or a list of labels
           # (nix-github-actions emits either), so normalize to a list before
           # matching -- a bare string == comparison would silently miss every
-          # row if .os happens to come back as a list.
-          filter='def osIs(x): (.os | if type == "array" then . else [.] end) | contains([x]); {include: [.include[] | select(osIs($os))]}'
+          # row if .os happens to come back as a list. Match with `index`
+          # (exact element equality), NOT `contains`: jq's `contains` is a deep
+          # SUBSTRING test, so `["ubuntu-24.04-arm"] | contains(["ubuntu-24.04"])`
+          # is true and an aarch64 row would leak into the x86_64 bucket (built
+          # on the wrong-arch runner).
+          filter='def osIs(x): ((.os | if type == "array" then . else [.] end) | index(x)) != null; {include: [.include[] | select(osIs($os))]}'
           x8664="$(jq -c --arg os ubuntu-24.04 "$filter" <<<"$matrix")"
           aarch64linux="$(jq -c --arg os ubuntu-24.04-arm "$filter" <<<"$matrix")"
           darwin="$(jq -c --arg os macos-14 "$filter" <<<"$matrix")"

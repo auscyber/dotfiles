@@ -29,29 +29,46 @@ let
   excludeHosts = [ ];
 
   systemOf = cfg: cfg.config.nixpkgs.hostPlatform.system;
+  # Standalone home-manager configs don't carry `config.nixpkgs.hostPlatform`
+  # (useGlobalPkgs disables the nixpkgs module), and their buildable toplevel is
+  # `activationPackage`, not `system.build.toplevel` -- so they key off `pkgs`.
+  homeSystemOf = cfg: cfg.pkgs.stdenv.hostPlatform.system;
   keep = configs: removeAttrs configs excludeHosts;
 
   # { <system> = { "<class>-<name>" = <toplevel>; }; } -- the exact shape
   # nix-github-actions.lib.mkGithubMatrix consumes. Its default `platforms` maps
   # each of our systems to a runner (x86_64-linux -> ubuntu-24.04, aarch64-linux
-  # -> ubuntu-24.04-arm, aarch64-darwin -> macos-14).
+  # -> ubuntu-24.04-arm, aarch64-darwin -> macos-14). homeConfigurations join the
+  # same map under the `home-` class, so systems.yml buckets and builds them by
+  # arch exactly like the nixos/darwin hosts, with no workflow changes.
   checksBySystem =
     let
       add =
+        { systemF, toplevelF }:
         class: acc: name: cfg:
         let
-          s = systemOf cfg;
+          s = systemF cfg;
         in
         acc
         // {
           ${s} = (acc.${s} or { }) // {
-            "${class}-${name}" = cfg.config.system.build.toplevel;
+            "${name} (${class})" = toplevelF cfg;
           };
         };
+      addSystem = add {
+        systemF = systemOf;
+        toplevelF = cfg: cfg.config.system.build.toplevel;
+      };
+      addHome = add {
+        systemF = homeSystemOf;
+        toplevelF = cfg: cfg.activationPackage;
+      };
     in
-    lib.foldlAttrs (add "darwin") (lib.foldlAttrs (add "nixos") { } (
-      keep (self.nixosConfigurations or { })
-    )) (keep (self.darwinConfigurations or { }));
+    lib.foldlAttrs (addHome "home") (lib.foldlAttrs (addSystem "darwin") (lib.foldlAttrs
+      (addSystem "nixos")
+      { }
+      (keep (self.nixosConfigurations or { }))
+    ) (keep (self.darwinConfigurations or { }))) (keep (self.homeConfigurations or { }));
 in
 {
   ff.nix-github-actions = {
@@ -90,6 +107,14 @@ in
         class: configs:
         lib.mapAttrs' (name: cfg: lib.nameValuePair "${class}-${name}" cfg.config.system.build.toplevel) (
           onThisSystem (keep configs)
+        );
+
+      # Same as `toplevels` but for standalone homeConfigurations: keyed off
+      # `pkgs` and exposing `activationPackage` (see homeSystemOf above).
+      homeToplevels =
+        configs:
+        lib.mapAttrs' (name: cfg: lib.nameValuePair "home-${name}" cfg.activationPackage) (
+          lib.filterAttrs (_: cfg: homeSystemOf cfg == system) (keep configs)
         );
 
       # Same master identity + age plugins the `.#rekey` app uses, so the sync
@@ -151,6 +176,7 @@ in
       packages =
         toplevels "nixos" (self.nixosConfigurations or { })
         // toplevels "darwin" (self.darwinConfigurations or { })
+        // homeToplevels (self.homeConfigurations or { })
         // lib.optionalAttrs supported { celler = inputs'.celler.packages.celler; };
 
       apps = lib.optionalAttrs supported {

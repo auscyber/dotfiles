@@ -29,4 +29,6 @@ in
 {
   den.schema.host = extraOptions;
   den.schema.user = extraOptions;
+  # A standalone home carries its own hostPublicKey too (agenix rekey via `anyUser`).
+  den.schema.home = extraOptions;
 }

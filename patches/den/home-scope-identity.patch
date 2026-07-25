@@ -1,0 +1,37 @@
+diff --git a/nix/lib/entities/home.nix b/nix/lib/entities/home.nix
+index 0f292a9..bf0350d 100644
+--- a/nix/lib/entities/home.nix
++++ b/nix/lib/entities/home.nix
+@@ -99,9 +99,13 @@ let
+                 inputs.home-manager.lib.homeManagerConfiguration;
+           in
+           {
+-            # mkInstanceType defaults name to the registry key (e.g. "tux@igloo");
+-            # den's name is the bare user name, so identity/description stay stable.
+-            config.name = lib.mkForce userName;
++            # mkInstanceType defaults name to the registry key (e.g. "tux@igloo").
++            # A `user@host` home keeps that full key so its scope identity is unique:
++            # two standalone homes for the same user (ivy@imflopet, ivy@contabo)
++            # otherwise share config.name (= bare userName) and collide on scope id
++            # (mkScopeId keys on `.name`) at the flake→home fan-out, resolving as one.
++            # Plain (host-less-name) homes keep the bare user name.
++            config.name = lib.mkForce (if nameWithHost then name else userName);
+             config._module.args.host = hostCtx;
+             config._module.args.user = userByName;
+             options = {
+@@ -126,7 +130,14 @@ let
+                 description = "Aspect that configures this home.";
+                 type = lib.types.raw; # no merging
+                 defaultText = "den.aspects.<name>";
+-                default = lookupAspect den config;
++                # lookupAspect keys on config.name; for a `user@host` home that name
++                # is the full registry key, so resolve the aspect by the bare user
++                # name (what lookupAspect matched before the name carried the host).
++                default =
++                  if nameWithHost && (den.aspects ? ${userName}) then
++                    den.aspects.${userName}
++                  else
++                    lookupAspect den config;
+               };
+               description = strOpt "home description" "home.${config.name}@${config.system}";
+               pkgs = lib.mkOption {

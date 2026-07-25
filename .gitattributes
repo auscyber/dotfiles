@@ -1,6 +1,9 @@
 # noisy diffs
 flake.lock -diff
 
+README.md -diff
+screenshots/* -diff
+
 # treat age files as binarys
 *.age -text -diff
 

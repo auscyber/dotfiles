@@ -23,4 +23,9 @@
   };
 
   den.schema.user.includes = [ den.aspects.ivy-fetch ];
+  # Standalone homes are their own user, but `den.schema.user.includes` only
+  # reaches user-kind entities. Include ivy-fetch (and its packages.ivy-fetch
+  # overlay) for home-kind entities too, so a standalone home's dependent
+  # `_overlays` carries the ivy-fetch overlay and `pkgs.ivy-fetch` resolves.
+  den.schema.home.includes = [ den.aspects.ivy-fetch ];
 }

@@ -8,7 +8,6 @@
     };
     nvim.plugins = {
       difftastic.enable = true;
-
       jujutsu.settings.diff_preset = "difftastic";
     };
   };

@@ -56,11 +56,13 @@
           "darwin"
         ]
       )
-      (den.lib.policy.route {
-        fromClass = "nix";
-        intoClass = host.class;
-        path = [ "nix" ];
-      });
+      (
+        den.lib.policy.route {
+          fromClass = "nix";
+          intoClass = host.class;
+          path = [ "nix" ];
+        }
+      );
 
   den.aspects.extra-registry = {
     # `nix.registry` here is picked up by the `nix-to-host` policy above (no
@@ -107,6 +109,9 @@
     };
 
     nix.registry.dotfiles.flake = inputs.self;
+    hmStandalone = { pkgs, ... }: {
+      nix.package = lib.mkDefault pkgs.nix;
+    };
 
     nix.settings = {
       extra-experimental-features = [
