@@ -46,22 +46,22 @@ in
             name = hostName;
           };
 
-          # filterUserAspects alone only drops <anon>/resolve(...) bookkeeping
-          # and wrapper/context nodes -- it leaves every `<policy:aspect-role>[N]`
-          # dispatch node in place, and those dominate node count (one per
-          # aspect x role combination). `simplified` additionally folds
-          # provider sub-aspects into their parents and flattens the
-          # per-host entity-kind grouping. On top of that, drop the
-          # remaining policy-dispatch routing nodes outright -- they're
-          # pipeline plumbing for policy resolution, not aspects a user
-          # declared, and pruning them (with edges touching them) is what
-          # actually collapses the diagram to a readable size.
+          # filterUserAspects/simplified don't touch these: the `isPolicyDispatch`
+          # node field turned out not to be set on them (verified against actual
+          # generated output, not just the library source). What's actually
+          # reliable is the rendered label -- every one of these nodes has a
+          # label starting with `<policy:`, e.g. `<policy:ccache-role-dev>[6]`
+          # or the nested `<policy:<policy:onepassword-role-gui>[132]/to-hosts>[0]`.
+          # There's one per aspect x role combination, and they dominate node
+          # count on any host with roles. Match on the label directly instead
+          # of trusting the isPolicyDispatch flag.
           gSimplified = diagram.graph.simplified g;
+          isPolicyNode = n: (builtins.match "<policy:.*" n.label) != null;
           keptIds = lib.listToAttrs (
             map (n: {
               name = n.id;
               value = true;
-            }) (builtins.filter (n: !(n.isPolicyDispatch or false)) gSimplified.nodes)
+            }) (builtins.filter (n: !(isPolicyNode n)) gSimplified.nodes)
           );
           gFiltered = gSimplified // {
             nodes = builtins.filter (n: keptIds ? ${n.id}) gSimplified.nodes;
