@@ -55,10 +55,7 @@ jobs:
       # flake's `.#celler` attribute directly -- in practice that produced a
       # different derivation than `.#celler.outPath`, so this install kept
       # missing the cache and rebuilding celler (including its aws-sdk-s3 /
-      # aws-config Rust deps) from source on every host job. Pinned to the
-      # claude/celler-flake-ref-rt3xlu branch because the flake-ref input
-      # (PR auscyber/celler-action#2) hasn't merged to @main yet -- switch
-      # this to @main once that lands.
+      # aws-config Rust deps) from source on every host job.
       - name: Setup celler cache
         if: ${{ github.event_name != 'pull_request' }}
         uses: auscyber/celler-action@main
@@ -67,5 +64,14 @@ jobs:
           cache: main
           token: ${{ secrets.CELLER_TOKEN }}
           flake-ref: ".#celler"
+      # No `shell:` key here previously meant no pipefail guarantee (GH only
+      # applies -o pipefail when `shell: bash` is explicit -- the unspecified
+      # default is a known gotcha, see actions/runner#1212/#1955). Piped into
+      # `tee`, the step's exit code was tee's (~always 0), not nix build's --
+      # so a genuine build failure still reported this step, and the whole
+      # job, as green. `set -eo pipefail` makes a failed nix build actually
+      # fail the step.
       - name: Build ${{ inputs.name }}
-        run: nix build --no-link --fallback --impure --print-out-paths ".#${{ inputs.attr }}" | tee "$RUNNER_TEMP/out-paths"
+        run: |
+          set -eo pipefail
+          nix build --no-link --fallback --impure --print-out-paths ".#${{ inputs.attr }}" | tee "$RUNNER_TEMP/out-paths"
