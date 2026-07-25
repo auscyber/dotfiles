@@ -29,7 +29,6 @@ graph LR
   Ivys_MacBook_Pro([Ivys-MacBook-Pro]):::root
 
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
-  _anon_["<anon>"]:::_anon__c
   _policy__policy_onepassword_role_gui__132___to_hosts__0_["<policy:<policy:onepassword-role-gui>[132]/to-hosts>[0]"]:::_policy__policy_onepassword_role_gui__132___to_hosts__0__c
   _policy__policy_onepassword_role_gui__132___to_users__1_["<policy:<policy:onepassword-role-gui>[132]/to-users>[1]"]:::_policy__policy_onepassword_role_gui__132___to_users__1__c
   _policy_Ivys_MacBook_Pro_role_dev__2_["<policy:Ivys-MacBook-Pro-role-dev>[2]"]:::_policy_Ivys_MacBook_Pro_role_dev__2__c
@@ -100,7 +99,6 @@ graph LR
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_Ivys_MacBook_Pro["default"]:::default_host_Ivys_MacBook_Pro_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivypierlot_Ivys_MacBook_Pro{{"batteries/define-user/ivypierlot@Ivys-MacBook-Pro"}}:::den__batteries__define_user__ivypierlot_Ivys_MacBook_Pro_c
   difftastic["difftastic"]:::difftastic_c
@@ -110,17 +108,8 @@ graph LR
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
   homebrew_host_Ivys_MacBook_Pro["homebrew"]:::homebrew_host_Ivys_MacBook_Pro_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__4_["host/resolve(<when>:4)"]:::host__resolve__when__4__c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_["host/resolve(default)"]:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
-  host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -180,57 +169,28 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_Ivys_MacBook_Pro --> den__batteries__define_user
-  default_host_Ivys_MacBook_Pro --> extra_registry
-  default_host_Ivys_MacBook_Pro --> home_base
-  default_host_Ivys_MacBook_Pro -.-x host__resolve_default_
-  default_host_Ivys_MacBook_Pro --> den__batteries__hostname
-  default_host_Ivys_MacBook_Pro --> den__batteries__inputs_
-  default_host_Ivys_MacBook_Pro --> insecure_predicate
-  default_host_Ivys_MacBook_Pro --> lib
-  default_host_Ivys_MacBook_Pro --> nix
-  default_host_Ivys_MacBook_Pro --> overlays
-  default_host_Ivys_MacBook_Pro --> den__batteries__self_
-  default_host_Ivys_MacBook_Pro --> den__batteries__sources
-  default_host_Ivys_MacBook_Pro --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__ivypierlot_Ivys_MacBook_Pro
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_Ivys_MacBook_Pro --> fonts___when__4
   fonts_host_Ivys_MacBook_Pro --> fonts___when__5
   home_base --> shell_host_Ivys_MacBook_Pro
-  host --> Ivys_MacBook_Pro
-  host --> darwin_base
-  host --> default_host_Ivys_MacBook_Pro
-  host --> fonts_host_Ivys_MacBook_Pro
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_Ivys_MacBook_Pro
-  host --> openssh
-  host --> pam_rssh_host_Ivys_MacBook_Pro
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
-  jujutsu___when__5 --> host__resolve__when__5_
   nix --> nix___when__5
   nixpkgs_config_host_Ivys_MacBook_Pro --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell_host_Ivys_MacBook_Pro -.-x host__resolve_shell_
   shell_host_Ivys_MacBook_Pro --> jujutsu
   shell_host_Ivys_MacBook_Pro --> nix_index
   shell_host_Ivys_MacBook_Pro --> starship
   unfree_predicate --> unfree_predicate__os
   unfree_predicate --> unfree_predicate__user
-  vpn --> host__resolve_vpn_
   vpn --> vpn_secrets
   vpn --> vpn_ssh_config
   vpn_secrets --> agenix_rekey_host_Ivys_MacBook_Pro
@@ -431,7 +391,6 @@ graph LR
   cotabby_role_dev["cotabby-role-dev"]:::cotabby_role_dev_c
   cotabby_role_gui["cotabby-role-gui"]:::cotabby_role_gui_c
   cotabby_role_study["cotabby-role-study"]:::cotabby_role_study_c
-  default_user_ivypierlot["default"]:::default_user_ivypierlot_c
   default_role_dev["default-role-dev"]:::default_role_dev_c
   default_role_gui["default-role-gui"]:::default_role_gui_c
   default_role_study["default-role-study"]:::default_role_study_c
@@ -657,19 +616,8 @@ graph LR
   unfree_predicate_role_dev["unfree-predicate-role-dev"]:::unfree_predicate_role_dev_c
   unfree_predicate_role_gui["unfree-predicate-role-gui"]:::unfree_predicate_role_gui_c
   unfree_predicate_role_study["unfree-predicate-role-study"]:::unfree_predicate_role_study_c
-  user["user"]:::user_c
   user_shell__ivypierlot_Ivys_MacBook_Pro{{"user-shell/ivypierlot@Ivys-MacBook-Pro"}}:::user_shell__ivypierlot_Ivys_MacBook_Pro_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve__when__4_["user/resolve(<when>:4)"]:::user__resolve__when__4__c
-  user__resolve__when__5_["user/resolve(<when>:5)"]:::user__resolve__when__5__c
-  user__resolve_dev_nix_{{"user/resolve(dev-nix)"}}:::user__resolve_dev_nix__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_jankyborders_{{"user/resolve(jankyborders)"}}:::user__resolve_jankyborders__c
-  user__resolve_kanata_{{"user/resolve(kanata)"}}:::user__resolve_kanata__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
-  user__resolve_zen_{{"user/resolve(zen)"}}:::user__resolve_zen__c
   wakatime["wakatime"]:::wakatime_c
   wakatime_role_dev["wakatime-role-dev"]:::wakatime_role_dev_c
   wakatime_role_gui["wakatime-role-gui"]:::wakatime_role_gui_c
@@ -687,15 +635,11 @@ graph LR
   _policy_ivypierlot_role_study__80_ --> zotero
   _policy_zen_role_study__182_ --> zen_classes
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
-  browsers__zen --> user__resolve_zen_
   cotabby --> packages__cotabby
   dev --> dev_cli
   dev --> dev_nix
-  dev_nix --> user__resolve_dev_nix_
   fish --> shell_user_ivypierlot
   fish --> user_shell__ivypierlot_Ivys_MacBook_Pro
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ghostty --> packages__ghostty
   idris --> lspmux
   ivy_fetch --> packages__ivy_fetch
@@ -724,12 +668,8 @@ graph LR
   ivypierlot --> browsers__zen
   ivypierlot__Ivys_MacBook_Pro --> laptop_brew
   jankyborders --> packages__jankyborders
-  jankyborders --> user__resolve_jankyborders_
   kanata --> packages__kanata_tray
-  kanata --> user__resolve_kanata_
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_ivypierlot
   mcp_servers --> packages__jj_mcp_server
   mcp_servers --> packages__zotero_mcp
@@ -740,207 +680,15 @@ graph LR
   nixvim --> wakatime
   onepassword --> onepassword___when__5
   onepassword --> den__provides__unfree_onepassword_password_manager_
-  onepassword___when__5 --> user__resolve__when__5_
   opencode --> mcp_servers
   rift --> jankyborders
   sketchybar --> packages__sketchybar
   sketchybar --> packages__sketchybar_app_font
-  user --> _policy_agenix_rekey_role_dev__0_
-  user --> _policy_agenix_rekey_role_gui__1_
-  user --> _policy_agenix_rekey_role_study__2_
-  user --> _policy_agenix_rekey__to_users__3_
-  user --> _policy_celler_push_role_dev__5_
-  user --> _policy_celler_push_role_gui__6_
-  user --> _policy_celler_push_role_study__7_
-  user --> _policy_cotabby_role_dev__8_
-  user --> _policy_cotabby_role_gui__9_
-  user --> _policy_cotabby_role_study__10_
-  user --> _policy_default_role_dev__11_
-  user --> _policy_default_role_gui__12_
-  user --> _policy_default_role_study__13_
-  user --> _policy_default__to_hosts__14_
-  user --> _policy_define_user_role_dev__15_
-  user --> _policy_define_user_role_gui__16_
-  user --> _policy_define_user_role_study__17_
-  user --> _policy_dev_cli_role_dev__18_
-  user --> _policy_dev_cli_role_gui__19_
-  user --> _policy_dev_cli_role_study__20_
-  user --> _policy_dev_nix_role_dev__21_
-  user --> _policy_dev_nix_role_gui__22_
-  user --> _policy_dev_nix_role_study__23_
-  user --> _policy_dev_role_dev__24_
-  user --> _policy_dev_role_gui__25_
-  user --> _policy_dev_role_study__26_
-  user --> _policy_difftastic_role_dev__27_
-  user --> _policy_difftastic_role_gui__28_
-  user --> _policy_difftastic_role_study__29_
-  user --> _policy_eagle_nvim_role_dev__30_
-  user --> _policy_eagle_nvim_role_gui__31_
-  user --> _policy_eagle_nvim_role_study__32_
-  user --> _policy_extra_registry_role_dev__33_
-  user --> _policy_extra_registry_role_gui__34_
-  user --> _policy_extra_registry_role_study__35_
-  user --> _policy_file_local_role_dev__36_
-  user --> _policy_file_local_role_gui__37_
-  user --> _policy_file_local_role_study__38_
-  user --> _policy_fish_role_dev__39_
-  user --> _policy_fish_role_gui__40_
-  user --> _policy_fish_role_study__41_
-  user --> _policy_fonts_role_dev__43_
-  user --> _policy_fonts_role_gui__44_
-  user --> _policy_fonts_role_study__45_
-  user --> _policy_ghostty_role_dev__46_
-  user --> _policy_ghostty_role_gui__47_
-  user --> _policy_ghostty_role_study__48_
-  user --> _policy_gpg_role_dev__49_
-  user --> _policy_gpg_role_gui__50_
-  user --> _policy_gpg_role_study__51_
-  user --> _policy_gui_role_dev__52_
-  user --> _policy_gui_role_gui__53_
-  user --> _policy_gui_role_study__54_
-  user --> _policy_hm_user_detect__55_
-  user --> _policy_home_base_role_dev__57_
-  user --> _policy_home_base_role_gui__58_
-  user --> _policy_home_base_role_study__59_
-  user --> _policy_homebrew_role_dev__60_
-  user --> _policy_homebrew_role_gui__61_
-  user --> _policy_homebrew_role_study__62_
-  user --> _policy_hostname_role_dev__63_
-  user --> _policy_hostname_role_gui__64_
-  user --> _policy_hostname_role_study__65_
-  user --> _policy_idris_role_dev__66_
-  user --> _policy_idris_role_gui__67_
-  user --> _policy_idris_role_study__68_
-  user --> _policy_inputs__role_dev__69_
-  user --> _policy_inputs__role_gui__70_
-  user --> _policy_inputs__role_study__71_
-  user --> _policy_insecure_predicate_role_dev__72_
-  user --> _policy_insecure_predicate_role_gui__73_
-  user --> _policy_insecure_predicate_role_study__74_
-  user --> _policy_ivy_fetch_role_dev__75_
-  user --> _policy_ivy_fetch_role_gui__76_
-  user --> _policy_ivy_fetch_role_study__77_
-  user --> _policy_ivypierlot_role_dev__78_
-  user --> _policy_ivypierlot_role_gui__79_
-  user --> _policy_ivypierlot_role_study__80_
-  user --> _policy_jankyborders_role_dev__82_
-  user --> _policy_jankyborders_role_gui__83_
-  user --> _policy_jankyborders_role_study__84_
-  user --> _policy_jj_mcp_server_role_dev__85_
-  user --> _policy_jj_mcp_server_role_gui__86_
-  user --> _policy_jj_mcp_server_role_study__87_
-  user --> _policy_jujutsu_role_dev__88_
-  user --> _policy_jujutsu_role_gui__89_
-  user --> _policy_jujutsu_role_study__90_
-  user --> _policy_kanata_role_dev__91_
-  user --> _policy_kanata_role_gui__92_
-  user --> _policy_kanata_role_study__93_
-  user --> _policy_lib_role_dev__95_
-  user --> _policy_lib_role_gui__96_
-  user --> _policy_lib_role_study__97_
-  user --> _policy_llama_cpp_role_dev__98_
-  user --> _policy_llama_cpp_role_gui__99_
-  user --> _policy_llama_cpp_role_study__100_
-  user --> _policy_lspmux_role_dev__101_
-  user --> _policy_lspmux_role_gui__102_
-  user --> _policy_lspmux_role_study__103_
-  user --> _policy_main_ssh_key_role_dev__104_
-  user --> _policy_main_ssh_key_role_gui__105_
-  user --> _policy_main_ssh_key_role_study__106_
-  user --> _policy_main_ssh_key__to_hosts__107_
-  user --> _policy_mcp_servers_role_dev__108_
-  user --> _policy_mcp_servers_role_gui__109_
-  user --> _policy_mcp_servers_role_study__110_
-  user --> _policy_neovim_role_dev__111_
-  user --> _policy_neovim_role_gui__112_
-  user --> _policy_neovim_role_study__113_
-  user --> _policy_nix_index_role_dev__115_
-  user --> _policy_nix_index_role_gui__116_
-  user --> _policy_nix_index_role_study__117_
-  user --> _policy_nix_role_dev__118_
-  user --> _policy_nix_role_gui__119_
-  user --> _policy_nix_role_study__120_
-  user --> _policy_nixpkgs_config_role_dev__121_
-  user --> _policy_nixpkgs_config_role_gui__122_
-  user --> _policy_nixpkgs_config_role_study__123_
-  user --> _policy_nixvim_role_dev__124_
-  user --> _policy_nixvim_role_gui__125_
-  user --> _policy_nixvim_role_study__126_
-  user --> _policy_nixvim_user_forward__127_
-  user --> _policy_nushell_role_dev__128_
-  user --> _policy_nushell_role_gui__129_
-  user --> _policy_nushell_role_study__130_
-  user --> _policy_onepassword_role_dev__131_
-  user --> _policy_onepassword_role_gui__132_
-  user --> _policy_onepassword_role_study__133_
-  user --> _policy_openclaw_role_dev__134_
-  user --> _policy_openclaw_role_gui__135_
-  user --> _policy_openclaw_role_study__136_
-  user --> _policy_opencode_role_dev__137_
-  user --> _policy_opencode_role_gui__138_
-  user --> _policy_opencode_role_study__139_
-  user --> _policy_overlays_role_dev__140_
-  user --> _policy_overlays_role_gui__141_
-  user --> _policy_overlays_role_study__142_
-  user --> _policy_pam_rssh_role_dev__143_
-  user --> _policy_pam_rssh_role_gui__144_
-  user --> _policy_pam_rssh_role_study__145_
-  user --> _policy_rift_role_dev__146_
-  user --> _policy_rift_role_gui__147_
-  user --> _policy_rift_role_study__148_
-  user --> _policy_rust_role_dev__149_
-  user --> _policy_rust_role_gui__150_
-  user --> _policy_rust_role_study__151_
-  user --> _policy_self__role_dev__152_
-  user --> _policy_self__role_gui__153_
-  user --> _policy_self__role_study__154_
-  user --> _policy_shell_role_dev__155_
-  user --> _policy_shell_role_gui__156_
-  user --> _policy_shell_role_study__157_
-  user --> _policy_sketchybar_role_dev__159_
-  user --> _policy_sketchybar_role_gui__160_
-  user --> _policy_sketchybar_role_study__161_
-  user --> _policy_sketchybar_app_font_role_dev__162_
-  user --> _policy_sketchybar_app_font_role_gui__163_
-  user --> _policy_sketchybar_app_font_role_study__164_
-  user --> _policy_sources_role_dev__165_
-  user --> _policy_sources_role_gui__166_
-  user --> _policy_sources_role_study__167_
-  user --> _policy_starship_role_dev__168_
-  user --> _policy_starship_role_gui__169_
-  user --> _policy_starship_role_study__170_
-  user --> _policy_stylix_role_dev__171_
-  user --> _policy_stylix_role_gui__172_
-  user --> _policy_stylix_role_study__173_
-  user --> _policy_unfree_predicate_role_dev__174_
-  user --> _policy_unfree_predicate_role_gui__175_
-  user --> _policy_unfree_predicate_role_study__176_
-  user --> _policy_wakatime_role_dev__177_
-  user --> _policy_wakatime_role_gui__178_
-  user --> _policy_wakatime_role_study__179_
-  user --> _policy_zen_role_dev__180_
-  user --> _policy_zen_role_gui__181_
-  user --> _policy_zen_role_study__182_
-  user --> _policy_zotero_mcp_role_dev__183_
-  user --> _policy_zotero_mcp_role_gui__184_
-  user --> _policy_zotero_mcp_role_study__185_
-  user --> ivypierlot__Ivys_MacBook_Pro
-  user --> default_user_ivypierlot
-  user --> fonts_user_ivypierlot
-  user --> ivy_fetch
-  user --> ivypierlot
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_ivypierlot
-  user --> sudoagents_user_ivypierlot
-  user --> neovim__to_users
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   ivypierlot -.->|provides| ivypierlot__Ivys_MacBook_Pro__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy__policy_onepassword_role_gui__132___to_hosts__0__c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy__policy_onepassword_role_gui__132___to_users__1__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_Ivys_MacBook_Pro_role_dev__2__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -1207,8 +955,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_Ivys_MacBook_Pro_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default_role_study_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -1281,17 +1027,8 @@ graph LR
   classDef homebrew_role_dev_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef homebrew_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef homebrew_role_study_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve__when__5__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_default__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef hostname_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -1500,19 +1237,8 @@ graph LR
   classDef unfree_predicate_role_study_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__ivypierlot_Ivys_MacBook_Pro_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve__when__5__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_dev_nix__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_jankyborders__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_kanata__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_zen__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef vpn_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef vpn_ssh_config_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1547,7 +1273,6 @@ graph LR
   auspc([auspc]):::root
 
   subgraph ctx_host_auspc["host: auspc"]
-  _anon_["<anon>"]:::_anon__c
   _policy_alx_wol_role_dev__0_["<policy:alx-wol-role-dev>[0]"]:::_policy_alx_wol_role_dev__0__c
   _policy_alx_wol_role_gaming__1_["<policy:alx-wol-role-gaming>[1]"]:::_policy_alx_wol_role_gaming__1__c
   _policy_alx_wol_role_gui__2_["<policy:alx-wol-role-gui>[2]"]:::_policy_alx_wol_role_gui__2__c
@@ -1675,7 +1400,6 @@ graph LR
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_auspc["default"]:::default_host_auspc_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__auscyber_auspc{{"batteries/define-user/auscyber@auspc"}}:::den__batteries__define_user__auscyber_auspc_c
   difftastic["difftastic"]:::difftastic_c
@@ -1687,18 +1411,8 @@ graph LR
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   gpus["gpus"]:::gpus_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__4_["host/resolve(<when>:4)"]:::host__resolve__when__4__c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_gpus_{{"host/resolve(gpus)"}}:::host__resolve_gpus__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
-  host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -1762,60 +1476,29 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_auspc --> den__batteries__define_user
-  default_host_auspc --> extra_registry
-  default_host_auspc --> home_base
-  default_host_auspc --> host__resolve_default_
-  default_host_auspc --> den__batteries__hostname
-  default_host_auspc --> den__batteries__inputs_
-  default_host_auspc --> insecure_predicate
-  default_host_auspc --> lib
-  default_host_auspc --> nix
-  default_host_auspc --> overlays
-  default_host_auspc --> den__batteries__self_
-  default_host_auspc --> den__batteries__sources
-  default_host_auspc --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__auscyber_auspc
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_auspc --> fonts___when__4
   fonts_host_auspc --> fonts___when__5
-  gpus --> host__resolve_gpus_
   home_base --> shell_host_auspc
-  host --> auspc
-  host --> darwin_base
-  host --> default_host_auspc
-  host --> fonts_host_auspc
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_auspc
-  host --> openssh
-  host --> pam_rssh_host_auspc
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nix --> nix___when__5
-  nix___when__4 --> host__resolve__when__4_
-  nix___when__5 -.-x host__resolve__when__5_
   nixpkgs_config_host_auspc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell_host_auspc -.-x host__resolve_shell_
   shell_host_auspc --> jujutsu
   shell_host_auspc --> nix_index
   shell_host_auspc --> starship
   unfree_predicate --> unfree_predicate__os
   unfree_predicate --> unfree_predicate__user
-  vpn --> host__resolve_vpn_
   vpn --> vpn_secrets
   vpn --> vpn_ssh_config
   vpn_secrets --> agenix_rekey_host_auspc
@@ -1927,7 +1610,6 @@ graph LR
   celler_push_role_dev["celler-push-role-dev"]:::celler_push_role_dev_c
   celler_push_role_gaming["celler-push-role-gaming"]:::celler_push_role_gaming_c
   celler_push_role_gui["celler-push-role-gui"]:::celler_push_role_gui_c
-  default_user_auscyber["default"]:::default_user_auscyber_c
   default_role_dev["default-role-dev"]:::default_role_dev_c
   default_role_gaming["default-role-gaming"]:::default_role_gaming_c
   default_role_gui["default-role-gui"]:::default_role_gui_c
@@ -2052,16 +1734,9 @@ graph LR
   unfree_predicate_role_dev["unfree-predicate-role-dev"]:::unfree_predicate_role_dev_c
   unfree_predicate_role_gaming["unfree-predicate-role-gaming"]:::unfree_predicate_role_gaming_c
   unfree_predicate_role_gui["unfree-predicate-role-gui"]:::unfree_predicate_role_gui_c
-  user["user"]:::user_c
   user_pwd["user-pwd"]:::user_pwd_c
   user_shell__auscyber_auspc{{"user-shell/auscyber@auspc"}}:::user_shell__auscyber_auspc_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  auscyber__user__resolve_auspc__auscyber{{"auscyber/user/resolve(auspc):auscyber"}}:::auscyber__user__resolve_auspc__auscyber_c
-  user__resolve_dev_nix_{{"user/resolve(dev-nix)"}}:::user__resolve_dev_nix__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   _policy_auscyber__to_hosts__8_ --> user_pwd
   _policy_default_role_gaming__13_ --> packages__proton_ge_bin
@@ -2078,22 +1753,16 @@ graph LR
   auscyber__auspc --> plasma
   auscyber__auspc --> den__batteries__primary_user_auscyber_auspc_
   auscyber__auspc --> stylix
-  auscyber__auspc --> auscyber__user__resolve_auspc__auscyber
   celler_push --> agenix_rekey_user_auscyber
   dev --> dev_cli
   dev --> dev_nix
-  dev_nix --> user__resolve_dev_nix_
   fish --> shell_user_auscyber
   fish --> user_shell__auscyber_auspc
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ghostty --> packages__ghostty
   gui --> ghostty
   gui --> onepassword
   ivy_fetch --> packages__ivy_fetch
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_auscyber
   neovim --> nixvim
   nixvim --> packages__eagle_nvim
@@ -2103,113 +1772,12 @@ graph LR
   onepassword --> onepassword___when__5
   onepassword --> den__provides__unfree_onepassword_password_manager_
   rust --> lspmux
-  user --> _policy_agenix_rekey_role_dev__0_
-  user --> _policy_agenix_rekey_role_gaming__1_
-  user --> _policy_agenix_rekey_role_gui__2_
-  user --> _policy_agenix_rekey__to_users__3_
-  user --> _policy_auscyber_role_dev__4_
-  user --> _policy_auscyber_role_gaming__5_
-  user --> _policy_auscyber_role_gui__6_
-  user --> _policy_auscyber__to_hosts__8_
-  user --> _policy_celler_push_role_dev__9_
-  user --> _policy_celler_push_role_gaming__10_
-  user --> _policy_celler_push_role_gui__11_
-  user --> _policy_default_role_dev__12_
-  user --> _policy_default_role_gaming__13_
-  user --> _policy_default_role_gui__14_
-  user --> _policy_default__to_hosts__15_
-  user --> _policy_define_user_role_dev__16_
-  user --> _policy_define_user_role_gaming__17_
-  user --> _policy_define_user_role_gui__18_
-  user --> _policy_difftastic_role_dev__19_
-  user --> _policy_difftastic_role_gaming__20_
-  user --> _policy_difftastic_role_gui__21_
-  user --> _policy_extra_registry_role_dev__22_
-  user --> _policy_extra_registry_role_gaming__23_
-  user --> _policy_extra_registry_role_gui__24_
-  user --> _policy_fish_role_dev__25_
-  user --> _policy_fish_role_gaming__26_
-  user --> _policy_fish_role_gui__27_
-  user --> _policy_fonts_role_dev__29_
-  user --> _policy_fonts_role_gaming__30_
-  user --> _policy_fonts_role_gui__31_
-  user --> _policy_hm_user_detect__32_
-  user --> _policy_home_base_role_dev__34_
-  user --> _policy_home_base_role_gaming__35_
-  user --> _policy_home_base_role_gui__36_
-  user --> _policy_hostname_role_dev__37_
-  user --> _policy_hostname_role_gaming__38_
-  user --> _policy_hostname_role_gui__39_
-  user --> _policy_inputs__role_dev__40_
-  user --> _policy_inputs__role_gaming__41_
-  user --> _policy_inputs__role_gui__42_
-  user --> _policy_insecure_predicate_role_dev__43_
-  user --> _policy_insecure_predicate_role_gaming__44_
-  user --> _policy_insecure_predicate_role_gui__45_
-  user --> _policy_ivy_fetch_role_dev__46_
-  user --> _policy_ivy_fetch_role_gaming__47_
-  user --> _policy_ivy_fetch_role_gui__48_
-  user --> _policy_jujutsu_role_dev__49_
-  user --> _policy_jujutsu_role_gaming__50_
-  user --> _policy_jujutsu_role_gui__51_
-  user --> _policy_lib_role_dev__52_
-  user --> _policy_lib_role_gaming__53_
-  user --> _policy_lib_role_gui__54_
-  user --> _policy_lix_role_dev__55_
-  user --> _policy_lix_role_gaming__56_
-  user --> _policy_lix_role_gui__57_
-  user --> _policy_main_ssh_key_role_dev__58_
-  user --> _policy_main_ssh_key_role_gaming__59_
-  user --> _policy_main_ssh_key_role_gui__60_
-  user --> _policy_main_ssh_key__to_hosts__61_
-  user --> _policy_nix_index_role_dev__62_
-  user --> _policy_nix_index_role_gaming__63_
-  user --> _policy_nix_index_role_gui__64_
-  user --> _policy_nix_role_dev__65_
-  user --> _policy_nix_role_gaming__66_
-  user --> _policy_nix_role_gui__67_
-  user --> _policy_nixpkgs_config_role_dev__68_
-  user --> _policy_nixpkgs_config_role_gaming__69_
-  user --> _policy_nixpkgs_config_role_gui__70_
-  user --> _policy_nixvim_user_forward__71_
-  user --> _policy_overlays_role_dev__72_
-  user --> _policy_overlays_role_gaming__73_
-  user --> _policy_overlays_role_gui__74_
-  user --> _policy_pam_rssh_role_dev__75_
-  user --> _policy_pam_rssh_role_gaming__76_
-  user --> _policy_pam_rssh_role_gui__77_
-  user --> _policy_self__role_dev__78_
-  user --> _policy_self__role_gaming__79_
-  user --> _policy_self__role_gui__80_
-  user --> _policy_shell_role_dev__81_
-  user --> _policy_shell_role_gaming__82_
-  user --> _policy_shell_role_gui__83_
-  user --> _policy_sources_role_dev__85_
-  user --> _policy_sources_role_gaming__86_
-  user --> _policy_sources_role_gui__87_
-  user --> _policy_starship_role_dev__88_
-  user --> _policy_starship_role_gaming__89_
-  user --> _policy_starship_role_gui__90_
-  user --> _policy_unfree_predicate_role_dev__91_
-  user --> _policy_unfree_predicate_role_gaming__92_
-  user --> _policy_unfree_predicate_role_gui__93_
-  user --> auscyber
-  user --> auscyber__auspc
-  user --> default_user_auscyber
-  user --> fonts_user_auscyber
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_auscyber
-  user --> shell__to_users
-  user --> user__resolve_user_
-  auscyber -.->|provides| auscyber__user__resolve_auspc__auscyber
   end
 
   auscyber -.->|provides| auscyber__auspc__to_users
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey_role_dev__0__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_agenix_rekey_role_gaming__1__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_agenix_rekey_role_gui__2__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -2443,8 +2011,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_auscyber_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default_role_gaming_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -2491,18 +2057,8 @@ graph LR
   classDef home_base_role_dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_role_gaming_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_role_gui_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_gpus__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef hostname_role_gaming_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -2638,16 +2194,9 @@ graph LR
   classDef unfree_predicate_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_pwd_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef user_shell__auscyber_auspc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef auscyber__user__resolve_auspc__auscyber_c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_dev_nix__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef vpn_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef vpn_ssh_config_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -2668,14 +2217,12 @@ graph LR
   contabo([contabo]):::root
 
   subgraph ctx_host_contabo["host: contabo"]
-  _anon_["<anon>"]:::_anon__c
   _policy_fish___anon__4__to_hosts__0_["<policy:fish/<anon>:4/to-hosts>[0]"]:::_policy_fish___anon__4__to_hosts__0__c
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_contabo["default"]:::default_host_contabo_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivy_contabo{{"batteries/define-user/ivy@contabo"}}:::den__batteries__define_user__ivy_contabo_c
   difftastic["difftastic"]:::difftastic_c
@@ -2684,15 +2231,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -2738,51 +2278,23 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_contabo --> agenix_rekey
-  default_host_contabo --> den__batteries__define_user
-  default_host_contabo --> extra_registry
-  default_host_contabo --> home_base
-  default_host_contabo --> host__resolve_default_
-  default_host_contabo --> den__batteries__hostname
-  default_host_contabo --> den__batteries__inputs_
-  default_host_contabo --> insecure_predicate
-  default_host_contabo --> lib
-  default_host_contabo --> nix
-  default_host_contabo --> overlays
-  default_host_contabo --> den__batteries__self_
-  default_host_contabo --> den__batteries__sources
-  default_host_contabo --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__ivy_contabo
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_contabo --> fonts___when__4
   fonts_host_contabo --> fonts___when__5
   home_base --> shell
-  host --> contabo
-  host --> darwin_base
-  host --> default_host_contabo
-  host --> fonts_host_contabo
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_contabo
-  host --> openssh
-  host --> pam_rssh_host_contabo
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_contabo --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -2796,7 +2308,6 @@ graph LR
   _policy_main_ssh_key__to_hosts__5_["<policy:main-ssh-key/to-hosts>[5]"]:::_policy_main_ssh_key__to_hosts__5__c
   _policy_nixvim_user_forward__6_["<policy:nixvim-user-forward>[6]"]:::_policy_nixvim_user_forward__6__c
   agenix_rekey__to_users["agenix-rekey/to-users"]:::agenix_rekey__to_users_c
-  default_user_ivy["default"]:::default_user_ivy_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   packages__eagle_nvim[/"packages/eagle-nvim"\]:::packages__eagle_nvim_c
   fish["fish"]:::fish_c
@@ -2830,24 +2341,15 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
-  user["user"]:::user_c
   user_shell__ivy_contabo{{"user-shell/ivy@contabo"}}:::user_shell__ivy_contabo_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   fish --> user_shell__ivy_contabo
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   ivy__contabo --> fish
   ivy__contabo --> neovim
   ivy__contabo --> den__batteries__primary_user_ivy_contabo_
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_ivy
   neovim --> nixvim
   neovim --> stylix
@@ -2856,26 +2358,11 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   rust --> lspmux
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_default__to_hosts__1_
-  user --> _policy_hm_user_detect__2_
-  user --> _policy_main_ssh_key__to_hosts__5_
-  user --> _policy_nixvim_user_forward__6_
-  user --> ivy__contabo
-  user --> default_user_ivy
-  user --> fonts_user_ivy
-  user --> ivy
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_ivy
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__1__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_fish___anon__4__to_hosts__0__c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -2889,8 +2376,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_contabo_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_ivy_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__ivy_contabo_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -2904,15 +2389,8 @@ graph LR
   classDef fonts___when__5_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -2983,13 +2461,8 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__ivy_contabo_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
 style ctx_host_contabo fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -3007,14 +2480,12 @@ graph LR
   imflopet([imflopet]):::root
 
   subgraph ctx_host_imflopet["host: imflopet"]
-  _anon_["<anon>"]:::_anon__c
   _policy_fish___anon__4__to_hosts__0_["<policy:fish/<anon>:4/to-hosts>[0]"]:::_policy_fish___anon__4__to_hosts__0__c
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_imflopet["default"]:::default_host_imflopet_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivy_imflopet{{"batteries/define-user/ivy@imflopet"}}:::den__batteries__define_user__ivy_imflopet_c
   difftastic["difftastic"]:::difftastic_c
@@ -3023,15 +2494,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -3078,51 +2542,23 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_imflopet --> agenix_rekey
-  default_host_imflopet --> den__batteries__define_user
-  default_host_imflopet --> extra_registry
-  default_host_imflopet --> home_base
-  default_host_imflopet --> host__resolve_default_
-  default_host_imflopet --> den__batteries__hostname
-  default_host_imflopet --> den__batteries__inputs_
-  default_host_imflopet --> insecure_predicate
-  default_host_imflopet --> lib
-  default_host_imflopet --> nix
-  default_host_imflopet --> overlays
-  default_host_imflopet --> den__batteries__self_
-  default_host_imflopet --> den__batteries__sources
-  default_host_imflopet --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__ivy_imflopet
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_imflopet --> fonts___when__4
   fonts_host_imflopet --> fonts___when__5
   home_base --> shell
-  host --> darwin_base
-  host --> default_host_imflopet
-  host --> fonts_host_imflopet
-  host --> host__resolve_host_
-  host --> imflopet
-  host --> nixos_general
-  host --> nixpkgs_config_host_imflopet
-  host --> openssh
-  host --> pam_rssh_host_imflopet
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_imflopet --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -3136,7 +2572,6 @@ graph LR
   _policy_main_ssh_key__to_hosts__5_["<policy:main-ssh-key/to-hosts>[5]"]:::_policy_main_ssh_key__to_hosts__5__c
   _policy_nixvim_user_forward__6_["<policy:nixvim-user-forward>[6]"]:::_policy_nixvim_user_forward__6__c
   agenix_rekey__to_users["agenix-rekey/to-users"]:::agenix_rekey__to_users_c
-  default_user_ivy["default"]:::default_user_ivy_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   packages__eagle_nvim[/"packages/eagle-nvim"\]:::packages__eagle_nvim_c
   fish["fish"]:::fish_c
@@ -3171,25 +2606,16 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
-  user["user"]:::user_c
   user_shell__ivy_imflopet{{"user-shell/ivy@imflopet"}}:::user_shell__ivy_imflopet_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   fish --> user_shell__ivy_imflopet
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   ivy__imflopet --> fish
   ivy__imflopet --> gpg
   ivy__imflopet --> neovim
   ivy__imflopet --> den__batteries__primary_user_ivy_imflopet_
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_ivy
   neovim --> nixvim
   neovim --> stylix
@@ -3198,27 +2624,12 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   rust --> lspmux
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_default__to_hosts__1_
-  user --> _policy_hm_user_detect__2_
-  user --> _policy_main_ssh_key__to_hosts__5_
-  user --> _policy_nixvim_user_forward__6_
-  user --> default_user_ivy
-  user --> fonts_user_ivy
-  user --> ivy__imflopet
-  user --> ivy
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_ivy
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   ivy -.->|provides| ivy__imflopet__to_users
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__1__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_fish___anon__4__to_hosts__0__c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -3231,8 +2642,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_imflopet_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_ivy_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__ivy_imflopet_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
@@ -3247,15 +2656,8 @@ graph LR
   classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef imflopet_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -3328,13 +2730,8 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__ivy_imflopet_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
 style ctx_host_imflopet fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -3352,14 +2749,12 @@ graph LR
   lora_pi([lora-pi]):::root
 
   subgraph ctx_host_lora_pi["host: lora-pi"]
-  _anon_["<anon>"]:::_anon__c
   _policy_fish___anon__4__to_hosts__0_["<policy:fish/<anon>:4/to-hosts>[0]"]:::_policy_fish___anon__4__to_hosts__0__c
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_lora_pi["default"]:::default_host_lora_pi_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivy_lora_pi{{"batteries/define-user/ivy@lora-pi"}}:::den__batteries__define_user__ivy_lora_pi_c
   difftastic["difftastic"]:::difftastic_c
@@ -3368,15 +2763,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -3423,44 +2811,17 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_lora_pi --> agenix_rekey
-  default_host_lora_pi --> den__batteries__define_user
-  default_host_lora_pi --> extra_registry
-  default_host_lora_pi --> home_base
-  default_host_lora_pi --> host__resolve_default_
-  default_host_lora_pi --> den__batteries__hostname
-  default_host_lora_pi --> den__batteries__inputs_
-  default_host_lora_pi --> insecure_predicate
-  default_host_lora_pi --> lib
-  default_host_lora_pi --> nix
-  default_host_lora_pi --> overlays
-  default_host_lora_pi --> den__batteries__self_
-  default_host_lora_pi --> den__batteries__sources
-  default_host_lora_pi --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__ivy_lora_pi
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_lora_pi --> fonts___when__4
   fonts_host_lora_pi --> fonts___when__5
   home_base --> shell
-  host --> darwin_base
-  host --> default_host_lora_pi
-  host --> fonts_host_lora_pi
-  host --> host__resolve_host_
-  host --> lora_pi
-  host --> nixos_general
-  host --> nixpkgs_config_host_lora_pi
-  host --> openssh
-  host --> pam_rssh_host_lora_pi
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
@@ -3468,7 +2829,6 @@ graph LR
   lora_pi --> nixos_raspberrypi
   nix --> nix___when__4
   nixpkgs_config_host_lora_pi --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -3482,7 +2842,6 @@ graph LR
   _policy_main_ssh_key__to_hosts__5_["<policy:main-ssh-key/to-hosts>[5]"]:::_policy_main_ssh_key__to_hosts__5__c
   _policy_nixvim_user_forward__6_["<policy:nixvim-user-forward>[6]"]:::_policy_nixvim_user_forward__6__c
   agenix_rekey__to_users["agenix-rekey/to-users"]:::agenix_rekey__to_users_c
-  default_user_ivy["default"]:::default_user_ivy_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   packages__eagle_nvim[/"packages/eagle-nvim"\]:::packages__eagle_nvim_c
   fish["fish"]:::fish_c
@@ -3517,25 +2876,16 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
-  user["user"]:::user_c
   user_shell__ivy_lora_pi{{"user-shell/ivy@lora-pi"}}:::user_shell__ivy_lora_pi_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   fish --> user_shell__ivy_lora_pi
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   ivy__lora_pi --> fish
   ivy__lora_pi --> gpg
   ivy__lora_pi --> neovim
   ivy__lora_pi --> den__batteries__primary_user_ivy_lora_pi_
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_ivy
   neovim --> nixvim
   neovim --> stylix
@@ -3544,26 +2894,11 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   rust --> lspmux
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_default__to_hosts__1_
-  user --> _policy_hm_user_detect__2_
-  user --> _policy_main_ssh_key__to_hosts__5_
-  user --> _policy_nixvim_user_forward__6_
-  user --> default_user_ivy
-  user --> fonts_user_ivy
-  user --> ivy
-  user --> ivy_fetch
-  user --> ivy__lora_pi
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_ivy
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__1__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_fish___anon__4__to_hosts__0__c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -3576,8 +2911,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_ivy_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__ivy_lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -3592,15 +2925,8 @@ graph LR
   classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -3673,13 +2999,8 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__ivy_lora_pi_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
 style ctx_host_lora_pi fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -3698,7 +3019,6 @@ graph LR
   macmini([macmini]):::root
 
   subgraph ctx_host_macmini["host: macmini"]
-  _anon_["<anon>"]:::_anon__c
   _policy__policy_onepassword_role_gui__51___to_hosts__0_["<policy:<policy:onepassword-role-gui>[51]/to-hosts>[0]"]:::_policy__policy_onepassword_role_gui__51___to_hosts__0__c
   _policy__policy_onepassword_role_gui__51___to_users__1_["<policy:<policy:onepassword-role-gui>[51]/to-users>[1]"]:::_policy__policy_onepassword_role_gui__51___to_users__1__c
   _policy_darwin_base_role_gui__2_["<policy:darwin-base-role-gui>[2]"]:::_policy_darwin_base_role_gui__2__c
@@ -3716,7 +3036,6 @@ graph LR
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_macmini["default"]:::default_host_macmini_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivypierlot_macmini{{"batteries/define-user/ivypierlot@macmini"}}:::den__batteries__define_user__ivypierlot_macmini_c
   difftastic["difftastic"]:::difftastic_c
@@ -3726,15 +3045,8 @@ graph LR
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
   homebrew_host_macmini["homebrew"]:::homebrew_host_macmini_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -3779,53 +3091,24 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_macmini --> agenix_rekey_host_macmini
-  default_host_macmini --> den__batteries__define_user
-  default_host_macmini --> extra_registry
-  default_host_macmini --> home_base
-  default_host_macmini --> host__resolve_default_
-  default_host_macmini --> den__batteries__hostname
-  default_host_macmini --> den__batteries__inputs_
-  default_host_macmini --> insecure_predicate
-  default_host_macmini --> lib
-  default_host_macmini --> nix
-  default_host_macmini --> overlays
-  default_host_macmini --> den__batteries__self_
-  default_host_macmini --> den__batteries__sources
-  default_host_macmini --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__ivypierlot_macmini
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_macmini --> fonts___when__4
   fonts_host_macmini --> fonts___when__5
   home_base --> shell_host_macmini
-  host --> darwin_base
-  host --> default_host_macmini
-  host --> fonts_host_macmini
-  host --> host__resolve_host_
-  host --> macmini
-  host --> nixos_general
-  host --> nixpkgs_config_host_macmini
-  host --> openssh
-  host --> pam_rssh_host_macmini
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
-  jujutsu___when__5 --> host__resolve__when__5_
   macmini --> homebrew_host_macmini
   nix --> nix___when__4
   nixpkgs_config_host_macmini --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell_host_macmini -.-x host__resolve_shell_
   shell_host_macmini --> jujutsu
   shell_host_macmini --> nix_index
   shell_host_macmini --> starship
@@ -3905,7 +3188,6 @@ graph LR
   packages__cotabby[/"packages/cotabby"\]:::packages__cotabby_c
   cotabby["cotabby"]:::cotabby_c
   cotabby_role_gui["cotabby-role-gui"]:::cotabby_role_gui_c
-  default_user_ivypierlot["default"]:::default_user_ivypierlot_c
   default_role_gui["default-role-gui"]:::default_role_gui_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   define_user_role_gui["define-user-role-gui"]:::define_user_role_gui_c
@@ -4026,19 +3308,8 @@ graph LR
   den__provides__unfree_libkey_nomad_onepassword_password_manager_{{"provides/unfree(libkey-nomad,onepassword-password-manager)"}}:::den__provides__unfree_libkey_nomad_onepassword_password_manager__c
   den__provides__unfree_onepassword_password_manager_{{"provides/unfree(onepassword-password-manager)"}}:::den__provides__unfree_onepassword_password_manager__c
   unfree_predicate_role_gui["unfree-predicate-role-gui"]:::unfree_predicate_role_gui_c
-  user["user"]:::user_c
   user_shell__ivypierlot_macmini{{"user-shell/ivypierlot@macmini"}}:::user_shell__ivypierlot_macmini_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve__when__4_["user/resolve(<when>:4)"]:::user__resolve__when__4__c
-  user__resolve__when__5_["user/resolve(<when>:5)"]:::user__resolve__when__5__c
-  user__resolve_dev_nix_{{"user/resolve(dev-nix)"}}:::user__resolve_dev_nix__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_jankyborders_{{"user/resolve(jankyborders)"}}:::user__resolve_jankyborders__c
-  user__resolve_kanata_{{"user/resolve(kanata)"}}:::user__resolve_kanata__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
-  user__resolve_zen_{{"user/resolve(zen)"}}:::user__resolve_zen__c
   wakatime["wakatime"]:::wakatime_c
   wakatime_role_gui["wakatime-role-gui"]:::wakatime_role_gui_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
@@ -4046,15 +3317,11 @@ graph LR
   packages__zotero_mcp[/"packages/zotero-mcp"\]:::packages__zotero_mcp_c
   zotero_mcp_role_gui["zotero-mcp-role-gui"]:::zotero_mcp_role_gui_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
-  browsers__zen --> user__resolve_zen_
   cotabby --> packages__cotabby
   dev --> dev_cli
   dev --> dev_nix
-  dev_nix --> user__resolve_dev_nix_
   fish --> shell_user_ivypierlot
   fish --> user_shell__ivypierlot_macmini
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ghostty --> packages__ghostty
   idris --> lspmux
   ivy_fetch --> packages__ivy_fetch
@@ -4082,12 +3349,8 @@ graph LR
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
   jankyborders --> packages__jankyborders
-  jankyborders --> user__resolve_jankyborders_
   kanata --> packages__kanata_tray
-  kanata --> user__resolve_kanata_
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_ivypierlot
   mcp_servers --> packages__jj_mcp_server
   mcp_servers --> packages__zotero_mcp
@@ -4098,90 +3361,14 @@ graph LR
   nixvim --> wakatime
   onepassword --> onepassword___when__5
   onepassword --> den__provides__unfree_onepassword_password_manager_
-  onepassword___when__5 --> user__resolve__when__5_
   opencode --> mcp_servers
   rift --> jankyborders
   sketchybar --> packages__sketchybar
   sketchybar --> packages__sketchybar_app_font
-  user --> _policy_agenix_rekey_role_gui__0_
-  user --> _policy_agenix_rekey__to_users__1_
-  user --> _policy_celler_push_role_gui__3_
-  user --> _policy_cotabby_role_gui__4_
-  user --> _policy_default_role_gui__5_
-  user --> _policy_default__to_hosts__6_
-  user --> _policy_define_user_role_gui__7_
-  user --> _policy_dev_cli_role_gui__8_
-  user --> _policy_dev_nix_role_gui__9_
-  user --> _policy_dev_role_gui__10_
-  user --> _policy_difftastic_role_gui__11_
-  user --> _policy_eagle_nvim_role_gui__12_
-  user --> _policy_extra_registry_role_gui__13_
-  user --> _policy_file_local_role_gui__14_
-  user --> _policy_fish_role_gui__15_
-  user --> _policy_fonts_role_gui__17_
-  user --> _policy_ghostty_role_gui__18_
-  user --> _policy_gpg_role_gui__19_
-  user --> _policy_gui_role_gui__20_
-  user --> _policy_hm_user_detect__21_
-  user --> _policy_home_base_role_gui__23_
-  user --> _policy_homebrew_role_gui__24_
-  user --> _policy_hostname_role_gui__25_
-  user --> _policy_idris_role_gui__26_
-  user --> _policy_inputs__role_gui__27_
-  user --> _policy_insecure_predicate_role_gui__28_
-  user --> _policy_ivy_fetch_role_gui__29_
-  user --> _policy_ivypierlot_role_gui__30_
-  user --> _policy_jankyborders_role_gui__32_
-  user --> _policy_jj_mcp_server_role_gui__33_
-  user --> _policy_jujutsu_role_gui__34_
-  user --> _policy_kanata_role_gui__35_
-  user --> _policy_lib_role_gui__37_
-  user --> _policy_llama_cpp_role_gui__38_
-  user --> _policy_lspmux_role_gui__39_
-  user --> _policy_main_ssh_key_role_gui__40_
-  user --> _policy_main_ssh_key__to_hosts__41_
-  user --> _policy_mcp_servers_role_gui__42_
-  user --> _policy_neovim_role_gui__43_
-  user --> _policy_nix_index_role_gui__45_
-  user --> _policy_nix_role_gui__46_
-  user --> _policy_nixpkgs_config_role_gui__47_
-  user --> _policy_nixvim_role_gui__48_
-  user --> _policy_nixvim_user_forward__49_
-  user --> _policy_nushell_role_gui__50_
-  user --> _policy_onepassword_role_gui__51_
-  user --> _policy_openclaw_role_gui__52_
-  user --> _policy_opencode_role_gui__53_
-  user --> _policy_overlays_role_gui__54_
-  user --> _policy_pam_rssh_role_gui__55_
-  user --> _policy_rift_role_gui__56_
-  user --> _policy_rust_role_gui__57_
-  user --> _policy_self__role_gui__58_
-  user --> _policy_shell_role_gui__59_
-  user --> _policy_sketchybar_role_gui__61_
-  user --> _policy_sketchybar_app_font_role_gui__62_
-  user --> _policy_sources_role_gui__63_
-  user --> _policy_starship_role_gui__64_
-  user --> _policy_stylix_role_gui__65_
-  user --> _policy_unfree_predicate_role_gui__66_
-  user --> _policy_wakatime_role_gui__67_
-  user --> _policy_zen_role_gui__68_
-  user --> _policy_zotero_mcp_role_gui__69_
-  user --> default_user_ivypierlot
-  user --> fonts_user_ivypierlot
-  user --> ivy_fetch
-  user --> ivypierlot
-  user --> ivypierlot__macmini
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_ivypierlot
-  user --> sudoagents
-  user --> neovim__to_users
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy__policy_onepassword_role_gui__51___to_hosts__0__c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy__policy_onepassword_role_gui__51___to_users__1__c fill:#bf8700,stroke:#bf8700,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_agenix_rekey_role_gui__0__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -4272,8 +3459,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_macmini_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -4314,15 +3499,8 @@ graph LR
   classDef homebrew_host_macmini_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef homebrew_user_ivypierlot_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef homebrew_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -4454,19 +3632,8 @@ graph LR
   classDef unfree_predicate_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__ivypierlot_macmini_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve__when__5__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_dev_nix__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_jankyborders__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_kanata__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_zen__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef wakatime_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
@@ -4489,13 +3656,11 @@ graph LR
   pentestvm([pentestvm]):::root
 
   subgraph ctx_host_pentestvm["host: pentestvm"]
-  _anon_["<anon>"]:::_anon__c
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_pentestvm["default"]:::default_host_pentestvm_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__admin_pentestvm{{"batteries/define-user/admin@pentestvm"}}:::den__batteries__define_user__admin_pentestvm_c
   difftastic["difftastic"]:::difftastic_c
@@ -4504,15 +3669,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -4557,51 +3715,23 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_pentestvm --> agenix_rekey
-  default_host_pentestvm --> den__batteries__define_user
-  default_host_pentestvm --> extra_registry
-  default_host_pentestvm --> home_base
-  default_host_pentestvm --> host__resolve_default_
-  default_host_pentestvm --> den__batteries__hostname
-  default_host_pentestvm --> den__batteries__inputs_
-  default_host_pentestvm --> insecure_predicate
-  default_host_pentestvm --> lib
-  default_host_pentestvm --> nix
-  default_host_pentestvm --> overlays
-  default_host_pentestvm --> den__batteries__self_
-  default_host_pentestvm --> den__batteries__sources
-  default_host_pentestvm --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__admin_pentestvm
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_pentestvm --> fonts___when__4
   fonts_host_pentestvm --> fonts___when__5
   home_base --> shell
-  host --> darwin_base
-  host --> default_host_pentestvm
-  host --> fonts_host_pentestvm
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_pentestvm
-  host --> openssh
-  host --> pam_rssh_host_pentestvm
-  host --> pentestvm
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_pentestvm --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -4616,7 +3746,6 @@ graph LR
   _policy_nixvim_user_forward__5_["<policy:nixvim-user-forward>[5]"]:::_policy_nixvim_user_forward__5__c
   admin{{"admin"}}:::admin_c
   agenix_rekey__to_users["agenix-rekey/to-users"]:::agenix_rekey__to_users_c
-  default_user_admin["default"]:::default_user_admin_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   fonts_user_admin["fonts"]:::fonts_user_admin_c
   hm_user_detect["hm-user-detect"]:::hm_user_detect_c
@@ -4639,30 +3768,14 @@ graph LR
   den__batteries__primary_user_admin_pentestvm_{{"batteries/primary-user(admin@pentestvm)"}}:::den__batteries__primary_user_admin_pentestvm__c
   route_casks_user_admin["route-casks"]:::route_casks_user_admin_c
   shell__to_users["shell/to-users"]:::shell__to_users_c
-  user["user"]:::user_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   admin --> den__batteries__primary_user_admin_pentestvm_
   ivy_fetch --> packages__ivy_fetch
   main_ssh_key --> pam_rssh_user_admin
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_default__to_hosts__1_
-  user --> _policy_hm_user_detect__2_
-  user --> _policy_main_ssh_key__to_hosts__4_
-  user --> _policy_nixvim_user_forward__5_
-  user --> admin
-  user --> default_user_admin
-  user --> fonts_user_admin
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_admin
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__1__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_hm_user_detect__2__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -4675,8 +3788,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_pentestvm_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_admin_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__admin_pentestvm_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -4688,15 +3799,8 @@ graph LR
   classDef fonts___when__5_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -4758,9 +3862,7 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
 style ctx_host_pentestvm fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 ```
@@ -4777,7 +3879,6 @@ graph LR
   secondpc([secondpc]):::root
 
   subgraph ctx_host_secondpc["host: secondpc"]
-  _anon_["<anon>"]:::_anon__c
   _policy_vpn_ssh_config__to_users__1_["<policy:vpn-ssh-config/to-users>[1]"]:::_policy_vpn_ssh_config__to_users__1__c
   agenix_rekey_host_secondpc["agenix-rekey"]:::agenix_rekey_host_secondpc_c
   builder_server["builder-server"]:::builder_server_c
@@ -4786,7 +3887,6 @@ graph LR
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_secondpc["default"]:::default_host_secondpc_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__auscyber_secondpc{{"batteries/define-user/auscyber@secondpc"}}:::den__batteries__define_user__auscyber_secondpc_c
   difftastic["difftastic"]:::difftastic_c
@@ -4797,18 +3897,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__4_["host/resolve(<when>:4)"]:::host__resolve__when__4__c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_nginx_{{"host/resolve(nginx)"}}:::host__resolve_nginx__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
-  host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -4865,52 +3955,23 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_secondpc --> den__batteries__define_user
-  default_host_secondpc --> extra_registry
-  default_host_secondpc --> home_base
-  default_host_secondpc --> host__resolve_default_
-  default_host_secondpc --> den__batteries__hostname
-  default_host_secondpc --> den__batteries__inputs_
-  default_host_secondpc --> insecure_predicate
-  default_host_secondpc --> lib
-  default_host_secondpc --> nix
-  default_host_secondpc --> overlays
-  default_host_secondpc --> den__batteries__self_
-  default_host_secondpc --> den__batteries__sources
-  default_host_secondpc --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__auscyber_secondpc
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_secondpc --> fonts___when__4
   fonts_host_secondpc --> fonts___when__5
   home_base --> shell_host_secondpc
-  host --> darwin_base
-  host --> default_host_secondpc
-  host --> fonts_host_secondpc
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_secondpc
-  host --> openssh
-  host --> pam_rssh_host_secondpc
-  host --> secondpc
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
-  nginx_host_secondpc --> host__resolve_nginx_
   nix --> nix___when__4
   nix --> nix___when__5
-  nix___when__4 --> host__resolve__when__4_
-  nix___when__5 -.-x host__resolve__when__5_
   nixpkgs_config_host_secondpc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
   secondpc --> builder_server
   secondpc --> builders
@@ -4924,13 +3985,11 @@ graph LR
   secondpc --> den__provides__unfree_intel_ocl_
   secondpc --> user_pwd_host_secondpc
   secondpc --> vpn_server
-  shell_host_secondpc -.-x host__resolve_shell_
   shell_host_secondpc --> jujutsu
   shell_host_secondpc --> nix_index
   shell_host_secondpc --> starship
   unfree_predicate --> unfree_predicate__os
   unfree_predicate --> unfree_predicate__user
-  vpn --> host__resolve_vpn_
   vpn --> vpn_secrets
   vpn --> vpn_ssh_config
   vpn_secrets --> agenix_rekey_host_secondpc
@@ -4950,7 +4009,6 @@ graph LR
   auscyber__to_hosts["auscyber/to-hosts"]:::auscyber__to_hosts_c
   celler["celler"]:::celler_c
   celler_push["celler-push"]:::celler_push_c
-  default_user_auscyber["default"]:::default_user_auscyber_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   packages__eagle_nvim[/"packages/eagle-nvim"\]:::packages__eagle_nvim_c
   fish["fish"]:::fish_c
@@ -4989,14 +4047,9 @@ graph LR
   stylix["stylix"]:::stylix_c
   den__provides__unfree_castlabs_electron_{{"provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__c
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
-  user["user"]:::user_c
   user_pwd_user_auscyber["user-pwd"]:::user_pwd_user_auscyber_c
   user_shell__auscyber_secondpc{{"user-shell/auscyber@secondpc"}}:::user_shell__auscyber_secondpc_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   _policy_auscyber__to_hosts__2_ --> user_pwd_user_auscyber
   auscyber --> celler_push
@@ -5009,12 +4062,8 @@ graph LR
   celler_push --> agenix_rekey_user_auscyber
   fish --> shell_user_auscyber
   fish --> user_shell__auscyber_secondpc
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_auscyber
   neovim --> nixvim
   neovim --> stylix
@@ -5025,28 +4074,11 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   rust --> lspmux
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_auscyber__to_hosts__2_
-  user --> _policy_default__to_hosts__3_
-  user --> _policy_hm_user_detect__5_
-  user --> _policy_main_ssh_key__to_hosts__7_
-  user --> _policy_nixvim_user_forward__9_
-  user --> auscyber
-  user --> default_user_auscyber
-  user --> fonts_user_auscyber
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_auscyber
-  user --> auscyber__secondpc
-  user --> nix__secondpc
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_auscyber__to_hosts__2__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__3__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -5068,8 +4100,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_secondpc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_auscyber_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__auscyber_secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -5087,18 +4117,8 @@ graph LR
   classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_nginx__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -5179,15 +4199,10 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_pwd_host_secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef user_pwd_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef user_shell__auscyber_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef vpn_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef vpn_server_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -5210,7 +4225,6 @@ graph LR
   surfacelaptop([surfacelaptop]):::root
 
   subgraph ctx_host_surfacelaptop["host: surfacelaptop"]
-  _anon_["<anon>"]:::_anon__c
   _policy_darwin_base_role_dev__0_["<policy:darwin-base-role-dev>[0]"]:::_policy_darwin_base_role_dev__0__c
   _policy_darwin_base_role_gui__1_["<policy:darwin-base-role-gui>[1]"]:::_policy_darwin_base_role_gui__1__c
   _policy_darwin_finder_role_dev__2_["<policy:darwin-finder-role-dev>[2]"]:::_policy_darwin_finder_role_dev__2__c
@@ -5252,7 +4266,6 @@ graph LR
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_surfacelaptop["default"]:::default_host_surfacelaptop_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__auscyber_surfacelaptop{{"batteries/define-user/auscyber@surfacelaptop"}}:::den__batteries__define_user__auscyber_surfacelaptop_c
   difftastic["difftastic"]:::difftastic_c
@@ -5261,16 +4274,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__4_["host/resolve(<when>:4)"]:::host__resolve__when__4__c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -5317,54 +4322,24 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_surfacelaptop --> agenix_rekey_host_surfacelaptop
-  default_host_surfacelaptop --> den__batteries__define_user
-  default_host_surfacelaptop --> extra_registry
-  default_host_surfacelaptop --> home_base
-  default_host_surfacelaptop --> host__resolve_default_
-  default_host_surfacelaptop --> den__batteries__hostname
-  default_host_surfacelaptop --> den__batteries__inputs_
-  default_host_surfacelaptop --> insecure_predicate
-  default_host_surfacelaptop --> lib
-  default_host_surfacelaptop --> nix
-  default_host_surfacelaptop --> overlays
-  default_host_surfacelaptop --> den__batteries__self_
-  default_host_surfacelaptop --> den__batteries__sources
-  default_host_surfacelaptop --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__auscyber_surfacelaptop
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_surfacelaptop --> fonts___when__4
   fonts_host_surfacelaptop --> fonts___when__5
   home_base --> shell_host_surfacelaptop
-  host --> darwin_base
-  host --> default_host_surfacelaptop
-  host --> fonts_host_surfacelaptop
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_surfacelaptop
-  host --> openssh
-  host --> pam_rssh_host_surfacelaptop
-  host --> surfacelaptop
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nix --> nix___when__5
-  nix___when__4 --> host__resolve__when__4_
-  nix___when__5 -.-x host__resolve__when__5_
   nixpkgs_config_host_surfacelaptop --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell_host_surfacelaptop -.-x host__resolve_shell_
   shell_host_surfacelaptop --> jujutsu
   shell_host_surfacelaptop --> nix_index
   shell_host_surfacelaptop --> starship
@@ -5446,7 +4421,6 @@ graph LR
   celler_push["celler-push"]:::celler_push_c
   celler_push_role_dev["celler-push-role-dev"]:::celler_push_role_dev_c
   celler_push_role_gui["celler-push-role-gui"]:::celler_push_role_gui_c
-  default_user_auscyber["default"]:::default_user_auscyber_c
   default_role_dev["default-role-dev"]:::default_role_dev_c
   default_role_gui["default-role-gui"]:::default_role_gui_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
@@ -5533,14 +4507,9 @@ graph LR
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
   unfree_predicate_role_dev["unfree-predicate-role-dev"]:::unfree_predicate_role_dev_c
   unfree_predicate_role_gui["unfree-predicate-role-gui"]:::unfree_predicate_role_gui_c
-  user["user"]:::user_c
   user_pwd["user-pwd"]:::user_pwd_c
   user_shell__auscyber_surfacelaptop{{"user-shell/auscyber@surfacelaptop"}}:::user_shell__auscyber_surfacelaptop_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_lspmux_{{"user/resolve(lspmux)"}}:::user__resolve_lspmux__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   wakatime["wakatime"]:::wakatime_c
   _policy_auscyber__to_hosts__6_ --> user_pwd
   auscyber --> celler_push
@@ -5553,12 +4522,8 @@ graph LR
   celler_push --> agenix_rekey_user_auscyber
   fish --> shell_user_auscyber
   fish --> user_shell__auscyber_surfacelaptop
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   lspmux --> packages__lspmux
-  lspmux --> user__resolve__anon__4_
-  lspmux --> user__resolve_lspmux_
   main_ssh_key --> pam_rssh_user_auscyber
   neovim --> nixvim
   neovim --> stylix
@@ -5567,83 +4532,11 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   rust --> lspmux
-  user --> _policy_agenix_rekey_role_dev__0_
-  user --> _policy_agenix_rekey_role_gui__1_
-  user --> _policy_agenix_rekey__to_users__2_
-  user --> _policy_auscyber_role_dev__3_
-  user --> _policy_auscyber_role_gui__4_
-  user --> _policy_auscyber__to_hosts__6_
-  user --> _policy_celler_push_role_dev__7_
-  user --> _policy_celler_push_role_gui__8_
-  user --> _policy_default_role_dev__9_
-  user --> _policy_default_role_gui__10_
-  user --> _policy_default__to_hosts__11_
-  user --> _policy_define_user_role_dev__12_
-  user --> _policy_define_user_role_gui__13_
-  user --> _policy_difftastic_role_dev__14_
-  user --> _policy_difftastic_role_gui__15_
-  user --> _policy_extra_registry_role_dev__16_
-  user --> _policy_extra_registry_role_gui__17_
-  user --> _policy_fish_role_dev__18_
-  user --> _policy_fish_role_gui__19_
-  user --> _policy_fonts_role_dev__21_
-  user --> _policy_fonts_role_gui__22_
-  user --> _policy_hm_user_detect__23_
-  user --> _policy_home_base_role_dev__25_
-  user --> _policy_home_base_role_gui__26_
-  user --> _policy_hostname_role_dev__27_
-  user --> _policy_hostname_role_gui__28_
-  user --> _policy_inputs__role_dev__29_
-  user --> _policy_inputs__role_gui__30_
-  user --> _policy_insecure_predicate_role_dev__31_
-  user --> _policy_insecure_predicate_role_gui__32_
-  user --> _policy_ivy_fetch_role_dev__33_
-  user --> _policy_ivy_fetch_role_gui__34_
-  user --> _policy_jujutsu_role_dev__35_
-  user --> _policy_jujutsu_role_gui__36_
-  user --> _policy_lib_role_dev__37_
-  user --> _policy_lib_role_gui__38_
-  user --> _policy_lix_role_dev__39_
-  user --> _policy_lix_role_gui__40_
-  user --> _policy_main_ssh_key_role_dev__41_
-  user --> _policy_main_ssh_key_role_gui__42_
-  user --> _policy_main_ssh_key__to_hosts__43_
-  user --> _policy_nix_index_role_dev__44_
-  user --> _policy_nix_index_role_gui__45_
-  user --> _policy_nix_role_dev__46_
-  user --> _policy_nix_role_gui__47_
-  user --> _policy_nixpkgs_config_role_dev__48_
-  user --> _policy_nixpkgs_config_role_gui__49_
-  user --> _policy_nixvim_user_forward__50_
-  user --> _policy_overlays_role_dev__51_
-  user --> _policy_overlays_role_gui__52_
-  user --> _policy_pam_rssh_role_dev__53_
-  user --> _policy_pam_rssh_role_gui__54_
-  user --> _policy_self__role_dev__55_
-  user --> _policy_self__role_gui__56_
-  user --> _policy_shell_role_dev__57_
-  user --> _policy_shell_role_gui__58_
-  user --> _policy_sources_role_dev__60_
-  user --> _policy_sources_role_gui__61_
-  user --> _policy_starship_role_dev__62_
-  user --> _policy_starship_role_gui__63_
-  user --> _policy_unfree_predicate_role_dev__64_
-  user --> _policy_unfree_predicate_role_gui__65_
-  user --> auscyber
-  user --> default_user_auscyber
-  user --> fonts_user_auscyber
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixpkgs_config_user_auscyber
-  user --> auscyber__surfacelaptop
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey_role_dev__0__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_agenix_rekey_role_gui__1__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_agenix_rekey__to_users__2__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -5759,8 +4652,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_surfacelaptop_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_auscyber_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -5790,16 +4681,8 @@ graph LR
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef home_base_role_dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_role_gui_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef hostname_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -5909,14 +4792,9 @@ graph LR
   classDef unfree_predicate_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_pwd_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef user_shell__auscyber_surfacelaptop_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_lspmux__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
 style ctx_host_surfacelaptop fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -5934,13 +4812,11 @@ graph LR
   wsl_nixos([wsl-nixos]):::root
 
   subgraph ctx_host_wsl_nixos["host: wsl-nixos"]
-  _anon_["<anon>"]:::_anon__c
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
   darwin_hmApps["darwin-hmApps"]:::darwin_hmApps_c
-  default_host_wsl_nixos["default"]:::default_host_wsl_nixos_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__nixos_wsl_nixos{{"batteries/define-user/nixos@wsl-nixos"}}:::den__batteries__define_user__nixos_wsl_nixos_c
   difftastic["difftastic"]:::difftastic_c
@@ -5949,15 +4825,8 @@ graph LR
   fonts___when__4["fonts/<when>:4"]:::fonts___when__4_c
   fonts___when__5["fonts/<when>:5"]:::fonts___when__5_c
   home_base["home-base"]:::home_base_c
-  host["host"]:::host_c
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
-  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
-  host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
-  host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
-  host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
-  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
-  host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -6002,51 +4871,23 @@ graph LR
   darwin_base --> darwin_general
   darwin_base --> darwin_hmApps
   darwin_base --> pam_touchid
-  default_host_wsl_nixos --> agenix_rekey
-  default_host_wsl_nixos --> den__batteries__define_user
-  default_host_wsl_nixos --> extra_registry
-  default_host_wsl_nixos --> home_base
-  default_host_wsl_nixos --> host__resolve_default_
-  default_host_wsl_nixos --> den__batteries__hostname
-  default_host_wsl_nixos --> den__batteries__inputs_
-  default_host_wsl_nixos --> insecure_predicate
-  default_host_wsl_nixos --> lib
-  default_host_wsl_nixos --> nix
-  default_host_wsl_nixos --> overlays
-  default_host_wsl_nixos --> den__batteries__self_
-  default_host_wsl_nixos --> den__batteries__sources
-  default_host_wsl_nixos --> unfree_predicate
   den__batteries__define_user --> den__batteries__define_user__nixos_wsl_nixos
   den__batteries__hostname --> den__batteries__hostname__os
   den__batteries__inputs_ --> den__batteries__inputs___os
   den__batteries__inputs_ --> den__batteries__inputs___user
-  den__batteries__inputs___user --> host__resolve_user_
   den__batteries__self_ --> den__batteries__self___os
   den__batteries__self_ --> den__batteries__self___user
-  den__batteries__self___user --> host__resolve_user_
   den__batteries__sources --> den__batteries__sources__os
   den__batteries__sources --> den__batteries__sources__user
-  den__batteries__sources__user --> host__resolve_user_
-  difftastic --> host__resolve_difftastic_
   fonts_host_wsl_nixos --> fonts___when__4
   fonts_host_wsl_nixos --> fonts___when__5
   home_base --> shell_host_wsl_nixos
-  host --> darwin_base
-  host --> default_host_wsl_nixos
-  host --> fonts_host_wsl_nixos
-  host --> host__resolve_host_
-  host --> nixos_general
-  host --> nixpkgs_config_host_wsl_nixos
-  host --> openssh
-  host --> pam_rssh_host_wsl_nixos
-  host --> wsl_nixos
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
   jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_wsl_nixos --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
-  shell_host_wsl_nixos -.-x host__resolve_shell_
   shell_host_wsl_nixos --> jujutsu
   shell_host_wsl_nixos --> nix_index
   shell_host_wsl_nixos --> starship
@@ -6060,7 +4901,6 @@ graph LR
   _policy_main_ssh_key__to_hosts__5_["<policy:main-ssh-key/to-hosts>[5]"]:::_policy_main_ssh_key__to_hosts__5__c
   _policy_nixvim_user_forward__7_["<policy:nixvim-user-forward>[7]"]:::_policy_nixvim_user_forward__7__c
   agenix_rekey__to_users["agenix-rekey/to-users"]:::agenix_rekey__to_users_c
-  default_user_nixos["default"]:::default_user_nixos_c
   default__to_hosts["default/to-hosts"]:::default__to_hosts_c
   fish["fish"]:::fish_c
   fish___anon__4__to_hosts["fish/<anon>:4/to-hosts"]:::fish___anon__4__to_hosts_c
@@ -6089,41 +4929,19 @@ graph LR
   route_casks_user_nixos["route-casks"]:::route_casks_user_nixos_c
   shell_user_nixos["shell"]:::shell_user_nixos_c
   shell__to_users["shell/to-users"]:::shell__to_users_c
-  user["user"]:::user_c
   user_shell__nixos_wsl_nixos{{"user-shell/nixos@wsl-nixos"}}:::user_shell__nixos_wsl_nixos_c
   user_to_host["user-to-host"]:::user_to_host_c
-  user__resolve__anon__4_["user/resolve(<anon>:4)"]:::user__resolve__anon__4__c
-  user__resolve_fish_{{"user/resolve(fish)"}}:::user__resolve_fish__c
-  user__resolve_user_["user/resolve(user)"]:::user__resolve_user__c
   fish --> shell_user_nixos
   fish --> user_shell__nixos_wsl_nixos
-  fish --> user__resolve__anon__4_
-  fish --> user__resolve_fish_
   ivy_fetch --> packages__ivy_fetch
   main_ssh_key --> pam_rssh_user_nixos
   nixos --> fish
   nixos --> den__batteries__primary_user_nixos_wsl_nixos_
-  user --> _policy_agenix_rekey__to_users__0_
-  user --> _policy_default__to_hosts__1_
-  user --> _policy_hm_user_detect__3_
-  user --> _policy_main_ssh_key__to_hosts__5_
-  user --> _policy_nixvim_user_forward__7_
-  user --> default_user_nixos
-  user --> fonts_user_nixos
-  user --> ivy_fetch
-  user --> main_ssh_key
-  user --> nixos
-  user --> wsl_nixos__nixos
-  user --> nixpkgs_config_user_nixos
-  user --> nixos__to_users
-  user --> shell__to_users
-  user --> user__resolve_user_
   end
 
   wsl_nixos -.->|provides| wsl_nixos__nixos
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
-  classDef _anon__c fill:#e16f24,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef _policy_agenix_rekey__to_users__0__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_default__to_hosts__1__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef _policy_hm_user_detect__3__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -6135,8 +4953,6 @@ graph LR
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
-  classDef default_host_wsl_nixos_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef default_user_nixos_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef default__to_hosts_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__nixos_wsl_nixos_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -6150,15 +4966,8 @@ graph LR
   classDef fonts___when__5_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef hm_user_detect_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef host__resolve__when__5__c fill:#4d2d00,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -6223,12 +5032,8 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
-  classDef user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef user_shell__nixos_wsl_nixos_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef user_to_host_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef user__resolve__anon__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_fish__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
-  classDef user__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef wsl_nixos_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
 style ctx_host_wsl_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
