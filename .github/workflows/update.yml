@@ -14,6 +14,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Generate GitHub App Token
       id: app-token
+      continue-on-error: true
       uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
       with:
         app-id: ${{ secrets.APP_ID }}
@@ -32,14 +33,14 @@ jobs:
       id: cpr
       uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
       with:
-       token: ${{ steps.app-token.outputs.token }}
+       token: ${{ steps.app-token.outputs.token || github.token }}
        commit-message: "chore(deps): update flake inputs"
        title: "chore(deps): update flake inputs"
        branch: update-flake
-       sign-commits: true
+       sign-commits: ${{ steps.app-token.outcome == 'success' }}
     - name: Enable auto-merge
       if: steps.cpr.outputs.pull-request-number
       run: |
        gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
       env:
-       GH_TOKEN: ${{ steps.app-token.outputs.token }}
+       GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
