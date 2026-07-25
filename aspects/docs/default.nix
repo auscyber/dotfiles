@@ -101,11 +101,20 @@ in
               scheme = "catppuccin-mocha";
             };
           };
+
+          # Same node set the diagram renders, as a plain sorted list of
+          # display labels -- host/user scoped duplicates (e.g. "shell"
+          # applied at both host and user level) collapse to one entry
+          # since they share a label, and the root itself is excluded.
+          aspectNames = lib.unique (
+            map (n: n.label) (builtins.filter (n: n.id != gFiltered.rootId) gFiltered.nodes)
+          );
         in
         {
           mermaid = diagram.toMermaid gFiltered;
           svg = rc.mmdSourceToSvg hostName (diagram.toMermaid gFiltered);
           dot = diagram.toDot gFiltered;
+          aspects = lib.sort (a: b: a < b) aspectNames;
         };
 
       # Build diagrams for all hosts
@@ -127,6 +136,7 @@ in
           system = host.system or "unknown";
           roles = lib.concatStringsSep ", " (host.roles or [ ]);
           mermaid = hostDiagrams.${hostName}.mermaid;
+          aspects = hostDiagrams.${hostName}.aspects;
         }) allHosts;
 
         packages = packageList;

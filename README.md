@@ -20,6 +20,84 @@
 **Architecture:** `aarch64-darwin`
 **Roles:** study, gui, dev
 
+### Aspects
+- Ivys-MacBook-Pro/to-users
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/ivypierlot@Ivys-MacBook-Pro
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(ivypierlot@Ivys-MacBook-Pro)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- browsers
+- browsers/zen
+- ccache
+- ccache/Ivys-MacBook-Pro
+- celler-push
+- cotabby
+- darwin-base
+- darwin-finder
+- darwin-general
+- darwin-hmApps
+- dev
+- dev-cli
+- file-local
+- fish
+- ghostty
+- gpg
+- gui
+- home-base
+- homebrew
+- idris
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- ivypierlot
+- jujutsu
+- karabiner-driver
+- lib
+- llama-cpp
+- main-ssh-key
+- mcp-servers
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixpkgs-config
+- nixvim
+- nushell
+- onepassword
+- openclaw
+- opencode
+- overlays
+- pam-rssh
+- pam-touchid
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(libkey-nomad,onepassword-password-manager)
+- provides/unfree(onepassword-password-manager)
+- rift
+- shell
+- shell/to-users
+- sketchybar
+- starship
+- stylix
+- sudoagents
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/ivypierlot@Ivys-MacBook-Pro
+- vpn
+- vpn-secrets
+- wakatime
+- zotero
+
 ### Aspect Graph
 
 ```mermaid
@@ -261,6 +339,75 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 **Architecture:** `x86_64-linux`
 **Roles:** gui, gaming, dev
 
+### Aspects
+- agenix-rekey
+- auscyber
+- auscyber/auspc
+- auspc/to-users
+- batteries/define-user
+- batteries/define-user/auscyber@auspc
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(auscyber@auspc)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- bootlogo
+- builder-server
+- cachyos-kernel
+- ccache
+- ccache/auspc
+- celler-push
+- den/provides/unfree(castlabs-electron)
+- dev
+- dev-cli
+- disko
+- fish
+- ghostty
+- gpg
+- gui
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- jujutsu
+- lib
+- main-ssh-key
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixos-general
+- nixpkgs-config
+- nixvim
+- nushell
+- onepassword
+- openssh
+- overlays
+- packages
+- packages/proton-ge-bin
+- pam-rssh
+- plasma
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(onepassword-password-manager)
+- secure-boot
+- shell
+- shell/to-users
+- starship
+- stylix
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/auscyber@auspc
+- vpn
+- vpn-secrets
+- wakatime
+
 ### Aspect Graph
 
 ```mermaid
@@ -471,6 +618,54 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 **Architecture:** `x86_64-linux`
 
+### Aspects
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/ivy@imflopet
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(ivy@imflopet)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- fish
+- gpg
+- home-base
+- imflopet/to-users
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy
+- ivy-fetch
+- ivy/imflopet
+- jujutsu
+- lib
+- main-ssh-key
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixos-general
+- nixpkgs-config
+- nixvim
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- shell
+- shell/to-users
+- starship
+- stylix
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/ivy@imflopet
+- wakatime
+
 ### Aspect Graph
 
 ```mermaid
@@ -613,6 +808,54 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 ## lora-pi
 
 **Architecture:** `aarch64-linux`
+
+### Aspects
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/ivy@lora-pi
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(ivy@lora-pi)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- fish
+- gpg
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy
+- ivy-fetch
+- ivy/lora-pi
+- jujutsu
+- lib
+- main-ssh-key
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixos-general
+- nixos-raspberrypi
+- nixpkgs-config
+- nixvim
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- shell
+- shell/to-users
+- starship
+- stylix
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/ivy@lora-pi
+- wakatime
 
 ### Aspect Graph
 
@@ -757,6 +1000,77 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 **Architecture:** `aarch64-darwin`
 **Roles:** gui
+
+### Aspects
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/ivypierlot@macmini
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(ivypierlot@macmini)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- browsers
+- browsers/zen
+- celler-push
+- cotabby
+- darwin-base
+- darwin-finder
+- darwin-general
+- darwin-hmApps
+- dev
+- dev-cli
+- file-local
+- fish
+- ghostty
+- gpg
+- gui
+- home-base
+- homebrew
+- idris
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- ivypierlot
+- jujutsu
+- lib
+- llama-cpp
+- main-ssh-key
+- mcp-servers
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixpkgs-config
+- nixvim
+- nushell
+- onepassword
+- openclaw
+- opencode
+- overlays
+- pam-rssh
+- pam-touchid
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(libkey-nomad,onepassword-password-manager)
+- provides/unfree(onepassword-password-manager)
+- rift
+- shell
+- shell/to-users
+- sketchybar
+- starship
+- stylix
+- sudoagents
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/ivypierlot@macmini
+- wakatime
 
 ### Aspect Graph
 
@@ -974,6 +1288,43 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 **Architecture:** `x86_64-linux`
 
+### Aspects
+- admin
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/admin@pentestvm
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(admin@pentestvm)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- jujutsu
+- lib
+- main-ssh-key
+- nix
+- nix-index
+- nixos-general
+- nixpkgs-config
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- shell
+- shell/to-users
+- starship
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+
 ### Aspect Graph
 
 ```mermaid
@@ -1084,6 +1435,68 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 ## secondpc
 
 **Architecture:** `x86_64-linux`
+
+### Aspects
+- agenix-rekey
+- auscyber
+- auscyber/secondpc
+- batteries/define-user
+- batteries/define-user/auscyber@secondpc
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(auscyber@secondpc)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- builder-server
+- builders
+- celler
+- celler-push
+- disko
+- fish
+- gpg
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- jujutsu
+- lib
+- local
+- main-ssh-key
+- neovim
+- neovim/to-users
+- nginx
+- nix
+- nix-index
+- nix/secondpc
+- nixos-general
+- nixpkgs-config
+- nixvim
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(castlabs-electron)
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(intel-ocl)
+- searchix
+- secondpc-web
+- shell
+- shell/to-users
+- starship
+- stylix
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/auscyber@secondpc
+- vpn
+- vpn-secrets
+- vpn-server
+- wakatime
 
 ### Aspect Graph
 
@@ -1278,6 +1691,55 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 **Architecture:** `x86_64-linux`
 **Roles:** gui, dev
 
+### Aspects
+- agenix-rekey
+- auscyber
+- auscyber/surfacelaptop
+- batteries/define-user
+- batteries/define-user/auscyber@surfacelaptop
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(auscyber@surfacelaptop)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- celler-push
+- fish
+- gpg
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- jujutsu
+- lib
+- main-ssh-key
+- neovim
+- neovim/to-users
+- nix
+- nix-index
+- nixos-general
+- nixpkgs-config
+- nixvim
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(castlabs-electron)
+- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- shell
+- shell/to-users
+- starship
+- stylix
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/auscyber@surfacelaptop
+- wakatime
+
 ### Aspect Graph
 
 ```mermaid
@@ -1426,6 +1888,46 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 ## wsl-nixos
 
 **Architecture:** `x86_64-linux`
+
+### Aspects
+- agenix-rekey
+- batteries/define-user
+- batteries/define-user/nixos@wsl-nixos
+- batteries/hostname
+- batteries/hostname/os
+- batteries/inputs&#39;
+- batteries/inputs&#39;/os
+- batteries/primary-user(nixos@wsl-nixos)
+- batteries/self&#39;
+- batteries/self&#39;/os
+- batteries/sources
+- batteries/sources/os
+- fish
+- home-base
+- insecure-predicate
+- insecure-predicate/os
+- insecure-predicate/user
+- ivy-fetch
+- jujutsu
+- lib
+- main-ssh-key
+- nix
+- nix-index
+- nixos
+- nixos-general
+- nixos/to-users
+- nixpkgs-config
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- shell
+- shell/to-users
+- starship
+- unfree-predicate
+- unfree-predicate/os
+- unfree-predicate/user
+- user-shell/nixos@wsl-nixos
 
 ### Aspect Graph
 
