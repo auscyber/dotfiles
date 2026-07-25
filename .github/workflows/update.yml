@@ -24,9 +24,9 @@ jobs:
       with:
         # use lix main
         extra-conf: |
-          experimental-features = nix-command flakes
+          experimental-features = nix-command flakes pipe-operators
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - name: run ipdate
+    - name: run update
       run: nix run .#update
     - name: Create Pull Request
       id: cpr
