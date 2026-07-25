@@ -27,13 +27,16 @@
               }:
               let
                 settingsFile = prev.writeText "user_settings.py" (toPySettings settings);
+                proton = geProton.steamcompattool;
               in
-              prev.runCommand "${geProton.name}-with-settings" { } ''
-                mkdir -p $out
-                cp -r ${geProton}/. $out/
-                chmod -R u+w $out
-                cp ${settingsFile} $out/user_settings.py
-              '';
+              prev.runCommand "${geProton.pname}-${geProton.version}-with-settings"
+                { outputs = [ "steamcompattool" ]; }
+                ''
+                  mkdir -p $steamcompattool
+                  cp -r ${proton}/. $steamcompattool/
+                  chmod -R u+w $steamcompattool
+                  cp ${settingsFile} $steamcompattool/user_settings.py
+                '';
           in
           lib.makeOverridable build;
         proton-ge-bin = prev.proton-ge-bin.overrideAttrs { inherit (sources.proton-ge-bin) src version; };
