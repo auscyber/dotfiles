@@ -1,6 +1,5 @@
 { den, ... }: {
-  den.hosts.x86_64-linux.contabo = {
-    users.ivy = { };
+  den.homes.x86_64-linux."ivy@contabo" = {
   };
 
   den.aspects.contabo = { };
