@@ -46,28 +46,30 @@ in
             name = hostName;
           };
 
-          # filterUserAspects/simplified don't touch these: the `isPolicyDispatch`
-          # node field turned out not to be set on them (verified against actual
-          # generated output, not just the library source). What's actually
-          # reliable is the rendered label -- every one of these nodes has a
-          # label starting with `<policy:`, e.g. `<policy:ccache-role-dev>[6]`
-          # or the nested `<policy:<policy:onepassword-role-gui>[132]/to-hosts>[0]`.
-          # There's one per aspect x role combination, and they dominate node
-          # count on any host with roles. Match on the label directly instead
-          # of trusting the isPolicyDispatch flag.
-          gSimplified = diagram.graph.simplified g;
+          # `simplified` was pulling in `aspectsOnly`, which unconditionally
+          # drops every edge tagged style = "provide" (provider-provenance
+          # edges). For several nodes -- including, on some no-role hosts,
+          # literally every edge out of the host root -- that "provide" edge
+          # was their ONLY connection, so `simplified` left them as
+          # disconnected floating nodes (confirmed: 7-11 orphaned nodes per
+          # host after regenerating, with the host root itself orphaned on
+          # 5 of them). Use `filterUserAspects` instead: it drops the same
+          # <anon>/resolve(...)/wrapper noise but keeps every edge,
+          # including "provide" ones, so real structural connections aren't
+          # severed as a side effect of "simplifying".
           isPolicyNode = n: (builtins.match "<policy:.*" n.label) != null;
+          gBase = diagram.graph.filterUserAspects g;
           policyKeptIds = lib.listToAttrs (
             map (n: {
               name = n.id;
               value = true;
-            }) (builtins.filter (n: !(isPolicyNode n)) gSimplified.nodes)
+            }) (builtins.filter (n: !(isPolicyNode n)) gBase.nodes)
           );
-          gNoPolicy = gSimplified // {
-            nodes = builtins.filter (n: policyKeptIds ? ${n.id}) gSimplified.nodes;
+          gNoPolicy = gBase // {
+            nodes = builtins.filter (n: policyKeptIds ? ${n.id}) gBase.nodes;
             edges = builtins.filter (
               e: policyKeptIds ? ${e.from} && policyKeptIds ? ${e.to}
-            ) gSimplified.edges;
+            ) gBase.edges;
           };
 
           # `den` traces the WHOLE aspect tree for every host regardless of
