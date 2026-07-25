@@ -46,6 +46,11 @@ in
             name = hostName;
           };
 
+          # Drop pipeline noise (<anon>, resolve(...) bookkeeping, policy
+          # plumbing) so the rendered graph reflects aspects a user actually
+          # declared instead of every internal resolution step.
+          gFiltered = diagram.graph.filterUserAspects g;
+
           rc = diagram.renderContext {
             inherit pkgs;
             theme = diagram.themeFromBase16 {
@@ -55,9 +60,9 @@ in
           };
         in
         {
-          mermaid = diagram.toMermaid g;
-          svg = rc.mmdSourceToSvg hostName (diagram.toMermaid g);
-          dot = diagram.toDot g;
+          mermaid = diagram.toMermaid gFiltered;
+          svg = rc.mmdSourceToSvg hostName (diagram.toMermaid gFiltered);
+          dot = diagram.toDot gFiltered;
         };
 
       # Build diagrams for all hosts
