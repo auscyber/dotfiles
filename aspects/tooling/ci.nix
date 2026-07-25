@@ -52,7 +52,7 @@ let
         acc
         // {
           ${s} = (acc.${s} or { }) // {
-            "${name} (${class})" = toplevelF cfg;
+            "${class}-${name}" = toplevelF cfg;
           };
         };
       addSystem = add {
