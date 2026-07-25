@@ -114,9 +114,11 @@ graph LR
   host_to_hm_users["host-to-hm-users"]:::host_to_hm_users_c
   host_to_users["host-to-users"]:::host_to_users_c
   host__resolve__when__4_["host/resolve(<when>:4)"]:::host__resolve__when__4__c
+  host__resolve__when__5_["host/resolve(<when>:5)"]:::host__resolve__when__5__c
   host__resolve_default_["host/resolve(default)"]:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
@@ -128,6 +130,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   karabiner_driver["karabiner-driver"]:::karabiner_driver_c
   kind_system_routes_host_Ivys_MacBook_Pro["kind-system-routes"]:::kind_system_routes_host_Ivys_MacBook_Pro_c
   lib["lib"]:::lib_c
@@ -217,8 +220,11 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
+  jujutsu___when__5 --> host__resolve__when__5_
   nix --> nix___when__5
   nixpkgs_config_host_Ivys_MacBook_Pro --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_Ivys_MacBook_Pro -.-x host__resolve_shell_
   shell_host_Ivys_MacBook_Pro --> jujutsu
   shell_host_Ivys_MacBook_Pro --> nix_index
   shell_host_Ivys_MacBook_Pro --> starship
@@ -1279,9 +1285,11 @@ graph LR
   classDef host_to_hm_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host_to_users_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef host__resolve__when__4__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve__when__5__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_default__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -1328,6 +1336,7 @@ graph LR
   classDef jujutsu_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_role_study_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kanata_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef kanata_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kanata_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -1687,6 +1696,7 @@ graph LR
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_gpus_{{"host/resolve(gpus)"}}:::host__resolve_gpus__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
@@ -1698,6 +1708,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_auspc["kind-system-routes"]:::kind_system_routes_host_auspc_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -1792,11 +1803,13 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nix --> nix___when__5
   nix___when__4 --> host__resolve__when__4_
   nix___when__5 -.-x host__resolve__when__5_
   nixpkgs_config_host_auspc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_auspc -.-x host__resolve_shell_
   shell_host_auspc --> jujutsu
   shell_host_auspc --> nix_index
   shell_host_auspc --> starship
@@ -2487,6 +2500,7 @@ graph LR
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_gpus__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -2515,6 +2529,7 @@ graph LR
   classDef jujutsu_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_role_gaming_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_auspc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -2676,6 +2691,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -2686,6 +2702,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_contabo["kind-system-routes"]:::kind_system_routes_host_contabo_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -2762,8 +2779,10 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_contabo --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -2892,6 +2911,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -2906,6 +2926,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivy__contabo_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_contabo_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_ivy_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -3009,6 +3030,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -3019,6 +3041,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_imflopet["kind-system-routes"]:::kind_system_routes_host_imflopet_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -3096,8 +3119,10 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_imflopet --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -3229,6 +3254,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -3244,6 +3270,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivy__imflopet_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_imflopet_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_ivy_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -3348,6 +3375,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -3358,6 +3386,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_lora_pi["kind-system-routes"]:::kind_system_routes_host_lora_pi_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -3435,9 +3464,11 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   lora_pi --> nixos_raspberrypi
   nix --> nix___when__4
   nixpkgs_config_host_lora_pi --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -3568,6 +3599,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -3582,6 +3614,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivy__lora_pi_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_lora_pi_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_ivy_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -3700,6 +3733,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -3710,6 +3744,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_macmini["kind-system-routes"]:::kind_system_routes_host_macmini_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -3785,9 +3820,12 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
+  jujutsu___when__5 --> host__resolve__when__5_
   macmini --> homebrew_host_macmini
   nix --> nix___when__4
   nixpkgs_config_host_macmini --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_macmini -.-x host__resolve_shell_
   shell_host_macmini --> jujutsu
   shell_host_macmini --> nix_index
   shell_host_macmini --> starship
@@ -4283,6 +4321,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -4310,6 +4349,7 @@ graph LR
   classDef jj_mcp_server_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kanata_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef kanata_role_gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef packages__kanata_tray_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -4471,6 +4511,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -4481,6 +4522,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_pentestvm["kind-system-routes"]:::kind_system_routes_host_pentestvm_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -4556,8 +4598,10 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_pentestvm --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell -.-x host__resolve_shell_
   shell --> jujutsu
   shell --> nix_index
   shell --> starship
@@ -4651,6 +4695,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -4663,6 +4708,7 @@ graph LR
   classDef packages__ivy_fetch_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_pentestvm_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_admin_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -4760,6 +4806,7 @@ graph LR
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
   host__resolve_nginx_{{"host/resolve(nginx)"}}:::host__resolve_nginx__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   host__resolve_vpn_{{"host/resolve(vpn)"}}:::host__resolve_vpn__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
@@ -4771,6 +4818,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_secondpc["kind-system-routes"]:::kind_system_routes_host_secondpc_c
   lib["lib"]:::lib_c
   local["local"]:::local_c
@@ -4857,6 +4905,7 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nginx_host_secondpc --> host__resolve_nginx_
   nix --> nix___when__4
   nix --> nix___when__5
@@ -4875,6 +4924,7 @@ graph LR
   secondpc --> den__provides__unfree_intel_ocl_
   secondpc --> user_pwd_host_secondpc
   secondpc --> vpn_server
+  shell_host_secondpc -.-x host__resolve_shell_
   shell_host_secondpc --> jujutsu
   shell_host_secondpc --> nix_index
   shell_host_secondpc --> starship
@@ -5046,6 +5096,7 @@ graph LR
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_nginx__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_vpn__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -5059,6 +5110,7 @@ graph LR
   classDef packages__ivy_fetch_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -5217,6 +5269,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -5227,6 +5280,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_surfacelaptop["kind-system-routes"]:::kind_system_routes_host_surfacelaptop_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -5304,11 +5358,13 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nix --> nix___when__5
   nix___when__4 --> host__resolve__when__4_
   nix___when__5 -.-x host__resolve__when__5_
   nixpkgs_config_host_surfacelaptop --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_surfacelaptop -.-x host__resolve_shell_
   shell_host_surfacelaptop --> jujutsu
   shell_host_surfacelaptop --> nix_index
   shell_host_surfacelaptop --> starship
@@ -5742,6 +5798,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef hostname_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
@@ -5764,6 +5821,7 @@ graph LR
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_role_dev_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_role_gui_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_surfacelaptop_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -5898,6 +5956,7 @@ graph LR
   host__resolve_default_{{"host/resolve(default)"}}:::host__resolve_default__c
   host__resolve_difftastic_{{"host/resolve(difftastic)"}}:::host__resolve_difftastic__c
   host__resolve_host_["host/resolve(host)"]:::host__resolve_host__c
+  host__resolve_shell_["host/resolve(shell)"]:::host__resolve_shell__c
   host__resolve_user_["host/resolve(user)"]:::host__resolve_user__c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
@@ -5908,6 +5967,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  jujutsu___when__5["jujutsu/<when>:5"]:::jujutsu___when__5_c
   kind_system_routes_host_wsl_nixos["kind-system-routes"]:::kind_system_routes_host_wsl_nixos_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
@@ -5983,8 +6043,10 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  jujutsu --> jujutsu___when__5
   nix --> nix___when__4
   nixpkgs_config_host_wsl_nixos --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_wsl_nixos -.-x host__resolve_shell_
   shell_host_wsl_nixos --> jujutsu
   shell_host_wsl_nixos --> nix_index
   shell_host_wsl_nixos --> starship
@@ -6095,6 +6157,7 @@ graph LR
   classDef host__resolve_default__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_difftastic__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef host__resolve_host__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
+  classDef host__resolve_shell__c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef host__resolve_user__c fill:#d0d7de,stroke:#8c959f,color:#424a53,stroke-dasharray: 2 2,stroke-width:1px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -6107,6 +6170,7 @@ graph LR
   classDef packages__ivy_fetch_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef jujutsu___when__5_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef kind_system_routes_host_wsl_nixos_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef kind_system_routes_user_nixos_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
