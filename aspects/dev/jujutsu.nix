@@ -28,7 +28,7 @@
 
                 if [ -z "$(echo "$content" | tr -d '[:space:]')" ]; then
                 	diff=$(jj diff --git -r @)
-                	summary=$(curl -s http://localhost:${config.programs.llama-cpp.port}/v1/chat/completions \
+                	summary=$(curl -s http://localhost:${builtins.toString config.programs.llama-cpp.port}/v1/chat/completions \
                 		-H "Content-Type: application/json" \
                 		-d "$(jq -n --arg diff "$diff" '{
                       messages: [{role:"user", content: ("Write a concise, imperative-mood commit message for this diff. Output only the message.\n\n" + $diff)}],
