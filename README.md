@@ -38,6 +38,7 @@
 - ccache
 - ccache/Ivys-MacBook-Pro
 - celler-push
+- claude
 - cotabby
 - darwin-base
 - darwin-finder
@@ -176,6 +177,7 @@ graph LR
   subgraph ctx_user_ivypierlot["user: ivypierlot"]
   agenix_rekey_user_ivypierlot["agenix-rekey"]:::agenix_rekey_user_ivypierlot_c
   celler_push["celler-push"]:::celler_push_c
+  claude["claude"]:::claude_c
   cotabby["cotabby"]:::cotabby_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
@@ -242,6 +244,7 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   onepassword --> den__provides__unfree_onepassword_password_manager_
+  opencode --> claude
   opencode --> mcp_servers
   end
 
@@ -255,6 +258,7 @@ graph LR
   classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef ccache_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cotabby_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_base_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -825,6 +829,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - browsers
 - browsers/zen
 - celler-push
+- claude
 - cotabby
 - darwin-base
 - darwin-finder
@@ -945,6 +950,7 @@ graph LR
   subgraph ctx_user_ivypierlot["user: ivypierlot"]
   agenix_rekey_user_ivypierlot["agenix-rekey"]:::agenix_rekey_user_ivypierlot_c
   celler_push["celler-push"]:::celler_push_c
+  claude["claude"]:::claude_c
   cotabby["cotabby"]:::cotabby_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
@@ -1010,6 +1016,7 @@ graph LR
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
   nixvim --> wakatime
   onepassword --> den__provides__unfree_onepassword_password_manager_
+  opencode --> claude
   opencode --> mcp_servers
   end
 
@@ -1019,6 +1026,7 @@ graph LR
   classDef agenix_rekey_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cotabby_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_base_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
