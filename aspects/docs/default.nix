@@ -61,11 +61,43 @@ in
           # `den` traces the WHOLE aspect tree for every host regardless of
           # whether an aspect actually applies to it -- that's why
           # darwin-base/darwin-finder/etc show up even on plain NixOS hosts,
-          # identically across all 10 hosts. `hasClass` is the field that
-          # says "this aspect actually contributes to one of this host's
-          # classes"; nothing upstream of this filters on it. Keep root
-          # (has no meaningful hasClass) plus anything with hasClass = true.
-          isIrrelevant = n: !(n.hasClass or false) && n.id != gSimplified.rootId;
+          # identically across all 10 hosts. `hasClass` (per this host's
+          # traced classes) is the field that says "this aspect actually
+          # contributes content". A flat hasClass filter is wrong though --
+          # it drops organizational/entity nodes (e.g. the user entity
+          # "ivypierlot") that don't carry hasClass themselves but anchor
+          # real hasClass=true aspects underneath them, leaving those
+          # aspects dangling/disconnected. Need the ancestor closure instead:
+          # keep a node if IT is relevant OR IT'S AN ANCESTOR of a relevant
+          # node -- same strategy den-diagram's own `classSlice` filter uses
+          # (generalized across this host's two traced classes, since
+          # classSlice only takes one).
+          hasAnyClass = n: builtins.any (c: n.perClass.${c}.hasClass or false) classes;
+
+          # parent adjacency: child id -> [parent ids], built from edges
+          # (edge.from is the parent, edge.to is the child).
+          parentsOf =
+            let
+              adj = lib.foldl' (
+                acc: e: acc // { ${e.to} = (acc.${e.to} or [ ]) ++ [ e.from ]; }
+              ) { } gSimplified.edges;
+            in
+            id: adj.${id} or [ ];
+
+          seedIds = map (n: n.id) (builtins.filter hasAnyClass gSimplified.nodes);
+
+          relevantIds =
+            let
+              expand =
+                id: visited:
+                if visited ? ${id} then
+                  visited
+                else
+                  lib.foldl' (acc: p: expand p acc) (visited // { ${id} = true; }) (parentsOf id);
+            in
+            lib.foldl' (acc: id: expand id acc) { } seedIds;
+
+          isIrrelevant = n: !(relevantIds ? ${n.id}) && n.id != gSimplified.rootId;
 
           keepNode = n: !(isPolicyNode n) && !(isIrrelevant n);
           keptIds = lib.listToAttrs (
