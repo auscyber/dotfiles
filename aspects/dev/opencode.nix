@@ -1,7 +1,16 @@
-{ den, ... }: {
+{ den, lib, ... }: {
   # Pulls the shared MCP registry (adds programs.mcp.servers.zotero) alongside
   # the servers declared inline below; all merge into the one registry.
-  den.aspects.opencode.includes = [ den.aspects.mcp-servers ];
+  den.aspects.opencode.includes = [
+    den.aspects.claude
+    den.aspects.mcp-servers
+    (den.lib.whenAspect den.aspects.jujutsu {
+      homeManager = { pkgs, ... }: {
+        programs.mcp.servers.mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
+      };
+
+    })
+  ];
 
   # jj-mcp-server built from source (importNpmLock vendors its deps from the
   # committed package-lock.json), so `mcp_jujutsu` runs a pinned store path instead
@@ -16,6 +25,7 @@
     {
       pkgs,
       lib,
+      config,
       ...
     }:
     {
@@ -25,17 +35,6 @@
 
       # enableMcpIntegration needs claude-code >= 2.1.76; nixpkgs pins 2.1.25, so
       # bump the prebuilt binary.
-      programs.claude-code = {
-        enable = true;
-        enableMcpIntegration = true;
-        package = pkgs.claude-code.overrideAttrs (_: rec {
-          version = "2.1.211";
-          src = pkgs.fetchurl {
-            url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/darwin-arm64/claude";
-            hash = "sha256-WnKKdhmLbsp/PHzb/0O6tEt3tIwhCPejEH2Il3M4Jik=";
-          };
-        });
-      };
 
       # MCP servers live in the shared `programs.mcp` registry: it writes
       # ~/.config/mcp/mcp.json and, via `enableMcpIntegration` below, is merged into
@@ -44,7 +43,7 @@
       programs.mcp = {
         enable = true;
         servers = {
-          mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
+
           nixos.command = lib.getExe pkgs.mcp-nixos;
         };
       };
@@ -100,7 +99,7 @@
               name = "Llama.cpp (local, M4)";
               npm = "@ai-sdk/openai-compatible";
               options = {
-                baseURL = "http://127.0.0.1:8080/v1";
+                baseURL = "http://127.0.0.1:${builtins.toString config.programs.llama-cpp.port}/v1";
               };
               models = {
                 "qwen3-8b" = {

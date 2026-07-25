@@ -102,6 +102,8 @@
     os.nix = {
       gc.automatic = true;
       channel.enable = false;
+
+      checkConfig = false;
       #      settings.experimental-features = [
       #        "nix-command"
       #        "flakes"
@@ -120,7 +122,6 @@
       ];
     };
     darwin = {
-      nix.checkConfig = false;
       nix.enable = true;
       nix.settings.trusted-users = [ "@admin" ];
       nix.settings.auto-optimise-store = true;

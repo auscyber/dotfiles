@@ -5,58 +5,52 @@
     includes = [
       den.aspects.difftastic
 
-      (den.lib.whenAspect den.aspects.llama-cpp ({
-        homeManager =
-          {
-            config,
-            pkgs,
-            lib,
-            ...
-          }:
-
-          let
-            jjAiEditor = pkgs.writeShellApplication {
-              name = "jj-ai-editor";
-              runtimeInputs = with pkgs; [
-                jujutsu
-                curl
-                jq
-              ];
-              text = ''
-                file="$1"
-                content=$(grep -v '^JJ:' "$file")
-
-                if [ -z "$(echo "$content" | tr -d '[:space:]')" ]; then
-                	diff=$(jj diff --git -r @)
-                	summary=$(curl -s http://localhost:${builtins.toString config.programs.llama-cpp.port}/v1/chat/completions \
-                		-H "Content-Type: application/json" \
-                		-d "$(jq -n --arg diff "$diff" '{
-                      messages: [{role:"user", content: ("Write a concise, imperative-mood commit message for this diff. Output only the message.\n\n" + $diff)}],
-                      temperature: 0.2
-                    }')" | jq -r '.choices[0].message.content')
-                	{
-                		echo "$summary"
-                		echo
-                		cat "$file"
-                	} >"$file.tmp"
-                	mv "$file.tmp" "$file"
-                fi
-
-                exec "''${VISUAL:-''${EDITOR:-nvim}}" "$file"
-              '';
-            };
-          in
-          {
-            home.packages = [ jjAiEditor ];
-
-            programs.jujutsu = {
-              enable = true;
-              settings = {
-                ui.editor = "${jjAiEditor}/bin/jj-ai-editor";
-              };
-            };
-          };
-      }))
+      #      (den.lib.whenAspect den.aspects.claude ({
+      #        homeManager =
+      #          {
+      #            config,
+      #            pkgs,
+      #            lib,
+      #            ...
+      #          }:
+      #
+      #          let
+      #            jjAiEditor = pkgs.writeShellApplication {
+      #              name = "jj-ai-editor";
+      #              runtimeInputs = with pkgs; [
+      #                jujutsu
+      #                config.programs.claude-code.package
+      #              ];
+      #              text = ''
+      #                file="$1"
+      #                content=$(grep -v '^JJ:' "$file")
+      #                if [ -z "$(echo "$content" | tr -d '[:space:]')" ]; then
+      #                	diff=$(jj diff --git -r @)
+      #                	summary=$(echo "Write a concise, imperative-mood commit message for this diff. Output only the message.
+      #
+      #                $diff" | claude --model claude-haiku-4-5-20251001)
+      #                	{
+      #                		echo "$summary"
+      #                		echo
+      #                		cat "$file"
+      #                	} >"$file.tmp"
+      #                	mv "$file.tmp" "$file"
+      #                fi
+      #                exec "''${VISUAL:-''${EDITOR:-nvim}}" "$file"
+      #              '';
+      #            };
+      #          in
+      #          {
+      #            home.packages = [ jjAiEditor ];
+      #
+      #            programs.jujutsu = {
+      #              enable = true;
+      #              settings = {
+      #                ui.editor = "${jjAiEditor}/bin/jj-ai-editor";
+      #              };
+      #            };
+      #          };
+      #      }))
     ];
 
     homeManager = {
