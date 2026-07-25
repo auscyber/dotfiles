@@ -57,11 +57,22 @@ in
           # of trusting the isPolicyDispatch flag.
           gSimplified = diagram.graph.simplified g;
           isPolicyNode = n: (builtins.match "<policy:.*" n.label) != null;
+
+          # `den` traces the WHOLE aspect tree for every host regardless of
+          # whether an aspect actually applies to it -- that's why
+          # darwin-base/darwin-finder/etc show up even on plain NixOS hosts,
+          # identically across all 10 hosts. `hasClass` is the field that
+          # says "this aspect actually contributes to one of this host's
+          # classes"; nothing upstream of this filters on it. Keep root
+          # (has no meaningful hasClass) plus anything with hasClass = true.
+          isIrrelevant = n: !(n.hasClass or false) && n.id != gSimplified.rootId;
+
+          keepNode = n: !(isPolicyNode n) && !(isIrrelevant n);
           keptIds = lib.listToAttrs (
             map (n: {
               name = n.id;
               value = true;
-            }) (builtins.filter (n: !(isPolicyNode n)) gSimplified.nodes)
+            }) (builtins.filter keepNode gSimplified.nodes)
           );
           gFiltered = gSimplified // {
             nodes = builtins.filter (n: keptIds ? ${n.id}) gSimplified.nodes;
