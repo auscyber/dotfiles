@@ -30,12 +30,18 @@
                 proton = geProton.steamcompattool;
               in
               prev.runCommand "${geProton.pname}-${geProton.version}-with-settings"
-                { outputs = [ "steamcompattool" ]; }
+                {
+                  outputs = [
+                    "out"
+                    "steamcompattool"
+                  ];
+                }
                 ''
-                  mkdir -p $steamcompattool
-                  cp -r ${proton}/. $steamcompattool/
-                  chmod -R u+w $steamcompattool
-                  cp ${settingsFile} $steamcompattool/user_settings.py
+                  mkdir -p $out
+                  cp -r ${proton}/. $out/
+                  chmod -R u+w $out
+                  cp ${settingsFile} $out/user_settings.py
+                  ln -s $out $steamcompattool
                 '';
           in
           lib.makeOverridable build;
