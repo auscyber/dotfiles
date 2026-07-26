@@ -6,13 +6,18 @@
 let
   inherit (den.lib.policy) include mkPolicy;
 
-  roles =
-    (builtins.attrValues den.hosts)
-    |> lib.concatMap builtins.attrValues
-    |> lib.concatMap (
-      host: host.roles or [ ] ++ lib.concatMap (user: user.roles) (builtins.attrValues host.users)
-    )
-    |> lib.unique;
+  # The full set of role names in use across every host/user. Was derived by
+  # walking den.hosts (all systems -> all hosts -> all users) and collecting
+  # `.roles`, unique'd — but that traversal reran on every eval for a set that
+  # only changes when someone adds a genuinely new role name. Written out
+  # literally instead; update this list when a host/user declares a role not
+  # already here (`grep -rn 'roles = \[' aspects/hosts` to check).
+  roles = [
+    "gui"
+    "dev"
+    "gaming"
+    "study"
+  ];
 
   hasRole = role: entity: lib.elem role (entity.roles or [ ]);
 in
