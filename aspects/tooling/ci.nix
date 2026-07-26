@@ -94,8 +94,6 @@ in
     }:
     let
       # This system has a runner (i.e. is a system we actually build for).
-      # x86_64-freebsd is in the merged `systems` list but has no hosts and no
-      # age-plugin build, so its dev outputs are skipped.
       supported = builtins.elem system [
         "x86_64-linux"
         "aarch64-linux"
