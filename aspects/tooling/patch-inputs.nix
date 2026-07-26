@@ -122,6 +122,108 @@ let
     in
     if ignore || !builtins.pathExists file then { } else builtins.fromJSON (builtins.readFile file);
 
+  # The per-node resolution `nodesFn` performs over a lock file, factored out
+  # so it can ALSO be invoked for a single key against an externally-supplied
+  # `allNodes` — `patchFlake` uses this to override just the one node being
+  # patched inside an otherwise-shared graph walk (see `sharedTopNodes`),
+  # instead of re-deriving the whole graph per patched input.
+  mkResolvedNode =
+    {
+      lockFile,
+      rootKey,
+      passedInputs,
+      flakePath,
+      backupNode,
+      patchSrc,
+      allNodes,
+    }:
+    key: node:
+    let
+      isRelative = node.locked.type or null == "path" && builtins.substring 0 1 node.locked.path != "/";
+
+      parentNode = allNodes.${getInputByPath lockFile.root node.parent};
+      flipped = flipAttrs (lockFile.nodes.${lockFile.root}.inputs or { });
+
+      sourceInfo = (
+        if key == lockFile.root then
+          flakePath
+        else if isRelative then
+          parentNode.sourceInfo
+        else if flipped ? "${key}" && key != rootKey && passedInputs ? "${flipped.${key}}" then
+          (passedInputs.${flipped.${key}})
+        else
+          fetchTree (node.info or { } // removeAttrs node.locked [ "dir" ])
+      );
+
+      subdir = if key == lockFile.root then "" else node.locked.dir or "";
+
+      outPath = (
+        if key == rootKey && lockFile.root != key then
+          patchSrc
+        else if isRelative then
+          parentNode.outPath + (if node.locked.path == "" then "" else "/" + node.locked.path)
+        else
+          sourceInfo.outPath + (if subdir == "" then "" else "/" + subdir)
+      );
+
+      flake = import (outPath + "/flake.nix");
+      backupInputs = if backupNode != null && key == rootKey then backupNode.result.inputs else { };
+
+      newInputs =
+        backupInputs
+        // lib.mapAttrs (_inputName: inputSpec: allNodes.${resolveInput inputSpec}.result) (
+          node.inputs or { }
+        );
+
+      # Resolve a input spec into a node name. An input spec is
+      # either a node name, or a 'follows' path from the root
+      # node.
+      resolveInput =
+        inputSpec: if builtins.isList inputSpec then getInputByPath lockFile.root inputSpec else inputSpec;
+
+      # Follow an input path (e.g. ["dwarffs" "nixpkgs"]) from the
+      # root node, returning the final node.
+
+      outputs = flake.outputs (newInputs // { self = result; });
+      getInputByPath =
+        nodeName: path:
+        if path == [ ] then
+          nodeName
+        else
+          getInputByPath
+            # Since this could be a 'follows' input, call resolveInput.
+            (resolveInput lockFile.nodes.${nodeName}.inputs.${builtins.head path})
+            (builtins.tail path);
+
+      result =
+        outputs
+        // sourceInfo
+        // {
+          # This shadows the sourceInfo.outPath
+          inherit outPath;
+
+          inputs = newInputs;
+          inherit outputs;
+          inherit sourceInfo;
+          _type = "flake";
+        };
+    in
+    {
+      result =
+        if node.flake or true then
+          assert builtins.isFunction flake.outputs;
+          result
+        else
+          sourceInfo // { inherit sourceInfo outPath; };
+      extraPathStuff =
+        if isRelative then
+          (if node.locked.path == "" then "" else "/" + node.locked.path)
+        else
+          (if subdir == "" then "" else "/" + subdir);
+
+      inherit sourceInfo outPath;
+    };
+
   nodesFn =
     {
       lockFile,
@@ -132,94 +234,7 @@ let
       patchSrc ? null,
     }:
     let
-      allNodes = mapAttrs (
-        key: node:
-        let
-          isRelative = node.locked.type or null == "path" && builtins.substring 0 1 node.locked.path != "/";
-
-          parentNode = allNodes.${getInputByPath lockFile.root node.parent};
-          flipped = flipAttrs (lockFile.nodes.${lockFile.root}.inputs or { });
-
-          sourceInfo = (
-            if key == lockFile.root then
-              flakePath
-            else if isRelative then
-              parentNode.sourceInfo
-            else if flipped ? "${key}" && key != rootKey && passedInputs ? "${flipped.${key}}" then
-              (passedInputs.${flipped.${key}})
-            else
-              fetchTree (node.info or { } // removeAttrs node.locked [ "dir" ])
-          );
-
-          subdir = if key == lockFile.root then "" else node.locked.dir or "";
-
-          outPath = (
-            if key == rootKey && lockFile.root != key then
-              patchSrc
-            else if isRelative then
-              parentNode.outPath + (if node.locked.path == "" then "" else "/" + node.locked.path)
-            else
-              sourceInfo.outPath + (if subdir == "" then "" else "/" + subdir)
-          );
-
-          flake = import (outPath + "/flake.nix");
-          backupInputs = if backupNode != null && key == rootKey then backupNode.result.inputs else { };
-
-          newInputs =
-            backupInputs
-            // lib.mapAttrs (_inputName: inputSpec: allNodes.${resolveInput inputSpec}.result) (
-              node.inputs or { }
-            );
-
-          # Resolve a input spec into a node name. An input spec is
-          # either a node name, or a 'follows' path from the root
-          # node.
-          resolveInput =
-            inputSpec: if builtins.isList inputSpec then getInputByPath lockFile.root inputSpec else inputSpec;
-
-          # Follow an input path (e.g. ["dwarffs" "nixpkgs"]) from the
-          # root node, returning the final node.
-
-          outputs = flake.outputs (newInputs // { self = result; });
-          getInputByPath =
-            nodeName: path:
-            if path == [ ] then
-              nodeName
-            else
-              getInputByPath
-                # Since this could be a 'follows' input, call resolveInput.
-                (resolveInput lockFile.nodes.${nodeName}.inputs.${builtins.head path})
-                (builtins.tail path);
-
-          result =
-            outputs
-            // sourceInfo
-            // {
-              # This shadows the sourceInfo.outPath
-              inherit outPath;
-
-              inputs = newInputs;
-              inherit outputs;
-              inherit sourceInfo;
-              _type = "flake";
-            };
-        in
-        {
-          result =
-            if node.flake or true then
-              assert builtins.isFunction flake.outputs;
-              result
-            else
-              sourceInfo // { inherit sourceInfo outPath; };
-          extraPathStuff =
-            if isRelative then
-              (if node.locked.path == "" then "" else "/" + node.locked.path)
-            else
-              (if subdir == "" then "" else "/" + subdir);
-
-          inherit sourceInfo outPath;
-        }
-      ) lockFile.nodes;
+      allNodes = mapAttrs (mkResolvedNode { inherit lockFile rootKey passedInputs flakePath backupNode patchSrc allNodes; }) lockFile.nodes;
     in
     allNodes;
 
@@ -301,7 +316,8 @@ let
       prePatch ? "",
       postPatch ? "",
       hash ? null,
-      extraInputs ? { },
+      passedInputs,
+      sharedTopNodes,
       ...
     }:
     let
@@ -316,7 +332,6 @@ let
           hash
           ;
       };
-      passedInputs = realInputs // inputs // extraInputs;
       lockFilePath = "${patchedSrc}/flake.lock";
 
       backupLockFile = builtins.fromJSON (builtins.readFile lockFilePath);
@@ -328,15 +343,22 @@ let
         passedInputs = passedInputs;
       };
 
-      topLockFile = builtins.fromJSON (builtins.readFile "${rootPath}/flake.lock");
-
-      allNodes = nodesFn {
-        inherit passedInputs;
-        lockFile = topLockFile;
-        rootKey = name;
-        backupNode = backupNodes.${backupLockFile.root};
-        flakePath = "${rootPath}";
-        patchSrc = "${patchedSrc}";
+      # Reuse the shared, rootKey-independent walk of the root lock graph
+      # (`sharedTopNodes`, built once in `buildPatched`), overriding only this
+      # entry's OWN node. Every other node resolves identically to
+      # `sharedTopNodes` regardless of which entry is being patched — see
+      # `sharedTopNodes`'s comment — so there's no need to re-derive the whole
+      # ~223-node graph again for each of the handful of patched/auto-unified
+      # inputs.
+      allNodes = sharedTopNodes // {
+        ${name} =
+          mkResolvedNode {
+            inherit lockFile passedInputs allNodes;
+            rootKey = name;
+            flakePath = "${rootPath}";
+            backupNode = backupNodes.${backupLockFile.root};
+            patchSrc = "${patchedSrc}";
+          } name lockFile.nodes.${name};
       };
 
       flakeNode = allNodes.${name};
@@ -461,14 +483,31 @@ let
   buildPatched =
     pkgs:
     let
+      # Shared across every patched/auto-unified entry: `passedInputs` only
+      # depends on `realInputs`/`inputs` (constant) and `allInputs` itself (the
+      # same self-referential fixpoint every entry already threads through via
+      # cross-references), so it's one value, not one per entry.
+      passedInputs = realInputs // inputs // allInputs;
+
+      # The root lock graph, walked ONCE with `rootKey = null` — a value no
+      # real node key ever equals, so every node takes the same branch it
+      # would under any OTHER entry's call where it isn't THAT entry's own key
+      # (see `mkResolvedNode`'s `key == rootKey` checks). `patchFlake` reuses
+      # this unchanged for every key except the one it's patching, instead of
+      # re-deriving the whole ~223-node graph per entry.
+      sharedTopNodes = nodesFn {
+        inherit passedInputs lockFile;
+        rootKey = null;
+        flakePath = "${rootPath}";
+      };
+
       allInputs = lib.genAttrs toBuild (
         n:
         let
           p = cfgFor n;
         in
         patchFlake {
-          inherit pkgs;
-          extraInputs = allInputs;
+          inherit pkgs passedInputs sharedTopNodes;
           inherit (p)
             src
             patches
