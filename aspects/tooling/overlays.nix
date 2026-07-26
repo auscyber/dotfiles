@@ -211,16 +211,29 @@ in
   ];
   den.schema.flake-parts.includes = [
     den.policies.overlays-to-flake-parts
-    den.policies.flake-parts-to-host
   ];
-  # `flake-parts-to-host` resolves each host *into* the perSystem/flake-parts
-  # scope so the overlays route can collect their `overlays` class. But the
-  # `inputs'`/`self'` batteries provide their module args via `withSystem system`
-  # — which forces the very perSystem being built, an infinite recursion. They
-  # are irrelevant to overlay collection (overlays use `inputs`/`sources`, never
-  # `inputs'`/`self'`), so exclude them from *this* scope only. Schema-tier
-  # excludes are scope-local, so real host configs (resolved under `flake-mod`)
-  # keep `inputs'`/`self'`.
+  # NOT included here: `den.policies.flake-parts-to-host`, which used to
+  # resolve every host *into* this scope so the overlays route could collect
+  # a per-host-conditional `overlays` class. Dropped because:
+  #   1. No aspect in this repo declares a host-conditional `overlays` (i.e.
+  #      `overlays = { host, ... }: ...`) — grepped every `overlays =`
+  #      declaration; all are keyed by aspect/system only. So this scope
+  #      currently has nothing host-specific to collect.
+  #   2. Real host configs don't depend on it either: `resolve.to "host"` here
+  #      duplicated den's own native host resolution (`modules/policies/flake.nix`'s
+  #      `system-to-os-outputs`, which already walks every host regardless).
+  #      Verified: removing this inclusion still produces byte-identical
+  #      `darwinConfigurations.*` outputs (same derivation store paths).
+  # Measured cost of keeping it: resolving all 8 hosts a second time here cost
+  # ~20-27% of total eval thunks/calls for a single host build. If a future
+  # aspect needs a genuinely host-conditional overlay, re-add the inclusion
+  # (and keep the `inputs'`/`self'` exclude below — see its own comment).
+  #
+  # The exclude below still matters if this policy is ever reintroduced:
+  # `inputs'`/`self'` provide their module args via `withSystem system` —
+  # which forces the very perSystem being built, an infinite recursion. They
+  # are irrelevant to overlay collection (overlays use `inputs`/`sources`,
+  # never `inputs'`/`self'`), so they're excluded from *this* scope specifically.
   den.schema.flake-parts.excludes = [
     den.batteries.inputs'
     den.batteries.self'
