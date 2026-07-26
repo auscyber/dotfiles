@@ -75,6 +75,14 @@ in
       # "option `includes' does not exist"); `lib.optionalAttrs` instead omits
       # the key entirely when the option is absent, so the standalone schema
       # carries no stray definition.
+      # Only roles this SPECIFIC aspect actually declares content for get a
+      # delivery policy. `den.schema.aspect` applies to all ~159 aspects, but
+      # only one (security/1password.nix, "gui") sets any of the 4 role keys —
+      # the other ~158 would otherwise get 4 policies apiece created and
+      # dispatched at every scope they resolve in, all doing nothing but
+      # `include {}`. `config.${role} != { }` forces only that one aspect's own
+      # role value (cheap: a single `raw`-typed option, no recursion) rather
+      # than the mkPolicy closure + its later dispatch.
       config = lib.optionalAttrs (options ? includes) {
         includes = map (
           role:
@@ -86,7 +94,7 @@ in
             }:
             lib.optional (hasRole role host && hasRole role user) (include config.${role})
           )
-        ) roles;
+        ) (lib.filter (role: config.${role} != { }) roles);
       };
     };
 }
