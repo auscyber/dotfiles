@@ -37,6 +37,9 @@
 
     provides.to-users.homeManager.programs.git.enable = true;
     vpn = { };
+    nix.settings = {
+      min-free = 1024 * 1024 * 1024; # 1 GiB
+    };
 
     darwin =
       {
@@ -76,7 +79,6 @@
         # space drops under min-free it GCs until max-free is available again.
         # This machine runs close to full, so the weekly timer alone is too coarse.
         nix.settings = {
-          min-free = 5 * 1024 * 1024 * 1024;
           max-free = 25 * 1024 * 1024 * 1024;
           # Keeping .drv files alive costs space and only buys offline rebuilds
           # of things already built; not worth it on a space-constrained laptop.
@@ -176,7 +178,7 @@
       den.aspects.kanata
       den.aspects.dev
       den.aspects.opencode
-      den.aspects.openclaw
+      #      den.aspects.openclaw
       den.aspects.llama-cpp
       #      den.aspects.zeroclaw
       den.aspects.file-local

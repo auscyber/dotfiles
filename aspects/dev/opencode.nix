@@ -102,8 +102,8 @@
                 baseURL = "http://127.0.0.1:${builtins.toString config.programs.llama-cpp.port}/v1";
               };
               models = {
-                "qwen3-8b" = {
-                  name = "Qwen3-8B (local)";
+                "${config.programs.llama-cpp.alias}" = {
+                  name = "Qwen1.5-1.7B (local)";
                 };
               };
             };

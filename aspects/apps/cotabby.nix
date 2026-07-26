@@ -39,7 +39,7 @@
           cotabbySelectedEngine = "openAICompatible";
           cotabbyOpenAICompatibleAPIMode = "chatCompletions";
           cotabbyOpenAICompatibleBaseURL = "http://127.0.0.1:${toString config.programs.llama-cpp.port}/v1";
-          cotabbyOpenAICompatibleModelName = "qwen3-8b";
+          cotabbyOpenAICompatibleModelName = "${config.programs.llama-cpp.alias}";
         };
       };
   };

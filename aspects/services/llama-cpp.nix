@@ -21,12 +21,12 @@
         # `-hf` resolves through LLAMA_CACHE below, so the ~4.7 GiB pull happens
         # once on first start and every later start is local. The repo is
         # ungated, so no HF token is needed in this service.
-        model = "Qwen/Qwen3-8B-GGUF:Q4_K_M";
+        model = "Qwen/Qwen2.5-0.5B-Instruct-GGUF:Q4_K_M";
 
         # Stable id for OpenAI-compatible clients. Without --alias, llama-server
         # advertises the GGUF basename at /v1/models, which then has to be kept
         # in sync by hand wherever a provider names the model.
-        alias = "qwen3-8b";
+        alias = "qwen2.5-0.5b";
 
         # The GGUF declares 40960 native, but the KV cache is drawn from that
         # same 16 GiB: ~144 KiB/token here (36 layers, 8 GQA KV heads, f16), so
@@ -40,28 +40,61 @@
           "--port"
           (toString cfg.port)
           "-hf"
-          model
+          cfg.model
           "--alias"
-          alias
+          cfg.alias
           "-c"
           (toString ctx)
+          "-v"
           # Offload all layers to Metal. The GPU shares the same physical
           # memory, so there is no host/device transfer cost to trade against.
           "-ngl"
           "99"
+          "--reasoning-budget"
+          "0"
+          "--jinja"
         ];
       in
       {
-        options.programs.llama-cpp.port = lib.mkOption {
-          type = lib.types.port;
-          default = 8080;
-          description = ''
-            Port the shared llama-server (OpenAI-compatible) listens on.
-            Every consumer (this service's own launchd/systemd unit, and any
-            other aspect pointing a client at the server, e.g. cotabby) reads
-            this option rather than hardcoding the port, so it only needs
-            changing in one place.
-          '';
+        options.programs.llama-cpp = {
+          model = lib.mkOption {
+            type = lib.types.str;
+            default = model;
+            description = ''
+              GGUF model to load. The first run will pull it from HuggingFace
+              into $LLAMA_CACHE, so the service can then start offline.
+            '';
+          };
+
+          alias = lib.mkOption {
+            type = lib.types.str;
+            default = alias;
+            description = ''
+              Stable model id for OpenAI-compatible clients. Without this, the
+              GGUF basename is advertised at /v1/models, which then has to be
+              kept in sync by hand wherever a provider names the model.
+            '';
+          };
+
+          port = lib.mkOption {
+            type = lib.types.port;
+            default = 8080;
+            description = ''
+              Port the shared llama-server (OpenAI-compatible) listens on.
+              Every consumer (this service's own launchd/systemd unit, and any
+              other aspect pointing a client at the server, e.g. cotabby) reads
+              this option rather than hardcoding the port, so it only needs
+              changing in one place.
+            '';
+          };
+          package = lib.mkOption {
+            type = lib.types.package;
+            default = pkgs.llama-cpp;
+            description = ''
+              Package providing the llama-server binary. The default is the
+              denpkgs version, but a local build can be used instead.
+            '';
+          };
         };
 
         config = {
@@ -72,7 +105,7 @@
           launchd.agents.llama_cpp = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
             enable = true;
             config = {
-              Program = "${pkgs.llama-cpp}/bin/llama-server";
+              Program = "${cfg.package}/bin/llama-server";
               # Capitalised: the option is an enum of "Background" | "Standard" |
               # "Adaptive" | "Interactive", so lowercase fails to type-check.
               # Interactive keeps launchd from CPU-throttling inference the way it
