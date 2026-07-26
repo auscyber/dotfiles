@@ -14,11 +14,14 @@ let
   isBuildable = pkg: lib.isDerivation pkg;
 in
 {
+  # x86_64-linux/aarch64-darwin already come from aspects/framework/flake-file.nix;
+  # aarch64-linux is added here for lora-pi's perSystem dev outputs (see the
+  # `supported` set in aspects/tooling/ci.nix). x86_64-freebsd was here too, but
+  # nothing needs it (ci.nix already special-cased it as unsupported/no hosts) —
+  # every perSystem across the ~40 aspects that declare one was evaluating for
+  # that extra, unused system for nothing.
   systems = [
-    "x86_64-freebsd"
-    "x86_64-linux"
     "aarch64-linux"
-    "aarch64-darwin"
   ];
   perSystem =
     { pkgs, ... }:
