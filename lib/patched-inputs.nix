@@ -56,38 +56,12 @@ let
     }
   );
 
-  # Recorded SRI hashes of the patched trees, feeding each entry's `hash`
-  # default. A missing file (or a missing entry) yields `null`, which falls back
-  # to a locally-built, unsubstitutable tree — so this is safe to bootstrap from
-  # nothing: `nix run .#update-patch-hashes` writes it.
-  patchHashes =
-    let
-      # NOTE: relative to THIS file (<root>/lib/), not to the aspects module
-      # this logic was extracted from — hence ../patches, not ../../patches.
-      file = ../patches/hashes.json;
-
-      # Escape hatch. A recorded hash covers the patched *content*, so bumping a
-      # patched input invalidates it — and because `flake.nix` computes
-      # `newInputs` before anything else, a stale hash fails the fixed-output
-      # build and takes the whole flake's evaluation down with it, including the
-      # app that would refresh the hashes. Chicken, meet egg.
-      #
-      #   PATCH_HASHES=ignore nix run --impure .#update-patch-hashes
-      #
-      # drops back to the unhashed (non-fixed-output) path so the updater can
-      # evaluate, rebuild the trees and rewrite this file. `nix run .#update`
-      # does the same thing around a `nix flake update`.
-      #
-      # `getEnv` returns "" under pure eval, so this is inert everywhere else.
-      ignore = builtins.getEnv "PATCH_HASHES" == "ignore";
-    in
-    if ignore || !builtins.pathExists file then { } else builtins.fromJSON (builtins.readFile file);
-
-  # The per-node resolution `nodesFn` performs over a lock file, factored out
-  # so it can ALSO be invoked for a single key against an externally-supplied
-  # `allNodes` — `patchFlake` uses this to override just the one node being
-  # patched inside an otherwise-shared graph walk (see `sharedTopNodes`),
-  # instead of re-deriving the whole graph per patched input.
+  # Every caller supplies `hash` in its spec — flake.nix from the generated
+  # ./patched-inputs.nix, the aspects module from the `hash` option (whose
+  # default reads that same generated file). There is no separate hashes.json
+  # to consult, so an absent `hash` simply means "no recorded hash": build the
+  # tree locally, unsubstitutably.
+  patchHashes = { };
   mkResolvedNode =
     {
       lockFile,
@@ -355,7 +329,7 @@ let
   # short-circuit to the pristine source in `patchSource`, which is not a
   # derivation and so must not reach `checks`/`patchedSources`.
   # `hashed = false` builds the very same tree as an ordinary (non-fixed-output)
-  # derivation. `update-patch-hashes` hashes *that*, so a stale recorded hash can
+  # derivation. `write-patched-inputs` hashes *that*, so a stale recorded hash can
   # never poison the value used to refresh itself.
   patchedDrvsWith =
     { hashed }:
