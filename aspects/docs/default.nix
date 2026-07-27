@@ -14,6 +14,9 @@ in
   # Moved from the now-deleted aspects/docs/diagram.nix, which was this
   # module's only other declarer of the `den-diagram` input.
   ff.den-diagram.url = "github:denful/den-diagram";
+  # Without this, den-diagram pulls its own full nixpkgs (a separate
+  # releases.nixos.org nixexprs.tar.xz) rather than reusing ours.
+  ff.den-diagram.inputs.nixpkgs.follows = "nixpkgs";
 
   perSystem =
     {

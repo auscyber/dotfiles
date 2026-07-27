@@ -21,6 +21,10 @@ let
 in
 {
   ff.nh.url = "github:nix-community/nh";
+  # Without this, nh pulls its own full nixpkgs (a separate
+  # releases.nixos.org nixexprs.tar.xz), fetched and re-checked independently
+  # of the one everything else already uses.
+  ff.nh.inputs.nixpkgs.follows = "nixpkgs";
   patchedInputs.nh = {
     patches = [ ../../patches/nh/edit.patch ];
   };

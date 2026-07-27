@@ -5,6 +5,9 @@
 }:
 {
   ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
+  # Without this, nixos-hardware pulls its own full nixpkgs (a separate
+  # releases.nixos.org nixexprs.tar.xz) rather than reusing ours.
+  ff.nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
 
   den.hosts.x86_64-linux.surfacelaptop = {
     roles = [

@@ -92,7 +92,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     den.url = "github:denful/den/latest";
-    den-diagram.url = "github:denful/den-diagram";
+    den-diagram = {
+      url = "github:denful/den-diagram";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -179,7 +182,10 @@
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nh.url = "github:nix-community/nh";
+    nh = {
+      url = "github:nix-community/nh";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -203,7 +209,10 @@
       };
     };
     nixcord.url = "github:kaylorben/nixcord";
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-images = {
       url = "github:nvmd/nixos-images/sdimage-installer";
       inputs = {
