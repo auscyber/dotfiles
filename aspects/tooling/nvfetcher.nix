@@ -13,4 +13,14 @@
     inputs.ivixlib.flakeModules.default
     (inputs.den.namespace "ivixlib" inputs.ivixlib)
   ];
+
+  perSystem = { config, ... }: {
+
+    update-hooks.postFlake = {
+      update-sources = ''
+        ${config.apps.update-sources.program}  # call the shared script from ivixlib
+      '';
+    };
+
+  };
 }

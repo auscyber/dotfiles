@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.14.7.1";
+    version = "0.14.9.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.14.7.1/helium-0.14.7.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-fJDwfUJChM9Fl7mckDKI7oIe5rG7+P11AdEkd+MlN3o=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.14.9.1/helium-0.14.9.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-W4q9kBmcSboPKNHJzXs42sU/Yth05ZlLJV5ZO3yM4kg=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.14.7.1";
+    version = "0.14.9.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.14.7.1/helium_0.14.7.1_arm64-macos.dmg";
-      sha256 = "sha256-ZwIhBInDTRRDkp1xuZtoBIZMJ1ir0CKX1O2H1E15TxY=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.14.9.1/helium_0.14.9.1_arm64-macos.dmg";
+      sha256 = "sha256-cRrbAXH5GudV5GCNViImm/8viJnZCBAWYS/L5eta6QU=";
     };
   };
   jankyborders = {
@@ -107,6 +107,7 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
       outputHashes = {
+        
       };
     };
     date = "2026-03-11";
@@ -124,15 +125,16 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock";
       outputHashes = {
+        
       };
     };
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton11-1";
+    version = "GE-Proton11-3";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-1/GE-Proton11-1.tar.gz";
-      sha256 = "sha256-I7SSvzQQ/NqdvwjpJ9IFFtAaTS+rgHUyXx0us1vIOnw=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-3/GE-Proton11-3.tar.gz";
+      sha256 = "sha256-RiCmnUKeZRhPUCgm7fsROKFkAl37+/tYkA47tQtkIF4=";
     };
   };
   sketchybar = {
@@ -149,17 +151,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "701dbf9a10a6857fe9ea72944c84475ab58c81c8";
+    version = "160f6af8b415ad77dd1ecde8a95d7e93b75d9095";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "701dbf9a10a6857fe9ea72944c84475ab58c81c8";
+      rev = "160f6af8b415ad77dd1ecde8a95d7e93b75d9095";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-w0hFYVAlqq9wl1xNEC/oHG32BeklP8t+++3EaU8Ximg=";
+      sha256 = "sha256-k7FjcFvtl3iK6ImSiDu6FiXalfCUImlVMY6ctluI04Y=";
     };
-    date = "2026-07-15";
+    date = "2026-07-27";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
@@ -187,10 +189,18 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.47";
+    version = "9.0.50";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.47/zotero-better-bibtex-9.0.47.xpi";
-      sha256 = "sha256-yI7l5ryUoJc7RtyNEo8L7ikV8sShkWSPKsl3lzJ04AQ=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.50/zotero-better-bibtex-9.0.50.xpi";
+      sha256 = "sha256-zJxyU7OD3blQBXQEj6InFEk/Y9AWXX01duwTk5O33Zk=";
+    };
+  };
+  zotero-better-notes = {
+    pname = "zotero-better-notes";
+    version = "3.2.6";
+    src = fetchurl {
+      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.2.6/better-notes-for-zotero.xpi";
+      sha256 = "sha256-TMZZ5VbVR3ScjKcJbY6UEWcqvCdq/xPTZDiNSX4X3dY=";
     };
   };
   zotero-notero = {
@@ -223,10 +233,10 @@
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.0.0-alpha.3";
+    version = "2.0.0-beta.2";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-alpha.3/zotlit-zotero-2.0.0-alpha.3.xpi";
-      sha256 = "sha256-MHbi4AB+9Ouas19d+YhAef3zEeRWsSsVGtmW024DOwY=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-beta.2/zotlit-zotero-2.0.0-beta.2.xpi";
+      sha256 = "sha256-i7WO1U+V+T9yeRpJoLf/7GV2SDR9LuoxMtw/atSNLA8=";
     };
   };
 }

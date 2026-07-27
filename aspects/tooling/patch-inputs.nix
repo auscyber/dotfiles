@@ -181,8 +181,7 @@ let
   # first. Deliberately the unhashed variant: hashing the hashed one would just
   # echo back whatever is already recorded, so a stale value could never be
   # corrected.
-  hashEntries =
-    pkgs: lib.mapAttrsToList (n: drv: "${n} ${drv}") (patchedDrvsUnhashed pkgs);
+  hashEntries = pkgs: lib.mapAttrsToList (n: drv: "${n} ${drv}") (patchedDrvsUnhashed pkgs);
 
   # Inputs with no patches at all: nothing is built, so they get `hash = null`.
   nullHashNames = lib.attrNames (
@@ -430,19 +429,19 @@ in
               tmp="$(mktemp)"
               trap 'rm -f "$tmp"' EXIT
 
-              cat > "$tmp" <<'HEADER'
+              cat >"$tmp" <<'HEADER'
               ${header}
               HEADER
 
-              cat >> "$tmp" <<'PATCHES'
+              cat >>"$tmp" <<'PATCHES'
               ${generatedPatchLines}
               PATCHES
-              printf '\n' >> "$tmp"
+              printf '\n' >>"$tmp"
 
               while read -r name path; do
               	[ -n "$name" ] || continue
               	h="$(nix hash path --sri "$path")"
-              	echo "  $name.hash = \"$h\";" >> "$tmp"
+              	echo "  $name.hash = \"$h\";" >>"$tmp"
               	echo "  $name  $h"
               done <<-'ENTRIES'
               	${lib.concatStringsSep "\n\t" (hashEntries pkgs)}
@@ -450,13 +449,13 @@ in
 
               while read -r n; do
               	[ -n "$n" ] || continue
-              	echo "  $n.hash = null;" >> "$tmp"
+              	echo "  $n.hash = null;" >>"$tmp"
               	echo "  $n  (no patches — no hash)"
               done <<-'NULLHASHES'
               	${lib.concatStringsSep "\n\t" nullHashNames}
               NULLHASHES
 
-              echo "}" >> "$tmp"
+              echo "}" >>"$tmp"
               mv "$tmp" "$out"
               trap - EXIT
               echo "wrote $out"
@@ -475,19 +474,11 @@ in
       # very app that rewrites them. Ignoring them falls back to unhashed
       # builds, which evaluate fine and are what the generator hashes anyway.
       # `--impure` is required for `builtins.getEnv` to see the variable.
-      apps.update = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "update";
-            text = ''
-              set -euo pipefail
-              nix flake update "$@"
-              PATCH_HASHES=ignore nix run --impure .#write-patched-inputs
-            '';
-          }
-        );
-      };
+
+      update-hooks.finalPostParse = ''
+        echo "Updating patched-inputs.nix…"
+        PATCH_HASHES=ignore nix run --impure .#write-patched-inputs
+      '';
 
       # Building these fails `nix flake check` if a declared patch is stale
       # (it no longer applies) or a recorded `hash` is stale (hash mismatch).

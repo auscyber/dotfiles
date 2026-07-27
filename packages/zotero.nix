@@ -4,6 +4,11 @@
   # fetchZoteroAddon asserts this at build time, so a silent upstream id change
   # fails the build instead of quietly not loading in Zotero.
   nvfetcher.sources = {
+    zotero-better-notes = {
+      src.github = "windingwind/zotero-better-notes";
+      src.prefix = "v";
+      fetch.url = "https://github.com/windingwind/zotero-better-notes/releases/download/v$ver/better-notes-for-zotero.xpi";
+    };
     zotero-better-bibtex = {
       src.github = "retorquere/zotero-better-bibtex";
       src.prefix = "v";
@@ -69,6 +74,11 @@
           notero = prev.callPackage ./_notero.nix { source = sources.zotero-notero; };
         }
         // prev.lib.mapAttrs (_: spec: final.fetchZoteroAddon spec) {
+          better-notes = {
+            addonId = "Knowledge4Zotero@windingwind.com";
+            inherit (sources.zotero-better-notes) pname version src;
+          };
+
           better-bibtex = {
             addonId = "better-bibtex@iris-advies.com";
             inherit (sources.zotero-better-bibtex) pname version src;

@@ -18,6 +18,7 @@
           settings.extensions.zotero.httpServer.localAPI.enabled = true;
           extensions.packages = with pkgs.zoteroAddons; [
             better-bibtex
+            better-notes
             attanger
             actions-tags
             notero
