@@ -31,15 +31,22 @@ in
     };
   };
 
-  perSystem = { pkgs, ... }: {
-    packages = den.lib.nh.denPackages { fromFlake = true; } (pkgs.extend inputs.nh.overlays.default);
+  perSystem =
+    { pkgs, ... }:
+    let
+      # Bound once, not inlined at both use sites. `pkgs.extend` rebuilds the
+      # whole nixpkgs fixpoint, so writing it out twice did that work (and the
+      # `denPackages` call on top of it) twice per system for one identical
+      # value.
+      nhPackages = den.lib.nh.denPackages { fromFlake = true; } (
+        pkgs.extend inputs.nh.overlays.default
+      );
+    in
+    {
+      packages = nhPackages;
 
-    devshells.default.packages = builtins.attrValues (
-      den.lib.nh.denPackages {
-        fromFlake = true;
-      } (pkgs.extend inputs.nh.overlays.default)
-    );
-  };
+      devshells.default.packages = builtins.attrValues nhPackages;
+    };
 
   # Policy: set nh environment variables based on user's flakeFolder
   den.policies.nh-env =
