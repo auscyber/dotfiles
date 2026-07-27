@@ -11,13 +11,6 @@
     patch.enable = true;
   };
 
-  # nix-openclaw pins OpenClaw-2026.7.1.zip's hash from 07-14 05:30; upstream
-  # re-signed and re-uploaded the macOS artifacts at 06:49, so the pin no longer
-  # matches what GitHub serves and upstream's own flake cannot build openclaw-app.
-  # The served zip is notarized Developer ID (OpenClaw Foundation, FWJYW4S8P8),
-  # so the bytes are authentic; only the recorded hash is stale. Drop this once
-  # upstream re-pins.
-
   den.aspects.openclaw = {
     includes = [
       den.aspects.mcp-servers

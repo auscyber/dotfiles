@@ -42,9 +42,7 @@
   nh.patches = [
     ./patches/nh/edit.patch
   ];
-  nix-openclaw.patches = [
-    ./patches/nix-openclaw/openclaw-app-resigned-hash.patch
-  ];
+  nix-openclaw.patches = [ ];
   zen-browser.patches = [ ];
 
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
@@ -53,6 +51,6 @@
   darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
   home-manager.hash = "sha256-CDSNwZoS48xt5j08UGGHz1I4CTKGv7mNGijSbJTe0Mo=";
   nh.hash = "sha256-Bo1gDfDOGSkVi9mkwHjIu/ZWd/bM1tgtEAmLSkyBWVQ=";
-  nix-openclaw.hash = "sha256-dWGb8g1baqqKruXwfaAkqmAocour4Di2zlwE9qbLvoY=";
+  nix-openclaw.hash = null;
   zen-browser.hash = null;
 }
