@@ -200,7 +200,7 @@ in
       adaptArgs =
         args:
         let
-          basePkgs = import inputs.nixpkgs { inherit (args) system; };
+          basePkgs = inputs.nixpkgs.legacyPackages.${args.system};
         in
         args
         // {
@@ -233,9 +233,7 @@ in
       ...
     }:
     let
-      basePkgs = import inputs.nixpkgs {
-        inherit system;
-      };
+      basePkgs = inputs.nixpkgs.legacyPackages.${system};
       sources = self.lib.withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
 
       # Registry walk over `den.aspects.packages` (configurator shapes that are

@@ -44,9 +44,11 @@
 
       # Build the scope from an independent nixpkgs fixpoint: the scope's tools are
       # `<pkg>.override { nix = self.lix; }`, so routing them back into the host
-      # `pkgs` (below) from that *same* pkgs would self-reference. A separate import
-      # makes `nil`/`colmena`/… resolve to stock packages, breaking the cycle.
-      basePkgs = import inputs.nixpkgs { inherit (pkgs.stdenv.hostPlatform) system; };
+      # `pkgs` (below) from that *same* pkgs would self-reference. Using nixpkgs's
+      # own (unoverlaid, memoized) `legacyPackages` rather than a fresh `import`
+      # still makes `nil`/`colmena`/… resolve to stock packages, breaking the
+      # cycle, without re-bootstrapping nixpkgs from scratch.
+      basePkgs = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
       scope = inputs.ivylix.mkScope {
         pkgs = basePkgs;

@@ -21,6 +21,10 @@ let
 in
 {
   ff.nh.url = "github:nix-community/nh";
+  # Without this, nh pulls its own full nixpkgs (a separate
+  # releases.nixos.org nixexprs.tar.xz), fetched and re-checked independently
+  # of the one everything else already uses.
+  ff.nh.inputs.nixpkgs.follows = "nixpkgs";
   patchedInputs.nh = {
     patches = [ ../../patches/nh/edit.patch ];
   };
@@ -31,15 +35,27 @@ in
     };
   };
 
-  perSystem = { pkgs, ... }: {
-    packages = den.lib.nh.denPackages { fromFlake = true; } (pkgs.extend inputs.nh.overlays.default);
+  perSystem =
+    { pkgs, ... }:
+    let
+      # Plain `pkgs`, not `pkgs.extend inputs.nh.overlays.default`. The nh
+      # overlay is already declared in `den.default.overlays` above, so it is
+      # collected into `_collectedOverlays` and applied when aspects/tooling/
+      # overlays.nix builds the perSystem `pkgs` — extending here re-applied an
+      # overlay that was already present, rebuilding the whole nixpkgs fixpoint
+      # to arrive at the same values.
+      #
+      # Verified rather than assumed: the overlay defines exactly one attribute
+      # (`nh`), whose drvPath is identical in `pkgs` and in the extended set,
+      # and all 10 packages `denPackages` returns have identical names and
+      # identical drvPaths either way.
+      nhPackages = den.lib.nh.denPackages { fromFlake = true; } pkgs;
+    in
+    {
+      packages = nhPackages;
 
-    devshells.default.packages = builtins.attrValues (
-      den.lib.nh.denPackages {
-        fromFlake = true;
-      } (pkgs.extend inputs.nh.overlays.default)
-    );
-  };
+      devshells.default.packages = builtins.attrValues nhPackages;
+    };
 
   # Policy: set nh environment variables based on user's flakeFolder
   den.policies.nh-env =

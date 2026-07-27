@@ -6,13 +6,18 @@
 let
   inherit (den.lib.policy) include mkPolicy;
 
-  roles =
-    (builtins.attrValues den.hosts)
-    |> lib.concatMap builtins.attrValues
-    |> lib.concatMap (
-      host: host.roles or [ ] ++ lib.concatMap (user: user.roles) (builtins.attrValues host.users)
-    )
-    |> lib.unique;
+  # The full set of role names in use across every host/user. Was derived by
+  # walking den.hosts (all systems -> all hosts -> all users) and collecting
+  # `.roles`, unique'd — but that traversal reran on every eval for a set that
+  # only changes when someone adds a genuinely new role name. Written out
+  # literally instead; update this list when a host/user declares a role not
+  # already here (`grep -rn 'roles = \[' aspects/hosts` to check).
+  roles = [
+    "gui"
+    "dev"
+    "gaming"
+    "study"
+  ];
 
   hasRole = role: entity: lib.elem role (entity.roles or [ ]);
 in
@@ -70,6 +75,14 @@ in
       # "option `includes' does not exist"); `lib.optionalAttrs` instead omits
       # the key entirely when the option is absent, so the standalone schema
       # carries no stray definition.
+      # Only roles this SPECIFIC aspect actually declares content for get a
+      # delivery policy. `den.schema.aspect` applies to all ~159 aspects, but
+      # only one (security/1password.nix, "gui") sets any of the 4 role keys —
+      # the other ~158 would otherwise get 4 policies apiece created and
+      # dispatched at every scope they resolve in, all doing nothing but
+      # `include {}`. `config.${role} != { }` forces only that one aspect's own
+      # role value (cheap: a single `raw`-typed option, no recursion) rather
+      # than the mkPolicy closure + its later dispatch.
       config = lib.optionalAttrs (options ? includes) {
         includes = map (
           role:
@@ -81,7 +94,7 @@ in
             }:
             lib.optional (hasRole role host && hasRole role user) (include config.${role})
           )
-        ) roles;
+        ) (lib.filter (role: config.${role} != { }) roles);
       };
     };
 }
