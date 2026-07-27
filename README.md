@@ -73,7 +73,6 @@
 - nixvim
 - nushell
 - onepassword
-- openclaw
 - opencode
 - overlays
 - pam-rssh
@@ -198,7 +197,6 @@ graph LR
   nixvim["nixvim"]:::nixvim_c
   nushell["nushell"]:::nushell_c
   onepassword["onepassword"]:::onepassword_c
-  openclaw["openclaw"]:::openclaw_c
   opencode["opencode"]:::opencode_c
   pam_rssh_user_ivypierlot["pam-rssh"]:::pam_rssh_user_ivypierlot_c
   den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_{{"batteries/primary-user(ivypierlot@Ivys-MacBook-Pro)"}}:::den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro__c
@@ -233,7 +231,6 @@ graph LR
   ivypierlot --> nixvim
   ivypierlot --> nushell
   ivypierlot --> onepassword
-  ivypierlot --> openclaw
   ivypierlot --> opencode
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
   ivypierlot --> rift
@@ -300,7 +297,6 @@ graph LR
   classDef nixvim_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef nushell_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef onepassword_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef openclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef opencode_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef overlays_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_host_Ivys_MacBook_Pro_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -863,7 +859,6 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - nixvim
 - nushell
 - onepassword
-- openclaw
 - opencode
 - overlays
 - pam-rssh
@@ -971,7 +966,6 @@ graph LR
   nixvim["nixvim"]:::nixvim_c
   nushell["nushell"]:::nushell_c
   onepassword["onepassword"]:::onepassword_c
-  openclaw["openclaw"]:::openclaw_c
   opencode["opencode"]:::opencode_c
   pam_rssh_user_ivypierlot["pam-rssh"]:::pam_rssh_user_ivypierlot_c
   den__batteries__primary_user_ivypierlot_macmini_{{"batteries/primary-user(ivypierlot@macmini)"}}:::den__batteries__primary_user_ivypierlot_macmini__c
@@ -1005,7 +999,6 @@ graph LR
   ivypierlot --> nixvim
   ivypierlot --> nushell
   ivypierlot --> onepassword
-  ivypierlot --> openclaw
   ivypierlot --> opencode
   ivypierlot --> den__batteries__primary_user_ivypierlot_macmini_
   ivypierlot --> rift
@@ -1068,7 +1061,6 @@ graph LR
   classDef nixvim_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef nushell_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef onepassword_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef openclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef opencode_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef overlays_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_host_macmini_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
