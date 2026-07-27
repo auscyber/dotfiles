@@ -36,9 +36,19 @@ let
       postPatch = spec.postPatch or "";
       isInput = spec.isInput or true;
       src = spec.src or realInputs.${name}.sourceInfo;
-      hash = spec.hash or (patchHashes.${name} or null);
+      # `PATCH_HASHES=ignore` must still defeat a recorded hash even when the
+      # spec carries one inline (the generated ../patched-inputs.nix does).
+      # That escape hatch is the only way out of the chicken-and-egg a stale
+      # hash creates: the fixed-output build fails, which takes the whole
+      # flake's evaluation down with it — including the app that would refresh
+      # the hash. Reading it from the spec instead of hashes.json must not
+      # quietly remove that recovery path.
+      hash = if ignoreHashes then null else (spec.hash or (patchHashes.${name} or null));
     }
   ) patchSpecs;
+
+  # `getEnv` returns "" under pure eval, so this is inert everywhere else.
+  ignoreHashes = builtins.getEnv "PATCH_HASHES" == "ignore";
 
   flipAttrs = lib.mapAttrs' (
     value: name: {
