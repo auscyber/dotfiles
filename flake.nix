@@ -9,42 +9,48 @@
   outputs =
     inputs:
     let
-      # Flake-LEVEL input overrides. ./patched-inputs.nix returns an attrset
-      # that is merged over `inputs`, so the result is what every module
-      # (and flake-level import) sees as `inputs`. Patched sources are built
-      # with the pinned system below; empty patched-inputs.nix is a no-op
-      # (pkgs is only forced when an override actually uses it).
+      lib = inputs.nixpkgs.lib.extend (import ./lib);
+
+      # The patched `inputs`, computed WITHOUT running the flake-parts module
+      # system. This used to be `(inputsFn inputs).newInputs`, i.e. a complete
+      # mkFlake over all of ./aspects purely to learn which inputs to patch —
+      # after which the whole thing ran a SECOND time with the result. The two
+      # passes are separate module fixpoints, so Nix shared nothing between
+      # them and every aspect was evaluated twice.
+      #
+      # ./patched-inputs.nix is generated (`nix run .#write-patched-inputs`)
+      # and holds the only part that genuinely needs the module system: which
+      # inputs are patched, and with which patches. Everything else is derived
+      # purely here. `checks.patched-inputs-generated-current` fails if it goes
+      # stale.
+      patchedInputs =
+        (import ./lib/patched-inputs.nix {
+          inherit inputs lib;
+          rootPath = ./.;
+          patchSpecs = import ./patched-inputs.nix;
+        }).newInputs;
+
       imports =
-        with inputs.nixpkgs.lib;
+        with lib;
         ./aspects
         |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
         |> fileset.toList;
-
-      inputsFn =
-        finalInputs:
-        inputs.flake-parts.lib.mkFlake
-          {
-            inputs = finalInputs;
-            specialArgs = {
-              realInputs = inputs;
-              lib = inputs.nixpkgs.lib.extend (import ./lib);
-            };
-          }
-          {
-            # Import all *.nix files in the ./aspects directory
-            # Except ones that start with '_'
-            inherit imports;
-
-            _module.args.rootPath = ./.;
-          };
-      output =
-        let
-          patchedInputs = (inputsFn inputs).newInputs;
-        in
-        inputsFn (patchedInputs);
     in
-    builtins.removeAttrs output [ "newInputs" ];
+    inputs.flake-parts.lib.mkFlake
+      {
+        inputs = patchedInputs;
+        specialArgs = {
+          realInputs = inputs;
+          inherit lib;
+        };
+      }
+      {
+        # Import all *.nix files in the ./aspects directory
+        # Except ones that start with '_'
+        inherit imports;
 
+        _module.args.rootPath = ./.;
+      };
   nixConfig = {
     extra-substituters = [
       "https://cache.ivymect.in/main"
