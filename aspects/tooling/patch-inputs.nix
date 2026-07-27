@@ -465,9 +465,16 @@ in
         );
       };
 
-      # `nix run .#update` — bump inputs, then refresh the patch hashes that
-      # the bump just invalidated. Resolved and built *before* the lock moves,
-      # so it still runs even though the flake won't evaluate in between.
+      # `nix run .#update` — bump the inputs, then regenerate
+      # ./patched-inputs.nix, which the bump just invalidated: a patched input
+      # moving to a new rev changes the patched tree, and therefore its hash.
+      #
+      # `PATCH_HASHES=ignore` is what makes the second step possible at all.
+      # Between the two commands the recorded hashes describe the OLD revs, so
+      # a normal evaluation would fail the fixed-output build and take down the
+      # very app that rewrites them. Ignoring them falls back to unhashed
+      # builds, which evaluate fine and are what the generator hashes anyway.
+      # `--impure` is required for `builtins.getEnv` to see the variable.
       apps.update = {
         type = "app";
         program = lib.getExe (
