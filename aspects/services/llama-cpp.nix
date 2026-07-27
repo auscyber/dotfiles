@@ -21,12 +21,12 @@
         # `-hf` resolves through LLAMA_CACHE below, so the ~4.7 GiB pull happens
         # once on first start and every later start is local. The repo is
         # ungated, so no HF token is needed in this service.
-        model = "Qwen/Qwen2.5-0.5B-Instruct-GGUF:Q4_K_M";
+        model = "Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M";
 
         # Stable id for OpenAI-compatible clients. Without --alias, llama-server
         # advertises the GGUF basename at /v1/models, which then has to be kept
         # in sync by hand wherever a provider names the model.
-        alias = "qwen2.5-0.5b";
+        alias = "qwen2.5-1.5b";
 
         # The GGUF declares 40960 native, but the KV cache is drawn from that
         # same 16 GiB: ~144 KiB/token here (36 layers, 8 GQA KV heads, f16), so
