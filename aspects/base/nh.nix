@@ -34,13 +34,18 @@ in
   perSystem =
     { pkgs, ... }:
     let
-      # Bound once, not inlined at both use sites. `pkgs.extend` rebuilds the
-      # whole nixpkgs fixpoint, so writing it out twice did that work (and the
-      # `denPackages` call on top of it) twice per system for one identical
-      # value.
-      nhPackages = den.lib.nh.denPackages { fromFlake = true; } (
-        pkgs.extend inputs.nh.overlays.default
-      );
+      # Plain `pkgs`, not `pkgs.extend inputs.nh.overlays.default`. The nh
+      # overlay is already declared in `den.default.overlays` above, so it is
+      # collected into `_collectedOverlays` and applied when aspects/tooling/
+      # overlays.nix builds the perSystem `pkgs` — extending here re-applied an
+      # overlay that was already present, rebuilding the whole nixpkgs fixpoint
+      # to arrive at the same values.
+      #
+      # Verified rather than assumed: the overlay defines exactly one attribute
+      # (`nh`), whose drvPath is identical in `pkgs` and in the extended set,
+      # and all 10 packages `denPackages` returns have identical names and
+      # identical drvPaths either way.
+      nhPackages = den.lib.nh.denPackages { fromFlake = true; } pkgs;
     in
     {
       packages = nhPackages;
