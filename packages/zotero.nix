@@ -7,6 +7,7 @@
     zotero-better-notes = {
       src.github = "windingwind/zotero-better-notes";
       src.prefix = "v";
+      src.prerelease = true;
       fetch.url = "https://github.com/windingwind/zotero-better-notes/releases/download/v$ver/better-notes-for-zotero.xpi";
     };
     zotero-better-bibtex = {
