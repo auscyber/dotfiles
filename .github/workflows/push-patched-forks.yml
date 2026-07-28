@@ -73,3 +73,6 @@ jobs:
         run: ./scripts/push-patched-forks.sh --manifest manifest.json
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          # Attribute the patch commits to the App's bot identity (resolved
+          # from the token by the script).
+          GH_APP_SLUG: ${{ steps.app-token.outputs.app-slug }}

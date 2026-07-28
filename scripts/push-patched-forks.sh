@@ -56,8 +56,10 @@ else
 	manifest_json="$(cat)"
 fi
 
-git_name="${PATCH_COMMIT_NAME:-dendritic-bot}"
-git_email="${PATCH_COMMIT_EMAIL:-dendritic-bot@users.noreply.github.com}"
+# Commit identity is resolved from the token by resolve_committer() below,
+# unless PATCH_COMMIT_NAME / PATCH_COMMIT_EMAIL explicitly override it.
+git_name=""
+git_email=""
 
 # Auto-create a missing fork before pushing (set AUTO_FORK=0 to manage forks by
 # hand). The fork lands under the authenticated account, so GH_TOKEN must be for
@@ -90,6 +92,39 @@ ensure_fork() {
 	done
 	echo "  ERROR: fork ${t_owner}/${t_repo} was not available after ~60s" >&2
 	return 1
+}
+
+# Resolve the git author/committer from whatever token GH_TOKEN holds, so the
+# patch commits are attributed to that account. Order:
+#   1. explicit PATCH_COMMIT_NAME + PATCH_COMMIT_EMAIL override,
+#   2. a GitHub App token (GH_APP_SLUG set) → the "<slug>[bot]" identity, with
+#      the canonical <id>+<slug>[bot]@users.noreply.github.com noreply address,
+#   3. a user/PAT token → `gh api user` login + id.
+# Falls back to a plain name if the API can't be reached (e.g. a tokenless dry
+# run, where the identity is cosmetic anyway).
+resolve_committer() {
+	if [ -n "${PATCH_COMMIT_NAME:-}" ] && [ -n "${PATCH_COMMIT_EMAIL:-}" ]; then
+		git_name="$PATCH_COMMIT_NAME"
+		git_email="$PATCH_COMMIT_EMAIL"
+		return
+	fi
+	local slug login id
+	if [ -n "${GH_APP_SLUG:-}" ]; then
+		slug="$GH_APP_SLUG"
+		git_name="${slug}[bot]"
+		id="$(gh api "/users/${slug}[bot]" --jq .id 2>/dev/null || true)"
+		git_email="${id:+${id}+}${slug}[bot]@users.noreply.github.com"
+		return
+	fi
+	login="$(gh api user --jq .login 2>/dev/null || true)"
+	if [ -n "$login" ]; then
+		id="$(gh api user --jq .id 2>/dev/null || true)"
+		git_name="$login"
+		git_email="${id:+${id}+}${login}@users.noreply.github.com"
+		return
+	fi
+	git_name="auscyber-bot"
+	git_email="auscyber-bot@users.noreply.github.com"
 }
 
 # Push needs a token; a dry run does not (it never touches a fork remote).
@@ -176,6 +211,9 @@ if [ "$count" -eq 0 ]; then
 	echo "manifest is empty — nothing to push."
 	exit 0
 fi
+
+resolve_committer
+echo "committing patches as ${git_name} <${git_email}>"
 echo "Publishing ${count} patched fork(s)$([ "$dry_run" = 1 ] && echo ' (dry run)')…"
 
 mapfile -t entries < <(jq -c '.[]' <<<"$manifest_json")
