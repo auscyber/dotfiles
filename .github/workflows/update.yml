@@ -25,6 +25,7 @@ jobs:
         # use lix main
         extra-conf: |
           experimental-features = nix-command flakes pipe-operators
+          accept-flake-config = true
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - name: run update
       run: nix run .#update
