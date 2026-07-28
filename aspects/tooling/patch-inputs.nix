@@ -121,6 +121,18 @@ let
     hasPatches
     ;
 
+  # Manifest of patched inputs to republish as GitHub forks, shared by the
+  # `patched-forks-manifest` / `push-patched-forks` apps below and the CI
+  # workflow (which evaluates lib/patched-forks-manifest.nix directly). Pulls
+  # the upstream github owner/repo/rev from ./flake.lock crossed with the
+  # committed ./patched-inputs.nix — see that file's header.
+  pushForksManifestJSON = builtins.toJSON (
+    import ../../lib/patched-forks-manifest.nix {
+      inherit (config.pushPatches) owner branch;
+      root = rootPath;
+    }
+  );
+
   # The `<name>.patches = [...]` half of ./patched-inputs.nix. Paths are
   # emitted relative to the flake root so the generated file stays
   # source-relative (./patches/...) rather than baking in /nix/store paths.
@@ -341,6 +353,25 @@ in
     type = lib.types.attrsOf (lib.types.submodule patchedInputModule);
   };
 
+  options.pushPatches = {
+    owner = lib.mkOption {
+      type = lib.types.str;
+      default = "auscyber";
+      description = ''
+        GitHub account that owns the destination forks published by
+        `nix run .#push-patched-forks` (and the push-patched-forks workflow).
+      '';
+    };
+    branch = lib.mkOption {
+      type = lib.types.str;
+      default = "dendritic-patched";
+      description = ''
+        Branch force-pushed to each fork: `github:<owner>/<repo>/<branch>` is
+        what a downstream flake then consumes as a patched input.
+      '';
+    };
+  };
+
   imports = [
     (lib.inputMetaModules [
       (lib.mkAliasOptionModule [ "patch" ] [ "meta" "patch" ])
@@ -402,6 +433,43 @@ in
       apps.patch-input = {
         type = "app";
         program = lib.getExe (patchInputScript pkgs);
+      };
+
+      # Print the fork manifest (which patched input goes to which
+      # github:<owner>/<repo>/<branch>). What CI feeds to the push script.
+      apps.patched-forks-manifest = {
+        type = "app";
+        program = lib.getExe (
+          pkgs.writeShellApplication {
+            name = "patched-forks-manifest";
+            runtimeInputs = [ pkgs.jq ];
+            text = ''jq . ${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON}'';
+          }
+        );
+      };
+
+      # Republish every patched input as a fork under `pushPatches.owner`:
+      # upstream-as-locked + its patches, force-pushed to the branch. Needs
+      # `GH_TOKEN` with push access (or `--dry-run` to fetch+apply without
+      # pushing). Same script the push-patched-forks workflow runs.
+      apps.push-patched-forks = {
+        type = "app";
+        program = lib.getExe (
+          pkgs.writeShellApplication {
+            name = "push-patched-forks";
+            runtimeInputs = [
+              pkgs.git
+              pkgs.jq
+              pkgs.gh
+              pkgs.gnupatch
+              pkgs.coreutils
+            ];
+            text = ''
+              exec bash ${../../scripts/push-patched-forks.sh} \
+                --manifest ${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON} "$@"
+            '';
+          }
+        );
       };
 
       # Regenerates ../../patched-inputs.nix from the live aspect declarations.
