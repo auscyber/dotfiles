@@ -443,7 +443,7 @@ in
           pkgs.writeShellApplication {
             name = "patched-forks-manifest";
             runtimeInputs = [ pkgs.jq ];
-            text = ''jq . ${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON}'';
+            text = "jq .${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON}";
           }
         );
       };
@@ -543,7 +543,7 @@ in
       # builds, which evaluate fine and are what the generator hashes anyway.
       # `--impure` is required for `builtins.getEnv` to see the variable.
 
-      update-hooks.finalPostParse = ''
+      update-hooks.postFlake = ''
         echo "Updating patched-inputs.nix…"
         PATCH_HASHES=ignore nix run --impure .#write-patched-inputs
       '';
