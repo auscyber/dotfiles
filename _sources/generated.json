@@ -307,11 +307,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=",
+            "sha256": "sha256-XBBPHfdJG0n+I1zsBwgcRm1yaOFDY1uVTdbWWmMi5Os=",
             "type": "url",
-            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi"
+            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.9/zotero-attanger.xpi"
         },
-        "version": "1.4.8"
+        "version": "1.4.9"
     },
     "zotero-better-bibtex": {
         "cargoLock": null,
@@ -339,11 +339,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-TMZZ5VbVR3ScjKcJbY6UEWcqvCdq/xPTZDiNSX4X3dY=",
+            "sha256": "sha256-jLgeldrBTVFNN820w33GWdSeZLj6M3/3JRdbf6T06hU=",
             "type": "url",
-            "url": "https://github.com/windingwind/zotero-better-notes/releases/download/v3.2.6/better-notes-for-zotero.xpi"
+            "url": "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.0-beta.4/better-notes-for-zotero.xpi"
         },
-        "version": "3.2.6"
+        "version": "3.3.0-beta.4"
     },
     "zotero-notero": {
         "cargoLock": null,
@@ -393,7 +393,7 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-bOHWVQD+ArzpTLt2MKyRAAs9yV/P1SX2AXqaAmmULoM=",
+            "sha256": "sha256-4O9FGvcxwqV4Hxey3AmYkDMy2CiA1krp/fO/Ei0Ijx8=",
             "type": "url",
             "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.1/papersgpt-v0.6.1.xpi"
         },
