@@ -1859,14 +1859,14 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 |---------|---------|-------------|
 | cotabby | `v0.6.2-beta` |  |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.14.7.1` | Private, fast, and honest web browser based on Chromium |
+| helium | `0.14.9.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
-| kanata-ls | `701dbf9a10a6857fe9ea72944c84475ab58c81c8` | Kanata Language Server |
+| kanata-ls | `160f6af8b415ad77dd1ecde8a95d7e93b75d9095` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
-| proton-ge-bin | `GE-Proton11-1` | Compatibility tool for Steam Play based on Wine and additional components.
+| proton-ge-bin | `GE-Proton11-3` | Compatibility tool for Steam Play based on Wine and additional components.
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
