@@ -181,10 +181,10 @@
   };
   zotero-attanger = {
     pname = "zotero-attanger";
-    version = "1.4.8";
+    version = "1.4.9";
     src = fetchurl {
-      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.8/zotero-attanger.xpi";
-      sha256 = "sha256-4ybf5lABuWzWVfViQFyH4JX2Yoh0lv0toqDvzLFMuWc=";
+      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.9/zotero-attanger.xpi";
+      sha256 = "sha256-XBBPHfdJG0n+I1zsBwgcRm1yaOFDY1uVTdbWWmMi5Os=";
     };
   };
   zotero-better-bibtex = {
@@ -197,10 +197,10 @@
   };
   zotero-better-notes = {
     pname = "zotero-better-notes";
-    version = "3.2.6";
+    version = "3.3.0-beta.4";
     src = fetchurl {
-      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.2.6/better-notes-for-zotero.xpi";
-      sha256 = "sha256-TMZZ5VbVR3ScjKcJbY6UEWcqvCdq/xPTZDiNSX4X3dY=";
+      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.0-beta.4/better-notes-for-zotero.xpi";
+      sha256 = "sha256-jLgeldrBTVFNN820w33GWdSeZLj6M3/3JRdbf6T06hU=";
     };
   };
   zotero-notero = {
@@ -228,7 +228,7 @@
     version = "papersgpt-v0.6.1";
     src = fetchurl {
       url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.1/papersgpt-v0.6.1.xpi";
-      sha256 = "sha256-bOHWVQD+ArzpTLt2MKyRAAs9yV/P1SX2AXqaAmmULoM=";
+      sha256 = "sha256-4O9FGvcxwqV4Hxey3AmYkDMy2CiA1krp/fO/Ei0Ijx8=";
     };
   };
   zotero-zotlit = {
