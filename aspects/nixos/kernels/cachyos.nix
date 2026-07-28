@@ -26,15 +26,16 @@
               system = pkgs.stdenv.system;
             };
             helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
-            ccacheLLVMStdenv = pkgs.ccacheStdenv.override { stdenv = helpers.stdenvLLVM; };
+            #            stdenv = pkgs.ccacheStdenv.override { stdenv = helpers.stdenvLLVM; };
+            stdenv = helpers.stdenvLLVM;
 
             kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
               lto = "thin";
               cpusched = "bore";
-              stdenv = ccacheLLVMStdenv;
+              stdenv = stdenv;
               extraMakeFlags = [
-                "CC=${ccacheLLVMStdenv.cc}/bin/clang"
-                "HOSTCC=${ccacheLLVMStdenv.cc}/bin/clang"
+                "CC=${stdenv.cc}/bin/clang"
+                "HOSTCC=${stdenv.cc}/bin/clang"
               ];
             };
           in
