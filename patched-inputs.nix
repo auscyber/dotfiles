@@ -48,7 +48,7 @@
   agenix.hash = "sha256-6Jh720QCOUYbcypjmIFcwhckE2acN13G60kk9yCLW2s=";
   agenix-rekey.hash = "sha256-YCmqS/NDsOUaBoIskV0wTq+1odiNdeTR+0eRNJtISvU=";
   darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
-  home-manager.hash = "sha256-sJYUpAzsYHa9zNfKoNXxz8zn9btELd/TInTd2rB6DZo=";
-  nh.hash = "sha256-Bo1gDfDOGSkVi9mkwHjIu/ZWd/bM1tgtEAmLSkyBWVQ=";
+  home-manager.hash = "sha256-ZvNxpa2K4NJCdbVNv0Izv9ehqh9gfi4xYqNUIhKw4WY=";
+  nh.hash = "sha256-NcGY5wuPsc/jl+pS2TBR7DukWwdSyGbJ7YlpvZD7+WY=";
   zen-browser.hash = null;
 }
