@@ -429,191 +429,193 @@ in
     # costs nothing unless something actually reads it.
     flake.newInputs = impl.newInputs;
 
-    perSystem = { pkgs, ... }: {
-      apps.patch-input = {
-        type = "app";
-        program = lib.getExe (patchInputScript pkgs);
-      };
-
-      # Print the fork manifest (which patched input goes to which
-      # github:<owner>/<repo>/<branch>). What CI feeds to the push script.
-      apps.patched-forks-manifest = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "patched-forks-manifest";
-            runtimeInputs = [ pkgs.jq ];
-            text = "jq .${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON}";
-          }
-        );
-      };
-
-      # Republish every patched input as a fork under `pushPatches.owner`:
-      # upstream-as-locked + its patches, force-pushed to the branch. Needs
-      # `GH_TOKEN` with push access (or `--dry-run` to fetch+apply without
-      # pushing). Same script the push-patched-forks workflow runs.
-      apps.push-patched-forks = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "push-patched-forks";
-            runtimeInputs = [
-              pkgs.git
-              pkgs.jq
-              pkgs.gh
-              pkgs.gnupatch
-              pkgs.coreutils
-            ];
-            text = ''
-              exec bash ${../../scripts/push-patched-forks.sh} \
-                --manifest ${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON} "$@"
-            '';
-          }
-        );
-      };
-
-      # Regenerates ../../patched-inputs.nix from the live aspect declarations.
-      # Run after adding/removing a patch or toggling `patch.enable`.
-      # The ONE generator: builds each patched tree, hashes it, and writes
-      # ./patched-inputs.nix with both the patch lists and the resulting
-      # hashes. Previously this was two commands (`update-patch-hashes` wrote
-      # patches/hashes.json, then `write-patched-inputs` copied the hashes
-      # into the generated file), which could leave the two disagreeing.
-      apps.write-patched-inputs = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "write-patched-inputs";
-            runtimeInputs = [ pkgs.coreutils ];
-            text = ''
-              set -euo pipefail
-              repo="$PWD"
-              if [ ! -e "$repo/flake.nix" ]; then
-              	echo "error: run from the flake root (no flake.nix in $repo)" >&2
-              	exit 2
-              fi
-
-              out="$repo/patched-inputs.nix"
-              tmp="$(mktemp)"
-              trap 'rm -f "$tmp"' EXIT
-
-              cat >"$tmp" <<'HEADER'
-              ${header}
-              HEADER
-
-              cat >>"$tmp" <<'PATCHES'
-              ${generatedPatchLines}
-              PATCHES
-              printf '\n' >>"$tmp"
-
-              while read -r name path; do
-              	[ -n "$name" ] || continue
-              	h="$(nix hash path --sri "$path")"
-              	echo "  $name.hash = \"$h\";" >>"$tmp"
-              	echo "  $name  $h"
-              done <<-'ENTRIES'
-              	${lib.concatStringsSep "\n\t" (hashEntries pkgs)}
-              ENTRIES
-
-              while read -r n; do
-              	[ -n "$n" ] || continue
-              	echo "  $n.hash = null;" >>"$tmp"
-              	echo "  $n  (no patches — no hash)"
-              done <<-'NULLHASHES'
-              	${lib.concatStringsSep "\n\t" nullHashNames}
-              NULLHASHES
-
-              echo "}" >>"$tmp"
-              mv "$tmp" "$out"
-              trap - EXIT
-              echo "wrote $out"
-            '';
-          }
-        );
-      };
-
-      # `nix run .#update` — bump the inputs, then regenerate
-      # ./patched-inputs.nix, which the bump just invalidated: a patched input
-      # moving to a new rev changes the patched tree, and therefore its hash.
-      #
-      # `PATCH_HASHES=ignore` is what makes the second step possible at all.
-      # Between the two commands the recorded hashes describe the OLD revs, so
-      # a normal evaluation would fail the fixed-output build and take down the
-      # very app that rewrites them. Ignoring them falls back to unhashed
-      # builds, which evaluate fine and are what the generator hashes anyway.
-      # `--impure` is required for `builtins.getEnv` to see the variable.
-
-      update-hooks.flake = ''
-        echo "Updating patched-inputs.nix…"
-        PATCH_HASHES=ignore nix run --impure .#write-patched-inputs
-      '';
-
-      # Building these fails `nix flake check` if a declared patch is stale
-      # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
-      # Entries with no patches are skipped: `patchSource` hands those back
-      # as the pristine source path, which is not a derivation to build.
-      checks =
-        lib.mapAttrs' (n: _: {
-          name = "patched-input-${n}";
-          value = (patchedDrvs pkgs).${n};
-        }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
-        // {
-          # Guard `buildPatched`'s fixpoint: every re-evaluated input — patched or
-          # merely auto-unified — must resolve its own inputs to the *patched*
-          # versions of them, not the pristine ones. E.g. `agenix` declares
-          # `darwin` and `home-manager`, both patched, so severing the fixpoint
-          # shows up here rather than as a mysteriously unpatched module at
-          # rebuild time. Covers the whole `toBuild` set, not just declared patches.
-          # The generated ../../patched-inputs.nix is what flake.nix reads to
-          # build the patched inputs without running the module system. If it
-          # drifts from what the aspects actually declare, flake.nix would
-          # apply the wrong patch set — silently, since nothing else compares
-          # them. Fail here instead. Refresh with
-          # `nix run .#write-patched-inputs`.
-          patched-inputs-generated-current =
-            let
-              generated = lib.mapAttrs (_: v: {
-                patches = map toString (v.patches or [ ]);
-                hash = v.hash or null;
-              }) (import ../../patched-inputs.nix);
-              live = lib.mapAttrs (_: v: {
-                patches = map toString v.patches;
-                inherit (v) hash;
-              }) (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
-              missing = lib.attrNames (removeAttrs live (lib.attrNames generated));
-              extra = lib.attrNames (removeAttrs generated (lib.attrNames live));
-              changed = lib.filter (n: (generated.${n} or null) != live.${n}) (
-                lib.attrNames (builtins.intersectAttrs generated live)
-              );
-            in
-            assert lib.assertMsg (missing == [ ] && extra == [ ] && changed == [ ]) ''
-              ./patched-inputs.nix is out of date — run `nix run .#write-patched-inputs`.
-                missing from the generated file: ${lib.concatStringsSep ", " missing}
-                no longer declared by aspects:   ${lib.concatStringsSep ", " extra}
-                different patches or hash:       ${lib.concatStringsSep ", " changed}
-            '';
-            pkgs.emptyFile;
-
-          patched-inputs-intertwined =
-            let
-              patched = toBuild;
-              mismatches = lib.concatMap (
-                name:
-                let
-                  deps = lib.filter (d: lib.elem d patched) (lib.attrNames (inputs.${name}.inputs or { }));
-                in
-                lib.forEach (lib.filter (d: inputs.${name}.inputs.${d}.outPath != inputs.${d}.outPath) deps) (
-                  d: "  ${name} sees ${d} = ${inputs.${name}.inputs.${d}.outPath}, want ${inputs.${d}.outPath}"
-                )
-              ) patched;
-            in
-            assert lib.assertMsg (mismatches == [ ]) ''
-              patched inputs are not intertwined — a re-evaluated flake is seeing an
-              unpatched dependency:
-              ${lib.concatStringsSep "\n" mismatches}
-            '';
-            pkgs.emptyFile;
+    perSystem =
+      args@{ pkgs, ... }:
+      {
+        apps.patch-input = {
+          type = "app";
+          program = lib.getExe (patchInputScript pkgs);
         };
-    };
+
+        # Print the fork manifest (which patched input goes to which
+        # github:<owner>/<repo>/<branch>). What CI feeds to the push script.
+        apps.patched-forks-manifest = {
+          type = "app";
+          program = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "patched-forks-manifest";
+              runtimeInputs = [ pkgs.jq ];
+              text = "jq .${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON}";
+            }
+          );
+        };
+
+        # Republish every patched input as a fork under `pushPatches.owner`:
+        # upstream-as-locked + its patches, force-pushed to the branch. Needs
+        # `GH_TOKEN` with push access (or `--dry-run` to fetch+apply without
+        # pushing). Same script the push-patched-forks workflow runs.
+        apps.push-patched-forks = {
+          type = "app";
+          program = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "push-patched-forks";
+              runtimeInputs = [
+                pkgs.git
+                pkgs.jq
+                pkgs.gh
+                pkgs.gnupatch
+                pkgs.coreutils
+              ];
+              text = ''
+                exec bash ${../../scripts/push-patched-forks.sh} \
+                  --manifest ${pkgs.writeText "patched-forks-manifest.json" pushForksManifestJSON} "$@"
+              '';
+            }
+          );
+        };
+
+        # Regenerates ../../patched-inputs.nix from the live aspect declarations.
+        # Run after adding/removing a patch or toggling `patch.enable`.
+        # The ONE generator: builds each patched tree, hashes it, and writes
+        # ./patched-inputs.nix with both the patch lists and the resulting
+        # hashes. Previously this was two commands (`update-patch-hashes` wrote
+        # patches/hashes.json, then `write-patched-inputs` copied the hashes
+        # into the generated file), which could leave the two disagreeing.
+        apps.write-patched-inputs = {
+          type = "app";
+          program = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "write-patched-inputs";
+              runtimeInputs = [ pkgs.coreutils ];
+              text = ''
+                set -euo pipefail
+                repo="$PWD"
+                if [ ! -e "$repo/flake.nix" ]; then
+                	echo "error: run from the flake root (no flake.nix in $repo)" >&2
+                	exit 2
+                fi
+
+                out="$repo/patched-inputs.nix"
+                tmp="$(mktemp)"
+                trap 'rm -f "$tmp"' EXIT
+
+                cat >"$tmp" <<'HEADER'
+                ${header}
+                HEADER
+
+                cat >>"$tmp" <<'PATCHES'
+                ${generatedPatchLines}
+                PATCHES
+                printf '\n' >>"$tmp"
+
+                while read -r name path; do
+                	[ -n "$name" ] || continue
+                	h="$(nix hash path --sri "$path")"
+                	echo "  $name.hash = \"$h\";" >>"$tmp"
+                	echo "  $name  $h"
+                done <<-'ENTRIES'
+                	${lib.concatStringsSep "\n\t" (hashEntries pkgs)}
+                ENTRIES
+
+                while read -r n; do
+                	[ -n "$n" ] || continue
+                	echo "  $n.hash = null;" >>"$tmp"
+                	echo "  $n  (no patches — no hash)"
+                done <<-'NULLHASHES'
+                	${lib.concatStringsSep "\n\t" nullHashNames}
+                NULLHASHES
+
+                echo "}" >>"$tmp"
+                mv "$tmp" "$out"
+                trap - EXIT
+                echo "wrote $out"
+              '';
+            }
+          );
+        };
+
+        # `nix run .#update` — bump the inputs, then regenerate
+        # ./patched-inputs.nix, which the bump just invalidated: a patched input
+        # moving to a new rev changes the patched tree, and therefore its hash.
+        #
+        # `PATCH_HASHES=ignore` is what makes the second step possible at all.
+        # Between the two commands the recorded hashes describe the OLD revs, so
+        # a normal evaluation would fail the fixed-output build and take down the
+        # very app that rewrites them. Ignoring them falls back to unhashed
+        # builds, which evaluate fine and are what the generator hashes anyway.
+        # `--impure` is required for `builtins.getEnv` to see the variable.
+
+        update-hooks.flake = ''
+          echo "Updating patched-inputs.nix…"
+          PATCH_HASHES=ignore ${args.config.apps.write-patched-inputs.program}
+        '';
+
+        # Building these fails `nix flake check` if a declared patch is stale
+        # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
+        # Entries with no patches are skipped: `patchSource` hands those back
+        # as the pristine source path, which is not a derivation to build.
+        checks =
+          lib.mapAttrs' (n: _: {
+            name = "patched-input-${n}";
+            value = (patchedDrvs pkgs).${n};
+          }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
+          // {
+            # Guard `buildPatched`'s fixpoint: every re-evaluated input — patched or
+            # merely auto-unified — must resolve its own inputs to the *patched*
+            # versions of them, not the pristine ones. E.g. `agenix` declares
+            # `darwin` and `home-manager`, both patched, so severing the fixpoint
+            # shows up here rather than as a mysteriously unpatched module at
+            # rebuild time. Covers the whole `toBuild` set, not just declared patches.
+            # The generated ../../patched-inputs.nix is what flake.nix reads to
+            # build the patched inputs without running the module system. If it
+            # drifts from what the aspects actually declare, flake.nix would
+            # apply the wrong patch set — silently, since nothing else compares
+            # them. Fail here instead. Refresh with
+            # `nix run .#write-patched-inputs`.
+            patched-inputs-generated-current =
+              let
+                generated = lib.mapAttrs (_: v: {
+                  patches = map toString (v.patches or [ ]);
+                  hash = v.hash or null;
+                }) (import ../../patched-inputs.nix);
+                live = lib.mapAttrs (_: v: {
+                  patches = map toString v.patches;
+                  inherit (v) hash;
+                }) (lib.filterAttrs (_: v: v.isInput) config.patchedInputs);
+                missing = lib.attrNames (removeAttrs live (lib.attrNames generated));
+                extra = lib.attrNames (removeAttrs generated (lib.attrNames live));
+                changed = lib.filter (n: (generated.${n} or null) != live.${n}) (
+                  lib.attrNames (builtins.intersectAttrs generated live)
+                );
+              in
+              assert lib.assertMsg (missing == [ ] && extra == [ ] && changed == [ ]) ''
+                ./patched-inputs.nix is out of date — run `nix run .#write-patched-inputs`.
+                  missing from the generated file: ${lib.concatStringsSep ", " missing}
+                  no longer declared by aspects:   ${lib.concatStringsSep ", " extra}
+                  different patches or hash:       ${lib.concatStringsSep ", " changed}
+              '';
+              pkgs.emptyFile;
+
+            patched-inputs-intertwined =
+              let
+                patched = toBuild;
+                mismatches = lib.concatMap (
+                  name:
+                  let
+                    deps = lib.filter (d: lib.elem d patched) (lib.attrNames (inputs.${name}.inputs or { }));
+                  in
+                  lib.forEach (lib.filter (d: inputs.${name}.inputs.${d}.outPath != inputs.${d}.outPath) deps) (
+                    d: "  ${name} sees ${d} = ${inputs.${name}.inputs.${d}.outPath}, want ${inputs.${d}.outPath}"
+                  )
+                ) patched;
+              in
+              assert lib.assertMsg (mismatches == [ ]) ''
+                patched inputs are not intertwined — a re-evaluated flake is seeing an
+                unpatched dependency:
+                ${lib.concatStringsSep "\n" mismatches}
+              '';
+              pkgs.emptyFile;
+          };
+      };
   };
 }
