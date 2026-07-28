@@ -18,6 +18,18 @@
 
     update-hooks.postFlake = {
       update-sources = ''
+        # ivixlib's update-sources runs nvfetcher, which authenticates GitHub via
+        # an nvchecker keyfile (NVCHECKER_KEYS / -k / $HOME/.config/nvchecker.toml),
+        # never from the environment. When a token is exported — e.g. CI's
+        # GITHUB_TOKEN — synthesise a keyfile and point NVCHECKER_KEYS at it so the
+        # run is authenticated; otherwise update-sources uses its own default.
+        token="''${GITHUB_TOKEN:-''${GH_TOKEN:-}}"
+        if [ -n "$token" ]; then
+          NVCHECKER_KEYS="$(mktemp "''${TMPDIR:-/tmp}/nvchecker-keys.XXXXXX")"
+          export NVCHECKER_KEYS
+          trap 'rm -f "$NVCHECKER_KEYS"' EXIT
+          printf '[keys]\ngithub = "%s"\n' "$token" > "$NVCHECKER_KEYS"
+        fi
         ${config.apps.update-sources.program}  # call the shared script from ivixlib
       '';
     };
