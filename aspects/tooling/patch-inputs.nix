@@ -543,7 +543,7 @@ in
       # builds, which evaluate fine and are what the generator hashes anyway.
       # `--impure` is required for `builtins.getEnv` to see the variable.
 
-      update-hooks.postFlake = ''
+      update-hooks.flake = ''
         echo "Updating patched-inputs.nix…"
         PATCH_HASHES=ignore nix run --impure .#write-patched-inputs
       '';
