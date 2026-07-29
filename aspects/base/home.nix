@@ -14,7 +14,7 @@ let
     }:
     den.provides.forward {
       each = [
-        #        "Linux"
+        "Linux"
         "Darwin"
       ];
       fromClass = platform: "hm${platform}";

@@ -5,11 +5,7 @@
 }:
 {
   den.aspects.fish =
-    {
-      anyUser,
-      host,
-      ...
-    }:
+
     {
       includes = [
         (den.batteries.user-shell "fish")
