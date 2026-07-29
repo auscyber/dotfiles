@@ -391,7 +391,7 @@ index 54695ae..51f347c 100644
        {
          assertion = cfg.identityPaths != [ ];
 diff --git a/modules/age.nix b/modules/age.nix
-index acae79f..fdfd59d 100644
+index acae79f..ac045bc 100644
 --- a/modules/age.nix
 +++ b/modules/age.nix
 @@ -11,6 +11,11 @@ let
@@ -406,7 +406,7 @@ index acae79f..fdfd59d 100644
    ageBin = config.age.ageBin;
  
    users = config.users.users;
-@@ -24,41 +29,50 @@ let
+@@ -24,41 +29,52 @@ let
    mountCommand =
      if isDarwin then
        ''
@@ -450,6 +450,8 @@ index acae79f..fdfd59d 100644
 +            chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
 +            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}"
 +            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}"
++        	mkdir -p "$(dirname "${cfg.secretsDir}")"
++        	mkdir -p "$(dirname "${cfg.templateDir}")"
    '';
  
    chownGroup = if isDarwin then "admin" else "keys";
@@ -471,7 +473,7 @@ index acae79f..fdfd59d 100644
          ''
        else
          ''
-@@ -66,12 +80,11 @@ let
+@@ -66,12 +82,11 @@ let
          ''
      }
    '';
@@ -487,7 +489,7 @@ index acae79f..fdfd59d 100644
      IDENTITIES=()
      for identity in ${toString cfg.identityPaths}; do
        test -r "$identity" || continue
-@@ -83,7 +96,61 @@ let
+@@ -83,7 +98,61 @@ let
      test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
  
      mkdir -p "$(dirname "$_truePath")"
@@ -550,7 +552,7 @@ index acae79f..fdfd59d 100644
      (
        umask u=r,g=,o=
        test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -92,6 +159,25 @@ let
+@@ -92,6 +161,25 @@ let
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
@@ -576,7 +578,7 @@ index acae79f..fdfd59d 100644
      chmod ${secretType.mode} "$TMP_FILE"
      mv -f "$TMP_FILE" "$_truePath"
  
-@@ -105,22 +191,76 @@ let
+@@ -105,22 +193,71 @@ let
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
@@ -597,12 +599,7 @@ index acae79f..fdfd59d 100644
 +
 +        (( ++_agenix_generation ))
 +        echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
-+        mkdir -p "$(dirname "${cfg.secretsDir}")"
-+        mkdir -p "$(dirname "${cfg.templateDir}")"
-+        [ -e "${cfg.secretsDir}" ] && [ ! -L "${cfg.secretsDir}" ] && rm -rf "${cfg.secretsDir}"
-+        [ -e "${cfg.templateDir}" ] && [ ! -L "${cfg.templateDir}" ] && rm -rf "${cfg.templateDir}"
-+        mkdir -p "${cfg.secretsDir}"
-+        chmod 0751 "${cfg.secretsDir}"
++        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}" ${cfg.secretsDir}
 +        echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."
 +        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}" ${cfg.templateDir}
 +
@@ -664,7 +661,7 @@ index acae79f..fdfd59d 100644
    );
  
    chownSecret = secretType: ''
-@@ -132,6 +272,131 @@ let
+@@ -132,6 +269,131 @@ let
      [ "echo '[agenix] chowning...'" ]
      ++ [ chownMountPoint ]
      ++ (map chownSecret (builtins.attrValues cfg.secrets))
@@ -796,7 +793,7 @@ index acae79f..fdfd59d 100644
    );
  
    secretType = types.submodule (
-@@ -146,6 +411,12 @@ let
+@@ -146,6 +408,12 @@ let
              Name of the file used in {option}`age.secretsDir`
            '';
          };
@@ -809,7 +806,7 @@ index acae79f..fdfd59d 100644
          file = mkOption {
            type = types.path;
            description = ''
-@@ -169,6 +440,20 @@ let
+@@ -169,6 +437,20 @@ let
              Permissions mode of the decrypted secret in a format understood by chmod.
            '';
          };
@@ -830,7 +827,7 @@ index acae79f..fdfd59d 100644
          owner = mkOption {
            type = types.str;
            default = "0";
-@@ -199,6 +484,14 @@ in
+@@ -199,6 +481,14 @@ in
    ];
  
    options.age = {
@@ -845,7 +842,7 @@ index acae79f..fdfd59d 100644
      ageBin = mkOption {
        type = types.str;
        default = "${pkgs.age}/bin/age";
-@@ -218,12 +511,19 @@ in
+@@ -218,12 +508,19 @@ in
      };
      secretsDir = mkOption {
        type = types.path;
@@ -867,7 +864,7 @@ index acae79f..fdfd59d 100644
        type =
          types.addCheck types.str (
            s:
-@@ -266,9 +566,10 @@ in
+@@ -266,9 +563,10 @@ in
          Path to SSH keys to be used as identities in age decryption.
        '';
      };
@@ -879,7 +876,7 @@ index acae79f..fdfd59d 100644
      {
        assertions = [
          {
-@@ -277,6 +578,7 @@ in
+@@ -277,6 +575,7 @@ in
          }
        ];
      }
@@ -887,7 +884,7 @@ index acae79f..fdfd59d 100644
      (optionalAttrs (!isDarwin) {
        # When using sysusers we no longer be started as an activation script
        # because those are started in initrd while sysusers is started later.
-@@ -285,7 +587,12 @@ in
+@@ -285,7 +584,12 @@ in
          after = [ "systemd-sysusers.service" ];
          unitConfig.DefaultDependencies = "no";
  
@@ -901,7 +898,7 @@ index acae79f..fdfd59d 100644
          serviceConfig = {
            Type = "oneshot";
            ExecStart = pkgs.writeShellScript "agenix-install" (concatLines [
-@@ -341,7 +648,7 @@ in
+@@ -341,7 +645,7 @@ in
          script = ''
            set -e
            set -o pipefail
