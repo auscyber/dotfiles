@@ -9,7 +9,7 @@
         enable = true;
         settings = {
           animation = "dur_file";
-          dur_file_path = builtins.toString ./blackhole.dur;
+          dur_file_path = builtins.toString (builtins.path { name = "blackhole.dur"; path = ./blackhole.dur; });
           full_color = true;
         };
       };

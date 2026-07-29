@@ -28,7 +28,10 @@
       sshUser = "builder";
     };
     users.auscyber = {
-      wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
+      wallpaper = builtins.path {
+        name = "wallpaper";
+        path = ../../backgrounds/phoebebridgers-2.jpg;
+      };
       roles = [
         "gui"
         "gaming"
@@ -79,7 +82,10 @@
 
         # Hardware detection (kernel modules, microcode, ...) from the facter
         # report instead of a hand-written hardware-configuration.nix.
-        hardware.facter.reportPath = ./auspc/facter.json;
+        hardware.facter.reportPath = builtins.path {
+          name = "facter";
+          path = ./auspc/facter.json;
+        };
 
         # Root/nix/var/home live on the natively-encrypted zpool `zpool`; disko
         # generates their fileSystems from the dataset layout. ZFS device paths
