@@ -5,7 +5,11 @@ let
     options = {
       flakeFolder = lib.mkOption {
         type = lib.types.str;
-        default = "${config.home.homeDirectory}/dotfiles";
+        default =
+          if user.host.class == "darwin" then
+            "/Users/${user.name}/dotfiles"
+          else
+            "/home/${user.name}/dotfiles";
         defaultText = lib.literalExpression ''"''${config.home.homeDirectory}/dotfiles"'';
         description = "Folder where this user's flake.nix is checked out.";
       };
