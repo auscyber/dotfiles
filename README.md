@@ -46,6 +46,7 @@
 - darwin-hmApps
 - dev
 - dev-cli
+- dev-nix
 - file-local
 - fish
 - ghostty
@@ -180,6 +181,7 @@ graph LR
   cotabby["cotabby"]:::cotabby_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
+  dev_nix["dev-nix"]:::dev_nix_c
   file_local["file-local"]:::file_local_c
   fish["fish"]:::fish_c
   ghostty["ghostty"]:::ghostty_c
@@ -214,6 +216,7 @@ graph LR
   zotero["zotero"]:::zotero_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
+  dev --> dev_nix
   fish --> user_shell__ivypierlot_Ivys_MacBook_Pro
   ivypierlot --> agenix_rekey_user_ivypierlot
   ivypierlot --> celler_push
@@ -265,6 +268,7 @@ graph LR
   classDef den__batteries__define_user__ivypierlot_Ivys_MacBook_Pro_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef dev_cli_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef dev_nix_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef file_local_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef ghostty_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -363,6 +367,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - den/provides/unfree(castlabs-electron)
 - dev
 - dev-cli
+- dev-nix
 - disko
 - fish
 - ghostty
@@ -490,6 +495,7 @@ graph LR
   celler_push["celler-push"]:::celler_push_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
+  dev_nix["dev-nix"]:::dev_nix_c
   fish["fish"]:::fish_c
   ghostty["ghostty"]:::ghostty_c
   gpg["gpg"]:::gpg_c
@@ -524,6 +530,7 @@ graph LR
   auscyber__auspc --> stylix
   celler_push --> agenix_rekey_user_auscyber
   dev --> dev_cli
+  dev --> dev_nix
   fish --> user_shell__auscyber_auspc
   gui --> ghostty
   gui --> onepassword
@@ -553,6 +560,7 @@ graph LR
   classDef den__batteries__define_user__auscyber_auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef dev_cli_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef dev_nix_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef disko_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef ghostty_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -833,6 +841,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - darwin-hmApps
 - dev
 - dev-cli
+- dev-nix
 - file-local
 - fish
 - ghostty
@@ -949,6 +958,7 @@ graph LR
   cotabby["cotabby"]:::cotabby_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
+  dev_nix["dev-nix"]:::dev_nix_c
   file_local["file-local"]:::file_local_c
   fish["fish"]:::fish_c
   ghostty["ghostty"]:::ghostty_c
@@ -982,6 +992,7 @@ graph LR
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
+  dev --> dev_nix
   fish --> user_shell__ivypierlot_macmini
   ivypierlot --> agenix_rekey_user_ivypierlot
   ivypierlot --> celler_push
@@ -1029,6 +1040,7 @@ graph LR
   classDef den__batteries__define_user__ivypierlot_macmini_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef dev_cli_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef dev_nix_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef file_local_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef ghostty_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
