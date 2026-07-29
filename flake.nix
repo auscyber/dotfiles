@@ -93,6 +93,10 @@
       url = "github:blitz/celler/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     crane.url = "github:ipetkov/crane";
     darwin = {
       url = "github:nix-darwin/nix-darwin";
