@@ -6,7 +6,7 @@
 {
   den.aspects.fish =
     {
-      user,
+      anyUser,
       host,
       ...
     }:

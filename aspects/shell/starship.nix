@@ -3,7 +3,7 @@
     environment.shells = [ pkgs.zsh ];
     programs.zsh.enable = true;
   };
-  den.aspects.starship.homeManager = { user, ... }: {
+  den.aspects.starship.homeManager = { anyUser, ... }: {
     programs.starship = {
       enable = true;
       settings = {
