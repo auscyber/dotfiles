@@ -53,7 +53,16 @@ let
       modules = [
         inputs.celler.nixosModules.cellerd
         {
-          _module.args = { inherit pkgs; };
+          # `scoped` is injected into real configs by lib/age-scoped.nix, which
+          # this fixpoint has no reason to import (there is no agenix here). The
+          # body requests it for `services.cellerd.environmentFile`, and a module
+          # function throws on a missing arg even under `_module.check = false`
+          # -- but nothing here forces environmentFile, so an empty stub is
+          # enough to let the function apply.
+          _module.args = {
+            inherit pkgs;
+            scoped = { };
+          };
           _module.check = false;
         }
       ]
@@ -137,7 +146,7 @@ in
           client_max_body_size 15g;
         '';
       };
-      secrets = { secrets, ... }: {
+      secrets = { secrets, scoped, ... }: {
         # RS256 signing key (aspects/base/cache.age): both the input the
         # github_cache_key generator decrypts to mint tokens AND the key
         # cellerd reads at runtime via the celler_env template below, so on
@@ -168,40 +177,51 @@ in
         };
       };
 
-      nixos = { config, ... }: {
-        imports = [ inputs.celler.nixosModules.cellerd ];
+      # In the `templates` class rather than raw in `nixos` below, because only
+      # the classes this aspect re-emits get scope-local args: here `secrets` is
+      # this aspect's own scope keyed by short name, so `cache_key` needs no
+      # `celler/` prefix. In a terminal class body (`nixos`/`darwin`/`homeManager`)
+      # `secrets` is the flat global set -- den binds those args per scope, not
+      # per aspect.
+      templates.env = { secrets, ... }: {
+        dependencies.cache_key = secrets.cache_key;
+        content = { placeholders, ... }: ''
+          CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
+        '';
+      };
 
-        services.cellerd = {
-          enable = true;
-          environmentFile = "${config.age.templates."celler_env".path}";
-          useFlakeCompatOverlay = false;
-          settings = {
-            listen = "[::]:${toString port}";
-            storage = {
-              type = "local";
-              path = "/mnt/hdd/attic";
-            };
+      nixos =
+        {
+          scoped,
+          ...
+        }:
+        {
+          imports = [ inputs.celler.nixosModules.cellerd ];
 
-            jwt = { };
+          services.cellerd = {
+            enable = true;
+            environmentFile = scoped.celler.access.env.path;
+            useFlakeCompatOverlay = false;
+            settings = {
+              listen = "[::]:${toString port}";
+              storage = {
+                type = "local";
+                path = "/mnt/hdd/attic";
+              };
 
-            # Data chunking. Changing these makes existing chunks unreusable
-            # (different cutpoints), hurting dedup until re-uploaded.
-            chunking = {
-              nar-size-threshold = 64 * 1024; # 64 KiB
-              min-size = 16 * 1024; # 16 KiB
-              avg-size = 64 * 1024; # 64 KiB
-              max-size = 256 * 1024; # 256 KiB
+              jwt = { };
+
+              # Data chunking. Changing these makes existing chunks unreusable
+              # (different cutpoints), hurting dedup until re-uploaded.
+              chunking = {
+                nar-size-threshold = 64 * 1024; # 64 KiB
+                min-size = 16 * 1024; # 16 KiB
+                avg-size = 64 * 1024; # 64 KiB
+                max-size = 256 * 1024; # 256 KiB
+              };
             };
           };
         };
-
-        age.templates.celler_env = {
-          dependencies.cache_key = config.age.secrets.cache_key;
-          content = { placeholders, ... }: ''
-            CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.cache_key}
-          '';
-        };
-      };
     };
 
   # Opt-in per-host cache credentials. A host that includes this aspect gets its
@@ -218,13 +238,21 @@ in
       {
         pkgs,
         config,
+        scoped,
         ...
       }:
       {
         age.templates."celler_config" = {
           path = "${config.home.homeDirectory}/.config/celler/config.toml";
+          # `homeManager` is a terminal class, so `scoped` is the whole tree here
+          # and the scope has to be named -- see the note in
+          # ../security/age-scope.nix on why a per-aspect context binding cannot
+          # reach an aspect's own class bodies. This template stays raw rather
+          # than moving into the `templates` class because its `path` needs the
+          # enclosing home-manager `config`, which an entry module function
+          # cannot see (inside a submodule, `config` is the entry's own).
           dependencies = {
-            inherit (config.age.secrets) celler_token;
+            inherit (scoped.celler-push.access) celler_token;
           };
           content =
             {
@@ -244,27 +272,28 @@ in
 
     secrets =
       {
+        scoped,
         secrets,
         host,
         ...
       }:
       {
-        cache_keyy = {
+        cache_key = {
           rekeyFile = ./cache.age;
           intermediary = lib.mkDefault true;
         };
         celler_token.generator = {
           tags = [ "celler_token" ];
           dependencies = {
-            cache_key = secrets.cache_keyy;
+            cache_key = secrets.cache_key;
           };
           script = cellerTokenScript { sub = host.name; };
         };
       };
     templates =
       {
+        scoped,
         secrets,
-        config,
         ...
       }:
       {
@@ -290,6 +319,7 @@ in
         config,
         pkgs,
         host,
+        scoped,
         ...
       }:
       let
@@ -305,7 +335,7 @@ in
               set -f # disable globbing
               export IFS=' '
               export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
-              celler login central https://${vhost} "$(cat ${config.age.secrets.celler_token.path})"
+              celler login central https://${vhost} "$(cat ${scoped.celler-push.access.celler_token.path})"
 
               echo "Uploading paths" $OUT_PATHS
               if [[ -n "''${OUT_PATHS:-}" ]]; then
@@ -325,7 +355,7 @@ in
       {
         nix.settings = {
           post-build-hook = "${lib.getExe build-hook}";
-          netrc-file = config.age.templates.netrc.path;
+          netrc-file = scoped.celler-push.access.netrc.path;
         };
       };
   };

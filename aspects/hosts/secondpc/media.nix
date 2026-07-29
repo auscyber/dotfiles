@@ -16,6 +16,7 @@
         config,
         pkgs,
         lib,
+        scoped,
         ...
       }:
       {
@@ -100,7 +101,7 @@
         age.secrets.htpasswd = {
           owner = config.services.nginx.user;
           generator = {
-            dependencies = { inherit (config.age.secrets) ivy-password; };
+            dependencies = { inherit (scoped.user-pwd.access) ivy-password; };
             script =
               {
                 pkgs,
@@ -115,7 +116,7 @@
           };
         };
         security.acme.certs."logs.pierlot.com.au" = {
-          environmentFile = config.age.secrets."acme_cloudflare.env".path;
+          environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
           group = config.services.nginx.group;
         };
         services.nginx.virtualHosts."logs.pierlot.com.au" = {

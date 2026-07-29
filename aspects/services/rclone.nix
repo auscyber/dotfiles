@@ -13,18 +13,20 @@ in
   den.aspects.rclone = {
     includes = [ den.aspects.agenix-rekey ];
 
-    # Route into age.secrets.<name> via the agenix-rekey `secrets` forward class.
+    # Nested under this aspect's own scope by aspects/security/age-scope.nix, so
+    # each remote lands at `age.secrets."rclone/<remote>"` -- the key here is
+    # just the remote name, no hand-written prefix.
     secrets = lib.listToAttrs (
       map (name: {
-        name = "rclone/secrets/${name}";
+        inherit name;
         value.rekeyFile = ../../secrets/rclone + "/${name}.age";
       }) remoteNames
     );
 
     homeManager =
-      { config, ... }:
+      { config, scoped, ... }:
       let
-        secretFor = name: config.age.secrets."rclone/secrets/${name}".path;
+        secretFor = name: scoped.rclone.access.${name}.path;
       in
       {
         programs.rclone = {

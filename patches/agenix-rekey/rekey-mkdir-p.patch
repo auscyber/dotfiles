@@ -1,0 +1,14 @@
+--- a/apps/rekey.nix	2026-07-29 21:56:10
++++ b/apps/rekey.nix	2026-07-29 21:56:10
+@@ -192,6 +192,11 @@
+                 # Mark secret as known
+                 TRACKED_SECRETS[${escapeShellArg secretOut}]=true
+ 
++                # `secret.name` may contain `/` (scoped secrets), which makes
++                # secretOut land in a subdirectory of localStorageDir that the
++                # single `mkdir -p ${hostRekeyDir}` below does not create.
++                mkdir -p "$(dirname ${escapeShellArg secretOut})"
++
+                 if [[ -e ${escapeShellArg secretOut} ]] && [[ "$FORCE" != true ]]; then
+                   echo "[1;90m    Skipping[m [90m[already rekeyed] "${escapeShellArg hostName}":"${escapeShellArg secretName}"[m"
+                 else

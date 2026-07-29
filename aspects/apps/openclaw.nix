@@ -27,14 +27,6 @@
     # from `prev` and take pnpm_11 as an explicit argument, so dropping the
     # top-level attr leaves them untouched; it stays at
     # pkgs.openclawPackages.pnpm_11.
-    # Trailing `tr -d '\n'`: `base64` line-wraps at 76 columns, and 32 hex-encoded
-    # bytes encode to 88 characters, so without it the token is emitted as two
-    # lines. agenix substitutes a dependency's embedded newlines literally (only
-    # the *trailing* one is stripped, by `$(...)`), which would split the
-    # KEY=VALUE template below across two lines and truncate the token.
-    secrets.openclaw-token.generator.script = { pkgs, ... }: ''
-      openssl rand -hex 32 | tr -d '\n' | base64 | tr -d '\n'
-    '';
     overlays.nix-openclaw =
       final: prev: removeAttrs (inputs.nix-openclaw.overlays.default final prev) [ "pnpm_11" ];
 
@@ -43,11 +35,41 @@
       nixpkgs.config.allowInsecurePredicate = pkg: lib.hasPrefix "openclaw" (lib.getName pkg);
     };
 
+    # --- scoped secrets (see lib/age-scoped.nix) ---------------------------
+    # This aspect owns the `openclaw` scope, so the two keys below land at
+    # age.secrets."openclaw/openclaw-token" and age.templates."openclaw/env",
+    # deployed to ~/Library/agenix/{secrets,templates}/openclaw/.
+    #
+    # Trailing `tr -d '\n'`: `base64` line-wraps at 76 columns, and 32 hex-encoded
+    # bytes encode to 88 characters, so without it the token is emitted as two
+    # lines. agenix substitutes a dependency's embedded newlines literally (only
+    # the *trailing* one is stripped, by `$(...)`), which would split the
+    # KEY=VALUE template below across two lines and truncate the token.
+    secrets.openclaw-token.generator.script = { pkgs, ... }: ''
+      openssl rand -hex 32 | tr -d '\n' | base64 | tr -d '\n'
+    '';
+
+    # Render the generated gateway token into the KEY=VALUE shape an environment
+    # file has. Only the placeholder lives in the world-readable store copy;
+    # agenix decrypts and substitutes at activation.
+    #
+    # `secrets` is rebound to this aspect's own scope inside a `secrets`/
+    # `templates` body, so sibling secrets are named by their short key -- the
+    # scope prefix never appears. (The `dependencies` could also be omitted
+    # entirely: a template implicitly depends on every secret in its scope.)
+    templates.env = { secrets, ... }: {
+      dependencies.openclaw-token = secrets.openclaw-token;
+      content = { placeholders, ... }: ''
+        OPENCLAW_GATEWAY_TOKEN=${placeholders.openclaw-token}
+      '';
+    };
+
     homeManager =
       {
         config,
         lib,
         pkgs,
+        scoped,
         ...
       }:
       {
@@ -57,12 +79,6 @@
         # environment file has. Only the placeholder lives in the world-readable
         # store copy; agenix decrypts and substitutes at activation, into
         # ~/Library/agenix/templates.
-        age.templates."openclaw-env" = {
-          dependencies.openclaw-token = config.age.secrets.openclaw-token;
-          content = { placeholders, ... }: ''
-            OPENCLAW_GATEWAY_TOKEN=${placeholders.openclaw-token}
-          '';
-        };
 
         programs.openclaw = {
           enable = true;
@@ -87,7 +103,7 @@
           # environment file, so the token reaches the gateway process' env
           # without passing through the store or ~/.config/openclaw/openclaw.json.
           # (A var whose name ends in `_FILE` would be handed the path instead.)
-          environment.OPENCLAW_GATEWAY_TOKEN = config.age.templates."openclaw-env".path;
+          environment.OPENCLAW_GATEWAY_TOKEN = scoped.env.path;
 
           # `agents.defaults` below routes the primary model through the
           # `claude-cli` agent runtime, which shells out to `claude` -- so the

@@ -159,6 +159,7 @@ in
       {
         config,
         host,
+        scoped,
         ...
       }:
       let
@@ -173,7 +174,7 @@ in
         config = lib.mkIf (cfg.backend == "wg-quick") {
           networking.wg-quick.interfaces.${cfg.interface} = {
             address = [ "${tunnelIp cfg host}/24" ];
-            privateKeyFile = config.age.secrets.wireguard_key.path;
+            privateKeyFile = scoped.vpn-secrets.access.wireguard_key.path;
             peers = tunnelPeers cfg host;
           }
           // lib.optionalAttrs (cfg.listenPort != null) { inherit (cfg) listenPort; };
@@ -188,6 +189,7 @@ in
       {
         config,
         host,
+        scoped,
         ...
       }:
       let
@@ -201,7 +203,11 @@ in
 
           # networkd opens the key as the systemd-network user; wg-quick runs
           # as root and does not care.
-          age.secrets.wireguard_key = {
+          #
+          # This has to reach the key through its scope -- `age.secrets.wireguard_key`
+          # would declare a SECOND, unrelated secret now that the `vpn-secrets`
+          # aspect's declaration lives at `vpn-secrets/wireguard_key`.
+          age.scoped.vpn-secrets.secrets.wireguard_key = {
             owner = "systemd-network";
             group = "systemd-network";
           };
@@ -213,7 +219,7 @@ in
               MTUBytes = "1500";
             };
             wireguardConfig = {
-              PrivateKeyFile = config.age.secrets.wireguard_key.path;
+              PrivateKeyFile = scoped.vpn-secrets.access.wireguard_key.path;
               RouteTable = "main";
             }
             // lib.optionalAttrs (cfg.listenPort != null) { ListenPort = cfg.listenPort; };

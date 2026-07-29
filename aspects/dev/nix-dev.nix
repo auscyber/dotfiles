@@ -4,18 +4,23 @@
   ...
 }:
 {
-  den.aspects.dev-nix = { user, ... }: {
+  # NOT a bare parametric aspect (`den.aspects.dev-nix = { user, ... }: { ... }`).
+  # den coerces that shape to `{ includes = [ fn ]; }`, so the class content ends
+  # up on an anonymous child aspect -- where `den.schema.aspect` never sees it
+  # under the name `dev-nix`, and its secrets would not be scoped. Each class
+  # body requests the context args it needs instead.
+  den.aspects.dev-nix = {
     templates =
       {
         config,
         user,
-        secrets,
+        scoped,
         ...
       }:
       {
         "extra-nix-conf" = {
           dependencies = {
-            inherit (secrets) nix_github_token;
+            inherit (scoped.secrets) nix_github_token;
           };
           content =
             {
@@ -42,12 +47,12 @@
     homeManager =
       {
         pkgs,
-        config,
+        scoped,
         ...
       }:
       {
         nix.extraOptions = ''
-          !include ${config.age.templates."extra-nix-conf".path}
+          !include ${scoped.dev-nix.access."extra-nix-conf".path}
         '';
         home.packages = with pkgs; [
           nil

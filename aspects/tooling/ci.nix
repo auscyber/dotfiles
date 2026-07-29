@@ -143,6 +143,9 @@ in
           	exit 1
           fi
 
+          # Unchanged by scoping: this secret sets an explicit `rekeyFile`, so
+          # its source path is fixed by that, not derived from the secret name.
+          # Only the name `agenix generate` is called with picks up the scope.
           src="aspects/base/github_cache_key.age"
           id="aspects/security/gpg-yubikey.pub"
 
@@ -153,7 +156,7 @@ in
           # scoped celler JWT (sub=github, push=main), regenerated only if absent.
           if [ ! -e "$src" ]; then
           	echo "sync-ci-secrets: $src missing, minting it (touch your YubiKey) ..." >&2
-          	agenix generate github_cache_key
+          	agenix generate celler/github_cache_key
           fi
 
           # Decrypt the master-encrypted source with the same identity `.#rekey`

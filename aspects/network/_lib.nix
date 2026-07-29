@@ -7,7 +7,10 @@ let
   hexToInt = s: (builtins.fromTOML "v=0x${s}").v;
   hostOctet =
     name: 2 + lib.mod (hexToInt (lib.substring 0 6 (builtins.hashString "sha256" name))) 253;
-  pubKeyFile = name: ../../secrets/generated + "/${name}/wireguard_key.pub";
+  # `vpn-secrets/` is the scope prefix: the keypair is declared by the
+  # `vpn-secrets` aspect, so agenix-rekey's generator writes it (and the `.pub`
+  # sidecar) under `<generatedSecretsDir>/vpn-secrets/`.
+  pubKeyFile = name: ../../secrets/generated + "/${name}/vpn-secrets/wireguard_key.pub";
   pubKey = name: lib.removeSuffix "\n" (builtins.readFile (pubKeyFile name));
 
   # A host peers over wireguard iff the generator has produced a host-level

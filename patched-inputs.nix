@@ -30,6 +30,7 @@
   agenix-rekey.patches = [
     ./patches/agenix-rekey/template.patch
     ./patches/agenix-rekey/stat-portable.patch
+    ./patches/agenix-rekey/rekey-mkdir-p.patch
   ];
   darwin.patches = [
     ./patches/darwin/karabiner.patch
@@ -45,8 +46,8 @@
   zen-browser.patches = [ ];
 
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
-  agenix.hash = "sha256-6Jh720QCOUYbcypjmIFcwhckE2acN13G60kk9yCLW2s=";
-  agenix-rekey.hash = "sha256-YCmqS/NDsOUaBoIskV0wTq+1odiNdeTR+0eRNJtISvU=";
+  agenix.hash = "sha256-IxvHSroDzQk1d476BVWzdUijtUVfEIc1OO7AWWlke+g=";
+  agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
   darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
   home-manager.hash = "sha256-0gXNFapHEstAY0PVA7mls72OnNNdlEMzvaWGl5ysvvs=";
   nh.hash = "sha256-AB5LGXgRBAJR2cFrXDT2Gos0YGHxt97JytkSZ4uNiDE=";

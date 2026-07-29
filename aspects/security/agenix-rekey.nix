@@ -26,11 +26,18 @@ let
     #    ]) [ "warnings" ])
   ];
 
+  # `age.scoped` -- per-scope groups of secrets/templates flattened back into
+  # `age.secrets`/`age.templates`, plus the `secrets`/`templates`/`scoped` module
+  # args. Imported next to the agenix modules in each class so the option exists
+  # exactly where `age.*` does. See ./age-scope.nix for the per-aspect nesting.
+  scopedModule = class: import ../../lib/age-scoped.nix { inherit lib class; };
+
   # homeManager rekey content as a function of the resolved identity (`anyUser`).
   mkHmRekey = anyUser: {
     imports = [
       (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
       inputs.agenix.homeManagerModules.default
+      (scopedModule "homeManager")
     ]
     ++ rename;
     age.rekey.storageMode = "local";
@@ -51,11 +58,20 @@ let
         // rec {
           age = config.age;
           secrets = age.secrets;
+          templates = age.templates;
+          scoped = age.scoped;
         };
       path = pF { inherit kind system; }; # Your existing intoPath function
     };
 
-  # Generate all routes via cartesian product
+  # Generate all routes via cartesian product.
+  #
+  # `secrets` and `templates` are deliberately absent: they are still registered
+  # classes (aspects keep writing them, and den's key classification needs them),
+  # but aspects/security/age-scope.nix nests each aspect's content under
+  # `scoped.<aspect>` instead, and the `scoped` route below is what carries it to
+  # `age.scoped`. Routing them here as well would double-deliver, once flat and
+  # once scoped.
   allRoutes = lib.flatten (
     lib.mapCartesianProduct
       (
@@ -67,8 +83,7 @@ let
       )
       {
         kind = [
-          "secrets"
-          "templates"
+          "scoped"
           "rekey"
           "age"
         ];
@@ -106,6 +121,12 @@ in
         # every generated secret regenerates on every run. Pin the check to GNU
         # coreutils' stat (same style as the file's existing ${pkgs.coreutils}/bin/realpath).
         ../../patches/agenix-rekey/stat-portable.patch
+        # `storageMode = "local"` writes each rekeyed secret to
+        # <localStorageDir>/<identHash>-<secret.name>.age but only creates
+        # localStorageDir. Scoped secrets put a `/` in the name (`celler/cache_key`),
+        # so the target directory does not exist and reencrypt fails. (Already a
+        # latent bug for aspects/services/rclone.nix, which has never been rekeyed.)
+        ../../patches/agenix-rekey/rekey-mkdir-p.patch
 
       ];
       inputs.nixpkgs.follows = "nixpkgs";
@@ -150,12 +171,14 @@ in
       imports = [
         inputs.agenix.nixosModules.default
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+        (scopedModule "nixos")
       ];
     };
     darwin.imports = [
       #      inputs.agenix-rekey.nixosModules.default
       (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
       inputs.agenix.darwinModules.default
+      (scopedModule "darwin")
     ];
     os =
       {

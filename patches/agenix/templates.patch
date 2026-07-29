@@ -1,8 +1,36 @@
+diff --git a/README.md b/README.md
+index 8284e7e..6e7d14b 100644
+--- a/README.md
++++ b/README.md
+@@ -559,6 +559,12 @@ stop using them.
+ Some programs do not like following symlinks (for example Java
+ programs like Elasticsearch).
+ 
++If `age.secrets.<name>.path` points inside `age.secretsDir`, the secret
++is created in the generation directory that `age.secretsDir` links to,
++keeping any nested folders of the path. It is still a regular file (not
++a symlink) at that path, but it is cleaned up with its generation like
++any other secret.
++
+ Example:
+ 
+ ```nix
+@@ -678,6 +684,10 @@ in a format understood by chmod.
+ secrets are symlinked to `age.secrets.<name>.path`. If false, secrets
+ are copied to `age.secrets.<name>.path`.
+ 
++If `age.secrets.<name>.path` points inside `age.secretsDir`, the secret
++is created in the generation directory that `age.secretsDir` links to,
++keeping any nested folders of the path.
++
+ #### `age.identityPaths`
+ 
+ `age.identityPaths` is a list of paths to SSH private keys to use for decryption.
 diff --git a/modules/age-home.nix b/modules/age-home.nix
-index 54695ae..51f347c 100644
+index 54695ae..28ffbc9 100644
 --- a/modules/age-home.nix
 +++ b/modules/age-home.nix
-@@ -11,21 +11,35 @@ let
+@@ -11,21 +11,55 @@ let
  
    ageBin = lib.getExe config.age.package;
  
@@ -35,30 +63,58 @@ index 54695ae..51f347c 100644
 +        mkdir -p "${cfg.ageMountPoint}/$_agenix_generation${templatesMountPoint}"
    '';
  
++  # The agenix managed directory a secret or template is exposed through, and
++  # the mount point of that directory inside a generation.
++  targetDir =
++    secretType: toString (if secretType.type == "template" then cfg.templateDir else cfg.secretsDir);
++  mountPoint =
++    secretType: if secretType.type == "template" then templatesMountPoint else secretsMountPoint;
++
++  # Whether path points inside the agenix managed directory. That directory is
++  # itself a symlink which only points at the new generation once everything is
++  # installed, so such files cannot be written to path directly: they would land
++  # in the previous generation and be removed together with it. They are created
++  # in the new generation instead, keeping any nested folders of path.
++  inTargetDir = secretType: hasPrefix "${targetDir secretType}/" secretType.path;
++
++  # Location of the file inside a generation, relative to its mount point.
++  generationPath =
++    secretType:
++    if inTargetDir secretType then
++      removePrefix "${targetDir secretType}/" secretType.path
++    else
++      secretType.name;
++
    setTruePath = secretType: ''
      ${
-       if secretType.symlink then
+-      if secretType.symlink then
++      if secretType.symlink || inTargetDir secretType then
          ''
 -          _truePath="${cfg.secretsMountPoint}/$_agenix_generation/${secretType.name}"
-+          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${
-+            if secretType.type == "template" then "templates" else "secrets"
-+          }/${secretType.name}"
++          _truePath="${cfg.ageMountPoint}/$_agenix_generation${mountPoint secretType}/${generationPath secretType}"
          ''
        else
          ''
-@@ -33,16 +47,15 @@ let
-         ''
+@@ -34,15 +68,23 @@ let
      }
    '';
--
+ 
 -  installSecret = secretType: ''
++  # Files outside of the managed directory are symlinked into place. Files
++  # inside it are already reachable through the directory symlink itself.
++  linkToPath =
++    secretType:
++    optionalString (secretType.symlink && !inTargetDir secretType) ''
++      mkdir -p "$(dirname "${secretType.path}")"
++      ln -sfT "${targetDir secretType}/${secretType.name}" "${secretType.path}"
++    '';
++
 +  setupStart = secretType: ''
      ${setTruePath secretType}
 -    echo "decrypting '${secretType.file}' to '$_truePath'..."
 +    echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."
      TMP_FILE="$_truePath.tmp"
 -
-+    mkdir -p "$(dirname "$_truePath")"
      IDENTITIES=()
 -    # shellcheck disable=2043
      for identity in ${toString cfg.identityPaths}; do
@@ -67,10 +123,12 @@ index 54695ae..51f347c 100644
        IDENTITIES+=(-i)
        IDENTITIES+=("$identity")
      done
-@@ -50,6 +63,57 @@ let
+@@ -50,8 +92,52 @@ let
      test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
  
      mkdir -p "$(dirname "$_truePath")"
+-    # shellcheck disable=SC2193,SC2050
+-    [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && mkdir -p "$(dirname "${secretType.path}")"
 +
 +  '';
 +
@@ -112,20 +170,15 @@ index 54695ae..51f347c 100644
 +
 +        chmod ${templateType.mode} "$TMP_FILE"
 +        mv -f "$TMP_FILE" "$_truePath"
-+    ${optionalString templateType.symlink ''
-+      # shellcheck disable=SC2193,SC2050
-+      [ "${templateType.path}" != "${cfg.templateDir}/${templateType.name}" ] && ln -sfT "${cfg.templateDir}/${templateType.name}" "${templateType.path}"
-+    ''}
-+
++    ${linkToPath templateType}
 +  '';
 +
 +  installSecret = secretType: ''
 +    ${setupStart secretType}
-+
-     # shellcheck disable=SC2193,SC2050
-     [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && mkdir -p "$(dirname "${secretType.path}")"
      (
-@@ -60,6 +124,17 @@ let
+       umask u=r,g=,o=
+       test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
+@@ -60,13 +146,21 @@ let
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
@@ -143,7 +196,15 @@ index 54695ae..51f347c 100644
      chmod ${secretType.mode} "$TMP_FILE"
      mv -f "$TMP_FILE" "$_truePath"
  
-@@ -74,22 +149,139 @@ let
+-    ${optionalString secretType.symlink ''
+-      # shellcheck disable=SC2193,SC2050
+-      [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && ln -sfT "${cfg.secretsDir}/${secretType.name}" "${secretType.path}"
+-    ''}
++    ${linkToPath secretType}
+   '';
+ 
+   testIdentities = map (path: ''
+@@ -74,22 +168,139 @@ let
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
@@ -294,7 +355,7 @@ index 54695ae..51f347c 100644
    );
  
    secretType = types.submodule (
-@@ -107,6 +299,12 @@ let
+@@ -107,6 +318,12 @@ let
              Name of the file used in ''${cfg.secretsDir}
            '';
          };
@@ -307,7 +368,7 @@ index 54695ae..51f347c 100644
          file = mkOption {
            type = types.path;
            description = ''
-@@ -127,6 +325,13 @@ let
+@@ -127,6 +344,13 @@ let
              Permissions mode of the decrypted secret in a format understood by chmod.
            '';
          };
@@ -321,7 +382,7 @@ index 54695ae..51f347c 100644
          symlink = mkEnableOption "symlinking secrets to their destination" // {
            default = true;
          };
-@@ -138,7 +343,14 @@ let
+@@ -138,7 +362,14 @@ let
      let
        app = pkgs.writeShellApplication {
          name = "agenix-home-manager-mount-secrets";
@@ -337,7 +398,7 @@ index 54695ae..51f347c 100644
          text = ''
            ${newGeneration}
            ${installSecrets}
-@@ -175,6 +387,14 @@ in
+@@ -175,6 +406,14 @@ in
        '';
      };
  
@@ -352,7 +413,7 @@ index 54695ae..51f347c 100644
      identityPaths = mkOption {
        type = types.listOf types.path;
        default = [
-@@ -194,23 +414,32 @@ in
+@@ -194,23 +433,32 @@ in
  
      secretsDir = mkOption {
        type = types.str;
@@ -391,7 +452,7 @@ index 54695ae..51f347c 100644
        {
          assertion = cfg.identityPaths != [ ];
 diff --git a/modules/age.nix b/modules/age.nix
-index acae79f..ac045bc 100644
+index acae79f..fddd77d 100644
 --- a/modules/age.nix
 +++ b/modules/age.nix
 @@ -11,6 +11,11 @@ let
@@ -406,7 +467,7 @@ index acae79f..ac045bc 100644
    ageBin = config.age.ageBin;
  
    users = config.users.users;
-@@ -24,41 +29,52 @@ let
+@@ -24,41 +29,72 @@ let
    mountCommand =
      if isDarwin then
        ''
@@ -462,34 +523,62 @@ index acae79f..ac045bc 100644
 +    chown :${chownGroup} "${cfg.ageMountPoint}" "${cfg.ageMountPoint}/$_agenix_generation"
    '';
  
++  # The agenix managed directory a secret or template is exposed through, and
++  # the mount point of that directory inside a generation.
++  targetDir =
++    secretType: toString (if secretType.type == "template" then cfg.templateDir else cfg.secretsDir);
++  mountPoint =
++    secretType: if secretType.type == "template" then templatesMountPoint else secretsMountPoint;
++
++  # Whether path points inside the agenix managed directory. That directory is
++  # itself a symlink which only points at the new generation once everything is
++  # installed, so such files cannot be written to path directly: they would land
++  # in the previous generation and be removed together with it. They are created
++  # in the new generation instead, keeping any nested folders of path.
++  inTargetDir = secretType: hasPrefix "${targetDir secretType}/" secretType.path;
++
++  # Location of the file inside a generation, relative to its mount point.
++  generationPath =
++    secretType:
++    if inTargetDir secretType then
++      removePrefix "${targetDir secretType}/" secretType.path
++    else
++      secretType.name;
++
    setTruePath = secretType: ''
      ${
-       if secretType.symlink then
+-      if secretType.symlink then
++      if secretType.symlink || inTargetDir secretType then
          ''
 -          _truePath="${cfg.secretsMountPoint}/$_agenix_generation/${secretType.name}"
-+          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${
-+            if secretType.type == "template" then templatesMountPoint else secretsMountPoint
-+          }/${secretType.name}"
++          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${mountPoint secretType}/${generationPath secretType}"
          ''
        else
          ''
-@@ -66,12 +82,11 @@ let
-         ''
+@@ -67,11 +103,19 @@ let
      }
    '';
--
+ 
 -  installSecret = secretType: ''
++  # Files outside of the managed directory are symlinked into place. Files
++  # inside it are already reachable through the directory symlink itself.
++  linkToPath =
++    secretType:
++    optionalString (secretType.symlink && !inTargetDir secretType) ''
++      mkdir -p "$(dirname "${secretType.path}")"
++      ln -sfT "${targetDir secretType}/${secretType.name}" "${secretType.path}"
++    '';
++
 +  setupStart = secretType: ''
      ${setTruePath secretType}
 -    echo "decrypting '${secretType.file}' to '$_truePath'..."
 +    echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."
      TMP_FILE="$_truePath.tmp"
 -
-+    mkdir -p "$(dirname "$_truePath")"
      IDENTITIES=()
      for identity in ${toString cfg.identityPaths}; do
        test -r "$identity" || continue
-@@ -83,7 +98,61 @@ let
+@@ -83,7 +127,57 @@ let
      test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
  
      mkdir -p "$(dirname "$_truePath")"
@@ -539,20 +628,16 @@ index acae79f..ac045bc 100644
 +
 +    chmod ${templateType.mode} "$TMP_FILE"
 +    mv -f "$TMP_FILE" "$_truePath"
-+    ${optionalString templateType.symlink ''
-+      [ "${templateType.path}" != "${cfg.templateDir}/${templateType.name}" ] && ln -sfT "${cfg.templateDir}/${templateType.name}" "${templateType.path}"
-+    ''}
++    ${linkToPath templateType}
 +  '';
 +
 +  installSecret = secretType: ''
 +    ${setupStart secretType}
 +    echo "decrypting '${secretType.file}' to '$_truePath'..."
-+
-+        [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && mkdir -p "$(dirname "${secretType.path}")"
      (
        umask u=r,g=,o=
        test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -92,6 +161,25 @@ let
+@@ -92,12 +186,29 @@ let
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
@@ -578,7 +663,14 @@ index acae79f..ac045bc 100644
      chmod ${secretType.mode} "$TMP_FILE"
      mv -f "$TMP_FILE" "$_truePath"
  
-@@ -105,22 +193,71 @@ let
+-    ${optionalString secretType.symlink ''
+-      [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && ln -sfT "${cfg.secretsDir}/${secretType.name}" "${secretType.path}"
+-    ''}
++    ${linkToPath secretType}
+   '';
+ 
+   testIdentities = map (path: ''
+@@ -105,22 +216,71 @@ let
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
@@ -661,7 +753,7 @@ index acae79f..ac045bc 100644
    );
  
    chownSecret = secretType: ''
-@@ -132,6 +269,131 @@ let
+@@ -132,6 +292,131 @@ let
      [ "echo '[agenix] chowning...'" ]
      ++ [ chownMountPoint ]
      ++ (map chownSecret (builtins.attrValues cfg.secrets))
@@ -793,7 +885,7 @@ index acae79f..ac045bc 100644
    );
  
    secretType = types.submodule (
-@@ -146,6 +408,12 @@ let
+@@ -146,6 +431,12 @@ let
              Name of the file used in {option}`age.secretsDir`
            '';
          };
@@ -806,7 +898,7 @@ index acae79f..ac045bc 100644
          file = mkOption {
            type = types.path;
            description = ''
-@@ -169,6 +437,20 @@ let
+@@ -169,6 +460,20 @@ let
              Permissions mode of the decrypted secret in a format understood by chmod.
            '';
          };
@@ -827,7 +919,7 @@ index acae79f..ac045bc 100644
          owner = mkOption {
            type = types.str;
            default = "0";
-@@ -199,6 +481,14 @@ in
+@@ -199,6 +504,14 @@ in
    ];
  
    options.age = {
@@ -842,7 +934,7 @@ index acae79f..ac045bc 100644
      ageBin = mkOption {
        type = types.str;
        default = "${pkgs.age}/bin/age";
-@@ -218,12 +508,19 @@ in
+@@ -218,12 +531,19 @@ in
      };
      secretsDir = mkOption {
        type = types.path;
@@ -864,7 +956,7 @@ index acae79f..ac045bc 100644
        type =
          types.addCheck types.str (
            s:
-@@ -266,9 +563,10 @@ in
+@@ -266,9 +586,10 @@ in
          Path to SSH keys to be used as identities in age decryption.
        '';
      };
@@ -876,7 +968,7 @@ index acae79f..ac045bc 100644
      {
        assertions = [
          {
-@@ -277,6 +575,7 @@ in
+@@ -277,6 +598,7 @@ in
          }
        ];
      }
@@ -884,7 +976,7 @@ index acae79f..ac045bc 100644
      (optionalAttrs (!isDarwin) {
        # When using sysusers we no longer be started as an activation script
        # because those are started in initrd while sysusers is started later.
-@@ -285,7 +584,12 @@ in
+@@ -285,7 +607,12 @@ in
          after = [ "systemd-sysusers.service" ];
          unitConfig.DefaultDependencies = "no";
  
@@ -898,7 +990,7 @@ index acae79f..ac045bc 100644
          serviceConfig = {
            Type = "oneshot";
            ExecStart = pkgs.writeShellScript "agenix-install" (concatLines [
-@@ -341,7 +645,7 @@ in
+@@ -341,7 +668,7 @@ in
          script = ''
            set -e
            set -o pipefail
@@ -907,3 +999,119 @@ index acae79f..ac045bc 100644
            ${newGeneration}
            ${installSecrets}
            ${chownSecrets}
+diff --git a/test/integration.nix b/test/integration.nix
+index 87210a7..689ed56 100644
+--- a/test/integration.nix
++++ b/test/integration.nix
+@@ -28,6 +28,12 @@ pkgs.nixosTest {
+       age.secrets = {
+         passwordfile-user1.file = ../example/passwordfile-user1.age;
+         leading-hyphen.file = ../example/-leading-hyphen-filename.age;
++        # a real file in a nested folder of secretsDir
++        nested-hyphen = {
++          file = ../example/-leading-hyphen-filename.age;
++          symlink = false;
++          path = "${config.age.secretsDir}/nested/dir/leading-hyphen";
++        };
+       };
+ 
+       age.identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
+@@ -49,7 +55,7 @@ pkgs.nixosTest {
+       };
+ 
+       home-manager.users.user1 =
+-        { options, ... }:
++        { config, options, ... }:
+         {
+           imports = [
+             ../modules/age-home.nix
+@@ -70,6 +76,12 @@ pkgs.nixosTest {
+             secrets.armored-secret = {
+               file = ../example/armored-secret.age;
+             };
++            # a real file in a nested folder of secretsDir
++            secrets.nested-secret2 = {
++              file = ../example/secret2.age;
++              symlink = false;
++              path = "${config.age.secretsDir}/nested/dir/secret2";
++            };
+           };
+         };
+     };
+@@ -81,6 +93,7 @@ pkgs.nixosTest {
+       secret2 = "world!";
+       hyphen-secret = "filename started with hyphen";
+       armored-secret = "Hello World!";
++      nested-secret-path = "/run/agenix/secrets/nested/dir/leading-hyphen";
+     in
+     ''
+       system1.wait_for_unit("multi-user.target")
+@@ -106,8 +119,16 @@ pkgs.nixosTest {
+       system1.wait_for_file("/tmp/3")
+       assert "${armored-secret}" in system1.succeed("cat /tmp/3")
+ 
++      system1.send_chars("cat /run/user/$(id -u)/agenix/secrets/nested/dir/secret2 > /tmp/4\n")
++      system1.wait_for_file("/tmp/4")
++      assert "${secret2}" in system1.succeed("cat /tmp/4")
++
+       assert "${hyphen-secret}" in system1.succeed("cat /run/agenix/leading-hyphen")
+ 
++      # secrets in a nested folder of secretsDir are real files, not symlinks
++      assert "${hyphen-secret}" in system1.succeed("cat ${nested-secret-path}")
++      system1.fail("test -L ${nested-secret-path}")
++
+       userDo = lambda input : f"sudo -u user1 -- bash -c 'set -eou pipefail; cd /tmp/secrets; {input}'"
+ 
+       before_hash = system1.succeed(userDo('sha256sum passwordfile-user1.age')).split()
+diff --git a/test/integration_darwin.nix b/test/integration_darwin.nix
+index 92da807..af49660 100644
+--- a/test/integration_darwin.nix
++++ b/test/integration_darwin.nix
+@@ -10,6 +10,8 @@ let
+     name = "agenix-integration";
+     text = ''
+       grep "${secret}" "${config.age.secrets.system-secret.path}"
++      grep "${secret}" "${config.age.secrets.nested-system-secret.path}"
++      test ! -L "${config.age.secrets.nested-system-secret.path}"
+     '';
+   };
+ in
+@@ -22,6 +24,12 @@ in
+   age = {
+     identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
+     secrets.system-secret.file = ../example/secret1.age;
++    # a real file in a nested folder of secretsDir
++    secrets.nested-system-secret = {
++      file = ../example/secret1.age;
++      symlink = false;
++      path = "${config.age.secretsDir}/nested/dir/system-secret";
++    };
+   };
+ 
+   environment.systemPackages = [ testScript ];
+diff --git a/test/integration_hm_darwin.nix b/test/integration_hm_darwin.nix
+index 965057d..fcf0609 100644
+--- a/test/integration_hm_darwin.nix
++++ b/test/integration_hm_darwin.nix
+@@ -11,6 +11,12 @@
+   age = {
+     identityPaths = options.age.identityPaths.default ++ [ "/Users/user1/.ssh/this_key_wont_exist" ];
+     secrets.user-secret.file = ../example/secret2.age;
++    # a real file in a nested folder of secretsDir
++    secrets.nested-user-secret = {
++      file = ../example/secret2.age;
++      symlink = false;
++      path = "${config.age.secretsDir}/nested/dir/user-secret";
++    };
+   };
+ 
+   home = rec {
+@@ -32,6 +38,8 @@
+           in
+           ''
+             diff -q "${config.age.secrets.user-secret.path}" <(printf '${secret}\n')
++            diff -q "${config.age.secrets.nested-user-secret.path}" <(printf '${secret}\n')
++            test ! -L "${config.age.secrets.nested-user-secret.path}"
+           '';
+       };
+     };

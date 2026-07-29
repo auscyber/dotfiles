@@ -4,11 +4,11 @@
     includes = [ den.aspects.agenix-rekey ];
     nvim.plugins.wakatime.enable = true;
     secrets.wakatime.rekeyFile = ../../secrets/wakatime_api.age;
-    homeManager = { config, ... }: {
+    homeManager = { config, scoped, ... }: {
       age.templates = {
         wakatime_config = {
           dependencies = {
-            wakatime = config.age.secrets.wakatime;
+            inherit (scoped.wakatime.access) wakatime;
           };
           content =
             {

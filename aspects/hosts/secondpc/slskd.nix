@@ -20,6 +20,7 @@
         config,
         pkgs,
         lib,
+        scoped,
         ...
       }:
       {
@@ -87,7 +88,8 @@
           restartUnits = [ "slskd.service" ];
           generator = {
             dependencies = {
-              inherit (config.age.secrets) ivy-password slskd_soularr_apikey slskd_secrets_env;
+              inherit (config.age.secrets) slskd_soularr_apikey slskd_secrets_env;
+              inherit (scoped.user-pwd.access) ivy-password;
             };
             script =
               {

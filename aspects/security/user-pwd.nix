@@ -1,13 +1,13 @@
 { den, ... }: {
   den.aspects.user-pwd = {
     includes = [ den.aspects.agenix-rekey ];
-    secrets = { secrets, ... }: {
+    secrets = { scoped, ... }: {
       ivy-password = {
         rekeyFile = ./ivy-password.age;
         intermediary = true;
       };
       ivy-pwd-hash.generator = {
-        dependencies = [ secrets.ivy-password ];
+        dependencies = [ scoped.secrets.ivy-password ];
         script =
           {
             pkgs,
@@ -32,8 +32,8 @@
     }:
     {
       includes = [ den.aspects.user-pwd ];
-      os = { config, ... }: {
-        users.users.${user.name}.hashedPasswordFile = config.age.secrets.ivy-pwd-hash.file;
+      os = { scoped, ... }: {
+        users.users.${user.name}.hashedPasswordFile = scoped.user-pwd.access.ivy-pwd-hash.file;
       };
     };
 }
