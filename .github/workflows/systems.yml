@@ -100,6 +100,21 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
+      # Build+push every patched-input FOD natively on this arch's own
+      # runner, via the fully-qualified `packages.x86_64-linux.*` ref (no
+      # system-detection needed, so no --impure). This runs before the
+      # build-x86_64-linux matrix below, so those host builds always hit a
+      # warm cache for the patched inputs instead of racing this job -- and
+      # aarch64-linux/aarch64-darwin never need to fall back to a foreign
+      # x86_64-linux builder for them. See packages.patched-inputs-warm in
+      # aspects/tooling/patch-inputs.nix.
+      - if: ${{ github.event_name != 'pull_request' }}
+        uses: auscyber/celler-action@main
+        with:
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.CELLER_TOKEN }}
+          flake-ref: ".#packages.x86_64-linux.patched-inputs-warm"
 
   celler-aarch64-linux:
     name: celler (aarch64-linux)
@@ -124,6 +139,14 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
+      # See the matching step in celler-x86_64-linux above.
+      - if: ${{ github.event_name != 'pull_request' }}
+        uses: auscyber/celler-action@main
+        with:
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.CELLER_TOKEN }}
+          flake-ref: ".#packages.aarch64-linux.patched-inputs-warm"
 
   celler-aarch64-darwin:
     name: celler (aarch64-darwin)
@@ -148,6 +171,14 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
+      # See the matching step in celler-x86_64-linux above.
+      - if: ${{ github.event_name != 'pull_request' }}
+        uses: auscyber/celler-action@main
+        with:
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.CELLER_TOKEN }}
+          flake-ref: ".#packages.aarch64-darwin.patched-inputs-warm"
 
   build-x86_64-linux:
     needs: [matrix, celler-x86_64-linux]
