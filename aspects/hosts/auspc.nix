@@ -57,6 +57,10 @@
       # roles.nix); no explicit include needed.
     ];
 
+    provides.to-users.homeManager = {
+
+      stylix.targets.gnome.enable = false;
+    };
     nixos =
       {
         pkgs,
@@ -64,6 +68,7 @@
         ...
       }:
       {
+        stylix.targets.gnome.enable = false;
         boot.extraModulePackages = with config.boot.kernelPackages; [ alx-wol ];
         networking.hostName = "auspc";
         networking.hostId = "230c61e9";
@@ -283,6 +288,8 @@
           pinentry.program = pkgs.pinentry-qt;
           extraConfig = "allow-loopback-pinentry";
         };
+
+        stylix.targets.gnome.enable = false;
 
         home.packages = with pkgs; [
           obs-studio
