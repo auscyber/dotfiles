@@ -15,7 +15,6 @@
   ];
 
   perSystem = { config, ... }: {
-
     update-hooks.postFlake = {
       update-sources = ''
         # ivixlib's update-sources runs nvfetcher, which authenticates GitHub via
@@ -33,6 +32,5 @@
         ${config.apps.update-sources.program}  # call the shared script from ivixlib
       '';
     };
-
   };
 }

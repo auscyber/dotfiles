@@ -51,25 +51,31 @@
       };
     };
 
-    nixos = { config, scoped, ... }: {
-      # DNS-01 certs. dnsProvider/acceptTerms/email come from the nginx aspect
-      # defaults; here we only add the per-cert cloudflare credential + group.
-      security.acme.certs = {
-        "ivymect.in" = {
-          domain = "*.ivymect.in";
-          environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
-          group = config.services.nginx.group;
+    nixos =
+      {
+        config,
+        scoped,
+        ...
+      }:
+      {
+        # DNS-01 certs. dnsProvider/acceptTerms/email come from the nginx aspect
+        # defaults; here we only add the per-cert cloudflare credential + group.
+        security.acme.certs = {
+          "ivymect.in" = {
+            domain = "*.ivymect.in";
+            environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
+            group = config.services.nginx.group;
+          };
+          "jellyfin.pierlot.com.au" = {
+            environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
+            group = config.services.nginx.group;
+          };
+          # jitsi auto-creates the meet.ivymect.in cert; just supply DNS creds.
+          "meet.ivymect.in".environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
         };
-        "jellyfin.pierlot.com.au" = {
-          environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
-          group = config.services.nginx.group;
-        };
-        # jitsi auto-creates the meet.ivymect.in cert; just supply DNS creds.
-        "meet.ivymect.in".environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
-      };
 
-      # navidrome reads its external API keys from the rekeyed env file.
-      services.navidrome.environmentFile = scoped.secondpc-web.access.navidrome_env.path;
-    };
+        # navidrome reads its external API keys from the rekeyed env file.
+        services.navidrome.environmentFile = scoped.secondpc-web.access.navidrome_env.path;
+      };
   };
 }

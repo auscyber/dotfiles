@@ -1,5 +1,4 @@
 { den, ... }: {
-
   den.homes.x86_64-linux."ivy@imflopet" = {
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOwzECwhRtEus12VIOPw8UrOkBuBwH69VKodEWEuXAsX ivy@imflopet";
   };

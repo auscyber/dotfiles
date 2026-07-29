@@ -1,8 +1,8 @@
 diff --git a/README.md b/README.md
-index 8284e7e..6e7d14b 100644
+index 8284e7e017..6e7d14b164 100644
 --- a/README.md
 +++ b/README.md
-@@ -559,6 +559,12 @@ stop using them.
+@@ -559,6 +559,12 @@
  Some programs do not like following symlinks (for example Java
  programs like Elasticsearch).
  
@@ -15,7 +15,7 @@ index 8284e7e..6e7d14b 100644
  Example:
  
  ```nix
-@@ -678,6 +684,10 @@ in a format understood by chmod.
+@@ -678,6 +684,10 @@
  secrets are symlinked to `age.secrets.<name>.path`. If false, secrets
  are copied to `age.secrets.<name>.path`.
  
@@ -27,10 +27,10 @@ index 8284e7e..6e7d14b 100644
  
  `age.identityPaths` is a list of paths to SSH private keys to use for decryption.
 diff --git a/modules/age-home.nix b/modules/age-home.nix
-index 54695ae..28ffbc9 100644
+index 54695aeb8e..28ffbc9ead 100644
 --- a/modules/age-home.nix
 +++ b/modules/age-home.nix
-@@ -11,21 +11,55 @@ let
+@@ -11,21 +11,55 @@
  
    ageBin = lib.getExe config.age.package;
  
@@ -95,7 +95,7 @@ index 54695ae..28ffbc9 100644
          ''
        else
          ''
-@@ -34,15 +68,23 @@ let
+@@ -34,15 +68,23 @@
      }
    '';
  
@@ -123,7 +123,7 @@ index 54695ae..28ffbc9 100644
        IDENTITIES+=(-i)
        IDENTITIES+=("$identity")
      done
-@@ -50,8 +92,52 @@ let
+@@ -50,8 +92,52 @@
      test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
  
      mkdir -p "$(dirname "$_truePath")"
@@ -178,7 +178,7 @@ index 54695ae..28ffbc9 100644
      (
        umask u=r,g=,o=
        test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -60,13 +146,21 @@ let
+@@ -60,13 +146,21 @@
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
@@ -204,7 +204,7 @@ index 54695ae..28ffbc9 100644
    '';
  
    testIdentities = map (path: ''
-@@ -74,22 +168,139 @@ let
+@@ -74,22 +168,139 @@
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
@@ -355,7 +355,7 @@ index 54695ae..28ffbc9 100644
    );
  
    secretType = types.submodule (
-@@ -107,6 +318,12 @@ let
+@@ -107,6 +318,12 @@
              Name of the file used in ''${cfg.secretsDir}
            '';
          };
@@ -368,7 +368,7 @@ index 54695ae..28ffbc9 100644
          file = mkOption {
            type = types.path;
            description = ''
-@@ -127,6 +344,13 @@ let
+@@ -127,6 +344,13 @@
              Permissions mode of the decrypted secret in a format understood by chmod.
            '';
          };
@@ -382,7 +382,7 @@ index 54695ae..28ffbc9 100644
          symlink = mkEnableOption "symlinking secrets to their destination" // {
            default = true;
          };
-@@ -138,7 +362,14 @@ let
+@@ -138,7 +362,14 @@
      let
        app = pkgs.writeShellApplication {
          name = "agenix-home-manager-mount-secrets";
@@ -398,7 +398,7 @@ index 54695ae..28ffbc9 100644
          text = ''
            ${newGeneration}
            ${installSecrets}
-@@ -175,6 +406,14 @@ in
+@@ -175,6 +406,14 @@
        '';
      };
  
@@ -413,7 +413,7 @@ index 54695ae..28ffbc9 100644
      identityPaths = mkOption {
        type = types.listOf types.path;
        default = [
-@@ -194,23 +433,32 @@ in
+@@ -194,23 +433,32 @@
  
      secretsDir = mkOption {
        type = types.str;
@@ -452,10 +452,10 @@ index 54695ae..28ffbc9 100644
        {
          assertion = cfg.identityPaths != [ ];
 diff --git a/modules/age.nix b/modules/age.nix
-index acae79f..fddd77d 100644
+index acae79fe80..5a34b20f42 100644
 --- a/modules/age.nix
 +++ b/modules/age.nix
-@@ -11,6 +11,11 @@ let
+@@ -11,6 +11,11 @@
  
    isDarwin = lib.attrsets.hasAttrByPath [ "environment" "darwinConfig" ] options;
  
@@ -467,7 +467,7 @@ index acae79f..fddd77d 100644
    ageBin = config.age.ageBin;
  
    users = config.users.users;
-@@ -24,41 +29,72 @@ let
+@@ -24,41 +29,72 @@
    mountCommand =
      if isDarwin then
        ''
@@ -555,7 +555,7 @@ index acae79f..fddd77d 100644
          ''
        else
          ''
-@@ -67,11 +103,19 @@ let
+@@ -67,11 +103,19 @@
      }
    '';
  
@@ -578,7 +578,7 @@ index acae79f..fddd77d 100644
      IDENTITIES=()
      for identity in ${toString cfg.identityPaths}; do
        test -r "$identity" || continue
-@@ -83,7 +127,57 @@ let
+@@ -83,7 +127,57 @@
      test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
  
      mkdir -p "$(dirname "$_truePath")"
@@ -637,7 +637,7 @@ index acae79f..fddd77d 100644
      (
        umask u=r,g=,o=
        test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -92,12 +186,29 @@ let
+@@ -92,12 +186,29 @@
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
@@ -670,7 +670,7 @@ index acae79f..fddd77d 100644
    '';
  
    testIdentities = map (path: ''
-@@ -105,22 +216,71 @@ let
+@@ -105,22 +216,71 @@
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
@@ -753,7 +753,7 @@ index acae79f..fddd77d 100644
    );
  
    chownSecret = secretType: ''
-@@ -132,6 +292,131 @@ let
+@@ -132,6 +292,133 @@
      [ "echo '[agenix] chowning...'" ]
      ++ [ chownMountPoint ]
      ++ (map chownSecret (builtins.attrValues cfg.secrets))
@@ -840,7 +840,9 @@ index acae79f..fddd77d 100644
 +            dep:
 +            dep
 +            // {
-+              placeholder = "<AGE_PLACEHOLDER:${builtins.hashString "sha256" dep.name}:${builtins.hashString "sha256" dep.file}:>";
++              placeholder = "<AGE_PLACEHOLDER:${builtins.hashString "sha256" dep.name}:${
++                builtins.hashString "sha256" (toString dep.file)
++              }:>";
 +            }
 +          ) config.dependencies;
 +          internal = true;
@@ -885,7 +887,7 @@ index acae79f..fddd77d 100644
    );
  
    secretType = types.submodule (
-@@ -146,6 +431,12 @@ let
+@@ -146,6 +433,12 @@
              Name of the file used in {option}`age.secretsDir`
            '';
          };
@@ -898,7 +900,7 @@ index acae79f..fddd77d 100644
          file = mkOption {
            type = types.path;
            description = ''
-@@ -169,6 +460,20 @@ let
+@@ -169,6 +462,20 @@
              Permissions mode of the decrypted secret in a format understood by chmod.
            '';
          };
@@ -919,7 +921,7 @@ index acae79f..fddd77d 100644
          owner = mkOption {
            type = types.str;
            default = "0";
-@@ -199,6 +504,14 @@ in
+@@ -199,6 +506,14 @@
    ];
  
    options.age = {
@@ -934,7 +936,7 @@ index acae79f..fddd77d 100644
      ageBin = mkOption {
        type = types.str;
        default = "${pkgs.age}/bin/age";
-@@ -218,12 +531,19 @@ in
+@@ -218,12 +533,19 @@
      };
      secretsDir = mkOption {
        type = types.path;
@@ -956,7 +958,7 @@ index acae79f..fddd77d 100644
        type =
          types.addCheck types.str (
            s:
-@@ -266,9 +586,10 @@ in
+@@ -266,9 +588,10 @@
          Path to SSH keys to be used as identities in age decryption.
        '';
      };
@@ -968,7 +970,7 @@ index acae79f..fddd77d 100644
      {
        assertions = [
          {
-@@ -277,6 +598,7 @@ in
+@@ -277,6 +600,7 @@
          }
        ];
      }
@@ -976,7 +978,7 @@ index acae79f..fddd77d 100644
      (optionalAttrs (!isDarwin) {
        # When using sysusers we no longer be started as an activation script
        # because those are started in initrd while sysusers is started later.
-@@ -285,7 +607,12 @@ in
+@@ -285,7 +609,12 @@
          after = [ "systemd-sysusers.service" ];
          unitConfig.DefaultDependencies = "no";
  
@@ -990,7 +992,7 @@ index acae79f..fddd77d 100644
          serviceConfig = {
            Type = "oneshot";
            ExecStart = pkgs.writeShellScript "agenix-install" (concatLines [
-@@ -341,7 +668,7 @@ in
+@@ -341,7 +670,7 @@
          script = ''
            set -e
            set -o pipefail
@@ -1000,10 +1002,10 @@ index acae79f..fddd77d 100644
            ${installSecrets}
            ${chownSecrets}
 diff --git a/test/integration.nix b/test/integration.nix
-index 87210a7..689ed56 100644
+index 87210a7bc1..689ed56c05 100644
 --- a/test/integration.nix
 +++ b/test/integration.nix
-@@ -28,6 +28,12 @@ pkgs.nixosTest {
+@@ -28,6 +28,12 @@
        age.secrets = {
          passwordfile-user1.file = ../example/passwordfile-user1.age;
          leading-hyphen.file = ../example/-leading-hyphen-filename.age;
@@ -1016,7 +1018,7 @@ index 87210a7..689ed56 100644
        };
  
        age.identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
-@@ -49,7 +55,7 @@ pkgs.nixosTest {
+@@ -49,7 +55,7 @@
        };
  
        home-manager.users.user1 =
@@ -1025,7 +1027,7 @@ index 87210a7..689ed56 100644
          {
            imports = [
              ../modules/age-home.nix
-@@ -70,6 +76,12 @@ pkgs.nixosTest {
+@@ -70,6 +76,12 @@
              secrets.armored-secret = {
                file = ../example/armored-secret.age;
              };
@@ -1038,7 +1040,7 @@ index 87210a7..689ed56 100644
            };
          };
      };
-@@ -81,6 +93,7 @@ pkgs.nixosTest {
+@@ -81,6 +93,7 @@
        secret2 = "world!";
        hyphen-secret = "filename started with hyphen";
        armored-secret = "Hello World!";
@@ -1046,7 +1048,7 @@ index 87210a7..689ed56 100644
      in
      ''
        system1.wait_for_unit("multi-user.target")
-@@ -106,8 +119,16 @@ pkgs.nixosTest {
+@@ -106,8 +119,16 @@
        system1.wait_for_file("/tmp/3")
        assert "${armored-secret}" in system1.succeed("cat /tmp/3")
  
@@ -1064,10 +1066,10 @@ index 87210a7..689ed56 100644
  
        before_hash = system1.succeed(userDo('sha256sum passwordfile-user1.age')).split()
 diff --git a/test/integration_darwin.nix b/test/integration_darwin.nix
-index 92da807..af49660 100644
+index 92da8074fd..af49660fee 100644
 --- a/test/integration_darwin.nix
 +++ b/test/integration_darwin.nix
-@@ -10,6 +10,8 @@ let
+@@ -10,6 +10,8 @@
      name = "agenix-integration";
      text = ''
        grep "${secret}" "${config.age.secrets.system-secret.path}"
@@ -1076,7 +1078,7 @@ index 92da807..af49660 100644
      '';
    };
  in
-@@ -22,6 +24,12 @@ in
+@@ -22,6 +24,12 @@
    age = {
      identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
      secrets.system-secret.file = ../example/secret1.age;
@@ -1090,7 +1092,7 @@ index 92da807..af49660 100644
  
    environment.systemPackages = [ testScript ];
 diff --git a/test/integration_hm_darwin.nix b/test/integration_hm_darwin.nix
-index 965057d..fcf0609 100644
+index 965057d5bc..fcf0609eef 100644
 --- a/test/integration_hm_darwin.nix
 +++ b/test/integration_hm_darwin.nix
 @@ -11,6 +11,12 @@

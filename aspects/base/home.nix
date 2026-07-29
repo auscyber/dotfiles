@@ -38,7 +38,6 @@ let
       fromAspect = _: lib.head aspect-chain;
       adaptArgs = { config, ... }: { osConfig = config; };
     };
-
 in
 {
   ff.home-manager = {
@@ -81,7 +80,10 @@ in
 
       homeManagerConfiguration =
         if nameWithHost && hostByName != null then
-          { pkgs, modules }:
+          {
+            pkgs,
+            modules,
+          }:
           inputs.home-manager.lib.homeManagerConfiguration {
             inherit pkgs modules;
             extraSpecialArgs.osConfig = lib.attrByPath (
@@ -110,15 +112,13 @@ in
   # the home's own scope, and a top-level home has no parent host, so spawnRoot ==
   # parent == self (spawnNode collapses to zero fleet peers). The home's hmStandalone
   # content lives in its own scope, so a same-scope route collects it with no spawn.
-  den.policies.home-standalone-route =
-    { home, ... }:
-    [
-      (den.lib.policy.route {
-        fromClass = "hmStandalone";
-        intoClass = "homeManager";
-        path = [ ];
-      })
-    ];
+  den.policies.home-standalone-route = { home, ... }: [
+    (den.lib.policy.route {
+      fromClass = "hmStandalone";
+      intoClass = "homeManager";
+      path = [ ];
+    })
+  ];
   den.default.includes = [
     hmPlatforms
     #  hmAlias

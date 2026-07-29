@@ -28,7 +28,6 @@ final: prev: {
     final.inputMetaModules [
       (args: {
         options.meta = prev.mkOption { type = prev.types.submodule { options = opts args; }; };
-
       })
     ];
 

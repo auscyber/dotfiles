@@ -33,8 +33,15 @@
 # (whose top-level dirs are read as *class names* by aspects/tooling/extraModules.nix),
 # so this file is only ever pulled in by an explicit `import` -- same as
 # lib/tmpfiles.nix.
-{ lib, class }:
-{ config, pkgs, ... }:
+{
+  lib,
+  class,
+}:
+{
+  config,
+  pkgs,
+  ...
+}:
 let
   inherit (lib) mkOption types;
 
@@ -43,7 +50,12 @@ let
   # safe on an undeclared name.
   serviceCfg = service: config.services.${service} or null;
 
-  enabled = service: let svc = serviceCfg service; in svc != null && (svc.enable or false);
+  enabled =
+    service:
+    let
+      svc = serviceCfg service;
+    in
+    svc != null && (svc.enable or false);
 
   # `services.<s>.user` where the service module declares one. Some modules
   # default it to a non-string (null, an integer uid) -- only a string is a
@@ -64,16 +76,16 @@ let
       owner = serviceOwner service;
     in
     lib.optionalAttrs (owner != null) (
-      { inherit owner; }
+      {
+        inherit owner;
+      }
       // lib.optionalAttrs (config.users.users ? ${owner}) {
         inherit (config.users.users.${owner}) group;
       }
     );
 
   backends = {
-    nixos =
-      service:
-      { restartUnits = [ "${service}.service" ]; } // ownership service;
+    nixos = service: { restartUnits = [ "${service}.service" ]; } // ownership service;
 
     # nix-darwin's activation runs `launchctl kickstart -k "system/$unit"` with
     # no `|| true`, so an unknown label would fail activation outright -- only
@@ -146,7 +158,19 @@ let
   entryType =
     scope:
     types.submodule {
-      freeformType = types.lazyAttrsOf types.raw;
+      # `types.attrs` (shallow `//` across definitions), NOT `lazyAttrsOf raw`.
+      # An aspect can legitimately arrive twice -- `user-pwd` is included both
+      # directly and through `auscyber.provides.to-hosts` -- and `raw` rejects a
+      # second definition even when it is identical, so every field of every
+      # secret in such an aspect became "defined multiple times". `types.anything`
+      # is not the fix either: it would compare the duplicated `content` /
+      # `generator.script` FUNCTIONS for equality and fail on those instead.
+      #
+      # Shallow merge is also what the pre-scoping `attrsOf types.attrs` did, so
+      # two files adding different fields to one secret keep working exactly as
+      # they did (aspects/network/vpn.nix adds `owner`/`group` to a `wireguard_key`
+      # declared elsewhere).
+      freeformType = types.attrs;
       config._module.args = scopeLocalArgs scope;
     };
 
@@ -224,9 +248,7 @@ let
           own secrets (`scoped.slskd.access.env.path`) without repeating the prefix.
         '';
         default =
-          lib.mapAttrs (
-            key: _: config.age.secrets.${flatName submod.config key}
-          ) submod.config.secrets
+          lib.mapAttrs (key: _: config.age.secrets.${flatName submod.config key}) submod.config.secrets
           // lib.mapAttrs (
             key: _: config.age.templates.${flatName submod.config key}
           ) submod.config.templates;
@@ -255,7 +277,8 @@ let
   flatten =
     field: mk:
     lib.concatMapAttrs (
-      _: scope: lib.mapAttrs' (key: value: lib.nameValuePair (flatName scope key) (mk scope value)) scope.${field}
+      _: scope:
+      lib.mapAttrs' (key: value: lib.nameValuePair (flatName scope key) (mk scope value)) scope.${field}
     ) cfg;
 in
 {

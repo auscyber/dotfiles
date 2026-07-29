@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.default.gaming = {
     includes = [ den.aspects.packages.proton-ge-bin ];
     nixos = { pkgs, ... }: {
@@ -16,7 +15,6 @@
               PROTON_ENABLE_WAYLAND = "1";
               PROTON_NO_ESYNC = "0";
             };
-
           };
           enable = true;
           extraCompatPackages = with pkgs; [

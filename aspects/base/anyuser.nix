@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 # `anyUser` — the shared identity of a homeManager environment, whether it is a
 # host-managed `user` or a standalone `home`. It is a first-class CONTEXT arg (a
 # registered schema kind, like `host`/`user`/`home`): every `user` and `home` binds its

@@ -15,6 +15,10 @@
         package = pkgs.idris2Packages.idris2Lsp;
         exe = "idris2-lsp";
         nvim = false;
+        extensionToLanguage = {
+          ".idr" = "idris2";
+          ".lidr" = "idris2";
+        };
       };
     };
 

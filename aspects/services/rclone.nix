@@ -24,7 +24,11 @@ in
     );
 
     homeManager =
-      { config, scoped, ... }:
+      {
+        config,
+        scoped,
+        ...
+      }:
       let
         secretFor = name: scoped.rclone.access.${name}.path;
       in

@@ -51,7 +51,10 @@ let
     let
       s = builtins.toString p;
     in
-    if builtins.substring 0 plen s == prefix then builtins.substring plen (builtins.stringLength s) s else s;
+    if builtins.substring 0 plen s == prefix then
+      builtins.substring plen (builtins.stringLength s) s
+    else
+      s;
 
   entryFor =
     name:

@@ -28,24 +28,21 @@ let
 
   # Fill in the same defaults the `patchedInputModule` option declarations
   # provide, so a spec only has to carry what differs.
-  patchedInputs = lib.mapAttrs (
-    name: spec:
-    {
-      patches = spec.patches or [ ];
-      prePatch = spec.prePatch or "";
-      postPatch = spec.postPatch or "";
-      isInput = spec.isInput or true;
-      src = spec.src or realInputs.${name}.sourceInfo;
-      # `PATCH_HASHES=ignore` must still defeat a recorded hash even when the
-      # spec carries one inline (the generated ../patched-inputs.nix does).
-      # That escape hatch is the only way out of the chicken-and-egg a stale
-      # hash creates: the fixed-output build fails, which takes the whole
-      # flake's evaluation down with it — including the app that would refresh
-      # the hash. Reading it from the spec instead of hashes.json must not
-      # quietly remove that recovery path.
-      hash = if ignoreHashes then null else (spec.hash or (patchHashes.${name} or null));
-    }
-  ) patchSpecs;
+  patchedInputs = lib.mapAttrs (name: spec: {
+    patches = spec.patches or [ ];
+    prePatch = spec.prePatch or "";
+    postPatch = spec.postPatch or "";
+    isInput = spec.isInput or true;
+    src = spec.src or realInputs.${name}.sourceInfo;
+    # `PATCH_HASHES=ignore` must still defeat a recorded hash even when the
+    # spec carries one inline (the generated ../patched-inputs.nix does).
+    # That escape hatch is the only way out of the chicken-and-egg a stale
+    # hash creates: the fixed-output build fails, which takes the whole
+    # flake's evaluation down with it — including the app that would refresh
+    # the hash. Reading it from the spec instead of hashes.json must not
+    # quietly remove that recovery path.
+    hash = if ignoreHashes then null else (spec.hash or (patchHashes.${name} or null));
+  }) patchSpecs;
 
   # `getEnv` returns "" under pure eval, so this is inert everywhere else.
   ignoreHashes = builtins.getEnv "PATCH_HASHES" == "ignore";
@@ -169,7 +166,17 @@ let
       patchSrc ? null,
     }:
     let
-      allNodes = mapAttrs (mkResolvedNode { inherit lockFile rootKey passedInputs flakePath backupNode patchSrc allNodes; }) lockFile.nodes;
+      allNodes = mapAttrs (mkResolvedNode {
+        inherit
+          lockFile
+          rootKey
+          passedInputs
+          flakePath
+          backupNode
+          patchSrc
+          allNodes
+          ;
+      }) lockFile.nodes;
     in
     allNodes;
 
@@ -286,14 +293,13 @@ let
       # ~223-node graph again for each of the handful of patched/auto-unified
       # inputs.
       allNodes = sharedTopNodes // {
-        ${name} =
-          mkResolvedNode {
-            inherit lockFile passedInputs allNodes;
-            rootKey = name;
-            flakePath = "${rootPath}";
-            backupNode = backupNodes.${backupLockFile.root};
-            patchSrc = "${patchedSrc}";
-          } name lockFile.nodes.${name};
+        ${name} = mkResolvedNode {
+          inherit lockFile passedInputs allNodes;
+          rootKey = name;
+          flakePath = "${rootPath}";
+          backupNode = backupNodes.${backupLockFile.root};
+          patchSrc = "${patchedSrc}";
+        } name lockFile.nodes.${name};
       };
 
       flakeNode = allNodes.${name};

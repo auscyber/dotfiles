@@ -1,5 +1,4 @@
 { lib, ... }:
-
 let
   inherit (lib)
     mkOptionType
@@ -103,66 +102,66 @@ let
       }
       echo "----------------------------------------"
     '') hooks;
-
 in
-
 {
-  perSystem = { pkgs, config, ... }: {
-    options.update-hooks = {
-      preFlake = lib.mkOption {
-        type = hookType;
-        default = [ ];
+  perSystem =
+    {
+      pkgs,
+      config,
+      ...
+    }:
+    {
+      options.update-hooks = {
+        preFlake = lib.mkOption {
+          type = hookType;
+          default = [ ];
+        };
+        flake = lib.mkOption {
+          type = hookType;
+          default = [ ];
+        };
+        postFlake = lib.mkOption {
+          type = hookType;
+          default = [ ];
+        };
+        finalPostParse = lib.mkOption {
+          type = hookType;
+          default = [ ];
+        };
+      };
+      config = {
+        apps.update = {
+          type = "app";
+          program = pkgs.writeShellScriptBin "update" ''
+                                                                                                                                                                                                          #!${pkgs.runtimeShell}
+                                                                                                                                                                                                          set -euo pipefail
+                                                                                                                                                                                                          ${
+                                                                                                                                                                                                            lib.optionalString
+                                                                                                                                                                                                            (config.update-hooks.preFlake != [ ])
+                                                                                                                                                                                                            ''
+                                                                                                                                                                                                                echo "Running pre-flake hooks..."
+                                                                                                                                                                                                              ${makeHookText config.update-hooks.preFlake}
+                                                                                                                                                                                                            ''
+                                                                                                                                                                                                          }
+                                                                                                                                                                                                          echo "Updating flake inputs..."
+                                                                                                                                                                                                          nix flake update
+            ${lib.optionalString (config.update-hooks.postFlake != [ ]) ''
+                echo "Running post-flake hooks..."
+              ${makeHookText config.update-hooks.postFlake}
+            ''}
 
-      };
-      flake = lib.mkOption {
-        type = hookType;
-        default = [ ];
-      };
-      postFlake = lib.mkOption {
-        type = hookType;
-        default = [ ];
-      };
-      finalPostParse = lib.mkOption {
-        type = hookType;
-        default = [ ];
-      };
+            ${lib.optionalString (config.update-hooks.flake != [ ]) ''
+                echo "Running interwined flake hooks..."
+              ${makeHookText config.update-hooks.flake}
+            ''}
 
+            ${lib.optionalString (config.update-hooks.finalPostParse != [ ]) ''
+                echo "Running final post-parse hooks..."
+              ${makeHookText config.update-hooks.finalPostParse}
+            ''}
+
+          '';
+        };
+      };
     };
-    config = {
-      apps.update = {
-        type = "app";
-        program = pkgs.writeShellScriptBin "update" ''
-                                                                                                                                                                                                        #!${pkgs.runtimeShell}
-                                                                                                                                                                                                        set -euo pipefail
-                                                                                                                                                                                                        ${
-                                                                                                                                                                                                          lib.optionalString
-                                                                                                                                                                                                          (config.update-hooks.preFlake != [ ])
-                                                                                                                                                                                                          ''
-                                                                                                                                                                                                              echo "Running pre-flake hooks..."
-                                                                                                                                                                                                            ${makeHookText config.update-hooks.preFlake}
-                                                                                                                                                                                                          ''
-                                                                                                                                                                                                        }
-                                                                                                                                                                                                        echo "Updating flake inputs..."
-                                                                                                                                                                                                        nix flake update
-          ${lib.optionalString (config.update-hooks.postFlake != [ ]) ''
-              echo "Running post-flake hooks..."
-            ${makeHookText config.update-hooks.postFlake}
-          ''}
-
-          ${lib.optionalString (config.update-hooks.flake != [ ]) ''
-              echo "Running interwined flake hooks..."
-            ${makeHookText config.update-hooks.flake}
-          ''}
-
-          ${lib.optionalString (config.update-hooks.finalPostParse != [ ]) ''
-              echo "Running final post-parse hooks..."
-            ${makeHookText config.update-hooks.finalPostParse}
-          ''}
-
-        '';
-
-      };
-
-    };
-  };
 }

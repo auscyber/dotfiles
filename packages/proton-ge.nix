@@ -1,16 +1,13 @@
-{ lib, ... }:
-{
+{ lib, ... }: {
   nvfetcher.sources.proton-ge-bin = {
     src.github = "gloriouseggroll/proton-ge-custom";
     fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver.tar.gz";
   };
 
   den.aspects.packages.proton-ge-bin = {
-
     overlays = { sources, ... }: {
       proton-ge-bin = final: prev: {
         wrapProtonGE =
-
           let
             toPySettings =
               attrs:
@@ -50,7 +47,11 @@
     };
 
     nixos =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       let
         cfg = config.programs.steam.proton-ge;
       in
@@ -77,7 +78,6 @@
             internal = true;
             description = "Override the wrapped Proton GE package used by Steam.";
           };
-
         };
         config = lib.mkIf config.programs.steam.proton-ge.enable {
           programs.steam.proton-ge.wrappedPackage = pkgs.wrapProtonGE {
@@ -87,9 +87,7 @@
           programs.steam.extraCompatPackages = [
             cfg.wrappedPackage
           ];
-
         };
       };
-
   };
 }

@@ -19,7 +19,6 @@
 # or bumping a patched input. `checks.patched-inputs-generated-current`
 # fails if the patch lists here drift from the aspects' declarations.
 {
-
   age-plugin-gpg.patches = [
     ./patches/age-plugin-gpg/age-plugin-gpg.patch
   ];
@@ -46,7 +45,7 @@
   zen-browser.patches = [ ];
 
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
-  agenix.hash = "sha256-IxvHSroDzQk1d476BVWzdUijtUVfEIc1OO7AWWlke+g=";
+  agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
   darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
   home-manager.hash = "sha256-0gXNFapHEstAY0PVA7mls72OnNNdlEMzvaWGl5ysvvs=";

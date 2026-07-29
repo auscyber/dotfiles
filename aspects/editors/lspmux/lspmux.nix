@@ -71,6 +71,17 @@ let
           default = config.exe;
           description = "opencode's server id to override with the shim (surfaced only when it is an opencode built-in), or null to opt out.";
         };
+        # File-extension -> LSP languageId map for claude-code's `.lsp.json`
+        # (`programs.claude-code.lspServers`). claude-code routes a file to this
+        # server only when its extension is a key here, so a server with an empty
+        # map is not surfaced to claude-code at all. Unlike the zed/opencode ids this
+        # is not derivable from the exe/lspconfig name -- it is the `languageId` sent
+        # in `textDocument/didOpen` -- so it is written out per server.
+        extensionToLanguage = lib.mkOption {
+          type = lib.types.attrsOf lib.types.str;
+          default = { };
+          description = "File extension (`.rs`) -> LSP languageId (`rust`) map consumed by claude-code's lspServers. Empty = not surfaced to claude-code.";
+        };
         server_config = lib.mkOption {
           type = lib.types.attrs;
           default = { };
@@ -299,10 +310,20 @@ in
         package = pkgs.clang-tools;
         exe = "clangd";
         zed = "clangd";
+        extensionToLanguage = {
+          ".c" = "c";
+          ".h" = "c";
+          ".cpp" = "cpp";
+          ".cc" = "cpp";
+          ".cxx" = "cpp";
+          ".hpp" = "cpp";
+          ".hh" = "cpp";
+        };
       };
       dhall_lsp_server = {
         package = pkgs.dhall-lsp-server;
         exe = "dhall-lsp-server";
+        extensionToLanguage.".dhall" = "dhall";
       };
       docker_compose_language_service = {
         package = pkgs.docker-compose-language-service;
@@ -313,6 +334,7 @@ in
         package = pkgs.gopls;
         exe = "gopls";
         zed = "gopls";
+        extensionToLanguage.".go" = "go";
       };
       hls = {
         package = pkgs.haskell-language-server;
@@ -320,41 +342,61 @@ in
         args = [ "--lsp" ];
         zed = "hls";
         opencode = "haskell-language-server";
+        extensionToLanguage = {
+          ".hs" = "haskell";
+          ".lhs" = "haskell";
+        };
       };
       jdtls = {
         package = pkgs.jdt-language-server;
         exe = "jdtls";
         dynamicCmd = true;
         zed = "jdtls";
+        extensionToLanguage.".java" = "java";
       };
       kotlin_language_server = {
         package = pkgs.kotlin-language-server;
         exe = "kotlin-language-server";
         zed = "kotlin-language-server";
         opencode = "kotlin-ls";
+        extensionToLanguage = {
+          ".kt" = "kotlin";
+          ".kts" = "kotlin";
+        };
       };
       lua_ls = {
         package = pkgs.lua-language-server;
         exe = "lua-language-server";
         zed = "lua-language-server";
         opencode = "lua-ls";
+        extensionToLanguage.".lua" = "lua";
       };
       metals = {
         package = pkgs.metals;
         exe = "metals";
         zed = "metals";
+        extensionToLanguage = {
+          ".scala" = "scala";
+          ".sc" = "scala";
+          ".sbt" = "scala";
+        };
       };
       nil_ls = {
         package = pkgs.nil;
         exe = "nil";
         zed = "nix";
         opencode = "nixd";
+        extensionToLanguage.".nix" = "nix";
       };
       ocamllsp = {
         package = pkgs.ocamlPackages.ocaml-lsp;
         exe = "ocamllsp";
         zed = "ocamllsp";
         opencode = "ocaml-lsp";
+        extensionToLanguage = {
+          ".ml" = "ocaml";
+          ".mli" = "ocaml";
+        };
       };
       pyright = {
         package = pkgs.pyright;
@@ -362,6 +404,10 @@ in
         args = [ "--stdio" ];
         zed = "pyright";
         opencode = "pyright";
+        extensionToLanguage = {
+          ".py" = "python";
+          ".pyi" = "python";
+        };
       };
       tailwindcss = {
         package = pkgs.tailwindcss-language-server;
@@ -373,12 +419,28 @@ in
         package = pkgs.typescript-language-server;
         exe = "typescript-language-server";
         dynamicCmd = true;
+        # `--stdio` is the static tail of lspconfig's cmd. nvim's dynamicCmd path
+        # ignores `args` (lspconfig re-adds it when it name-shadows the shim), but
+        # the direct-spawn consumers -- zed, and now claude-code -- need it, since
+        # typescript-language-server refuses to start without a transport flag.
+        args = [ "--stdio" ];
         zed = "typescript-language-server";
+        extensionToLanguage = {
+          ".ts" = "typescript";
+          ".mts" = "typescript";
+          ".cts" = "typescript";
+          ".tsx" = "typescriptreact";
+          ".js" = "javascript";
+          ".mjs" = "javascript";
+          ".cjs" = "javascript";
+          ".jsx" = "javascriptreact";
+        };
       };
       zls = {
         package = pkgs.zls;
         exe = "zls";
         zed = "zls";
+        extensionToLanguage.".zig" = "zig";
       };
     };
 
@@ -601,6 +663,25 @@ in
               (
                 lib.filterAttrs (_lspconfig: spec: builtins.elem spec.opencode opencodeBuiltins) config.lsp.servers
               )
+          );
+
+          # Feed the same registry into claude-code's `lspServers` (which home-manager
+          # writes to `.lsp.json`). claude-code keys servers freely -- no built-in-id
+          # constraint like opencode -- but needs an `extensionToLanguage` map to know
+          # which files to route to each, so only servers that declare one are
+          # surfaced. `command` is the shim path (a bare string here, not opencode's
+          # command+args list) and `args` its tail. Gated on claude-code being enabled
+          # so lspmux stays one opt-in.
+          programs.claude-code.lspServers = lib.mkIf config.programs.claude-code.enable (
+            lib.mapAttrs
+              (
+                lspconfig: spec: {
+                  command = lib.getExe (pkgs.wrapLspMux (spec // { inherit lspconfig; }));
+                  args = spec.args;
+                  extensionToLanguage = spec.extensionToLanguage;
+                }
+              )
+              (lib.filterAttrs (_lspconfig: spec: spec.extensionToLanguage != { }) config.lsp.servers)
           );
         };
       };

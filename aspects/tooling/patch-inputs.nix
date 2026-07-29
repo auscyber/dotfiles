@@ -290,7 +290,6 @@ let
         echo "Add it to patchedInputs.\"$input\".patches and rebuild."
       '';
     };
-
 in
 {
   options.patchSystem = lib.mkOption {
@@ -380,7 +379,6 @@ in
           type = lib.types.submodule {
             options.patch = lib.mkOption {
               type = lib.types.submoduleWith {
-
                 shorthandOnlyDefinesConfig = true;
 
                 modules = [
@@ -396,7 +394,6 @@ in
             };
           };
         };
-
       })
     ])
   ];
@@ -562,7 +559,10 @@ in
         # foreign x86_64-linux builder, and therefore never need `--impure` to
         # fall back to one.
         packages.patched-inputs-warm = pkgs.linkFarm "patched-inputs-warm" (
-          lib.mapAttrsToList (name: drv: { inherit name; path = drv; }) (patchedDrvs pkgs)
+          lib.mapAttrsToList (name: drv: {
+            inherit name;
+            path = drv;
+          }) (patchedDrvs pkgs)
         );
 
         # Building these fails `nix flake check` if a declared patch is stale

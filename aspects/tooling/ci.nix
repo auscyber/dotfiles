@@ -44,7 +44,10 @@ let
   checksBySystem =
     let
       add =
-        { systemF, toplevelF }:
+        {
+          systemF,
+          toplevelF,
+        }:
         class: acc: name: cfg:
         let
           s = systemF cfg;

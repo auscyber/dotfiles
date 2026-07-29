@@ -1,6 +1,5 @@
 # modules/inputs/_extras.nix
 { lib, ... }:
-
 let
   metaDefault = lib.extraSub [ { options.meta = lib.mkOption { default = { }; }; } ];
 in

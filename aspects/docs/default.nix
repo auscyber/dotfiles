@@ -74,9 +74,7 @@ in
           );
           gNoPolicy = gBase // {
             nodes = builtins.filter (n: policyKeptIds ? ${n.id}) gBase.nodes;
-            edges = builtins.filter (
-              e: policyKeptIds ? ${e.from} && policyKeptIds ? ${e.to}
-            ) gBase.edges;
+            edges = builtins.filter (e: policyKeptIds ? ${e.from} && policyKeptIds ? ${e.to}) gBase.edges;
           };
 
           # `den` traces the WHOLE aspect tree for every host regardless of

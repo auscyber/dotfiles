@@ -21,6 +21,7 @@
         nvim = false;
         zed = "rust-analyzer";
         opencode = "rust";
+        extensionToLanguage.".rs" = "rust";
       };
     };
 

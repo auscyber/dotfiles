@@ -5,7 +5,7 @@
     includes = [
       den.aspects.difftastic
 
-      (den.lib.whenAspect den.aspects.llama-cpp ({
+      (den.lib.whenAspect den.aspects.llama-cpp {
         homeManager =
           {
             config,
@@ -89,8 +89,7 @@
               };
             };
           };
-
-      }))
+      })
     ];
 
     homeManager = {

@@ -58,7 +58,6 @@
     ];
 
     provides.to-users.homeManager = {
-
       stylix.targets.gnome.enable = false;
     };
     nixos =
@@ -262,6 +261,8 @@
   den.aspects.auscyber = {
     includes = [
       den.aspects.fish
+      den.aspects.lspmux
+      den.aspects.claude
       (den.batteries.unfree [ "castlabs-electron" ])
       den.aspects.celler-push
       den.aspects.lix

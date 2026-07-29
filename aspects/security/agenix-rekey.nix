@@ -102,12 +102,10 @@ in
   den.policies.kind-system-routes = _: allRoutes;
 
   ff = {
-
     agenix.patch.enable = true;
     agenix.patch.patches = [
       ../../patches/agenix/templates.patch
       ../../patches/agenix/edit.patch
-
     ];
 
     agenix-rekey = {
@@ -127,7 +125,6 @@ in
         # so the target directory does not exist and reencrypt fails. (Already a
         # latent bug for aspects/services/rclone.nix, which has never been rekeyed.)
         ../../patches/agenix-rekey/rekey-mkdir-p.patch
-
       ];
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -136,7 +133,6 @@ in
     agenix.inputs.darwin.follows = "darwin";
     agenix.inputs.home-manager.follows = "home-manager";
     age-plugin-gpg = {
-
       url = "github:certainlach/age-plugin-gpg";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
@@ -147,7 +143,6 @@ in
     };
   };
   patchedInputs = {
-
   };
 
   imports = lib.optionals (inputs ? "agenix-rekey") [

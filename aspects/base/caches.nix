@@ -146,36 +146,42 @@ in
           client_max_body_size 15g;
         '';
       };
-      secrets = { secrets, scoped, ... }: {
-        # RS256 signing key (aspects/base/cache.age): both the input the
-        # github_cache_key generator decrypts to mint tokens AND the key
-        # cellerd reads at runtime via the celler_env template below, so on
-        # secondpc it is deployed (not intermediary). Same key celler-push
-        # hands its own generator on the client hosts.
-        cache_key = {
-          rekeyFile = ./cache.age;
-        };
-        # CI push token for GitHub Actions: scoped to sub=github, may push the
-        # `main` cache. `nix run .#sync-ci-secrets` decrypts this and uploads
-        # it as the CELLER_TOKEN GitHub Actions secret; systems.yml hands it to
-        # auscyber/celler-action, which pushes every host it builds. (Not
-        # ryanccn/attic-action -- celler's upload protocol needs an
-        # X-Celler-Nar-Info header that the upstream attic client never sends.)
-        # (Previously this
-        # named `deps.cache_key` with no dependency declared, so it never
-        # generated -- hence github_cache_key.age was missing on disk.)
-        github_cache_key = {
-          rekeyFile = ./github_cache_key.age;
-          generator = {
-            tags = [ "github_cache_key" ];
-            dependencies.cache_key = secrets.cache_key;
-            script = cellerTokenScript {
-              sub = "github";
-              push = [ "main" ];
+      secrets =
+        {
+          secrets,
+          scoped,
+          ...
+        }:
+        {
+          # RS256 signing key (aspects/base/cache.age): both the input the
+          # github_cache_key generator decrypts to mint tokens AND the key
+          # cellerd reads at runtime via the celler_env template below, so on
+          # secondpc it is deployed (not intermediary). Same key celler-push
+          # hands its own generator on the client hosts.
+          cache_key = {
+            rekeyFile = ./cache.age;
+          };
+          # CI push token for GitHub Actions: scoped to sub=github, may push the
+          # `main` cache. `nix run .#sync-ci-secrets` decrypts this and uploads
+          # it as the CELLER_TOKEN GitHub Actions secret; systems.yml hands it to
+          # auscyber/celler-action, which pushes every host it builds. (Not
+          # ryanccn/attic-action -- celler's upload protocol needs an
+          # X-Celler-Nar-Info header that the upstream attic client never sends.)
+          # (Previously this
+          # named `deps.cache_key` with no dependency declared, so it never
+          # generated -- hence github_cache_key.age was missing on disk.)
+          github_cache_key = {
+            rekeyFile = ./github_cache_key.age;
+            generator = {
+              tags = [ "github_cache_key" ];
+              dependencies.cache_key = secrets.cache_key;
+              script = cellerTokenScript {
+                sub = "github";
+                push = [ "main" ];
+              };
             };
           };
         };
-      };
 
       # In the `templates` class rather than raw in `nixos` below, because only
       # the classes this aspect re-emits get scope-local args: here `secrets` is
@@ -190,38 +196,33 @@ in
         '';
       };
 
-      nixos =
-        {
-          scoped,
-          ...
-        }:
-        {
-          imports = [ inputs.celler.nixosModules.cellerd ];
+      nixos = { scoped, ... }: {
+        imports = [ inputs.celler.nixosModules.cellerd ];
 
-          services.cellerd = {
-            enable = true;
-            environmentFile = scoped.celler.access.env.path;
-            useFlakeCompatOverlay = false;
-            settings = {
-              listen = "[::]:${toString port}";
-              storage = {
-                type = "local";
-                path = "/mnt/hdd/attic";
-              };
+        services.cellerd = {
+          enable = true;
+          environmentFile = scoped.celler.access.env.path;
+          useFlakeCompatOverlay = false;
+          settings = {
+            listen = "[::]:${toString port}";
+            storage = {
+              type = "local";
+              path = "/mnt/hdd/attic";
+            };
 
-              jwt = { };
+            jwt = { };
 
-              # Data chunking. Changing these makes existing chunks unreusable
-              # (different cutpoints), hurting dedup until re-uploaded.
-              chunking = {
-                nar-size-threshold = 64 * 1024; # 64 KiB
-                min-size = 16 * 1024; # 16 KiB
-                avg-size = 64 * 1024; # 64 KiB
-                max-size = 256 * 1024; # 256 KiB
-              };
+            # Data chunking. Changing these makes existing chunks unreusable
+            # (different cutpoints), hurting dedup until re-uploaded.
+            chunking = {
+              nar-size-threshold = 64 * 1024; # 64 KiB
+              min-size = 16 * 1024; # 16 KiB
+              avg-size = 64 * 1024; # 64 KiB
+              max-size = 256 * 1024; # 256 KiB
             };
           };
         };
+      };
     };
 
   # Opt-in per-host cache credentials. A host that includes this aspect gets its

@@ -1,4 +1,9 @@
-{ den, lib, ... }: {
+{
+  den,
+  lib,
+  ...
+}:
+{
   # Pulls the shared MCP registry (adds programs.mcp.servers.zotero) alongside
   # the servers declared inline below; all merge into the one registry.
   den.aspects.opencode.includes = [
@@ -8,7 +13,6 @@
       homeManager = { pkgs, ... }: {
         programs.mcp.servers.mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
       };
-
     })
   ];
 
@@ -43,7 +47,6 @@
       programs.mcp = {
         enable = true;
         servers = {
-
           nixos.command = lib.getExe pkgs.mcp-nixos;
         };
       };
