@@ -152,6 +152,17 @@
           };
         };
 
+        # `zpool/swap` zvol used as swap space; documents the dataset for
+        # reprovisioning (see NOTE above). `swapDevices` below is set
+        # explicitly since disko is never run against this live machine.
+        disko.devices.zpool.zpool.datasets.swap = {
+          type = "zfs_volume";
+          size = "16G";
+          content = {
+            type = "swap";
+          };
+        };
+
         # ESP + data disk kept on their existing UUIDs (see NOTE above).
         hardware.bluetooth = {
           enable = true;
@@ -227,7 +238,19 @@
           };
         };
 
-        swapDevices = [ ];
+        # `zpool/swap` is a 16G zvol on the encrypted pool (see disko.devices
+        # above). Like the `disko.devices` root/nix/var/home datasets, this
+        # matches an already-provisioned dataset rather than something disko
+        # creates on this live machine — see the NOTE at the top of the
+        # `disko.devices` block. Create it once out-of-band before applying:
+        #   zfs create -V 16G -b $(getconf PAGESIZE) \
+        #     -o compression=zle -o logbias=throughput -o sync=always \
+        #     -o primarycache=metadata -o secondarycache=none \
+        #     -o com.sun:auto-snapshot=false zpool/swap
+        #   mkswap -f /dev/zvol/zpool/swap
+        swapDevices = [
+          { device = "/dev/zvol/zpool/swap"; }
+        ];
       };
   };
 
