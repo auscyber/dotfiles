@@ -143,8 +143,12 @@ jobs:
         with:
           endpoint: https://cache.ivymect.in
           cache: main
+          flake-ref: ".#celler"
           token: ${{ secrets.CELLER_TOKEN }}
-          flake-ref: ".#packages.x86_64-linux.patched-inputs-warm"
+      - name: "warm patched inputs"
+        run: |
+          set -euo pipefail
+          nix build --no-link .#packages.patched-inputs-warm
 
   celler-aarch64-linux:
     name: celler (aarch64-linux)
