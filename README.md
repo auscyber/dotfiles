@@ -630,6 +630,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- fish
 - gpg
 - home-base
 - insecure-predicate
@@ -661,6 +662,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - unfree-predicate
 - unfree-predicate/os
 - unfree-predicate/user
+- user-shell/ivy@lora-pi
 - wakatime
 
 ### Aspect Graph
@@ -720,6 +722,7 @@ graph LR
   unfree_predicate --> unfree_predicate__user
   end
   subgraph ctx_user_ivy["user: ivy"]
+  fish["fish"]:::fish_c
   gpg["gpg"]:::gpg_c
   ivy{{"ivy"}}:::ivy_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
@@ -732,7 +735,10 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  user_shell__ivy_lora_pi{{"user-shell/ivy@lora-pi"}}:::user_shell__ivy_lora_pi_c
   wakatime["wakatime"]:::wakatime_c
+  fish --> user_shell__ivy_lora_pi
+  ivy__lora_pi --> fish
   ivy__lora_pi --> gpg
   ivy__lora_pi --> neovim
   ivy__lora_pi --> den__batteries__primary_user_ivy_lora_pi_
@@ -749,6 +755,7 @@ graph LR
   classDef agenix_rekey_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__ivy_lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -791,6 +798,7 @@ graph LR
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef user_shell__ivy_lora_pi_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
 style ctx_host_lora_pi fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
