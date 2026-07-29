@@ -45,7 +45,7 @@
   zen-browser.patches = [ ];
 
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
-  agenix.hash = "sha256-9x+2U9A55h7f1E4GBl8hxQJ9T1drupRocGyd6OmFcf8=";
+  agenix.hash = "sha256-rPYZWZo+RPVwJs3SgTxZ3maiAF0hA/q9fMrg1yVPuKc=";
   agenix-rekey.hash = "sha256-YCmqS/NDsOUaBoIskV0wTq+1odiNdeTR+0eRNJtISvU=";
   darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
   home-manager.hash = "sha256-0gXNFapHEstAY0PVA7mls72OnNNdlEMzvaWGl5ysvvs=";
