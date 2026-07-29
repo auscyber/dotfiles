@@ -550,6 +550,21 @@ in
           PATCH_HASHES=ignore ${args.config.apps.write-patched-inputs.program}
         '';
 
+        # One buildable target that forces every patched input's FOD for
+        # *this* system, built with `pkgs` from `perSystem` -- i.e. the
+        # runner's own native nixpkgs, not the `patchSystem` guess `newInputs`
+        # falls back to under pure eval (see lib/patched-inputs.nix). CI builds
+        # this natively on every system's own runner (systems.yml's
+        # `celler-<system>` jobs, one per arch) and pushes the result to the
+        # shared cache *before* any host build needs it, so `newInputs`'s
+        # global, single-`patchSystem` realisation is always a cache hit --
+        # host builds on aarch64-linux/aarch64-darwin runners never need a
+        # foreign x86_64-linux builder, and therefore never need `--impure` to
+        # fall back to one.
+        packages.patched-inputs-warm = pkgs.linkFarm "patched-inputs-warm" (
+          lib.mapAttrsToList (name: drv: { inherit name; path = drv; }) (patchedDrvs pkgs)
+        );
+
         # Building these fails `nix flake check` if a declared patch is stale
         # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
         # Entries with no patches are skipped: `patchSource` hands those back
