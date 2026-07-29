@@ -18,6 +18,35 @@ let
     "secrets"
     "templates"
   ];
+
+  # ---------------------------------------------------------------------------
+  # Why terminal class bodies (nixos / darwin / homeManager) must name the scope
+  # -- `scoped.<aspect>.secrets.<key>` -- while `secrets`/`templates` bodies do
+  # not. This WAS implemented and then removed; do not re-attempt it as written.
+  #
+  # The hook is real: wrap-classes.nix `applyPipeTargeting` does
+  #     ctx // (ctx.__pipeTargeted.<declaringAspectIdentity> or { })
+  # at class-wrap time, keyed by the DECLARING aspect -- the one place den knows
+  # it. `pipe.to` fills that map with lists, but the override is shape-agnostic,
+  # so a `policy.resolve { __pipeTargeted = ...; }` in `den.default.includes`
+  # delivers a per-aspect SCALAR. That evaluated correctly for nixos.
+  #
+  # It is nevertheless wrong, because a context binding is per SCOPE and a scope
+  # emits modules for more than one config. `captureFleet` shows the scope
+  # `aspect=<h>,host=<h>,system=<s>,user=<u>` carries both `homeManager` content
+  # and `os` content (aspects/security/user-pwd.nix writes
+  # `users.users.<u>.hashedPasswordFile` from a user scope). One binding cannot be
+  # right for both, and `class` is NOT in the policy context -- the keys are
+  # __entityKind, anyUser, aspect, home, host, self, system, user -- so there is
+  # nothing to discriminate on. Binding the host config made home-manager bodies
+  # silently resolve `scoped.secrets.<k>` against the HOST's scope, and standalone
+  # homes (`ivy@contabo`) got no binding at all and failed outright.
+  #
+  # A wrong secret that still evaluates is far worse than a longer spelling, so
+  # the scope name stays explicit. `__entityKind` does not rescue it: the
+  # os-from-user-scope case is ambiguous by construction.
+  # ---------------------------------------------------------------------------
+
 in
 {
   den.classes.scoped = { };
@@ -102,32 +131,46 @@ in
           # `scoped.templates`. Both are keyed by the SHORT name and hold the
           # deployed entries, so nothing repeats the scope prefix.
           #
-          # These two are bound by this wrapper because it re-emits them.
-          # Terminal classes get the same `scoped` from the `policy.resolve`
-          # context binding below.
+          # Narrow the tree to THIS aspect's scope. The `scoped` arg is already
+          # the viewed tree (lib/age-scoped.nix), so `s.secrets` / `s.templates`
+          # are the evaluated `age.secrets` / `age.templates` entries under their
+          # short names -- nothing to re-derive here, just pick the scope out and
+          # alias its two halves.
           #
-          # Everything below is lazy on purpose. Forcing `access` needs the key
-          # set of `age.scoped.<scope>.secrets`, which needs this module's own
-          # config keys -- so the injected args must not be forced while the
-          # wrapper is building the attrset it returns.
-          # Read the scope out of the `scoped` arg, not `config`: a nested-route
-          # module's `config` is the subtree it was nested under, not the
-          # top-level config, so `config.age` is not there. The route's
-          # `adaptArgs` (../security/agenix-rekey.nix) injects `scoped` from the
-          # real config, and lib/age-scoped.nix sets the same value as a global
-          # `_module.args`, so this arg is right either way.
+          # Read it from the `scoped` arg, never `config`: a nested-route module's
+          # `config` is the subtree it was nested under, not the top-level config,
+          # so `config.age` is not there.
+          #
+          # Stays lazy on purpose. Forcing these needs the key set of
+          # `age.scoped.<scope>.secrets`, which needs this module's own config
+          # keys -- so they must not be forced while the wrapper is building the
+          # attrset it returns.
           scopeLocal =
             args:
             let
-              s = args.scoped.${scope};
-              view = s // {
-                secrets = builtins.intersectAttrs s.secrets s.access;
-                templates = builtins.intersectAttrs s.templates s.access;
+              raw = args.scoped.${scope};
+              # Re-view unconditionally. `scoped` can arrive here already viewed
+              # (lib/age-scoped.nix `_module.args`, or the per-aspect
+              # `__pipeTargeted` override) or raw, depending on which supplier
+              # wins for this routed module -- and a raw scope's `secrets` holds
+              # DECLARATIONS, so a template dependency taken from it is not a real
+              # agenix secret. agenix-rekey then reads `secret.rekeyFile` off it
+              # (apps/rekey.nix pulls every template dependency into the rekey
+              # set) and fails with "attribute 'rekeyFile' missing" -- but only
+              # for entries that do not literally declare `rekeyFile`, i.e.
+              # generated ones, so it hides until rekey runs.
+              #
+              # Idempotent: `intersectAttrs` takes names from the first argument
+              # and VALUES from `access`, so viewing an already-viewed scope is a
+              # no-op.
+              s = raw // {
+                secrets = builtins.intersectAttrs raw.secrets raw.access;
+                templates = builtins.intersectAttrs raw.templates raw.access;
               };
             in
             {
-              scoped = view;
-              inherit (view) secrets templates;
+              scoped = s;
+              inherit (s) secrets templates;
             };
 
           # A class definition comes in two shapes, and both may be functions:
@@ -187,6 +230,19 @@ in
           #     scope's secrets. `resolve.withIncludes` puts content inside the
           #     new scope, but the aspect's own content cannot be moved there
           #     without emitting it twice.
+          #
+          #  3. `aspect-chain` is not a way around it either, and neither are
+          #     quirks. `aspect-chain` is the one per-aspect handle den maintains
+          #     (fx/handlers/chain.nix pushes and pops it as the walk descends,
+          #     and aspects/base/home.nix reads `lib.head aspect-chain` to forward
+          #     per aspect) -- but it reaches PARAMETRIC INCLUDES only. A class
+          #     module asking for it falls through to `_module.args.aspect-chain`
+          #     and errors: den's class-module wrapper pre-applies entity args
+          #     only. Quirks fail for the same underlying reason -- values are
+          #     collected per scope and delivered as a LIST, and though
+          #     `pipe.withProvenance` tags each entry with its origin, the consumer
+          #     has no handle on which aspect it itself is, so it cannot pick its
+          #     own entry out.
           #
           # So terminal bodies keep the whole tree: `scoped.<aspect>.secrets.<key>`.
           # The way to shorten a given site is to move its content into a class

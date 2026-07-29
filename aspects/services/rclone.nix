@@ -30,7 +30,7 @@ in
         ...
       }:
       let
-        secretFor = name: scoped.rclone.access.${name}.path;
+        secretFor = name: scoped.rclone.secrets.${name}.path;
       in
       {
         programs.rclone = {

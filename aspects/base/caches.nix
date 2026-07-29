@@ -196,33 +196,35 @@ in
         '';
       };
 
-      nixos = { scoped, ... }: {
-        imports = [ inputs.celler.nixosModules.cellerd ];
+      nixos =
+        { scoped, ... }:
+        {
+          imports = [ inputs.celler.nixosModules.cellerd ];
 
-        services.cellerd = {
-          enable = true;
-          environmentFile = scoped.celler.access.env.path;
-          useFlakeCompatOverlay = false;
-          settings = {
-            listen = "[::]:${toString port}";
-            storage = {
-              type = "local";
-              path = "/mnt/hdd/attic";
-            };
+          services.cellerd = {
+            enable = true;
+            environmentFile = scoped.celler.templates.env.path;
+            useFlakeCompatOverlay = false;
+            settings = {
+              listen = "[::]:${toString port}";
+              storage = {
+                type = "local";
+                path = "/mnt/hdd/attic";
+              };
 
-            jwt = { };
+              jwt = { };
 
-            # Data chunking. Changing these makes existing chunks unreusable
-            # (different cutpoints), hurting dedup until re-uploaded.
-            chunking = {
-              nar-size-threshold = 64 * 1024; # 64 KiB
-              min-size = 16 * 1024; # 16 KiB
-              avg-size = 64 * 1024; # 64 KiB
-              max-size = 256 * 1024; # 256 KiB
+              # Data chunking. Changing these makes existing chunks unreusable
+              # (different cutpoints), hurting dedup until re-uploaded.
+              chunking = {
+                nar-size-threshold = 64 * 1024; # 64 KiB
+                min-size = 16 * 1024; # 16 KiB
+                avg-size = 64 * 1024; # 64 KiB
+                max-size = 256 * 1024; # 256 KiB
+              };
             };
           };
         };
-      };
     };
 
   # Opt-in per-host cache credentials. A host that includes this aspect gets its
@@ -253,7 +255,7 @@ in
           # enclosing home-manager `config`, which an entry module function
           # cannot see (inside a submodule, `config` is the entry's own).
           dependencies = {
-            inherit (scoped.celler-push.access) celler_token;
+            inherit (scoped.celler-push.secrets) celler_token;
           };
           content =
             {
@@ -336,7 +338,7 @@ in
               set -f # disable globbing
               export IFS=' '
               export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
-              celler login central https://${vhost} "$(cat ${scoped.celler-push.access.celler_token.path})"
+              celler login central https://${vhost} "$(cat ${scoped.celler-push.secrets.celler_token.path})"
 
               echo "Uploading paths" $OUT_PATHS
               if [[ -n "''${OUT_PATHS:-}" ]]; then
@@ -356,7 +358,7 @@ in
       {
         nix.settings = {
           post-build-hook = "${lib.getExe build-hook}";
-          netrc-file = scoped.celler-push.access.netrc.path;
+          netrc-file = scoped.celler-push.templates.netrc.path;
         };
       };
   };

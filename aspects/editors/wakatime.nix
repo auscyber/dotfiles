@@ -13,7 +13,7 @@
         age.templates = {
           wakatime_config = {
             dependencies = {
-              inherit (scoped.wakatime.access) wakatime;
+              inherit (scoped.wakatime.secrets) wakatime;
             };
             content =
               {

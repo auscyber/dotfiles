@@ -297,13 +297,20 @@ in
     age.templates = flatten "templates" mkTemplate;
 
     # Available in every module of this class, so a body can read
-    # `secrets."slskd/env".path` or `scoped.slskd.access.env.path` rather than
+    # `secrets."slskd/env".path` or `scoped.slskd.secrets.env.path` rather than
     # reaching through `config.age.*`. `secrets`/`templates` are the flat global
     # sets and mean the same thing in every aspect -- another aspect's secrets
     # are reached exactly like your own.
+    #
+    # The `scoped` ARG is the viewed tree, not the raw option: under it,
+    # `scoped.<name>.secrets` / `.templates` are the evaluated `age.secrets` /
+    # `age.templates` entries keyed by short name, so they are directly usable as
+    # dependencies and have `.path` / `.file`. The option `age.scoped.<name>.secrets`
+    # keeps holding the declarations -- that is where you write them, this is how
+    # you read them back.
     _module.args = {
       inherit (config.age) secrets templates;
-      scoped = cfg;
+      scoped = lib.mapAttrs (_: scopeView) cfg;
     };
   };
 }

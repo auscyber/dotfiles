@@ -63,19 +63,19 @@
         security.acme.certs = {
           "ivymect.in" = {
             domain = "*.ivymect.in";
-            environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
+            environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
             group = config.services.nginx.group;
           };
           "jellyfin.pierlot.com.au" = {
-            environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
+            environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
             group = config.services.nginx.group;
           };
           # jitsi auto-creates the meet.ivymect.in cert; just supply DNS creds.
-          "meet.ivymect.in".environmentFile = scoped.secondpc-web.access."acme_cloudflare.env".path;
+          "meet.ivymect.in".environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
         };
 
         # navidrome reads its external API keys from the rekeyed env file.
-        services.navidrome.environmentFile = scoped.secondpc-web.access.navidrome_env.path;
+        services.navidrome.environmentFile = scoped.secondpc-web.secrets.navidrome_env.path;
       };
   };
 }

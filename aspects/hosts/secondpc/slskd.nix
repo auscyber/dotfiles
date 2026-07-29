@@ -89,7 +89,7 @@
           generator = {
             dependencies = {
               inherit (config.age.secrets) slskd_soularr_apikey slskd_secrets_env;
-              inherit (scoped.user-pwd.access) ivy-password;
+              inherit (scoped.user-pwd.secrets) ivy-password;
             };
             script =
               {

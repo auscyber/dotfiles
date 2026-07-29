@@ -33,7 +33,7 @@
     {
       includes = [ den.aspects.user-pwd ];
       os = { scoped, ... }: {
-        users.users.${user.name}.hashedPasswordFile = scoped.user-pwd.access.ivy-pwd-hash.file;
+        users.users.${user.name}.hashedPasswordFile = scoped.user-pwd.secrets.ivy-pwd-hash.file;
       };
     };
 }

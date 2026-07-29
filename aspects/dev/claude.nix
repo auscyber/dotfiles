@@ -11,17 +11,18 @@
         package =
           pkgs.runCommand "claude-wrapped"
             {
+              version = pkgs.claude-code.version;
               nativeBuildInputs = [ pkgs.makeWrapper ];
             }
             ''
               # Create a symlink tree of the original package
               mkdir -p $out/bin
-              ln -s${pkgs.claude-code}/bin/claude $out/bin/claude
+              ln -s ${pkgs.claude-code}/bin/claude $out/bin/claude
 
               # Wrap the symlink — it becomes a shell script that sets
               # env vars and then calls the original binary.
               wrapProgram $out/bin/claude \
-              --run "export CLAUDE_CODE_AUTH_TOKEN=$(cat ${scoped.claude.secrets.cclaude_token.path})"
+              --run 'export ANTHROPIC_AUTH_TOKEN=$(cat ${scoped.claude.secrets.claude_token.path})'
             '';
       };
     };

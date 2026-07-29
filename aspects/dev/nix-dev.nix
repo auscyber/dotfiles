@@ -52,7 +52,7 @@
       }:
       {
         nix.extraOptions = ''
-          !include ${scoped.dev-nix.access."extra-nix-conf".path}
+          !include ${scoped.dev-nix.templates."extra-nix-conf".path}
         '';
         home.packages = with pkgs; [
           nil

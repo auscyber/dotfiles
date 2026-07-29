@@ -174,7 +174,7 @@ in
         config = lib.mkIf (cfg.backend == "wg-quick") {
           networking.wg-quick.interfaces.${cfg.interface} = {
             address = [ "${tunnelIp cfg host}/24" ];
-            privateKeyFile = scoped.vpn-secrets.access.wireguard_key.path;
+            privateKeyFile = scoped.vpn-secrets.secrets.wireguard_key.path;
             peers = tunnelPeers cfg host;
           }
           // lib.optionalAttrs (cfg.listenPort != null) { inherit (cfg) listenPort; };
@@ -219,7 +219,7 @@ in
               MTUBytes = "1500";
             };
             wireguardConfig = {
-              PrivateKeyFile = scoped.vpn-secrets.access.wireguard_key.path;
+              PrivateKeyFile = scoped.vpn-secrets.secrets.wireguard_key.path;
               RouteTable = "main";
             }
             // lib.optionalAttrs (cfg.listenPort != null) { ListenPort = cfg.listenPort; };
