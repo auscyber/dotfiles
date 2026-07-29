@@ -24,15 +24,23 @@ on:
 # than per host) means it happens exactly once per arch instead of racing N
 # copies of itself across every host that shares that arch.
 #
+# `warm-patched-inputs` builds and pushes every patched-input FOD
+# (packages.patched-inputs-warm, aspects/tooling/patch-inputs.nix) once,
+# natively on x86_64-linux. Those trees are fixed-output derivations once
+# their hash is recorded, so the output path is identical on every system --
+# substitution never cares which arch built it. build-aarch64-linux and
+# build-darwin both require this job, so they always hit a warm cache for the
+# patched inputs instead of racing a build of their own on a foreign
+# x86_64-linux builder (which is what `--impure` used to paper over).
+#
 # `build-<system>` each call the reusable ./.github/workflows/build-host.yml
 # once per host (via `strategy.matrix`, which reusable-workflow calls
-# support), so the actual build/push steps are defined in one place. Each
-# caller needs only its own matching celler-<system> gate -- not the other two
-# -- which is what lets e.g. darwin hosts start as soon as the darwin celler
-# gate is done, without ever waiting on the Linux gates: Actions' `needs:`
-# blocks on an entire job (every matrix leg of it), so there's no way to
-# depend on just one leg of a shared job, and a single `build` job covering
-# multiple arches would have forced exactly that kind of cross-arch wait.
+# support), so the actual build/push steps are defined in one place.
+# build-x86_64-linux needs only its own matching celler-x86_64-linux gate;
+# build-aarch64-linux and build-darwin additionally need warm-patched-inputs
+# (and, transitively through it, celler-x86_64-linux) -- the one deliberate
+# cross-arch wait, needed so those two never have to build the patched
+# inputs themselves.
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -100,14 +108,35 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
-      # Build+push every patched-input FOD natively on this arch's own
-      # runner, via the fully-qualified `packages.x86_64-linux.*` ref (no
-      # system-detection needed, so no --impure). This runs before the
-      # build-x86_64-linux matrix below, so those host builds always hit a
-      # warm cache for the patched inputs instead of racing this job -- and
-      # aarch64-linux/aarch64-darwin never need to fall back to a foreign
-      # x86_64-linux builder for them. See packages.patched-inputs-warm in
-      # aspects/tooling/patch-inputs.nix.
+
+  # Every patched-input tree is a fixed-output derivation once its hash is
+  # recorded (lib/patched-inputs.nix), so its output path is identical
+  # regardless of which system builds it -- substitution never cares about
+  # arch. Building it once here, natively on x86_64-linux, and requiring this
+  # job for the non-x86_64-linux builds below means those never need to
+  # realise it themselves: no cache-miss race, no falling back to a foreign
+  # x86_64-linux builder, no `--impure` to paper over that. See
+  # packages.patched-inputs-warm in aspects/tooling/patch-inputs.nix.
+  warm-patched-inputs:
+    name: warm patched-input FODs
+    needs: celler-x86_64-linux
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+      - uses: ./.github/actions/nix-cache
       - if: ${{ github.event_name != 'pull_request' }}
         uses: auscyber/celler-action@main
         with:
@@ -139,14 +168,6 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
-      # See the matching step in celler-x86_64-linux above.
-      - if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@main
-        with:
-          endpoint: https://cache.ivymect.in
-          cache: main
-          token: ${{ secrets.CELLER_TOKEN }}
-          flake-ref: ".#packages.aarch64-linux.patched-inputs-warm"
 
   celler-aarch64-darwin:
     name: celler (aarch64-darwin)
@@ -171,14 +192,6 @@ jobs:
         uses: ./.github/actions/ensure-celler
         with:
           celler-token: ${{ secrets.CELLER_TOKEN }}
-      # See the matching step in celler-x86_64-linux above.
-      - if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@main
-        with:
-          endpoint: https://cache.ivymect.in
-          cache: main
-          token: ${{ secrets.CELLER_TOKEN }}
-          flake-ref: ".#packages.aarch64-darwin.patched-inputs-warm"
 
   build-x86_64-linux:
     needs: [matrix, celler-x86_64-linux]
@@ -193,7 +206,7 @@ jobs:
     secrets: inherit
 
   build-aarch64-linux:
-    needs: [matrix, celler-aarch64-linux]
+    needs: [matrix, celler-aarch64-linux, warm-patched-inputs]
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix-aarch64-linux) }}
@@ -205,7 +218,7 @@ jobs:
     secrets: inherit
 
   build-darwin:
-    needs: [matrix, celler-aarch64-darwin]
+    needs: [matrix, celler-aarch64-darwin, warm-patched-inputs]
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix-darwin) }}
@@ -232,6 +245,7 @@ jobs:
       - celler-x86_64-linux
       - celler-aarch64-linux
       - celler-aarch64-darwin
+      - warm-patched-inputs
       - build-x86_64-linux
       - build-aarch64-linux
       - build-darwin
