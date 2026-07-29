@@ -10,9 +10,10 @@ on:
 # actions, from aspects/tooling/ci.nix) at run time and splits it three ways,
 # one bucket per arch (`matrix-x86_64-linux`, `matrix-aarch64-linux`,
 # `matrix-darwin`), so each of the three host-build calls below can depend on
-# exactly its own celler gate job and nothing else. fail-fast: false -> one
-# machine failing never stops the others. All jobs `accept-flake-config`, so
-# substituters + trusted-public-keys come from the flake's nixConfig (built
+# its own matching celler gate job (plus the shared warm-patched-inputs gate,
+# see below). fail-fast: false -> one machine failing never stops the others.
+# All jobs `accept-flake-config`, so substituters + trusted-public-keys come
+# from the flake's nixConfig (built
 # from aspects/base/celler-keys.json) -- nothing hardcoded here, except in the
 # jobs that need celler's cache to actually be trusted before celler itself is
 # installed (see extra-trusted-substituters below).
@@ -28,19 +29,19 @@ on:
 # (packages.patched-inputs-warm, aspects/tooling/patch-inputs.nix) once,
 # natively on x86_64-linux. Those trees are fixed-output derivations once
 # their hash is recorded, so the output path is identical on every system --
-# substitution never cares which arch built it. build-aarch64-linux and
-# build-darwin both require this job, so they always hit a warm cache for the
-# patched inputs instead of racing a build of their own on a foreign
-# x86_64-linux builder (which is what `--impure` used to paper over).
+# substitution never cares which arch built it. Every build-<system> job
+# below requires this one, so none of them ever have to realise a
+# patched-input FOD themselves: no cache-miss race, no falling back to a
+# foreign x86_64-linux builder on aarch64-linux/aarch64-darwin (which is what
+# `--impure` used to paper over).
 #
 # `build-<system>` each call the reusable ./.github/workflows/build-host.yml
 # once per host (via `strategy.matrix`, which reusable-workflow calls
-# support), so the actual build/push steps are defined in one place.
-# build-x86_64-linux needs only its own matching celler-x86_64-linux gate;
-# build-aarch64-linux and build-darwin additionally need warm-patched-inputs
-# (and, transitively through it, celler-x86_64-linux) -- the one deliberate
-# cross-arch wait, needed so those two never have to build the patched
-# inputs themselves.
+# support), so the actual build/push steps are defined in one place. Each
+# needs its own matching celler-<system> gate plus warm-patched-inputs --
+# the latter is a deliberate shared cross-arch wait (via its own dependency
+# on celler-x86_64-linux), needed so no build-<system> job builds the
+# patched inputs itself.
 jobs:
   matrix:
     runs-on: ubuntu-latest
@@ -194,7 +195,7 @@ jobs:
           celler-token: ${{ secrets.CELLER_TOKEN }}
 
   build-x86_64-linux:
-    needs: [matrix, celler-x86_64-linux]
+    needs: [matrix, celler-x86_64-linux, warm-patched-inputs]
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix-x86_64-linux) }}
