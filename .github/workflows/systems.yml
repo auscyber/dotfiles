@@ -148,7 +148,7 @@ jobs:
       - name: "warm patched inputs"
         run: |
           set -euo pipefail
-          nix build --no-link .#packages.patched-inputs-warm
+          nix build --no-link .#patched-inputs-warm
 
   celler-aarch64-linux:
     name: celler (aarch64-linux)
