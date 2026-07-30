@@ -12,6 +12,7 @@
   outputs = _: { };
 
   inputs = {
+    home-manager.url = "github:nix-community/home-manager/e705714e918c3b11affcdd15db2cbe3a070420a0";
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
@@ -29,8 +30,23 @@
       flake = false;
     };
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
+    my-nur = {
+      url = "github:auscyber/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    nixpkgs.url = "github:nixos/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab";
+    nixpkgs.url = "github:nixos/nixpkgs/9bc02893134c733dd85de46ee4fb2fac696b5529";
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     rift.url = "github:auscyber/rift";
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 }

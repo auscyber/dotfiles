@@ -26,6 +26,15 @@ let
   inherit (lib) mapAttrs;
   realInputs = inputs;
 
+  # The patch registry (`patchSpecs`, i.e. ./patched-inputs.nix) is SHARED: the
+  # root flake and every partition sub-flake are handed the same file. A spec
+  # only applies where its input actually exists — a bucket-only input listed in
+  # the registry must be an inert no-op for the root eval (and vice versa), never
+  # an `attribute '<input>' missing`. So drop any input-spec whose input isn't in
+  # THIS flake's `realInputs` before anything forces it. `isInput = false` entries
+  # patch non-input trees and carry their own `src`, so they're kept regardless.
+  applicableSpecs = lib.filterAttrs (name: spec: (spec.isInput or true) -> (realInputs ? ${name})) patchSpecs;
+
   # Fill in the same defaults the `patchedInputModule` option declarations
   # provide, so a spec only has to carry what differs.
   patchedInputs = lib.mapAttrs (name: spec: {
@@ -42,7 +51,7 @@ let
     # the hash. Reading it from the spec instead of hashes.json must not
     # quietly remove that recovery path.
     hash = if ignoreHashes then null else (spec.hash or (patchHashes.${name} or null));
-  }) patchSpecs;
+  }) applicableSpecs;
 
   # `getEnv` returns "" under pure eval, so this is inert everywhere else.
   ignoreHashes = builtins.getEnv "PATCH_HASHES" == "ignore";

@@ -116,6 +116,10 @@
     };
 
     nix.settings = {
+      extra-deprecated-features = [
+        "broken-string-escape"
+        "or-as-identifier"
+      ];
       extra-experimental-features = [
         "nix-command"
         "flakes"

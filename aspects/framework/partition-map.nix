@@ -35,7 +35,9 @@ let
   hostAspects = import ../../lib/host-aspects.nix { inherit lib den diagram; };
 
   allHosts = lib.mergeAttrsList (builtins.attrValues den.hosts);
-  platformOf = host: if lib.hasSuffix "darwin" (host.system or "") then "darwin" else "nixos";
+  # den resolves a `class` ("nixos"/"darwin") onto every host — the authoritative
+  # platform, rather than string-matching the system tuple.
+  platformOf = host: host.class;
 
   # platform -> every aspect label any host of that platform actually uses.
   usedBy =
@@ -68,6 +70,48 @@ let
 
   relPath = file: builtins.head (builtins.match ".*/aspects/(.*)" file);
 
+  # A definition may declare a NESTED aspect (`den.aspects.browsers.zen`), which a
+  # base file navigates into directly (`den.lib.whenAspect den.aspects.browsers.zen`).
+  # A flat `browsers` stub (`{}`) would then lose the `.zen` key and the base
+  # evaluation dies with `Aspect 'browsers' has no key 'zen'`. So the stub list
+  # carries the FULL path (`browsers/zen`) and partitions.nix rebuilds a nested
+  # inert stub. An attrset is a namespace to recurse into only while it carries no
+  # aspect content: real content always brings `includes` or one of den's class
+  # keys, whereas a namespace's keys are just further aspect names. Functions and
+  # empty attrsets are leaves as they stand.
+  aspectContentKeys = [
+    "includes"
+    "provides"
+    "meta"
+    "den"
+    "when"
+    "systems"
+    "nixos"
+    "darwin"
+    "homeManager"
+    "homeModules"
+    "home"
+    "overlays"
+    "inputs"
+    "flake-file"
+    "ff"
+    "flake-mod"
+    "perSystem"
+    "flake"
+    "packages"
+    "os"
+  ];
+  aspectLeafPaths =
+    prefix: v:
+    if
+      !(builtins.isAttrs v)
+      || v == { }
+      || builtins.any (k: builtins.elem k aspectContentKeys) (builtins.attrNames v)
+    then
+      [ (lib.concatStringsSep "/" prefix) ]
+    else
+      builtins.concatMap (name: aspectLeafPaths (prefix ++ [ name ]) v.${name}) (builtins.attrNames v);
+
   contributions = lib.foldl' (
     acc: d:
     let
@@ -75,17 +119,25 @@ let
       prev =
         acc.${path} or {
           aspects = [ ];
+          nestedAspects = [ ];
           platforms = [ ];
         };
+      declared = d.value.aspects or { };
     in
     acc
     // {
       ${path} = {
-        aspects = prev.aspects ++ builtins.attrNames (d.value.aspects or { });
+        aspects = prev.aspects ++ builtins.attrNames declared;
+        nestedAspects =
+          prev.nestedAspects
+          ++ builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (builtins.attrNames declared);
+        # A file's raw `den.hosts.<system>.<name>` definition carries no resolved
+        # `class` (that is den-injected), so look the host up in the resolved
+        # `allHosts` by name to read its authoritative class.
         platforms =
           prev.platforms
-          ++ map platformOf (
-            builtins.concatMap builtins.attrValues (builtins.attrValues (d.value.hosts or { }))
+          ++ map (name: platformOf allHosts.${name}) (
+            builtins.concatMap builtins.attrNames (builtins.attrValues (d.value.hosts or { }))
           );
       };
     }
@@ -97,16 +149,27 @@ let
   bucketOf =
     contribution:
     let
-      platforms = lib.unique (
-        contribution.platforms
-        ++ builtins.concatMap (
-          name:
-          builtins.filter (p: usedSet.${p} ? ${name}) [
-            "darwin"
-            "nixos"
-          ]
-        ) contribution.aspects
-      );
+      # A file that declares hosts is classified by those hosts' platforms ALONE.
+      # The declared system is authoritative, and the file's own aspects are
+      # host-specific (they must travel with the host regardless). Folding in
+      # aspect-usage here would let reachability's cross-platform over-approximation
+      # (a nixos host's trace still lists darwin host aspects, hence classSlice)
+      # mark a darwin host file multi-platform and strand it at base -- which then
+      # breaks that host's den fleet spawn (`spawnNode spawn root equals its parent
+      # scope`). Aspect-usage classification is only for files that declare no host.
+      platforms =
+        if contribution.platforms != [ ] then
+          lib.unique contribution.platforms
+        else
+          lib.unique (
+            builtins.concatMap (
+              name:
+              builtins.filter (p: usedSet.${p} ? ${name}) [
+                "darwin"
+                "nixos"
+              ]
+            ) contribution.aspects
+          );
       touchesNothing = contribution.aspects == [ ] && contribution.platforms == [ ];
     in
     if touchesNothing || builtins.length platforms != 1 then null else builtins.head platforms;
@@ -150,11 +213,48 @@ let
   # `attribute '<x>' missing` as soon as a definition moves into a bucket.
   stubs = lib.sort (a: b: a < b) (
     lib.unique (
-      builtins.concatMap (path: (contributions.${path} or { aspects = [ ]; }).aspects) (
+      builtins.concatMap (path: (contributions.${path} or { nestedAspects = [ ]; }).nestedAspects) (
         builtins.concatLists (builtins.attrValues bucketMap)
       )
     )
   );
+  # ── Serialize the derived map back to ../../partition-map.nix ──────────────
+  # `nix run .#write-partition-map` writes the file the base flake reads. The
+  # classification is reachability-derived (see the header): it is a STARTING
+  # POINT, not guaranteed drop-in. A file that stays at base may still navigate
+  # INTO a moved aspect (`den.aspects.browsers.zen`), which stubs cannot repair,
+  # so after regenerating always re-run `nix run .#write-flake` and confirm the
+  # base evaluation still succeeds before committing.
+  fileHeader = ''
+    # GENERATED by `nix run .#write-partition-map` -- reconcile by hand if the base
+    # evaluation breaks (see aspects/framework/partition-map.nix for why the derived
+    # classification is a starting point, not a guarantee).
+    #
+    # Which aspects live in a flake-parts partition instead of the base evaluation.
+    # An aspect listed here is NOT imported by the root flake, so its `ff.*` input
+    # declarations never reach the root `flake.nix`/`flake.lock`; they are written to
+    # `partitions/<bucket>/flake.nix` instead. See aspects/framework/partitions.nix.
+    #
+    # Entries are paths relative to ./aspects. A directory entry claims everything
+    # under it. `stubs` are the aspect names bucketed files define, stubbed inert at
+    # base so a base file naming a moved aspect still resolves.'';
+
+  bucketBlock =
+    name: paths:
+    "    ${name} = [\n${lib.concatMapStringsSep "\n" (p: "      \"${p}\"") paths}\n    ];";
+
+  partitionMapText = ''
+    ${fileHeader}
+    {
+      buckets = {
+    ${lib.concatStringsSep "\n" (lib.mapAttrsToList bucketBlock bucketMap)}
+      };
+
+      stubs = [
+    ${lib.concatMapStringsSep "\n" (s: "    \"${s}\"") stubs}
+      ];
+    }
+  '';
 in
 {
   # Advisory: the classification den can derive, NOT the map in force. See the
@@ -164,4 +264,31 @@ in
     inherit stubs;
     map = bucketMap;
   };
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      apps.write-partition-map = {
+        type = "app";
+        program = lib.getExe (
+          pkgs.writeShellApplication {
+            name = "write-partition-map";
+            runtimeInputs = [ pkgs.coreutils ];
+            text = ''
+              set -euo pipefail
+              repo="$PWD"
+              if [ ! -e "$repo/flake.nix" ]; then
+              	echo "error: run from the flake root (no flake.nix in $repo)" >&2
+              	exit 2
+              fi
+              cat >"$repo/partition-map.nix" <<'PARTITIONMAP'
+              ${partitionMapText}
+              PARTITIONMAP
+              echo "wrote $repo/partition-map.nix"
+              echo "now run 'nix run .#write-flake' and confirm the base evaluation still succeeds." >&2
+            '';
+          }
+        );
+      };
+    };
 }

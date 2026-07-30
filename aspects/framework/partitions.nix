@@ -278,7 +278,14 @@ in
   # Darwin hosts pull it in. Stub every partitioned aspect so those references
   # resolve to something inert here; the real definition is merged back in by
   # whichever partition imports its file.
-  den.aspects = lib.genAttrs aspectPartitions.stubs (_: { });
+  #
+  # A stub entry is a slash path, so a NESTED aspect a base file navigates into
+  # (`den.aspects.browsers.zen`) rebuilds as `{ browsers.zen = { }; }` rather than
+  # a flat `browsers = { }` that would lose the `.zen` key. The inert `{ }` leaf
+  # merges cleanly with the real definition inside whichever partition imports it.
+  den.aspects = lib.foldl' lib.recursiveUpdate { } (
+    map (p: lib.setAttrByPath (lib.splitString "/" p) { }) aspectPartitions.stubs
+  );
 
   partitions =
     lib.genAttrs buckets (bucket: {

@@ -262,9 +262,39 @@ let
         	exit 2
         fi
 
+        # Resolve the input's PRISTINE source. A partitioned input never appears
+        # in the root flake -- its `ff` lives on an aspect that only a bucket
+        # imports, so its lock node is in partitions/<bucket>/flake.lock, not the
+        # root's. Try the root first, then each partition sub-flake, so
+        # `patch-input <name>` works the same whether the input is at the root or
+        # in a bucket. The written patch path (./patches/<input>/) is identical
+        # either way -- the registry (patched-inputs.nix) is shared, so a bucket
+        # applies it via the same declaration (see aspects/framework/partitions.nix).
+        # `dir` must have NO trailing slash: it is interpolated as a bare Nix path
+        # literal (`toString /abs/dir`), and a path literal ending in `/` is a
+        # syntax error -- which `2>/dev/null` would swallow, turning a real hit
+        # into a spurious "not found". The `*/` glob yields trailing slashes, so
+        # strip them at the call site.
+        resolveSrc() {
+        	nix eval --impure --raw --expr \
+        		"builtins.toString (builtins.getFlake (toString ''${1%/})).inputs.\"$input\"" 2>/dev/null
+        }
         echo "Resolving source of input '$input'…"
-        src="$(nix eval --impure --raw --expr \
-        	"builtins.toString (builtins.getFlake (toString $repo)).inputs.\"$input\"")"
+        src="$(resolveSrc "$repo" || true)"
+        if [ -z "$src" ]; then
+        	for sub in "$repo"/partitions/*/; do
+        		sub="''${sub%/}"
+        		[ -e "$sub/flake.nix" ] || continue
+        		if src="$(resolveSrc "$sub")" && [ -n "$src" ]; then
+        			echo "  (partitioned input, from ''${sub#"$repo"/})"
+        			break
+        		fi
+        	done
+        fi
+        if [ -z "$src" ]; then
+        	echo "error: input '$input' not found in the root flake or any partition" >&2
+        	exit 2
+        fi
         echo "  $src"
 
         work="$(mktemp -d -t "patch-$input.XXXXXX")"
