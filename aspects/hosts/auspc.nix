@@ -78,6 +78,7 @@
         networking.networkmanager.enable = true;
         time.timeZone = "Australia/Melbourne";
         i18n.defaultLocale = "en_AU.UTF-8";
+        boot.initrd.compressor = "xz";
 
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
         boot.supportedFilesystems = [
@@ -195,7 +196,6 @@
           enable = true;
           polkitPolicyOwners = [ "auscyber" ];
         };
-        boot.initrd.compressor = "bzip2";
 
         users.users.auscyber = {
           isNormalUser = true;
