@@ -364,6 +364,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - ccache
 - ccache/auspc
 - celler-push
+- claude
 - den/provides/unfree(castlabs-electron)
 - dev
 - dev-cli
@@ -493,6 +494,7 @@ graph LR
   auscyber{{"auscyber"}}:::auscyber_c
   auscyber__auspc["auscyber/auspc"]:::auscyber__auspc_c
   celler_push["celler-push"]:::celler_push_c
+  claude["claude"]:::claude_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
   dev_nix["dev-nix"]:::dev_nix_c
@@ -518,6 +520,7 @@ graph LR
   user_shell__auscyber_auspc{{"user-shell/auscyber@auspc"}}:::user_shell__auscyber_auspc_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
+  auscyber --> claude
   auscyber --> fish
   auscyber --> den__provides__unfree_castlabs_electron__user_auscyber
   auscyber__auspc --> dev
@@ -556,6 +559,7 @@ graph LR
   classDef cachyos_kernel_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef ccache_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__auscyber_auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -1275,6 +1279,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - builders
 - celler
 - celler-push
+- claude
 - disko
 - fish
 - gpg
@@ -1402,6 +1407,7 @@ graph LR
   auscyber__secondpc["auscyber/secondpc"]:::auscyber__secondpc_c
   celler["celler"]:::celler_c
   celler_push["celler-push"]:::celler_push_c
+  claude["claude"]:::claude_c
   fish["fish"]:::fish_c
   gpg["gpg"]:::gpg_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
@@ -1419,6 +1425,7 @@ graph LR
   user_shell__auscyber_secondpc{{"user-shell/auscyber@secondpc"}}:::user_shell__auscyber_secondpc_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
+  auscyber --> claude
   auscyber --> fish
   auscyber --> den__provides__unfree_castlabs_electron_
   auscyber__secondpc --> gpg
@@ -1446,6 +1453,7 @@ graph LR
   classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__auscyber_secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef disko_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1527,6 +1535,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/sources
 - batteries/sources/os
 - celler-push
+- claude
 - fish
 - gpg
 - home-base
@@ -1619,6 +1628,7 @@ graph LR
   auscyber{{"auscyber"}}:::auscyber_c
   auscyber__surfacelaptop["auscyber/surfacelaptop"]:::auscyber__surfacelaptop_c
   celler_push["celler-push"]:::celler_push_c
+  claude["claude"]:::claude_c
   fish["fish"]:::fish_c
   gpg["gpg"]:::gpg_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
@@ -1634,6 +1644,7 @@ graph LR
   user_shell__auscyber_surfacelaptop{{"user-shell/auscyber@surfacelaptop"}}:::user_shell__auscyber_surfacelaptop_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
+  auscyber --> claude
   auscyber --> fish
   auscyber --> den__provides__unfree_castlabs_electron_
   auscyber__surfacelaptop --> gpg
@@ -1656,6 +1667,7 @@ graph LR
   classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef auscyber__surfacelaptop_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__auscyber_surfacelaptop_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
