@@ -146,7 +146,7 @@
         # See aspects/framework/partitions.nix.
         aspectPartitions = lib.aspectPartitions {
           dir = ./aspects;
-          map = import ./partition-map.nix;
+          map = (import ./partition-map.nix).buckets;
         };
       in
       inputs.flake-parts.lib.mkFlake
@@ -161,7 +161,9 @@
           imports = aspectPartitions.base;
 
           _module.args.rootPath = ./.;
-          _module.args.aspectPartitions = aspectPartitions;
+          _module.args.aspectPartitions = aspectPartitions // {
+          inherit ((import ./partition-map.nix)) stubs;
+        };
         }
     '';
   };

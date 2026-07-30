@@ -136,6 +136,13 @@ in
     flake = false;
   };
 
+  # Reachability says which hosts USE an aspect, not which files NAME one: a
+  # base file can still write `den.aspects.karabiner-driver` even though only
+  # Darwin hosts pull it in. Stub every partitioned aspect so those references
+  # resolve to something inert here; the real definition is merged back in by
+  # whichever partition imports its file.
+  den.aspects = lib.genAttrs aspectPartitions.stubs (_: { });
+
   partitions =
     lib.genAttrs buckets (bucket: {
       extraInputs = subInputs bucket;
@@ -158,7 +165,9 @@ in
     ciMatrix = "all";
     darwinConfigurations = "darwin";
     deploy = "all";
+    homeConfigurations = "all";
     nixosConfigurations = "nixos";
+    partitionMap = "all";
   };
 
   # `nix flake update` only touches the root lock, so bring the partitions along:

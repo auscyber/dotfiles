@@ -13,25 +13,16 @@
 #     `accept-flake-config`, so they pick up substituters + trusted-public-keys
 #     straight from the flake's nixConfig -- everything derived from
 #     aspects/base/celler-keys.json -- with nothing hardcoded in the workflow.
+#   * Per-host build targets are `.#ciMatrix.checks.<system>."<class>-<name>"`.
+#     There used to be `packages.<class>-<name>` aliases for the same
+#     derivations here, but enumerating them means reading
+#     `self.{nixos,darwin}Configurations`, which forces every platform partition
+#     just to list `packages` -- i.e. a Linux `nix build .#nvim` would fetch the
+#     homebrew tarballs again. See aspects/framework/partitions.nix.
 #   * `apps.sync-ci-secrets` mints + uploads the CELLER_TOKEN that
 #     auscyber/celler-action pushes with (a fork of ryanccn/attic-action that
 #     uses the celler client instead of attic, since celler's upload protocol
 #     requires an X-Celler-Nar-Info header that upstream attic doesn't send).
-let
-  self = inputs.self;
-
-  # Escape hatch: hosts to leave out of CI entirely. Empty by default -- a host
-  # that fails to build just goes red on its own job without affecting the rest
-  # (that is the whole point of fail-fast: false).
-  excludeHosts = [ ];
-
-  systemOf = cfg: cfg.config.nixpkgs.hostPlatform.system;
-  # Standalone home-manager configs don't carry `config.nixpkgs.hostPlatform`
-  # (useGlobalPkgs disables the nixpkgs module), and their buildable toplevel is
-  # `activationPackage`, not `system.build.toplevel` -- so they key off `pkgs`.
-  homeSystemOf = cfg: cfg.pkgs.stdenv.hostPlatform.system;
-  keep = configs: removeAttrs configs excludeHosts;
-in
 {
   perSystem =
     {
@@ -47,21 +38,6 @@ in
         "aarch64-linux"
         "aarch64-darwin"
       ];
-
-      onThisSystem = lib.filterAttrs (_: cfg: systemOf cfg == system);
-      toplevels =
-        class: configs:
-        lib.mapAttrs' (name: cfg: lib.nameValuePair "${class}-${name}" cfg.config.system.build.toplevel) (
-          onThisSystem (keep configs)
-        );
-
-      # Same as `toplevels` but for standalone homeConfigurations: keyed off
-      # `pkgs` and exposing `activationPackage` (see homeSystemOf above).
-      homeToplevels =
-        configs:
-        lib.mapAttrs' (name: cfg: lib.nameValuePair "home-${name}" cfg.activationPackage) (
-          lib.filterAttrs (_: cfg: homeSystemOf cfg == system) (keep configs)
-        );
 
       # Same master identity + age plugins the `.#rekey` app uses, so the sync
       # app can decrypt the master-encrypted token source with the YubiKey.
@@ -122,11 +98,7 @@ in
       };
     in
     {
-      packages =
-        toplevels "nixos" (self.nixosConfigurations or { })
-        // toplevels "darwin" (self.darwinConfigurations or { })
-        // homeToplevels (self.homeConfigurations or { })
-        // lib.optionalAttrs supported { celler = inputs'.celler.packages.celler; };
+      packages = lib.optionalAttrs supported { celler = inputs'.celler.packages.celler; };
 
       apps = lib.optionalAttrs supported {
         sync-ci-secrets = {

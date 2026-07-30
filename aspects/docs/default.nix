@@ -6,6 +6,7 @@
 }:
 let
   diagram = inputs.den-diagram.lib;
+  hostAspects = import ../../lib/host-aspects.nix { inherit lib den diagram; };
 
   # All hosts flattened: { hostName -> hostAttr }
   allHosts = lib.mergeAttrsList (builtins.attrValues den.hosts);
@@ -25,79 +26,15 @@ in
       ...
     }:
     let
-      # Generate diagram for a single host
+      # Generate diagram for a single host. The graph filtering lives in
+      # ../../lib/host-aspects.nix, shared with aspects/framework/partition-map.nix
+      # so the "which aspects does this host really use" answer cannot drift
+      # between the diagrams and the partition analysis.
       hostDiagram =
         hostName: host:
         let
-          classes =
-            if lib.hasSuffix "darwin" (host.system or "") then
-              [
-                "darwin"
-                "homeManager"
-              ]
-            else
-              [
-                "nixos"
-                "homeManager"
-              ];
-
-          captured = den.lib.capture.captureWithPathsWith {
-            inherit classes;
-            root = den.lib.resolveEntity "host" { inherit host; };
-            ctx = { inherit host; };
-          };
-
-          g = diagram.context {
-            entries = captured.entries;
-            ctxTrace = captured.ctxTrace;
-            name = hostName;
-          };
-
-          # `simplified` was pulling in `aspectsOnly`, which unconditionally
-          # drops every edge tagged style = "provide" (provider-provenance
-          # edges). For several nodes -- including, on some no-role hosts,
-          # literally every edge out of the host root -- that "provide" edge
-          # was their ONLY connection, so `simplified` left them as
-          # disconnected floating nodes (confirmed: 7-11 orphaned nodes per
-          # host after regenerating, with the host root itself orphaned on
-          # 5 of them). Use `filterUserAspects` instead: it drops the same
-          # <anon>/resolve(...)/wrapper noise but keeps every edge,
-          # including "provide" ones, so real structural connections aren't
-          # severed as a side effect of "simplifying".
-          isPolicyNode = n: (builtins.match "<policy:.*" n.label) != null;
-          gBase = diagram.graph.filterUserAspects g;
-          policyKeptIds = lib.listToAttrs (
-            map (n: {
-              name = n.id;
-              value = true;
-            }) (builtins.filter (n: !(isPolicyNode n)) gBase.nodes)
-          );
-          gNoPolicy = gBase // {
-            nodes = builtins.filter (n: policyKeptIds ? ${n.id}) gBase.nodes;
-            edges = builtins.filter (e: policyKeptIds ? ${e.from} && policyKeptIds ? ${e.to}) gBase.edges;
-          };
-
-          # `den` traces the WHOLE aspect tree for every host regardless of
-          # whether an aspect actually applies to it -- that's why
-          # darwin-base/darwin-finder/etc showed up even on plain NixOS
-          # hosts, identically across all 10 hosts. `diagram.graph.classSlice`
-          # is den-diagram's own filter for exactly this: it keeps a node if
-          # IT (or anything under it) actually contributes to a given class,
-          # via ancestor closure -- so organizational/entity nodes (e.g. the
-          # user entity "ivypierlot") that don't carry hasClass themselves
-          # but anchor real content underneath them are correctly kept
-          # instead of left dangling. It only takes one class at a time, so
-          # union the slices across this host's two traced classes
-          # (nixos/darwin + homeManager).
-          perClassSlices = map (c: diagram.graph.classSlice c gNoPolicy) classes;
-          keptIds = lib.foldl' (
-            acc: slice: lib.foldl' (acc': n: acc' // { ${n.id} = true; }) acc slice.nodes
-          ) { } perClassSlices;
-
-          gFiltered = gNoPolicy // {
-            nodes = builtins.filter (n: keptIds ? ${n.id}) gNoPolicy.nodes;
-            edges = builtins.filter (e: keptIds ? ${e.from} && keptIds ? ${e.to}) gNoPolicy.edges;
-          };
+          filtered = hostAspects.forHost hostName host (hostAspects.classesFor host);
+          inherit (filtered) graph;
 
           rc = diagram.renderContext {
             inherit pkgs;
@@ -106,20 +43,12 @@ in
               scheme = "catppuccin-mocha";
             };
           };
-
-          # Same node set the diagram renders, as a plain sorted list of
-          # display labels -- host/user scoped duplicates (e.g. "shell"
-          # applied at both host and user level) collapse to one entry
-          # since they share a label, and the root itself is excluded.
-          aspectNames = lib.unique (
-            map (n: n.label) (builtins.filter (n: n.id != gFiltered.rootId) gFiltered.nodes)
-          );
         in
         {
-          mermaid = diagram.toMermaid gFiltered;
-          svg = rc.mmdSourceToSvg hostName (diagram.toMermaid gFiltered);
-          dot = diagram.toDot gFiltered;
-          aspects = lib.sort (a: b: a < b) aspectNames;
+          mermaid = diagram.toMermaid graph;
+          svg = rc.mmdSourceToSvg hostName (diagram.toMermaid graph);
+          dot = diagram.toDot graph;
+          aspects = lib.sort (a: b: a < b) filtered.names;
         };
 
       # Build diagrams for all hosts
