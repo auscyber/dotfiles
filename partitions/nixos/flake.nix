@@ -34,6 +34,10 @@
     };
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-images = {
       url = "github:nvmd/nixos-images/sdimage-installer";
       inputs = {
@@ -47,8 +51,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-    nixpkgs.url = "github:nixos/nixpkgs/9bc02893134c733dd85de46ee4fb2fac696b5529";
+    nixpkgs.url = "github:nixos/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab";
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
+    nixvirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
       inputs = {

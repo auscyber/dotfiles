@@ -147,6 +147,10 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    my-nur = {
+      url = "github:auscyber/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -167,11 +171,10 @@
       };
     };
     nixcord.url = "github:kaylorben/nixcord";
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     nixvim.url = "github:nix-community/nixvim";
-    nixvirt = {
-      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+    nur = {
+      url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     op-shell-plugins.url = "github:1Password/shell-plugins";
@@ -180,8 +183,20 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    searchix = {
+      url = "git+https://git.sr.ht/~alanpearce/searchix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     stylix.url = "github:nix-community/stylix";
+
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     zeroclaw = {
       url = "github:zeroclaw-labs/zeroclaw";
       inputs.fenix.follows = "fenix";
