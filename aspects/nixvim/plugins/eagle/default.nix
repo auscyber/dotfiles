@@ -1,8 +1,16 @@
-{ den, ... }: {
+{
+  den,
+  inputs,
+  ...
+}:
+let
+  nixvimLib = inputs.nixvim.lib.nixvim;
+in
+{
   den.aspects.nixvim = {
     nvim =
       { lib, ... }:
-      lib.nixvim.plugins.mkNeovimPlugin {
+      nixvimLib.plugins.mkNeovimPlugin {
         name = "eagle";
         package = "eagle-nvim";
         moduleName = "eagle";

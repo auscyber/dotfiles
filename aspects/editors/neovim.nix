@@ -26,7 +26,7 @@
 
     nvim.enableMan = false;
     provides.to-users.gui.homeManager = { pkgs, ... }: { home.packages = with pkgs; [ neovide ]; };
-    provides.to-users.homeManager = { pkgs, ... }: {
+    homeManager = { pkgs, ... }: {
       stylix.targets.nixvim.enable = false;
       programs.nixvim = {
         enable = true;

@@ -52,6 +52,9 @@ in
     darwin = {
       imports = lib.optional (inputs ? stylix) inputs.stylix.darwinModules.default;
     };
+    homeManager = { home, ... }: {
+      imports = lib.optional (inputs ? stylix) inputs.stylix.homeModules.default;
+    };
 
     nixos = {
       imports = lib.optional (inputs ? stylix) inputs.stylix.nixosModules.default;

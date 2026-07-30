@@ -47,9 +47,10 @@
       programs.mcp = {
         enable = true;
         servers = {
-          nixos.command = lib.getExe pkgs.mcp-nixos;
+          #          nixos.command = lib.getExe pkgs.mcp-nixos;
         };
       };
+      stylix.targets.opencode.enable = false;
 
       programs.opencode = {
         enable = true;

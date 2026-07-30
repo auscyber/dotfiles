@@ -8,10 +8,7 @@ let
   # Check if user has homeManager class
   # Forward nvim class content into homeManager at programs.nixvim
   nvimForward =
-    {
-      host,
-      user,
-    }:
+    { aspect-chain }:
     den.provides.forward {
       each = lib.singleton true;
       fromClass = _: "nvim";
@@ -20,7 +17,9 @@ let
         "programs"
         "nixvim"
       ];
-      fromAspect = _: den.lib.resolveEntity "user" { inherit host user; };
+      # Forward the current entity's resolved aspect (works for both `user`
+      # and `home` entities) rather than hardcoding `resolveEntity "user"`.
+      fromAspect = _: lib.head aspect-chain;
     };
 in
 {
@@ -82,7 +81,8 @@ in
   den.policies.nixvim-hm-module =
     {
       host,
-      user,
+      user ? null,
+      home ? null,
       ...
     }:
     (den.lib.policy.provide {
@@ -108,12 +108,11 @@ in
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
     {
-      host,
-      user,
+      aspect-chain,
       ...
     }:
     (den.lib.policy.include (nvimForward {
-      inherit host user;
+      inherit aspect-chain;
     }));
 
   # ---------------------------------------------------------------------------

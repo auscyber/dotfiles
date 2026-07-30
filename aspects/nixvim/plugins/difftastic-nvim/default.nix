@@ -1,3 +1,7 @@
+{ inputs, ... }:
+let
+  nixvimLib = inputs.nixvim.lib.nixvim;
+in
 {
   den.aspects.nixvim.nvim =
     {
@@ -5,7 +9,7 @@
       pkgs,
       ...
     }:
-    lib.nixvim.plugins.mkNeovimPlugin {
+    nixvimLib.plugins.mkNeovimPlugin {
       name = "difftastic";
       package = "difftastic-nvim";
       moduleName = "difftastic-nvim";

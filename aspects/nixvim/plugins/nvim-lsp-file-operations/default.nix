@@ -1,8 +1,16 @@
-{ den, ... }: {
+{
+  den,
+  inputs,
+  ...
+}:
+let
+  nixvimLib = inputs.nixvim.lib.nixvim;
+in
+{
   den.aspects.nixvim = {
     nvim =
       { lib, ... }:
-      lib.nixvim.plugins.mkNeovimPlugin {
+      nixvimLib.plugins.mkNeovimPlugin {
         name = "lsp-file-operations";
         package = "nvim-lsp-file-operations";
         moduleName = "lsp-file-operations";
