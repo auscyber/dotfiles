@@ -46,30 +46,48 @@ let
   # needed. Without this an input that moved into a bucket would be silently
   # UNPATCHED -- the sub-flake is loaded straight through flake-compat, which
   # knows nothing about patches.
-  patchFor =
+  # Hashes recorded FOR THIS BUCKET, written by `nix run .#write-patched-inputs`
+  # next to the sub-flake they belong to.
+  bucketPatchFile = bucket: rootPath + "/partitions/${bucket}/patched-inputs.nix";
+
+  patchContextFor =
     bucket: raw:
     let
       inputsOnly = builtins.removeAttrs raw [ "self" ];
+      recorded =
+        if builtins.pathExists (bucketPatchFile bucket) then import (bucketPatchFile bucket) else { };
     in
-    (import (rootPath + "/lib/patched-inputs.nix") {
+    import (rootPath + "/lib/patched-inputs.nix") {
       inherit lib;
       inputs = inputsOnly;
       rootPath = rootPath + "/partitions/${bucket}";
       # Only specs for inputs this bucket actually provides: a spec's `src`
       # defaults to `inputs.<name>.sourceInfo`, which would not resolve here.
-      patchSpecs = lib.filterAttrs (name: _: inputsOnly ? ${name}) (
-        import (rootPath + "/patched-inputs.nix")
-      );
-    }).newInputs;
+      #
+      # The patch LISTS are shared with the root -- same aspect declarations --
+      # but the recorded HASH is not. A hash pins the patched tree built from
+      # one particular source rev, and a bucket pins its own; reusing the root's
+      # would fail the fixed-output build, and a failing FOD takes down the very
+      # evaluation that runs the generator meant to fix it. So a bucket uses
+      # only a hash recorded for that bucket, and otherwise builds locally --
+      # unsubstitutable, but never wedged.
+      patchSpecs = lib.mapAttrs (
+        name: spec: builtins.removeAttrs spec [ "hash" ] // { hash = recorded.${name}.hash or null; }
+      ) (lib.filterAttrs (name: _: inputsOnly ? ${name}) (import (rootPath + "/patched-inputs.nix")));
+    };
+
+  rawSubFlakeInputs =
+    bucket:
+    (import inputs.flake-compat {
+      src = rootPath + "/partitions/${bucket}";
+      system = throw "flake-compat is loading a partition in pure mode; `system` must not be forced";
+    }).outputs.inputs;
 
   subInputs =
     bucket:
-    builtins.removeAttrs (patchFor bucket
-      (import inputs.flake-compat {
-        src = rootPath + "/partitions/${bucket}";
-        system = throw "flake-compat is loading a partition in pure mode; `system` must not be forced";
-      }).outputs.inputs
-    ) ([ "self" ] ++ baseInputNames);
+    builtins.removeAttrs (patchContextFor bucket (rawSubFlakeInputs bucket)).newInputs (
+      [ "self" ] ++ baseInputNames
+    );
 
   # flake-file's own serializer, so the top level can look at a bucket's inputs
   # in the same shape `preProcess` receives them.
@@ -205,6 +223,13 @@ let
 in
 {
   imports = [ inputs.flake-parts.flakeModules.partitions ];
+
+  # The per-bucket patch context, so `nix run .#write-patched-inputs` can build
+  # and hash each bucket's patched trees. Functions and derivations, never
+  # serialised -- this is an internal handle, not a consumer-facing output.
+  flake.partitionPatchContext = lib.genAttrs buckets (
+    bucket: patchContextFor bucket (rawSubFlakeInputs bucket)
+  );
 
   ff.flake-compat = {
     url = "github:nixos/flake-compat";
