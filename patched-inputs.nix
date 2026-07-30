@@ -48,7 +48,7 @@
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
   agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
-  darwin.hash = "sha256-TGc+dRQNDOVi4Jji8x1ts6W/+l+TqgvM8OY//JiFjn8=";
+  darwin.hash = "sha256-JvpHtXBeAyTejgOMRLvUsgJy1hGu/RMt/7PI5PnBYK0=";
   home-manager.hash = "sha256-Cn9eILapIdq5/dWGpaCkl7Ljn9G2cpP0h9GPsLeIs2w=";
   nh.hash = "sha256-AB5LGXgRBAJR2cFrXDT2Gos0YGHxt97JytkSZ4uNiDE=";
   zen-browser.hash = null;
