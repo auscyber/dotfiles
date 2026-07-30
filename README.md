@@ -380,6 +380,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - insecure-predicate/user
 - ivy-fetch
 - jujutsu
+- kernel-trim
 - lib
 - main-ssh-key
 - neovim
@@ -439,6 +440,7 @@ graph LR
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
+  kernel_trim["kernel-trim"]:::kernel_trim_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
   nix_index["nix-index"]:::nix_index_c
@@ -467,6 +469,7 @@ graph LR
   auspc --> builder_server
   auspc --> cachyos_kernel
   auspc --> disko
+  auspc --> kernel_trim
   auspc --> secure_boot
   auspc --> den__provides__unfree_castlabs_electron__host_auspc
   auspc --> vpn
@@ -580,6 +583,7 @@ graph LR
   classDef insecure_predicate__user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef kernel_trim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
