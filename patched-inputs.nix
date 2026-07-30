@@ -19,6 +19,7 @@
 # or bumping a patched input. `checks.patched-inputs-generated-current`
 # fails if the patch lists here drift from the aspects' declarations.
 {
+
   age-plugin-gpg.patches = [
     ./patches/age-plugin-gpg/age-plugin-gpg.patch
   ];
