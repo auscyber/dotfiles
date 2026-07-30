@@ -29,15 +29,16 @@
             #            stdenv = pkgs.ccacheStdenv.override { stdenv = helpers.stdenvLLVM; };
             stdenv = helpers.stdenvLLVM;
 
-            kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
+            kernel = pkgs.cachyosKernels.linux-cachyos-latest.override (super: {
               lto = "thin";
               cpusched = "bore";
+              kernelPatches = (super.kernelPatches or [ ]) ++ config.boot.kernelPatches;
               stdenv = stdenv;
               extraMakeFlags = [
                 "CC=${stdenv.cc}/bin/clang"
                 "HOSTCC=${stdenv.cc}/bin/clang"
               ];
-            };
+            });
           in
           (cachyOsPackages.linuxKernel.packagesFor kernel).extend (
             lib.composeManyExtensions (
