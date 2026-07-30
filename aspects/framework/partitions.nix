@@ -38,14 +38,38 @@ let
   # ever redeclares a root input because a `follows` cannot reach the parent
   # flake, so its copy is always the wrong one -- most sharply for home-manager,
   # where the root's is patched (see lib/patched-inputs.nix).
+  # A partition's inputs must go through the same patch pass the root's do.
+  # lib/patched-inputs.nix is a plain function precisely so more than one caller
+  # can share it (flake.nix and aspects/tooling/patch-inputs.nix already do);
+  # `rootPath` is only used for the flake path and the lock it reads the
+  # auto-unify closure from, so pointing it at the sub-flake is all that is
+  # needed. Without this an input that moved into a bucket would be silently
+  # UNPATCHED -- the sub-flake is loaded straight through flake-compat, which
+  # knows nothing about patches.
+  patchFor =
+    bucket: raw:
+    let
+      inputsOnly = builtins.removeAttrs raw [ "self" ];
+    in
+    (import (rootPath + "/lib/patched-inputs.nix") {
+      inherit lib;
+      inputs = inputsOnly;
+      rootPath = rootPath + "/partitions/${bucket}";
+      # Only specs for inputs this bucket actually provides: a spec's `src`
+      # defaults to `inputs.<name>.sourceInfo`, which would not resolve here.
+      patchSpecs = lib.filterAttrs (name: _: inputsOnly ? ${name}) (
+        import (rootPath + "/patched-inputs.nix")
+      );
+    }).newInputs;
+
   subInputs =
     bucket:
-    builtins.removeAttrs
+    builtins.removeAttrs (patchFor bucket
       (import inputs.flake-compat {
         src = rootPath + "/partitions/${bucket}";
         system = throw "flake-compat is loading a partition in pure mode; `system` must not be forced";
       }).outputs.inputs
-      ([ "self" ] ++ baseInputNames);
+    ) ([ "self" ] ++ baseInputNames);
 
   # flake-file's own serializer, so the top level can look at a bucket's inputs
   # in the same shape `preProcess` receives them.
