@@ -29,5 +29,6 @@
     };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nixpkgs.url = "github:nixos/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab";
+    rift.url = "github:auscyber/rift";
   };
 }

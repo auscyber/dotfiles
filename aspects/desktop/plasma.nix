@@ -1,10 +1,15 @@
 { inputs, ... }: {
-  ff.plasma-manager = {
-    url = "github:nix-community/plasma-manager";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.home-manager.follows = "home-manager";
-  };
   den.aspects.plasma = {
+    # Declared on the aspect, not the file: the partition generator reads
+    # which aspect owns an input, and which platforms pull that aspect in.
+    flake-file = _: {
+      inputs.plasma-manager = {
+        url = "github:nix-community/plasma-manager";
+        inputs.nixpkgs.follows = "nixpkgs";
+        inputs.home-manager.follows = "home-manager";
+      };
+    };
+
     nixos = {
       services.desktopManager.plasma6.enable = true;
     };

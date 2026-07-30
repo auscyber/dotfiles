@@ -1,0 +1,109 @@
+diff --git a/nix/lib/aspects/fx/edges/route.nix b/nix/lib/aspects/fx/edges/route.nix
+--- a/nix/lib/aspects/fx/edges/route.nix
++++ b/nix/lib/aspects/fx/edges/route.nix
+@@ -301,8 +301,68 @@
+   # Collect class modules from a scope and all descendants, skipping isolated
+   # descendants (isolation-AWARE; collection root always included). The plain
+   # case collects from the route's own scope only.
++
++  # The aspect a collected class module was emitted by. class-collector.nix
++  # tags every entry with `key = "<class>@<identity>"` (and `__loc` for raw
++  # entries), so provenance is already on the module -- no extra bookkeeping.
++  moduleIdentity =
++    mod:
++    let
++      loc = mod.key or mod.__loc or mod._file or null;
++      parts = if builtins.isString loc then lib.splitString "@" loc else [ ];
++    in
++    if builtins.length parts < 2 then null else lib.concatStringsSep "@" (lib.tail parts);
++
++  # Aspects that emitted content for at least one of `classes` anywhere in
++  # `scopes`, as a set for cheap lookup.
++  identitiesEmittingClasses =
++    wrappedPerScope: scopes: classes:
++    lib.listToAttrs (
++      lib.concatMap (
++        sid:
++        lib.concatMap (
++          class:
++          lib.concatMap (
++            mod:
++            let
++              id = moduleIdentity mod;
++            in
++            lib.optional (id != null) {
++              name = id;
++              value = true;
++            }
++          ) (wrappedPerScope.${sid}.${class} or [ ])
++        ) classes
++      ) scopes
++    );
++
++  # `requireClass`: keep only modules whose aspect ALSO contributes to one of
++  # the named classes. den resolves the whole aspect tree for every entity and
++  # gates on class downstream, so an unfiltered collection is class-blind: a
++  # NixOS host collects `flake-file` content from darwin-only aspects, which is
++  # right for a flake-level route (the flake needs every input) but wrong for a
++  # per-host one (which inputs does THIS host need?). Null = collect everything,
++  # which is the pre-existing behaviour and stays the default.
++  filterByRequiredClasses =
++    wrappedPerScope: scopes: requireClass: mods:
++    if requireClass == null || requireClass == [ ] then
++      mods
++    else
++      let
++        allowed = identitiesEmittingClasses wrappedPerScope scopes requireClass;
++      in
++      builtins.filter (
++        mod:
++        let
++          id = moduleIdentity mod;
++        in
++        # An entry with no recoverable identity is kept: dropping it would
++        # silently lose content on any emission path that does not tag a key.
++        id == null || allowed ? ${id}
++      ) mods;
++
+   collectFromSubtree =
+-    wrappedPerScope: scopeParent: scopeIsolated: rootScopeId: fromClass:
++    wrappedPerScope: scopeParent: scopeIsolated: rootScopeId: fromClass: requireClass:
+     let
+       scopes = subtreeScopes {
+         inherit scopeParent;
+@@ -311,7 +371,9 @@
+         allScopeIds = builtins.attrNames wrappedPerScope;
+       };
+     in
+-    lib.concatMap (sid: wrappedPerScope.${sid}.${fromClass} or [ ]) scopes;
++    filterByRequiredClasses wrappedPerScope scopes requireClass (
++      lib.concatMap (sid: wrappedPerScope.${sid}.${fromClass} or [ ]) scopes
++    );
+ 
+   sourceModulesOf =
+     {
+@@ -322,11 +384,15 @@
+     }:
+     let
+       isFlakeRoute = route.intoClass == "flake";
++      requireClass = route.requireClass or null;
+     in
+     if isFlakeRoute || (route.collectSubtree or false) then
+       collectFromSubtree wrappedPerScope scopeParent scopeIsolated route.sourceScopeId route.fromClass
++        requireClass
+     else if wrappedPerScope ? ${route.sourceScopeId} then
+-      wrappedPerScope.${route.sourceScopeId}.${route.fromClass} or [ ]
++      filterByRequiredClasses wrappedPerScope [ route.sourceScopeId ] requireClass (
++        wrappedPerScope.${route.sourceScopeId}.${route.fromClass} or [ ]
++      )
+     else
+       [ ];
+ 
+@@ -808,6 +874,7 @@
+             lib.optionalAttrs (spec.adaptArgs or null != null) { adaptArgs = true; }
+             // lib.optionalAttrs (spec.guard or null != null) { guard = true; }
+             // lib.optionalAttrs (spec.collectSubtree or false) { collectSubtree = true; }
++            // lib.optionalAttrs ((spec.requireClass or null) != null) { requireClass = true; }
+             // lib.optionalAttrs ((spec.intoClass or null) == "flake") { isFlakeRoute = true; }
+             // lib.optionalAttrs ((spec.instantiate or null) != null) { instantiate = true; }
+             // lib.optionalAttrs appendToParent { appendToParent = true; }

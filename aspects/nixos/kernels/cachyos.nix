@@ -4,12 +4,15 @@
   ...
 }:
 {
-  ff.nix-cachyos-kernel = {
-    url = "github:xddxdd/nix-cachyos-kernel/release";
-  };
-  # Do not override its nixpkgs input, otherwise there can be mismatch between patches and kernel version
-
   den.aspects.cachyos-kernel = {
+    # Declared on the aspect, not the file: the partition generator reads which
+    # aspect owns an input, and hosts tell it which platforms pull that aspect
+    # in. Do not override its nixpkgs input, otherwise there can be a mismatch
+    # between patches and kernel version.
+    flake-file = _: {
+      inputs.nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    };
+
     includes = [ den.aspects.ccache ];
     overlays.cachyosKernels = inputs.nix-cachyos-kernel.overlays.pinned;
     nixos =
