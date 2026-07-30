@@ -47,6 +47,10 @@
                   zfs_cachyos = (
                     kFinal.callPackage "${inputs.nix-cachyos-kernel.outPath}/zfs-cachyos/default.nix" {
                       inputs = { inherit (inputs) nixpkgs; };
+                      # Which key to read out of zfs-cachyos/version.json. Upstream's
+                      # packages.nix passes the kernel's `zfsVariant` passthru here; the
+                      # arg's own default ("latest") is not a key in that file.
+                      variant = kernel.zfsVariant;
                     }
                   );
                 })

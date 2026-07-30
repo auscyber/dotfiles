@@ -270,13 +270,7 @@
       url = "git+https://git.sr.ht/~alanpearce/searchix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs = {
-        darwin.follows = "darwin";
-        home-manager.follows = "home-manager";
-      };
-    };
+    stylix.url = "github:nix-community/stylix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";

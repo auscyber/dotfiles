@@ -27,8 +27,6 @@ let
 in
 {
   ff.stylix.url = "github:nix-community/stylix";
-  ff.stylix.inputs.home-manager.follows = "home-manager";
-  ff.stylix.inputs.darwin.follows = "darwin";
 
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =
