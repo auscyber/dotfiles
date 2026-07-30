@@ -4,8 +4,13 @@
   ...
 }:
 {
-  ff.idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
   den.aspects.idris = {
+    # Declared on the aspect, not the file: the input set follows which
+    # hosts pull this aspect in, and so does its partition.
+    flake-file = _: {
+      inputs.idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
+    };
+
     # Multiplex idris2-lsp through lspmux, co-located with the language aspect: this
     # contributes the entry to the `lsp-servers` class, which the forward on
     # den.aspects.lspmux turns into `pkgs.lspmuxed.idris2_lsp` and enables in nvim.

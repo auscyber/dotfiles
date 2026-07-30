@@ -47,6 +47,53 @@ let
       }).outputs.inputs
       ([ "self" ] ++ baseInputNames);
 
+  # flake-file's own serializer, so the top level can look at a bucket's inputs
+  # in the same shape `preProcess` receives them.
+  ffLib = import "${inputs.flake-file}/dev/modules/_lib" lib;
+
+  # What each bucket declares that base does not. Forcing this forces that
+  # partition's evaluation, so it is only ever reached from `preProcess` --
+  # i.e. when a flake.nix is being written or checked, never during a host build.
+  bucketOwn =
+    bucket:
+    builtins.removeAttrs (ffLib.inputsExpr
+      config.partitions.${bucket}.module.flake-file.inputs
+    ) baseInputNames;
+
+  followsTargetsOf =
+    specs:
+    lib.unique (
+      builtins.concatMap (
+        spec:
+        builtins.filter (f: f != null) (lib.mapAttrsToList (_: v: v.follows or null) (spec.inputs or { }))
+      ) (builtins.attrValues specs)
+    );
+
+  # An input declared on an aspect cannot always live in a bucket. Two cases
+  # force it back to the root flake, and both are silent corruption if missed:
+  #
+  #   * more than one bucket declares it -- the aspect is used on both platforms,
+  #     so each sub-flake would lock its own copy and `subInputs` would pick one
+  #     arbitrarily (crane, celler, stylix, ...);
+  #   * a root input `follows` it -- the root lock then names an input it does
+  #     not have, which nix rejects outright and which cannot be repaired by
+  #     regenerating, because the flake no longer evaluates
+  #     (`input 'age-plugin-gpg/crane' follows a non-existent input 'crane'`).
+  #
+  # Both are decided here rather than by hand-editing the aspect back.
+  ownByBucket = lib.genAttrs buckets bucketOwn;
+  allOwn = lib.mergeAttrsList (builtins.attrValues ownByBucket);
+  declaredIn = name: builtins.filter (b: ownByBucket.${b} ? ${name}) buckets;
+
+  baseSerialized = ffLib.inputsExpr config.flake-file.inputs;
+
+  hoistedNames =
+    let
+      shared = builtins.filter (n: builtins.length (declaredIn n) > 1) (builtins.attrNames allOwn);
+      followed = builtins.filter (n: allOwn ? ${n}) (followsTargetsOf baseSerialized);
+    in
+    lib.unique (shared ++ followed);
+
   # This aspect is re-imported inside every partition (superset eval), so a
   # partition declares partitions of its own. Those are never read -- but the
   # write-flake hook below is part of every evaluation, and letting a partition
@@ -79,10 +126,12 @@ let
         # partition, and is here purely so the inputs below can `follows` it -- a
         # `follows` cannot reach the parent flake.
       '';
-      preProcess =
+      # mkForce: base defines its own preProcess (hoisting), and a partition
+      # re-imports that definition.
+      preProcess = lib.mkForce (
         serialized:
         let
-          own = builtins.removeAttrs serialized baseInputNames;
+          own = builtins.removeAttrs serialized (baseInputNames ++ hoistedNames);
 
           # A `follows` can only name an input of the flake it is written in, so
           # a base input that a bucket input follows has to be carried into the
@@ -105,7 +154,8 @@ let
         // lib.genAttrs carried (
           name: lib.filterAttrs (k: _: k == "url" || k == "flake") serialized.${name}
         )
-        // own;
+        // own
+      );
     };
   };
 
@@ -123,8 +173,9 @@ let
       # freshly generated one. Here the aspect tree also carries the partitioned
       # `ff.*` declarations, so subtract them back out or the check reports every
       # partitioned input as missing from the root flake.
-      flake-file.preProcess =
-        serialized: builtins.removeAttrs serialized (builtins.attrNames partitionedInputs);
+      flake-file.preProcess = lib.mkForce (
+        serialized: builtins.removeAttrs serialized (builtins.attrNames partitionedInputs)
+      );
     };
   };
 in
@@ -151,6 +202,11 @@ in
     // {
       all = allPartition;
     };
+
+  # The root flake.nix takes back anything the buckets could not keep. Without
+  # this a hoisted input is declared nowhere at all: it left the base evaluation
+  # when its `ff` moved onto an aspect, and the buckets just dropped it.
+  flake-file.preProcess = serialized: serialized // lib.getAttrs hoistedNames allOwn;
 
   # Which flake outputs come from `all` instead of the base evaluation. Keep this
   # list to attributes that are genuinely dev-time or need the whole host set:

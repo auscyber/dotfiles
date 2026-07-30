@@ -123,7 +123,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     import-tree.url = "github:vic/import-tree";
     ivixlib = {
       url = "github:auscyber/ivixlib";

@@ -1,12 +1,12 @@
 { den, ... }: {
-  ff.crane.url = "github:ipetkov/crane";
-
   # Rust's editor integration is its own aspect; nixvim pulls it in. That keeps the
   # rust-analyzer server declaration co-located with the rest of the rust tooling
   # (and with the lspmux `lsp-servers` entry) instead of scattered onto nixvim.
   den.aspects.nixvim.includes = [ den.aspects.rust ];
 
   den.aspects.rust = {
+    flake-file = _: { inputs.crane.url = "github:ipetkov/crane"; };
+
     includes = [ den.aspects.lspmux ];
 
     # Multiplex rust-analyzer through lspmux (so zed's `pkgs.lspmuxed.rust_analyzer`
