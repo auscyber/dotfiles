@@ -1,0 +1,5 @@
+{
+  "NETCONSOLE": "n",
+  "USB_SERIAL_XSENS_MT": "n",
+  "SCHEDSTATS": "y"
+}

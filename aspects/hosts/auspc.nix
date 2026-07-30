@@ -46,6 +46,10 @@
       den.aspects.vpn
       den.aspects.packages.alx-wol
       den.aspects.cachyos-kernel
+      # Inert until `nix run .#gen-kernel-trim` (run on auspc) writes
+      # ./auspc/kernel-trim.json; needed here for the generator to find its
+      # builder in this host's config.
+      den.aspects.kernel-trim
       den.aspects.bootlogo
       #      den.aspects.builders
       den.aspects.builder-server
