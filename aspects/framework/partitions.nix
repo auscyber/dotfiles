@@ -27,11 +27,17 @@
 let
   buckets = builtins.attrNames aspectPartitions.parts;
 
-  # `extraInputsFlake` would let a sub-flake's `nixpkgs` win over ours inside the
-  # partition (flake-parts merges `inputs // extraInputs`), so load the sub-flake
-  # ourselves and drop it. The sub-flake declares `nixpkgs` only so its own inputs
-  # can `follows` it -- a `follows` cannot reach the parent flake -- and it is
-  # pinned to the root flake's locked rev by the generator below.
+  # The base evaluation's input names. Subtracted inside each partition so the
+  # generated partitions/<bucket>/flake.nix holds only that bucket's own inputs
+  # (a partition's flake-file sees base + bucket, being a superset eval).
+  baseInputNames = builtins.attrNames config.flake-file.inputs;
+
+  # `extraInputsFlake` would let the sub-flake win every name it shares with the
+  # root (flake-parts merges `inputs // extraInputs`), so load the sub-flake
+  # ourselves and drop everything the root already provides. A sub-flake only
+  # ever redeclares a root input because a `follows` cannot reach the parent
+  # flake, so its copy is always the wrong one -- most sharply for home-manager,
+  # where the root's is patched (see lib/patched-inputs.nix).
   subInputs =
     bucket:
     builtins.removeAttrs
@@ -39,15 +45,7 @@ let
         src = rootPath + "/partitions/${bucket}";
         system = throw "flake-compat is loading a partition in pure mode; `system` must not be forced";
       }).outputs.inputs
-      [
-        "nixpkgs"
-        "self"
-      ];
-
-  # The base evaluation's input names. Subtracted inside each partition so the
-  # generated partitions/<bucket>/flake.nix holds only that bucket's own inputs
-  # (a partition's flake-file sees base + bucket, being a superset eval).
-  baseInputNames = builtins.attrNames config.flake-file.inputs;
+      ([ "self" ] ++ baseInputNames);
 
   # This aspect is re-imported inside every partition (superset eval), so a
   # partition declares partitions of its own. Those are never read -- but the
@@ -83,10 +81,31 @@ let
       '';
       preProcess =
         serialized:
+        let
+          own = builtins.removeAttrs serialized baseInputNames;
+
+          # A `follows` can only name an input of the flake it is written in, so
+          # a base input that a bucket input follows has to be carried into the
+          # sub-flake too -- nix rejects the lock outright otherwise ("follows a
+          # non-existent input"). Carried entries keep only `url`/`flake`; their
+          # own `follows` would dangle in turn, and `subInputs` drops them again
+          # so the partition still sees the root's copy.
+          followsOf =
+            spec:
+            builtins.filter (f: f != null) (lib.mapAttrsToList (_: v: v.follows or null) (spec.inputs or { }));
+          carried = lib.unique (
+            builtins.filter (name: serialized ? ${name} && !(own ? ${name}) && name != "nixpkgs") (
+              builtins.concatMap followsOf (builtins.attrValues own)
+            )
+          );
+        in
         {
           nixpkgs.url = "github:nixos/nixpkgs/${realInputs.nixpkgs.rev}";
         }
-        // builtins.removeAttrs serialized baseInputNames;
+        // lib.genAttrs carried (
+          name: lib.filterAttrs (k: _: k == "url" || k == "flake") serialized.${name}
+        )
+        // own;
     };
   };
 
@@ -139,6 +158,7 @@ in
     ciMatrix = "all";
     darwinConfigurations = "darwin";
     deploy = "all";
+    nixosConfigurations = "nixos";
   };
 
   # `nix flake update` only touches the root lock, so bring the partitions along:

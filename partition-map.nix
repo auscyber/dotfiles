@@ -27,6 +27,29 @@
     "hosts/macmini.nix"
   ];
 
+  # Everything that eagerly reaches for a NixOS-only input, plus the aspects
+  # that `include` what they define. The Linux hosts move with them: a host
+  # resolves `den.aspects.<x>` during the base evaluation, so it cannot outlive
+  # its dependencies there.
+  nixos = [
+    "nixos"
+    "storage.nix"
+    "security/secure-boot.nix"
+    "desktop/plasma.nix"
+    "desktop/noctalia.nix"
+    "wms/niri.nix"
+    "services/homeassistant.nix"
+    "services/searchix.nix"
+    "docs/searchix.nix"
+    "hosts/auspc"
+    "hosts/auspc.nix"
+    "hosts/secondpc"
+    "hosts/surfacelaptop.nix"
+    "hosts/wsl-nixos.nix"
+    "hosts/lora-pi.nix"
+    "hosts/pentestvm.nix"
+  ];
+
   dev = [
     "tooling/deploy.nix"
     "tooling/ci-matrix.nix"

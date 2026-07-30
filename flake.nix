@@ -91,7 +91,6 @@
       url = "github:oddlama/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    arion.url = "github:hercules-ci/arion";
     celler = {
       url = "github:blitz/celler/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -107,18 +106,6 @@
     };
     den.url = "github:denful/den/latest";
     devshell.url = "github:numtide/devshell";
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    disko-zfs = {
-      url = "github:numtide/disko-zfs";
-      inputs = {
-        disko.follows = "disko";
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
     emacs.url = "github:nix-community/emacs-overlay";
     fenix.url = "github:nix-community/fenix";
     flake-compat = {
@@ -135,7 +122,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
-    impermanence.url = "github:nix-community/impermanence";
     import-tree.url = "github:vic/import-tree";
     ivixlib = {
       url = "github:auscyber/ivixlib";
@@ -160,10 +146,6 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     my-nur = {
       url = "github:auscyber/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -176,12 +158,6 @@
       url = "github:nix-community/nh";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    niri = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/";
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -194,54 +170,17 @@
       };
     };
     nixcord.url = "github:kaylorben/nixcord";
-    nixos-hardware = {
-      url = "github:NixOS/nixos-hardware";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-images = {
-      url = "github:nvmd/nixos-images/sdimage-installer";
-      inputs = {
-        nixos-stable.follows = "nixpkgs-nvmd";
-        nixos-unstable.follows = "nixpkgs-nvmd";
-      };
-    };
-    nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
-    nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     nixvim.url = "github:nix-community/nixvim";
-    nixvirt = {
-      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    noctalia = {
-      url = "github:noctalia-dev/noctalia";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     op-shell-plugins.url = "github:1Password/shell-plugins";
     pandoc.url = "github:srid/pandoc?ref=haskell-flake-revamp";
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs = {
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
     rift.url = "github:auscyber/rift";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    searchix = {
-      url = "git+https://git.sr.ht/~alanpearce/searchix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix.url = "github:nix-community/stylix";
