@@ -1,6 +1,5 @@
 {
   inputs,
-  realInputs,
   lib,
   config,
   rootPath,
@@ -26,6 +25,36 @@
 # that actually matters is read from `all` via `partitionedAttrs`.
 let
   buckets = builtins.attrNames aspectPartitions.parts;
+
+  # Root's own lock, so a carried input can be pinned to the exact rev main
+  # resolved rather than re-resolved to whatever is current when the sub-flake
+  # is locked. `nixpkgs` was already pinned this way by hand; every shared
+  # `follows` target now goes through the same path, so a sub-flake lock can
+  # never disagree with main on a carried input.
+  rootLocked =
+    let
+      lock = builtins.fromJSON (builtins.readFile (rootPath + "/flake.lock"));
+    in
+    lib.mapAttrs (_: node: lock.nodes.${node}.locked) lock.nodes.${lock.root}.inputs;
+
+  # Render a locked node back to a rev-pinned flake ref. Falls back to the bare
+  # url for input types that cannot carry a rev inline (a plain tarball/path),
+  # which is the pre-existing behaviour for those.
+  pinnedRef =
+    name: fallback:
+    let
+      l = rootLocked.${name} or null;
+      dir = l.dir or null;
+      suffix = lib.optionalString (dir != null) "?dir=${dir}";
+    in
+    if l == null || !(l ? rev) then
+      fallback
+    else if l.type == "github" || l.type == "gitlab" || l.type == "sourcehut" then
+      "${l.type}:${l.owner}/${l.repo}/${l.rev}${suffix}"
+    else if l.type == "git" then
+      "git+${l.url}?rev=${l.rev}" + lib.optionalString (l ? ref) "&ref=${l.ref}"
+    else
+      fallback;
 
   # The base evaluation's input names. Subtracted inside each partition so the
   # generated partitions/<bucket>/flake.nix holds only that bucket's own inputs
@@ -163,10 +192,11 @@ let
         #
         # It exists only to hold inputs and their lock: the root flake reads
         # `.inputs` out of it (see aspects/framework/partitions.nix) and never calls
-        # `outputs`. `nixpkgs` is pinned to the root flake's locked rev so the two locks
-        # cannot drift; it is dropped again before the inputs are merged into the
-        # partition, and is here purely so the inputs below can `follows` it -- a
-        # `follows` cannot reach the parent flake.
+        # `outputs`. `nixpkgs` and every shared `follows` target are pinned to the
+        # root flake's locked rev so the two locks cannot drift; each is dropped
+        # again before the inputs are merged into the partition, and is here purely
+        # so the inputs below can `follows` it -- a `follows` cannot reach the
+        # parent flake.
       '';
       # mkForce: base defines its own preProcess (hoisting), and a partition
       # re-imports that definition.
@@ -178,9 +208,12 @@ let
           # A `follows` can only name an input of the flake it is written in, so
           # a base input that a bucket input follows has to be carried into the
           # sub-flake too -- nix rejects the lock outright otherwise ("follows a
-          # non-existent input"). Carried entries keep only `url`/`flake`; their
-          # own `follows` would dangle in turn, and `subInputs` drops them again
-          # so the partition still sees the root's copy.
+          # non-existent input"). Carried entries are pinned to main's locked
+          # rev (see pinnedRef): a bare url would re-resolve to whatever is
+          # current when the sub-flake is locked, so its `follows` could then
+          # resolve against a rev main never used. Their own `follows` are
+          # dropped -- they would dangle in turn -- and `subInputs` drops the
+          # carried input itself, so the partition still sees the root's copy.
           followsOf =
             spec:
             builtins.filter (f: f != null) (lib.mapAttrsToList (_: v: v.follows or null) (spec.inputs or { }));
@@ -189,13 +222,17 @@ let
               builtins.concatMap followsOf (builtins.attrValues own)
             )
           );
+          pin =
+            name: fallbackSpec:
+            {
+              url = pinnedRef name (fallbackSpec.url or null);
+            }
+            // lib.optionalAttrs (fallbackSpec ? flake) { inherit (fallbackSpec) flake; };
         in
         {
-          nixpkgs.url = "github:nixos/nixpkgs/${realInputs.nixpkgs.rev}";
+          nixpkgs = pin "nixpkgs" (serialized.nixpkgs or { });
         }
-        // lib.genAttrs carried (
-          name: lib.filterAttrs (k: _: k == "url" || k == "flake") serialized.${name}
-        )
+        // lib.genAttrs carried (name: pin name serialized.${name})
         // own
       );
     };

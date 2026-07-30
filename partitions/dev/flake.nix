@@ -3,10 +3,11 @@
 #
 # It exists only to hold inputs and their lock: the root flake reads
 # `.inputs` out of it (see aspects/framework/partitions.nix) and never calls
-# `outputs`. `nixpkgs` is pinned to the root flake's locked rev so the two locks
-# cannot drift; it is dropped again before the inputs are merged into the
-# partition, and is here purely so the inputs below can `follows` it -- a
-# `follows` cannot reach the parent flake.
+# `outputs`. `nixpkgs` and every shared `follows` target are pinned to the
+# root flake's locked rev so the two locks cannot drift; each is dropped
+# again before the inputs are merged into the partition, and is here purely
+# so the inputs below can `follows` it -- a `follows` cannot reach the
+# parent flake.
 {
   outputs = _: { };
 

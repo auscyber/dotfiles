@@ -3,10 +3,11 @@
 #
 # It exists only to hold inputs and their lock: the root flake reads
 # `.inputs` out of it (see aspects/framework/partitions.nix) and never calls
-# `outputs`. `nixpkgs` is pinned to the root flake's locked rev so the two locks
-# cannot drift; it is dropped again before the inputs are merged into the
-# partition, and is here purely so the inputs below can `follows` it -- a
-# `follows` cannot reach the parent flake.
+# `outputs`. `nixpkgs` and every shared `follows` target are pinned to the
+# root flake's locked rev so the two locks cannot drift; each is dropped
+# again before the inputs are merged into the partition, and is here purely
+# so the inputs below can `follows` it -- a `follows` cannot reach the
+# parent flake.
 {
   outputs = _: { };
 
@@ -24,8 +25,8 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    home-manager.url = "github:nix-community/home-manager";
+    flake-parts.url = "github:hercules-ci/flake-parts/17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e";
+    home-manager.url = "github:nix-community/home-manager/e705714e918c3b11affcdd15db2cbe3a070420a0";
     impermanence.url = "github:nix-community/impermanence";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
