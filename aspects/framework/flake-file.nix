@@ -139,11 +139,15 @@
             patchSpecs = import ./patched-inputs.nix;
           }).newInputs;
 
-        imports =
-          with lib;
-          ./aspects
-          |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
-          |> fileset.toList;
+        # All *.nix under ./aspects (except ones starting with '_'), split into
+        # the base import list and one list per flake-parts partition. Anything
+        # claimed by ./partition-map.nix is deliberately NOT imported here: that
+        # is what keeps its `ff.*` inputs out of this file and out of flake.lock.
+        # See aspects/framework/partitions.nix.
+        aspectPartitions = lib.aspectPartitions {
+          dir = ./aspects;
+          map = import ./partition-map.nix;
+        };
       in
       inputs.flake-parts.lib.mkFlake
         {
@@ -154,11 +158,10 @@
           };
         }
         {
-          # Import all *.nix files in the ./aspects directory
-          # Except ones that start with '_'
-          inherit imports;
+          imports = aspectPartitions.base;
 
           _module.args.rootPath = ./.;
+          _module.args.aspectPartitions = aspectPartitions;
         }
     '';
   };

@@ -30,11 +30,15 @@
           patchSpecs = import ./patched-inputs.nix;
         }).newInputs;
 
-      imports =
-        with lib;
-        ./aspects
-        |> fileset.fileFilter (file: file.hasExt "nix" && !hasPrefix "_" file.name)
-        |> fileset.toList;
+      # All *.nix under ./aspects (except ones starting with '_'), split into
+      # the base import list and one list per flake-parts partition. Anything
+      # claimed by ./partition-map.nix is deliberately NOT imported here: that
+      # is what keeps its `ff.*` inputs out of this file and out of flake.lock.
+      # See aspects/framework/partitions.nix.
+      aspectPartitions = lib.aspectPartitions {
+        dir = ./aspects;
+        map = import ./partition-map.nix;
+      };
     in
     inputs.flake-parts.lib.mkFlake
       {
@@ -45,11 +49,10 @@
         };
       }
       {
-        # Import all *.nix files in the ./aspects directory
-        # Except ones that start with '_'
-        inherit imports;
+        imports = aspectPartitions.base;
 
         _module.args.rootPath = ./.;
+        _module.args.aspectPartitions = aspectPartitions;
       };
 
   nixConfig = {
@@ -103,14 +106,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     den.url = "github:denful/den/latest";
-    den-diagram = {
-      url = "github:denful/den-diagram";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    deploy-rs = {
-      url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     devshell.url = "github:numtide/devshell";
     disko = {
       url = "github:nix-community/disko";
@@ -138,22 +133,6 @@
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
-    homebrew-core = {
-      url = "github:homebrew/homebrew-core";
-      flake = false;
-    };
-    homebrew-speedtest = {
-      url = "github:teamookla/homebrew-speedtest";
-      flake = false;
-    };
-    homebrew-typewhisper = {
-      url = "github:typewhisper/homebrew-tap";
-      flake = false;
     };
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     impermanence.url = "github:nix-community/impermanence";
@@ -203,11 +182,6 @@
     };
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
-    nix-github-actions = {
-      url = "github:nix-community/nix-github-actions";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";

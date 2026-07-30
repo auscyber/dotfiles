@@ -167,6 +167,12 @@ in
         ''}";
       };
 
+      # Also a check: this aspect lives in the `dev` partition (see
+      # ../../partition-map.nix) and `packages` is taken from the base
+      # evaluation, so `packages.docs-diagrams` is not reachable from the CLI.
+      # `checks` is partitioned to `all`, so this alias is.
+      checks.docs-diagrams = config.packages.docs-diagrams;
+
       packages.docs-diagrams = pkgs.runCommand "docs-diagrams" { } ''
         mkdir -p $out
         ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: svg: "cp ${svg} $out/${name}.svg") svgFiles)}
