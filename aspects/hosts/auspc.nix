@@ -47,8 +47,8 @@
       den.aspects.packages.alx-wol
       den.aspects.cachyos-kernel
       # Inert until `nix run .#gen-kernel-trim` (run on auspc) writes
-      # ./auspc/kernel-trim.json; needed here for the generator to find its
-      # builder in this host's config.
+      # ./auspc/kernel-trim.json; then it rides along with the cachyos kernel
+      # above as one more `boot.kernelPatches` entry.
       den.aspects.kernel-trim
       den.aspects.bootlogo
       #      den.aspects.builders
