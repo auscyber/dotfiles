@@ -15,6 +15,10 @@
 # and across kernels — cachyos, zen, vanilla — since the base is always whatever
 # kernel the patch ends up attached to.
 #
+# Only `m -> n` transitions are recorded, and only for symbols nothing in the
+# kernel `select`s, so every value in the JSON is "n". See the awk below: the
+# rest of the diff cannot survive being replayed as answers to `make config`.
+#
 # Run this ON the target host (it reads that machine's modprobed.db) from the
 # repo root:
 #
@@ -88,7 +92,12 @@ drv=$(nix eval --impure --raw --expr "
 configs=$(nix build --no-link --print-out-paths "$drv^out")
 
 echo "==> diffing $configs/{base,trimmed}.config"
-awk -v base="$configs/base.config" -v trimmed="$configs/trimmed.config" '
+awk -v base="$configs/base.config" -v trimmed="$configs/trimmed.config" \
+    -v selected="$configs/selected.syms" '
+  function loadList(file, arr,   line) {
+    while ((getline line < file) > 0) if (line != "") arr[line] = 1
+    close(file)
+  }
   function load(file, arr,   line, key, val, eq) {
     while ((getline line < file) > 0) {
       if (line ~ /^CONFIG_[A-Za-z0-9_]+=/) {
@@ -111,9 +120,30 @@ awk -v base="$configs/base.config" -v trimmed="$configs/trimmed.config" '
   BEGIN {
     load(base, b)
     load(trimmed, t)
+    loadList(selected, s)
     for (key in t) {
       old = (key in b) ? b[key] : "n"
-      if (t[key] != old) print key "\t" t[key]
+
+      # Keep ONLY module -> off, and only for symbols nothing selects.
+      #
+      # localmodconfig measures exactly one thing: which *modules* went unused.
+      # streamline_config.pl never touches a built-in, so a y -> n (or y -> m,
+      # or a changed string) in the diff is oldconfig fallout from re-resolving
+      # dependencies, not a measurement.
+      #
+      # The select filter is the one that matters. This diff is replayed as
+      # ANSWERS through the interactive `make config` in nixpkgs, one symbol at
+      # a time, and kconfig refuses to set a selected symbol below the value of
+      # whatever selects it. It re-prompts ("(SYM) [Y/?]"),
+      # generate-config.pl feeds it the same "n" again, sees the identical
+      # question twice, and dies with "repeated question"; kconfig then reads
+      # EOF for every remaining question ("Error in reading or end of file."
+      # to the end of the log). The output of localmodconfig is only
+      # self-consistent as a whole config; as independent answers, every select
+      # target is a live grenade. Measured on auspc/7.1.5: 462 of 3941 entries
+      # were select targets, among them CRYPTO_SHA512 (selected by
+      # CRYPTO_DRBG_HMAC and MODULE_SIG_SHA512). Dropping them keeps 88%.
+      if (old == "m" && t[key] == "n" && !(key in s)) print key "\t" t[key]
     }
   }
 ' | sort >"$work/delta"

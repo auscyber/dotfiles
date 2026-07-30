@@ -83,6 +83,16 @@ let
         mkdir -p "$out"
         mv "$buildRoot/.config.base" "$out/base.config"
         mv "$buildRoot/.config" "$out/trimmed.config"
+
+        # Every symbol that something else `select`s, straight out of this
+        # kernel's own Kconfig. kconfig will not let a selected symbol drop
+        # below its selector's value: it re-prompts ("(SYM) [Y/?]"), and
+        # nixpkgs' generate-config.pl answers the trim's "n" a second time and
+        # dies with "repeated question". The generator drops these from the
+        # diff — localmodconfig's output is only self-consistent as a whole
+        # config, not as independent answers replayed through `make config`.
+        grep -rhE '^[[:space:]]*select[[:space:]]+[A-Za-z0-9_]+' --include='Kconfig*' . \
+          | awk '{ print $2 }' | sort -u > "$out/selected.syms"
       '';
     });
 in
