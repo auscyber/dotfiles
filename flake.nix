@@ -183,12 +183,7 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    searchix = {
-      url = "git+https://git.sr.ht/~alanpearce/searchix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     stylix.url = "github:nix-community/stylix";
-
     treefmt-nix.url = "github:numtide/treefmt-nix";
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";

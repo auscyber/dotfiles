@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-07-20",
+        "date": "2026-07-30",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "d52c78b73970e6343026b12092a030fb73e4bd30",
-            "sha256": "sha256-pnAFT3MaPpAHObBkrGk9pSOGZdykjTHcRLBq4hCtVf0=",
+            "rev": "7f56808fc521bc9141969bf867a9424566b2327f",
+            "sha256": "sha256-xKSdbAu8ZE9ifL2WGh5CBMhk7hPqKs/4HEQ3m5tKnm4=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "d52c78b73970e6343026b12092a030fb73e4bd30"
+        "version": "7f56808fc521bc9141969bf867a9424566b2327f"
     },
     "cotabby": {
         "cargoLock": null,
