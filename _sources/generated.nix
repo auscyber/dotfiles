@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "d52c78b73970e6343026b12092a030fb73e4bd30";
+    version = "7f56808fc521bc9141969bf867a9424566b2327f";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "d52c78b73970e6343026b12092a030fb73e4bd30";
+      rev = "7f56808fc521bc9141969bf867a9424566b2327f";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-pnAFT3MaPpAHObBkrGk9pSOGZdykjTHcRLBq4hCtVf0=";
+      sha256 = "sha256-xKSdbAu8ZE9ifL2WGh5CBMhk7hPqKs/4HEQ3m5tKnm4=";
     };
-    date = "2026-07-20";
+    date = "2026-07-30";
   };
   cotabby = {
     pname = "cotabby";
