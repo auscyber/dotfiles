@@ -9,6 +9,7 @@
     includes = [
       den.aspects.fish
       den.aspects.neovim
+      den.aspects.dev
       den.aspects.gpg
       den.batteries.primary-user
     ];
