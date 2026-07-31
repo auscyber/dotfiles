@@ -67,7 +67,6 @@
 - main-ssh-key
 - mcp-servers
 - neovim
-- neovim/to-users
 - nix
 - nix-index
 - nixpkgs-config
@@ -195,7 +194,6 @@ graph LR
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   mcp_servers["mcp-servers"]:::mcp_servers_c
   neovim["neovim"]:::neovim_c
-  neovim__to_users["neovim/to-users"]:::neovim__to_users_c
   nixvim["nixvim"]:::nixvim_c
   nushell["nushell"]:::nushell_c
   onepassword["onepassword"]:::onepassword_c
@@ -294,7 +292,6 @@ graph LR
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef mcp_servers_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef nix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nix_index_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef nixpkgs_config_host_Ivys_MacBook_Pro_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -384,7 +381,6 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - lib
 - main-ssh-key
 - neovim
-- neovim/to-users
 - nix
 - nix-index
 - nixos-general
@@ -457,7 +453,6 @@ graph LR
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   starship["starship"]:::starship_c
   auscyber__auspc__to_users[/"auspc/to-users"\]:::auscyber__auspc__to_users_c
-  neovim__to_users[/"neovim/to-users"\]:::neovim__to_users_c
   den__provides__unfree_castlabs_electron__host_auspc{{"den/provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__host_auspc_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
@@ -548,7 +543,6 @@ graph LR
   end
 
   auscyber -.->|provides| auscyber__auspc__to_users
-  neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_host_auspc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -612,7 +606,6 @@ graph LR
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef auscyber__auspc__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__host_auspc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_castlabs_electron__user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
@@ -659,7 +652,6 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - lib
 - main-ssh-key
 - neovim
-- neovim/to-users
 - nix
 - nix-index
 - nixos-general
@@ -716,7 +708,6 @@ graph LR
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   starship["starship"]:::starship_c
-  neovim__to_users[/"neovim/to-users"\]:::neovim__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__os{{"unfree-predicate/os"}}:::unfree_predicate__os_c
@@ -765,7 +756,6 @@ graph LR
   nixvim --> wakatime
   end
 
-  neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -808,7 +798,6 @@ graph LR
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -869,7 +858,6 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - main-ssh-key
 - mcp-servers
 - neovim
-- neovim/to-users
 - nix
 - nix-index
 - nixpkgs-config
@@ -980,7 +968,6 @@ graph LR
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   mcp_servers["mcp-servers"]:::mcp_servers_c
   neovim["neovim"]:::neovim_c
-  neovim__to_users["neovim/to-users"]:::neovim__to_users_c
   nixvim["nixvim"]:::nixvim_c
   nushell["nushell"]:::nushell_c
   onepassword["onepassword"]:::onepassword_c
@@ -1074,7 +1061,6 @@ graph LR
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef mcp_servers_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef nix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nix_index_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef nixpkgs_config_host_macmini_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -1297,7 +1283,6 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - local
 - main-ssh-key
 - neovim
-- neovim/to-users
 - nginx
 - nix
 - nix-index
@@ -1368,7 +1353,6 @@ graph LR
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   starship["starship"]:::starship_c
-  neovim__to_users[/"neovim/to-users"\]:::neovim__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   den__provides__unfree_intel_ocl_{{"provides/unfree(intel-ocl)"}}:::den__provides__unfree_intel_ocl__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
@@ -1446,7 +1430,6 @@ graph LR
   nixvim --> wakatime
   end
 
-  neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_host_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1501,7 +1484,6 @@ graph LR
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -1551,7 +1533,6 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - lib
 - main-ssh-key
 - neovim
-- neovim/to-users
 - nix
 - nix-index
 - nixos-general
@@ -1607,7 +1588,6 @@ graph LR
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   starship["starship"]:::starship_c
-  neovim__to_users[/"neovim/to-users"\]:::neovim__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__os{{"unfree-predicate/os"}}:::unfree_predicate__os_c
@@ -1663,7 +1643,6 @@ graph LR
   nixvim --> wakatime
   end
 
-  neovim -.->|provides| neovim__to_users
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_host_surfacelaptop_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1708,7 +1687,6 @@ graph LR
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef surfacelaptop_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef neovim__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
