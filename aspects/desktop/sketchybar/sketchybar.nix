@@ -43,15 +43,7 @@
           brown = colors.base0F;
         };
 
-        # toLua emits a *value*, so prepend `return` to make it a loadable module
-        sketchybar-app-fontModule =
-          luaPs:
-          luaPs.toLuaModule (
-            pkgs.runCommand "sketchybar-app-fontModule" { } ''
-              mkdir -p $out
-              install -Dm644 ${pkgs.sketchybar-app-font}/lib/sketchybar-app-font/icon_map.lua "$out/share/lua/${luaPs.lua.luaversion}/icon_map.lua"
-            ''
-          );
+        inherit (import ./_lua-modules.nix { inherit pkgs lib; }) mkColorsModule mkIconMapModule;
       in
       {
         home.file.".config/sketchybar" = {
@@ -65,14 +57,13 @@
           luaPackage = pkgs.lua5_5;
           configType = "lua";
           extraLuaPackages = luaPs: [
-            (luaPs.callPackage ./_colorPackage.nix { config = colourConfig; })
-            (sketchybar-app-fontModule luaPs)
+            (mkColorsModule colourConfig luaPs)
+            (mkIconMapModule luaPs)
           ];
           extraPackages = with pkgs; [
             jq
             yq
             nowplaying-cli
-            rift
           ];
         };
       };

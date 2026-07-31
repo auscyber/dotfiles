@@ -1,11 +1,7 @@
-{ inputs, ... }:
-let
-  nixvimLib = inputs.nixvim.lib.nixvim;
-in
-{
+_: {
   den.aspects.nixvim.nvim =
     { lib, ... }:
-    nixvimLib.plugins.mkNeovimPlugin {
+    lib.nixvim.plugins.mkNeovimPlugin {
       name = "jujutsu";
       package = "jujutsu-nvim";
       moduleName = "jujutsu-nvim";
@@ -35,7 +31,7 @@ in
           default = "center";
         };
         keymap = lib.mkOption {
-          type = lib.types.nullOr (nixvimLib.lua-types.tableOf nixvimLib.lua-types.anything);
+          type = lib.types.nullOr (lib.nixvim.lua-types.tableOf lib.nixvim.lua-types.anything);
           default = null;
         };
       };

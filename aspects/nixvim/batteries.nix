@@ -5,10 +5,14 @@
   ...
 }:
 let
-  # Check if user has homeManager class
-  # Forward nvim class content into homeManager at programs.nixvim
+  # Forward nvim class content into homeManager at programs.nixvim.
+  #
+  # `sourceAspect` must be an already-resolved entity aspect (as produced by
+  # `den.lib.resolveEntity`). Policies do not receive `aspect-chain` — that is
+  # an aspect-parametric arg — so the source has to be resolved explicitly,
+  # the same way den's own `home-env` battery does it.
   nvimForward =
-    { aspect-chain }:
+    sourceAspect:
     den.provides.forward {
       each = lib.singleton true;
       fromClass = _: "nvim";
@@ -17,9 +21,7 @@ let
         "programs"
         "nixvim"
       ];
-      # Forward the current entity's resolved aspect (works for both `user`
-      # and `home` entities) rather than hardcoding `resolveEntity "user"`.
-      fromAspect = _: lib.head aspect-chain;
+      fromAspect = _: sourceAspect;
     };
 in
 {
@@ -81,8 +83,6 @@ in
   den.policies.nixvim-hm-module =
     {
       host,
-      user ? null,
-      home ? null,
       ...
     }:
     (den.lib.policy.provide {
@@ -107,13 +107,14 @@ in
 
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
-    {
-      aspect-chain,
-      ...
-    }:
-    (den.lib.policy.include (nvimForward {
-      inherit aspect-chain;
-    }));
+    { host, user, ... }:
+    den.lib.policy.include (nvimForward (den.lib.resolveEntity "user" { inherit host user; }));
+
+  # Home-scope policy: same, for standalone `den.homes` entities, which have no
+  # owning host and so are never reached by the user-scope policy above.
+  den.policies.nixvim-home-forward =
+    { home, ... }:
+    den.lib.policy.include (nvimForward (den.lib.resolveEntity "home" { inherit home; }));
 
   # ---------------------------------------------------------------------------
   # Schema includes
@@ -125,5 +126,6 @@ in
     den.policies.nixvim-hm-module
     den.policies.nixvim-include-global-pkgs
     den.policies.nixvim-user-forward
+    den.policies.nixvim-home-forward
   ];
 }

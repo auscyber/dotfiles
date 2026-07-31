@@ -87,7 +87,6 @@
           extraPackages = [
             pkgs.jq
             #          pkgs.yabai
-            pkgs.rift
           ];
           extraCommandPiping = builtins.path {
             name = "kanata-config";

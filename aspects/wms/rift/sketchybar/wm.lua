@@ -1,5 +1,23 @@
+-- rift window-manager sketchybar provider.
+--
+-- Shipped by den.aspects.rift as a Lua module on sketchybar's require path
+-- (programs.sketchybar.extraLuaPackages), so the base config's `require("wm")`
+-- resolves to this when rift is the enabled WM. It owns:
+--   * the rift_* bar events (fed by rift's run_on_start subscribe bridge),
+--   * the per-display workspaces widget, and
+--   * the focused-window title label on front_app + the secondary items.
+--
+-- Relies on globals set by the base config: `sbar` (init.lua),
+-- `_G.reorder_left_items` / `_G.last_space_item` (items/left.lua),
+-- `_G.secondary_window_name_items` (items/secondary.lua); and modules on the
+-- Lua path: colors, settings, icon_map.
+
 local colors = require("colors")
 local settings = require("settings")
+
+sbar.add("event", "rift_windows_changed")
+sbar.add("event", "rift_workspace_changed")
+sbar.add("event", "rift_windows_title")
 
 local function shell_quote(value)
 	return "'" .. string.gsub(value, "'", "'\\''") .. "'"
@@ -7,18 +25,7 @@ end
 
 _G.icon_map = require("icon_map")
 
-local function config_dir()
-	return os.getenv("CONFIG_DIR") or ((os.getenv("HOME") or "") .. "/.config/sketchybar")
-end
-
-local function trim(value)
-	return (value or ""):gsub("^%s+", ""):gsub("%s+$", "")
-end
-
 local function get_background_style(selected)
-	print(colors.with_alpha(colors.selection, 0.75))
-
-	print(colors.with_alpha(colors.background or colors.black, 0.45))
 	if selected then
 		return {
 			drawing = true,
@@ -205,7 +212,6 @@ local function add_items_for_display(arrangement_id, workspace_names)
 				end
 
 				if sender == "mouse.clicked" then
-					print("Switching to workspace " .. space_name .. " (index " .. workspace_index .. ")")
 					sbar.exec("rift-cli execute workspace switch " .. shell_quote(workspace_index))
 					return
 				end
@@ -310,3 +316,20 @@ end)
 spaces_observer:subscribe({ "space_change", "display_change" }, function()
 	refresh_display_spaces()
 end)
+
+-- Focused-window title on front_app + the secondary display's title items.
+-- This replaces the old plugins/front_app.sh (which shelled out to rift-cli).
+local function update_titles()
+	sbar.exec("rift-cli query windows | jq -r '.[] | select(.is_focused) | .title'", function(output)
+		local title = (output or ""):gsub("^%s+", ""):gsub("%s+$", "")
+		sbar.set("front_app", { label = title })
+		if _G.secondary_window_name_items then
+			for _, item_name in ipairs(_G.secondary_window_name_items) do
+				sbar.set(item_name, { label = title })
+			end
+		end
+	end)
+end
+
+local title_observer = sbar.add("item", "wm_title_observer", { drawing = false })
+title_observer:subscribe({ "rift_windows_title", "front_app_switched" }, update_titles)

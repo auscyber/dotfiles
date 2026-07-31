@@ -1,10 +1,8 @@
 #!/bin/sh
 
-# Some events send additional information specific to the event in the $INFO
-# variable. E.g. the front_app_switched event sends the name of the newly
-# focused application in the $INFO variable:
-# https://felixkratz.github.io/SketchyBar/config/events#events-and-scripting
-
-if [ "$SENDER" = "front_app_switched" ]; then
-	sketchybar --set "$NAME" label="$(rift-cli query windows | jq -r '.[] | select(.is_focused) | .title')"
-fi
+# The focused-window title label is set by the enabled WM aspect's `wm` Lua
+# module (it subscribes front_app + the secondary title items to its own
+# title-changed event and sets their labels from a WM query). This plugin is
+# intentionally a no-op so the front_app item's script path stays valid on
+# hosts with no WM provider.
+exit 0

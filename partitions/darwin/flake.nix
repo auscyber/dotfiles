@@ -12,6 +12,7 @@
   outputs = _: { };
 
   inputs = {
+    crane.url = "github:ipetkov/crane/756d6d07c3818ea95d1e2cdac63fa7d02fe3e61b";
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
@@ -32,5 +33,13 @@
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nixpkgs.url = "github:nixos/nixpkgs/9bc02893134c733dd85de46ee4fb2fac696b5529";
     rift.url = "github:auscyber/rift";
+    nixpkgs.url = "github:nixos/nixpkgs/9bc02893134c733dd85de46ee4fb2fac696b5529";
+    paneru = {
+      url = "github:auscyber/paneru?ref=add-lua-stuff";
+      inputs = {
+        crane.follows = "crane";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 }

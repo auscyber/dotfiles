@@ -97,7 +97,7 @@
           networking.wg-quick.interfaces = lib.mkForce { };
 
           home-manager.users.ivypierlot = {
-            services.rift.enable = lib.mkForce false;
+            services.paneru.enable = lib.mkForce false;
             services.jankyborders.enable = lib.mkForce false;
             programs.kanata.enable = lib.mkForce false;
             programs.sketchybar.enable = lib.mkForce false;
@@ -174,7 +174,7 @@
       den.aspects.gui
       den.aspects.gpg
       #      den.aspects.rclone
-      den.aspects.rift
+      den.aspects.paneru
       den.aspects.kanata
       den.aspects.dev
       den.aspects.opencode

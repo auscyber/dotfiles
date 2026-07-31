@@ -79,6 +79,19 @@
               )
             ];
           })
+          (lib.optionalAttrs (options.programs ? sketchybar) {
+            # Push rift's CLI onto sketchybar's PATH and its bar provider onto
+            # sketchybar's Lua require path as the `wm` module, so the base
+            # sketchybar config stays WM-agnostic (`require("wm")`).
+            programs.sketchybar.extraPackages = [ pkgs.rift ];
+            programs.sketchybar.extraLuaPackages = luaPs: [
+              (luaPs.toLuaModule (
+                pkgs.runCommandLocal "sketchybar-wm-rift" { } ''
+                  install -Dm644 ${./sketchybar/wm.lua} "$out/share/lua/${luaPs.lua.luaversion}/wm.lua"
+                ''
+              ))
+            ];
+          })
           {
             services.rift = {
               enable = true;
