@@ -26,7 +26,7 @@
       };
     };
     flake-parts.url = "github:hercules-ci/flake-parts/17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e";
-    home-manager.url = "github:nix-community/home-manager/2e6715977106c498355a70bcefd2c78a33c94558";
+    home-manager.url = "github:nix-community/home-manager/bf9ce9fec78f95f374e8dd3b503863a3ec128ebe";
     impermanence.url = "github:nix-community/impermanence";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
@@ -51,7 +51,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-    nixpkgs.url = "github:nixos/nixpkgs/9bc02893134c733dd85de46ee4fb2fac696b5529";
+    nixpkgs.url = "github:nixos/nixpkgs/59ea0b1c043c463e39fcb3cfb9a5c8bcf0777c72";
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     nixvirt = {
       url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
