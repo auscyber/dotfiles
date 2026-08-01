@@ -1865,7 +1865,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 |---------|---------|-------------|
 | cotabby | `v0.6.2-beta` |  |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.14.9.1` | Private, fast, and honest web browser based on Chromium |
+| helium | `0.15.1.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
