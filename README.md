@@ -77,11 +77,11 @@
 - overlays
 - pam-rssh
 - pam-touchid
+- paneru
 - provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(libkey-nomad,onepassword-password-manager)
 - provides/unfree(onepassword-password-manager)
-- rift
 - shell
 - shell/to-users
 - sketchybar
@@ -199,8 +199,8 @@ graph LR
   onepassword["onepassword"]:::onepassword_c
   opencode["opencode"]:::opencode_c
   pam_rssh_user_ivypierlot["pam-rssh"]:::pam_rssh_user_ivypierlot_c
+  paneru["paneru"]:::paneru_c
   den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_{{"batteries/primary-user(ivypierlot@Ivys-MacBook-Pro)"}}:::den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro__c
-  rift["rift"]:::rift_c
   shell__to_users["shell/to-users"]:::shell__to_users_c
   sketchybar["sketchybar"]:::sketchybar_c
   stylix["stylix"]:::stylix_c
@@ -233,8 +233,8 @@ graph LR
   ivypierlot --> nushell
   ivypierlot --> onepassword
   ivypierlot --> opencode
+  ivypierlot --> paneru
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
-  ivypierlot --> rift
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
   main_ssh_key --> pam_rssh_user_ivypierlot
@@ -303,8 +303,8 @@ graph LR
   classDef pam_rssh_host_Ivys_MacBook_Pro_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_user_ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef pam_touchid_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef paneru_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
-  classDef rift_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__batteries__self__c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__self___os_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef shell_host_Ivys_MacBook_Pro_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -868,11 +868,11 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - overlays
 - pam-rssh
 - pam-touchid
+- paneru
 - provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(libkey-nomad,onepassword-password-manager)
 - provides/unfree(onepassword-password-manager)
-- rift
 - shell
 - shell/to-users
 - sketchybar
@@ -973,8 +973,8 @@ graph LR
   onepassword["onepassword"]:::onepassword_c
   opencode["opencode"]:::opencode_c
   pam_rssh_user_ivypierlot["pam-rssh"]:::pam_rssh_user_ivypierlot_c
+  paneru["paneru"]:::paneru_c
   den__batteries__primary_user_ivypierlot_macmini_{{"batteries/primary-user(ivypierlot@macmini)"}}:::den__batteries__primary_user_ivypierlot_macmini__c
-  rift["rift"]:::rift_c
   shell__to_users["shell/to-users"]:::shell__to_users_c
   sketchybar["sketchybar"]:::sketchybar_c
   stylix["stylix"]:::stylix_c
@@ -1006,8 +1006,8 @@ graph LR
   ivypierlot --> nushell
   ivypierlot --> onepassword
   ivypierlot --> opencode
+  ivypierlot --> paneru
   ivypierlot --> den__batteries__primary_user_ivypierlot_macmini_
-  ivypierlot --> rift
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
   main_ssh_key --> pam_rssh_user_ivypierlot
@@ -1072,8 +1072,8 @@ graph LR
   classDef pam_rssh_host_macmini_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_user_ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef pam_touchid_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef paneru_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__batteries__primary_user_ivypierlot_macmini__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
-  classDef rift_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__batteries__self__c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__self___os_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef shell_host_macmini_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
