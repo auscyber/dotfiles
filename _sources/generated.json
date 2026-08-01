@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-07-30",
+        "date": "2026-08-01",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "7f56808fc521bc9141969bf867a9424566b2327f",
-            "sha256": "sha256-xKSdbAu8ZE9ifL2WGh5CBMhk7hPqKs/4HEQ3m5tKnm4=",
+            "rev": "a1566747b5114890ae4ea0c3a6321e0dbcb526f4",
+            "sha256": "sha256-9mVDJiOUOas3+NtbAu4TTkVPjdffFp/AOV4gdFUHofA=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "7f56808fc521bc9141969bf867a9424566b2327f"
+        "version": "a1566747b5114890ae4ea0c3a6321e0dbcb526f4"
     },
     "cotabby": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-W4q9kBmcSboPKNHJzXs42sU/Yth05ZlLJV5ZO3yM4kg=",
+            "sha256": "sha256-5byVy+3mvCMNAuRHsDlLufPZXGbBXV/byFd1z4lmokQ=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.14.9.1/helium-0.14.9.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.1.1/helium-0.15.1.1-x86_64_linux.tar.xz"
         },
-        "version": "0.14.9.1"
+        "version": "0.15.1.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -323,11 +323,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-zJxyU7OD3blQBXQEj6InFEk/Y9AWXX01duwTk5O33Zk=",
+            "sha256": "sha256-FPATwf1+5TyLq5+n8s2G3LbJA1092rSkze+Z7Igvpp0=",
             "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.50/zotero-better-bibtex-9.0.50.xpi"
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.54/zotero-better-bibtex-9.0.54.xpi"
         },
-        "version": "9.0.50"
+        "version": "9.0.54"
     },
     "zotero-better-notes": {
         "cargoLock": null,
@@ -409,10 +409,10 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-i7WO1U+V+T9yeRpJoLf/7GV2SDR9LuoxMtw/atSNLA8=",
+            "sha256": "sha256-M7t7Sxk2Im7DwUvzBaVUf27uhOcAyOQvW/Y/HTmk+So=",
             "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-beta.2/zotlit-zotero-2.0.0-beta.2.xpi"
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-beta.3/zotlit-zotero-2.0.0-beta.3.xpi"
         },
-        "version": "2.0.0-beta.2"
+        "version": "2.0.0-beta.3"
     }
 }
