@@ -23,6 +23,7 @@
     # resolve them. Both hosts and zotero are Darwin-only anyway.
     darwin = [
       "darwin/homebrew.nix"
+      "wms/paneru/default.nix"
       "programs/zotero.nix"
       "hosts/laptop.nix"
       "hosts/macmini.nix"

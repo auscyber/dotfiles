@@ -61,8 +61,8 @@
     extra-substituters = [
       "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
-      #      "https://devenv.cachix.org"
-      #      "https://nix-community.cachix.org"
+      "https://devenv.cachix.org"
+      "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
       "main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4="
