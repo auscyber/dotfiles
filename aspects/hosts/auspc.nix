@@ -40,16 +40,37 @@
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOJWDxkmOeVGAq7WcPI+BygJ2zbsn4J0UAq0R6B6ZVx auscyber@auspc";
     };
   };
+  den.aspects.qemu = {
+    provides.to-users.homeManager = { pkgs, ... }: {
+      home.packages = with pkgs; [ virt-manager ];
 
+    };
+
+    nixos = {
+      virtualisation.libvirtd.enable = true;
+
+      # Enable TPM emulation (optional)
+      # install pkgs.swtpm system-wide for use in virt-manager (optional)
+      virtualisation.libvirtd.qemu = {
+        swtpm.enable = true;
+      };
+
+      # Enable USB redirection (optional)
+      virtualisation.spiceUSBRedirection.enable = true;
+      users.users.auscyber.extraGroups = [ "libvirtd" ];
+
+    };
+  };
   den.aspects.auspc = {
     includes = [
+      den.aspects.qemu
       den.aspects.vpn
       den.aspects.packages.alx-wol
       den.aspects.cachyos-kernel
       # Inert until `nix run .#gen-kernel-trim` (run on auspc) writes
       # ./auspc/kernel-trim.json; then it rides along with the cachyos kernel
       # above as one more `boot.kernelPatches` entry.
-      den.aspects.kernel-trim
+      #      den.aspects.kernel-trim
       den.aspects.bootlogo
       #      den.aspects.builders
       den.aspects.builder-server

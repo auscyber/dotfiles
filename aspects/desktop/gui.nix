@@ -20,4 +20,14 @@
       };
     };
   };
+
+  den.aspects.razer = {
+    gui.nixos = { user, pkgs, ... }: {
+      hardware.openrazer.enable = true;
+      users.users.${user.name}.extraGroups = [ "openrazer" ];
+
+    };
+
+  };
+  den.aspects.auspc.includes = [ den.aspects.razer ];
 }

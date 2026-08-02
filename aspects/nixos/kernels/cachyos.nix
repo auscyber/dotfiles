@@ -35,7 +35,10 @@
             kernel = pkgs.cachyosKernels.linux-cachyos-latest.override (super: {
               lto = "thin";
               cpusched = "bore";
-              kernelPatches = (super.kernelPatches or [ ]) ++ config.boot.kernelPatches;
+              # boot.kernelPatches is merged in automatically by NixOS's core
+              # `boot.kernelPackages` option (nixos/modules/system/boot/kernel.nix)
+              # -- appending it here too double-applies it and builds a second,
+              # redundant kernel derivation.
               stdenv = stdenv;
               extraMakeFlags = [
                 "CC=${stdenv.cc}/bin/clang"
