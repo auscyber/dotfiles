@@ -673,82 +673,64 @@ in
           # command+args list) and `args` its tail. Gated on claude-code being enabled
           # so lspmux stays one opt-in.
           programs.claude-code.lspServers = lib.mkIf config.programs.claude-code.enable (
-            lib.mapAttrs
-              (
-                lspconfig: spec: {
-                  command = lib.getExe (pkgs.wrapLspMux (spec // { inherit lspconfig; }));
-                  args = spec.args;
-                  extensionToLanguage = spec.extensionToLanguage;
-                }
-              )
-              (lib.filterAttrs (_lspconfig: spec: spec.extensionToLanguage != { }) config.lsp.servers)
+            lib.mapAttrs (lspconfig: spec: {
+              command = lib.getExe (pkgs.wrapLspMux (spec // { inherit lspconfig; }));
+              args = spec.args;
+              extensionToLanguage = spec.extensionToLanguage;
+            }) (lib.filterAttrs (_lspconfig: spec: spec.extensionToLanguage != { }) config.lsp.servers)
           );
-        };
-      };
 
-    hmLinux =
-      {
-        config,
-        pkgs,
-        ...
-      }:
-      {
-        home.file.".config/lspmux/config.toml".source = pkgs.writers.writeTOML "lspmux.toml" lspmux;
+          home.file.".config/lspmux/config.toml".source = pkgs.writers.writeTOML "lspmux.toml" lspmux;
 
-        systemd.user.services.lspmux = {
-          description = "lspmux service";
-          after = [ "network.target" ];
-          wantedBy = [ "default.target" ];
-          serviceConfig = {
-            ExecStart = "${pkgs.lspmux}/bin/lspmux server";
-            Restart = "always";
-            RestartSec = 5;
-            StandardOutput = "append:/tmp/lspmux.log";
-            StandardError = "append:/tmp/lspmux.log";
+          systemd.user.services.lspmux = {
+            Unit = {
+              Description = "lspmux service";
+              After = [ "network.target" ];
+            };
+            Install.WantedBy = [ "default.target" ];
+            Service = {
+              ExecStart = "${pkgs.lspmux}/bin/lspmux server";
+              Restart = "always";
+              RestartSec = 5;
+              StandardOutput = "append:/tmp/lspmux.log";
+              StandardError = "append:/tmp/lspmux.log";
+            };
           };
-        };
-      };
 
-    hmDarwin =
-      {
-        config,
-        pkgs,
-        ...
-      }:
-      {
-        home.file."Library/Application Support/lspmux/config.toml".source =
-          pkgs.writers.writeTOML "lspmux.toml" lspmux;
+          home.file."Library/Application Support/lspmux/config.toml".source =
+            pkgs.writers.writeTOML "lspmux.toml" lspmux;
 
-        launchd.agents.lspmux = {
-          enable = true;
-          config = {
-            ProgramArguments = [
-              "${pkgs.lspmux}/bin/lspmux"
-              "server"
-            ];
+          launchd.agents.lspmux = {
+            enable = true;
+            config = {
+              ProgramArguments = [
+                "${pkgs.lspmux}/bin/lspmux"
+                "server"
+              ];
 
-            EnvironmentVariables = {
-              PATH = lib.concatStringsSep ":" [
-                "/usr/bin"
-                "/bin"
-                "/usr/sbin"
-                "/sbin"
+              EnvironmentVariables = {
+                PATH = lib.concatStringsSep ":" [
+                  "/usr/bin"
+                  "/bin"
+                  "/usr/sbin"
+                  "/sbin"
+                ];
+              };
+
+              StandardOutPath = "/tmp/lspmux.log";
+              StandardErrorPath = "/tmp/lspmux.log";
+
+              KeepAlive = true;
+              RunAtLoad = true;
+
+              LimitLoadToSessionType = [
+                "Aqua"
+                "Background"
+                "LoginWindow"
+                "StandardIO"
+                "System"
               ];
             };
-
-            StandardOutPath = "/tmp/lspmux.log";
-            StandardErrorPath = "/tmp/lspmux.log";
-
-            KeepAlive = true;
-            RunAtLoad = true;
-
-            LimitLoadToSessionType = [
-              "Aqua"
-              "Background"
-              "LoginWindow"
-              "StandardIO"
-              "System"
-            ];
           };
         };
       };

@@ -49,6 +49,6 @@
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
   darwin.hash = "sha256-JvpHtXBeAyTejgOMRLvUsgJy1hGu/RMt/7PI5PnBYK0=";
   home-manager.hash = "sha256-8EQ/0H5Lp+LA4L6Mj6lLfY0CsU3Ht4kZAHjAxUOmdu0=";
-  nh.hash = "sha256-AB5LGXgRBAJR2cFrXDT2Gos0YGHxt97JytkSZ4uNiDE=";
+  nh.hash = "sha256-akDP1b5UJzWCj0B/q9/uN5g/DOyLZKUjIP7KE4iyh70=";
   zen-browser.hash = null;
 }

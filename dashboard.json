@@ -1,0 +1,24 @@
+{
+    "showCpu": true,
+    "showDisk": true,
+    "showGpu": true,
+    "showDevices": false,
+    "verticalUi": false,
+    "celsius": true,
+    "showLabels": true,
+    "showBattery": false,
+    "rgbOff": false,
+    "temperatureBar": true,
+    "addDeviceToDashboard": true,
+    "sidebarCollapsed": false,
+    "languageCode": "en_US",
+    "pageTitle": "OPENLINKHUB WebUI",
+    "devices": [],
+    "theme": "default",
+    "themes": null,
+    "keyboardLayout": 0,
+    "keyboardLayouts": {
+        "0": "QWERTY",
+        "1": "AZERTY"
+    }
+}

@@ -1,0 +1,6 @@
+{"level":"info","message":"Detected monitor bounds","monitors":[{"Index":1,"Name":"card1-DP-3","Width":3840,"Height":2160,"Left":false,"Top":false}],"timestamp":"2026-08-02T23:12:33+10:00"}
+{"file":"/home/auscyber/dotfiles/database/audio.json","level":"info","message":"Audio file is missing, creating initial one.","timestamp":"2026-08-02T23:12:33+10:00"}
+{"error":"open /home/auscyber/dotfiles/database/audio.json: no such file or directory","level":"error","location":"/home/auscyber/dotfiles/database/audio.json","message":"Unable to save audio data","timestamp":"2026-08-02T23:12:33+10:00"}
+{"file":"/home/auscyber/dotfiles/dashboard.json","level":"info","message":"Dashboard file is missing, creating initial one.","timestamp":"2026-08-02T23:12:33+10:00"}
+{"file":"/home/auscyber/dotfiles/dashboard.json","level":"info","message":"Dashboard file is created.","timestamp":"2026-08-02T23:12:33+10:00"}
+{"error":"open /home/auscyber/dotfiles/static/css/themes/: no such file or directory","level":"fatal","location":"/home/auscyber/dotfiles/static/css/themes/","message":"Unable to read content of a folder","timestamp":"2026-08-02T23:12:33+10:00"}

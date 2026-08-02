@@ -2,6 +2,7 @@
   den.default.gaming = {
     includes = [ den.aspects.packages.proton-ge-bin ];
     nixos = { pkgs, ... }: {
+      boot.kernelModules = [ "ntsync" ];
       programs = {
         gamescope = {
           enable = true;
