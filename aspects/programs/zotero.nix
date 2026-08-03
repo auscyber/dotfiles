@@ -1,4 +1,4 @@
-{ den, ... }: {
+{ den, lib, ... }: {
   den.aspects.zotero = {
     includes = [ den.aspects.homebrew ];
     brew.casks = [ "zotero" ];
@@ -12,10 +12,18 @@
           id = 0;
           path = "x3xvsrif.default";
           isDefault = true;
-          settings.extensions.update.autoUpdateDefault = false;
-          # Zotero 7 local API (localhost:23119) for zotero-mcp's local mode.
-          settings.extensions.zotero.httpServer.enabled = true;
-          settings.extensions.zotero.httpServer.localAPI.enabled = true;
+          settings = lib.flattenAttrset {
+            extensions.zotero.zoteroocr = {
+              pdftoppmPath = lib.getExe' pkgs.poppler-utils "pdftoppm";
+
+              ocrPath = lib.getExe pkgs.tesseract;
+
+            };
+            extensions.update.autoUpdateDefault = false;
+            # Zotero 7 local API (localhost:23119) for zotero-mcp's local mode.
+            extensions.zotero.httpServer.enabled = true;
+            extensions.settings.extensions.zotero.httpServer.localAPI.enabled = true;
+          };
           extensions.packages = with pkgs.zoteroAddons; [
             better-bibtex
             better-notes

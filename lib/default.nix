@@ -72,4 +72,18 @@ final: prev: {
     ];
 
   inputMeta = opts: final.inputMetaWithArgs (_: opts);
+  flattenAttrset =
+    set:
+    let
+      recurse =
+        path:
+        final.concatMapAttrs (
+          name: value:
+          if builtins.isAttrs value then
+            recurse (path ++ [ name ]) value
+          else
+            { ${builtins.concatStringsSep "." (path ++ [ name ])} = value; }
+        );
+    in
+    recurse [ ] set;
 }

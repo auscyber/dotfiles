@@ -54,7 +54,6 @@
         programs.sketchybar = {
           service.enable = true;
           enable = true;
-          luaPackage = pkgs.lua5_5;
           configType = "lua";
           extraLuaPackages = luaPs: [
             (mkColorsModule colourConfig luaPs)

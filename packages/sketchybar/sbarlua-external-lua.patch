@@ -1,0 +1,63 @@
+--- a/makefile
++++ b/makefile
+@@ -1,18 +1,47 @@
+ NAME=sketchybar
+ CFLAGS=-std=c99 -O3 -g -shared -fPIC
+ INSTALL_DIR=$(HOME)/.local/share/sketchybar_lua
++CC?=clang
++PKG_CONFIG?=pkg-config
+ 
+-LUA_DIR=lua-5.5.0
+-LIBS=-I$(LUA_DIR)/src -Lbin -llua -framework CoreFoundation
++# Which Lua to build against.  By default the bundled Lua 5.5 sources are
++# compiled and statically linked into the module.  To build against an already
++# installed Lua (5.1 - 5.5, LuaJIT, ...) either give its pkg-config name
++#
++#   make LUA_PKG=luajit
++#   make LUA_PKG=lua5.4
++#
++# or set LUA_CFLAGS/LUA_LDFLAGS by hand
++#
++#   make LUA_CFLAGS=-I/opt/homebrew/include/luajit-2.1
++#
++# Only the headers are needed for an external Lua: a loadable module resolves
++# the Lua API from whichever interpreter loads it, so nothing gets linked in.
++LUA_DIR?=lua-5.5.0
++LUA_PKG?=
+ 
++ifeq ($(strip $(LUA_PKG))$(strip $(LUA_CFLAGS)),)
++ LUA_CFLAGS=-I$(LUA_DIR)/src
++ LUA_LDFLAGS=-Lbin -llua
++ LUA_LIB=bin/liblua.a
++else
++ ifneq ($(strip $(LUA_PKG)),)
++  LUA_CFLAGS?=$(shell $(PKG_CONFIG) --cflags $(LUA_PKG))
++ endif
++ LUA_LDFLAGS?=-undefined dynamic_lookup
++ LUA_LIB=
++endif
++
++LIBS=$(LUA_CFLAGS) $(LUA_LDFLAGS) -framework CoreFoundation
++
+ ifeq ($(shell uname -sm),Darwin arm64)
+  ARCH= -arch arm64
+ else
+  ARCH= -arch x86_64
+ endif
+ 
+-bin/$(NAME).so: src/$(NAME).c src/*.c bin/liblua.a
+-	clang $(CFLAGS) $(ARCH) $^ $(LIBS) -o bin/$(NAME).so
++bin/$(NAME).so: src/$(NAME).c src/*.c $(LUA_LIB) | bin
++	$(CC) $(CFLAGS) $(ARCH) $^ $(LIBS) -o bin/$(NAME).so
+ 
+ install: bin/$(NAME).so | $(INSTALL_DIR)
+ 	mkdir -p $(INSTALL_DIR)
+@@ -23,7 +52,7 @@
+ 
+ clean:
+ 	rm -rf bin
+-	cd $(LUA_DIR) && make clean
++	[ -d $(LUA_DIR) ] && cd $(LUA_DIR) && make clean || true
+ 
+ bin/liblua.a: | bin
+ 	cd $(LUA_DIR) && make

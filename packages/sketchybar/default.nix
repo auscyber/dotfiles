@@ -6,11 +6,12 @@
 
   den.aspects.packages.sketchybar = {
     overlays = { sources, ... }: {
-      sketchybar = self: super: {
-        sketchybar = super.sketchybar.overrideAttrs (old: {
+      sketchybar = final: prev: {
+        sbarlua = final.callPackage ./_sbarlua.nix { luaPackages = prev.luaPackages; };
+        sketchybar = prev.sketchybar.overrideAttrs (old: {
           inherit (sources.sketchybar) src;
           version = "2.24.0";
-          patches = super.sketchybar.patches or [ ] ++ [
+          patches = prev.sketchybar.patches or [ ] ++ [
             # Fixes the build on macOS Sonoma
             ./sketchybar-pid.patch
           ];
