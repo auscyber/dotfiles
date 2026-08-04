@@ -167,6 +167,48 @@
               pads = scratchpads;
             };
 
+            # The spec as a Lua module rather than a table inlined into
+            # init.lua: two hosts load these declarations now — paneru's
+            # embedded runtime, and ./scratchpad-cli.lua under a plain
+            # interpreter — and generating it once is what keeps them from
+            # drifting.
+            scratchpadSpecFile = pkgs.writeText "paneru-scratchpad-spec.lua" ''
+              -- Generated from aspects/wms/paneru/default.nix — do not edit by hand.
+              return ${lib.generators.toLua { } scratchpadSpec}
+            '';
+
+            # `paneru-scratchpad <name>`, the program kanata calls — see the
+            # header of ./scratchpad-cli.lua for why a program is needed at all
+            # (`Command::Lua` has no argv encoding, so `send-cmd` cannot name a
+            # `paneru.bind` callback). It is ./scratchpad.lua's `toggle` run
+            # against paneru's loadable *client* module over the socket, so
+            # both paths end in the same code over the same `scratchpad.shown`
+            # state.
+            #
+            # Built against `services.paneru.lua` — the interpreter the daemon's
+            # own modules resolve against — because `paneru.so` is a C module
+            # and has to match the interpreter loading it.
+            paneruScratchpad =
+              let
+                luaPs = config.services.paneru.lua.pkgs;
+                modules = [
+                  (mkLuaFileModule "paneru_scratchpad" ./scratchpad.lua luaPs)
+                  (mkLuaFileModule "paneru_scratchpad_spec" scratchpadSpecFile luaPs)
+                ];
+                client = config.services.paneru.finalPackage.passthru.luaModule.override {
+                  inherit (luaPs) lua;
+                };
+              in
+              pkgs.writeShellScriptBin "paneru-scratchpad" ''
+                export LUA_PATH=${
+                  lib.escapeShellArg (lib.concatMapStringsSep ";" luaPs.getLuaPath (modules ++ [ client ]))
+                }
+                export LUA_CPATH=${
+                  lib.escapeShellArg (lib.concatMapStringsSep ";" luaPs.getLuaCPath (modules ++ [ client ]))
+                }
+                exec ${lib.getExe config.services.paneru.lua} ${./scratchpad-cli.lua} "$@"
+              '';
+
             # Native paneru hotkeys for virtual-workspace navigation, as a
             # fallback path alongside the kanata layer (which drives the bare
             # arrow keys via `send-cmd`). alt+up/down move between rows;
@@ -205,10 +247,10 @@
                   width = 2.0;
                   radius = 12.0;
                 };
-                inactive.dim = {
-                  opacity = 0.1;
-                  color = "#000000";
-                };
+                #inactive.dim = {
+                #  opacity = 0.1;
+                #  color = "#000000";
+                #};
                 inactive.border = {
                   enabled = true;
                   color = config.stylix.base16Scheme.base0D;
@@ -279,7 +321,7 @@
                           -- .extraLuaPackages below). `setup` compiles each pad's match
                           -- patterns, registers the placement/hide-on-focus-loss hooks and
                           -- binds each pad's chord.
-                require("paneru_scratchpad").setup ${lib.generators.toLua { } scratchpadSpec}
+                require("paneru_scratchpad").setup(require("paneru_scratchpad_spec"))
                           ${lib.optionalString (options.programs ? sketchybar) ''
                             -- Incremental bar repaints, driven from paneru's own event loop
                             -- (services.paneru.extraLuaPackages, below). Creating the items and
@@ -292,7 +334,10 @@
           in
           lib.mkMerge [
             (lib.optionalAttrs (options.programs ? kanata) {
-              programs.kanata.extraPackages = [ config.services.paneru.finalPackage ];
+              programs.kanata.extraPackages = [
+                config.services.paneru.finalPackage
+                paneruScratchpad
+              ];
               programs.kanata.extraConfigPaths = [
                 (pkgs.writeText "paneru-keybinds"
                   # commonlisp
@@ -302,18 +347,21 @@
                       ;; closest best-effort analog to rift's enable_spaces.
                       enable_spaces (t! runasuser "paneru send-cmd restart")
 
-                      ;; Scratchpads are Lua-side, bound with paneru.bind in
-                      ;; init.lua (see scratchpads above): Command::Lua has no
-                      ;; argv encoding, so no send-cmd can reach a Lua callback.
-                      ;; These aliases therefore just emit the bare letter — the
-                      ;; space_manip layer already holds lalt and forks on
-                      ;; lshift, so what leaves kanata's virtual HID is the
-                      ;; alt+shift-<letter> chord paneru's own event tap binds.
-                      toggle_discord_scratchpad d
-                      toggle_fantastical_scratchpad f
-                      toggle_beeper_scratchpad b
-                      toggle_music_scratchpad s
-                      toggle_1password_scratchpad p
+                      ;; Scratchpads are Lua-side and Command::Lua has no argv
+                      ;; encoding, so no send-cmd can name a paneru.bind
+                      ;; callback. `paneru-scratchpad` (built above from
+                      ;; ./scratchpad-cli.lua) is the way in: the same toggle,
+                      ;; run against paneru's loadable client module over the
+                      ;; socket, addressable by pad name.
+                      ;;
+                      ;; The alt+shift-<letter> chords stay bound in init.lua
+                      ;; and keep working on their own; both paths run the same
+                      ;; `toggle` over the same `scratchpad.shown` state.
+                      toggle_discord_scratchpad (t! runasuser "${lib.getExe paneruScratchpad} discord")
+                      toggle_fantastical_scratchpad (t! runasuser "${lib.getExe paneruScratchpad} fantastical")
+                      toggle_beeper_scratchpad (t! runasuser "${lib.getExe paneruScratchpad} beeper")
+                      toggle_music_scratchpad (t! runasuser "${lib.getExe paneruScratchpad} music")
+                      toggle_1password_scratchpad (t! runasuser "${lib.getExe paneruScratchpad} 1password")
 
                       minimise (t! runasuser "yabai -m window --minimize")
                       switch-focus (t! runasuser "paneru send-cmd window focus east")
@@ -392,6 +440,7 @@
                   luaPs:
                   [
                     (mkLuaFileModule "paneru_scratchpad" ./scratchpad.lua luaPs)
+                    (mkLuaFileModule "paneru_scratchpad_spec" scratchpadSpecFile luaPs)
                   ]
                   ++ lib.optionals (options.programs ? sketchybar) [
                     (pkgs.sbarlua.override { luaPackages = luaPs; })

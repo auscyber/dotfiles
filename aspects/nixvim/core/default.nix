@@ -650,6 +650,7 @@
         vim.wo.foldmethod = "expr"
         vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
         vim.wo.foldlevel = 3
+        vim.g["conjure#filetypes"] = { "clojure", "fennel", "janet", "lisp", "racket", "scheme" }
 
         -- Match previous guifont behavior (Windows vs other)
         if vim.fn.has("win32") > 0 then

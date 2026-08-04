@@ -45,6 +45,22 @@
 -- lib.generators.toLua from Nix — a `paneru.match{...}` call is not data. The
 -- predicates are built here, in `define`.
 --
+-- ALSO RUNS OUTSIDE THE DAEMON
+--
+-- Everything below the hooks is host-agnostic: `toggle` is a `function(ws)`
+-- over the window set, and the window set, `paneru.match` and `paneru.state`
+-- are spelled the same in paneru's loadable client module (crates/lua) as in
+-- the embedded runtime. So ./scratchpad-cli.lua loads this same file under a
+-- plain LuaJIT with `require("paneru")` as the global, calls `M.load` instead
+-- of `M.setup` — pads defined, no hooks, no binds — and hands `M.toggle(name)`
+-- to `paneru.windows`. That is the path kanata takes (`paneru-scratchpad
+-- <name>`), since `Command::Lua` has no argv encoding and `send-cmd` therefore
+-- cannot reach a `paneru.bind` callback.
+--
+-- Only three things are embedded-only, and each is guarded: `paneru.log`
+-- (falls back to stderr), `paneru.bind` and `paneru.on` (registered by `setup`,
+-- which the CLI does not call).
+--
 -- Nothing that has to survive a reload lives in this table. Saving init.lua
 -- rebuilds paneru's interpreter and every Lua global with it, so the two pieces
 -- of genuinely persistent state — which pads are meant to be on screen, and
@@ -77,9 +93,18 @@ local M = {
 local SHOWN = "scratchpad.shown"
 local FOCUSED = "scratchpad.focused"
 
+-- `paneru.log` is the embedded runtime's; the client module has no logging of
+-- its own, so under scratchpad-cli.lua this goes to stderr instead — where the
+-- shell that ran it (or kanata's log) can pick it up.
 local function log(...)
-	if M.debug then
-		paneru.log("scratchpad: " .. table.concat({ ... }, " "))
+	if not M.debug then
+		return
+	end
+	local line = "scratchpad: " .. table.concat({ ... }, " ")
+	if paneru.log then
+		paneru.log(line)
+	else
+		io.stderr:write(line, "\n")
 	end
 end
 
@@ -299,12 +324,31 @@ end
 -- paneru_events' own window_focused handler without any of them knowing about
 -- the others. They act on different windows — the one that just took the focus,
 -- and the one that just lost it — so they never contradict each other.
-function M.setup(spec)
+--
+-- `load` is the half of this that needs no host: the declarations, and nothing
+-- registered. scratchpad-cli.lua calls it (see the header) — a one-shot process
+-- has nothing to hook and nothing to bind, and `paneru.on`/`paneru.bind` do not
+-- exist in the client module anyway.
+function M.load(spec)
 	M.debug = spec.debug or false
 	M.sliver = spec.sliver or M.sliver
+	-- Declarations are rebuilt from the spec, never added to: `define` appends
+	-- to `M.order`, and a second `load` in the same interpreter would otherwise
+	-- leave every pad in it twice.
+	M.pads, M.order = {}, {}
 
 	for _, name in ipairs(spec.order or {}) do
-		local pad = M.define(name, spec.pads[name])
+		M.define(name, spec.pads[name])
+	end
+
+	return M
+end
+
+function M.setup(spec)
+	M.load(spec)
+
+	for _, name in ipairs(M.order) do
+		local pad = M.pads[name]
 		if pad.key then
 			paneru.bind(pad.key, M.toggle(name))
 		end
