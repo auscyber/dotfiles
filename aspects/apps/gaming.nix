@@ -44,7 +44,7 @@
           };
           protontricks.enable = true;
           gamescopeSession = {
-            enable = false;
+            enable = true;
             args = [
               "--force-grab-cursor"
               "--mangoapp"
@@ -52,9 +52,9 @@
               "-r"
               "144"
               "-w"
-              "1920"
+              "2560"
               "-h"
-              "1080"
+              "1440"
               "--adaptive-sync"
             ];
           };

@@ -1,7 +1,7 @@
 {
   den.aspects.rgb.gui.nixos = { pkgs, ... }: {
     services.hardware.openrgb = {
-      enable = true;
+      enable = false;
       package = pkgs.openrgb-with-all-plugins;
       motherboard = "amd";
       server.port = 6742;

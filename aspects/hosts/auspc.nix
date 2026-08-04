@@ -109,6 +109,7 @@
         nixpkgs.config.allowUnfree = true;
         boot.zfs.requestEncryptionCredentials = true;
         boot.zfs.forceImportRoot = true;
+        services.zfs.autoScrub.enable = true;
 
         # Hardware detection (kernel modules, microcode, ...) from the facter
         # report instead of a hand-written hardware-configuration.nix.
@@ -187,7 +188,7 @@
         # explicitly since disko is never run against this live machine.
         disko.devices.zpool.zpool.datasets.swap = {
           type = "zfs_volume";
-          size = "16G";
+          size = "10G";
           content = {
             type = "swap";
           };
@@ -277,9 +278,9 @@
         #     -o primarycache=metadata -o secondarycache=none \
         #     -o com.sun:auto-snapshot=false zpool/swap
         #   mkswap -f /dev/zvol/zpool/swap
-        swapDevices = [
-          { device = "/dev/zvol/zpool/swap"; }
-        ];
+        #        swapDevices = [
+        #          { device = "/dev/zvol/zpool/swap"; }
+        #        ];
       };
   };
 
@@ -319,7 +320,13 @@
 
         home.packages = with pkgs; [
           obs-studio
-          heroic
+          (heroic.override {
+            extraPkgs =
+              pkgs': with pkgs; [
+                gamescope
+                gamemode
+              ];
+          })
           shadps4
           tidal-hifi
           tmux
