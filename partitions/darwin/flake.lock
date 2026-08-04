@@ -617,11 +617,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785813064,
-        "narHash": "sha256-e2DTRC+YW60jEtGXblStE88b08K/B67Z3VLdD04nRN8=",
+        "lastModified": 1785819314,
+        "narHash": "sha256-FgzG5gHjX2EV2xnGvqGaHifNO3Ii1Jyge9boSM86z+M=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "b81ced2ef49aea98ad0b16135d13e4ae97f1db2b",
+        "rev": "a412f8a8e0962e7a3ed8438f2d778de12e50f148",
         "type": "github"
       },
       "original": {
