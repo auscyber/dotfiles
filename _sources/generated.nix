@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "a1566747b5114890ae4ea0c3a6321e0dbcb526f4";
+    version = "4f1bc3211c2402614484bdfbc12deccbb2182969";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "a1566747b5114890ae4ea0c3a6321e0dbcb526f4";
+      rev = "4f1bc3211c2402614484bdfbc12deccbb2182969";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-9mVDJiOUOas3+NtbAu4TTkVPjdffFp/AOV4gdFUHofA=";
+      sha256 = "sha256-t4m8hiatezn1BCMFHeLzHtMccaqYf9Ux7evfKzM3rrs=";
     };
-    date = "2026-08-01";
+    date = "2026-08-04";
   };
   cotabby = {
     pname = "cotabby";
@@ -61,10 +61,10 @@
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.14.9.1";
+    version = "0.15.1.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.14.9.1/helium_0.14.9.1_arm64-macos.dmg";
-      sha256 = "sha256-cRrbAXH5GudV5GCNViImm/8viJnZCBAWYS/L5eta6QU=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.1.1/helium_0.15.1.1_arm64-macos.dmg";
+      sha256 = "sha256-N2W+rfqJbjv+lKnVJj7sct8vl+L2/8E3fstmmCYd7Ww=";
     };
   };
   jankyborders = {
@@ -189,18 +189,18 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.54";
+    version = "9.0.55";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.54/zotero-better-bibtex-9.0.54.xpi";
-      sha256 = "sha256-FPATwf1+5TyLq5+n8s2G3LbJA1092rSkze+Z7Igvpp0=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.55/zotero-better-bibtex-9.0.55.xpi";
+      sha256 = "sha256-LZFOuxdMLFkOz/dBppA/GXkGW0J0DzAdk47Cy2wD5NY=";
     };
   };
   zotero-better-notes = {
     pname = "zotero-better-notes";
-    version = "3.3.0-beta.4";
+    version = "3.3.0-beta.5";
     src = fetchurl {
-      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.0-beta.4/better-notes-for-zotero.xpi";
-      sha256 = "sha256-jLgeldrBTVFNN820w33GWdSeZLj6M3/3JRdbf6T06hU=";
+      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.0-beta.5/better-notes-for-zotero.xpi";
+      sha256 = "sha256-SjvJqCkVw/gb77RD5dAVUXXdfyrAXgNjE1vweDoHQM4=";
     };
   };
   zotero-notero = {
