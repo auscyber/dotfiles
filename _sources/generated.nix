@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "4f1bc3211c2402614484bdfbc12deccbb2182969";
+    version = "ed8af7a49f5b3963fcf88d772372cd93e949f63c";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "4f1bc3211c2402614484bdfbc12deccbb2182969";
+      rev = "ed8af7a49f5b3963fcf88d772372cd93e949f63c";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-t4m8hiatezn1BCMFHeLzHtMccaqYf9Ux7evfKzM3rrs=";
+      sha256 = "sha256-Xyj2yPU7Sd6WTWHrVAmx2JGGvUihM5jq79yXbLUz9Qk=";
     };
-    date = "2026-08-04";
+    date = "2026-08-05";
   };
   cotabby = {
     pname = "cotabby";
@@ -225,18 +225,18 @@
   };
   zotero-papersgpt = {
     pname = "zotero-papersgpt";
-    version = "papersgpt-v0.6.1";
+    version = "papersgpt-v1.0.0";
     src = fetchurl {
-      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v0.6.1/papersgpt-v0.6.1.xpi";
-      sha256 = "sha256-4O9FGvcxwqV4Hxey3AmYkDMy2CiA1krp/fO/Ei0Ijx8=";
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.0.0/papersgpt-v1.0.0.xpi";
+      sha256 = "sha256-PqViilL8NeL9Oqkb+vhdNcAB1NhDBzC6SWnIO3zEdHc=";
     };
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.0.0-beta.3";
+    version = "2.0.0";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0-beta.3/zotlit-zotero-2.0.0-beta.3.xpi";
-      sha256 = "sha256-M7t7Sxk2Im7DwUvzBaVUf27uhOcAyOQvW/Y/HTmk+So=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0/zotlit-zotero-2.0.0.xpi";
+      sha256 = "sha256-dYIDdmrGNSSOXR2c0xERjBso4/LJ6jj8jTakXEu9INo=";
     };
   };
 }
