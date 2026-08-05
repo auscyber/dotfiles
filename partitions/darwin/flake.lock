@@ -155,11 +155,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1785822975,
-        "narHash": "sha256-QBN5aJ2NugKgpI6NpGGYSZqdohyWCudyMaZVilEz9ac=",
+        "lastModified": 1785926816,
+        "narHash": "sha256-CYhEJIFUbpJLzjgT1npxur6bO+623jRboXRBHgN17cA=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "52503524506c69878929326195e343131487c451",
+        "rev": "1b230103b56cceba9efd6a279e88365746fca6fb",
         "type": "github"
       },
       "original": {
@@ -171,11 +171,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1785818391,
-        "narHash": "sha256-VSWeAFonFCS3jCtC8QR528UFJ7yKlNj6AB4fLqg7XPw=",
+        "lastModified": 1785926669,
+        "narHash": "sha256-z9tPehMe/8S3aFDlGVNQ1imzbmsEvaueBdtJCI2odFY=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "d60fb1537df205e147519dea8317fbad31cc6709",
+        "rev": "dfc5f60f115579f07eae2361304bd56aa4d88482",
         "type": "github"
       },
       "original": {
@@ -401,11 +401,11 @@
     "idris2PackDbSrc": {
       "flake": false,
       "locked": {
-        "lastModified": 1785799581,
-        "narHash": "sha256-eybHCoc6cVQdFLpyotzeIg0Q1MWFDhVmTAY1RTpdu1w=",
+        "lastModified": 1785896988,
+        "narHash": "sha256-UuQ5kkdKQdmivhC5z9k58zb7uVN+AQALEXfi2EnPZtY=",
         "owner": "stefan-hoeck",
         "repo": "idris2-pack-db",
-        "rev": "f8608fd7060e0f6eea469bc246df21269c3185b6",
+        "rev": "b1e5ca33645ad0285ca88801268770ed1d7c2e2b",
         "type": "github"
       },
       "original": {
@@ -422,11 +422,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1785817439,
-        "narHash": "sha256-9ntRa8UIxZmDRtmAV2Khy4R8HYY44OVDFOcwwK0TKc0=",
+        "lastModified": 1785903754,
+        "narHash": "sha256-2aiMZGZT8vZsXcm5kyitbRqa6ZZWlg/02gn27ecb/hE=",
         "owner": "mattpolzin",
         "repo": "nix-idris2-packages",
-        "rev": "98f7d7a71525e67e88e6603f2f6d1f99a89a4bc6",
+        "rev": "34ceccc23dfabd4ec79edf309e9143d69fcc3870",
         "type": "github"
       },
       "original": {
@@ -617,11 +617,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785819314,
-        "narHash": "sha256-FgzG5gHjX2EV2xnGvqGaHifNO3Ii1Jyge9boSM86z+M=",
+        "lastModified": 1785834311,
+        "narHash": "sha256-qp0yfvSffwhOaPMvZmpcqxjH4X7NpFsTceHnsi8+Hjc=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "a412f8a8e0962e7a3ed8438f2d778de12e50f148",
+        "rev": "b16bf58f649ed1e48faab52d493eaac85291c6da",
         "type": "github"
       },
       "original": {

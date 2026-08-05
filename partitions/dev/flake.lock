@@ -29,11 +29,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1785518313,
-        "narHash": "sha256-anlq3YQDCsNrkNlu3HTg4dEIpRugwnyAVUxoPcBmA/U=",
+        "lastModified": 1785892481,
+        "narHash": "sha256-1JTy9/LyITSBP1a4WZ9tmOv2yDh9OTbA3YUJbQHiMYc=",
         "owner": "serokell",
         "repo": "deploy-rs",
-        "rev": "b974715a27b49fadbf3bf6d85e26bcb3109daa6d",
+        "rev": "f6f2359a6cb7e3c51ea673bcb39933ac2622350d",
         "type": "github"
       },
       "original": {
