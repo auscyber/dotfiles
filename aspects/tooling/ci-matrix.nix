@@ -7,15 +7,21 @@
 # needs `nix-github-actions`, and it lives in the `dev` partition so that input
 # stays out of the root flake.lock (see ../../partition-map.nix).
 #
-#   * `.#ciMatrix.matrix` is a GitHub matrix (one row per host, each system mapped
-#     to a runner) that .github/workflows/systems.yml evaluates AT RUN TIME
-#     (`nix eval` in a matrix job, `fromJSON` in the build job) -- a proper dynamic
-#     matrix, not baked into the YAML. `.#ciMatrix.checks.<system>."<name>"` is the
-#     buildable toplevel each row targets.
-#   * The build jobs run `nix build` against THIS flake with `accept-flake-config`,
-#     so they pick up substituters + trusted-public-keys straight from the flake's
-#     nixConfig -- everything derived from aspects/base/celler-keys.json -- with
-#     nothing hardcoded in the workflow.
+#   * `.#ciMatrix.checks.<system>."<name>"` is the buildable toplevel for each
+#     host. .github/workflows/systems.yml runs `nix-fast-build` against
+#     `.#ciMatrix.checks.<system>` once per system type (not once per host),
+#     so it never needs to enumerate individual host names -- nix-fast-build's
+#     own nix-eval-jobs pass discovers every `<name>` under that attrset at
+#     run time.
+#   * `.#ciMatrix.matrix` is a GitHub matrix (one row per host, each system
+#     mapped to a runner) that `mkGithubMatrix` produces alongside `checks` --
+#     nothing in .github/workflows/ evaluates it anymore (it predates the
+#     one-job-per-arch build below), but it's cheap to keep since `checks` and
+#     `matrix` come from the same `mkGithubMatrix` call.
+#   * The build jobs run `nix-fast-build`/`nix build` against THIS flake with
+#     `accept-flake-config`, so they pick up substituters + trusted-public-keys
+#     straight from the flake's nixConfig -- everything derived from
+#     aspects/base/celler-keys.json -- with nothing hardcoded in the workflow.
 let
   self = inputs.self;
 

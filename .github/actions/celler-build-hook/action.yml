@@ -1,0 +1,78 @@
+name: "Set up a celler post-build-hook"
+description: >
+  Write a Nix post-build-hook script that pushes every derivation the job's
+  nix daemon builds to the celler cache the moment it finishes, instead of a
+  single bulk push after the whole job completes. Run this BEFORE
+  cachix/install-nix-action and pass its `hook-path` output as that action's
+  `post-build-hook` nix.conf line.
+
+inputs:
+  celler-token:
+    description: >
+      Celler push token. Leave empty (e.g. on a fork pull_request, which has
+      no access to the real secret) to make the hook a silent no-op.
+    required: false
+    default: ""
+
+outputs:
+  hook-path:
+    description: "Absolute path to the generated hook script."
+    value: ${{ steps.write.outputs.hook-path }}
+
+runs:
+  using: "composite"
+  steps:
+    # post-build-hook runs as a subprocess of the system nix-daemon, which was
+    # started before this job's steps ran -- it does NOT inherit this shell's
+    # env (secrets, $GITHUB_WORKSPACE, etc), so every value the hook needs is
+    # baked into the script's text here rather than read from the
+    # environment at hook-run time.
+    - id: write
+      shell: bash
+      run: |
+        set -euo pipefail
+        token_file="$RUNNER_TEMP/celler-build-hook.token"
+        bin_cache="$RUNNER_TEMP/celler-build-hook.bin-path"
+        hook="$RUNNER_TEMP/celler-build-hook.sh"
+        rm -f "$bin_cache" "$bin_cache.logged-in"
+
+        # Empty when the token input is empty (pull_request) -- the script
+        # below checks `-s` on this file and no-ops the push in that case.
+        printf '%s' "${{ inputs.celler-token }}" > "$token_file"
+        chmod 600 "$token_file"
+
+        cat > "$hook" <<EOF
+        #!/bin/sh
+        set -eu
+        set -f # disable globbing -- \$OUT_PATHS is word-split below, not globbed
+        export IFS=' '
+
+        TOKEN_FILE="$token_file"
+        BIN_CACHE="$bin_cache"
+        FLAKE_DIR="$GITHUB_WORKSPACE"
+
+        if [ ! -s "\$TOKEN_FILE" ]; then
+          exit 0
+        fi
+
+        # Resolve + cache the celler binary once per job instead of once per
+        # build event -- this hook fires for every derivation the job
+        # actually builds (not just the top-level host), and re-evaluating
+        # ".#celler" every time would add that cost to each one.
+        if [ -s "\$BIN_CACHE" ]; then
+          CELLER_BIN="\$(cat "\$BIN_CACHE")"
+        else
+          CELLER_BIN="\$(nix build --no-link --print-out-paths "\$FLAKE_DIR#celler")/bin/celler"
+          printf '%s' "\$CELLER_BIN" > "\$BIN_CACHE"
+        fi
+
+        if [ ! -e "\$BIN_CACHE.logged-in" ]; then
+          "\$CELLER_BIN" login --set-default main https://cache.ivymect.in "\$(cat "\$TOKEN_FILE")"
+          touch "\$BIN_CACHE.logged-in"
+        fi
+
+        echo "celler-build-hook: uploading \$OUT_PATHS" >&2
+        "\$CELLER_BIN" push main \$OUT_PATHS
+        EOF
+        chmod +x "$hook"
+        echo "hook-path=$hook" >> "$GITHUB_OUTPUT"

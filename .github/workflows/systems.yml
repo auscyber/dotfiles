@@ -6,24 +6,47 @@ on:
       - master
   workflow_dispatch:
 
-# Dynamic matrix: the `matrix` job evaluates `.#ciMatrix.matrix` (nix-github-
-# actions, from aspects/tooling/ci.nix) at run time and splits it three ways,
-# one bucket per arch (`matrix-x86_64-linux`, `matrix-aarch64-linux`,
-# `matrix-darwin`), so each of the three host-build calls below can depend on
-# its own matching celler gate job (plus the shared warm-patched-inputs gate,
-# see below). fail-fast: false -> one machine failing never stops the others.
-# All jobs `accept-flake-config`, so substituters + trusted-public-keys come
-# from the flake's nixConfig (built
-# from aspects/base/celler-keys.json) -- nothing hardcoded here, except in the
-# jobs that need celler's cache to actually be trusted before celler itself is
-# installed (see extra-trusted-substituters below).
+# One job per system type (x86_64-linux, aarch64-linux, aarch64-darwin), not
+# one job per host: each build-<arch> job below points `nix-fast-build` (see
+# aspects/tooling/ci.nix) at `.#ciMatrix.checks.<arch>` -- the full set of
+# host toplevels for that arch, computed by aspects/tooling/ci-matrix.nix --
+# and builds every host of that arch in one nix-eval-jobs-driven pass.
+# Deliberately scoped to `.checks.<arch>` (not `.checks` + a `--systems`
+# filter): nix-fast-build force-recurses the whole attrset it's pointed at
+# before filtering by system, so pointing it at the single matching arch
+# (and letting `--systems` default to the runner's own native system) skips
+# evaluating the other two arches' host configs entirely on every job,
+# instead of evaluating all three redundantly on all three runners. That
+# replaces what used to be a GitHub Actions matrix job PER HOST (one
+# checkout/install-nix/cache-restore per host, all duplicated N times per
+# arch); now it happens exactly once per arch, and nix-fast-build's own
+# parallel evaluation+build keeps hosts of the same arch building
+# concurrently inside that one job. fail-fast is nix-fast-build's own
+# behaviour (it builds/reports every job, doesn't stop at the first
+# failure) -- one host failing to build never stops its arch-mates.
 #
-# `celler-<system>` makes sure the `celler` client itself (`.#celler`, exposed
-# by aspects/tooling/ci.nix) is present in the cache for that one arch, via
-# ./.github/actions/ensure-celler (builds and dogfood-pushes it only if it's
-# actually missing -- a hit is one cheap query). One gate job per arch (rather
-# than per host) means it happens exactly once per arch instead of racing N
-# copies of itself across every host that shares that arch.
+# Each build-<arch> job also wires up a real Nix `post-build-hook`
+# (.github/actions/celler-build-hook, mirroring the same mechanism
+# aspects/base/caches.nix uses on real hosts) so every derivation it builds
+# is pushed to celler the moment it finishes, rather than in a single bulk
+# push at job end -- with N hosts now sharing one job, a bulk end-of-job
+# push would mean a fast host's result sits unpushed until the slowest host
+# in its arch finishes (or is lost entirely if the job times out).
+#
+# All jobs `accept-flake-config`, so substituters + trusted-public-keys come
+# from the flake's nixConfig (built from aspects/base/celler-keys.json) --
+# nothing hardcoded here, except in the jobs that need celler's cache to
+# actually be trusted before celler itself is installed (see
+# extra-trusted-substituters below).
+#
+# `celler-<system>` makes sure the `celler` client itself (`.#celler`,
+# exposed by aspects/tooling/ci.nix) is present in the cache for that one
+# arch, via ./.github/actions/ensure-celler (builds and dogfood-pushes it
+# only if it's actually missing -- a hit is one cheap query). One gate job
+# per arch (rather than per host) means it happens exactly once per arch,
+# and the build-<arch> jobs (plus their post-build-hook, which also shells
+# out to `.#celler`) depend on it so `.#celler` is always a cache hit by the
+# time they need it.
 #
 # `warm-patched-inputs` builds and pushes every patched-input FOD
 # (packages.patched-inputs-warm, aspects/tooling/patch-inputs.nix) once,
@@ -34,58 +57,7 @@ on:
 # patched-input FOD themselves: no cache-miss race, no falling back to a
 # foreign x86_64-linux builder on aarch64-linux/aarch64-darwin (which is what
 # `--impure` used to paper over).
-#
-# `build-<system>` each call the reusable ./.github/workflows/build-host.yml
-# once per host (via `strategy.matrix`, which reusable-workflow calls
-# support), so the actual build/push steps are defined in one place. Each
-# needs its own matching celler-<system> gate plus warm-patched-inputs --
-# the latter is a deliberate shared cross-arch wait (via its own dependency
-# on celler-x86_64-linux), needed so no build-<system> job builds the
-# patched inputs itself.
 jobs:
-  matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix-x86_64-linux: ${{ steps.set.outputs.matrix-x86_64-linux }}
-      matrix-aarch64-linux: ${{ steps.set.outputs.matrix-aarch64-linux }}
-      matrix-darwin: ${{ steps.set.outputs.matrix-darwin }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-          extra_nix_config: |
-            experimental-features = nix-command flakes pipe-operators
-            accept-flake-config = true
-            fallback = true
-            connect-timeout = 5
-      - uses: ./.github/actions/nix-cache
-      - id: set
-        run: |
-          set -euo pipefail
-          matrix="$(nix eval --json .#ciMatrix.matrix)"
-          if [ -z "$matrix" ] || [ "$matrix" = "null" ]; then
-            echo "::error::.#ciMatrix.matrix produced nothing — flake eval failed above" >&2
-            exit 1
-          fi
-          # .os can be either a plain runner-label string or a list of labels
-          # (nix-github-actions emits either), so normalize to a list before
-          # matching -- a bare string == comparison would silently miss every
-          # row if .os happens to come back as a list. Match with `index`
-          # (exact element equality), NOT `contains`: jq's `contains` is a deep
-          # SUBSTRING test, so `["ubuntu-24.04-arm"] | contains(["ubuntu-24.04"])`
-          # is true and an aarch64 row would leak into the x86_64 bucket (built
-          # on the wrong-arch runner).
-          filter='def osIs(x): ((.os | if type == "array" then . else [.] end) | index(x)) != null; {include: [.include[] | select(osIs($os))]}'
-          x8664="$(jq -c --arg os ubuntu-24.04 "$filter" <<<"$matrix")"
-          aarch64linux="$(jq -c --arg os ubuntu-24.04-arm "$filter" <<<"$matrix")"
-          darwin="$(jq -c --arg os macos-14 "$filter" <<<"$matrix")"
-          echo "matrix-x86_64-linux=$x8664" >> "$GITHUB_OUTPUT"
-          echo "matrix-aarch64-linux=$aarch64linux" >> "$GITHUB_OUTPUT"
-          echo "matrix-darwin=$darwin" >> "$GITHUB_OUTPUT"
-
   celler-x86_64-linux:
     name: celler (x86_64-linux)
     runs-on: ubuntu-24.04
@@ -199,54 +171,115 @@ jobs:
           celler-token: ${{ secrets.CELLER_TOKEN }}
 
   build-x86_64-linux:
-    needs: [matrix, celler-x86_64-linux, warm-patched-inputs]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-x86_64-linux) }}
-    uses: ./.github/workflows/build-host.yml
-    with:
-      name: ${{ matrix.name }}
-      os: ${{ toJSON(matrix.os) }}
-      attr: ${{ matrix.attr }}
-    secrets: inherit
+    name: build (x86_64-linux)
+    needs: [celler-x86_64-linux, warm-patched-inputs]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # Must run BEFORE install-nix-action: it writes the post-build-hook
+      # script that install-nix-action's nix.conf points at below.
+      - uses: ./.github/actions/celler-build-hook
+        id: build-hook
+        with:
+          celler-token: ${{ github.event_name != 'pull_request' && secrets.CELLER_TOKEN || '' }}
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            post-build-hook = ${{ steps.build-hook.outputs.hook-path }}
+      - uses: ./.github/actions/nix-cache
+      - name: Build every x86_64-linux host
+        run: |
+          set -euo pipefail
+          nix run .#nix-fast-build -- \
+            --flake ".#ciMatrix.checks.x86_64-linux" \
+            --skip-cached \
+            --no-link
 
   build-aarch64-linux:
-    needs: [matrix, celler-aarch64-linux, warm-patched-inputs]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-aarch64-linux) }}
-    uses: ./.github/workflows/build-host.yml
-    with:
-      name: ${{ matrix.name }}
-      os: ${{ toJSON(matrix.os) }}
-      attr: ${{ matrix.attr }}
-    secrets: inherit
+    name: build (aarch64-linux)
+    needs: [celler-aarch64-linux, warm-patched-inputs]
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/celler-build-hook
+        id: build-hook
+        with:
+          celler-token: ${{ github.event_name != 'pull_request' && secrets.CELLER_TOKEN || '' }}
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            post-build-hook = ${{ steps.build-hook.outputs.hook-path }}
+      - uses: ./.github/actions/nix-cache
+      - name: Build every aarch64-linux host
+        run: |
+          set -euo pipefail
+          nix run .#nix-fast-build -- \
+            --flake ".#ciMatrix.checks.aarch64-linux" \
+            --skip-cached \
+            --no-link
 
   build-darwin:
-    needs: [matrix, celler-aarch64-darwin, warm-patched-inputs]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.matrix.outputs.matrix-darwin) }}
-    uses: ./.github/workflows/build-host.yml
-    with:
-      name: ${{ matrix.name }}
-      os: ${{ toJSON(matrix.os) }}
-      attr: ${{ matrix.attr }}
-    secrets: inherit
+    name: build (aarch64-darwin)
+    needs: [celler-aarch64-darwin, warm-patched-inputs]
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/celler-build-hook
+        id: build-hook
+        with:
+          celler-token: ${{ github.event_name != 'pull_request' && secrets.CELLER_TOKEN || '' }}
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            post-build-hook = ${{ steps.build-hook.outputs.hook-path }}
+      - uses: ./.github/actions/nix-cache
+      - name: Build every aarch64-darwin host
+        run: |
+          set -euo pipefail
+          nix run .#nix-fast-build -- \
+            --flake ".#ciMatrix.checks.aarch64-darwin" \
+            --skip-cached \
+            --no-link
 
-  # GitHub reports one check per matrix leg (e.g. "build-x86_64-linux
-  # (nixos-auspc)"), not one for the build-<arch> job as a whole, so nothing
-  # otherwise turns the overall run red when a single host fails to build.
-  # This job runs unconditionally (if: always(), so it still runs even though
-  # some of its needs may have failed) after everything else finishes and
-  # fails loudly if anything it depends on did -- fail-fast: false above
-  # already keeps a failing host from cancelling its siblings, this job just
-  # makes that failure visible instead of leaving it buried in one leg.
+  # One job per arch now (rather than one leg per host), so a build-<arch>
+  # job going red already makes the run red -- this just aggregates the gate
+  # jobs alongside the three build jobs into a single friendly check, and
+  # still runs unconditionally (if: always()) so it reports even when one of
+  # its needs failed or was skipped.
   ci:
     name: CI
     if: always()
     needs:
-      - matrix
       - celler-x86_64-linux
       - celler-aarch64-linux
       - celler-aarch64-darwin
