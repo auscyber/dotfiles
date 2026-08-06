@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-5byVy+3mvCMNAuRHsDlLufPZXGbBXV/byFd1z4lmokQ=",
+            "sha256": "sha256-hhNnIQIfv9Qcrg2kzepSE8AME7Y70GkM0ELssEtV+F8=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.1.1/helium-0.15.1.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.2.1/helium-0.15.2.1-x86_64_linux.tar.xz"
         },
-        "version": "0.15.1.1"
+        "version": "0.15.2.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-N2W+rfqJbjv+lKnVJj7sct8vl+L2/8E3fstmmCYd7Ww=",
+            "sha256": "sha256-+onoZkK37fwg0upK0A03xGmMORC0e8+ozeHqN/2j/X8=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.1.1/helium_0.15.1.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.2.1/helium_0.15.2.1_arm64-macos.dmg"
         },
-        "version": "0.15.1.1"
+        "version": "0.15.2.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -393,7 +393,7 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-PqViilL8NeL9Oqkb+vhdNcAB1NhDBzC6SWnIO3zEdHc=",
+            "sha256": "sha256-Cb0dNSIM22exvUFP2pVCEIWRohpC3e7uawokZwwkZcg=",
             "type": "url",
             "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.0.0/papersgpt-v1.0.0.xpi"
         },
@@ -409,10 +409,10 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-dYIDdmrGNSSOXR2c0xERjBso4/LJ6jj8jTakXEu9INo=",
+            "sha256": "sha256-vxkBUOWmPJRwVMzmSje1M1iJ8J8dFtAXUaAqR7pe03U=",
             "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0/zotlit-zotero-2.0.0.xpi"
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.1/zotlit-zotero-2.0.1.xpi"
         },
-        "version": "2.0.0"
+        "version": "2.0.1"
     }
 }
