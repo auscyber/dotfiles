@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.15.1.1";
+    version = "0.15.2.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.1.1/helium-0.15.1.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-5byVy+3mvCMNAuRHsDlLufPZXGbBXV/byFd1z4lmokQ=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.2.1/helium-0.15.2.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-hhNnIQIfv9Qcrg2kzepSE8AME7Y70GkM0ELssEtV+F8=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.15.1.1";
+    version = "0.15.2.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.1.1/helium_0.15.1.1_arm64-macos.dmg";
-      sha256 = "sha256-N2W+rfqJbjv+lKnVJj7sct8vl+L2/8E3fstmmCYd7Ww=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.2.1/helium_0.15.2.1_arm64-macos.dmg";
+      sha256 = "sha256-+onoZkK37fwg0upK0A03xGmMORC0e8+ozeHqN/2j/X8=";
     };
   };
   jankyborders = {
@@ -228,15 +228,15 @@
     version = "papersgpt-v1.0.0";
     src = fetchurl {
       url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.0.0/papersgpt-v1.0.0.xpi";
-      sha256 = "sha256-PqViilL8NeL9Oqkb+vhdNcAB1NhDBzC6SWnIO3zEdHc=";
+      sha256 = "sha256-Cb0dNSIM22exvUFP2pVCEIWRohpC3e7uawokZwwkZcg=";
     };
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.0.0";
+    version = "2.0.1";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.0/zotlit-zotero-2.0.0.xpi";
-      sha256 = "sha256-dYIDdmrGNSSOXR2c0xERjBso4/LJ6jj8jTakXEu9INo=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.1/zotlit-zotero-2.0.1.xpi";
+      sha256 = "sha256-vxkBUOWmPJRwVMzmSje1M1iJ8J8dFtAXUaAqR7pe03U=";
     };
   };
 }
