@@ -98,6 +98,24 @@ let
 in
 {
   debug = true;
+
+  # The celler overlay lives in the `packages` registry, not on
+  # `den.aspects.celler{,-push}`. The class route that feeds the perSystem `pkgs`
+  # (`overlays-to-flake-parts` in ../tooling/overlays.nix) only sees aspects that
+  # are *resolved* in the flake-parts scope, which it populates by resolving
+  # `den.hosts` -- and every host that includes a celler aspect (secondpc, auspc,
+  # laptop) lives in a partition, so the base evaluation resolved none of them and
+  # collected no celler overlay at all. That left the `perSystem` at the bottom of
+  # this file, which is in the base, without `pkgs.celler`.
+  #
+  # `den.aspects.packages.*` is exempt: overlays.nix walks that registry directly
+  # (`collectPackageOverlays`) regardless of inclusion, so the overlay reaches the
+  # perSystem `pkgs` unconditionally. Hosts still get it the normal way, by
+  # `includes`-ing this aspect below -- the same shape as ./ivy-fetch.nix.
+  den.aspects.packages.celler.overlays.celler = lib.optional (
+    inputs ? celler
+  ) inputs.celler.overlays.default;
+
   den.default.nix.settings = {
     trusted-substituters = builtins.attrNames caches;
     substituters = builtins.attrNames caches;
@@ -134,7 +152,7 @@ in
       port = 8069;
     in
     {
-      overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
+      includes = [ den.aspects.packages.celler ];
 
       vhosts.${vhost} = {
         useACMEHost = "ivymect.in";
@@ -235,8 +253,8 @@ in
   den.aspects.celler-push = {
     includes = [
       den.aspects.agenix-rekey
+      den.aspects.packages.celler
     ];
-    overlays.celler = lib.optional (inputs ? celler) inputs.celler.overlays.default;
     homeManager =
       {
         pkgs,

@@ -52,7 +52,25 @@
 
     overlays = { inputs', ... }: {
       idris2Packages = final: prev: {
-        idris2Packages = inputs'.idris2Packages.packages.idris2Packages;
+        idris2Packages =
+          let
+            inherit (prev) lib;
+            upstream = inputs'.idris2Packages.packages.idris2Packages;
+            # Idris2's own nix/package.nix writes `lib.optional cond [ pkg ]`,
+            # which yields `[ [ pkg ] ]`. nixpkgs 26.05 deprecates nested lists
+            # in dependency attributes, so every eval that forces idris2 traces
+            # a "uses a nested list in attribute 'nativeBuildInputs'" warning.
+            # stdenv already flattens these, so flattening here is drv-identical
+            # (verified: same .drv hash) -- it only silences the trace, and does
+            # not invalidate the cachix-substituted build.
+            unnest =
+              drv:
+              drv.overrideAttrs (o: {
+                nativeBuildInputs = lib.flatten (o.nativeBuildInputs or [ ]);
+                buildFlags = lib.flatten (o.buildFlags or [ ]);
+              });
+          in
+          upstream.override { idris2 = unnest upstream.idris2; };
       };
     };
     homeManager = { pkgs, ... }: {

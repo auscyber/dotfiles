@@ -217,8 +217,8 @@ local function reorder_left_items()
 		_G.reorder_left_items(M.last_item)
 		return
 	end
-	sbar.exec("sketchybar --move chevron after " .. M.last_item)
-	sbar.exec("sketchybar --move front_app after chevron")
+	paneru.exec("sketchybar --move chevron after " .. M.last_item)
+	paneru.exec("sketchybar --move front_app after chevron")
 end
 
 -- The bar items for every row: the row number, its icon slots, and the pill
