@@ -11,6 +11,13 @@
     # block above with GPT's own brew tap/formula instead. Rosetta (needed to
     # run GPT's x86_64 wine64 under translation) is already turned on by
     # `nix-homebrew.enableRosetta` in aspects/darwin/homebrew.nix.
+    # The formula's .dmg is gated behind an Apple Developer login, so `brew
+    # install` can't fetch it itself -- download it from developer.apple.com
+    # by hand once and drop it into Homebrew's download cache at the path/name
+    # `brew install apple/apple/game-porting-toolkit` reports missing (or
+    # `brew fetch --force apple/apple/game-porting-toolkit` to print it without
+    # installing); onActivation's `brew bundle` picks it up from cache after
+    # that, no re-download.
     brew = {
       taps.apple = "apple/homebrew-apple";
       brews = [ "apple/apple/game-porting-toolkit" ];
