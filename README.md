@@ -1867,6 +1867,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 | Package | Version | Description |
 |---------|---------|-------------|
+| celler | `0.1.0` | Multi-tenant Nix binary cache system |
 | cotabby | `v0.6.2-beta` |  |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
 | helium | `0.15.2.1` | Private, fast, and honest web browser based on Chromium |
