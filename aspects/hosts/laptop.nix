@@ -188,7 +188,7 @@
       den.aspects.cotabby
       #      <zen>
     ];
-    provides.Ivys-MacBook-Pro.includes = [ den.aspects.laptop-brew ];
+    provides.Ivys-MacBook-Pro.includes = [ den.aspects.laptop-brew den.aspects.darwin-gaming ];
     provides.Ivys-MacBook-Pro.provides.to-users = {
       homeManager = { pkgs, ... }: {
         # Off the 8080 default so it doesn't collide with anything else that

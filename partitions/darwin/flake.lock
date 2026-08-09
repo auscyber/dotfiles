@@ -152,6 +152,22 @@
         "type": "github"
       }
     },
+    "homebrew-apple": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1700101961,
+        "narHash": "sha256-VGt2OfrqnxyqJCsd6c4I7BP3EhcMrPbOLP7WBL5Mh4I=",
+        "owner": "apple",
+        "repo": "homebrew-apple",
+        "rev": "2bc44284e24d39ed64d6f492a0e1f4c47a5ced08",
+        "type": "github"
+      },
+      "original": {
+        "owner": "apple",
+        "repo": "homebrew-apple",
+        "type": "github"
+      }
+    },
     "homebrew-cask": {
       "flake": false,
       "locked": {
@@ -617,13 +633,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1786077074,
-        "narHash": "sha256-TiJg1gItJOlCDCgzjX0raPLx8D1jWQ6i5EuwDvsKljE=",
         "lastModified": 1786189409,
         "narHash": "sha256-FL4ALxWNnNXBMDEQerUM9FmS10vA+m0a7Gu9pXJ0NWo=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "4c80d1d859350ec70b678df4a15a62198c321edb",
         "rev": "a8b82df5e7dfb6b15c6b29ef1bef1a1db707740c",
         "type": "github"
       },
@@ -637,6 +650,7 @@
     "root": {
       "inputs": {
         "crane": "crane",
+        "homebrew-apple": "homebrew-apple",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "homebrew-speedtest": "homebrew-speedtest",

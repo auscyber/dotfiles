@@ -13,6 +13,10 @@
 
   inputs = {
     crane.url = "github:ipetkov/crane/2c71e194474d13de031d729b729c968ddbe3507f";
+    homebrew-apple = {
+      url = "github:apple/homebrew-apple";
+      flake = false;
+    };
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
