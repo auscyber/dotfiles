@@ -10,6 +10,7 @@
       "study"
       "gui"
       "dev"
+      "gaming"
     ];
     users.ivypierlot = {
       wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
@@ -19,6 +20,7 @@
         "study"
         "gui"
         "dev"
+        "gaming"
       ];
     };
   };
