@@ -42,6 +42,7 @@
 - cotabby
 - darwin-base
 - darwin-finder
+- darwin-gaming
 - darwin-general
 - darwin-hmApps
 - dev
@@ -60,6 +61,7 @@
 - insecure-predicate/user
 - ivy-fetch
 - ivypierlot
+- ivypierlot/Ivys-MacBook-Pro
 - jujutsu
 - karabiner-driver
 - lib
@@ -178,6 +180,7 @@ graph LR
   celler_push["celler-push"]:::celler_push_c
   claude["claude"]:::claude_c
   cotabby["cotabby"]:::cotabby_c
+  darwin_gaming["darwin-gaming"]:::darwin_gaming_c
   dev["dev"]:::dev_c
   dev_cli["dev-cli"]:::dev_cli_c
   dev_nix["dev-nix"]:::dev_nix_c
@@ -190,6 +193,7 @@ graph LR
   idris["idris"]:::idris_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
   ivypierlot{{"ivypierlot"}}:::ivypierlot_c
+  ivypierlot__Ivys_MacBook_Pro["ivypierlot/Ivys-MacBook-Pro"]:::ivypierlot__Ivys_MacBook_Pro_c
   llama_cpp["llama-cpp"]:::llama_cpp_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   mcp_servers["mcp-servers"]:::mcp_servers_c
@@ -237,6 +241,7 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
+  ivypierlot__Ivys_MacBook_Pro --> darwin_gaming
   main_ssh_key --> pam_rssh_user_ivypierlot
   neovim --> stylix
   nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
@@ -260,6 +265,7 @@ graph LR
   classDef cotabby_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_base_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef darwin_gaming_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef darwin_general_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef darwin_hmApps_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -285,6 +291,7 @@ graph LR
   classDef insecure_predicate__user_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef ivypierlot__Ivys_MacBook_Pro_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef karabiner_driver_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
