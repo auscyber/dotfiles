@@ -144,9 +144,14 @@
         # claimed by ./partition-map.nix is deliberately NOT imported here: that
         # is what keeps its `ff.*` inputs out of this file and out of flake.lock.
         # See aspects/framework/partitions.nix.
+        partitionMap = import ./partition-map.nix;
+
         aspectPartitions = lib.aspectPartitions {
           dir = ./aspects;
-          map = (import ./partition-map.nix).buckets;
+          map = partitionMap.buckets;
+          # A bucket every host needs (./packages) is imported back into the
+          # buckets the hosts live in; see aspects/framework/partitions.nix.
+          inherit (partitionMap) deps;
         };
       in
       inputs.flake-parts.lib.mkFlake
@@ -162,7 +167,7 @@
 
           _module.args.rootPath = ./.;
           _module.args.aspectPartitions = aspectPartitions // {
-          inherit ((import ./partition-map.nix)) stubs;
+          inherit (partitionMap) stubs;
         };
         }
     '';

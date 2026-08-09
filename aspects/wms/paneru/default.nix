@@ -9,7 +9,7 @@
     # Declared on the aspect, not the file: the partition generator reads
     # which aspect owns an input, and which platforms pull that aspect in.
     flake-file = _: {
-      inputs.paneru.url = "github:auscyber/paneru?ref=add-lua-stuff";
+      inputs.paneru.url = "github:auscyber/paneru?ref=testing";
       inputs.paneru.inputs.nixpkgs.follows = "nixpkgs";
       inputs.paneru.inputs.crane.follows = "crane";
     };

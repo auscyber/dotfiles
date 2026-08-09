@@ -64,6 +64,52 @@
       ];
     };
 
+    # Contribution to the `study` specialisation of whatever host resolves zen
+    # (aspects/framework/specialisations.nix). The blocklist belongs here, next to
+    # the browser it configures, rather than in a host file.
+    #
+    # Under `study.` -- the ROLE, aspects/framework/roles.nix -- so it only lands
+    # on machines whose host AND user actually carry the study role. Contributing
+    # it unconditionally would conjure a `study` profile onto every machine that
+    # merely has the browser (the mac mini), which is both surprising and a full
+    # extra system evaluation each time that machine is built.
+    #
+    # `WebsiteFilter` is an enterprise policy, so it cannot be clicked away from
+    # inside the browser; on macOS `programs.zen-browser.policies` is delivered
+    # through `targets.darwin.defaults.<darwinDefaultsId>` (home-manager
+    # modules/programs/firefox/mkFirefoxModule.nix), which is why the aspect sets
+    # `darwinDefaultsId` above. Patterns are match patterns, not regexes.
+    #
+    # `provides.to-users`, not plain `homeManager`: a contribution is composed in
+    # at the HOST root of the specialisation, and that is how host-level content
+    # reaches the machine's users.
+    study.specialisations.study.provides.to-users.homeManager = {
+      programs.zen-browser.policies.WebsiteFilter = {
+        Block = [
+          "*://*.youtube.com/*"
+          "*://*.reddit.com/*"
+          "*://*.twitter.com/*"
+          "*://*.x.com/*"
+          "*://*.instagram.com/*"
+          "*://*.tiktok.com/*"
+          "*://*.facebook.com/*"
+          "*://*.twitch.tv/*"
+          "*://*.netflix.com/*"
+          "*://*.discord.com/*"
+          "*://*.pinterest.com/*"
+          "*://*.tumblr.com/*"
+          "*://news.ycombinator.com/*"
+        ];
+        # Course content lives on YouTube often enough that a blanket block is
+        # the wrong tool; embeds and the two university-adjacent hosts stay.
+        Exceptions = [
+          "*://*.youtube.com/embed/*"
+          "*://*.youtube-nocookie.com/*"
+          "*://*.discord.com/api/*"
+        ];
+      };
+    };
+
     overlays = {
       zen =
         self: super:

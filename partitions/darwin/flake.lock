@@ -633,16 +633,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1786189409,
-        "narHash": "sha256-FL4ALxWNnNXBMDEQerUM9FmS10vA+m0a7Gu9pXJ0NWo=",
+        "lastModified": 1786710857,
+        "narHash": "sha256-uD+rVNXgjm723XTrLv846nEOP0QX8KSlHmp9AXdcMdo=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "a8b82df5e7dfb6b15c6b29ef1bef1a1db707740c",
+        "rev": "9e0259dbf18f4afa8f501e8f651e948f48b5fa82",
         "type": "github"
       },
       "original": {
         "owner": "auscyber",
-        "ref": "add-lua-stuff",
+        "ref": "testing",
         "repo": "paneru",
         "type": "github"
       }

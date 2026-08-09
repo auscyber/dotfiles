@@ -59,11 +59,58 @@
       "docs/default.nix"
       "framework/partition-map.nix"
     ];
+
+    # The ./packages tree, which tooling/extraPackages.nix imports wholesale.
+    # Claiming that one file moves all 19 package aspects out of the base
+    # evaluation, so a package can declare its own `ff.*` input without that
+    # input landing in the root flake.lock.
+    #
+    # Unlike the platform buckets this one is a DEPENDENCY (see `deps`): every
+    # host needs its overlays, so the buckets the hosts live in import it back.
+    packages = [
+      "tooling/extraPackages.nix"
+    ];
+  };
+
+  # Buckets whose partition is evaluated with another bucket's aspects imported
+  # too. Without this a host in `nixos` would resolve `den.aspects.packages.*`
+  # to the inert base stub below and silently lose every custom package -- a
+  # partition is base + its OWN aspects, never another bucket's.
+  #
+  # A dep's inputs are declared and locked once, in the dep's own sub-flake;
+  # aspects/framework/partitions.nix subtracts them from the dependent's
+  # generated flake.nix and merges them into its `extraInputs`.
+  deps = {
+    darwin = [ "packages" ];
+    dev = [ "packages" ];
+    nixos = [ "packages" ];
   };
 
   # Aspect names the bucketed files define. Consumed by
-  # aspects/framework/partitions.nix to stub them inert at base. Empty while the
-  # map is hand-written: it is picked so that no base file references a moved
-  # aspect, which is the condition stubs would otherwise paper over.
-  stubs = [ ];
+  # aspects/framework/partitions.nix to stub them inert at base.
+  #
+  # The platform buckets need none: the map is picked so that no base file
+  # references an aspect they moved. The `packages` bucket is the exception and
+  # the reason this list exists -- a dozen base aspects write
+  # `includes = [ den.aspects.packages.<name> ]`, so base needs every one of
+  # those keys to resolve to something. They resolve to `{ }` here and to the
+  # real definition inside whichever partition imports the bucket.
+  stubs = [
+    "packages/alx-wol"
+    "packages/cotabby"
+    "packages/eagle-nvim"
+    "packages/ghostty"
+    "packages/helium"
+    "packages/ivy-fetch"
+    "packages/jankyborders"
+    "packages/jj-mcp-server"
+    "packages/kanata-ls"
+    "packages/kanata-tray"
+    "packages/lspmux"
+    "packages/proton-ge-bin"
+    "packages/sketchybar"
+    "packages/sketchybar_app_font"
+    "packages/zotero-mcp"
+    "zotero"
+  ];
 }

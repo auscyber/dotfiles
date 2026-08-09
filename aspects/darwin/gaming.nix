@@ -9,11 +9,20 @@
     # cask (no compiling, no Apple-Developer-gated download).
     brew = {
       taps.gcenx = "gcenx/homebrew-wine";
-      casks = [ "game-porting-toolkit" ];
+      casks = [ "gcenx/wine/game-porting-toolkit" ];
     };
     darwin =
-      { pkgs, ... }:
+      { pkgs, config, ... }:
       {
+        nix-homebrew = {
+          enable = true;
+          enableRosetta = true;
+          user = config.system.primaryUser;
+          trust.taps = builtins.attrNames config.nix-homebrew.taps;
+          trust.casks = [ "gcenx/wine/game-porting-toolkit" ];
+          mutableTaps = false;
+          autoMigrate = true;
+        };
         environment.systemPackages = [
           (pkgs.writeShellApplication {
             name = "gpt-init-prefix";
@@ -27,8 +36,8 @@
               prefix="''${GPT_PREFIX:-$HOME/my-game-prefix}"
 
               if [[ ! -x "$wine64" ]]; then
-                echo "wine64 not found at '$wine64' -- is the game-porting-toolkit cask installed?" >&2
-                exit 1
+              	echo "wine64 not found at '$wine64' -- is the game-porting-toolkit cask installed?" >&2
+              	exit 1
               fi
 
               echo "Opening winecfg for '$prefix' -- select 'Windows 10' as the OS, then close it."

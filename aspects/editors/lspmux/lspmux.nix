@@ -288,7 +288,13 @@ in
     })
   ];
 
-  den.aspects.lspmux = { user, ... }: {
+  # NOT a bare parametric aspect (`den.aspects.lspmux = { user, ... }: { ... }`).
+  # den coerces that shape to `{ includes = [ fn ]; }`, so the content lands on an
+  # anonymous child aspect keyed by the args it was applied with -- a host-scope
+  # include and a user-scope include produce *two* children, both forwarding this
+  # `nvim` body into the same user's nixvim, and `options.lspmux.servers` gets
+  # declared twice. As a named aspect it dedupes by name from either scope.
+  den.aspects.lspmux = {
     includes = [
       den.aspects.packages.lspmux
       #        den.aspects.packages.kanata-ls
@@ -435,12 +441,6 @@ in
           ".cjs" = "javascript";
           ".jsx" = "javascriptreact";
         };
-      };
-      zls = {
-        package = pkgs.zls;
-        exe = "zls";
-        zed = "zls";
-        extensionToLanguage.".zig" = "zig";
       };
     };
 

@@ -6,12 +6,14 @@
   den.aspects.nixvim.includes = [
     (den.batteries.unfree [
       "cmp-nvim-lsp-document-symbol"
+      "copilot-language-server"
       "cmp-copilot"
     ])
     den.aspects.wakatime
   ];
   den.aspects.nixvim.unfreeAllowed = [
     "cmp-copilot"
+    "copilot-language-server"
     "copilot.vim"
     "idris2-vim"
     "presence.nvim"

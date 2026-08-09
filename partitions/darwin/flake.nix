@@ -37,7 +37,7 @@
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     nixpkgs.url = "github:nixos/nixpkgs/70ce234312134a463ba7728e94da2486a1d237ac";
     paneru = {
-      url = "github:auscyber/paneru?ref=add-lua-stuff";
+      url = "github:auscyber/paneru?ref=testing";
       inputs = {
         crane.follows = "crane";
         nixpkgs.follows = "nixpkgs";

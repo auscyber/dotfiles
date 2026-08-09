@@ -198,6 +198,19 @@ let
     "docs/default.nix"
     "framework/partition-map.nix"
   ];
+  # tooling/extraPackages.nix is nothing but `imports = ../../packages |> ...`,
+  # so it contributes no den content of its own and cannot be derived either.
+  manual.packages = [ "tooling/extraPackages.nix" ];
+
+  # Which buckets are evaluated with another bucket's aspects imported. Not
+  # derived -- it is a statement about what the partition mechanism has to carry,
+  # not about who uses what. Every host needs the ./packages overlays, and hosts
+  # live in the platform buckets. See ../../partition-map.nix and partitions.nix.
+  deps = {
+    darwin = [ "packages" ];
+    dev = [ "packages" ];
+    nixos = [ "packages" ];
+  };
 
   bucketMap = lib.mapAttrs (_: lib.sort (a: b: a < b)) (
     lib.zipAttrsWith (_: lib.concatLists) [
@@ -211,11 +224,26 @@ let
   # host uses karabiner-driver, but a base file still names it -- so base gets an
   # inert stub for each. Without this the base evaluation dies with
   # `attribute '<x>' missing` as soon as a definition moves into a bucket.
+  #
+  # The `packages` bucket needs a second source. Its files live in ./packages,
+  # outside the aspect tree, so `localDefs` filters them out and the path-based
+  # walk above finds nothing to stub -- while a dozen base aspects do write
+  # `den.aspects.packages.<name>`. Read those definitions straight off their own
+  # `den.*` locations instead.
+  packageStubs = builtins.concatMap (
+    d:
+    let
+      declared = d.value.aspects or { };
+    in
+    builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (builtins.attrNames declared)
+  ) (builtins.filter (d: (builtins.match ".*/packages/.*" d.file) != null) options.den.definitionsWithLocations);
+
   stubs = lib.sort (a: b: a < b) (
     lib.unique (
       builtins.concatMap (path: (contributions.${path} or { nestedAspects = [ ]; }).nestedAspects) (
         builtins.concatLists (builtins.attrValues bucketMap)
       )
+      ++ lib.optionals (bucketMap ? packages) packageStubs
     )
   );
   # ── Serialize the derived map back to ../../partition-map.nix ──────────────
@@ -237,17 +265,25 @@ let
     #
     # Entries are paths relative to ./aspects. A directory entry claims everything
     # under it. `stubs` are the aspect names bucketed files define, stubbed inert at
-    # base so a base file naming a moved aspect still resolves.'';
+    # base so a base file naming a moved aspect still resolves. `deps` are buckets
+    # evaluated with another bucket's aspects imported as well.'';
 
   bucketBlock =
     name: paths:
     "    ${name} = [\n${lib.concatMapStringsSep "\n" (p: "      \"${p}\"") paths}\n    ];";
+
+  depsBlock =
+    name: names: "    ${name} = [ ${lib.concatMapStringsSep " " (n: "\"${n}\"") names} ];";
 
   partitionMapText = ''
     ${fileHeader}
     {
       buckets = {
     ${lib.concatStringsSep "\n" (lib.mapAttrsToList bucketBlock bucketMap)}
+      };
+
+      deps = {
+    ${lib.concatStringsSep "\n" (lib.mapAttrsToList depsBlock deps)}
       };
 
       stubs = [
@@ -261,7 +297,7 @@ in
   # header comment for why the two are not the same thing yet.
   #   nix eval .#partitionMap.map --json | jq
   flake.partitionMap = {
-    inherit stubs;
+    inherit stubs deps;
     map = bucketMap;
   };
 

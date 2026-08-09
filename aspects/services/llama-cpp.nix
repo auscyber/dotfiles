@@ -78,7 +78,13 @@
 
           port = lib.mkOption {
             type = lib.types.port;
-            default = 8080;
+            # 8090, not llama-server's own 8080 default: 8080 is the port every
+            # ad-hoc dev server assumes. This used to be set per host, which
+            # meant the setting outlived the aspect -- a specialisation that
+            # excludes llama-cpp dropped the module while the host kept defining
+            # `programs.llama-cpp.port`, and the profile failed to evaluate on an
+            # option that no longer existed. The knob belongs with the aspect.
+            default = 8090;
             description = ''
               Port the shared llama-server (OpenAI-compatible) listens on.
               Every consumer (this service's own launchd/systemd unit, and any

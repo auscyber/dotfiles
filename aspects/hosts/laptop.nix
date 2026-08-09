@@ -34,93 +34,138 @@
       den.aspects.ccache
       den.aspects.sccache
       den.aspects.lix
+      den.aspects.laptop-dock
       #      den.aspects.builders
     ];
 
     provides.to-users.homeManager.programs.git.enable = true;
+
+    # "assessment": an exam/lockdown profile, expressed as this host minus the
+    # aspects that have no business running during an assessment. Building it
+    # re-resolves the whole aspect tree (users included) without them, so nothing
+    # here has to know *which* options each aspect happens to set -- the previous
+    # version of this was a hand-maintained list of `mkForce false` pokes that
+    # went stale the moment an aspect grew another service.
+    #
+    # Activate with the generation's own script:
+    #   /run/current-system/specialisation/assessment/activate
+    specialisations.assessment.excludes = [
+      den.aspects.karabiner-driver
+      den.aspects.vpn
+      den.aspects.paneru
+      den.aspects.jankyborders
+      den.aspects.kanata
+      den.aspects.sketchybar
+    ];
+
+    # "study": everything that is not study, gone. The browser half of this
+    # profile (the enterprise-policy site blocklist) is contributed by the zen
+    # aspect itself -- aspects/programs/browsers/zen.nix -- so the blocklist
+    # lives next to the browser and this host only says which distractions to
+    # drop. Zotero, the class/timetable integration and the rest of the `study`
+    # role content stay: they are what the profile is for.
+    specialisations.study.excludes = [
+      den.aspects.darwin-gaming
+      den.aspects.laptop-brew # steam/discord/beeper casks
+      den.aspects.llama-cpp
+      den.aspects.cotabby
+      den.aspects.opencode
+    ];
+
+    # "life-project": the machine with a dock that is only the life-project
+    # tools. `laptop-dock` owns the everyday dock, so the profile subtracts that
+    # aspect and includes the trimmed one instead of `mkForce`-ing a list -- the
+    # everyday dock can grow entries without this profile inheriting them.
+    specialisations.life-project = {
+      excludes = [
+        den.aspects.laptop-dock
+        den.aspects.darwin-gaming
+      ];
+      includes = [ den.aspects.laptop-dock-focused ];
+    };
+
     vpn = { };
     nix.settings = {
       min-free = 1024 * 1024 * 1024; # 1 GiB
     };
 
-    darwin =
-      {
-        pkgs,
-        lib,
-        ...
-      }:
-      {
-        stylix.targets.jankyborders.enable = false;
-        services.karabiner-elements.enable = false;
-        users.users.ivypierlot = {
-          name = "ivypierlot";
-          home = "/Users/ivypierlot";
-        };
-
-        environment.shells = [
-          pkgs.bash
-          pkgs.zsh
-          pkgs.fish
-        ];
-
-        # `gc.automatic` on its own runs `nix-collect-garbage` with no arguments,
-        # which only drops paths nothing refers to. Every system generation is a
-        # GC root, so without `--delete-older-than` the old ones pin their whole
-        # closure forever and the weekly run reclaims almost nothing.
-        nix.gc = {
-          automatic = true;
-          options = "--delete-older-than 14d";
-          interval = {
-            Hour = 3;
-            Minute = 15;
-            Weekday = 7;
-          };
-        };
-
-        # Let the daemon collect mid-build instead of only once a week: when free
-        # space drops under min-free it GCs until max-free is available again.
-        # This machine runs close to full, so the weekly timer alone is too coarse.
-        nix.settings = {
-          max-free = 25 * 1024 * 1024 * 1024;
-          # Keeping .drv files alive costs space and only buys offline rebuilds
-          # of things already built; not worth it on a space-constrained laptop.
-          keep-derivations = false;
-        };
-
-        # Local linux builder VM (ephemeral) for cross-building x86_64/aarch64-linux.
-        nix.distributedBuilds = true;
-
-        # "assessment" specialisation: an exam/lockdown profile that disables the
-        # window manager, keyboard remapper, status bar, window borders and VPN.
-        # Boot it with `darwin-rebuild switch --specialisation assessment` (or the
-        # equivalent activation), matching the old config's behaviour.
-        specialisation.assessment.configuration = {
-          services.karabiner-dk.enable = lib.mkForce false;
-          networking.wg-quick.interfaces = lib.mkForce { };
-
-          home-manager.users.ivypierlot = {
-            services.paneru.enable = lib.mkForce false;
-            services.jankyborders.enable = lib.mkForce false;
-            programs.kanata.enable = lib.mkForce false;
-            programs.sketchybar.enable = lib.mkForce false;
-          };
-        };
-
-        system.defaults.dock.persistent-apps = [
-          "/Applications/Nix Apps/Zen.app"
-          "/Applications/Microsoft Outlook.app"
-          "/Applications/Fantastical.app"
-          "/Applications/Microsoft Word.app"
-          "/System/Applications/Messages.app"
-          "/Applications/Beeper Desktop.app"
-          "/Applications/1Password.app"
-          "/System/Applications/System Settings.app"
-          "/Applications/Nix Apps/Visual Studio Code.app"
-          "/Applications/Zotero.app"
-          "/Applications/Nix Apps/Ghostty.app"
-          "/Applications/Todoist.app"
-        ];
+    darwin = { pkgs, ... }: {
+      stylix.targets.jankyborders.enable = false;
+      services.karabiner-elements.enable = false;
+      users.users.ivypierlot = {
+        name = "ivypierlot";
+        home = "/Users/ivypierlot";
       };
+
+      environment.shells = [
+        pkgs.bash
+        pkgs.zsh
+        pkgs.fish
+      ];
+
+      # `gc.automatic` on its own runs `nix-collect-garbage` with no arguments,
+      # which only drops paths nothing refers to. Every system generation is a
+      # GC root, so without `--delete-older-than` the old ones pin their whole
+      # closure forever and the weekly run reclaims almost nothing.
+      nix.gc = {
+        automatic = true;
+        options = "--delete-older-than 14d";
+        interval = {
+          Hour = 3;
+          Minute = 15;
+          Weekday = 7;
+        };
+      };
+
+      # Let the daemon collect mid-build instead of only once a week: when free
+      # space drops under min-free it GCs until max-free is available again.
+      # This machine runs close to full, so the weekly timer alone is too coarse.
+      nix.settings = {
+        max-free = 25 * 1024 * 1024 * 1024;
+        # Keeping .drv files alive costs space and only buys offline rebuilds
+        # of things already built; not worth it on a space-constrained laptop.
+        keep-derivations = false;
+      };
+
+      # Local linux builder VM (ephemeral) for cross-building x86_64/aarch64-linux.
+      nix.distributedBuilds = true;
+
+      # The specialisations live on the aspect above, as sets of excluded and
+      # included aspects rather than lists of overrides.
+    };
+  };
+
+  # The everyday dock, as its own aspect so a specialisation can drop it whole
+  # (see `specialisations.life-project`) instead of `mkForce`-ing the list.
+  den.aspects.laptop-dock.darwin.system.defaults.dock.persistent-apps = [
+    "/Applications/Nix Apps/Zen.app"
+    "/Applications/Microsoft Outlook.app"
+    "/Applications/Fantastical.app"
+    "/Applications/Microsoft Word.app"
+    "/System/Applications/Messages.app"
+    "/Applications/Beeper Desktop.app"
+    "/Applications/1Password.app"
+    "/System/Applications/System Settings.app"
+    "/Applications/Nix Apps/Visual Studio Code.app"
+    "/Applications/Zotero.app"
+    "/Applications/Nix Apps/Ghostty.app"
+    "/Applications/Todoist.app"
+  ];
+
+  # The life-project dock: writing, planning, reading, a terminal. No chat, no
+  # media, no IDE.
+  den.aspects.laptop-dock-focused.darwin.system.defaults.dock = {
+    persistent-apps = [
+      "/Applications/Nix Apps/Zen.app"
+      "/Applications/Fantastical.app"
+      "/Applications/Microsoft Word.app"
+      "/Applications/Zotero.app"
+      "/Applications/Todoist.app"
+      "/Applications/Nix Apps/Ghostty.app"
+    ];
+    # Nothing to fish out of the dock that is not pinned above.
+    show-recents = false;
+    static-only = true;
   };
 
   den.aspects.laptop-brew = {
@@ -156,9 +201,11 @@
   den.aspects.ivypierlot = {
     study.includes = [ den.aspects.zotero ];
     includes = [
+      den.aspects.zig
       den.aspects.homebrew
       #      den.aspects.zed
       den.aspects.idris
+      den.aspects.swift
       den.aspects.agenix-rekey
       den.aspects.onepassword
       den.aspects.nixvim
@@ -188,14 +235,12 @@
       den.aspects.cotabby
       #      <zen>
     ];
-    provides.Ivys-MacBook-Pro.includes = [ den.aspects.laptop-brew den.aspects.darwin-gaming ];
+    provides.Ivys-MacBook-Pro.includes = [
+      den.aspects.laptop-brew
+      den.aspects.darwin-gaming
+    ];
     provides.Ivys-MacBook-Pro.provides.to-users = {
       homeManager = { pkgs, ... }: {
-        # Off the 8080 default so it doesn't collide with anything else that
-        # assumes that port; cotabby (and any future local client) reads this
-        # same option rather than a hardcoded port.
-        programs.llama-cpp.port = 8090;
-
         home.packages = with pkgs; [
           nodejs
           opencode

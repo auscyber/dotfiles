@@ -23,8 +23,17 @@
 # (deploy.nodes, ciMatrix, the rekey app) do not need to move: at base they see
 # no extra aspects and evaluate to whatever they evaluate to, and every attribute
 # that actually matters is read from `all` via `partitionedAttrs`.
+#
+# A bucket may also DEPEND on another bucket (`deps` in ../../partition-map.nix).
+# Partitions are disjoint -- `partitions.nixos` is base + `parts.nixos`, never
+# another bucket's aspects -- so a bucket every host needs (./packages) would
+# otherwise leave the host partitions looking at the inert base stubs. A dep is
+# imported into the dependent's module, and its inputs come across via
+# `extraInputs`; the dependent's own generated flake.nix subtracts them, so the
+# input is declared and locked exactly once, in the dep's sub-flake.
 let
   buckets = builtins.attrNames aspectPartitions.parts;
+  depsOf = bucket: aspectPartitions.deps.${bucket};
 
   # Root's own lock, so a carried input can be pinned to the exact rev main
   # resolved rather than re-resolved to whatever is current when the sub-flake
@@ -129,7 +138,16 @@ let
     bucket:
     builtins.removeAttrs (ffLib.inputsExpr
       config.partitions.${bucket}.module.flake-file.inputs
-    ) baseInputNames;
+    ) (baseInputNames ++ depInputNames bucket);
+
+  # Inputs a bucket sees only because it imports a dep's aspects. They belong to
+  # the dep's sub-flake, so they must not count as this bucket's own: leaving
+  # them in would declare (and lock) the same input twice, and -- worse -- trip
+  # the `shared` test in `hoistedNames` below, hoisting a partitioned input all
+  # the way back into the root flake.lock, which is the one thing the whole
+  # partition mechanism exists to prevent.
+  depInputNames =
+    bucket: builtins.concatMap (d: builtins.attrNames (bucketOwn d)) (depsOf bucket);
 
   followsTargetsOf =
     specs:
@@ -178,7 +196,7 @@ let
   # Every partition also writes its own flake.nix, from the same `ff.*`
   # declarations that live next to the aspects using them.
   subFlakeModule = bucket: {
-    imports = aspectPartitions.parts.${bucket} ++ [ noNestedHooks ];
+    imports = aspectPartitions.partsFor bucket ++ [ noNestedHooks ];
     flake-file = {
       intoPath = "partitions/${bucket}";
       # mkForce: a partition re-imports aspects/framework/flake-file.nix (and
@@ -203,7 +221,13 @@ let
       preProcess = lib.mkForce (
         serialized:
         let
-          own = builtins.removeAttrs serialized (baseInputNames ++ hoistedNames);
+          # `depInputNames`: this bucket imports its deps' aspects, so their
+          # `ff.*` declarations are serialized here too. They are already
+          # declared in the dep's own partitions/<dep>/flake.nix, and `subInputs`
+          # merges them in from there -- writing them again would fork the lock.
+          own = builtins.removeAttrs serialized (
+            baseInputNames ++ hoistedNames ++ depInputNames bucket
+          );
 
           # A `follows` can only name an input of the flake it is written in, so
           # a base input that a bucket input follows has to be carried into the
@@ -252,8 +276,17 @@ let
       # freshly generated one. Here the aspect tree also carries the partitioned
       # `ff.*` declarations, so subtract them back out or the check reports every
       # partitioned input as missing from the root flake.
+      #
+      # ...but a HOISTED input is one no bucket could keep, so the root flake.nix
+      # that `.#write-flake` writes does declare it (base's preProcess adds it
+      # back the same way). It is still in `partitionedInputs` -- a bucket's
+      # sub-flake carries it too -- so subtracting alone would have this check
+      # demand the removal of an input the generator deliberately writes, and
+      # check-flake-file would fail on a pristine tree. It did, for `crane`.
       flake-file.preProcess = lib.mkForce (
-        serialized: builtins.removeAttrs serialized (builtins.attrNames partitionedInputs)
+        serialized:
+        builtins.removeAttrs serialized (builtins.attrNames partitionedInputs)
+        // lib.getAttrs hoistedNames allOwn
       );
     };
   };
@@ -289,7 +322,10 @@ in
 
   partitions =
     lib.genAttrs buckets (bucket: {
-      extraInputs = subInputs bucket;
+      # A dep's aspects are imported into this partition (see `subFlakeModule`),
+      # so its inputs have to be available here even though they are declared and
+      # locked in the dep's own sub-flake.
+      extraInputs = lib.mergeAttrsList (builtins.map subInputs ([ bucket ] ++ depsOf bucket));
       module = subFlakeModule bucket;
     })
     // {
@@ -315,6 +351,12 @@ in
     darwinConfigurations = "darwin";
     deploy = "all";
     homeConfigurations = "all";
+    # `legacyPackages.my` (aspects/tooling/my-packages.nix) is a walk over the
+    # `den.aspects.packages` registry. That registry now lives in the `packages`
+    # bucket, so at base it is nothing but the inert stubs and the output would
+    # come out empty -- `nix build .#my.<x>` has to be answered by the partition
+    # that can actually see the package aspects.
+    legacyPackages = "all";
     nixosConfigurations = "nixos";
     partitionMap = "all";
   };
