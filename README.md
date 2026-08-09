@@ -5,7 +5,7 @@
 
 | System | Architecture | Roles |
 |--------|--------------|-------|
-| Ivys-MacBook-Pro | aarch64-darwin | study, gui, dev |
+| Ivys-MacBook-Pro | aarch64-darwin | study, gui, dev, gaming |
 | auspc | x86_64-linux | gui, gaming, dev |
 | lora-pi | aarch64-linux |  |
 | macmini | aarch64-darwin | gui |
@@ -17,7 +17,7 @@
 ## Ivys-MacBook-Pro
 
 **Architecture:** `aarch64-darwin`
-**Roles:** study, gui, dev
+**Roles:** study, gui, dev, gaming
 
 ### Aspects
 - Ivys-MacBook-Pro/to-users
