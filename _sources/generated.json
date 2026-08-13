@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-hhNnIQIfv9Qcrg2kzepSE8AME7Y70GkM0ELssEtV+F8=",
+            "sha256": "sha256-6bBMDcKnhjXrJi8JGL3tY/LrjTfKGM0ZS7ktuOVaZ1E=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.2.1/helium-0.15.2.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.3.1/helium-0.15.3.1-x86_64_linux.tar.xz"
         },
-        "version": "0.15.2.1"
+        "version": "0.15.3.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-+onoZkK37fwg0upK0A03xGmMORC0e8+ozeHqN/2j/X8=",
+            "sha256": "sha256-JOBiYoQmtcZLZLAWroTVn0Eff5EntD2UgJKRP/E4aZ8=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.2.1/helium_0.15.2.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.3.1/helium_0.15.3.1_arm64-macos.dmg"
         },
-        "version": "0.15.2.1"
+        "version": "0.15.3.1"
     },
     "jankyborders": {
         "cargoLock": null,

@@ -51,7 +51,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-    nixpkgs.url = "github:nixos/nixpkgs/104240a772428cc2e20d8fd86c9ddbb886bbaff2";
+    nixpkgs.url = "github:nixos/nixpkgs/70ce234312134a463ba7728e94da2486a1d237ac";
     nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     nixvirt = {
       url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";

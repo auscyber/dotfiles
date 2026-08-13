@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.15.2.1";
+    version = "0.15.3.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.2.1/helium-0.15.2.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-hhNnIQIfv9Qcrg2kzepSE8AME7Y70GkM0ELssEtV+F8=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.3.1/helium-0.15.3.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-6bBMDcKnhjXrJi8JGL3tY/LrjTfKGM0ZS7ktuOVaZ1E=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.15.2.1";
+    version = "0.15.3.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.2.1/helium_0.15.2.1_arm64-macos.dmg";
-      sha256 = "sha256-+onoZkK37fwg0upK0A03xGmMORC0e8+ozeHqN/2j/X8=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.3.1/helium_0.15.3.1_arm64-macos.dmg";
+      sha256 = "sha256-JOBiYoQmtcZLZLAWroTVn0Eff5EntD2UgJKRP/E4aZ8=";
     };
   };
   jankyborders = {
