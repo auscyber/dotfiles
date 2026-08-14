@@ -35,7 +35,7 @@
     };
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    nixpkgs.url = "github:nixos/nixpkgs/70ce234312134a463ba7728e94da2486a1d237ac";
+    nixpkgs.url = "github:nixos/nixpkgs/6b5e5b7a6631f065bf6908986990b37d845f847f";
     paneru = {
       url = "github:auscyber/paneru?ref=testing";
       inputs = {
