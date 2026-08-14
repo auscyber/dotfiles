@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "ed8af7a49f5b3963fcf88d772372cd93e949f63c";
+    version = "63799c988bb2b5f13d4a810b40dd29ed4ffdab35";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "ed8af7a49f5b3963fcf88d772372cd93e949f63c";
+      rev = "63799c988bb2b5f13d4a810b40dd29ed4ffdab35";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-Xyj2yPU7Sd6WTWHrVAmx2JGGvUihM5jq79yXbLUz9Qk=";
+      sha256 = "sha256-o6Nq1vQWv2YMd0S2jUPtxPK3KrKyS1bF3RBNEM5ZHBg=";
     };
-    date = "2026-08-05";
+    date = "2026-08-13";
   };
   cotabby = {
     pname = "cotabby";
@@ -41,30 +41,30 @@
   };
   eagle-nvim = {
     pname = "eagle-nvim";
-    version = "d503b168932160b07d4d09551d90d5fbb388b641";
+    version = "e99f4e36eaf2b5da076ff4e3e8ee7559127aa9e2";
     src = fetchFromGitHub {
       owner = "soulis-1256";
       repo = "eagle.nvim";
-      rev = "d503b168932160b07d4d09551d90d5fbb388b641";
+      rev = "e99f4e36eaf2b5da076ff4e3e8ee7559127aa9e2";
       fetchSubmodules = false;
-      sha256 = "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=";
+      sha256 = "sha256-Hp15PXQ62fYm9cTtt4m3i3R31RlW6HicEbY+3rzgPxU=";
     };
-    date = "2026-02-10";
+    date = "2026-08-13";
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.15.3.1";
+    version = "0.15.4.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.3.1/helium-0.15.3.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-6bBMDcKnhjXrJi8JGL3tY/LrjTfKGM0ZS7ktuOVaZ1E=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.4.1/helium-0.15.4.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-bvePM38HlSm9IaPqlst3HQNKuz+mKtVg4pFA5aQWRhc=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.15.3.1";
+    version = "0.15.4.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.3.1/helium_0.15.3.1_arm64-macos.dmg";
-      sha256 = "sha256-JOBiYoQmtcZLZLAWroTVn0Eff5EntD2UgJKRP/E4aZ8=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.4.1/helium_0.15.4.1_arm64-macos.dmg";
+      sha256 = "sha256-GRX9snfkdi5B9oU5zimzSgY8zjKqdzJZZKVf2K7E9TU=";
     };
   };
   jankyborders = {
@@ -131,10 +131,10 @@
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton11-3";
+    version = "GE-Proton11-5";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-3/GE-Proton11-3.tar.gz";
-      sha256 = "sha256-RiCmnUKeZRhPUCgm7fsROKFkAl37+/tYkA47tQtkIF4=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-5/GE-Proton11-5-x86_64.tar.gz";
+      sha256 = "sha256-Sbyi5zXMhPIKSotvL5LEZ2dbDoLpXRcCyuY9TsnBnus=";
     };
   };
   sketchybar = {
@@ -151,17 +151,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "160f6af8b415ad77dd1ecde8a95d7e93b75d9095";
+    version = "dd26d8ee6f428acf1c8474f3945e01492e351c83";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "160f6af8b415ad77dd1ecde8a95d7e93b75d9095";
+      rev = "dd26d8ee6f428acf1c8474f3945e01492e351c83";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-k7FjcFvtl3iK6ImSiDu6FiXalfCUImlVMY6ctluI04Y=";
+      sha256 = "sha256-Ze0FLlxTfesSxVBnegStKC28budNP7HmIpOQTgi+6ho=";
     };
-    date = "2026-07-27";
+    date = "2026-08-10";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
@@ -225,10 +225,10 @@
   };
   zotero-papersgpt = {
     pname = "zotero-papersgpt";
-    version = "papersgpt-v1.0.0";
+    version = "papersgpt-v1.1.0";
     src = fetchurl {
-      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.0.0/papersgpt-v1.0.0.xpi";
-      sha256 = "sha256-Cb0dNSIM22exvUFP2pVCEIWRohpC3e7uawokZwwkZcg=";
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.1.0/papersgpt-v1.1.0.xpi";
+      sha256 = "sha256-/vyE3wemCGn4ncEFLrRiK8qU+XN2RrK6DcJGnJ7/ip8=";
     };
   };
   zotero-zotlit = {

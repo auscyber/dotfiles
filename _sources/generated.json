@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-08-05",
+        "date": "2026-08-13",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "ed8af7a49f5b3963fcf88d772372cd93e949f63c",
-            "sha256": "sha256-Xyj2yPU7Sd6WTWHrVAmx2JGGvUihM5jq79yXbLUz9Qk=",
+            "rev": "63799c988bb2b5f13d4a810b40dd29ed4ffdab35",
+            "sha256": "sha256-o6Nq1vQWv2YMd0S2jUPtxPK3KrKyS1bF3RBNEM5ZHBg=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "ed8af7a49f5b3963fcf88d772372cd93e949f63c"
+        "version": "63799c988bb2b5f13d4a810b40dd29ed4ffdab35"
     },
     "cotabby": {
         "cargoLock": null,
@@ -60,7 +60,7 @@
     },
     "eagle-nvim": {
         "cargoLock": null,
-        "date": "2026-02-10",
+        "date": "2026-08-13",
         "extract": null,
         "name": "eagle-nvim",
         "passthru": null,
@@ -73,12 +73,12 @@
             "name": null,
             "owner": "soulis-1256",
             "repo": "eagle.nvim",
-            "rev": "d503b168932160b07d4d09551d90d5fbb388b641",
-            "sha256": "sha256-Gug086B7EQ8qX6vKChnbjC5R2GroeqPuj3RWcbYOI9A=",
+            "rev": "e99f4e36eaf2b5da076ff4e3e8ee7559127aa9e2",
+            "sha256": "sha256-Hp15PXQ62fYm9cTtt4m3i3R31RlW6HicEbY+3rzgPxU=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "d503b168932160b07d4d09551d90d5fbb388b641"
+        "version": "e99f4e36eaf2b5da076ff4e3e8ee7559127aa9e2"
     },
     "helium_linux": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-6bBMDcKnhjXrJi8JGL3tY/LrjTfKGM0ZS7ktuOVaZ1E=",
+            "sha256": "sha256-bvePM38HlSm9IaPqlst3HQNKuz+mKtVg4pFA5aQWRhc=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.3.1/helium-0.15.3.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.4.1/helium-0.15.4.1-x86_64_linux.tar.xz"
         },
-        "version": "0.15.3.1"
+        "version": "0.15.4.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-JOBiYoQmtcZLZLAWroTVn0Eff5EntD2UgJKRP/E4aZ8=",
+            "sha256": "sha256-GRX9snfkdi5B9oU5zimzSgY8zjKqdzJZZKVf2K7E9TU=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.3.1/helium_0.15.3.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.4.1/helium_0.15.4.1_arm64-macos.dmg"
         },
-        "version": "0.15.3.1"
+        "version": "0.15.4.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -216,11 +216,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-RiCmnUKeZRhPUCgm7fsROKFkAl37+/tYkA47tQtkIF4=",
+            "sha256": "sha256-Sbyi5zXMhPIKSotvL5LEZ2dbDoLpXRcCyuY9TsnBnus=",
             "type": "tarball",
-            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-3/GE-Proton11-3.tar.gz"
+            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-5/GE-Proton11-5-x86_64.tar.gz"
         },
-        "version": "GE-Proton11-3"
+        "version": "GE-Proton11-5"
     },
     "sketchybar": {
         "cargoLock": null,
@@ -246,7 +246,7 @@
     },
     "vscode-kanata": {
         "cargoLock": null,
-        "date": "2026-07-27",
+        "date": "2026-08-10",
         "extract": null,
         "name": "vscode-kanata",
         "passthru": null,
@@ -257,13 +257,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "160f6af8b415ad77dd1ecde8a95d7e93b75d9095",
-            "sha256": "sha256-k7FjcFvtl3iK6ImSiDu6FiXalfCUImlVMY6ctluI04Y=",
+            "rev": "dd26d8ee6f428acf1c8474f3945e01492e351c83",
+            "sha256": "sha256-Ze0FLlxTfesSxVBnegStKC28budNP7HmIpOQTgi+6ho=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/rszyma/vscode-kanata.git"
         },
-        "version": "160f6af8b415ad77dd1ecde8a95d7e93b75d9095"
+        "version": "dd26d8ee6f428acf1c8474f3945e01492e351c83"
     },
     "zotero-actions-tags": {
         "cargoLock": null,
@@ -393,11 +393,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-Cb0dNSIM22exvUFP2pVCEIWRohpC3e7uawokZwwkZcg=",
+            "sha256": "sha256-/vyE3wemCGn4ncEFLrRiK8qU+XN2RrK6DcJGnJ7/ip8=",
             "type": "url",
-            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.0.0/papersgpt-v1.0.0.xpi"
+            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.1.0/papersgpt-v1.1.0.xpi"
         },
-        "version": "papersgpt-v1.0.0"
+        "version": "papersgpt-v1.1.0"
     },
     "zotero-zotlit": {
         "cargoLock": null,
