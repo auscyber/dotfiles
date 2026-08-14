@@ -6,5 +6,5 @@
 # partition. A missing entry just means "build it locally".
 {
 
-  home-manager.hash = "sha256-vByEyMgS/wdiJBkCR+QIA8t7anZU8RKiD+mmHDC2lBE=";
+  home-manager.hash = "sha256-4OIcRukgBD3VjEJYyT1PMOPiG8V5kDtCFGUe7aF0EEg=";
 }

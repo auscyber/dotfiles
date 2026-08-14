@@ -1,8 +1,8 @@
 diff --git a/modules/launchd/launchd.nix b/modules/launchd/launchd.nix
-index a093f99abc..49e0d45cbc 100644
+index a093f99..49e0d45 100644
 --- a/modules/launchd/launchd.nix
 +++ b/modules/launchd/launchd.nix
-@@ -852,6 +852,7 @@
+@@ -852,6 +852,7 @@ in
                    types.enum [
                      "stream"
                      "dgram"
@@ -10,7 +10,7 @@ index a093f99abc..49e0d45cbc 100644
                      "seqpacket"
                    ]
                  );
-@@ -892,11 +893,12 @@
+@@ -892,11 +893,12 @@ in
                    types.enum [
                      "IPv4"
                      "IPv6"
@@ -25,10 +25,10 @@ index a093f99abc..49e0d45cbc 100644
                };
  
 diff --git a/modules/programs/chromium.nix b/modules/programs/chromium.nix
-index 912cf92cdf..5d87607ed1 100644
+index 610293f..3d9b19b 100644
 --- a/modules/programs/chromium.nix
 +++ b/modules/programs/chromium.nix
-@@ -18,6 +18,7 @@
+@@ -18,6 +18,7 @@ let
      brave-origin = "Brave Origin";
      vivaldi = "Vivaldi Browser";
      microsoft-edge = "Microsoft Edge";
@@ -36,7 +36,7 @@ index 912cf92cdf..5d87607ed1 100644
    };
  
    plasmaSupportedBrowsers = [
-@@ -237,11 +238,13 @@
+@@ -237,11 +238,13 @@ let
          brave = "BraveSoftware/Brave-Browser";
          brave-origin = "BraveSoftware/Brave-Origin";
          microsoft-edge = "Microsoft Edge";
@@ -51,12 +51,13 @@ index 912cf92cdf..5d87607ed1 100644
  
        configDir =
 diff --git a/modules/services/gpg-agent.nix b/modules/services/gpg-agent/default.nix
+similarity index 97%
 rename from modules/services/gpg-agent.nix
 rename to modules/services/gpg-agent/default.nix
-index bfd7bbe1e5..5d975f2ad4 100644
+index fb9d225..c303e71 100644
 --- a/modules/services/gpg-agent.nix
 +++ b/modules/services/gpg-agent/default.nix
-@@ -18,6 +18,10 @@
+@@ -18,6 +18,10 @@ let
    gpgPkg = config.programs.gpg.package;
  
    inherit (config.programs.gpg) homedir;
@@ -67,7 +68,7 @@ index bfd7bbe1e5..5d975f2ad4 100644
  
    gpgSshSupportStr = "${gpgPkg}/bin/gpg-connect-agent --quiet updatestartuptty /bye";
  
-@@ -151,7 +155,7 @@
+@@ -151,7 +155,7 @@ let
  
    # Launchd agent socket generator.
    mkAgentSock = name: {
@@ -76,7 +77,7 @@ index bfd7bbe1e5..5d975f2ad4 100644
      SockPathName = gpgconf name;
      SockPathMode = 384; # Property lists don't support octal literals (0600 = 384).
    };
-@@ -456,6 +460,7 @@
+@@ -456,6 +460,7 @@ in
        enable = true;
        config = {
          ProgramArguments = [
@@ -84,7 +85,7 @@ index bfd7bbe1e5..5d975f2ad4 100644
            "${gpgPkg}/bin/gpg-agent"
            "--supervised"
          ]
-@@ -470,9 +475,9 @@
+@@ -470,9 +475,9 @@ in
          ProcessType = "Background";
          RunAtLoad = cfg.enableSshSupport;
          Sockets = {
@@ -99,7 +100,7 @@ index bfd7bbe1e5..5d975f2ad4 100644
      };
 diff --git a/modules/services/gpg-agent/wrapper.c b/modules/services/gpg-agent/wrapper.c
 new file mode 100644
-index 0000000000..8d8f2391f9
+index 0000000..8d8f239
 --- /dev/null
 +++ b/modules/services/gpg-agent/wrapper.c
 @@ -0,0 +1,166 @@
@@ -270,20 +271,20 @@ index 0000000000..8d8f2391f9
 +  err(1, "execvp: %s", argv[i]);
 +}
 diff --git a/modules/services/yubikey-agent.nix b/modules/services/yubikey-agent.nix
-index 9df45903ae..6375f895af 100644
+index 8a44d17..c83f32d 100644
 --- a/modules/services/yubikey-agent.nix
 +++ b/modules/services/yubikey-agent.nix
-@@ -37,7 +37,7 @@
+@@ -37,7 +37,7 @@ in
            fish = ''set -x SSH_AUTH_SOCK "${socketPath}"'';
            nushell = "$env.SSH_AUTH_SOCK = ${
-             if pkgs.stdenv.isDarwin then
+             if pkgs.stdenv.hostPlatform.isDarwin then
 -              "/tmp/yubikey-agent.sock"
 +              ''"${socketPath}"''
              else
                ''$"($env.XDG_RUNTIME_DIR | default $"/run/user/(id -u)")/yubikey-agent/yubikey-agent.sock"''
            }";
 diff --git a/tests/modules/services/gpg-agent/expected-agent.plist b/tests/modules/services/gpg-agent/expected-agent.plist
-index 093e313711..e5a4dc9ac6 100644
+index 093e313..e5a4dc9 100644
 --- a/tests/modules/services/gpg-agent/expected-agent.plist
 +++ b/tests/modules/services/gpg-agent/expected-agent.plist
 @@ -22,20 +22,20 @@
@@ -312,11 +313,11 @@ index 093e313711..e5a4dc9ac6 100644
  	</dict>
  </dict>
 diff --git a/tests/modules/services/gpg-agent/override-homedir.nix b/tests/modules/services/gpg-agent/override-homedir.nix
-index 196635fb38..7e787a8904 100644
+index 4b07eb1..2941867 100644
 --- a/tests/modules/services/gpg-agent/override-homedir.nix
 +++ b/tests/modules/services/gpg-agent/override-homedir.nix
-@@ -4,6 +4,15 @@
-   inherit (pkgs.stdenv) isDarwin;
+@@ -4,6 +4,15 @@ let
+   inherit (pkgs.stdenv.hostPlatform) isDarwin;
  in
  {
 +  test.unstubs = [
