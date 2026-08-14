@@ -1,7 +1,7 @@
 { lib, ... }: {
   nvfetcher.sources.proton-ge-bin = {
     src.github = "gloriouseggroll/proton-ge-custom";
-    fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver.tar.gz";
+    fetch.tarball = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ver/$ver-x86_64.tar.gz";
   };
 
   den.aspects.packages.proton-ge-bin = {
