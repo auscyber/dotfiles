@@ -64,8 +64,10 @@
 - ivypierlot/Ivys-MacBook-Pro
 - jujutsu
 - karabiner-driver
+- laptop-dock
 - lib
 - llama-cpp
+- lspmux
 - main-ssh-key
 - mcp-servers
 - neovim
@@ -80,7 +82,7 @@
 - pam-rssh
 - pam-touchid
 - paneru
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(libkey-nomad,onepassword-password-manager)
 - provides/unfree(onepassword-password-manager)
@@ -97,6 +99,7 @@
 - vpn
 - vpn-secrets
 - wakatime
+- zig
 - zotero
 
 ### Aspect Graph
@@ -127,6 +130,7 @@ graph LR
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
   karabiner_driver["karabiner-driver"]:::karabiner_driver_c
+  laptop_dock["laptop-dock"]:::laptop_dock_c
   lib["lib"]:::lib_c
   nix["nix"]:::nix_c
   nix_index["nix-index"]:::nix_index_c
@@ -151,6 +155,7 @@ graph LR
   Ivys_MacBook_Pro --> ccache
   Ivys_MacBook_Pro --> homebrew_host_Ivys_MacBook_Pro
   Ivys_MacBook_Pro --> karabiner_driver
+  Ivys_MacBook_Pro --> laptop_dock
   Ivys_MacBook_Pro --> sudoagents_host_Ivys_MacBook_Pro
   Ivys_MacBook_Pro --> vpn
   darwin_base --> darwin_finder
@@ -195,6 +200,7 @@ graph LR
   ivypierlot{{"ivypierlot"}}:::ivypierlot_c
   ivypierlot__Ivys_MacBook_Pro["ivypierlot/Ivys-MacBook-Pro"]:::ivypierlot__Ivys_MacBook_Pro_c
   llama_cpp["llama-cpp"]:::llama_cpp_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   mcp_servers["mcp-servers"]:::mcp_servers_c
   neovim["neovim"]:::neovim_c
@@ -209,12 +215,13 @@ graph LR
   sketchybar["sketchybar"]:::sketchybar_c
   stylix["stylix"]:::stylix_c
   sudoagents_user_ivypierlot["sudoagents"]:::sudoagents_user_ivypierlot_c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   den__provides__unfree_libkey_nomad_onepassword_password_manager_{{"provides/unfree(libkey-nomad,onepassword-password-manager)"}}:::den__provides__unfree_libkey_nomad_onepassword_password_manager__c
   den__provides__unfree_onepassword_password_manager_{{"provides/unfree(onepassword-password-manager)"}}:::den__provides__unfree_onepassword_password_manager__c
   user_shell__ivypierlot_Ivys_MacBook_Pro{{"user-shell/ivypierlot@Ivys-MacBook-Pro"}}:::user_shell__ivypierlot_Ivys_MacBook_Pro_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
+  zig["zig"]:::zig_c
   zotero["zotero"]:::zotero_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
@@ -241,14 +248,16 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
+  ivypierlot --> zig
   ivypierlot__Ivys_MacBook_Pro --> darwin_gaming
   main_ssh_key --> pam_rssh_user_ivypierlot
   neovim --> stylix
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
   onepassword --> den__provides__unfree_onepassword_password_manager_
   opencode --> claude
   opencode --> mcp_servers
+  zig --> lspmux
   end
 
   ivypierlot -.->|provides| ivypierlot__Ivys_MacBook_Pro__to_users
@@ -294,8 +303,10 @@ graph LR
   classDef ivypierlot__Ivys_MacBook_Pro_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef karabiner_driver_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef laptop_dock_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef llama_cpp_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef mcp_servers_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -324,7 +335,7 @@ graph LR
   classDef sudoagents_host_Ivys_MacBook_Pro_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef sudoagents_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef ivypierlot__Ivys_MacBook_Pro__to_users_c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-width:3px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_libkey_nomad_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
@@ -336,6 +347,7 @@ graph LR
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef zotero_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
 style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -385,6 +397,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - ivy-fetch
 - jujutsu
 - lib
+- lspmux
 - main-ssh-key
 - neovim
 - nix
@@ -400,7 +413,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - packages/proton-ge-bin
 - pam-rssh
 - plasma
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(onepassword-password-manager)
 - qemu
@@ -511,6 +524,7 @@ graph LR
   gpg["gpg"]:::gpg_c
   gui["gui"]:::gui_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   neovim["neovim"]:::neovim_c
   nixvim["nixvim"]:::nixvim_c
@@ -523,13 +537,14 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_castlabs_electron__user_auscyber{{"den/provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__user_auscyber_c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   den__provides__unfree_onepassword_password_manager_{{"provides/unfree(onepassword-password-manager)"}}:::den__provides__unfree_onepassword_password_manager__c
   user_shell__auscyber_auspc{{"user-shell/auscyber@auspc"}}:::user_shell__auscyber_auspc_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
   auscyber --> claude
   auscyber --> fish
+  auscyber --> lspmux
   auscyber --> den__provides__unfree_castlabs_electron__user_auscyber
   auscyber__auspc --> dev
   auscyber__auspc --> gpg
@@ -547,7 +562,7 @@ graph LR
   gui --> onepassword
   main_ssh_key --> pam_rssh_user_auscyber
   neovim --> nixvim
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
   onepassword --> den__provides__unfree_onepassword_password_manager_
   end
@@ -588,6 +603,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -619,7 +635,7 @@ graph LR
   classDef qemu__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__host_auspc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_castlabs_electron__user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -661,6 +677,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - ivy/lora-pi
 - jujutsu
 - lib
+- lspmux
 - main-ssh-key
 - neovim
 - nix
@@ -672,8 +689,9 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - openssh
 - overlays
 - pam-rssh
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- rust
 - shell
 - shell/to-users
 - starship
@@ -745,14 +763,16 @@ graph LR
   ivy{{"ivy"}}:::ivy_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
   ivy__lora_pi["ivy/lora-pi"]:::ivy__lora_pi_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   neovim["neovim"]:::neovim_c
   nixvim["nixvim"]:::nixvim_c
   pam_rssh_user_ivy["pam-rssh"]:::pam_rssh_user_ivy_c
   den__batteries__primary_user_ivy_lora_pi_{{"batteries/primary-user(ivy@lora-pi)"}}:::den__batteries__primary_user_ivy_lora_pi__c
+  rust["rust"]:::rust_c
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   user_shell__ivy_lora_pi{{"user-shell/ivy@lora-pi"}}:::user_shell__ivy_lora_pi_c
   wakatime["wakatime"]:::wakatime_c
   fish --> user_shell__ivy_lora_pi
@@ -763,8 +783,10 @@ graph LR
   main_ssh_key --> pam_rssh_user_ivy
   neovim --> nixvim
   neovim --> stylix
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> rust
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
+  rust --> lspmux
   end
 
 
@@ -788,6 +810,7 @@ graph LR
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -801,6 +824,7 @@ graph LR
   classDef pam_rssh_host_lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_user_ivy_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__primary_user_ivy_lora_pi__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
+  classDef rust_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__self__c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__self___os_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef shell_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -809,7 +833,7 @@ graph LR
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -866,6 +890,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - jujutsu
 - lib
 - llama-cpp
+- lspmux
 - main-ssh-key
 - mcp-servers
 - neovim
@@ -880,7 +905,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - pam-rssh
 - pam-touchid
 - paneru
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(libkey-nomad,onepassword-password-manager)
 - provides/unfree(onepassword-password-manager)
@@ -895,6 +920,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - unfree-predicate/user
 - user-shell/ivypierlot@macmini
 - wakatime
+- zig
 
 ### Aspect Graph
 
@@ -976,6 +1002,7 @@ graph LR
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
   ivypierlot{{"ivypierlot"}}:::ivypierlot_c
   llama_cpp["llama-cpp"]:::llama_cpp_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   mcp_servers["mcp-servers"]:::mcp_servers_c
   neovim["neovim"]:::neovim_c
@@ -990,12 +1017,13 @@ graph LR
   sketchybar["sketchybar"]:::sketchybar_c
   stylix["stylix"]:::stylix_c
   sudoagents["sudoagents"]:::sudoagents_c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   den__provides__unfree_libkey_nomad_onepassword_password_manager_{{"provides/unfree(libkey-nomad,onepassword-password-manager)"}}:::den__provides__unfree_libkey_nomad_onepassword_password_manager__c
   den__provides__unfree_onepassword_password_manager_{{"provides/unfree(onepassword-password-manager)"}}:::den__provides__unfree_onepassword_password_manager__c
   user_shell__ivypierlot_macmini{{"user-shell/ivypierlot@macmini"}}:::user_shell__ivypierlot_macmini_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
+  zig["zig"]:::zig_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
   dev --> dev_nix
@@ -1021,13 +1049,15 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_macmini_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
+  ivypierlot --> zig
   main_ssh_key --> pam_rssh_user_ivypierlot
   neovim --> stylix
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
   onepassword --> den__provides__unfree_onepassword_password_manager_
   opencode --> claude
   opencode --> mcp_servers
+  zig --> lspmux
   end
 
 
@@ -1068,6 +1098,7 @@ graph LR
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef llama_cpp_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef macmini_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef mcp_servers_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1095,7 +1126,7 @@ graph LR
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef sudoagents_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_libkey_nomad_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
@@ -1105,6 +1136,7 @@ graph LR
   classDef user_shell__ivypierlot_macmini_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
 style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 ```
@@ -1292,6 +1324,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - jujutsu
 - lib
 - local
+- lspmux
 - main-ssh-key
 - neovim
 - nginx
@@ -1305,7 +1338,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - overlays
 - pam-rssh
 - provides/unfree(castlabs-electron)
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(intel-ocl)
 - searchix
@@ -1410,6 +1443,7 @@ graph LR
   fish["fish"]:::fish_c
   gpg["gpg"]:::gpg_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   neovim["neovim"]:::neovim_c
   nginx_user_auscyber["nginx"]:::nginx_user_auscyber_c
@@ -1420,12 +1454,13 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_castlabs_electron_{{"provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   user_shell__auscyber_secondpc{{"user-shell/auscyber@secondpc"}}:::user_shell__auscyber_secondpc_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
   auscyber --> claude
   auscyber --> fish
+  auscyber --> lspmux
   auscyber --> den__provides__unfree_castlabs_electron_
   auscyber__secondpc --> gpg
   auscyber__secondpc --> neovim
@@ -1437,7 +1472,7 @@ graph LR
   neovim --> stylix
   nix__secondpc --> celler
   nix__secondpc --> nginx_user_auscyber
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
   end
 
@@ -1469,6 +1504,7 @@ graph LR
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef local_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nginx_host_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1496,7 +1532,7 @@ graph LR
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_intel_ocl__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1542,6 +1578,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - ivy-fetch
 - jujutsu
 - lib
+- lspmux
 - main-ssh-key
 - neovim
 - nix
@@ -1553,7 +1590,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - overlays
 - pam-rssh
 - provides/unfree(castlabs-electron)
-- provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)
+- provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - shell
 - shell/to-users
@@ -1627,6 +1664,7 @@ graph LR
   fish["fish"]:::fish_c
   gpg["gpg"]:::gpg_c
   ivy_fetch["ivy-fetch"]:::ivy_fetch_c
+  lspmux["lspmux"]:::lspmux_c
   main_ssh_key["main-ssh-key"]:::main_ssh_key_c
   neovim["neovim"]:::neovim_c
   nixvim["nixvim"]:::nixvim_c
@@ -1635,12 +1673,13 @@ graph LR
   shell__to_users["shell/to-users"]:::shell__to_users_c
   stylix["stylix"]:::stylix_c
   den__provides__unfree_castlabs_electron_{{"provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__c
-  den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c
   user_shell__auscyber_surfacelaptop{{"user-shell/auscyber@surfacelaptop"}}:::user_shell__auscyber_surfacelaptop_c
   wakatime["wakatime"]:::wakatime_c
   auscyber --> celler_push
   auscyber --> claude
   auscyber --> fish
+  auscyber --> lspmux
   auscyber --> den__provides__unfree_castlabs_electron_
   auscyber__surfacelaptop --> gpg
   auscyber__surfacelaptop --> neovim
@@ -1650,7 +1689,7 @@ graph LR
   main_ssh_key --> pam_rssh_user_auscyber
   neovim --> nixvim
   neovim --> stylix
-  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot_
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot_
   nixvim --> wakatime
   end
 
@@ -1677,6 +1716,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef nix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1699,7 +1739,7 @@ graph LR
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef surfacelaptop_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
-  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
