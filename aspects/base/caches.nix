@@ -295,7 +295,7 @@ in
       {
         scoped,
         secrets,
-        host,
+        age,
         ...
       }:
       {
@@ -308,7 +308,17 @@ in
           dependencies = {
             cache_key = secrets.cache_key;
           };
-          script = cellerTokenScript { sub = host.name; };
+          # Not `host.name`: a `secrets` body is routed into the target config
+          # as an ordinary module, so it sees that config's module args and
+          # nothing else -- den's entity context (`host`/`user`/`anyUser`) is
+          # never bound there, and asking for it failed the whole `agenix
+          # generate` eval. This content lands on BOTH the host and the user,
+          # and the user copy has neither `networking` nor `osConfig`, so the
+          # one thing both sides carry is where agenix puts their generated
+          # secrets: `<host>` for a host, `<host>-<user>` for a user.
+          script = cellerTokenScript {
+            sub = baseNameOf age.rekey.generatedSecretsDir;
+          };
         };
       };
     templates =

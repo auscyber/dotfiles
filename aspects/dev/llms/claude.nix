@@ -8,13 +8,21 @@
     homeManager =
       { pkgs, scoped, ... }:
       let
-        token_name = "claude_token";
+        token_name = "dad_token";
       in
 
       {
         programs.claude-code = {
           enable = true;
           enableMcpIntegration = true;
+
+          # A directory, not a file: the skill ships its script alongside
+          # SKILL.md, and the module symlinks the whole tree to
+          # `.claude/skills/flamegraph`. The script re-enters the target
+          # project's own dev shell (devenv or flake), since a project's
+          # toolchain is generally not on the ambient PATH here.
+          context = ./context.md;
+          skills.flamegraph = ./skills/flamegraph;
           package =
             pkgs.runCommand "claude-wrapped"
               {

@@ -18,10 +18,13 @@
       den.aspects.pam-touchid
     ];
 
-    darwin = {
+    darwin = { pkgs, ... }: {
+      environment.systemPackages = with pkgs; [
+        mole-cleaner
+        fd
+      ];
       documentation.enable = lib.mkDefault true;
       programs.zsh.enable = lib.mkDefault true;
-      programs.fish.enable = lib.mkDefault true;
       programs.gnupg.agent.enable = lib.mkDefault true;
       system.defaults.NSGlobalDomain = {
         AppleInterfaceStyle = lib.mkDefault "Dark";

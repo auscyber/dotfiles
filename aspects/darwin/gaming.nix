@@ -12,17 +12,14 @@
       casks = [ "gcenx/wine/game-porting-toolkit" ];
     };
     darwin =
-      { pkgs, config, ... }:
+      { pkgs, ... }:
       {
-        nix-homebrew = {
-          enable = true;
-          enableRosetta = true;
-          user = config.system.primaryUser;
-          trust.taps = builtins.attrNames config.nix-homebrew.taps;
-          trust.casks = [ "gcenx/wine/game-porting-toolkit" ];
-          mutableTaps = false;
-          autoMigrate = true;
-        };
+        # No `nix-homebrew` block here: enable/enableRosetta/user/mutableTaps/
+        # autoMigrate come from the included `homebrew` aspect, and trust is
+        # derived there from `brew.taps`/`brew.casks` -- declaring
+        # `taps.gcenx` and the fully-qualified cask above is enough to get
+        # both `gcenx/wine` trusted as a tap and
+        # `gcenx/wine/game-porting-toolkit` trusted as a cask.
         environment.systemPackages = [
           (pkgs.writeShellApplication {
             name = "gpt-init-prefix";

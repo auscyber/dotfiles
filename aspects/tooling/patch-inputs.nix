@@ -245,15 +245,21 @@ let
     pkgs.writeShellApplication {
       name = "patch-input";
       runtimeInputs = [
-        pkgs.git
+        pkgs.jujutsu
         pkgs.coreutils
+        pkgs.findutils
+        # GNU patch, the SAME program `applyPatches` runs -- not the host's
+        # `/usr/bin/patch`, which on darwin is Apple's 2.0 and silently ignores
+        # git rename headers (it patches the file in place and leaves it at the
+        # old path, so the tree "applies" here and breaks in the build).
+        pkgs.gnupatch
       ];
       text = ''
         set -euo pipefail
-        input="''${1:-}"
+        target="''${1:-}"
         patchName="''${2:-edit}"
-        if [ -z "$input" ]; then
-        	echo "usage: patch-input <input-name> [patch-name]" >&2
+        if [ -z "$target" ]; then
+        	echo "usage: patch-input [<partition>/]<input-name> [patch-name]" >&2
         	exit 2
         fi
         repo="$PWD"
@@ -262,14 +268,45 @@ let
         	exit 2
         fi
 
+        # `darwin/foo` names input `foo` of the `partitions/darwin` sub-flake --
+        # the same `<partition>/<input>` notation `write-patched-inputs` prints
+        # its per-bucket hashes under, so what that output tells you is what you
+        # can type here. It also disambiguates: a bare name is resolved by search
+        # (root first, then each partition), which silently picks the first hit
+        # when two buckets both have an input by that name.
+        partition=""
+        input="$target"
+        case "$target" in
+        	*/*)
+        		partition="''${target%%/*}"
+        		input="''${target#*/}"
+        		;;
+        esac
+        case "$input" in
+        	"" | */*)
+        		echo "error: '$target' is not [<partition>/]<input-name>" >&2
+        		exit 2
+        		;;
+        esac
+
+        partitions() {
+        	for sub in "$repo"/partitions/*/; do
+        		sub="''${sub%/}"
+        		[ -e "$sub/flake.nix" ] || continue
+        		echo "''${sub##*/}"
+        	done
+        }
+
         # Resolve the input's PRISTINE source. A partitioned input never appears
         # in the root flake -- its `ff` lives on an aspect that only a bucket
         # imports, so its lock node is in partitions/<bucket>/flake.lock, not the
-        # root's. Try the root first, then each partition sub-flake, so
-        # `patch-input <name>` works the same whether the input is at the root or
-        # in a bucket. The written patch path (./patches/<input>/) is identical
-        # either way -- the registry (patched-inputs.nix) is shared, so a bucket
-        # applies it via the same declaration (see aspects/framework/partitions.nix).
+        # root's. So a bare name tries the root first, then each partition
+        # sub-flake, and `<partition>/<input>` goes straight to one bucket. The
+        # written patch path (./patches/<input>/) is the same in every case --
+        # the registry (patched-inputs.nix) is shared, so a bucket applies it via
+        # the same declaration (see aspects/framework/partitions.nix); the
+        # partition selects which flake's LOCK the source comes from, not where
+        # the patch lands.
         # `dir` must have NO trailing slash: it is interpolated as a bare Nix path
         # literal (`toString /abs/dir`), and a path literal ending in `/` is a
         # syntax error -- which `2>/dev/null` would swallow, turning a real hit
@@ -280,20 +317,34 @@ let
         		"builtins.toString (builtins.getFlake (toString ''${1%/})).inputs.\"$input\"" 2>/dev/null
         }
         echo "Resolving source of input '$input'…"
-        src="$(resolveSrc "$repo" || true)"
-        if [ -z "$src" ]; then
-        	for sub in "$repo"/partitions/*/; do
-        		sub="''${sub%/}"
-        		[ -e "$sub/flake.nix" ] || continue
-        		if src="$(resolveSrc "$sub")" && [ -n "$src" ]; then
-        			echo "  (partitioned input, from ''${sub#"$repo"/})"
-        			break
-        		fi
-        	done
-        fi
-        if [ -z "$src" ]; then
-        	echo "error: input '$input' not found in the root flake or any partition" >&2
-        	exit 2
+        if [ -n "$partition" ]; then
+        	dir="$repo/partitions/$partition"
+        	if [ ! -e "$dir/flake.nix" ]; then
+        		echo "error: no partition '$partition' ($dir/flake.nix does not exist)" >&2
+        		echo "partitions:" >&2
+        		while IFS= read -r p; do echo "  $p" >&2; done < <(partitions)
+        		exit 2
+        	fi
+        	src="$(resolveSrc "$dir" || true)"
+        	if [ -z "$src" ]; then
+        		echo "error: partition '$partition' has no input '$input'" >&2
+        		exit 2
+        	fi
+        	echo "  (from partitions/$partition)"
+        else
+        	src="$(resolveSrc "$repo" || true)"
+        	if [ -z "$src" ]; then
+        		while IFS= read -r p; do
+        			if src="$(resolveSrc "$repo/partitions/$p")" && [ -n "$src" ]; then
+        				echo "  (partitioned input — '$p/$input' names it directly)"
+        				break
+        			fi
+        		done < <(partitions)
+        	fi
+        	if [ -z "$src" ]; then
+        		echo "error: input '$input' not found in the root flake or any partition" >&2
+        		exit 2
+        	fi
         fi
         echo "  $src"
 
@@ -301,25 +352,83 @@ let
         cp -R "$src/." "$work/"
         chmod -R u+w "$work"
         cd "$work"
-        git init -q
-        git add -A
-        GIT_AUTHOR_NAME=patch GIT_AUTHOR_EMAIL=patch@local \
-        	GIT_COMMITTER_NAME=patch GIT_COMMITTER_EMAIL=patch@local \
-        	git commit -q -m pristine
+
+        # jj, not git. The captured patch is a diff between two revisions, not a
+        # snapshot of the index, so the history in between is yours to shape:
+        # commit as many times as you like, describe each one, split/squash/reorder
+        # them while you work out what the patch should be. `pristine` is a
+        # bookmark on the untouched tree, so `jj diff --from pristine` at any point
+        # shows exactly what will be written on exit.
+        #
+        # The commits themselves die with $work -- only the diff is kept -- so the
+        # identity is a placeholder rather than the user's, and no signing config
+        # can wedge the run on a locked key.
+        export JJ_USER=patch JJ_EMAIL=patch@local
+        jj git init --quiet
+        jj describe --quiet -m "pristine $input"
+        jj bookmark create --quiet pristine -r @
+        jj new --quiet -m "$patchName"
+
+        out="$repo/patches/$input/$patchName.patch"
+
+        # Re-apply the existing patch with `patch`, NOT `git apply`. `git apply`
+        # is all-or-nothing: one hunk gone stale after an input bump and NOTHING
+        # lands, so the only way forward is rebuilding the whole patch by hand.
+        # `patch` applies every hunk it still can and writes the rest to
+        # <file>.rej, which is the point -- you land in the shell below with the
+        # patch mostly applied and an explicit list of what to fix. It is also
+        # the same program (and the same default fuzz) `applyPatches` uses, so
+        # "applies here" means "applies in the build".
+        #
+        # --no-backup-if-mismatch: no .orig droppings. Rejects are cleaned up
+        # after the shell (see below), so they never reach the captured diff.
+        rejected=""
+        if [ -e "$out" ]; then
+        	echo "Applying $patchName.patch…"
+        	if patch -p1 --no-backup-if-mismatch -i "$out"; then
+        		echo "  applied cleanly"
+        	else
+        		rejected="$(find . -path ./.jj -prune -o -name '*.rej' -print)"
+        	fi
+        fi
+
+        # Other patches for this input are NOT applied: the captured diff is
+        # taken against the pristine tree, so anything applied here would be
+        # folded into "$patchName".patch. Say so, rather than let a stale-looking
+        # tree be a surprise.
+        others="$(find "$repo/patches/$input" -maxdepth 1 -name '*.patch' \
+        	! -name "$patchName.patch" -exec basename {} \; 2>/dev/null | sort || true)"
 
         cat <<EOF
 
         Editing a copy of '$input' in:
           $work
-        Make your changes, then exit this shell ('exit' / Ctrl-D) to capture the diff.
+        It is a jj repo: 'pristine' bookmarks the untouched tree and @ is your work.
+        Commit, describe, split, reorder as you like -- what gets written is
+        \`jj diff --from pristine --to @\`, which you can inspect at any time.
+
+        Exit this shell ('exit' / Ctrl-D) to capture that diff into
+          patches/$input/$patchName.patch
         Exit non-zero (e.g. 'exit 1') to abort without writing a patch.
 
         EOF
 
-        out="$repo/patches/$input/$patchName.patch"
-        if [ -e "$out" ]; then
-        	git apply "$out"
+        if [ -n "$others" ]; then
+        	echo "Not applied (captured separately, each against the pristine tree):"
+        	while IFS= read -r p; do echo "  $p"; done <<<"$others"
+        	echo
         fi
+
+        if [ -n "$rejected" ]; then
+        	echo "SOME HUNKS DID NOT APPLY. Rejects:"
+        	while IFS= read -r r; do echo "  ''${r#./}"; done <<<"$rejected"
+        	echo
+        	echo "Apply each by hand in the file it names, then exit. The .rej files"
+        	echo "are removed before the diff is captured -- a hunk you leave"
+        	echo "unresolved is simply dropped from the rewritten patch."
+        	echo
+        fi
+
         set +e
         "''${SHELL:-/bin/sh}"
         shellrc=$?
@@ -329,12 +438,33 @@ let
         	exit "$shellrc"
         fi
 
-        git add -A
+        # `patch`'s scratch output is not part of the source tree: left in place,
+        # jj snapshots the .rej files into @ and they land in the rewritten patch
+        # as new files. Drop them -- but say which ones were still there, because
+        # each is a hunk that is about to vanish from the patch.
+        unresolved="$(find . -path ./.jj -prune -o -name '*.rej' -print)"
+        if [ -n "$unresolved" ]; then
+        	echo "warning: unresolved rejects; these hunks are NOT in the rewritten patch:" >&2
+        	while IFS= read -r r; do echo "  ''${r#./}" >&2; done <<<"$unresolved"
+        fi
+        find . -path ./.jj -prune -o \( -name '*.rej' -o -name '*.orig' \) -exec rm -f {} +
+
         mkdir -p "$(dirname "$out")"
-        # --no-ext-diff: bypass any external difftool (e.g. difftastic) from the
-        # user's global git config, which would emit non-applicable output.
-        # diff.noprefix=false: keep a/ b/ prefixes so `patch -p1` (applyPatches) works.
-        git -c diff.noprefix=false diff --no-ext-diff --cached --binary HEAD >"$out"
+        # A file the patch CREATES is picked up automatically (jj snapshots the
+        # working copy on every command), but one matching the input's own
+        # .gitignore is not -- same exclusion `git add -A` applied here before.
+        # `jj file track <path>` inside the shell forces such a file in.
+        #
+        # --from pristine --to @: the cumulative diff across however many commits
+        # were made in between, taken against the untouched tree -- the same shape
+        # `applyPatches` will replay onto that tree with `patch -p1`. --git keeps
+        # a/ b/ prefixes (so -p1 is right) and emits rename headers, which GNU
+        # patch honours; without it the rename would come out as a delete plus a
+        # full-content create.
+        # --git also overrides a configured `ui.diff-formatter` (difftastic and
+        # friends), whose output is unreadable to `patch`. --no-pager for the same
+        # reason `ui.paginate = "always"` would otherwise be a problem.
+        jj --no-pager diff --from pristine --to @ --git >"$out"
         if [ ! -s "$out" ]; then
         	rm -f "$out"
         	echo "no changes detected; nothing written." >&2
@@ -388,7 +518,13 @@ in
       argument seen by home-manager modules — reference it as `inputs.<name>`
       (e.g. `inputs.zen-browser-patched.homeModules.default`).
 
-      Produce/refresh a patch with `nix run .#patch-input -- <name>`.
+      Produce/refresh a patch with `nix run .#patch-input -- <name> [patch]`,
+      where `<name>` is an input of the root flake or `<partition>/<input>` for
+      one owned by a bucket (`nixos/home-manager`, as `write-patched-inputs`
+      prints it). It
+      drops you in a jj repo holding a copy of the input with the existing patch
+      re-applied — hunks that no longer apply are left as `.rej` files to fix by
+      hand — and captures `jj diff --from pristine --to @` when the shell exits.
 
       Note: `inputs` at the flake-module level is a flake-parts specialArg bound
       to `self.inputs` and cannot be shadowed there; this injection happens in
@@ -644,11 +780,22 @@ in
         # (it no longer applies) or a recorded `hash` is stale (hash mismatch).
         # Entries with no patches are skipped: `patchSource` hands those back
         # as the pristine source path, which is not a derivation to build.
+        #
+        # Only names `patchedDrvs` actually built. A patch list is also
+        # declared here for inputs the ROOT does not have -- a partitioned
+        # input like `paneru` lives in `partitions/darwin/flake.nix`, but its
+        # patches still have to land in ../../patched-inputs.nix, because that
+        # generated file is the shared patch registry every bucket reads (see
+        # `patchContextFor` in ../framework/partitions.nix). `applicableSpecs`
+        # in ../../lib/patched-inputs.nix already drops those from the build --
+        # there is no root source to patch -- so indexing `patchedDrvs` by every
+        # declared name would fail on exactly the inputs it correctly skipped.
+        # They are checked where they are built: in their own bucket.
         checks =
           lib.mapAttrs' (n: _: {
             name = "patched-input-${n}";
             value = (patchedDrvs pkgs).${n};
-          }) (lib.filterAttrs (_: hasPatches) config.patchedInputs)
+          }) (lib.filterAttrs (n: v: hasPatches v && (patchedDrvs pkgs) ? ${n}) config.patchedInputs)
           // {
             # Guard `buildPatched`'s fixpoint: every re-evaluated input — patched or
             # merely auto-unified — must resolve its own inputs to the *patched*

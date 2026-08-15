@@ -38,6 +38,11 @@ end
 
 local control_centre_focus_modes_click_script = nil
 
+sbar.add("alias", "Amphetamine,Amphetamine", {
+	position = "right",
+	click_script = helpers_dir .. "/menus/bin/menus -s 'Amphetamine,Amphetamine'",
+})
+
 sbar.add("alias", "Control Centre,FocusModes", {
 	position = "right",
 	padding_left = -15,
@@ -120,6 +125,7 @@ local extra_mapping = {}
 
 local alias_to_ignore = {
 	["Control Centre,FocusModes"] = true,
+	["Amphetamine,Amphetamine"] = true,
 	["Fantastical Helper,Fantastical"] = true,
 	["Control Centre,Clock"] = true,
 	["Control Centre,BentoBox-0"] = true,
@@ -219,6 +225,7 @@ sbar.add("bracket", "all_utils", {
 	"power",
 	"battery",
 	"Control Centre,FocusModes",
+	"Amphetamine,Amphetamine",
 }, {
 	background = {
 		color = colors.yellow,

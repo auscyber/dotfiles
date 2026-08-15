@@ -27,7 +27,20 @@
       };
     };
 
+    # `trusted-substituters` alone only *permits* an unprivileged caller to ask
+    # for this cache -- nix never queries it on its own. Without the matching
+    # `substituters` entry every idris2 derivation missed the cache and was
+    # built from source, which for idris2 means building the compiler twice:
+    # once the scheme `bootstrap` stage, then the real self-hosted build on top
+    # of it. Both stages are on the cachix (verified for aarch64-darwin), so
+    # listing it here is what actually turns those two builds into two fetches.
+    #
+    # Kept in `trusted-substituters` as well so non-trusted users (and
+    # `--substituters` on the command line) can still name it.
     nix.settings = {
+      substituters = [
+        "https://gh-nix-idris2-packages.cachix.org"
+      ];
       trusted-substituters = [
         "https://gh-nix-idris2-packages.cachix.org"
       ];

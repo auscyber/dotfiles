@@ -211,14 +211,21 @@ end
 
 -- Re-anchor chevron/front_app after the last workspace item. Inside sketchybar
 -- that's items/left.lua's own global; from paneru's process it's the same two
--- `sketchybar --move` shell calls, safe to issue from any process.
+-- `sketchybar --move` calls, safe to issue from any process.
+--
+-- `paneru.exec` is `exec(program, args?)` — NOT a shell, and NOT a command
+-- line. `program` is passed straight to `std::process::Command::new`, so a
+-- string with spaces in it is looked up as one long filename and fails with
+-- ENOENT ("No such file or directory"). Passing the arguments separately, as a
+-- table, is the only form that runs; there is no shell here, so no quoting or
+-- escaping is needed (or possible) either.
 local function reorder_left_items()
 	if _G.reorder_left_items then
 		_G.reorder_left_items(M.last_item)
 		return
 	end
-	paneru.exec("sketchybar --move chevron after " .. M.last_item)
-	paneru.exec("sketchybar --move front_app after chevron")
+	paneru.exec("sketchybar", { "--move", "chevron", "after", M.last_item })
+	paneru.exec("sketchybar", { "--move", "front_app", "after", "chevron" })
 end
 
 -- The bar items for every row: the row number, its icon slots, and the pill

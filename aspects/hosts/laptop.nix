@@ -35,6 +35,18 @@
       den.aspects.sccache
       den.aspects.lix
       den.aspects.laptop-dock
+      # Signs sketchybar/paneru/kanata and execs them from a fixed path so their
+      # TCC grants survive a rebuild. Host level, not user level: it is an
+      # overlay, and overlays only reach the host's `nixpkgs.overlays`.
+      #
+      # Two aspects on purpose: `codesign` cannot build until the identity
+      # `codesign-identity` deploys is already on disk, and a switch builds
+      # before it activates. To bootstrap (or to recover if the identity is ever
+      # lost), comment out `den.aspects.codesign`, switch, then restore it.
+      # `codesign-identity` also carries `sandbox = "relaxed"`, which is what
+      # keeps every other derivation from reading the signing key.
+      den.aspects.codesign-identity
+      den.aspects.codesign
       #      den.aspects.builders
     ];
 
@@ -172,7 +184,6 @@
     includes = [ den.aspects.homebrew ];
     brew = {
       brews = [
-        "mole"
         "speedtest"
       ];
       casks = [

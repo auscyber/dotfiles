@@ -53,8 +53,20 @@ let
       fromClass = kind;
       intoClass = system;
       adaptArgs =
-        { config, ... }:
-        config
+        args@{ config, ... }:
+        # `args`, not `args // config`. Splatting the target config put every
+        # top-level option into the module-argument namespace, so a routed body
+        # could bind `networking`, `services`, `launchd`, `users`... as if they
+        # were module args -- shadowing real ones and making the arg set differ
+        # per class. Routed bodies now get ordinary module args plus the four
+        # aliases below.
+        #
+        # Note what is NOT here, and never was: den's entity context. A routed
+        # class body becomes a plain module in the target config, so `host` /
+        # `user` / `anyUser` are not bound and asking for one fails eval with
+        # "attribute 'host' missing" (which is what `den.aspects.celler-push`
+        # did). Take the identity off `config` instead.
+        args
         // rec {
           age = config.age;
           secrets = age.secrets;

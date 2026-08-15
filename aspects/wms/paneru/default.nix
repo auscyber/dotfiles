@@ -5,6 +5,15 @@
   ...
 }:
 {
+  # ./sketchybar/paneru-bar.lua drives sketchybar from a `window_focused`
+  # handler through `paneru.exec`, and a failed exec raises a Lua error that
+  # aborts the rest of the handler — so the bar stops repainting halfway
+  # through. ../../../patches/paneru/echild-exec.patch stops a command that
+  # ran fine from being reported as a failure: paneru shares its process with
+  # AppKit, something there reaps the child first, and `Command::output`'s
+  # wait comes back ECHILD even though the program did its work.
+  #  patchedInputs.paneru = { };
+
   den.aspects.paneru = {
     # Declared on the aspect, not the file: the partition generator reads
     # which aspect owns an input, and which platforms pull that aspect in.
@@ -157,7 +166,12 @@
             # it in one returned set flush together, and `window_managed_trigger`
             # pins the window at its float rect before the move lands.
             scratchpadSpec = {
-              hide_on_focus_loss = true;
+              # A pad stays out once summoned; only its own chord (or
+              # `paneru-scratchpad <name>`) puts it back. Clicking through to
+              # another window used to park the pad off screen, which made the
+              # overlay unusable for anything you have to look at while working
+              # in the window underneath it.
+              hide_on_focus_loss = false;
               # Every toggle decision through `paneru.log` (/tmp/paneru.err.log
               # under the launchd agent). On because a pad that matches nothing
               # is otherwise indistinguishable from a dead keybind: both fall
@@ -286,12 +300,21 @@
                 vertical = true;
               };
               options = {
-                focus_follows_mouse = false;
+                focus_follows_mouse = true;
                 mouse_follows_focus = false;
                 virtual_workspace_animations = true;
-                # rift ran with animate=false; paneru disables animation with
-                # a high animation_speed (8-20 comfortable, higher ~= off).
-                animation_speed = 20.0;
+                # rift ran with animate=false. animation_speed is the knob,
+                # but "8-20 comfortable, higher ~= off" understates how far it
+                # has to go: at 20 a scratchpad toggle was measured at ~300ms
+                # per direction with 22-29 interpolated frames and a long
+                # ease-out tail, at 500 it is ~20-35ms in 4-5 frames.
+                #
+                # Scratchpads are what make this hurt. ./scratchpad.lua parks a
+                # hidden pad off the side of the display (see `parked_rect`),
+                # about a full window width away, so every show and every hide
+                # is the longest slide on screen — the animation is paid twice
+                # on every toggle, in full, before the pad is usable.
+                animation_speed = 500.0;
                 # false: keep a virtual-workspace row alive even when empty.
                 # With reap=true a freshly-switched-to (empty) row is deleted
                 # instantly, so nothing ever shows in the popup/menubar/bar.

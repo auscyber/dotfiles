@@ -147,6 +147,16 @@ end
 -- count — has to be converted against the display the window is actually on.
 -- `ws:display_of` gives those bounds. Without them, land the right edge exactly
 -- on the display's left edge, which is the same thing with a zero sliver.
+--
+-- COSTS AN ANIMATION. paneru's `animate_entities` interpolates every reposition,
+-- so parking here is not a jump — it is a slide of roughly a full window width,
+-- paid again in the other direction on the way back out. At the aspect's old
+-- `animation_speed = 20` that measured ~300ms per direction over 22-29 frames,
+-- with an ease-out tail that spends its last third crawling the final few
+-- pixels; the pad is unusable for the whole of it. Because a parked pad is
+-- further from its shown rect than anything else paneru moves, the scratchpads
+-- feel the animation setting harder than the tiling does — which is why
+-- aspects/wms/paneru/default.nix now runs `animation_speed = 500`.
 function M.parked_rect(display, rect)
 	local x = -rect.width
 	if display and display.width and display.width > 0 then
