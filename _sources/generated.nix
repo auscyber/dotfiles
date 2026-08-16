@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "63799c988bb2b5f13d4a810b40dd29ed4ffdab35";
+    version = "d03b0556e5910c71849fdbcb02863b5ac5fae12a";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "63799c988bb2b5f13d4a810b40dd29ed4ffdab35";
+      rev = "d03b0556e5910c71849fdbcb02863b5ac5fae12a";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-o6Nq1vQWv2YMd0S2jUPtxPK3KrKyS1bF3RBNEM5ZHBg=";
+      sha256 = "sha256-MJovtp+ybJdhc65Xu6MJC381zLh/YrQ0PMLP1OWX2m4=";
     };
-    date = "2026-08-13";
+    date = "2026-08-15";
   };
   cotabby = {
     pname = "cotabby";
@@ -151,17 +151,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "dd26d8ee6f428acf1c8474f3945e01492e351c83";
+    version = "9792013dba8db8fd1fe9253cd5a730ed09b81da0";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "dd26d8ee6f428acf1c8474f3945e01492e351c83";
+      rev = "9792013dba8db8fd1fe9253cd5a730ed09b81da0";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-Ze0FLlxTfesSxVBnegStKC28budNP7HmIpOQTgi+6ho=";
+      sha256 = "sha256-NsR/tWWmE6kUuCVlRt4miGS5oqcE3vhFC7nbN5VLy8Q=";
     };
-    date = "2026-08-10";
+    date = "2026-08-15";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
