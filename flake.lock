@@ -1071,11 +1071,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783996946,
-        "narHash": "sha256-CVgUDQBfY4zVIF7iJoTsYwBMoHgoP5nA5a9y8C55btQ=",
+        "lastModified": 1787141695,
+        "narHash": "sha256-jjR71CRsRQBuIcwAspGI90514rN6WwYOgBimevtxg+k=",
         "owner": "auscyber",
         "repo": "kanata",
-        "rev": "117eea06575252410be7f6d615a3917c44141ad7",
+        "rev": "ee29aa06a1ce47fef02523a9f993f2e7f6a235db",
         "type": "github"
       },
       "original": {
@@ -1624,11 +1624,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787137695,
-        "narHash": "sha256-YflLslKeVXNAQrnYEgXgu/DM8q8j+zl1us5uFtt6cho=",
+        "lastModified": 1787141604,
+        "narHash": "sha256-P6w0NRCRGSpDDmCBeqE7p3NHyuwddc0rIy50ZMEInbM=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "d1ee9f0edf86f5319234910ca305e93eeac858c3",
+        "rev": "6b6660e1e4a398aed634e5f352d77575e6142ac6",
         "type": "github"
       },
       "original": {
