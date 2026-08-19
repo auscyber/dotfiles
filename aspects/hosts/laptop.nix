@@ -240,7 +240,7 @@
       den.aspects.opencode
       #      den.aspects.openclaw
       den.aspects.llama-cpp
-      #      den.aspects.zeroclaw
+      den.aspects.zeroclaw
       den.aspects.file-local
       den.batteries.primary-user
       den.aspects.cotabby

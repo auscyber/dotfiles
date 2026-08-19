@@ -107,9 +107,11 @@
     "packages/kanata-ls"
     "packages/kanata-tray"
     "packages/lspmux"
+    "packages/ms-365-mcp-server"
     "packages/proton-ge-bin"
     "packages/sketchybar"
     "packages/sketchybar_app_font"
+    "packages/todoist-mcp"
     "packages/zotero-mcp"
     "zotero"
   ];

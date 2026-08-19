@@ -456,6 +456,7 @@ in
         program = lib.getExe updateCellerKeys;
       };
     };
+  patchedInputs.celler = { };
 
   ff.celler = {
     url = "github:blitz/celler/main";

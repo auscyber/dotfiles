@@ -32,6 +32,9 @@
     ./patches/agenix-rekey/stat-portable.patch
     ./patches/agenix-rekey/rekey-mkdir-p.patch
   ];
+  celler.patches = [
+    ./patches/celler/edit.patch
+  ];
   darwin.patches = [
     ./patches/darwin/karabiner.patch
     ./patches/darwin/specialisation.patch
@@ -47,6 +50,7 @@
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
   agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
+  celler.hash = "sha256-9yLd9c6RtlmjqOtqoFrkGDi2VoNS7vxmuurtAX6u8KY=";
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
   home-manager.hash = "sha256-CBh2KMMhMr9Ol0j8BxGHhNWi3pkUqGni5o8xQk46mi4=";
   nh.hash = "sha256-pjtE1tfuN1ZjRtW+K9Gdcs63dKkwsWMnNBCYyXNy6ic=";

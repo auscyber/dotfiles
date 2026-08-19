@@ -15,6 +15,11 @@
 # the two are interchangeable in a profile's extensions env.
 let
   addonId = "notero@vanoni.dev";
+  # scripts/utils/version.mts reads gen/version.json when it exists and otherwise
+  # computes a local version ending in `-<username>.<hostname>` -- inside the
+  # sandbox that's the useless `-nixbld.localhost`. Writing the file first pins
+  # the version create-xpi bakes into the manifest and the xpi filename.
+  versionTag = "auscyber-nix-${builtins.substring 0 7 source.version}";
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "zotero-notero";
@@ -34,11 +39,23 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     inherit (finalAttrs) pname version src;
     fetcherVersion = 3;
     pnpm = pnpm_10;
-    hash = "sha256-6wN50vxhDyKh4cqKl2R0BZZe8WYATAGPBvr5r9Ye1UI=";
+    hash = "sha256-t1bob6sx46uwhCfCO0rhYoCW4YvbEt2JtDwBbB8VfLk=";
   };
 
   buildPhase = ''
     runHook preBuild
+
+    # Same patch bump upstream's getLocalVersion applies, so the build outranks
+    # the released version in Zotero's update check.
+    xpiVersion=$(jq -er '
+      .version
+      | split(".")
+      | "\(.[0]).\(.[1]).\((.[2] | split("-") | .[0] | tonumber) + 1)"
+    ' package.json)-${versionTag}
+
+    mkdir -p gen
+    jq -n --arg version "$xpiVersion" '$version' > gen/version.json
+    echo "notero: pinned xpi version to $xpiVersion"
 
     pnpm run build
     pnpm run create-xpi
@@ -58,6 +75,13 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     manifestId=$(unzip -p "$xpi" manifest.json | jq -er '.applications.zotero.id')
     if [ "$manifestId" != ${lib.escapeShellArg addonId} ]; then
       echo "notero: manifest declares id '$manifestId', expected '${addonId}'" >&2
+      exit 1
+    fi
+
+    manifestVersion=$(unzip -p "$xpi" manifest.json | jq -er '.version')
+    pinnedVersion=$(jq -er . gen/version.json)
+    if [ "$manifestVersion" != "$pinnedVersion" ]; then
+      echo "notero: manifest declares version '$manifestVersion', expected '$pinnedVersion'" >&2
       exit 1
     fi
 

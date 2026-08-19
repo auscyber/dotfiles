@@ -34,7 +34,7 @@
     }:
     {
       home.packages = with pkgs; [
-        gemini-cli
+        #        gemini-cli
       ];
 
       # enableMcpIntegration needs claude-code >= 2.1.76; nixpkgs pins 2.1.25, so

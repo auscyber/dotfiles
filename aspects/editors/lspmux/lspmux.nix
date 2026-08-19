@@ -342,17 +342,6 @@ in
         zed = "gopls";
         extensionToLanguage.".go" = "go";
       };
-      hls = {
-        package = pkgs.haskell-language-server;
-        exe = "haskell-language-server-wrapper";
-        args = [ "--lsp" ];
-        zed = "hls";
-        opencode = "haskell-language-server";
-        extensionToLanguage = {
-          ".hs" = "haskell";
-          ".lhs" = "haskell";
-        };
-      };
       jdtls = {
         package = pkgs.jdt-language-server;
         exe = "jdtls";

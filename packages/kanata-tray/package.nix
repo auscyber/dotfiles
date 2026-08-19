@@ -34,7 +34,7 @@ buildGoModule (finalAttrs: {
   buildInputs = [
     makeWrapper
   ]
-  ++ (lib.optionals stdenv.platform..isLinux [
+  ++ (lib.optionals stdenv.isLinux [
     libayatana-appindicator
     gtk3
   ]);
