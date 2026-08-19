@@ -12,7 +12,7 @@
   outputs = _: { };
 
   inputs = {
-    crane.url = "github:ipetkov/crane/2c71e194474d13de031d729b729c968ddbe3507f";
+    crane.url = "github:ipetkov/crane/6ed595a5527c0ec9563e0e06417f1b8fc88ccb66";
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
@@ -35,7 +35,7 @@
     };
     idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    nixpkgs.url = "github:nixos/nixpkgs/8be7bd0c83f12e2e3bbba07c9044d6fed9e66f7f";
+    nixpkgs.url = "github:nixos/nixpkgs/afe3d8ac4395617bdcdac9f188ac8717a062e014";
     paneru = {
       url = "github:auscyber/paneru?ref=testing";
       inputs = {
