@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "d03b0556e5910c71849fdbcb02863b5ac5fae12a";
+    version = "8bb4dd84950bf24b8e8a16df684a7cfdac962b83";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "d03b0556e5910c71849fdbcb02863b5ac5fae12a";
+      rev = "8bb4dd84950bf24b8e8a16df684a7cfdac962b83";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-MJovtp+ybJdhc65Xu6MJC381zLh/YrQ0PMLP1OWX2m4=";
+      sha256 = "sha256-u+IbGVRvphjkyT1SMBfsedXXfrY1dxM4X6X5NI9wl1I=";
     };
-    date = "2026-08-15";
+    date = "2026-08-19";
   };
   cotabby = {
     pname = "cotabby";
@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.15.4.1";
+    version = "0.15.5.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.4.1/helium-0.15.4.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-bvePM38HlSm9IaPqlst3HQNKuz+mKtVg4pFA5aQWRhc=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.5.1/helium-0.15.5.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-jE64dbmwDP0qJF8OGCT5fAhzfoBzUjYLoxHahb0DNig=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.15.4.1";
+    version = "0.15.5.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.4.1/helium_0.15.4.1_arm64-macos.dmg";
-      sha256 = "sha256-GRX9snfkdi5B9oU5zimzSgY8zjKqdzJZZKVf2K7E9TU=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.5.1/helium_0.15.5.1_arm64-macos.dmg";
+      sha256 = "sha256-zKjDii66+j9hr04+xHe1is4kDhq9tX8YVHjK2P8kzl0=";
     };
   };
   jankyborders = {
@@ -151,17 +151,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "9792013dba8db8fd1fe9253cd5a730ed09b81da0";
+    version = "a00d3ee81fd6e9c48f407feee27274289230b365";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "9792013dba8db8fd1fe9253cd5a730ed09b81da0";
+      rev = "a00d3ee81fd6e9c48f407feee27274289230b365";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-NsR/tWWmE6kUuCVlRt4miGS5oqcE3vhFC7nbN5VLy8Q=";
+      sha256 = "sha256-nHEww+tTsPbD+VXB72rXWzpSuMyYtEACTO91bK/Gr7c=";
     };
-    date = "2026-08-15";
+    date = "2026-08-17";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
@@ -205,15 +205,15 @@
   };
   zotero-notero = {
     pname = "zotero-notero";
-    version = "556359043a4b61df5802b6650cbdbec6450bf9d4";
+    version = "011be2ca9ddc6b34326f7e5ce75089266cbf94bc";
     src = fetchFromGitHub {
       owner = "dvanoni";
       repo = "notero";
-      rev = "556359043a4b61df5802b6650cbdbec6450bf9d4";
+      rev = "011be2ca9ddc6b34326f7e5ce75089266cbf94bc";
       fetchSubmodules = false;
-      sha256 = "sha256-hl93l5W1qvW+XXSphvw8/36+xhfbajjIPNPqikWj/+k=";
+      sha256 = "sha256-qvjBHzQTTflW8cafr50yKuUteSctoBXl752nHyV/VmI=";
     };
-    date = "2026-05-08";
+    date = "2026-08-18";
   };
   zotero-ocr = {
     pname = "zotero-ocr";
