@@ -50,7 +50,7 @@
         }))
         pkgs.rage
       ]
-      ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.age-plugin-se ];
+      ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.age-plugin-se ];
 
       syncCiSecrets = pkgs.writeShellApplication {
         name = "sync-ci-secrets";

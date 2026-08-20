@@ -168,7 +168,7 @@
 
             darwinDefaultsId = "app.zen-browser.zen";
             package = lib.mkForce (
-              if stdenv.isDarwin then
+              if stdenv.hostPlatform.isDarwin then
                 null
               else
                 pkgs.wrapFirefox

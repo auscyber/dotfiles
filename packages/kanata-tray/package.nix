@@ -30,11 +30,11 @@ buildGoModule (finalAttrs: {
     "-X main.buildVersion=${finalAttrs.version}"
     "-X main.buildHash=${finalAttrs.src.rev}"
   ];
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ pkg-config ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
   buildInputs = [
     makeWrapper
   ]
-  ++ (lib.optionals stdenv.isLinux [
+  ++ (lib.optionals stdenv.hostPlatform.isLinux [
     libayatana-appindicator
     gtk3
   ]);
