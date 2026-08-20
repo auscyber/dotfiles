@@ -39,6 +39,8 @@
 - ccache/Ivys-MacBook-Pro
 - celler-push
 - claude
+- codesign
+- codesign-identity
 - cotabby
 - darwin-base
 - darwin-finder
@@ -99,6 +101,7 @@
 - vpn
 - vpn-secrets
 - wakatime
+- zeroclaw
 - zig
 - zotero
 
@@ -113,6 +116,8 @@ graph LR
   ccache__Ivys_MacBook_Pro[/"ccache/Ivys-MacBook-Pro"\]:::ccache__Ivys_MacBook_Pro_c
   agenix_rekey_host_Ivys_MacBook_Pro["agenix-rekey"]:::agenix_rekey_host_Ivys_MacBook_Pro_c
   ccache["ccache"]:::ccache_c
+  codesign["codesign"]:::codesign_c
+  codesign_identity["codesign-identity"]:::codesign_identity_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
@@ -153,6 +158,8 @@ graph LR
   vpn["vpn"]:::vpn_c
   vpn_secrets["vpn-secrets"]:::vpn_secrets_c
   Ivys_MacBook_Pro --> ccache
+  Ivys_MacBook_Pro --> codesign
+  Ivys_MacBook_Pro --> codesign_identity
   Ivys_MacBook_Pro --> homebrew_host_Ivys_MacBook_Pro
   Ivys_MacBook_Pro --> karabiner_driver
   Ivys_MacBook_Pro --> laptop_dock
@@ -221,6 +228,7 @@ graph LR
   user_shell__ivypierlot_Ivys_MacBook_Pro{{"user-shell/ivypierlot@Ivys-MacBook-Pro"}}:::user_shell__ivypierlot_Ivys_MacBook_Pro_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
+  zeroclaw["zeroclaw"]:::zeroclaw_c
   zig["zig"]:::zig_c
   zotero["zotero"]:::zotero_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
@@ -248,6 +256,7 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
+  ivypierlot --> zeroclaw
   ivypierlot --> zig
   ivypierlot__Ivys_MacBook_Pro --> darwin_gaming
   main_ssh_key --> pam_rssh_user_ivypierlot
@@ -271,6 +280,8 @@ graph LR
   classDef ccache_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef codesign_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef codesign_identity_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef cotabby_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef darwin_base_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef darwin_finder_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -347,6 +358,7 @@ graph LR
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef zeroclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef zotero_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
 style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -920,6 +932,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - unfree-predicate/user
 - user-shell/ivypierlot@macmini
 - wakatime
+- zeroclaw
 - zig
 
 ### Aspect Graph
@@ -1023,6 +1036,7 @@ graph LR
   user_shell__ivypierlot_macmini{{"user-shell/ivypierlot@macmini"}}:::user_shell__ivypierlot_macmini_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
+  zeroclaw["zeroclaw"]:::zeroclaw_c
   zig["zig"]:::zig_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
@@ -1049,6 +1063,7 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_macmini_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
+  ivypierlot --> zeroclaw
   ivypierlot --> zig
   main_ssh_key --> pam_rssh_user_ivypierlot
   neovim --> stylix
@@ -1136,6 +1151,7 @@ graph LR
   classDef user_shell__ivypierlot_macmini_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef zeroclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
 style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -1924,11 +1940,13 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 | kanata-ls | `a00d3ee81fd6e9c48f407feee27274289230b365` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
+| ms-365-mcp-server | `0.145.1` | Microsoft 365 / Outlook MCP server (mail, calendar, OneDrive, Excel) over Microsoft Graph |
 | proton-ge-bin | `GE-Proton11-5` | Compatibility tool for Steam Play based on Wine and additional components.
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
 | sketchybar | `2.24.0` | Highly customizable macOS status bar replacement |
+| todoist-mcp | `13.0.0` | Model Context Protocol server for Todoist |
 | zotero-mcp | `0.6.2` | Model Context Protocol server for Zotero |
 
 ## Other Projects
