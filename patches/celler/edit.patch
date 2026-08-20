@@ -1,5 +1,5 @@
 diff --git a/crane.nix b/crane.nix
-index 90f4d88b58..38db804a36 100644
+index 90f4d88b58..7a616fd3da 100644
 --- a/crane.nix
 +++ b/crane.nix
 @@ -1,11 +1,12 @@
@@ -20,7 +20,7 @@ index 90f4d88b58..38db804a36 100644
  }:
  
  let
-@@ -18,15 +19,20 @@
+@@ -18,15 +19,22 @@
      "nixos"
      "target"
    ];
@@ -31,6 +31,7 @@ index 90f4d88b58..38db804a36 100644
 +
 +  cargoVendorDir = craneLib.vendorCargoDeps {
 +    inherit src;
++    cargoLock = ./Cargo.lock;
 +  };
  
    commonArgs = {
@@ -43,10 +44,11 @@ index 90f4d88b58..38db804a36 100644
 -    };
 +    inherit src;
 +    cargoExtraArgs = "--locked";
++    inherit cargoVendorDir;
  
      nativeBuildInputs = [
        # pkg-config
-@@ -42,58 +48,70 @@
+@@ -42,58 +50,70 @@
      CELLER_DISTRIBUTOR = "celler";
    };
  
