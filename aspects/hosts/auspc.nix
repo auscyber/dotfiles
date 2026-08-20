@@ -343,7 +343,6 @@
           htop
           polychromatic
           fish
-          nitrogen
           maim
           gcc
           dunst
