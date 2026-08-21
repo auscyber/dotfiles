@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-08-19",
+        "date": "2026-08-21",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "8bb4dd84950bf24b8e8a16df684a7cfdac962b83",
-            "sha256": "sha256-u+IbGVRvphjkyT1SMBfsedXXfrY1dxM4X6X5NI9wl1I=",
+            "rev": "3efee65920c6d2efb89078987ee92b602b046719",
+            "sha256": "sha256-vuL+sYx4xRzGeiQG6TQfvptNcnif8cd3JhYB+LwSIEo=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "8bb4dd84950bf24b8e8a16df684a7cfdac962b83"
+        "version": "3efee65920c6d2efb89078987ee92b602b046719"
     },
     "cotabby": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-jE64dbmwDP0qJF8OGCT5fAhzfoBzUjYLoxHahb0DNig=",
+            "sha256": "sha256-Nkd6SQGcVQYI/KIC62Gkpo/6gCUfiV4sQVPm85gwElU=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.5.1/helium-0.15.5.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.6.1/helium-0.15.6.1-x86_64_linux.tar.xz"
         },
-        "version": "0.15.5.1"
+        "version": "0.15.6.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-zKjDii66+j9hr04+xHe1is4kDhq9tX8YVHjK2P8kzl0=",
+            "sha256": "sha256-medoiZEkXGXVDSc1LP6t/aU1DrtkqtQOtHGDPN8yPXk=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.5.1/helium_0.15.5.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.6.1/helium_0.15.6.1_arm64-macos.dmg"
         },
-        "version": "0.15.5.1"
+        "version": "0.15.6.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -409,10 +409,10 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-vxkBUOWmPJRwVMzmSje1M1iJ8J8dFtAXUaAqR7pe03U=",
+            "sha256": "sha256-Cy5zChuO2lxorchp2j6YJWbYJZUxlS86mScIAWdRIXE=",
             "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.1/zotlit-zotero-2.0.1.xpi"
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.0-beta.0/zotlit-zotero-2.1.0-beta.0.xpi"
         },
-        "version": "2.0.1"
+        "version": "2.1.0-beta.0"
     }
 }
