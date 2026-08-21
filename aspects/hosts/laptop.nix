@@ -222,8 +222,9 @@
       den.aspects.nixvim
       den.aspects.neovim
       #      den.aspects.zed
-      # Runs the lspmux server; nixvim and zed both spawn their servers through its
-      # shims, so without this the shims have nothing to connect to.
+      # Runs the lspmux server. nixvim connects to its unix socket directly (RPC);
+      # zed and the CLIs go through the `lspmux client` shims. Without this there
+      # is nothing on the other end of either.
       den.aspects.lspmux
       den.aspects.fish
       den.aspects.celler-push

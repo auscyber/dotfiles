@@ -201,9 +201,9 @@ let
           pkgs.writeText "${package.pname or package.name}-entitlements.plist" (
             lib.generators.toPlist { } entitlements
           );
-      entitlementsArg =
-        lib.optionalString (entitlementsFile != null)
-          "--entitlements-xml-path ${entitlementsFile}";
+      entitlementsArg = lib.optionalString (
+        entitlementsFile != null
+      ) "--entitlements-xml-path ${entitlementsFile}";
     in
     pkgs.runCommand "${package.name}-signed"
       {
@@ -226,14 +226,18 @@ let
         # dropping passthru breaks evaluation rather than just the signature.
         passthru = (package.passthru or { }) // {
           unsigned = package;
-          override = args: mkSignedWrapper pkgs {
-            package = package.override args;
-            inherit entitlements;
-          };
-          overrideAttrs = f: mkSignedWrapper pkgs {
-            package = package.overrideAttrs f;
-            inherit entitlements;
-          };
+          override =
+            args:
+            mkSignedWrapper pkgs {
+              package = package.override args;
+              inherit entitlements;
+            };
+          overrideAttrs =
+            f:
+            mkSignedWrapper pkgs {
+              package = package.overrideAttrs f;
+              inherit entitlements;
+            };
         };
         # `lib.getExe` is used on these, so mainProgram has to survive.
         meta = package.meta or { };
@@ -251,23 +255,23 @@ let
         # Mach-O by magic number; `file` is not in every stdenv. Follows
         # symlinks, which matters: inside a symlinkJoin every bin/ entry is one.
         isMachO() {
-          case "$(od -An -N4 -tx1 -- "$1" 2>/dev/null | tr -d ' \n')" in
-            cffaedfe | cefaedfe | cafebabe | bebafeca) return 0 ;;
-            *) return 1 ;;
-          esac
+        	case "$(od -An -N4 -tx1 -- "$1" 2>/dev/null | tr -d ' \n')" in
+        	cffaedfe | cefaedfe | cafebabe | bebafeca) return 0 ;;
+        	*) return 1 ;;
+        	esac
         }
 
         # A wrapper adds a signature; it is not a rebuild. Everything that is
         # not bin/ is the original, so it is symlinked rather than copied.
         shopt -s nullglob
         for entry in ${package}/*; do
-          name="$(basename "$entry")"
-          # `if`, not `[ ... ] && continue`: the builder runs under `set -e`, so
-          # a false test at the end of the body would abort the whole build.
-          if [ "$name" = bin ]; then
-            continue
-          fi
-          ln -s "$entry" "$out/$name"
+        	name="$(basename "$entry")"
+        	# `if`, not `[ ... ] && continue`: the builder runs under `set -e`, so
+        	# a false test at the end of the body would abort the whole build.
+        	if [ "$name" = bin ]; then
+        		continue
+        	fi
+        	ln -s "$entry" "$out/$name"
         done
 
         # Inherited by siblings with no bin/ at all -- paneru's loadable Lua
@@ -275,106 +279,106 @@ let
         # there: activation plants what it finds, so a package with nothing to
         # sign contributes nothing.
         if [ ! -d ${package}/bin ]; then
-          echo "codesign: ${package} has no bin/, nothing to sign"
-          exit 0
+        	echo "codesign: ${package} has no bin/, nothing to sign"
+        	exit 0
         fi
 
         if [ ! -r ${identityFile} ]; then
-          echo "codesign: ${identityFile} unreadable by $(id -un); run 'agenix generate' and switch once" >&2
-          exit 1
+        	echo "codesign: ${identityFile} unreadable by $(id -un); run 'agenix generate' and switch once" >&2
+        	exit 1
         fi
 
         for f in ${package}/bin/*; do
-          name="$(basename "$f")"
+        	name="$(basename "$f")"
 
-          # makeWrapper's hidden payloads are reached through their wrapper
-          # below, never signed under their own name.
-          case "$name" in
-            .*-wrapped) continue ;;
-          esac
+        	# makeWrapper's hidden payloads are reached through their wrapper
+        	# below, never signed under their own name.
+        	case "$name" in
+        	.*-wrapped) continue ;;
+        	esac
 
-          if [ ! -f "$f" ] || [ ! -x "$f" ]; then
-            ln -s "$f" "$out/bin/$name"
-            continue
-          fi
+        	if [ ! -f "$f" ] || [ ! -x "$f" ]; then
+        		ln -s "$f" "$out/bin/$name"
+        		continue
+        	fi
 
-          # Find the Mach-O this entry ultimately runs. Either it IS one, or it
-          # is a makeWrapper script and the real binary is the `.<name>-wrapped`
-          # sibling it execs, possibly through several layers of wrapping.
-          target="$f"
-          depth=0
-          while ! isMachO "$target"; do
-            hidden="$(dirname "$target")/.$(basename "$target")-wrapped"
-            if [ ! -e "$hidden" ]; then
-              target=""
-              break
-            fi
-            # Only one layer is handled. The rewrite below substitutes the
-            # path the SCRIPT references, and past one layer that is an
-            # intermediate script rather than the Mach-O -- each layer would
-            # have to be planted and repointed in turn. Nothing here is wrapped
-            # twice; if something starts being, this says so instead of
-            # substituting the wrong path.
-            if [ "$depth" -ge 1 ]; then
-              echo "codesign: $name is wrapped more than one layer deep, which this does not handle" >&2
-              exit 1
-            fi
-            target="$hidden"
-            depth=$((depth + 1))
-          done
+        	# Find the Mach-O this entry ultimately runs. Either it IS one, or it
+        	# is a makeWrapper script and the real binary is the `.<name>-wrapped`
+        	# sibling it execs, possibly through several layers of wrapping.
+        	target="$f"
+        	depth=0
+        	while ! isMachO "$target"; do
+        		hidden="$(dirname "$target")/.$(basename "$target")-wrapped"
+        		if [ ! -e "$hidden" ]; then
+        			target=""
+        			break
+        		fi
+        		# Only one layer is handled. The rewrite below substitutes the
+        		# path the SCRIPT references, and past one layer that is an
+        		# intermediate script rather than the Mach-O -- each layer would
+        		# have to be planted and repointed in turn. Nothing here is wrapped
+        		# twice; if something starts being, this says so instead of
+        		# substituting the wrong path.
+        		if [ "$depth" -ge 1 ]; then
+        			echo "codesign: $name is wrapped more than one layer deep, which this does not handle" >&2
+        			exit 1
+        		fi
+        		target="$hidden"
+        		depth=$((depth + 1))
+        	done
 
-          # Not a Mach-O and not a wrapper around one: a plain script, of which
-          # sketchybar ships several. Carried through untouched -- there is
-          # nothing to sign and nothing to plant.
-          if [ -z "$target" ]; then
-            ln -s "$f" "$out/bin/$name"
-            continue
-          fi
+        	# Not a Mach-O and not a wrapper around one: a plain script, of which
+        	# sketchybar ships several. Carried through untouched -- there is
+        	# nothing to sign and nothing to plant.
+        	if [ -z "$target" ]; then
+        		ln -s "$f" "$out/bin/$name"
+        		continue
+        	fi
 
-          # Where the signed payload has to land. A bare binary IS the program,
-          # so it takes the program's own name. A wrapped one keeps
-          # makeWrapper's hidden name, because the script that execs it is
-          # planted alongside under the program name and has to find it there.
-          if [ "$target" = "$f" ]; then
-            payload="$name"
-          else
-            payload=".$name-wrapped"
-          fi
+        	# Where the signed payload has to land. A bare binary IS the program,
+        	# so it takes the program's own name. A wrapped one keeps
+        	# makeWrapper's hidden name, because the script that execs it is
+        	# planted alongside under the program name and has to find it there.
+        	if [ "$target" = "$f" ]; then
+        		payload="$name"
+        	else
+        		payload=".$name-wrapped"
+        	fi
 
-          # `$target` is a Mach-O by construction -- the loop above only exits
-          # with it set once `isMachO` passed -- so this signs the real binary,
-          # never a wrapper script. A script cannot carry a code signature TCC
-          # would honour anyway.
-          #
-          # The identifier is the stable half of the requirement, so it is the
-          # name rather than anything version-derived.
-          # `--timestamp-url none`: rcodesign otherwise fetches a timestamp
-          # token from timestamp.apple.com, which is both a network call in a
-          # build and a source of non-determinism. Nothing here needs one --
-          # the requirement TCC stores is the certificate hash.
-          rcodesign sign --pem-file ${identityFile} --timestamp-url none \
-            --binary-identifier "$name" ${entitlementsArg} \
-            "$target" "$out/trusted/$payload"
-          chmod 755 "$out/trusted/$payload"
+        	# `$target` is a Mach-O by construction -- the loop above only exits
+        	# with it set once `isMachO` passed -- so this signs the real binary,
+        	# never a wrapper script. A script cannot carry a code signature TCC
+        	# would honour anyway.
+        	#
+        	# The identifier is the stable half of the requirement, so it is the
+        	# name rather than anything version-derived.
+        	# `--timestamp-url none`: rcodesign otherwise fetches a timestamp
+        	# token from timestamp.apple.com, which is both a network call in a
+        	# build and a source of non-determinism. Nothing here needs one --
+        	# the requirement TCC stores is the certificate hash.
+        	rcodesign sign --pem-file ${identityFile} --timestamp-url none \
+        		--binary-identifier "$name" ${entitlementsArg} \
+        		"$target" "$out/trusted/$payload"
+        	chmod 755 "$out/trusted/$payload"
 
-          if [ "$target" != "$f" ]; then
-            # Wrap the wrapper. The script is upstream's and it is what exports
-            # LUA_PATH, PATH and the rest, so it is kept verbatim and ONLY its
-            # exec target is repointed -- from the store copy of the payload to
-            # the planted one. Both halves of the chain then live at fixed
-            # paths, so nothing a rebuild moves is left in it.
-            cp "$f" "$out/trusted/$name"
-            chmod +w "$out/trusted/$name"
-            substituteInPlace "$out/trusted/$name" --replace-fail "$target" "${trustedDir}/$payload"
-            chmod 755 "$out/trusted/$name"
-          fi
+        	if [ "$target" != "$f" ]; then
+        		# Wrap the wrapper. The script is upstream's and it is what exports
+        		# LUA_PATH, PATH and the rest, so it is kept verbatim and ONLY its
+        		# exec target is repointed -- from the store copy of the payload to
+        		# the planted one. Both halves of the chain then live at fixed
+        		# paths, so nothing a rebuild moves is left in it.
+        		cp "$f" "$out/trusted/$name"
+        		chmod +w "$out/trusted/$name"
+        		substituteInPlace "$out/trusted/$name" --replace-fail "$target" "${trustedDir}/$payload"
+        		chmod 755 "$out/trusted/$name"
+        	fi
 
-          # Uniform regardless of shape: what the package exposes is a shim onto
-          # the stable path. makeWrapper cannot target ${trustedDir} directly --
-          # assertExecutable rejects a path that only exists after activation --
-          # so it is aimed at the planted file and then re-pointed.
-          makeWrapper "$out/trusted/$name" "$out/bin/$name"
-          substituteInPlace "$out/bin/$name" --replace-fail "$out/trusted/$name" "${trustedDir}/$name"
+        	# Uniform regardless of shape: what the package exposes is a shim onto
+        	# the stable path. makeWrapper cannot target ${trustedDir} directly --
+        	# assertExecutable rejects a path that only exists after activation --
+        	# so it is aimed at the planted file and then re-pointed.
+        	makeWrapper "$out/trusted/$name" "$out/bin/$name"
+        	substituteInPlace "$out/bin/$name" --replace-fail "$out/trusted/$name" "${trustedDir}/$name"
         done
       '';
 
@@ -451,13 +455,17 @@ in
   perSystem =
     { pkgs, lib, ... }:
     {
-      packages = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-        codesign-ci-identity = pkgs.writeShellApplication {
+      # The darwin guard lives under `packages` as `mkIf`, not at the module's
+      # top level: a `perSystem` body of `optionalAttrs pkgs.<x> { ... }` forces
+      # `pkgs` just to learn the module's shape, and `pkgs` is a `_module.args`
+      # fixpoint -> infinite recursion.
+      packages.codesign-ci-identity = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
+        pkgs.writeShellApplication {
           name = "codesign-ci-identity";
           runtimeInputs = [ pkgs.coreutils ];
           text = mkIdentity pkgs null;
-        };
-      };
+        }
+      );
     };
 
   # Deliberately its own aspect, and the only one a host needs for the first
@@ -576,9 +584,7 @@ in
           in
           ''
             install -d -m 0755 ${trustedDir}
-            for src in ${
-              lib.concatMapStringsSep " " (p: "${p}/trusted/* ${p}/trusted/.*-wrapped") runs
-            }; do
+            for src in ${lib.concatMapStringsSep " " (p: "${p}/trusted/* ${p}/trusted/.*-wrapped") runs}; do
               # A source can legitimately carry no `trusted/` -- a package with
               # no `bin/` signs nothing -- and `.*-wrapped` matches nothing for a
               # program that was never wrapped. Skip rather than fail the whole

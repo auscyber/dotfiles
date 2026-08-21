@@ -88,6 +88,11 @@
                   set -gx SSH_AUTH_SOCK "${_1passwordSocket}"
                 end
               '';
+              programs.gh = {
+                enable = true;
+                git_protocol = "ssh";
+
+              };
 
               home.packages = [ pkgs._1password-cli ];
               programs._1password-shell-plugins = {
@@ -98,7 +103,7 @@
                 plugins = with pkgs; [
                   gh
                   glab
-                  #            wrangler
+                  wrangler
 
                   awscli2
                 ];

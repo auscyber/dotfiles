@@ -92,19 +92,15 @@ let
   );
   inherit (den.lib.policy) route;
 
-  address = [
-    "127.0.0.1"
-    27631
-  ];
-
+  # lspmux listens on a unix domain socket rather than a TCP port. `listen` /
+  # `connect` are filled in per-consumer (`mkLspmuxConfig`) since the socket sits
+  # in the platform config dir, which differs between Linux and darwin.
   lspmux = {
-    listen = address;
     instance_timeout = 300; # after 5 minutes
 
     # time in seconds how long to wait between the gc task checks for disconnected
     # clients and possibly starts a timeout task. the value must be at least 1.
     gc_interval = 10; # every 10 seconds
-    connect = address; # same as `listen`
     log_filters = "info";
 
     # glob filters over the env vars `lspmux client` forwards to the server.
@@ -123,6 +119,24 @@ let
       "!NVIM"
     ];
   };
+
+  # lspmux reads its config from the platform config dir; the socket lives beside
+  # it (that directory is already created for `config.toml`). `lspmux server`
+  # removes a stale socket file on bind, so a fixed path is fine.
+  lspmuxDir = {
+    linux = ".config/lspmux";
+    darwin = "Library/Application Support/lspmux";
+  };
+  socketOf = home: dir: "${home}/${dir}/lspmux.sock";
+  mkLspmuxConfig = socket: lspmux // {
+    listen = socket;
+    connect = socket;
+  };
+
+  # Env var names `lspmux client` strips before forwarding during its handshake
+  # (the `!`-prefixed `pass_environment` entries). nvim's direct-socket path
+  # rebuilds the forwarded env itself, so it filters by the same list.
+  droppedEnv = map (lib.removePrefix "!") (builtins.filter (lib.hasPrefix "!") lspmux.pass_environment);
 
   # opencode's built-in LSP server ids. Only these can have their `command`
   # overridden with the shim without also supplying `extensions`, so the opencode
@@ -561,10 +575,18 @@ in
     #
     # Driven off `config.lspmux.servers` -- the `lsp-servers` class routed into the
     # nvim module system (see `lsp-servers-to-nvim`) -- rather than the `pkgs.lspmuxed`
-    # overlay, so nvim consumes the typed registry directly. Each shim is built with
-    # `pkgs.wrapLspMux`. A registered server is enabled by default; `nvim = false`
-    # (rust -> rustaceanvim, idris -> plugins.idris2) opts out. `server_config` (the
-    # server's own settings, e.g. rust-analyzer's `check.command`) becomes `settings`.
+    # overlay, so nvim consumes the typed registry directly. A registered server is
+    # enabled by default; `nvim = false` (rust -> rustaceanvim, idris ->
+    # plugins.idris2) opts out. `server_config` (the server's own settings, e.g.
+    # rust-analyzer's `check.command`) becomes `settings`.
+    #
+    # Static-cmd servers connect straight to the lspmux server over its unix socket
+    # (`vim.lsp.rpc.connect`) and ask it to spawn the language server via the
+    # `lspMux` initializationOptions -- no `lspmux client` shim process per buffer.
+    # `dynamicCmd` servers keep the shim: lspconfig computes their cmd in a lua
+    # function at runtime (jdtls derives `-data <workspace>`, ts_ls/tailwindcss
+    # prefer a project-local node_modules copy) and we would lose that if we
+    # replaced `cmd` with a socket.
     nvim =
       {
         config,
@@ -572,6 +594,34 @@ in
         lib,
         ...
       }:
+      let
+        socketRel = if pkgs.stdenv.hostPlatform.isDarwin then lspmuxDir.darwin else lspmuxDir.linux;
+        socketExpr = ''vim.env.HOME .. ${builtins.toJSON "/${socketRel}/lspmux.sock"}'';
+
+        # The env `lspmux client` would forward during its handshake, rebuilt for
+        # the direct-socket connection: nvim's full environment minus the names
+        # `pass_environment` drops, with the pinned server appended to PATH as a
+        # last-resort fallback (a project's own copy on nvim's PATH still wins).
+        lspMuxEnv =
+          spec:
+          let
+            drop = lib.concatMapStringsSep " " (n: "[${builtins.toJSON n}] = true,") droppedEnv;
+            pathFallback = lib.optionalString (
+              spec.package != null
+            ) ''env.PATH = (env.PATH or "") .. ${builtins.toJSON ":${spec.package}/bin"}'';
+          in
+          ''
+            (function()
+              local drop = { ${drop} }
+              local env = {}
+              for name, value in pairs(vim.fn.environ()) do
+                if not drop[name] then env[name] = value end
+              end
+              ${pathFallback}
+              return env
+            end)()
+          '';
+      in
       {
         options.lspmux.servers = lib.mkOption {
           type = lib.types.attrsOf lspSubModule;
@@ -581,32 +631,48 @@ in
 
         config.lsp.servers = lib.mapAttrs (
           lspconfig: spec:
-          let
-            shim = pkgs.wrapLspMux (spec // { inherit lspconfig; });
-            # The vim.lsp.config block: `cmd` for statically-spawned servers plus the
-            # server's own `settings` from `server_config`.
-            cfg =
-              (lib.optionalAttrs (!spec.dynamicCmd) { cmd = [ (lib.getExe shim) ] ++ spec.args; })
-              // (lib.optionalAttrs (spec.server_config != { }) { settings = spec.server_config; });
-          in
           {
             enable = lib.mkDefault true;
           }
           // (
             if spec.dynamicCmd then
-              # lspconfig builds this server's cmd in a lua function at runtime, and we
-              # cannot replace it without losing that logic (jdtls derives `-data
-              # <workspace>`, ts_ls prefers a project-local node_modules server). So
-              # shadow the binary name on $PATH instead: the function spawns it by bare
-              # name, lands in the shim, and its computed args are forwarded verbatim.
-              { package = shim; }
+              # Shadow the binary name on $PATH with the shim: lspconfig's cmd
+              # function spawns it by bare name and its computed args are forwarded
+              # to the same lspmux server verbatim.
+              {
+                package = pkgs.wrapLspMux (spec // { inherit lspconfig; });
+              }
+              // lib.optionalAttrs (spec.server_config != { }) { config.settings = spec.server_config; }
             else
-              # Spawn the shim by path; it resolves the real server off $PATH at
-              # runtime. `package = null` keeps nixvim from prefixing the pinned
-              # server onto nvim's $PATH, where it would beat the project's own copy.
-              { package = null; }
+              # `package = null` keeps nixvim from prefixing the pinned server onto
+              # nvim's $PATH; the fallback is folded into `lspMux.env.PATH` instead.
+              {
+                package = null;
+                config = {
+                  cmd.__raw = "vim.lsp.rpc.connect(${socketExpr})";
+                  init_options.lspMux = {
+                    version = "1";
+                    method = "connect";
+                    server = spec.exe;
+                    env.__raw = lspMuxEnv spec;
+                  }
+                  // lib.optionalAttrs (spec.args != [ ]) { args = spec.args; };
+                  # lspmux keys the instance off the workspace root, which nvim
+                  # sends as workspaceFolders/rootUri whenever a root is detected;
+                  # `cwd` is only the fallback for when it isn't. Set it at attach
+                  # time the way the `lspmux client` shim's own cwd would.
+                  before_init.__raw = ''
+                    function(params, config)
+                      local opts = params.initializationOptions or {}
+                      opts.lspMux = opts.lspMux or {}
+                      opts.lspMux.cwd = config.root_dir or vim.fn.getcwd()
+                      params.initializationOptions = opts
+                    end
+                  '';
+                }
+                // lib.optionalAttrs (spec.server_config != { }) { settings = spec.server_config; };
+              }
           )
-          // lib.optionalAttrs (cfg != { }) { config = cfg; }
         ) (lib.filterAttrs (_lspconfig: spec: spec.nvim) config.lspmux.servers);
       };
 
@@ -669,7 +735,9 @@ in
             }) (lib.filterAttrs (_lspconfig: spec: spec.extensionToLanguage != { }) config.lsp.servers)
           );
 
-          home.file.".config/lspmux/config.toml".source = pkgs.writers.writeTOML "lspmux.toml" lspmux;
+          home.file.".config/lspmux/config.toml".source = pkgs.writers.writeTOML "lspmux.toml" (
+            mkLspmuxConfig (socketOf config.home.homeDirectory lspmuxDir.linux)
+          );
 
           systemd.user.services.lspmux = {
             Unit = {
@@ -687,7 +755,9 @@ in
           };
 
           home.file."Library/Application Support/lspmux/config.toml".source =
-            pkgs.writers.writeTOML "lspmux.toml" lspmux;
+            pkgs.writers.writeTOML "lspmux.toml" (
+              mkLspmuxConfig (socketOf config.home.homeDirectory lspmuxDir.darwin)
+            );
 
           launchd.agents.lspmux = {
             enable = true;
