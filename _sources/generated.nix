@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "8bb4dd84950bf24b8e8a16df684a7cfdac962b83";
+    version = "3efee65920c6d2efb89078987ee92b602b046719";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "8bb4dd84950bf24b8e8a16df684a7cfdac962b83";
+      rev = "3efee65920c6d2efb89078987ee92b602b046719";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-u+IbGVRvphjkyT1SMBfsedXXfrY1dxM4X6X5NI9wl1I=";
+      sha256 = "sha256-vuL+sYx4xRzGeiQG6TQfvptNcnif8cd3JhYB+LwSIEo=";
     };
-    date = "2026-08-19";
+    date = "2026-08-21";
   };
   cotabby = {
     pname = "cotabby";
@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.15.5.1";
+    version = "0.15.6.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.5.1/helium-0.15.5.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-jE64dbmwDP0qJF8OGCT5fAhzfoBzUjYLoxHahb0DNig=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.15.6.1/helium-0.15.6.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-Nkd6SQGcVQYI/KIC62Gkpo/6gCUfiV4sQVPm85gwElU=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.15.5.1";
+    version = "0.15.6.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.5.1/helium_0.15.5.1_arm64-macos.dmg";
-      sha256 = "sha256-zKjDii66+j9hr04+xHe1is4kDhq9tX8YVHjK2P8kzl0=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.15.6.1/helium_0.15.6.1_arm64-macos.dmg";
+      sha256 = "sha256-medoiZEkXGXVDSc1LP6t/aU1DrtkqtQOtHGDPN8yPXk=";
     };
   };
   jankyborders = {
@@ -233,10 +233,10 @@
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.0.1";
+    version = "2.1.0-beta.0";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.0.1/zotlit-zotero-2.0.1.xpi";
-      sha256 = "sha256-vxkBUOWmPJRwVMzmSje1M1iJ8J8dFtAXUaAqR7pe03U=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.0-beta.0/zotlit-zotero-2.1.0-beta.0.xpi";
+      sha256 = "sha256-Cy5zChuO2lxorchp2j6YJWbYJZUxlS86mScIAWdRIXE=";
     };
   };
 }
