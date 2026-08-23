@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "3efee65920c6d2efb89078987ee92b602b046719";
+    version = "98c94336c20328fd37ea29dc480557e80303a134";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "3efee65920c6d2efb89078987ee92b602b046719";
+      rev = "98c94336c20328fd37ea29dc480557e80303a134";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-vuL+sYx4xRzGeiQG6TQfvptNcnif8cd3JhYB+LwSIEo=";
+      sha256 = "sha256-c3IjKptifLkEx/W+rSpOBQfh95MGhewnK2oSFEtjtU4=";
     };
-    date = "2026-08-21";
+    date = "2026-08-22";
   };
   cotabby = {
     pname = "cotabby";
@@ -181,18 +181,18 @@
   };
   zotero-attanger = {
     pname = "zotero-attanger";
-    version = "1.4.9";
+    version = "v1.5.0";
     src = fetchurl {
-      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.9/zotero-attanger.xpi";
-      sha256 = "sha256-XBBPHfdJG0n+I1zsBwgcRm1yaOFDY1uVTdbWWmMi5Os=";
+      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.0/zotero-attanger.xpi";
+      sha256 = "sha256-3/dpVWSoBnb8cGSHtAw5+4E8dPXUhw91LIeGWCpxW6c=";
     };
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.55";
+    version = "9.0.57";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.55/zotero-better-bibtex-9.0.55.xpi";
-      sha256 = "sha256-LZFOuxdMLFkOz/dBppA/GXkGW0J0DzAdk47Cy2wD5NY=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.57/zotero-better-bibtex-9.0.57.xpi";
+      sha256 = "sha256-xqKBWxGR5u/SdITwAPlvZp21JtYnc0TqEYB8bz9MpVI=";
     };
   };
   zotero-better-notes = {

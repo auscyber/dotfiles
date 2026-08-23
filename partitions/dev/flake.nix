@@ -24,6 +24,6 @@
       url = "github:nix-community/nix-github-actions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "github:nixos/nixpkgs/07e1d92cdc0ed416cfa11ff3ca40d17e61cfba7a";
+    nixpkgs.url = "github:nixos/nixpkgs/391b592eb44808b3bd0cb80bb71b63a5a118b8bb";
   };
 }

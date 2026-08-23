@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-08-21",
+        "date": "2026-08-22",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "3efee65920c6d2efb89078987ee92b602b046719",
-            "sha256": "sha256-vuL+sYx4xRzGeiQG6TQfvptNcnif8cd3JhYB+LwSIEo=",
+            "rev": "98c94336c20328fd37ea29dc480557e80303a134",
+            "sha256": "sha256-c3IjKptifLkEx/W+rSpOBQfh95MGhewnK2oSFEtjtU4=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "3efee65920c6d2efb89078987ee92b602b046719"
+        "version": "98c94336c20328fd37ea29dc480557e80303a134"
     },
     "cotabby": {
         "cargoLock": null,
@@ -307,11 +307,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-XBBPHfdJG0n+I1zsBwgcRm1yaOFDY1uVTdbWWmMi5Os=",
+            "sha256": "sha256-3/dpVWSoBnb8cGSHtAw5+4E8dPXUhw91LIeGWCpxW6c=",
             "type": "url",
-            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/1.4.9/zotero-attanger.xpi"
+            "url": "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.0/zotero-attanger.xpi"
         },
-        "version": "1.4.9"
+        "version": "v1.5.0"
     },
     "zotero-better-bibtex": {
         "cargoLock": null,
@@ -323,11 +323,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-LZFOuxdMLFkOz/dBppA/GXkGW0J0DzAdk47Cy2wD5NY=",
+            "sha256": "sha256-xqKBWxGR5u/SdITwAPlvZp21JtYnc0TqEYB8bz9MpVI=",
             "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.55/zotero-better-bibtex-9.0.55.xpi"
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.57/zotero-better-bibtex-9.0.57.xpi"
         },
-        "version": "9.0.55"
+        "version": "9.0.57"
     },
     "zotero-better-notes": {
         "cargoLock": null,
