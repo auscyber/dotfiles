@@ -52,7 +52,7 @@
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
   celler.hash = "sha256-0AtelSDZFXruBvBxMS7wfrE0AEJFXj2grsnn9llsxHE=";
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
-  home-manager.hash = "sha256-CBh2KMMhMr9Ol0j8BxGHhNWi3pkUqGni5o8xQk46mi4=";
+  home-manager.hash = "sha256-q4CgLpk9zlSvy6P+aBv+A3P2aT9EhU+nqM+/K/tSlSE=";
   nh.hash = "sha256-pjtE1tfuN1ZjRtW+K9Gdcs63dKkwsWMnNBCYyXNy6ic=";
   zen-browser.hash = null;
 }
