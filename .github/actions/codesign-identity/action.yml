@@ -34,8 +34,8 @@ inputs:
   identity:
     description: >-
       Concatenated private-key + certificate PEM to plant. Empty (the default)
-      mints a throwaway one with `.#codesign-ci-identity`, which shares its
-      recipe with the `agenix generate` generator.
+      mints a throwaway one with `openssl`, following the same recipe as
+      aspects/darwin/codesign.nix's `mkIdentity` (self-signed, codeSigning EKU).
     required: false
     default: ""
   path:
@@ -87,7 +87,37 @@ runs:
           sudo chmod 0640 "$IDENTITY_PATH"
           echo "planted the supplied codesign identity at $IDENTITY_PATH" >&2
         else
-          nix run .#codesign-ci-identity | sudo tee "$IDENTITY_PATH" >/dev/null
+          # Same recipe as `mkIdentity` in aspects/darwin/codesign.nix, in plain
+          # bash rather than through a flake output: a flake app would need a
+          # `perSystem` evaluated for every system just to produce something
+          # only ever consumed here, on macOS, and openssl is already on the
+          # runner. Keep the two recipes in sync if either changes.
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          # `printf`, not a heredoc: a heredoc terminator has to be at column
+          # zero with nothing else on the line, which conflicts with this
+          # script's own indentation inside the surrounding YAML block scalar
+          # (which requires every line to stay indented at least as much as the
+          # block's first line, or the block ends early -- and yamllint/the
+          # workflow parser will not warn, it silently reads the dedented lines
+          # as the next mapping key instead of script text).
+          printf '%s\n' \
+            '[req]' \
+            'distinguished_name = dn' \
+            'x509_extensions = v3' \
+            'prompt = no' \
+            '[dn]' \
+            'CN = Dendritic Local Codesign (CI, throwaway)' \
+            '[v3]' \
+            'basicConstraints = critical,CA:false' \
+            'keyUsage = critical,digitalSignature' \
+            'extendedKeyUsage = critical,codeSigning' \
+            '1.2.840.113635.100.6.1.14 = critical,DER:0500' \
+            >"$work/openssl.cnf"
+          openssl req -x509 -newkey rsa:2048 -nodes -days 7300 \
+            -config "$work/openssl.cnf" \
+            -keyout "$work/key.pem" -out "$work/cert.pem" 2>/dev/null
+          cat "$work/key.pem" "$work/cert.pem" | sudo tee "$IDENTITY_PATH" >/dev/null
           # Throwaway, and discarded with the runner -- world-readable rather
           # than depending on what the installer named the build-user group.
           sudo chmod 0644 "$IDENTITY_PATH"

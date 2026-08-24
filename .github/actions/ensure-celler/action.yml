@@ -18,7 +18,11 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        out="$(nix eval --impure --raw ".#celler.outPath")"
+        # --show-trace: a plain infinite-recursion or similar module-system
+        # error otherwise truncates ("use '--show-trace' to show the full,
+        # detailed trace"), hiding exactly the frame that would say which
+        # aspect's `pkgs`/`config` reference is cyclic.
+        out="$(nix eval --impure --raw --show-trace ".#celler.outPath")"
         echo "out=$out" | tee -a "$GITHUB_OUTPUT"
         if nix path-info --store https://cache.ivymect.in/main "$out" >/dev/null 2>&1; then
           echo "celler already in the cache, nothing to build" >&2

@@ -108,13 +108,14 @@ let
 
   subject = "Dendritic Local Codesign";
 
-  # One recipe for what a codesign identity IS, shared by the `agenix generate`
-  # generator below and the `codesign-ci-identity` package -- so a CI runner and
-  # a real host can never mint subtly different things. Emits the private key
-  # followed by the certificate on stdout, which is exactly the concatenated PEM
-  # `rcodesign --pem-file` wants. `certOut`, when set, also keeps the public half
-  # at that path (what the generator does, so the leaf hash can be read without
-  # decrypting anything).
+  # What a codesign identity IS: a self-signed cert with the codeSigning EKU,
+  # concatenated private key then certificate on stdout -- exactly the PEM
+  # `rcodesign --pem-file` wants. Used by the `agenix generate` generator below.
+  # `.github/actions/codesign-identity` mints the CI runner's throwaway identity
+  # with the same recipe, in plain bash rather than through this -- see the note
+  # by the generator below for why. `certOut`, when set, also keeps the public
+  # half at that path (what the generator does, so the leaf hash can be read
+  # without decrypting anything).
   mkIdentity =
     pkgs: certOut:
     ''
@@ -409,7 +410,6 @@ in
 
   # The public half lands next to the `.age` file (as the wireguard generator
   # does with `.pub`) so the leaf hash can be read without decrypting anything.
-  # The recipe itself is `mkIdentity` above, shared with `codesign-ci-identity`.
   den.aspects.agenix-rekey.age.generators.codesign_identity =
     {
       pkgs,
@@ -419,38 +419,17 @@ in
     }:
     mkIdentity pkgs (lib.escapeShellArg (lib.removeSuffix ".age" file + ".crt"));
 
-  # `nix run .#codesign-ci-identity` -- mint a THROWAWAY identity on stdout, in
-  # the same concatenated-PEM form `sign` feeds `rcodesign --pem-file`.
-  #
-  # This exists for the aarch64-darwin CI runner. `sign` reads `identityFile` at
-  # build time and aborts if it is missing, so a runner with no identity cannot
-  # build any signed package -- which is every darwin host that includes
-  # `den.aspects.codesign`, i.e. the ones `.#ciMatrix.checks.aarch64-darwin`
-  # covers. CI plants the output of this at `identityFile` before building (see
-  # .github/actions/build-system).
-  #
-  # Deliberately NOT the host's real identity, and deliberately fine that it is
-  # a different certificate every run:
-  #
-  #   * `sign` sets `allowSubstitutes = false` precisely because the identity is
-  #     an impure input that the derivation hash does not cover. A real host
-  #     therefore never substitutes a signed path -- it always rebuilds against
-  #     its own identity -- so a CI-signed output can never reach one and can
-  #     never invalidate a TCC grant. CI is proving these packages *build*, not
-  #     producing artefacts anyone installs.
-  #   * The alternative -- uploading the host's 20-year signing key as a GitHub
-  #     secret -- would put the one key that must never leak, and never change,
-  #     on every runner, to no benefit given the point above. The CI action still
-  #     accepts a real PEM if one is ever wanted; it just does not need one.
-  perSystem =
-    { pkgs, lib, ... }:
-    lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-      packages.codesign-ci-identity = pkgs.writeShellApplication {
-        name = "codesign-ci-identity";
-        runtimeInputs = [ pkgs.coreutils ];
-        text = mkIdentity pkgs null;
-      };
-    };
+  # No flake output mints the CI runner's throwaway identity (there used to be
+  # a `perSystem.packages.codesign-ci-identity` here). `sign` reads
+  # `identityFile` at build time and aborts if it is missing, so a darwin
+  # runner with no identity cannot build any signed package -- but minting one
+  # through a flake app meant a bare `perSystem` participating in flake-parts'
+  # own per-system module merging for EVERY system, unconditionally, just to
+  # produce an attribute only ever consumed on macOS. `.github/actions/codesign-
+  # identity` mints the equivalent throwaway PEM directly with the `openssl`
+  # already on the runner instead -- same recipe as `mkIdentity` above
+  # (self-signed, codeSigning EKU, no certOut), no flake evaluation involved.
+  # Keep the two recipes in sync if either changes.
 
   # Deliberately its own aspect, and the only one a host needs for the first
   # switch. `codesign` below cannot build until the identity is already deployed
