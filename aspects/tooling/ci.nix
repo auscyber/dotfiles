@@ -6,13 +6,17 @@
 # CI: build every host in parallel and push the results to the self-hosted
 # celler cache (cache.ivymect.in/main).
 #
-#   * The dynamic GitHub matrix (`flake.ciMatrix`) lives in ./ci-matrix.nix, in the
-#     `dev` partition -- it is the only part of CI that needs the
-#     `nix-github-actions` input.
-#   * The build jobs run `nix build` against THIS flake with
-#     `accept-flake-config`, so they pick up substituters + trusted-public-keys
-#     straight from the flake's nixConfig -- everything derived from
-#     aspects/base/celler-keys.json -- with nothing hardcoded in the workflow.
+#   * One workflow per system type (.github/workflows/build-<system>.yml), each a
+#     single job that hands `.#ciMatrix.checks.<system>` to nix-fast-build --
+#     every host for that arch evaluated in parallel, each built as soon as it
+#     evaluates, `--skip-cached` so an unchanged host is neither built nor
+#     downloaded.
+#   * `flake.ciMatrix` lives in ./ci-matrix.nix, in the `dev` partition -- it is
+#     the only part of CI that needs the `nix-github-actions` input.
+#   * The build jobs run against THIS flake with `accept-flake-config`, so they
+#     pick up substituters + trusted-public-keys straight from the flake's
+#     nixConfig -- everything derived from aspects/base/celler-keys.json -- with
+#     nothing hardcoded in the workflow.
 #   * Per-host build targets are `.#ciMatrix.checks.<system>."<class>-<name>"`.
 #     There used to be `packages.<class>-<name>` aliases for the same
 #     derivations here, but enumerating them means reading

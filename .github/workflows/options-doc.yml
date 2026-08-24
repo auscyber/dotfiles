@@ -13,12 +13,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install nix
-        uses: cachix/install-nix-action@v31
+      # Same nix setup as the per-system build workflows: nothing-but-nix
+      # (before the installer) + DeterminateSystems/nix-installer-action.
+      - uses: wimpysworld/nothing-but-nix@main
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-          extra_nix_config: |
+          hatchet-protocol: cleave
+      - name: Install nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
             experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - name: Setup cachix
         uses: cachix/cachix-action@v15
         with:
