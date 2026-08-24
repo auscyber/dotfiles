@@ -6,11 +6,9 @@ on:
       - master
   workflow_dispatch:
 
-# The aarch64-linux leg. One workflow per system type: nix-fast-build evaluates
-# every host for this arch in parallel and builds each as soon as it evaluates,
-# so the whole arch is a single job. See build-x86_64-linux.yml for the full
-# rationale -- these three files are deliberately identical apart from the
-# system, the runner label, and the macOS-only notes in build-aarch64-darwin.yml.
+# The aarch64-linux leg. See build-x86_64-linux.yml for the rationale and
+# ./.github/actions/build-system for every step.
+
 jobs:
   build:
     name: aarch64-linux
@@ -19,67 +17,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      # Must come before the installer: it builds the volume Nix is installed
-      # onto. Ubuntu-only; it warns and skips elsewhere.
-      - uses: wimpysworld/nothing-but-nix@main
+      - uses: ./.github/actions/build-system
         with:
-          hatchet-protocol: cleave
-
-      - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            experimental-features = nix-command flakes pipe-operators
-            accept-flake-config = true
-            fallback = true
-            connect-timeout = 5
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-            extra-substituters = https://cache.ivymect.in/main
-            extra-trusted-substituters = https://cache.ivymect.in/main
-            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
-
-      # Make sure the celler client itself is in the cache for this arch before
-      # anything tries to install it (builds + dogfood-pushes it only on a miss).
-      # Skipped on pull_request: fork PRs have no CELLER_TOKEN.
-      - if: ${{ github.event_name != 'pull_request' }}
-        uses: ./.github/actions/ensure-celler
-        with:
+          system: aarch64-linux
           celler-token: ${{ secrets.CELLER_TOKEN }}
-
-      # Installs the celler client and registers the post-job push, so every
-      # path nix-fast-build produces below lands in the cache. `flake-ref:
-      # ".#celler"` -- not `inputs-from: "."` -- so this installs the exact
-      # installable ensure-celler just verified is cached; resolving through the
-      # registry instead produced a different derivation and rebuilt celler
-      # (aws-sdk-s3 and all) on every run.
-      - name: Setup celler cache
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: auscyber/celler-action@main
-        with:
-          endpoint: https://cache.ivymect.in
-          cache: main
-          token: ${{ secrets.CELLER_TOKEN }}
-          flake-ref: ".#celler"
-
-      # Every patched-input tree is a fixed-output derivation once its hash is
-      # recorded (lib/patched-inputs.nix), so the output path is identical on
-      # every system. Building `.#patched-inputs-warm` natively here -- with
-      # this runner's own pkgs, never a foreign builder -- means the host builds
-      # below always find `newInputs`' single-`patchSystem` realisation already
-      # in the store. See aspects/tooling/patch-inputs.nix.
-      - name: Warm patched-input FODs
-        run: nix build --no-link --fallback .#patched-inputs-warm
-
-      # `--inputs-from .` resolves `nixpkgs` through this flake's lock, so
-      # nix-fast-build comes from the pinned nixpkgs (a cache.nixos.org hit)
-      # rather than whatever the runner's registry points at.
-      #
-      # Which hosts failed is not lost by collapsing them into one job:
-      # nix-fast-build writes a GitHub job summary naming every failure (with
-      # its build log) and folds the successful logs into ::group:: sections.
-      - name: Build all aarch64-linux hosts
-        run: |
-          set -euo pipefail
-          nix run --inputs-from . nixpkgs#nix-fast-build -- \
-            --flake ".#ciMatrix.checks.aarch64-linux" \
-            --skip-cached
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -60,6 +60,47 @@ let
 
   subject = "Dendritic Local Codesign";
 
+  # One recipe for what a codesign identity IS, shared by the `agenix generate`
+  # generator below and the `codesign-ci-identity` package -- so a CI runner and
+  # a real host can never mint subtly different things. Emits the private key
+  # followed by the certificate on stdout, which is exactly the concatenated PEM
+  # `rcodesign --pem-file` wants. `certOut`, when set, also keeps the public half
+  # at that path (what the generator does, so the leaf hash can be read without
+  # decrypting anything).
+  mkIdentity =
+    pkgs: certOut:
+    ''
+      work=$(mktemp -d)
+      trap 'rm -rf "$work"' EXIT
+
+      # codeSigning EKU is what makes this usable as an identity at all;
+      # 1.2.840.113635.100.6.1.14 is Apple's code-signing marker. 20 years,
+      # because re-minting invalidates every grant made against the old leaf.
+      cat > "$work/openssl.cnf" <<'CNF'
+      [req]
+      distinguished_name = dn
+      x509_extensions = v3
+      prompt = no
+      [dn]
+      CN = ${subject}
+      [v3]
+      basicConstraints = critical,CA:false
+      keyUsage = critical,digitalSignature
+      extendedKeyUsage = critical,codeSigning
+      1.2.840.113635.100.6.1.14 = critical,DER:0500
+      CNF
+
+      ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:2048 -nodes -days 7300 \
+        -config "$work/openssl.cnf" \
+        -keyout "$work/key.pem" -out "$work/cert.pem" 2>/dev/null
+    ''
+    + lib.optionalString (certOut != null) ''
+      cp "$work/cert.pem" ${certOut}
+    ''
+    + ''
+      cat "$work/key.pem" "$work/cert.pem"
+    '';
+
   sign =
     pkgs: pkg:
     pkg.overrideAttrs (old: {
@@ -156,6 +197,7 @@ in
 
   # The public half lands next to the `.age` file (as the wireguard generator
   # does with `.pub`) so the leaf hash can be read without decrypting anything.
+  # The recipe itself is `mkIdentity` above, shared with `codesign-ci-identity`.
   den.aspects.agenix-rekey.age.generators.codesign_identity =
     {
       pkgs,
@@ -163,34 +205,40 @@ in
       file,
       ...
     }:
-    ''
-      work=$(mktemp -d)
-      trap 'rm -rf "$work"' EXIT
+    mkIdentity pkgs (lib.escapeShellArg (lib.removeSuffix ".age" file + ".crt"));
 
-      # codeSigning EKU is what makes this usable as an identity at all;
-      # 1.2.840.113635.100.6.1.14 is Apple's code-signing marker. 20 years,
-      # because re-minting invalidates every grant made against the old leaf.
-      cat > "$work/openssl.cnf" <<'CNF'
-      [req]
-      distinguished_name = dn
-      x509_extensions = v3
-      prompt = no
-      [dn]
-      CN = ${subject}
-      [v3]
-      basicConstraints = critical,CA:false
-      keyUsage = critical,digitalSignature
-      extendedKeyUsage = critical,codeSigning
-      1.2.840.113635.100.6.1.14 = critical,DER:0500
-      CNF
-
-      ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:2048 -nodes -days 7300 \
-        -config "$work/openssl.cnf" \
-        -keyout "$work/key.pem" -out "$work/cert.pem" 2>/dev/null
-
-      cp "$work/cert.pem" ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".crt")}
-      cat "$work/key.pem" "$work/cert.pem"
-    '';
+  # `nix run .#codesign-ci-identity` -- mint a THROWAWAY identity on stdout, in
+  # the same concatenated-PEM form `sign` feeds `rcodesign --pem-file`.
+  #
+  # This exists for the aarch64-darwin CI runner. `sign` reads `identityFile` at
+  # build time and aborts if it is missing, so a runner with no identity cannot
+  # build any signed package -- which is every darwin host that includes
+  # `den.aspects.codesign`, i.e. the ones `.#ciMatrix.checks.aarch64-darwin`
+  # covers. CI plants the output of this at `identityFile` before building (see
+  # .github/actions/build-system).
+  #
+  # Deliberately NOT the host's real identity, and deliberately fine that it is
+  # a different certificate every run:
+  #
+  #   * `sign` sets `allowSubstitutes = false` precisely because the identity is
+  #     an impure input that the derivation hash does not cover. A real host
+  #     therefore never substitutes a signed path -- it always rebuilds against
+  #     its own identity -- so a CI-signed output can never reach one and can
+  #     never invalidate a TCC grant. CI is proving these packages *build*, not
+  #     producing artefacts anyone installs.
+  #   * The alternative -- uploading the host's 20-year signing key as a GitHub
+  #     secret -- would put the one key that must never leak, and never change,
+  #     on every runner, to no benefit given the point above. The CI action still
+  #     accepts a real PEM if one is ever wanted; it just does not need one.
+  perSystem =
+    { pkgs, lib, ... }:
+    lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+      packages.codesign-ci-identity = pkgs.writeShellApplication {
+        name = "codesign-ci-identity";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = mkIdentity pkgs null;
+      };
+    };
 
   # Deliberately its own aspect, and the only one a host needs for the first
   # switch. `codesign` below cannot build until the identity is already deployed

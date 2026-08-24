@@ -102,7 +102,32 @@
       };
     in
     {
-      packages = lib.optionalAttrs supported { celler = inputs'.celler.packages.celler; };
+      packages = lib.optionalAttrs supported {
+        celler = inputs'.celler.packages.celler;
+
+        # nix-fast-build with `--celler-cache`, which nixpkgs' does not have.
+        #
+        # Upstream can upload to cachix and to attic as each build finishes, but
+        # not to celler -- and celler is not simply "attic with a different
+        # name": its upload protocol requires the NAR info in an
+        # `X-Celler-Nar-Info` header, which the attic client never sends, so
+        # `--attic-cache` against cache.ivymect.in fails with "X-Celler-Nar-Info
+        # must be set". The celler client does send it, and is otherwise
+        # `celler push <cache> <paths...>` -- the same shape attic has. So the
+        # patch adds no second upload pipeline: it makes the *client binary* the
+        # attic path already shells out to configurable, and `--celler-cache`
+        # selects it. That is a handful of lines to re-apply on a nixpkgs bump
+        # instead of a duplicated queue/worker/ResultType.
+        #
+        # Why it is worth having at all: without it the only way to publish is
+        # celler-action's post-job push, which fires once, at the very end. One
+        # job now builds a whole arch, so that is a long time to hold everything
+        # in a runner that can be cancelled or time out. With it each host lands
+        # in the cache as it finishes.
+        nix-fast-build = pkgs.nix-fast-build.overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [ ../../patches/nix-fast-build/celler.patch ];
+        });
+      };
 
       apps = lib.optionalAttrs supported {
         sync-ci-secrets = {

@@ -1,0 +1,71 @@
+diff --git a/nix_fast_build/__init__.py b/nix_fast_build/__init__.py
+index fedc419..34622ca 100644
+--- a/nix_fast_build/__init__.py
++++ b/nix_fast_build/__init__.py
+@@ -86,6 +86,12 @@ class Options:
+     cachix_cache: str | None = None
+ 
+     attic_cache: str | None = None
++    # Which client binary does the `attic push`, and where to get it if it is
++    # not already on PATH. Celler is an attic fork with the same
++    # `<client> push <cache> <paths...>` interface, so pointing these at it is
++    # the whole of --celler-cache -- no second upload pipeline.
++    attic_client: str = "attic"
++    attic_client_package: str = "nixpkgs#attic-client"
+ 
+     @property
+     def remote_url(self) -> None | str:
+@@ -192,6 +198,14 @@ async def parse_args(args: list[str]) -> Options:
+         help="Attic cache to upload to",
+         default=None,
+     )
++    parser.add_argument(
++        "--celler-cache",
++        help="Celler cache to upload to. Celler is an attic fork whose upload "
++        "protocol requires an X-Celler-Nar-Info header the attic client never "
++        "sends, so it needs its own `celler` binary; the push itself is "
++        "identical to --attic-cache.",
++        default=None,
++    )
+     parser.add_argument(
+         "--no-nom",
+         help="Don't use nix-output-monitor to print build output (default: false)",
+@@ -317,6 +331,18 @@ async def parse_args(args: list[str]) -> Options:
+     else:
+         systems = set(a.systems.split(" "))
+ 
++    attic_cache = a.attic_cache
++    attic_client = "attic"
++    attic_client_package = "nixpkgs#attic-client"
++    if a.celler_cache is not None:
++        if a.attic_cache is not None:
++            parser.error("--celler-cache cannot be used with --attic-cache")
++        attic_cache = a.celler_cache
++        attic_client = "celler"
++        # Only reached when `celler` is not already on PATH; there is no celler
++        # in nixpkgs, so this is upstream.
++        attic_client_package = "github:blitz/celler#celler"
++
+     return Options(
+         flake_url=flake_url,
+         flake_fragment=flake_fragment,
+@@ -334,7 +360,9 @@ async def parse_args(args: list[str]) -> Options:
+         eval_workers=a.eval_workers,
+         copy_to=a.copy_to,
+         cachix_cache=a.cachix_cache,
+-        attic_cache=a.attic_cache,
++        attic_cache=attic_cache,
++        attic_client=attic_client,
++        attic_client_package=attic_client_package,
+         no_link=a.no_link,
+         out_link=a.out_link,
+         result_format=ResultFormat[a.result_format.upper()],
+@@ -661,7 +689,7 @@ class Build:
+             return 0
+         cmd = maybe_remote(
+             [
+-                *nix_shell("nixpkgs#attic-client", "attic"),
++                *nix_shell(opts.attic_client_package, opts.attic_client),
+                 "push",
+                 opts.attic_cache,
+                 self.outputs["out"],
