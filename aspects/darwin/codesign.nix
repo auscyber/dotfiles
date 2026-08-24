@@ -5,7 +5,7 @@
 #
 #   * TCC keys a non-bundled executable by absolute path (`client_type = 1`),
 #     and every rebuild moves the store path. Hence `trustedDir`: each signed
-#     binary moves to `signed-bin/`, `bin/<name>` becomes a makeWrapper shim
+#     binary moves to `trusted/`, `bin/<name>` becomes a makeWrapper shim
 #     exec'ing `${trustedDir}/<name>`, and activation plants the copy there.
 #     The exec resolves before the process exists, so TCC sees the stable path
 #     -- and nothing referring to `${pkgs.sketchybar}/bin/sketchybar` has to be
@@ -36,13 +36,19 @@
 # So the plists are left alone and `bin/` carries the repointing, in whichever
 # of the two shapes the package turns out to have:
 #
-#   bin/<name> is a Mach-O          it is signed, and bin/<name> is replaced by
-#                                   a shim exec'ing ${trustedDir}/<name>.
+#   bin/<name> is a Mach-O          it is signed and planted as
+#                                   ${trustedDir}/<name>.
 #   bin/<name> is a makeWrapper     the `.<name>-wrapped` payload it execs is
-#   script                          signed, and upstream's script is kept
-#                                   VERBATIM with only its exec target
-#                                   repointed -- every export it made still
-#                                   happens, it just lands on the stable path.
+#   script                          signed and planted as
+#                                   ${trustedDir}/.<name>-wrapped, and upstream's
+#                                   script is planted beside it as
+#                                   ${trustedDir}/<name>, kept VERBATIM with only
+#                                   its exec target repointed at that payload.
+#
+# Both halves of a wrapped chain are planted, not just the binary: a script that
+# still exec'd a store path would put a rebuild-varying path back in the middle
+# of the chain. Either way `bin/<name>` in the package is a shim onto
+# ${trustedDir}/<name>, so the entry point is one path regardless of shape.
 #
 # The second case is the reason this generalises. `bin/<name>` plus a hidden
 # `.<name>-wrapped` sibling is a nixpkgs-wide convention, not a paneru quirk, so
@@ -169,7 +175,7 @@ let
   # signature. What it produces is the same shape the activation script has
   # always planted from:
   #
-  #   signed-bin/<name>  the signed binary, which activation copies to trustedDir
+  #   trusted/<name>  the signed binary, which activation copies to trustedDir
   #   bin/<name>         a makeWrapper shim exec'ing ${trustedDir}/<name>
   #   everything else    symlinked straight through from the original
   #
@@ -233,7 +239,14 @@ let
         meta = package.meta or { };
       }
       ''
-        mkdir -p "$out/bin" "$out/signed-bin"
+        # `trusted/` is planted verbatim into ${trustedDir} by activation, and
+        # `bin/<name>` is always a shim onto ${trustedDir}/<name>. Everything
+        # that has to sit at a stable path lives in `trusted/` -- for a wrapped
+        # program that is BOTH the script and the payload it execs, because a
+        # script that execs a store path puts a rebuild-varying path back in the
+        # middle of the chain, which is the thing this whole aspect exists to
+        # avoid.
+        mkdir -p "$out/bin" "$out/trusted"
 
         # Mach-O by magic number; `file` is not in every stdenv. Follows
         # symlinks, which matters: inside a symlinkJoin every bin/ entry is one.
@@ -258,7 +271,7 @@ let
         done
 
         # Inherited by siblings with no bin/ at all -- paneru's loadable Lua
-        # module, for one. Producing no signed-bin/ is the correct outcome
+        # module, for one. Producing no trusted/ is the correct outcome
         # there: activation plants what it finds, so a package with nothing to
         # sign contributes nothing.
         if [ ! -d ${package}/bin ]; then
@@ -318,31 +331,39 @@ let
           # token from timestamp.apple.com, which is both a network call in a
           # build and a source of non-determinism. Nothing here needs one --
           # the requirement TCC stores is the certificate hash.
+          # Where the signed payload has to land. A bare binary IS the
+          # program, so it takes the program's own name. A wrapped one keeps
+          # makeWrapper's hidden name, because the script that execs it is
+          # planted alongside under the program name and has to find it there.
+          if [ "$target" = "$f" ]; then
+            payload="$name"
+          else
+            payload=".$name-wrapped"
+          fi
+
           rcodesign sign --pem-file ${identityFile} --timestamp-url none \
             --binary-identifier "$name" ${entitlementsArg} \
-            "$target" "$out/signed-bin/$name"
-          chmod 755 "$out/signed-bin/$name"
+            "$target" "$out/trusted/$payload"
+          chmod 755 "$out/trusted/$payload"
 
-          if [ "$target" = "$f" ]; then
-            # A bare binary: bin/<name> becomes a shim exec'ing the planted
-            # copy. makeWrapper cannot target ${trustedDir} directly --
-            # assertExecutable rejects a path that only exists after activation
-            # -- so it is aimed at the signed binary and then re-pointed.
-            makeWrapper "$out/signed-bin/$name" "$out/bin/$name"
-            substituteInPlace "$out/bin/$name" --replace-fail "$out/signed-bin/$name" "${trustedDir}/$name"
-          else
+          if [ "$target" != "$f" ]; then
             # Wrap the wrapper. The script is upstream's and it is what exports
             # LUA_PATH, PATH and the rest, so it is kept verbatim and ONLY its
-            # exec target is repointed: it still sets everything it used to,
-            # then execs the signed binary at the stable path instead of the
-            # store one. That is what lets an already-wrapped package keep both
-            # its environment and its TCC grant, without this having to know
-            # anything about what upstream put in the wrapper.
-            cp "$f" "$out/bin/$name"
-            chmod +w "$out/bin/$name"
-            substituteInPlace "$out/bin/$name" --replace-fail "$target" "${trustedDir}/$name"
-            chmod 755 "$out/bin/$name"
+            # exec target is repointed -- from the store copy of the payload to
+            # the planted one. Both halves of the chain then live at fixed
+            # paths, so nothing a rebuild moves is left in it.
+            cp "$f" "$out/trusted/$name"
+            chmod +w "$out/trusted/$name"
+            substituteInPlace "$out/trusted/$name" --replace-fail "$target" "${trustedDir}/$payload"
+            chmod 755 "$out/trusted/$name"
           fi
+
+          # Uniform regardless of shape: what the package exposes is a shim onto
+          # the stable path. makeWrapper cannot target ${trustedDir} directly --
+          # assertExecutable rejects a path that only exists after activation --
+          # so it is aimed at the planted file and then re-pointed.
+          makeWrapper "$out/trusted/$name" "$out/bin/$name"
+          substituteInPlace "$out/bin/$name" --replace-fail "$out/trusted/$name" "${trustedDir}/$name"
         done
       '';
 
@@ -489,18 +510,18 @@ in
         # `pkgs.<name>` is the wrong source: a module usually runs a derived
         # package, not the attribute the overlay named. `services.paneru` builds
         # `paneru-with-lua` via `.override` and then wraps it for `LUA_PATH`, so
-        # this host's closure holds three paths carrying `signed-bin/paneru` --
+        # this host's closure holds three paths carrying `trusted/paneru` --
         # the base build, the lua build, and the wrapper -- and `${pkgs.paneru}`
         # is the lua-LESS one. Planting that put a paneru with no lua at the
         # shim's target.
         #
-        # Walking the closure for `signed-bin/` does not disambiguate either:
+        # Walking the closure for `trusted/` does not disambiguate either:
         # there are four `sketchybar` and three `kanata` paths in it, counting
         # `.override` variants and `home-manager-path` (a buildEnv that
         # aggregates them). Nothing in the store says which one runs.
         #
         # The config does. These are the packages the launchd jobs actually
-        # exec, and a wrapper package carries `signed-bin` through as a symlink
+        # exec, and a wrapper package carries `trusted` through as a symlink
         # to the real build -- so taking the final package gets the right binary
         # without touching a single launchd job. `or null` throughout: a host
         # without one of these modules simply contributes nothing.
@@ -536,9 +557,12 @@ in
           in
           ''
             install -d -m 0755 ${trustedDir}
-            for src in ${lib.concatMapStringsSep " " (p: "${p}/signed-bin/*") runs}; do
-              # A source can legitimately carry no `signed-bin` -- a package with
-              # no `bin/` signs nothing. Skip rather than fail the whole
+            for src in ${
+              lib.concatMapStringsSep " " (p: "${p}/trusted/* ${p}/trusted/.*-wrapped") runs
+            }; do
+              # A source can legitimately carry no `trusted/` -- a package with
+              # no `bin/` signs nothing -- and `.*-wrapped` matches nothing for a
+              # program that was never wrapped. Skip rather than fail the whole
               # activation on an unmatched glob.
               [ -e "$src" ] || continue
 
