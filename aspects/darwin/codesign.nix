@@ -20,6 +20,38 @@
 #     the certificate must never be regenerated: a new one is a new hash, and
 #     every grant made against the old one dies with it.
 #
+# Why the shim lives in the package's `bin/` and NOT in the launchd plist:
+#
+# Pointing each job's `Program`/`ProgramArguments` straight at
+# `${trustedDir}/<name>` looks like the obvious simplification -- it names the
+# stable path outright and needs no `bin/` rewriting at all -- but it is only
+# correct for a job whose environment comes from the plist. Of the four:
+#
+#   kanata, kanata_tray      SAFE. `ProgramArguments = [ "/usr/bin/sudo" "-E" ]
+#                            ++ cfg.kanataCommand`, with PATH set by the plist's
+#                            own `EnvironmentVariables` (../input/kanata/_kanata.nix).
+#                            Nothing wraps the binary.
+#   kanata-vk-agent          SAFE. A bare `${pkgs.kanata-vk-agent}/bin/...` in
+#                            ProgramArguments, same file. No wrapper.
+#   paneru                   NOT SAFE. `Program = lib.getExe cfg.finalPackage`,
+#                            and `finalPackage` is `wrapPaneru (...)` -- a
+#                            symlinkJoin whose `bin/paneru` is a wrapProgram
+#                            SCRIPT that exports LUA_PATH before exec'ing the
+#                            real binary (paneru's nix/_paneru-common.nix).
+#                            Exec the signed binary directly and the Lua config
+#                            silently stops resolving.
+#   sketchybar               NOT SAFE, same shape: home-manager wraps the binary
+#                            to put `programs.sketchybar.extraPackages` on PATH,
+#                            and ../wms/paneru/default.nix puts paneru's own
+#                            finalPackage in there.
+#
+# The shim works for all four because it sits BELOW whatever the module wraps:
+# the module's wrapper script sets the environment and execs `bin/<name>`, which
+# is the shim, which execs `${trustedDir}/<name>`. Environment survives the exec,
+# TCC sees the stable path. Overriding the plist would have to re-implement each
+# upstream module's wrapping to keep that, and would drift the moment upstream
+# changed it. So: shim in `bin/`, plists untouched.
+#
 # Signing produces a separate WRAPPER derivation (`mkSignedWrapper`), not an
 # `overrideAttrs` on the package. The package itself builds purely and
 # substitutes like anything else; only the wrapper is `__noChroot` +
