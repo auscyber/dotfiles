@@ -1,18 +1,29 @@
 name: "Build one system"
-description: "Set up Nix, warm the caches, and build every host for one system with nix-fast-build."
+description: "Set up Nix, warm the caches, and build one flake attribute family for one system with nix-fast-build."
 
 # The whole body of a per-system build workflow lives here, so the three
 # .github/workflows/build-<system>.yml files stay a name, a runner label and a
 # call. They differ only in `runs-on`; everything below is either identical or
 # already conditional on `runner.os`.
 #
+# .github/workflows/checks.yml reuses the same steps with `attr: checks`, so the
+# flake's checks get the identical cache, codesign and push setup as the host
+# builds without a second copy of any of it.
+#
 # A composite action cannot set `runs-on`, and `secrets` is not in scope inside
 # one -- hence the tokens as inputs.
 
 inputs:
   system:
-    description: "Nix system to build, e.g. x86_64-linux. Selects `.#ciMatrix.checks.<system>`."
+    description: "Nix system to build, e.g. x86_64-linux."
     required: true
+  attr:
+    description: >-
+      Flake attribute family to build, evaluated as `.#<attr>.<system>`.
+      `ciMatrix.checks` (the default) is every host for that system;
+      `checks` is the flake's own checks.
+    required: false
+    default: "ciMatrix.checks"
   celler-token:
     description: "CELLER_TOKEN. Empty disables both the cache push and the celler gate (fork PRs have no secrets)."
     required: false
@@ -150,10 +161,11 @@ runs:
     # Which hosts failed is not lost by collapsing them into one job:
     # nix-fast-build writes a GitHub job summary naming every failure (with its
     # build log) and folds the successful logs into ::group:: sections.
-    - name: Build all ${{ inputs.system }} hosts
+    - name: Build ${{ inputs.attr }}.${{ inputs.system }}
       shell: bash
       env:
         SYSTEM: ${{ inputs.system }}
+        ATTR: ${{ inputs.attr }}
         CELLER_CACHE: ${{ inputs.celler-token != '' && 'main' || '' }}
         EVAL_WORKERS: ${{ inputs.eval-workers }}
       run: |
@@ -161,7 +173,7 @@ runs:
         # `if`, not `[ x ] && ...`: under `set -e` a failing `&&` list is itself
         # a failing command, so the plain guard would abort the step whenever
         # the variable happened to be empty.
-        args=(--flake ".#ciMatrix.checks.$SYSTEM" --skip-cached)
+        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached)
         if [ -n "$CELLER_CACHE" ]; then
           args+=(--celler-cache "$CELLER_CACHE")
         fi

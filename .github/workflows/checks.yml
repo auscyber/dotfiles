@@ -1,0 +1,57 @@
+name: "checks"
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# `.#checks.<system>` -- the flake's own checks, as opposed to the host toplevels
+# the three build-<system>.yml workflows cover. Kept separate from those because
+# it answers a different question ("is the flake self-consistent") and is far
+# cheaper: a red check here is a stale patch or a broken assertion, not a host
+# that failed to compile.
+#
+# One file with a static three-row matrix rather than three more workflows: the
+# per-system split exists so each arch gets its own long-running native build
+# job, and these do not build hosts. Nothing here is evaluated at run time, so
+# there is no matrix job -- the rows are written out below.
+#
+# What lands in `.#checks`:
+#   * aspects/hosts/checks.nix -- eval-only assertions about host features
+#     (x86_64-linux only; it reads nixosConfigurations).
+#   * aspects/tooling/patch-inputs.nix -- `patched-input-<name>` per patched
+#     input, which fail if a declared patch no longer applies or a recorded hash
+#     is stale, plus `patched-inputs-generated-current`, which fails if
+#     patched-inputs.nix has drifted from the aspects' declarations.
+#   * `home.checks` contributions such as aspects/wms/rift.
+#
+# `checks` is a partitioned attribute (`partitionedAttrs.checks = "all"` in
+# aspects/framework/partitions.nix), exactly like `ciMatrix` -- so this costs the
+# same full-den evaluation the build workflows already pay, and no more.
+jobs:
+  checks:
+    name: checks (${{ matrix.system }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            os: ubuntu-24.04
+          - system: aarch64-linux
+            os: ubuntu-24.04-arm
+          - system: aarch64-darwin
+            os: macos-14
+            eval-workers: 2
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-system
+        with:
+          system: ${{ matrix.system }}
+          attr: checks
+          celler-token: ${{ secrets.CELLER_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          eval-workers: ${{ matrix.eval-workers }}
