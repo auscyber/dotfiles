@@ -38,10 +38,9 @@ inputs:
     default: ""
   codesign-identity:
     description: >-
-      macOS only. A concatenated key+certificate PEM to plant at the codesign
-      identity path. Empty (the default) mints a throwaway one instead -- see
-      `codesign-ci-identity` in aspects/darwin/codesign.nix for why that is the
-      right default.
+      macOS only, and optional: passed straight through to
+      ./.github/actions/codesign-identity, which mints a throwaway identity when
+      it is empty. There is no reason to set it -- see that action for why.
     required: false
     default: ""
 
@@ -133,46 +132,12 @@ runs:
         token: ${{ inputs.celler-token }}
         flake-ref: ".#celler"
 
-    # Every signed package aborts its build if the codesign identity is missing
-    # (aspects/darwin/codesign.nix), and every darwin host in
-    # `.#ciMatrix.checks.aarch64-darwin` pulls in `den.aspects.codesign` -- so
-    # without this the darwin leg cannot build at all.
-    - name: Provision macOS codesign identity
-      if: ${{ runner.os == 'macOS' }}
-      shell: bash
-      env:
-        CODESIGN_IDENTITY: ${{ inputs.codesign-identity }}
-      run: |
-        set -euo pipefail
-        identity=/run/agenix/secrets/codesign/identity
-
-        # macOS seals `/`, so a new top-level directory needs a synthetic
-        # firmlink -- the same mechanism the Nix installer uses for /nix.
-        # nix-darwin does this for /run on a real host; a runner has never
-        # seen it.
-        if [ ! -d /run ]; then
-          printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf >/dev/null
-          apfs_util=/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
-          sudo "$apfs_util" -t >/dev/null 2>&1 || sudo "$apfs_util" -B >/dev/null 2>&1 || true
-        fi
-        if [ ! -d /run ]; then
-          echo "::error::/run could not be created on this runner; the codesign identity has nowhere to go" >&2
-          exit 1
-        fi
-        sudo install -d -m 0755 "$(dirname "$identity")"
-
-        if [ -n "$CODESIGN_IDENTITY" ]; then
-          printf '%s' "$CODESIGN_IDENTITY" | sudo tee "$identity" >/dev/null
-          # A real key gets the same 0640 root:nixbld the host uses, so only
-          # build users can read it.
-          sudo chown root:nixbld "$identity"
-          sudo chmod 0640 "$identity"
-        else
-          nix run .#codesign-ci-identity | sudo tee "$identity" >/dev/null
-          # Throwaway, and discarded with the runner -- world-readable rather
-          # than depending on what the installer named the build-user group.
-          sudo chmod 0644 "$identity"
-        fi
+    # Off macOS this is a no-op. On macOS it is load-bearing: every darwin host
+    # that includes `den.aspects.codesign` fails to build without it, and cannot
+    # fall back to the cache. See the action for the whole story.
+    - uses: ./.github/actions/codesign-identity
+      with:
+        identity: ${{ inputs.codesign-identity }}
 
     # Every patched-input tree is a fixed-output derivation once its hash is
     # recorded (lib/patched-inputs.nix), so the output path is identical on
