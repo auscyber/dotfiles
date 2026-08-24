@@ -1,11 +1,24 @@
-diff --git a/nix_fast_build/__init__.py b/nix_fast_build/__init__.py
-index fedc419..34622ca 100644
---- a/nix_fast_build/__init__.py
-+++ b/nix_fast_build/__init__.py
-@@ -86,6 +86,12 @@ class Options:
-     cachix_cache: str | None = None
- 
+diff --git a/nix_fast_build/build.py b/nix_fast_build/build.py
+index 1113bf0..cc84a91 100644
+--- a/nix_fast_build/build.py
++++ b/nix_fast_build/build.py
+@@ -178,7 +178,7 @@ class Build:
+             push_args.extend(self.outputs.values())
+         cmd = maybe_remote(
+             [
+-                *nix_shell("nixpkgs#attic-client", "attic"),
++                *nix_shell(opts.attic_client_package, opts.attic_client),
+                 *push_args,
+             ],
+             opts,
+diff --git a/nix_fast_build/options.py b/nix_fast_build/options.py
+index 1a63b83..3e15706 100644
+--- a/nix_fast_build/options.py
++++ b/nix_fast_build/options.py
+@@ -68,6 +68,12 @@ class Options:
      attic_cache: str | None = None
+     attic_ignore_upstream_cache_filter: bool = False
+     attic_push_build_closure: bool = False
 +    # Which client binary does the `attic push`, and where to get it if it is
 +    # not already on PATH. Celler is an attic fork with the same
 +    # `<client> push <cache> <paths...>` interface, so pointing these at it is
@@ -13,11 +26,11 @@ index fedc419..34622ca 100644
 +    attic_client: str = "attic"
 +    attic_client_package: str = "nixpkgs#attic-client"
  
-     @property
-     def remote_url(self) -> None | str:
-@@ -192,6 +198,14 @@ async def parse_args(args: list[str]) -> Options:
-         help="Attic cache to upload to",
-         default=None,
+     niks3_server: str | None = None
+ 
+@@ -277,6 +283,14 @@ async def parse_args(args: list[str]) -> Options:
+         help="Also push the build-time closure to attic, not just the runtime closure. Useful for caching intermediate build products in ephemeral CI environments (default: false)",
+         action="store_true",
      )
 +    parser.add_argument(
 +        "--celler-cache",
@@ -28,9 +41,17 @@ index fedc419..34622ca 100644
 +        default=None,
 +    )
      parser.add_argument(
-         "--no-nom",
-         help="Don't use nix-output-monitor to print build output (default: false)",
-@@ -317,6 +331,18 @@ async def parse_args(args: list[str]) -> Options:
+         "--niks3-server",
+         help="Niks3 server URL to upload to (auth from ~/.config/niks3/auth-token or NIKS3_AUTH_TOKEN_FILE)",
+@@ -422,6 +436,7 @@ async def parse_args(args: list[str]) -> Options:
+             (a.copy_to, "--copy-to"),
+             (a.cachix_cache, "--cachix-cache"),
+             (a.attic_cache, "--attic-cache"),
++            (a.celler_cache, "--celler-cache"),
+             (a.niks3_server, "--niks3-server"),
+             (a.out_link != "result", "--out-link"),
+         ]
+@@ -517,6 +532,18 @@ async def parse_args(args: list[str]) -> Options:
      else:
          systems = set(a.systems.split(" "))
  
@@ -47,9 +68,9 @@ index fedc419..34622ca 100644
 +        attic_client_package = "github:blitz/celler#celler"
 +
      return Options(
-         flake_url=flake_url,
-         flake_fragment=flake_fragment,
-@@ -334,7 +360,9 @@ async def parse_args(args: list[str]) -> Options:
+         nix_bin=nix_bin,
+         nix_eval_jobs_bin=nix_eval_jobs_bin,
+@@ -542,7 +569,9 @@ async def parse_args(args: list[str]) -> Options:
          eval_workers=a.eval_workers,
          copy_to=a.copy_to,
          cachix_cache=a.cachix_cache,
@@ -57,15 +78,6 @@ index fedc419..34622ca 100644
 +        attic_cache=attic_cache,
 +        attic_client=attic_client,
 +        attic_client_package=attic_client_package,
-         no_link=a.no_link,
-         out_link=a.out_link,
-         result_format=ResultFormat[a.result_format.upper()],
-@@ -661,7 +689,7 @@ class Build:
-             return 0
-         cmd = maybe_remote(
-             [
--                *nix_shell("nixpkgs#attic-client", "attic"),
-+                *nix_shell(opts.attic_client_package, opts.attic_client),
-                 "push",
-                 opts.attic_cache,
-                 self.outputs["out"],
+         attic_ignore_upstream_cache_filter=a.attic_ignore_upstream_cache_filter,
+         attic_push_build_closure=a.attic_push_build_closure,
+         niks3_server=a.niks3_server,
