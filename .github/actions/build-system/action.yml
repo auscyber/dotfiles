@@ -197,7 +197,13 @@ runs:
         # `if`, not `[ x ] && ...`: under `set -e` a failing `&&` list is itself
         # a failing command, so the plain guard would abort the step whenever
         # the variable happened to be empty.
-        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached --result-file "$results")
+        # --no-nom: force the plain, non-interactive log renderer. nix-fast-build
+        # already picks this automatically off a real terminal, but forcing it
+        # removes any doubt about how GitHub Actions' runner presents its
+        # pseudo-tty, and it's what makes the per-build ::group:: folding and the
+        # job summary work -- the interactive nom renderer assumes a live
+        # terminal it can redraw, which is not what a log viewer replays well.
+        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached --no-nom --result-file "$results")
         if [ -n "$CELLER_CACHE" ]; then
           args+=(--celler-cache "$CELLER_CACHE")
         fi
