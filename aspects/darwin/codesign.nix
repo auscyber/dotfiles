@@ -309,8 +309,14 @@ let
               target=""
               break
             fi
-            if [ "$depth" -ge 4 ]; then
-              echo "codesign: $name wraps more than 4 deep, giving up" >&2
+            # Only one layer is handled. The rewrite below substitutes the
+            # path the SCRIPT references, and past one layer that is an
+            # intermediate script rather than the Mach-O -- each layer would
+            # have to be planted and repointed in turn. Nothing here is wrapped
+            # twice; if something starts being, this says so instead of
+            # substituting the wrong path.
+            if [ "$depth" -ge 1 ]; then
+              echo "codesign: $name is wrapped more than one layer deep, which this does not handle" >&2
               exit 1
             fi
             target="$hidden"
@@ -325,14 +331,8 @@ let
             continue
           fi
 
-          # The identifier is the stable half of the requirement, so it is the
-          # name rather than anything version-derived.
-          # `--timestamp-url none`: rcodesign otherwise fetches a timestamp
-          # token from timestamp.apple.com, which is both a network call in a
-          # build and a source of non-determinism. Nothing here needs one --
-          # the requirement TCC stores is the certificate hash.
-          # Where the signed payload has to land. A bare binary IS the
-          # program, so it takes the program's own name. A wrapped one keeps
+          # Where the signed payload has to land. A bare binary IS the program,
+          # so it takes the program's own name. A wrapped one keeps
           # makeWrapper's hidden name, because the script that execs it is
           # planted alongside under the program name and has to find it there.
           if [ "$target" = "$f" ]; then
@@ -341,6 +341,17 @@ let
             payload=".$name-wrapped"
           fi
 
+          # `$target` is a Mach-O by construction -- the loop above only exits
+          # with it set once `isMachO` passed -- so this signs the real binary,
+          # never a wrapper script. A script cannot carry a code signature TCC
+          # would honour anyway.
+          #
+          # The identifier is the stable half of the requirement, so it is the
+          # name rather than anything version-derived.
+          # `--timestamp-url none`: rcodesign otherwise fetches a timestamp
+          # token from timestamp.apple.com, which is both a network call in a
+          # build and a source of non-determinism. Nothing here needs one --
+          # the requirement TCC stores is the certificate hash.
           rcodesign sign --pem-file ${identityFile} --timestamp-url none \
             --binary-identifier "$name" ${entitlementsArg} \
             "$target" "$out/trusted/$payload"
