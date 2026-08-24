@@ -1,0 +1,101 @@
+name: "Provision the macOS codesign identity"
+description: "Plant a code-signing identity where aspects/darwin/codesign.nix expects it, so signed packages can build on a runner."
+
+# Without this, a darwin host that includes `den.aspects.codesign` cannot build
+# at all. `sign` (aspects/darwin/codesign.nix) reads the identity in
+# `postFixup` and exits 1 if it is unreadable:
+#
+#     codesign: /run/agenix/secrets/codesign/identity unreadable by <user>;
+#     run 'agenix generate' and switch once
+#
+# and it sets `allowSubstitutes = false`, so those packages can never be
+# fetched instead of built -- the failure is unconditional, not a cache miss.
+# Today that is `darwin-laptop` (sketchybar, paneru, kanata-with-cmd,
+# kanata-vk-agent); `darwin-macmini` does not include the aspect and is
+# unaffected, as is everything on Linux.
+#
+# The identity this mints by default is a THROWAWAY, and a different
+# certificate every run, on purpose:
+#
+#   * `allowSubstitutes = false` exists precisely because the identity is an
+#     impure input the derivation hash does not cover. A real host therefore
+#     never substitutes a signed path -- it always rebuilds against its own
+#     identity -- so a CI-signed output cannot reach a machine and cannot
+#     invalidate a TCC grant. CI is proving these packages build, nothing more.
+#   * The alternative, uploading the host's 20-year signing key as a GitHub
+#     secret, would put the one key that must never leak, and never change, on
+#     every runner for no gain. Pass `identity` if you ever want that anyway.
+#
+# A no-op off macOS, so it is safe to call unconditionally, and never fatal:
+# if the identity cannot be planted it warns and lets the signed packages fail
+# on their own, which the caller's `allow-failure` already accounts for.
+
+inputs:
+  identity:
+    description: >-
+      Concatenated private-key + certificate PEM to plant. Empty (the default)
+      mints a throwaway one with `.#codesign-ci-identity`, which shares its
+      recipe with the `agenix generate` generator.
+    required: false
+    default: ""
+  path:
+    description: >-
+      Where to plant it. Must match `identityFile` in aspects/darwin/codesign.nix
+      -- that path is baked into every signed derivation, so it is not something
+      a caller can usefully vary.
+    required: false
+    default: "/run/agenix/secrets/codesign/identity"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Plant codesign identity
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      env:
+        CODESIGN_IDENTITY: ${{ inputs.identity }}
+        IDENTITY_PATH: ${{ inputs.path }}
+      run: |
+        set -euo pipefail
+
+        # macOS seals `/`, so a new top-level directory needs a synthetic
+        # firmlink -- the same mechanism the Nix installer uses for /nix.
+        # nix-darwin does this for /run on a real host; a runner has never
+        # seen it. `private/var/run` is the firmlink target and already exists.
+        if [ ! -d /run ]; then
+          printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf >/dev/null
+          apfs_util=/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
+          sudo "$apfs_util" -t >/dev/null 2>&1 || sudo "$apfs_util" -B >/dev/null 2>&1 || true
+        fi
+        # Deliberately a warning, not an error. The consequence of no identity
+        # is that the signed packages fail to build, and that failure is already
+        # handled where it lands: the darwin workflow lists its codesign host in
+        # `allow-failure`, so the rest of the system still builds and still
+        # reports. Aborting here instead would throw away that whole run to
+        # report the same thing earlier.
+        if [ ! -d /run ]; then
+          echo "::warning::/run could not be created on this runner; skipping the codesign identity - packages built by aspects/darwin/codesign.nix will fail" >&2
+          exit 0
+        fi
+        sudo install -d -m 0755 "$(dirname "$IDENTITY_PATH")"
+
+        if [ -n "$CODESIGN_IDENTITY" ]; then
+          printf '%s' "$CODESIGN_IDENTITY" | sudo tee "$IDENTITY_PATH" >/dev/null
+          # A real key gets the same 0640 root:nixbld the host uses, so only
+          # build users can read it.
+          sudo chown root:nixbld "$IDENTITY_PATH"
+          sudo chmod 0640 "$IDENTITY_PATH"
+          echo "planted the supplied codesign identity at $IDENTITY_PATH" >&2
+        else
+          nix run .#codesign-ci-identity | sudo tee "$IDENTITY_PATH" >/dev/null
+          # Throwaway, and discarded with the runner -- world-readable rather
+          # than depending on what the installer named the build-user group.
+          sudo chmod 0644 "$IDENTITY_PATH"
+          echo "minted a throwaway codesign identity at $IDENTITY_PATH" >&2
+        fi
+
+        # A signed build fails on `[ ! -r ... ]`, so check the same thing here
+        # where the error is one line instead of buried in a build log.
+        if [ ! -r "$IDENTITY_PATH" ]; then
+          echo "::warning::$IDENTITY_PATH is not readable after planting it - packages built by aspects/darwin/codesign.nix will fail" >&2
+        fi

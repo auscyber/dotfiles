@@ -1,0 +1,248 @@
+name: "Build one system"
+description: "Set up Nix, warm the caches, and build one flake attribute family for one system with nix-fast-build."
+
+# The whole body of a per-system build workflow lives here, so the three
+# .github/workflows/build-<system>.yml files stay a name, a runner label and a
+# call. They differ only in `runs-on`; everything below is either identical or
+# already conditional on `runner.os`.
+#
+# .github/workflows/checks.yml reuses the same steps with `attr: checks`, so the
+# flake's checks get the identical cache, codesign and push setup as the host
+# builds without a second copy of any of it.
+#
+# A composite action cannot set `runs-on`, and `secrets` is not in scope inside
+# one -- hence the tokens as inputs.
+
+inputs:
+  system:
+    description: "Nix system to build, e.g. x86_64-linux."
+    required: true
+  attr:
+    description: >-
+      Flake attribute family to build, evaluated as `.#<attr>.<system>`.
+      `ciMatrix.checks` (the default) is every host for that system;
+      `checks` is the flake's own checks.
+    required: false
+    default: "ciMatrix.checks"
+  celler-token:
+    description: "CELLER_TOKEN. Empty disables both the cache push and the celler gate (fork PRs have no secrets)."
+    required: false
+    default: ""
+  github-token:
+    description: "GITHUB_TOKEN, used for `access-tokens` so flake input fetches are not rate-limited."
+    required: false
+    default: ""
+  allow-failure:
+    description: >-
+      Space-separated attribute names whose failure must not fail the job, e.g.
+      a host that depends on an impure input this runner cannot have. Everything
+      still gets built and reported -- these are simply not fatal. Keep the list
+      empty wherever you can; each entry is coverage you are choosing to lose.
+    required: false
+    default: ""
+  eval-workers:
+    description: "Cap on nix-eval-jobs workers. Empty leaves nix-fast-build's default."
+    required: false
+    default: ""
+  codesign-identity:
+    description: >-
+      macOS only, and optional: passed straight through to
+      ./.github/actions/codesign-identity, which mints a throwaway identity when
+      it is empty. There is no reason to set it -- see that action for why.
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    # Must come before the installer: it builds the volume Nix is installed
+    # onto. Ubuntu-only, so it is skipped rather than left to warn on macOS.
+    - if: ${{ runner.os == 'Linux' }}
+      uses: wimpysworld/nothing-but-nix@main
+      with:
+        hatchet-protocol: cleave
+
+    # `accept-flake-config` pulls substituters + trusted-public-keys from the
+    # flake's own nixConfig (derived from aspects/base/celler-keys.json). The
+    # celler entries are repeated here because they have to be trusted *before*
+    # the flake is ever evaluated, i.e. while installing celler itself.
+    #
+    # `extra-trusted-users = runner`: the daemon honours `__noChroot` only for a
+    # trusted user, and every codesign-signed package sets it
+    # (aspects/darwin/codesign.nix) because it has to read the identity off the
+    # real filesystem. Without this the darwin leg fails on the first signed
+    # package with the identity "unreadable", however correctly it was planted.
+    - uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes pipe-operators
+          accept-flake-config = true
+          fallback = true
+          connect-timeout = 5
+          extra-trusted-users = runner
+          access-tokens = github.com=${{ inputs.github-token }}
+          extra-substituters = https://cache.ivymect.in/main
+          extra-trusted-substituters = https://cache.ivymect.in/main
+          extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
+
+    # Every run of the old workflow since at least #142 died here, and none of
+    # them died on a build: cache.ivymect.in is not reliably reachable from
+    # GitHub's runners. `celler login` failed with "Network is unreachable"
+    # (os error 51) on macos-14 and "Connection timed out" (os error 110) on
+    # ubuntu-24.04-arm, which took the whole job -- and therefore the whole
+    # workflow -- down before a single host was built.
+    #
+    # A self-hosted cache being down is not a reason to stop proving the flake
+    # builds, so its availability is probed once and everything that needs it is
+    # gated on the answer. Unreachable means: no gate, no push, no
+    # `--celler-cache`, one warning, and a run that still tells you whether the
+    # tree is good. `fallback = true` above already covers the substituter side.
+    #
+    # No `-f`: any HTTP response at all means the host answered, which is the
+    # only question here. A non-zero curl exit is a connect/DNS/timeout failure.
+    - name: Probe celler cache reachability
+      id: cache
+      shell: bash
+      env:
+        HAVE_TOKEN: ${{ inputs.celler-token != '' }}
+      run: |
+        set -uo pipefail
+        if [ "$HAVE_TOKEN" != "true" ]; then
+          echo "no CELLER_TOKEN in scope; building without the cache" >&2
+          echo "up=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        if curl -sS -o /dev/null --max-time 15 https://cache.ivymect.in/ 2>/dev/null; then
+          echo "up=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "::warning::cache.ivymect.in is unreachable from this runner - building without the celler cache, and nothing will be pushed"
+          echo "up=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    # Make sure the celler client itself is in the cache for this arch before
+    # anything tries to install it (builds + dogfood-pushes it only on a miss).
+    - if: ${{ steps.cache.outputs.up == 'true' }}
+      uses: ./.github/actions/ensure-celler
+      with:
+        celler-token: ${{ inputs.celler-token }}
+
+    # Installs the celler client, points nix at the cache, and registers the
+    # post-job push. `flake-ref: ".#celler"` -- not `inputs-from: "."` -- so this
+    # installs the exact installable ensure-celler just verified is cached;
+    # resolving through the registry instead produced a different derivation and
+    # rebuilt celler (aws-sdk-s3 and all) on every run.
+    - name: Setup celler cache
+      if: ${{ steps.cache.outputs.up == 'true' }}
+      uses: auscyber/celler-action@main
+      with:
+        endpoint: https://cache.ivymect.in
+        cache: main
+        token: ${{ inputs.celler-token }}
+        flake-ref: ".#celler"
+
+    # Off macOS this is a no-op. On macOS it is load-bearing: every darwin host
+    # that includes `den.aspects.codesign` fails to build without it, and cannot
+    # fall back to the cache. See the action for the whole story.
+    - uses: ./.github/actions/codesign-identity
+      with:
+        identity: ${{ inputs.codesign-identity }}
+
+    # Every patched-input tree is a fixed-output derivation once its hash is
+    # recorded (lib/patched-inputs.nix), so the output path is identical on
+    # every system. Building `.#patched-inputs-warm` natively here -- with this
+    # runner's own pkgs, never a foreign builder -- means the host builds below
+    # always find `newInputs`' single-`patchSystem` realisation already in the
+    # store. See aspects/tooling/patch-inputs.nix.
+    - name: Warm patched-input FODs
+      shell: bash
+      run: nix build --no-link --fallback .#patched-inputs-warm
+
+    # `.#nix-fast-build` rather than plain `nixpkgs#nix-fast-build`: ours carries
+    # patches/nix-fast-build/celler.patch, which adds `--celler-cache`. Uploads
+    # then happen as each host finishes instead of all at once in celler-action's
+    # post step -- which matters now that one job builds a whole arch and so runs
+    # long enough to be worth publishing progressively. celler-action's post push
+    # still runs, and is what covers everything nix-fast-build did not build
+    # (the warm FODs, nix-fast-build itself).
+    #
+    # Which hosts failed is not lost by collapsing them into one job:
+    # nix-fast-build writes a GitHub job summary naming every failure (with its
+    # build log) and folds the successful logs into ::group:: sections.
+    # nix-fast-build does not fail fast, so every attribute is attempted no
+    # matter what else broke, and the job's verdict is taken afterwards from the
+    # result file rather than from the exit code alone. That is what lets
+    # `allow-failure` be precise: the run is green only if every failure it
+    # recorded is one we agreed to tolerate, and a single unexpected failure
+    # anywhere still fails the job.
+    - name: Build ${{ inputs.attr }}.${{ inputs.system }}
+      shell: bash
+      env:
+        SYSTEM: ${{ inputs.system }}
+        ATTR: ${{ inputs.attr }}
+        CELLER_CACHE: ${{ steps.cache.outputs.up == 'true' && 'main' || '' }}
+        EVAL_WORKERS: ${{ inputs.eval-workers }}
+        ALLOW_FAILURE: ${{ inputs.allow-failure }}
+      run: |
+        set -euo pipefail
+        results="$RUNNER_TEMP/nix-fast-build.json"
+
+        # `if`, not `[ x ] && ...`: under `set -e` a failing `&&` list is itself
+        # a failing command, so the plain guard would abort the step whenever
+        # the variable happened to be empty.
+        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached --result-file "$results")
+        if [ -n "$CELLER_CACHE" ]; then
+          args+=(--celler-cache "$CELLER_CACHE")
+        fi
+        if [ -n "$EVAL_WORKERS" ]; then
+          args+=(--eval-workers "$EVAL_WORKERS")
+        fi
+
+        rc=0
+        nix run .#nix-fast-build -- "${args[@]}" || rc=$?
+        if [ "$rc" -eq 0 ]; then
+          exit 0
+        fi
+
+        # Nothing tolerated, or nix-fast-build died before it could write the
+        # file (an evaluation failure, an OOM): the exit code is all we have and
+        # it stands.
+        if [ -z "$ALLOW_FAILURE" ] || [ ! -s "$results" ]; then
+          exit "$rc"
+        fi
+
+        # `attr` is the leaf name here because --flake already pins the system,
+        # but nix-fast-build prefixes it with the system when the flake ref
+        # spans several. Match either.
+        unexpected="$(
+          jq -r --arg allow "$ALLOW_FAILURE" '
+            ($allow | split(" ") | map(select(length > 0))) as $ok
+            | .results[]
+            | select(.success == false)
+            | .attr
+            | select(. as $a | ($ok | any(. as $n | $a == $n or ($a | endswith("." + $n)))) | not)
+          ' "$results" | sort -u
+        )"
+        tolerated="$(
+          jq -r --arg allow "$ALLOW_FAILURE" '
+            ($allow | split(" ") | map(select(length > 0))) as $ok
+            | .results[]
+            | select(.success == false)
+            | .attr
+            | select(. as $a | ($ok | any(. as $n | $a == $n or ($a | endswith("." + $n)))))
+          ' "$results" | sort -u
+        )"
+
+        if [ -n "$tolerated" ]; then
+          while IFS= read -r a; do
+            echo "::warning::$a failed, and is in allow-failure for this workflow - see the job summary for its build log"
+          done <<<"$tolerated"
+        fi
+
+        if [ -n "$unexpected" ]; then
+          while IFS= read -r a; do
+            echo "::error::$a failed"
+          done <<<"$unexpected"
+          exit "$rc"
+        fi
+
+        echo "every failure was tolerated; not failing the job" >&2

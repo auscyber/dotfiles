@@ -1,0 +1,37 @@
+name: "x86_64-linux"
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# One workflow per system type. There is no dynamic GitHub matrix any more:
+# nix-fast-build evaluates every host for THIS system in parallel and starts
+# each build the moment its evaluation finishes, so the whole arch is one job
+# instead of one job per host plus a matrix job to enumerate them.
+#
+# The three build-<system>.yml files are deliberately nothing but a name, a
+# runner label and a call: every shared step lives in
+# ./.github/actions/build-system, which is also where the rationale for each of
+# them is written down. They differ only in `runs-on` and, on darwin, the eval
+# worker cap.
+#
+# fail-fast is not configured because there is nothing to fail fast over: one
+# job builds the whole arch, nix-fast-build does not stop at the first broken
+# host, and the job goes red at the end. That is what `fail-fast: false` plus
+# the old aggregate `ci` job used to buy us.
+
+jobs:
+  build:
+    name: x86_64-linux
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-system
+        with:
+          system: x86_64-linux
+          celler-token: ${{ secrets.CELLER_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

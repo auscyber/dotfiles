@@ -181,8 +181,9 @@ in
           };
           # CI push token for GitHub Actions: scoped to sub=github, may push the
           # `main` cache. `nix run .#sync-ci-secrets` decrypts this and uploads
-          # it as the CELLER_TOKEN GitHub Actions secret; systems.yml hands it to
-          # auscyber/celler-action, which pushes every host it builds. (Not
+          # it as the CELLER_TOKEN GitHub Actions secret; each per-system build
+          # workflow hands it to auscyber/celler-action, which pushes every host
+          # nix-fast-build produces in that job. (Not
           # ryanccn/attic-action -- celler's upload protocol needs an
           # X-Celler-Nar-Info header that the upstream attic client never sends.)
           # (Previously this
