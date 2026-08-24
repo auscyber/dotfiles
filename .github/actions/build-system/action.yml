@@ -85,6 +85,14 @@ runs:
           extra-trusted-substituters = https://cache.ivymect.in/main
           extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
+    # Restores the Nix store (and Nix's own flake eval cache) from a previous
+    # run keyed on the *.nix/flake.lock tree, and saves it back at the end of
+    # the job. celler only caches build OUTPUTS; without this, every job
+    # re-fetches and re-unpacks every flake input from scratch, and re-does
+    # every attribute evaluation cold. Must come after the installer -- it
+    # restores INTO the store the installer just created.
+    - uses: ./.github/actions/nix-cache
+
     # Every run of the old workflow since at least #142 died here, and none of
     # them died on a build: cache.ivymect.in is not reliably reachable from
     # GitHub's runners. `celler login` failed with "Network is unreachable"

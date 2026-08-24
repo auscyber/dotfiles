@@ -1,0 +1,42 @@
+name: "Restore and save Nix store"
+description: "Restore/save the Nix store cache across runs so eval and builds don't start cold every job."
+
+# Removed for one commit this session on the theory that nothing-but-nix (the
+# disk expansion) plus celler (the real binary cache) made this redundant.
+# Restored: celler caches BUILD OUTPUTS, not the flake input tarballs
+# themselves. Without this, every job -- every arch, every rerun -- re-fetched
+# and re-unpacked every flake input from scratch (den, ivixlib, nix-effects,
+# gen-schema, gen-algebra, ...; visible in the logs as a fresh "unpacking
+# https://github.com/.../archive/....zip into the Git cache" per job). That is
+# real, repeated network + eval work celler cannot help with, since none of it
+# is a derivation. Restoring the store cache also restores Nix's own flake
+# eval cache (~/.cache/nix/eval-cache-v*), which memoizes attribute evaluation
+# across runs -- gone for the one run this was removed, which is at least
+# plausibly part of why that run hit a fresh infinite-recursion error nothing
+# saw before (a warm eval cache can paper over a fragile module-system path a
+# cold one exercises for the first time).
+runs:
+  using: "composite"
+  steps:
+    - name: Restore and save Nix store
+      uses: nix-community/cache-nix-action@v7
+      with:
+        # restore and save a cache using this key
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+        # if there's no cache hit, restore a cache by this prefix
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        # collect garbage until the Nix store size (in bytes) is at most this number
+        # before trying to save a new cache
+        # 1G = 1073741824
+        gc-max-store-size: 2G
+        # do purge caches
+        purge: true
+        # purge all versions of the cache
+        purge-prefixes: nix-${{ runner.os }}-
+        # created more than this number of seconds ago
+        purge-created: 0
+        # or last accessed this duration (ISO 8601 duration format)
+        # before the start of the `Post Restore and save Nix store` phase
+        purge-last-accessed: P1DT12H
+        # except any version with the key that is the same as the `primary-key`
+        purge-primary-key: never
