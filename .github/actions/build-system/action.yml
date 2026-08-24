@@ -32,6 +32,14 @@ inputs:
     description: "GITHUB_TOKEN, used for `access-tokens` so flake input fetches are not rate-limited."
     required: false
     default: ""
+  allow-failure:
+    description: >-
+      Space-separated attribute names whose failure must not fail the job, e.g.
+      a host that depends on an impure input this runner cannot have. Everything
+      still gets built and reported -- these are simply not fatal. Keep the list
+      empty wherever you can; each entry is coverage you are choosing to lose.
+    required: false
+    default: ""
   eval-workers:
     description: "Cap on nix-eval-jobs workers. Empty leaves nix-fast-build's default."
     required: false
@@ -160,6 +168,12 @@ runs:
     # Which hosts failed is not lost by collapsing them into one job:
     # nix-fast-build writes a GitHub job summary naming every failure (with its
     # build log) and folds the successful logs into ::group:: sections.
+    # nix-fast-build does not fail fast, so every attribute is attempted no
+    # matter what else broke, and the job's verdict is taken afterwards from the
+    # result file rather than from the exit code alone. That is what lets
+    # `allow-failure` be precise: the run is green only if every failure it
+    # recorded is one we agreed to tolerate, and a single unexpected failure
+    # anywhere still fails the job.
     - name: Build ${{ inputs.attr }}.${{ inputs.system }}
       shell: bash
       env:
@@ -167,16 +181,68 @@ runs:
         ATTR: ${{ inputs.attr }}
         CELLER_CACHE: ${{ steps.cache.outputs.up == 'true' && 'main' || '' }}
         EVAL_WORKERS: ${{ inputs.eval-workers }}
+        ALLOW_FAILURE: ${{ inputs.allow-failure }}
       run: |
         set -euo pipefail
+        results="$RUNNER_TEMP/nix-fast-build.json"
+
         # `if`, not `[ x ] && ...`: under `set -e` a failing `&&` list is itself
         # a failing command, so the plain guard would abort the step whenever
         # the variable happened to be empty.
-        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached)
+        args=(--flake ".#$ATTR.$SYSTEM" --skip-cached --result-file "$results")
         if [ -n "$CELLER_CACHE" ]; then
           args+=(--celler-cache "$CELLER_CACHE")
         fi
         if [ -n "$EVAL_WORKERS" ]; then
           args+=(--eval-workers "$EVAL_WORKERS")
         fi
-        nix run .#nix-fast-build -- "${args[@]}"
+
+        rc=0
+        nix run .#nix-fast-build -- "${args[@]}" || rc=$?
+        if [ "$rc" -eq 0 ]; then
+          exit 0
+        fi
+
+        # Nothing tolerated, or nix-fast-build died before it could write the
+        # file (an evaluation failure, an OOM): the exit code is all we have and
+        # it stands.
+        if [ -z "$ALLOW_FAILURE" ] || [ ! -s "$results" ]; then
+          exit "$rc"
+        fi
+
+        # `attr` is the leaf name here because --flake already pins the system,
+        # but nix-fast-build prefixes it with the system when the flake ref
+        # spans several. Match either.
+        unexpected="$(
+          jq -r --arg allow "$ALLOW_FAILURE" '
+            ($allow | split(" ") | map(select(length > 0))) as $ok
+            | .results[]
+            | select(.success == false)
+            | .attr
+            | select(. as $a | ($ok | any(. as $n | $a == $n or ($a | endswith("." + $n)))) | not)
+          ' "$results" | sort -u
+        )"
+        tolerated="$(
+          jq -r --arg allow "$ALLOW_FAILURE" '
+            ($allow | split(" ") | map(select(length > 0))) as $ok
+            | .results[]
+            | select(.success == false)
+            | .attr
+            | select(. as $a | ($ok | any(. as $n | $a == $n or ($a | endswith("." + $n)))))
+          ' "$results" | sort -u
+        )"
+
+        if [ -n "$tolerated" ]; then
+          while IFS= read -r a; do
+            echo "::warning::$a failed, and is in allow-failure for this workflow - see the job summary for its build log"
+          done <<<"$tolerated"
+        fi
+
+        if [ -n "$unexpected" ]; then
+          while IFS= read -r a; do
+            echo "::error::$a failed"
+          done <<<"$unexpected"
+          exit "$rc"
+        fi
+
+        echo "every failure was tolerated; not failing the job" >&2

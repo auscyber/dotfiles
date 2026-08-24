@@ -26,7 +26,9 @@ description: "Plant a code-signing identity where aspects/darwin/codesign.nix ex
 #     secret, would put the one key that must never leak, and never change, on
 #     every runner for no gain. Pass `identity` if you ever want that anyway.
 #
-# A no-op off macOS, so it is safe to call unconditionally.
+# A no-op off macOS, so it is safe to call unconditionally, and never fatal:
+# if the identity cannot be planted it warns and lets the signed packages fail
+# on their own, which the caller's `allow-failure` already accounts for.
 
 inputs:
   identity:
@@ -65,9 +67,15 @@ runs:
           apfs_util=/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
           sudo "$apfs_util" -t >/dev/null 2>&1 || sudo "$apfs_util" -B >/dev/null 2>&1 || true
         fi
+        # Deliberately a warning, not an error. The consequence of no identity
+        # is that the signed packages fail to build, and that failure is already
+        # handled where it lands: the darwin workflow lists its codesign host in
+        # `allow-failure`, so the rest of the system still builds and still
+        # reports. Aborting here instead would throw away that whole run to
+        # report the same thing earlier.
         if [ ! -d /run ]; then
-          echo "::error::/run could not be created on this runner; the codesign identity has nowhere to go, and every signed package will fail to build" >&2
-          exit 1
+          echo "::warning::/run could not be created on this runner; skipping the codesign identity - packages built by aspects/darwin/codesign.nix will fail" >&2
+          exit 0
         fi
         sudo install -d -m 0755 "$(dirname "$IDENTITY_PATH")"
 
@@ -89,6 +97,5 @@ runs:
         # A signed build fails on `[ ! -r ... ]`, so check the same thing here
         # where the error is one line instead of buried in a build log.
         if [ ! -r "$IDENTITY_PATH" ]; then
-          echo "::error::$IDENTITY_PATH is not readable after planting it" >&2
-          exit 1
+          echo "::warning::$IDENTITY_PATH is not readable after planting it - packages built by aspects/darwin/codesign.nix will fail" >&2
         fi

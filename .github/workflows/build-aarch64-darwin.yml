@@ -27,3 +27,16 @@ jobs:
           # evaluating a darwin/home toplevel. Cap the workers so parallel
           # evaluation is not OOM-killed there.
           eval-workers: 2
+          # darwin-laptop is the only host that includes `den.aspects.codesign`
+          # (aspects/hosts/laptop.nix), so it is the only one that cannot be
+          # built without a signing identity: `sign` aborts in postFixup when
+          # the identity is unreadable, and sets `allowSubstitutes = false`, so
+          # there is no cache to fall back on. ./.github/actions/codesign-identity
+          # mints a throwaway one and usually makes this moot -- this is the
+          # backstop for when it cannot, so the rest of aarch64-darwin is still
+          # built and still reported instead of the run dying on one host.
+          #
+          # Drop this the moment codesign.nix signs via a separate wrapper
+          # derivation: then sketchybar/paneru/kanata build (and substitute)
+          # untouched, and only the wrapper needs the key.
+          allow-failure: darwin-laptop
