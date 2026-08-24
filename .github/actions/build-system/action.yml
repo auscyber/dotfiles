@@ -78,9 +78,43 @@ runs:
           extra-trusted-substituters = https://cache.ivymect.in/main
           extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
+    # Every run of the old workflow since at least #142 died here, and none of
+    # them died on a build: cache.ivymect.in is not reliably reachable from
+    # GitHub's runners. `celler login` failed with "Network is unreachable"
+    # (os error 51) on macos-14 and "Connection timed out" (os error 110) on
+    # ubuntu-24.04-arm, which took the whole job -- and therefore the whole
+    # workflow -- down before a single host was built.
+    #
+    # A self-hosted cache being down is not a reason to stop proving the flake
+    # builds, so its availability is probed once and everything that needs it is
+    # gated on the answer. Unreachable means: no gate, no push, no
+    # `--celler-cache`, one warning, and a run that still tells you whether the
+    # tree is good. `fallback = true` above already covers the substituter side.
+    #
+    # No `-f`: any HTTP response at all means the host answered, which is the
+    # only question here. A non-zero curl exit is a connect/DNS/timeout failure.
+    - name: Probe celler cache reachability
+      id: cache
+      shell: bash
+      env:
+        HAVE_TOKEN: ${{ inputs.celler-token != '' }}
+      run: |
+        set -uo pipefail
+        if [ "$HAVE_TOKEN" != "true" ]; then
+          echo "no CELLER_TOKEN in scope; building without the cache" >&2
+          echo "up=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        if curl -sS -o /dev/null --max-time 15 https://cache.ivymect.in/ 2>/dev/null; then
+          echo "up=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "::warning::cache.ivymect.in is unreachable from this runner - building without the celler cache, and nothing will be pushed"
+          echo "up=false" >> "$GITHUB_OUTPUT"
+        fi
+
     # Make sure the celler client itself is in the cache for this arch before
     # anything tries to install it (builds + dogfood-pushes it only on a miss).
-    - if: ${{ inputs.celler-token != '' }}
+    - if: ${{ steps.cache.outputs.up == 'true' }}
       uses: ./.github/actions/ensure-celler
       with:
         celler-token: ${{ inputs.celler-token }}
@@ -91,7 +125,7 @@ runs:
     # resolving through the registry instead produced a different derivation and
     # rebuilt celler (aws-sdk-s3 and all) on every run.
     - name: Setup celler cache
-      if: ${{ inputs.celler-token != '' }}
+      if: ${{ steps.cache.outputs.up == 'true' }}
       uses: auscyber/celler-action@main
       with:
         endpoint: https://cache.ivymect.in
@@ -166,7 +200,7 @@ runs:
       env:
         SYSTEM: ${{ inputs.system }}
         ATTR: ${{ inputs.attr }}
-        CELLER_CACHE: ${{ inputs.celler-token != '' && 'main' || '' }}
+        CELLER_CACHE: ${{ steps.cache.outputs.up == 'true' && 'main' || '' }}
         EVAL_WORKERS: ${{ inputs.eval-workers }}
       run: |
         set -euo pipefail
