@@ -20,37 +20,36 @@
 #     the certificate must never be regenerated: a new one is a new hash, and
 #     every grant made against the old one dies with it.
 #
-# Why the shim lives in the package's `bin/` and NOT in the launchd plist:
+# Where the repointing happens: in `bin/`, never in the launchd plist.
 #
 # Pointing each job's `Program`/`ProgramArguments` straight at
-# `${trustedDir}/<name>` looks like the obvious simplification -- it names the
-# stable path outright and needs no `bin/` rewriting at all -- but it is only
-# correct for a job whose environment comes from the plist. Of the four:
+# `${trustedDir}/<name>` looks like the obvious simplification, and it is
+# correct for a job whose environment comes from the plist -- kanata,
+# kanata_tray and kanata-vk-agent all qualify (../input/kanata/_kanata.nix sets
+# PATH in `EnvironmentVariables` and wraps nothing). It is wrong for a job whose
+# environment comes from a wrapper script, which is the far more common shape:
+# paneru's `finalPackage` is `wrapPaneru (...)`, a symlinkJoin whose `bin/paneru`
+# is a wrapProgram script exporting LUA_PATH, and home-manager wraps sketchybar
+# the same way to put `extraPackages` on PATH. Exec the signed binary directly
+# and those exports never run.
 #
-#   kanata, kanata_tray      SAFE. `ProgramArguments = [ "/usr/bin/sudo" "-E" ]
-#                            ++ cfg.kanataCommand`, with PATH set by the plist's
-#                            own `EnvironmentVariables` (../input/kanata/_kanata.nix).
-#                            Nothing wraps the binary.
-#   kanata-vk-agent          SAFE. A bare `${pkgs.kanata-vk-agent}/bin/...` in
-#                            ProgramArguments, same file. No wrapper.
-#   paneru                   NOT SAFE. `Program = lib.getExe cfg.finalPackage`,
-#                            and `finalPackage` is `wrapPaneru (...)` -- a
-#                            symlinkJoin whose `bin/paneru` is a wrapProgram
-#                            SCRIPT that exports LUA_PATH before exec'ing the
-#                            real binary (paneru's nix/_paneru-common.nix).
-#                            Exec the signed binary directly and the Lua config
-#                            silently stops resolving.
-#   sketchybar               NOT SAFE, same shape: home-manager wraps the binary
-#                            to put `programs.sketchybar.extraPackages` on PATH,
-#                            and ../wms/paneru/default.nix puts paneru's own
-#                            finalPackage in there.
+# So the plists are left alone and `bin/` carries the repointing, in whichever
+# of the two shapes the package turns out to have:
 #
-# The shim works for all four because it sits BELOW whatever the module wraps:
-# the module's wrapper script sets the environment and execs `bin/<name>`, which
-# is the shim, which execs `${trustedDir}/<name>`. Environment survives the exec,
-# TCC sees the stable path. Overriding the plist would have to re-implement each
-# upstream module's wrapping to keep that, and would drift the moment upstream
-# changed it. So: shim in `bin/`, plists untouched.
+#   bin/<name> is a Mach-O          it is signed, and bin/<name> is replaced by
+#                                   a shim exec'ing ${trustedDir}/<name>.
+#   bin/<name> is a makeWrapper     the `.<name>-wrapped` payload it execs is
+#   script                          signed, and upstream's script is kept
+#                                   VERBATIM with only its exec target
+#                                   repointed -- every export it made still
+#                                   happens, it just lands on the stable path.
+#
+# The second case is the reason this generalises. `bin/<name>` plus a hidden
+# `.<name>-wrapped` sibling is a nixpkgs-wide convention, not a paneru quirk, so
+# handling it structurally means upstream modules keep working untouched: no
+# option is repointed, no `mkForce` is needed, and nothing here has to know what
+# any particular wrapper put in the environment. A module that starts wrapping
+# something it did not wrap before is absorbed without a change.
 #
 # Signing produces a separate WRAPPER derivation (`mkSignedWrapper`), not an
 # `overrideAttrs` on the package. The package itself builds purely and
@@ -236,6 +235,15 @@ let
       ''
         mkdir -p "$out/bin" "$out/signed-bin"
 
+        # Mach-O by magic number; `file` is not in every stdenv. Follows
+        # symlinks, which matters: inside a symlinkJoin every bin/ entry is one.
+        isMachO() {
+          case "$(od -An -N4 -tx1 -- "$1" 2>/dev/null | tr -d ' \n')" in
+            cffaedfe | cefaedfe | cafebabe | bebafeca) return 0 ;;
+            *) return 1 ;;
+          esac
+        }
+
         # A wrapper adds a signature; it is not a rebuild. Everything that is
         # not bin/ is the original, so it is symlinked rather than copied.
         shopt -s nullglob
@@ -250,9 +258,9 @@ let
         done
 
         # Inherited by siblings with no bin/ at all -- paneru's loadable Lua
-        # module, for one. Producing no signed-bin/ is the correct outcome there:
-        # activation plants what it finds, so a package with nothing to sign
-        # contributes nothing.
+        # module, for one. Producing no signed-bin/ is the correct outcome
+        # there: activation plants what it finds, so a package with nothing to
+        # sign contributes nothing.
         if [ ! -d ${package}/bin ]; then
           echo "codesign: ${package} has no bin/, nothing to sign"
           exit 0
@@ -266,36 +274,75 @@ let
         for f in ${package}/bin/*; do
           name="$(basename "$f")"
 
-          # Mach-O by magic number; `file` is not in every stdenv. Anything else
-          # -- a shell script, a symlink to one -- is carried through untouched.
+          # makeWrapper's hidden payloads are reached through their wrapper
+          # below, never signed under their own name.
+          case "$name" in
+            .*-wrapped) continue ;;
+          esac
+
           if [ ! -f "$f" ] || [ ! -x "$f" ]; then
             ln -s "$f" "$out/bin/$name"
             continue
           fi
-          case "$(od -An -N4 -tx1 -- "$f" | tr -d ' \n')" in
-            cffaedfe | cefaedfe | cafebabe | bebafeca) ;;
-            *)
-              ln -s "$f" "$out/bin/$name"
-              continue
-              ;;
-          esac
+
+          # Find the Mach-O this entry ultimately runs. Either it IS one, or it
+          # is a makeWrapper script and the real binary is the `.<name>-wrapped`
+          # sibling it execs, possibly through several layers of wrapping.
+          target="$f"
+          depth=0
+          while ! isMachO "$target"; do
+            hidden="$(dirname "$target")/.$(basename "$target")-wrapped"
+            if [ ! -e "$hidden" ]; then
+              target=""
+              break
+            fi
+            if [ "$depth" -ge 4 ]; then
+              echo "codesign: $name wraps more than 4 deep, giving up" >&2
+              exit 1
+            fi
+            target="$hidden"
+            depth=$((depth + 1))
+          done
+
+          # Not a Mach-O and not a wrapper around one: a plain script, of which
+          # sketchybar ships several. Carried through untouched -- there is
+          # nothing to sign and nothing to plant.
+          if [ -z "$target" ]; then
+            ln -s "$f" "$out/bin/$name"
+            continue
+          fi
 
           # The identifier is the stable half of the requirement, so it is the
           # name rather than anything version-derived.
-          # `--timestamp-url none`: rcodesign otherwise fetches a timestamp token
-          # from timestamp.apple.com, which is both a network call in a build and
-          # a source of non-determinism. Nothing here needs one -- the
-          # requirement TCC stores is the certificate hash.
+          # `--timestamp-url none`: rcodesign otherwise fetches a timestamp
+          # token from timestamp.apple.com, which is both a network call in a
+          # build and a source of non-determinism. Nothing here needs one --
+          # the requirement TCC stores is the certificate hash.
           rcodesign sign --pem-file ${identityFile} --timestamp-url none \
             --binary-identifier "$name" ${entitlementsArg} \
-            "$f" "$out/signed-bin/$name"
+            "$target" "$out/signed-bin/$name"
           chmod 755 "$out/signed-bin/$name"
 
-          # makeWrapper cannot target ${trustedDir} directly -- assertExecutable
-          # rejects a path that only exists after activation -- so it is aimed at
-          # the signed binary and then re-pointed.
-          makeWrapper "$out/signed-bin/$name" "$out/bin/$name"
-          substituteInPlace "$out/bin/$name" --replace-fail "$out/signed-bin/$name" "${trustedDir}/$name"
+          if [ "$target" = "$f" ]; then
+            # A bare binary: bin/<name> becomes a shim exec'ing the planted
+            # copy. makeWrapper cannot target ${trustedDir} directly --
+            # assertExecutable rejects a path that only exists after activation
+            # -- so it is aimed at the signed binary and then re-pointed.
+            makeWrapper "$out/signed-bin/$name" "$out/bin/$name"
+            substituteInPlace "$out/bin/$name" --replace-fail "$out/signed-bin/$name" "${trustedDir}/$name"
+          else
+            # Wrap the wrapper. The script is upstream's and it is what exports
+            # LUA_PATH, PATH and the rest, so it is kept verbatim and ONLY its
+            # exec target is repointed: it still sets everything it used to,
+            # then execs the signed binary at the stable path instead of the
+            # store one. That is what lets an already-wrapped package keep both
+            # its environment and its TCC grant, without this having to know
+            # anything about what upstream put in the wrapper.
+            cp "$f" "$out/bin/$name"
+            chmod +w "$out/bin/$name"
+            substituteInPlace "$out/bin/$name" --replace-fail "$target" "${trustedDir}/$name"
+            chmod 755 "$out/bin/$name"
+          fi
         done
       '';
 
