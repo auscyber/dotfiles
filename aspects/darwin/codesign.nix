@@ -442,13 +442,21 @@ in
   #     secret -- would put the one key that must never leak, and never change,
   #     on every runner, to no benefit given the point above. The CI action still
   #     accepts a real PEM if one is ever wanted; it just does not need one.
+  # The darwin guard sits inside `packages`, not around the module body: a
+  # perSystem module whose top-level *shape* depends on `pkgs` cannot be
+  # evaluated, since `pkgs` is itself built from options other perSystem modules
+  # define, and reading them needs this module's attribute names first. Hoisting
+  # the `optionalAttrs` out of the body and into the attribute keeps the guard
+  # and breaks the cycle.
   perSystem =
     { pkgs, lib, ... }:
-    lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-      packages.codesign-ci-identity = pkgs.writeShellApplication {
-        name = "codesign-ci-identity";
-        runtimeInputs = [ pkgs.coreutils ];
-        text = mkIdentity pkgs null;
+    {
+      packages = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+        codesign-ci-identity = pkgs.writeShellApplication {
+          name = "codesign-ci-identity";
+          runtimeInputs = [ pkgs.coreutils ];
+          text = mkIdentity pkgs null;
+        };
       };
     };
 
