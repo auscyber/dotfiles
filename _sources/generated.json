@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-08-22",
+        "date": "2026-08-28",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "98c94336c20328fd37ea29dc480557e80303a134",
-            "sha256": "sha256-c3IjKptifLkEx/W+rSpOBQfh95MGhewnK2oSFEtjtU4=",
+            "rev": "486ab8c17b893379bb61276cc209ed4e05fb078c",
+            "sha256": "sha256-51yKVkDs8pjG5wYC2QTLV18UXpCsltONKas0YE5iGiE=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "98c94336c20328fd37ea29dc480557e80303a134"
+        "version": "486ab8c17b893379bb61276cc209ed4e05fb078c"
     },
     "cotabby": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-Nkd6SQGcVQYI/KIC62Gkpo/6gCUfiV4sQVPm85gwElU=",
+            "sha256": "sha256-0oZnUckDCPyq16SWWt9mX2vtDWn/5rd89btS9u6+c88=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.15.6.1/helium-0.15.6.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.16.2.1/helium-0.16.2.1-x86_64_linux.tar.xz"
         },
-        "version": "0.15.6.1"
+        "version": "0.16.2.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-medoiZEkXGXVDSc1LP6t/aU1DrtkqtQOtHGDPN8yPXk=",
+            "sha256": "sha256-aoi566LGNGht1XhyyZCla7kl7lk0WzTq33aBMkKhyu8=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.15.6.1/helium_0.15.6.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.16.2.1/helium_0.16.2.1_arm64-macos.dmg"
         },
-        "version": "0.15.6.1"
+        "version": "0.16.2.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -183,7 +183,7 @@
     "pam_rssh": {
         "cargoLock": {
             "Cargo.lock": [
-                "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=/Cargo.lock",
+                "sha256-y25d7gccIdatEDycieRtXfWOqzkfzZBWOUEKS5AXPb8=/Cargo.lock",
                 {}
             ]
         },
@@ -200,12 +200,12 @@
             "name": null,
             "owner": "z4yx",
             "repo": "pam_rssh",
-            "rev": "v1.2.1",
-            "sha256": "sha256-yHB6tEQuUFYve6GgAW6VuLSw49q0l0VzgH1vIquPNMQ=",
+            "rev": "v1.2.2-rc2",
+            "sha256": "sha256-y25d7gccIdatEDycieRtXfWOqzkfzZBWOUEKS5AXPb8=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "v1.2.1"
+        "version": "v1.2.2-rc2"
     },
     "proton-ge-bin": {
         "cargoLock": null,
@@ -216,11 +216,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-Sbyi5zXMhPIKSotvL5LEZ2dbDoLpXRcCyuY9TsnBnus=",
+            "sha256": "sha256-rX27DUrrrHtR1cgyr/424m9JPjrdASIisVGv2vWzMAs=",
             "type": "tarball",
-            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-5/GE-Proton11-5-x86_64.tar.gz"
+            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6-x86_64.tar.gz"
         },
-        "version": "GE-Proton11-5"
+        "version": "GE-Proton11-6"
     },
     "sketchybar": {
         "cargoLock": null,
@@ -246,7 +246,7 @@
     },
     "vscode-kanata": {
         "cargoLock": null,
-        "date": "2026-08-17",
+        "date": "2026-09-01",
         "extract": null,
         "name": "vscode-kanata",
         "passthru": null,
@@ -257,13 +257,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "a00d3ee81fd6e9c48f407feee27274289230b365",
-            "sha256": "sha256-nHEww+tTsPbD+VXB72rXWzpSuMyYtEACTO91bK/Gr7c=",
+            "rev": "99d1156047ed09a142ebb730be8f08742efb6fda",
+            "sha256": "sha256-lD8ksgsCh7QI1ibzfXcJeW2ZlSeSSj9W2KkOUu91GUE=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/rszyma/vscode-kanata.git"
         },
-        "version": "a00d3ee81fd6e9c48f407feee27274289230b365"
+        "version": "99d1156047ed09a142ebb730be8f08742efb6fda"
     },
     "zotero-actions-tags": {
         "cargoLock": null,
@@ -275,11 +275,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-ASPnaCjkRuyLHIg1gsPQ+hFMxFnl7gNxclSfAOPCxek=",
+            "sha256": "sha256-lVm1FVQylurzuldELohEEHEgNBHm5jr8GjHfTVdq65U=",
             "type": "url",
-            "url": "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.5.2/actions-and-tags-for-zotero.xpi"
+            "url": "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.6.1/actions-and-tags-for-zotero.xpi"
         },
-        "version": "2.5.2"
+        "version": "2.6.1"
     },
     "zotero-aria": {
         "cargoLock": null,
@@ -323,11 +323,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-xqKBWxGR5u/SdITwAPlvZp21JtYnc0TqEYB8bz9MpVI=",
+            "sha256": "sha256-Ok0IDslBU6jCS/gnVonF+UbZnjFLauD6tQYNaXD1Y4g=",
             "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.57/zotero-better-bibtex-9.0.57.xpi"
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.63/zotero-better-bibtex-9.0.63.xpi"
         },
-        "version": "9.0.57"
+        "version": "9.0.63"
     },
     "zotero-better-notes": {
         "cargoLock": null,
@@ -339,11 +339,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-SjvJqCkVw/gb77RD5dAVUXXdfyrAXgNjE1vweDoHQM4=",
+            "sha256": "sha256-SNQmAYM4vs14xx+FFZw2wDu+P2KZq1pWQJniN5CwHB4=",
             "type": "url",
-            "url": "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.0-beta.5/better-notes-for-zotero.xpi"
+            "url": "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.3/better-notes-for-zotero.xpi"
         },
-        "version": "3.3.0-beta.5"
+        "version": "3.3.3"
     },
     "zotero-notero": {
         "cargoLock": null,
@@ -393,11 +393,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-/vyE3wemCGn4ncEFLrRiK8qU+XN2RrK6DcJGnJ7/ip8=",
+            "sha256": "sha256-+2WzpKZxg9/PLc8DgohkvCHzT8iDRwSKkrdAFJ9rCx4=",
             "type": "url",
-            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.1.0/papersgpt-v1.1.0.xpi"
+            "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.2.0/papersgpt-v1.2.0.xpi"
         },
-        "version": "papersgpt-v1.1.0"
+        "version": "papersgpt-v1.2.0"
     },
     "zotero-zotlit": {
         "cargoLock": null,
@@ -409,10 +409,10 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-Cy5zChuO2lxorchp2j6YJWbYJZUxlS86mScIAWdRIXE=",
+            "sha256": "sha256-DK3rdMQLhijD/1ZRu6hv+/g+umuDoBv+orF2UKphCVA=",
             "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.0-beta.0/zotlit-zotero-2.1.0-beta.0.xpi"
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.0/zotlit-zotero-2.1.0.xpi"
         },
-        "version": "2.1.0-beta.0"
+        "version": "2.1.0"
     }
 }

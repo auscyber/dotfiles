@@ -12,8 +12,12 @@
     ivylix.inputs.nixpkgs.follows = "nixpkgs";
     ivylix.inputs.izlix.follows = "izlix";
     ivylix.inputs.ivixlib.follows = "ivixlib";
+    ivylix.inputs.den.follows = "den";
+    ivylix.inputs.flake-parts.follows = "flake-parts";
     ivixlib.url = "github:auscyber/ivixlib";
     ivixlib.inputs.nixpkgs.follows = "nixpkgs";
+    ivixlib.inputs.den.follows = "den";
+    ivixlib.inputs.flake-parts.follows = "flake-parts";
   };
 
   # The entire Lix build lives in the `ivylix` flake (sourced via nvfetcher through

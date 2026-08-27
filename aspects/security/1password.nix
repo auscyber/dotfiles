@@ -5,7 +5,10 @@
   ...
 }:
 {
-  ff.op-shell-plugins.url = "github:1Password/shell-plugins";
+  ff.op-shell-plugins = {
+    url = "github:1Password/shell-plugins";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   den.aspects.gui = {
     homeManager =
@@ -90,8 +93,7 @@
               '';
               programs.gh = {
                 enable = true;
-                git_protocol = "ssh";
-
+                settings.git_protocol = "ssh";
               };
 
               home.packages = [ pkgs._1password-cli ];

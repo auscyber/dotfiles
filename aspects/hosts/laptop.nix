@@ -27,6 +27,7 @@
 
   den.aspects.Ivys-MacBook-Pro = {
     includes = [
+      den.aspects.js
       den.aspects.vpn
       den.aspects.homebrew
       den.aspects.karabiner-driver

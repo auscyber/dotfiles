@@ -27,6 +27,8 @@ in
 {
   ff.nixvim = {
     url = "github:nix-community/nixvim";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.flake-parts.follows = "flake-parts";
   };
 
   # Register the nvim class
@@ -81,10 +83,7 @@ in
 
   # Provide nixvim HM module to users with homeManager class
   den.policies.nixvim-hm-module =
-    {
-      host,
-      ...
-    }:
+    { host, ... }:
     (den.lib.policy.provide {
       class = "homeManager";
       module = {
@@ -107,7 +106,11 @@ in
 
   # User-scope policy: forward nvim content into homeManager
   den.policies.nixvim-user-forward =
-    { host, user, ... }:
+    {
+      host,
+      user,
+      ...
+    }:
     den.lib.policy.include (nvimForward (den.lib.resolveEntity "user" { inherit host user; }));
 
   # Home-scope policy: same, for standalone `den.homes` entities, which have no

@@ -13,6 +13,7 @@
       nur = {
         url = "github:nix-community/NUR";
         inputs.nixpkgs.follows = "nixpkgs";
+        inputs.flake-parts.follows = "flake-parts";
       };
     };
   };
@@ -164,7 +165,7 @@
           stylix.targets.zen-browser.profileNames = [ profileName ];
           programs.zen-browser = {
             enable = true;
-            nativeMessagingHosts = [ pkgs._1password-gui-beta ];
+            nativeMessagingHosts = [ pkgs._1password-gui ];
 
             darwinDefaultsId = "app.zen-browser.zen";
             package = lib.mkForce (

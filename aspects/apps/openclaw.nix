@@ -8,6 +8,7 @@
     url = "github:openclaw/nix-openclaw";
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.home-manager.follows = "home-manager";
+    inputs.nix-openclaw-tools.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   den.aspects.openclaw = {

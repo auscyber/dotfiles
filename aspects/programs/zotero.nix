@@ -1,4 +1,21 @@
-{ den, lib, ... }: {
+{
+  den,
+  lib,
+  ...
+}:
+let
+  # `pkgs.tesseract` defaults to `enableLanguages = null`, which bundles the
+  # full `tessdata` set (~1 GB). Zotero only OCRs English here.
+  tesseractFor =
+    pkgs:
+    pkgs.tesseract.override {
+      enableLanguages = [
+        "eng"
+        "osd"
+      ];
+    };
+in
+{
   den.aspects.zotero = {
     includes = [ den.aspects.homebrew ];
     brew.casks = [ "zotero" ];
@@ -16,8 +33,7 @@
             extensions.zotero.zoteroocr = {
               pdftoppmPath = lib.getExe' pkgs.poppler-utils "pdftoppm";
 
-              ocrPath = lib.getExe pkgs.tesseract;
-
+              ocrPath = lib.getExe (tesseractFor pkgs);
             };
             extensions.update.autoUpdateDefault = false;
             # Zotero 7 local API (localhost:23119) for zotero-mcp's local mode.
@@ -35,9 +51,9 @@
           ];
         };
       };
-      home.packages = with pkgs; [
-        tesseract
-        poppler-utils
+      home.packages = [
+        (tesseractFor pkgs)
+        pkgs.poppler-utils
       ];
     };
   };

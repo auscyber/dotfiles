@@ -26,7 +26,12 @@ let
       true;
 in
 {
-  ff.stylix.url = "github:nix-community/stylix";
+  ff.stylix = {
+    url = "github:nix-community/stylix";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.flake-parts.follows = "flake-parts";
+    inputs.nur.follows = "nur";
+  };
 
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =

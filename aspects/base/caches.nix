@@ -215,35 +215,33 @@ in
         '';
       };
 
-      nixos =
-        { scoped, ... }:
-        {
-          imports = [ inputs.celler.nixosModules.cellerd ];
+      nixos = { scoped, ... }: {
+        imports = [ inputs.celler.nixosModules.cellerd ];
 
-          services.cellerd = {
-            enable = true;
-            environmentFile = scoped.celler.templates.env.path;
-            useFlakeCompatOverlay = false;
-            settings = {
-              listen = "[::]:${toString port}";
-              storage = {
-                type = "local";
-                path = "/mnt/hdd/attic";
-              };
+        services.cellerd = {
+          enable = true;
+          environmentFile = scoped.celler.templates.env.path;
+          useFlakeCompatOverlay = false;
+          settings = {
+            listen = "[::]:${toString port}";
+            storage = {
+              type = "local";
+              path = "/mnt/hdd/attic";
+            };
 
-              jwt = { };
+            jwt = { };
 
-              # Data chunking. Changing these makes existing chunks unreusable
-              # (different cutpoints), hurting dedup until re-uploaded.
-              chunking = {
-                nar-size-threshold = 64 * 1024; # 64 KiB
-                min-size = 16 * 1024; # 16 KiB
-                avg-size = 64 * 1024; # 64 KiB
-                max-size = 256 * 1024; # 256 KiB
-              };
+            # Data chunking. Changing these makes existing chunks unreusable
+            # (different cutpoints), hurting dedup until re-uploaded.
+            chunking = {
+              nar-size-threshold = 64 * 1024; # 64 KiB
+              min-size = 16 * 1024; # 16 KiB
+              avg-size = 64 * 1024; # 64 KiB
+              max-size = 256 * 1024; # 256 KiB
             };
           };
         };
+      };
     };
 
   # Opt-in per-host cache credentials. A host that includes this aspect gets its
@@ -462,6 +460,9 @@ in
   ff.celler = {
     url = "github:blitz/celler/main";
     inputs.nixpkgs.follows = "nixpkgs";
+    inputs.crane.follows = "crane";
+    inputs.flake-parts.follows = "flake-parts";
+    inputs.flake-compat.follows = "flake-compat";
   };
 
   flake-file.nixConfig = {

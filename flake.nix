@@ -96,11 +96,21 @@
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        devshell.follows = "devshell";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
     };
     celler = {
       url = "github:blitz/celler/main";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        crane.follows = "crane";
+        flake-compat.follows = "flake-compat";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     claude-code = {
       url = "github:sadjow/claude-code-nix";
@@ -112,9 +122,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     den.url = "github:denful/den/latest";
-    devshell.url = "github:numtide/devshell";
-    emacs.url = "github:nix-community/emacs-overlay";
-    fenix.url = "github:nix-community/fenix";
+    devshell = {
+      url = "github:numtide/devshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    emacs = {
+      url = "github:nix-community/emacs-overlay";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nixpkgs-stable.follows = "nixpkgs";
+      };
+    };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
@@ -131,11 +153,17 @@
     import-tree.url = "github:vic/import-tree";
     ivixlib = {
       url = "github:auscyber/ivixlib";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        den.follows = "den";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     ivylix = {
       url = "github:auscyber/ivylix";
       inputs = {
+        den.follows = "den";
+        flake-parts.follows = "flake-parts";
         ivixlib.follows = "ivixlib";
         izlix.follows = "izlix";
         nixpkgs.follows = "nixpkgs";
@@ -154,7 +182,11 @@
     };
     my-nur = {
       url = "github:auscyber/nur-packages";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        fenix.follows = "fenix";
+        nixpkgs.follows = "nixpkgs";
+        nvfetcher.inputs.nixpkgs.follows = "nixpkgs";
+      };
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
@@ -172,24 +204,57 @@
       url = "github:openclaw/nix-openclaw";
       inputs = {
         home-manager.follows = "home-manager";
+        nix-openclaw-tools.inputs.nixpkgs.follows = "nixpkgs";
         nixpkgs.follows = "nixpkgs";
       };
     };
-    nixcord.url = "github:kaylorben/nixcord";
+    nixcord = {
+      url = "github:kaylorben/nixcord";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    nixvim.url = "github:nix-community/nixvim";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     nur = {
       url = "github:nix-community/NUR";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+    op-shell-plugins = {
+      url = "github:1Password/shell-plugins";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    op-shell-plugins.url = "github:1Password/shell-plugins";
-    pandoc.url = "github:srid/pandoc?ref=haskell-flake-revamp";
+    pnpm-nix-provider = {
+      url = "github:wmertens/pnpm-nix-provider";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix.url = "github:nix-community/stylix";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        nur.follows = "nur";
+      };
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {
@@ -199,7 +264,10 @@
     };
     zeroclaw = {
       url = "github:zeroclaw-labs/zeroclaw";
-      inputs.fenix.follows = "fenix";
+      inputs = {
+        fenix.follows = "fenix";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
   };
 }

@@ -7,10 +7,6 @@
 {
   ff.neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
   ff.neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
-  ff.pandoc = {
-    url = "github:srid/pandoc?ref=haskell-flake-revamp";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-  };
   den.aspects.neovim = {
     includes = [
       den.aspects.nixvim

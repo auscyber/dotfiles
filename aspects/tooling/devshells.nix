@@ -8,7 +8,10 @@ let
   inherit (den.lib.policy) route;
 in
 {
-  ff.devshell.url = "github:numtide/devshell";
+  ff.devshell = {
+    url = "github:numtide/devshell";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   imports = lib.optional (inputs ? "devshell") inputs.devshell.flakeModule;
   den.classes.devshell = { };
   den.policies.devshell-to-flake-parts = _: [

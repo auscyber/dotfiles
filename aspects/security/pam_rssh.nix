@@ -22,14 +22,17 @@
       };
       security.pam.services.sudo.rssh = true;
     };
-    overlays = { sources, ... }: {
+    overlays = { ... }: {
       pam_rssh = self: super: {
+        # Stay on nixpkgs' own pinned pam_rssh (currently v1.2.1) rather than
+        # the nvfetcher-tracked latest tag: v1.2.2-rc2 fails to build (its
+        # `Facility::Auth` call doesn't exist in the libsyslog version it pulls
+        # in). `sources.pam_rssh` still feeds `cargo_lock` above so nvfetcher
+        # keeps a vendor hash ready for whenever upstream cuts a working
+        # release worth tracking.
         pam_rssh = super.pam_rssh.overrideAttrs (old: {
-          inherit (sources.pam_rssh) src version;
-          checkFlags = [
-            # reason for disabling test
+          checkFlags = old.checkFlags ++ [
             "--skip=auth_keys::test_parse_authorized_keys"
-            "--skip=tests::parse_user_authorized_keys"
           ];
           meta.platforms = old.meta.platforms ++ [ "aarch64-darwin" ];
         });

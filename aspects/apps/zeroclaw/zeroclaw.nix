@@ -21,10 +21,14 @@
   # But its bundled flake.lock pins a stale fenix (rust 1.93.1) that cannot build
   # the current source (0.8.3 onwards requires rust 1.96.1), so override fenix to
   # a fresh rev via `follows` — verified to clear the toolchain check and compile.
-  ff.fenix.url = "github:nix-community/fenix";
+  ff.fenix = {
+    url = "github:nix-community/fenix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   ff.zeroclaw = {
     url = "github:zeroclaw-labs/zeroclaw";
     inputs.fenix.follows = "fenix";
+    inputs.nixpkgs.follows = "nixpkgs";
   };
 
   den.aspects.zeroclaw = {
@@ -49,7 +53,52 @@
         cfg = config.programs.zeroclaw;
 
         zeroclawPkgs = inputs.zeroclaw.packages.${pkgs.stdenv.hostPlatform.system};
-        zeroclawPkg = zeroclawPkgs.default;
+
+        # rustc bakes the absolute path of the toolchain into every binary as the
+        # source path for panic locations (`.../library/core/src/cmp.rs`). Nothing
+        # links against it -- `otool -L` lists no such dylib -- but Nix scans for
+        # store paths in the output and so retained the entire fenix toolchain
+        # (974 MB, a second Rust on top of the nixpkgs one nvim's rustfmt already
+        # pulls) in the runtime closure. Scrub the strings; panic messages lose a
+        # path they could never have resolved on a user's machine anyway.
+        stripToolchainRefs =
+          pkg:
+          pkg.overrideAttrs (old: {
+            # Both tools by absolute path, and `nativeBuildInputs` deliberately
+            # left alone: sigtool ships its own `bin/codesign`, and putting that
+            # on PATH shadows Apple's for the WHOLE build -- rustc's link step
+            # picks it up and cargo-auditable dies with a panic in
+            # rustc_wrapper.rs, long before fixup ever runs.
+            postFixup =
+              (old.postFixup or "")
+              + ''
+                for bin in "$out"/bin/*; do
+                  [ -f "$bin" ] || continue
+                  refs=$(
+                    grep -aoE '/nix/store/[a-z0-9]{32}-[a-zA-Z0-9._+-]+' "$bin" \
+                      | sort -u | grep -E -- '-(rust|cargo)' || true
+                  )
+                  [ -n "$refs" ] || continue
+                  for ref in $refs; do
+                    ${pkgs.removeReferencesTo}/bin/remove-references-to -t "$ref" "$bin"
+                  done
+              ''
+              + lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
+                # `fixupOutput`'s darwin signing hook runs before `postFixup`, so
+                # rewriting bytes here invalidates the ad-hoc signature -- and
+                # aarch64-darwin SIGKILLs a binary whose signature does not match.
+                # `CODESIGN_ALLOCATE` inline rather than on PATH for the same
+                # reason: sigtool's codesign spawns `codesign_allocate` and aborts
+                # without it, but cctools must not leak into the build either.
+                CODESIGN_ALLOCATE=${pkgs.darwin.cctools}/bin/codesign_allocate \
+                  ${pkgs.darwin.sigtool}/bin/codesign -f -s - "$bin"
+              ''
+              + ''
+                done
+              '';
+          });
+
+        zeroclawPkg = stripToolchainRefs zeroclawPkgs.default;
 
         # zerocode is the TUI, and it prints its own warning on --version:
         # "This version must exactly match the running zeroclaw daemon. The TUI
@@ -61,7 +110,7 @@
         # contain these features: acp-bridge, agent-runtime, …". zerocode's own
         # manifest declares `default = []` and one unrelated `sop-authoring`
         # flag, so the correct build is simply no features at all.
-        zerocodePkg = zeroclawPkgs.zerocode.overrideAttrs (_: {
+        zerocodePkg = (stripToolchainRefs zeroclawPkgs.zerocode).overrideAttrs (_: {
           cargoBuildFlags = [
             "-p"
             "zerocode"
