@@ -1945,7 +1945,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
-| sketchybar | `2.24.0` | Highly customizable macOS status bar replacement |
+| sketchybar | `unknown` | Highly customizable macOS status bar replacement |
 | todoist-mcp | `13.0.0` | Model Context Protocol server for Todoist |
 | zotero-mcp | `0.6.2` | Model Context Protocol server for Zotero |
 
