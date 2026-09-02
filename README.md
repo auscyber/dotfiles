@@ -64,6 +64,7 @@
 - ivy-fetch
 - ivypierlot
 - ivypierlot/Ivys-MacBook-Pro
+- js
 - jujutsu
 - karabiner-driver
 - laptop-dock
@@ -133,6 +134,7 @@ graph LR
   insecure_predicate["insecure-predicate"]:::insecure_predicate_c
   insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
+  js["js"]:::js_c
   jujutsu["jujutsu"]:::jujutsu_c
   karabiner_driver["karabiner-driver"]:::karabiner_driver_c
   laptop_dock["laptop-dock"]:::laptop_dock_c
@@ -161,6 +163,7 @@ graph LR
   Ivys_MacBook_Pro --> codesign
   Ivys_MacBook_Pro --> codesign_identity
   Ivys_MacBook_Pro --> homebrew_host_Ivys_MacBook_Pro
+  Ivys_MacBook_Pro --> js
   Ivys_MacBook_Pro --> karabiner_driver
   Ivys_MacBook_Pro --> laptop_dock
   Ivys_MacBook_Pro --> sudoagents_host_Ivys_MacBook_Pro
@@ -312,6 +315,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivypierlot_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ivypierlot__Ivys_MacBook_Pro_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef js_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef karabiner_driver_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef laptop_dock_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -1933,15 +1937,15 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 | celler | `0.1.0` | Multi-tenant Nix binary cache system |
 | cotabby | `v0.6.2-beta` |  |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.15.6.1` | Private, fast, and honest web browser based on Chromium |
+| helium | `0.16.2.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
-| kanata-ls | `a00d3ee81fd6e9c48f407feee27274289230b365` | Kanata Language Server |
+| kanata-ls | `99d1156047ed09a142ebb730be8f08742efb6fda` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
 | ms-365-mcp-server | `0.145.1` | Microsoft 365 / Outlook MCP server (mail, calendar, OneDrive, Excel) over Microsoft Graph |
-| proton-ge-bin | `GE-Proton11-5` | Compatibility tool for Steam Play based on Wine and additional components.
+| proton-ge-bin | `GE-Proton11-6` | Compatibility tool for Steam Play based on Wine and additional components.
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
