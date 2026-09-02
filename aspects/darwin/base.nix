@@ -33,6 +33,24 @@
         InitialKeyRepeat = lib.mkDefault 10;
         KeyRepeat = lib.mkDefault 3;
       };
+
+      # No log by default -- nix-darwin only wires this up to
+      # `serviceConfig.StandardErrorPath` when set (modules/services/nix-daemon.nix),
+      # otherwise nix-daemon's stderr goes nowhere convenient. Needed for
+      # anything past `launchctl list`: a stuck/cycling remote builder,
+      # a substituter timing out, gc.automatic runs, etc.
+      services.nix-daemon.logFile = lib.mkDefault "/var/log/nix-daemon.log";
+
+      # Default kern.tty.ptmx_max (511) gets exhausted under heavy pty churn
+      # (many terminal/editor sessions, nix-build allocating one per builder to
+      # give tools a tty for colored output). Once the pool fills, every new
+      # pty request -- including nix-build's -- fails with "opening
+      # pseudoterminal master: Device not configured". `activate-system` reruns
+      # this at every boot and `darwin-rebuild switch`, so it doesn't need a
+      # dedicated launchd daemon.
+      system.activationScripts.extraActivation.text = ''
+        /usr/sbin/sysctl -w kern.tty.ptmx_max=970 || true
+      '';
     };
   };
 

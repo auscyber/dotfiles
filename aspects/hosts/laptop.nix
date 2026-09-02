@@ -242,7 +242,10 @@
       den.aspects.opencode
       #      den.aspects.openclaw
       den.aspects.llama-cpp
-      den.aspects.zeroclaw
+      # zeroclaw-daemon depends on a rust-src component that fails to build
+      # (rust-src-stable-2026-08-20.drv), taking the whole system switch down
+      # with it. Dropped until that's fixed upstream.
+      # den.aspects.zeroclaw
       den.aspects.file-local
       den.batteries.primary-user
       den.aspects.cotabby
@@ -259,10 +262,14 @@
           opencode
           vscode
           pandoc
-          # Medium over Full: Full costs ~1.4 GB of closure for packages this
-          # machine never pulls in. If a document wants something Medium lacks,
-          # prefer adding that package explicitly over going back to Full.
-          texliveMedium
+          # scheme-small + French over scheme-medium: medium pulls in every TeX
+          # Live language collection (dozens of hyphenation packages), which is
+          # most of what made evaluating this closure slow. English ships with
+          # scheme-small already; add collection-lang<x> here for any other
+          # language a document needs, rather than going back to Medium/Full.
+          (texlive.combine {
+            inherit (texlive) scheme-small collection-langfrench;
+          })
           mupdf
           # qemu dropped: nix.linux-builder already brings qemu-host-cpu-only,
           # which covers the aarch64-linux builder VM. Re-add the full package

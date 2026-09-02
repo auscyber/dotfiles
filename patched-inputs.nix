@@ -45,6 +45,9 @@
   nh.patches = [
     ./patches/nh/edit.patch
   ];
+  pnpm-nix-provider.patches = [
+    ./patches/pnpm-nix-provider/execute-bit.patch
+  ];
   zen-browser.patches = [ ];
 
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
@@ -54,5 +57,6 @@
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
   home-manager.hash = "sha256-jxwUf4NAfSYCvvxOXjnQx5DYyxDgN8xKDhDYLi5RyHg=";
   nh.hash = "sha256-+ycJgV7He0vCGYX6k0Kd6kYapeI030mnEiDEwP5IPw4=";
+  pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
   zen-browser.hash = null;
 }

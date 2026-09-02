@@ -101,10 +101,25 @@ let
   identityFile = "/run/agenix/secrets/codesign/identity";
 
   # What TCC records as the client for every shimmed program, so it is as
-  # permanent as the grants. Not under `/run`: macOS clears it on boot and
-  # nix-darwin activation only runs at `darwin-rebuild` time (see
-  # `extraModules/darwin/wrappers`), which would leave every shim dangling.
-  trustedDir = "/usr/local/dendritic/bin";
+  # permanent as the grants. Shares `/run/wrappers/bin` with
+  # `extraModules/darwin/wrappers`'s `security.wrappers` -- the same
+  # NixOS-`security.wrapperDir`-flavoured stable bin directory, one fixed path
+  # regardless of what happens to land in it. It inherits that module's own
+  # documented reboot gap: `/run` is a synthetic firmlink macOS clears on
+  # boot, and nix-darwin activation only reruns at `darwin-rebuild` time, not
+  # at boot (`org.nixos.activate-system`'s `RunAtLoad` job only relinks
+  # `/run/current-system` and `/etc`, it does not rerun `activate`) -- so
+  # every shim here is missing until the next switch after a reboot, exactly
+  # like the setuid wrappers already are. Accepted for consistency: one
+  # stable-bin convention instead of two.
+  #
+  # Sharing the directory means sharing its lifecycle too: that module's own
+  # `postActivation` does `rm -rf ${wrapperDir}` before repopulating it with
+  # just its own wrappers, so this aspect's own planting step (below) has to
+  # run in `postActivation` as well, ordered strictly after that with
+  # `lib.mkAfter` -- in `extraActivation` (which runs earlier) it would get
+  # wiped by that `rm -rf` on every single activation.
+  trustedDir = "/run/wrappers/bin";
 
   subject = "Dendritic Local Codesign";
 
@@ -382,15 +397,36 @@ let
         done
       '';
 
-  # All four are in this host's TCC database keyed by a store path, which is the
-  # whole reason for the list.
+  # In this host's TCC database keyed by a store path, which is the whole
+  # reason for the list. NOT paneru or sketchybar: both home-manager modules
+  # wrap `cfg.package` *again* after this overlay runs -- paneru's own
+  # `services.paneru.finalPackage` (`nix/_paneru-common.nix`) and
+  # home-manager's `programs.sketchybar.finalPackage`
+  # (`modules/programs/sketchybar.nix`) -- via a plain `symlinkJoin` +
+  # `wrapProgram` that has never heard of `mkSignedWrapper`, to inject
+  # `LUA_PATH`/`LUA_CPATH`/`PATH` (sketchybar's own `extraPackages`/
+  # `extraLuaPackages`, e.g. jq/yq/nowplaying-cli and the colours/icon-map Lua
+  # modules -- aspects/desktop/sketchybar/sketchybar.nix). Feeding that a
+  # pre-signed `pkgs.<name>` produces a *second*, unsigned
+  # wrapper-around-a-wrapper whose store path drifts on every rebuild that
+  # touches any of those dependencies, which is often -- exactly the
+  # instability this whole aspect exists to remove, just one layer further
+  # out. Leaving them out of `signed` keeps `pkgs.<name>` (hence `cfg.package`)
+  # plain, so `finalPackage` ends up wrapped exactly *once* over the real
+  # Mach-O -- the shape `mkSignedWrapper` already handles below. Each is
+  # signed explicitly at that point instead: see the `fromUser` entries in
+  # `den.aspects.codesign.darwin` and the matching calls in
+  # `aspects/wms/paneru/default.nix` and
+  # `aspects/desktop/sketchybar/sketchybar.nix`, which sign `finalPackage`
+  # itself (same inputs, so the same derivation either way).
   signed = [
-    "sketchybar"
-    "paneru"
     # `kanata-with-cmd`, not `kanata`: `aspects/input/kanata/_kanata.nix`
     # defaults `programs.kanata.package` to it, because the keybinds in the
     # paneru aspect are all `(t! runasuser ...)` and `cmd` is a build feature.
-    # Signing plain `kanata` would sign a package nothing runs.
+    # Signing plain `kanata` would sign a package nothing runs. Not
+    # double-wrapped like paneru/sketchybar above: its plist sets `PATH` via
+    # `EnvironmentVariables` directly and wraps nothing
+    # (aspects/input/kanata/_kanata.nix).
     "kanata-with-cmd"
     "kanata-vk-agent"
   ];
@@ -552,7 +588,15 @@ in
         # to the real build -- so taking the final package gets the right binary
         # without touching a single launchd job. `or null` throughout: a host
         # without one of these modules simply contributes nothing.
-        system.activationScripts.extraActivation.text =
+        # `postActivation`, not `extraActivation`: `trustedDir` is now
+        # `/run/wrappers/bin`, shared with `extraModules/darwin/wrappers`,
+        # whose own `postActivation` text does `rm -rf ${wrapperDir}` before
+        # replanting just its own setuid wrappers. `extraActivation` runs
+        # earlier, so anything planted there would be wiped by that `rm -rf`
+        # on every activation. `lib.mkAfter` guarantees this text sorts after
+        # that module's (untagged, default-priority) text within
+        # `postActivation` regardless of module declaration order.
+        system.activationScripts.postActivation.text = lib.mkAfter (
           let
             # Gated on `enable`, not written as `x.finalPackage or null`. These
             # options exist even where the module is switched off, so a bare
@@ -562,11 +606,28 @@ in
             fromUser = user: [
               {
                 on = user.services.paneru.enable or false;
-                get = _: user.services.paneru.finalPackage;
+                # `finalPackage` is wrapPaneru's own LUA_PATH wrap, applied
+                # *after* `services.paneru.package` (left unsigned -- see
+                # `signed` above) -- a single hidden-sibling layer over the
+                # real Mach-O, the shape `mkSignedWrapper` already handles.
+                # Signed here directly rather than through the generic
+                # `signed` list/overlay above, since nothing upstream of this
+                # point ever sees the fully-wrapped package to sign it.
+                # `aspects/wms/paneru/default.nix` calls this identically
+                # (same inputs) to point the launchd job's `Program` at the
+                # signed result instead of `finalPackage` itself.
+                get = _: mkSignedWrapper pkgs { package = user.services.paneru.finalPackage; };
               }
               {
                 on = user.programs.sketchybar.enable or false;
-                get = _: user.programs.sketchybar.finalPackage;
+                # Same shape and same reason as paneru above:
+                # `programs.sketchybar.finalPackage`
+                # (modules/programs/sketchybar.nix) wraps `programs.sketchybar
+                # .package` (left unsigned -- see `signed` above) again for
+                # `extraPackages`/`extraLuaPackages`, so it's what needs
+                # signing here, not the pre-wrap package. Matching call in
+                # `aspects/desktop/sketchybar/sketchybar.nix`.
+                get = _: mkSignedWrapper pkgs { package = user.programs.sketchybar.finalPackage; };
               }
               {
                 on = user.programs.kanata.enable or false;
@@ -606,7 +667,8 @@ in
               mv -f ${trustedDir}/.staged "${trustedDir}/$codesignName"
               echo "codesign: planted $codesignName in ${trustedDir}"
             done
-          '';
+          ''
+        );
       };
   };
 }

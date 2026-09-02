@@ -2,8 +2,16 @@
   inputs,
   lib,
   den,
+  config,
   ...
 }:
+let
+  # Alias for the flake-parts top-level `config`, captured here before the
+  # `homeManager` module below binds its own (home-manager) `config` of the
+  # same name -- which would otherwise shadow this one and put
+  # `codesign.mkSignedWrapper` out of reach inside it.
+  flakeParts = config;
+in
 {
   # ./sketchybar/paneru-bar.lua drives sketchybar from a `window_focused`
   # handler through `paneru.exec`, and a failed exec raises a Lua error that
@@ -354,6 +362,25 @@
                           ''}
 
               '';
+
+            # `services.paneru.finalPackage` (paneru's own home-manager module,
+            # `nix/_paneru-common.nix`) wraps `services.paneru.package` a
+            # *second* time -- for `LUA_PATH`/`LUA_CPATH`/`PATH` -- through a
+            # plain `symlinkJoin` + `wrapProgram` that has never heard of
+            # `mkSignedWrapper`. `services.paneru.package` above is left
+            # unsigned (see the `signed` list in aspects/darwin/codesign.nix)
+            # so that wrap is the *only* one `finalPackage` carries: a single
+            # hidden-sibling layer over the real Mach-O, the shape
+            # `mkSignedWrapper` already handles. Signing it here, rather than
+            # through codesign's own overlay, is what makes the actual
+            # launched entry point (below) stable across rebuilds instead of
+            # the raw Mach-O three hops further in. Identical to the call in
+            # `aspects/darwin/codesign.nix`'s activation script (same inputs
+            # -> same derivation), which is what plants it.
+            paneruSigned = flakeParts.flake.lib.codesign.mkSignedWrapper pkgs {
+              package = config.services.paneru.finalPackage;
+              entitlements = flakeParts.flake.lib.codesign.entitlementsFor.paneru or { };
+            };
           in
           lib.mkMerge [
             (lib.optionalAttrs (options.programs ? kanata) {
@@ -480,6 +507,18 @@
                 # intercepted.
                 config = paneruInitLua;
               };
+
+              # `services.paneru`'s own home-manager module (nix/home.nix)
+              # points this launchd job's `Program` at
+              # `services.paneru.finalPackage` directly, which is the
+              # UNSIGNED wrapPaneru wrap (see `paneruSigned` above). Forced
+              # to the signed equivalent instead, so the process launchd
+              # actually execs bottoms out at `${trustedDir}/paneru` rather
+              # than a raw, rebuild-varying store path -- TCC's Accessibility
+              # grant is worthless to a client whose path never survives a
+              # rebuild. Only `Program` is overridden; `Label`, `KeepAlive`
+              # and the rest keep whatever that module set.
+              launchd.agents.paneru.config.Program = lib.mkForce (lib.getExe paneruSigned);
 
               # Stop macOS from also acting on a 3-finger vertical swipe
               # (Mission Control up / App Expose down) so paneru's vertical

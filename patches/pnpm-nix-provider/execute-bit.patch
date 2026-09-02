@@ -1,0 +1,42 @@
+From 8db796aa02b40a30c7b0b0c0000c466ee313a4cd Mon Sep 17 00:00:00 2001
+From: Ivy Pierlot <pierlotchris@gmail.com>
+Date: Thu, 3 Sep 2026 13:18:58 +1000
+Subject: [PATCH] template.nix: set the execute bit on unpacked directories too
+
+chmod -R u+w after tar-extracting a package only ever adds the write
+bit. Some published tarballs (pngjs 4.0.1-7.0.0 at least) store their
+directories without the execute bit at all (mode 666), which u+w does
+nothing to fix since a plain rw- directory already has write. The
+result is a directory nothing can stat/traverse into, including our
+own later git apply / jq / chmod +x steps, and including whatever
+later tries to clean up or copy the tree (pnpm-nix-provider's impure
+host-build path in particular, which crashes with EACCES trying to
+unlink files inside it once the raw derivation is done).
+
+u+X adds execute only where a search/execute bit already exists for
+some class -- i.e. on directories (which always want to be
+traversable by their owner) and on files that are already executable
+by someone -- so plain non-executable files are left alone.
+---
+ src/template.nix | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/template.nix b/src/template.nix
+index 9d5ce2d..576831e 100644
+--- a/src/template.nix
++++ b/src/template.nix
+@@ -91,6 +91,14 @@ let
+       mkdir -p "${dir}"
+       ${unpack}
+       chmod -R u+w "${dir}"
++      # Some published tarballs (e.g. pngjs) store directories without
++      # the execute bit, which chmod u+w alone does not add back; without
++      # it the directory is unreadable/untraversable, later crashing any
++      # code that walks or removes it. u+X only sets execute where a
++      # search bit is already set for some class (i.e. on directories, and
++      # on files already executable by someone), so plain files are left
++      # alone.
++      chmod -R u+X "${dir}"
+       ${lib.optionalString (node ? patch) ''
+         ${pkgs.gitMinimal}/bin/git -C "${dir}" apply --whitespace=nowarn ${pkgs.writeText "pnpm-patch" node.patch.content}
+       ''}
