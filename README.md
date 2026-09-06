@@ -65,6 +65,7 @@
 - ivypierlot
 - ivypierlot/Ivys-MacBook-Pro
 - js
+- js/to-users
 - jujutsu
 - karabiner-driver
 - laptop-dock
@@ -102,7 +103,6 @@
 - vpn
 - vpn-secrets
 - wakatime
-- zeroclaw
 - zig
 - zotero
 
@@ -153,6 +153,7 @@ graph LR
   starship["starship"]:::starship_c
   sudoagents_host_Ivys_MacBook_Pro["sudoagents"]:::sudoagents_host_Ivys_MacBook_Pro_c
   ivypierlot__Ivys_MacBook_Pro__to_users[/"Ivys-MacBook-Pro/to-users"\]:::ivypierlot__Ivys_MacBook_Pro__to_users_c
+  js__to_users[/"js/to-users"\]:::js__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__os{{"unfree-predicate/os"}}:::unfree_predicate__os_c
@@ -189,6 +190,7 @@ graph LR
   vpn --> vpn_secrets
   vpn_secrets --> agenix_rekey_host_Ivys_MacBook_Pro
   ccache -.->|provides| ccache__Ivys_MacBook_Pro
+  js -.->|provides| js__to_users
   end
   subgraph ctx_user_ivypierlot["user: ivypierlot"]
   agenix_rekey_user_ivypierlot["agenix-rekey"]:::agenix_rekey_user_ivypierlot_c
@@ -231,7 +233,6 @@ graph LR
   user_shell__ivypierlot_Ivys_MacBook_Pro{{"user-shell/ivypierlot@Ivys-MacBook-Pro"}}:::user_shell__ivypierlot_Ivys_MacBook_Pro_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
-  zeroclaw["zeroclaw"]:::zeroclaw_c
   zig["zig"]:::zig_c
   zotero["zotero"]:::zotero_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
@@ -259,7 +260,6 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_Ivys_MacBook_Pro_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
-  ivypierlot --> zeroclaw
   ivypierlot --> zig
   ivypierlot__Ivys_MacBook_Pro --> darwin_gaming
   main_ssh_key --> pam_rssh_user_ivypierlot
@@ -350,6 +350,7 @@ graph LR
   classDef sudoagents_host_Ivys_MacBook_Pro_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef sudoagents_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef ivypierlot__Ivys_MacBook_Pro__to_users_c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-width:3px
+  classDef js__to_users_c fill:#bf8700,stroke:#bf8700,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_libkey_nomad_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
@@ -362,7 +363,6 @@ graph LR
   classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef zeroclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef zotero_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
 style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -936,7 +936,6 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - unfree-predicate/user
 - user-shell/ivypierlot@macmini
 - wakatime
-- zeroclaw
 - zig
 
 ### Aspect Graph
@@ -1040,7 +1039,6 @@ graph LR
   user_shell__ivypierlot_macmini{{"user-shell/ivypierlot@macmini"}}:::user_shell__ivypierlot_macmini_c
   wakatime["wakatime"]:::wakatime_c
   browsers__zen[/"browsers/zen"\]:::browsers__zen_c
-  zeroclaw["zeroclaw"]:::zeroclaw_c
   zig["zig"]:::zig_c
   browsers__zen --> den__provides__unfree_libkey_nomad_onepassword_password_manager_
   dev --> dev_cli
@@ -1067,7 +1065,6 @@ graph LR
   ivypierlot --> den__batteries__primary_user_ivypierlot_macmini_
   ivypierlot --> sketchybar
   ivypierlot --> browsers__zen
-  ivypierlot --> zeroclaw
   ivypierlot --> zig
   main_ssh_key --> pam_rssh_user_ivypierlot
   neovim --> stylix
@@ -1155,7 +1152,6 @@ graph LR
   classDef user_shell__ivypierlot_macmini_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef browsers__zen_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
-  classDef zeroclaw_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef zig_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
 style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -1949,7 +1945,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
-| sketchybar | `unknown` | Highly customizable macOS status bar replacement |
+| sketchybar | `2.24.0` | Highly customizable macOS status bar replacement |
 | todoist-mcp | `13.0.0` | Model Context Protocol server for Todoist |
 | zotero-mcp | `0.6.2` | Model Context Protocol server for Zotero |
 
