@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "486ab8c17b893379bb61276cc209ed4e05fb078c";
+    version = "1cb3270acf49a1efb9bb9138525076c13b464bb9";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "486ab8c17b893379bb61276cc209ed4e05fb078c";
+      rev = "1cb3270acf49a1efb9bb9138525076c13b464bb9";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-51yKVkDs8pjG5wYC2QTLV18UXpCsltONKas0YE5iGiE=";
+      sha256 = "sha256-gyRdHMwvY/+KjzQfTpKTIuk9txBqwh0Wq+CdN+lScCg=";
     };
-    date = "2026-08-28";
+    date = "2026-09-05";
   };
   cotabby = {
     pname = "cotabby";
@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.16.2.1";
+    version = "0.16.5.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.16.2.1/helium-0.16.2.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-0oZnUckDCPyq16SWWt9mX2vtDWn/5rd89btS9u6+c88=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.16.5.1/helium-0.16.5.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-9O1WNVKa7a8QsVtOExPSUqhYKjd/NlDc3rKzghn1fY0=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.16.2.1";
+    version = "0.16.5.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.16.2.1/helium_0.16.2.1_arm64-macos.dmg";
-      sha256 = "sha256-aoi566LGNGht1XhyyZCla7kl7lk0WzTq33aBMkKhyu8=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.16.5.1/helium_0.16.5.1_arm64-macos.dmg";
+      sha256 = "sha256-i+05Lp/WdkZ81I1oxr+uvFaRjGGgFePZHlVBF1CVTZs=";
     };
   };
   jankyborders = {
@@ -151,17 +151,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "99d1156047ed09a142ebb730be8f08742efb6fda";
+    version = "2122eb6090195434edf02774dc83a8aebcf77693";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "99d1156047ed09a142ebb730be8f08742efb6fda";
+      rev = "2122eb6090195434edf02774dc83a8aebcf77693";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-lD8ksgsCh7QI1ibzfXcJeW2ZlSeSSj9W2KkOUu91GUE=";
+      sha256 = "sha256-eJYWkHm6/Oc/FtDSEtzOCTkfAAx3W+kCe2wmLpUYI4A=";
     };
-    date = "2026-09-01";
+    date = "2026-09-02";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
