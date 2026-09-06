@@ -1937,11 +1937,11 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 | celler | `0.1.0` | Multi-tenant Nix binary cache system |
 | cotabby | `v0.6.2-beta` |  |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.16.2.1` | Private, fast, and honest web browser based on Chromium |
+| helium | `0.16.5.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
-| kanata-ls | `99d1156047ed09a142ebb730be8f08742efb6fda` | Kanata Language Server |
+| kanata-ls | `2122eb6090195434edf02774dc83a8aebcf77693` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
 | ms-365-mcp-server | `0.145.1` | Microsoft 365 / Outlook MCP server (mail, calendar, OneDrive, Excel) over Microsoft Graph |
