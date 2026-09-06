@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-08-28",
+        "date": "2026-09-05",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "486ab8c17b893379bb61276cc209ed4e05fb078c",
-            "sha256": "sha256-51yKVkDs8pjG5wYC2QTLV18UXpCsltONKas0YE5iGiE=",
+            "rev": "1cb3270acf49a1efb9bb9138525076c13b464bb9",
+            "sha256": "sha256-gyRdHMwvY/+KjzQfTpKTIuk9txBqwh0Wq+CdN+lScCg=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "486ab8c17b893379bb61276cc209ed4e05fb078c"
+        "version": "1cb3270acf49a1efb9bb9138525076c13b464bb9"
     },
     "cotabby": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-0oZnUckDCPyq16SWWt9mX2vtDWn/5rd89btS9u6+c88=",
+            "sha256": "sha256-9O1WNVKa7a8QsVtOExPSUqhYKjd/NlDc3rKzghn1fY0=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.16.2.1/helium-0.16.2.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.16.5.1/helium-0.16.5.1-x86_64_linux.tar.xz"
         },
-        "version": "0.16.2.1"
+        "version": "0.16.5.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-aoi566LGNGht1XhyyZCla7kl7lk0WzTq33aBMkKhyu8=",
+            "sha256": "sha256-i+05Lp/WdkZ81I1oxr+uvFaRjGGgFePZHlVBF1CVTZs=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.16.2.1/helium_0.16.2.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.16.5.1/helium_0.16.5.1_arm64-macos.dmg"
         },
-        "version": "0.16.2.1"
+        "version": "0.16.5.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -246,7 +246,7 @@
     },
     "vscode-kanata": {
         "cargoLock": null,
-        "date": "2026-09-01",
+        "date": "2026-09-02",
         "extract": null,
         "name": "vscode-kanata",
         "passthru": null,
@@ -257,13 +257,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "99d1156047ed09a142ebb730be8f08742efb6fda",
-            "sha256": "sha256-lD8ksgsCh7QI1ibzfXcJeW2ZlSeSSj9W2KkOUu91GUE=",
+            "rev": "2122eb6090195434edf02774dc83a8aebcf77693",
+            "sha256": "sha256-eJYWkHm6/Oc/FtDSEtzOCTkfAAx3W+kCe2wmLpUYI4A=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/rszyma/vscode-kanata.git"
         },
-        "version": "99d1156047ed09a142ebb730be8f08742efb6fda"
+        "version": "2122eb6090195434edf02774dc83a8aebcf77693"
     },
     "zotero-actions-tags": {
         "cargoLock": null,
