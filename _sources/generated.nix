@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "1cb3270acf49a1efb9bb9138525076c13b464bb9";
+    version = "949207df64f6e47164b574d9b33c36df6fa9abcb";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "1cb3270acf49a1efb9bb9138525076c13b464bb9";
+      rev = "949207df64f6e47164b574d9b33c36df6fa9abcb";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-gyRdHMwvY/+KjzQfTpKTIuk9txBqwh0Wq+CdN+lScCg=";
+      sha256 = "sha256-H1QPAhhODBjE+rK1FhrtK/oyMtmhHYYHHQUd+10QK7A=";
     };
-    date = "2026-09-05";
+    date = "2026-09-07";
   };
   cotabby = {
     pname = "cotabby";
@@ -53,18 +53,18 @@
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.16.5.1";
+    version = "0.16.6.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.16.5.1/helium-0.16.5.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-9O1WNVKa7a8QsVtOExPSUqhYKjd/NlDc3rKzghn1fY0=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.16.6.1/helium-0.16.6.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-CekyF3pfhYPq8Q7hvkJ/3UR4gVFK/Qx9ZeK8Ac5a988=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.16.5.1";
+    version = "0.16.6.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.16.5.1/helium_0.16.5.1_arm64-macos.dmg";
-      sha256 = "sha256-i+05Lp/WdkZ81I1oxr+uvFaRjGGgFePZHlVBF1CVTZs=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.16.6.1/helium_0.16.6.1_arm64-macos.dmg";
+      sha256 = "sha256-N3tVzdYFTIyzxr6aG2sAjYyTYrXvhKoenc+JPvfL5Lg=";
     };
   };
   jankyborders = {
@@ -189,10 +189,10 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.63";
+    version = "9.0.64";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.63/zotero-better-bibtex-9.0.63.xpi";
-      sha256 = "sha256-Ok0IDslBU6jCS/gnVonF+UbZnjFLauD6tQYNaXD1Y4g=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.64/zotero-better-bibtex-9.0.64.xpi";
+      sha256 = "sha256-hMS1sF/6yanH4v95ZjYSSG93gWkN1ZsSoeYq7Nz6fCc=";
     };
   };
   zotero-better-notes = {
@@ -217,10 +217,10 @@
   };
   zotero-ocr = {
     pname = "zotero-ocr";
-    version = "0.9.5.1";
+    version = "0.9.6";
     src = fetchurl {
-      url = "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi";
-      sha256 = "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=";
+      url = "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.6/zotero-ocr-0.9.6.xpi";
+      sha256 = "sha256-k2JzTfNfTVOmDI7GOkE0o1ebvCI6XZfYSI7KbcjJ4L8=";
     };
   };
   zotero-papersgpt = {
@@ -228,7 +228,7 @@
     version = "papersgpt-v1.2.0";
     src = fetchurl {
       url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.2.0/papersgpt-v1.2.0.xpi";
-      sha256 = "sha256-+2WzpKZxg9/PLc8DgohkvCHzT8iDRwSKkrdAFJ9rCx4=";
+      sha256 = "sha256-z7WOXTKkXDUq3IhPyf3i4lzbxUX9qxkfS3Ps7z5p0r4=";
     };
   };
   zotero-zotlit = {

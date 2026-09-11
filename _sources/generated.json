@@ -23,7 +23,7 @@
     },
     "app_font": {
         "cargoLock": null,
-        "date": "2026-09-05",
+        "date": "2026-09-07",
         "extract": null,
         "name": "app_font",
         "passthru": null,
@@ -34,13 +34,13 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "1cb3270acf49a1efb9bb9138525076c13b464bb9",
-            "sha256": "sha256-gyRdHMwvY/+KjzQfTpKTIuk9txBqwh0Wq+CdN+lScCg=",
+            "rev": "949207df64f6e47164b574d9b33c36df6fa9abcb",
+            "sha256": "sha256-H1QPAhhODBjE+rK1FhrtK/oyMtmhHYYHHQUd+10QK7A=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/kvndrsslr/sketchybar-app-font"
         },
-        "version": "1cb3270acf49a1efb9bb9138525076c13b464bb9"
+        "version": "949207df64f6e47164b574d9b33c36df6fa9abcb"
     },
     "cotabby": {
         "cargoLock": null,
@@ -89,11 +89,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-9O1WNVKa7a8QsVtOExPSUqhYKjd/NlDc3rKzghn1fY0=",
+            "sha256": "sha256-CekyF3pfhYPq8Q7hvkJ/3UR4gVFK/Qx9ZeK8Ac5a988=",
             "type": "tarball",
-            "url": "https://github.com/imputnet/helium-linux/releases/download/0.16.5.1/helium-0.16.5.1-x86_64_linux.tar.xz"
+            "url": "https://github.com/imputnet/helium-linux/releases/download/0.16.6.1/helium-0.16.6.1-x86_64_linux.tar.xz"
         },
-        "version": "0.16.5.1"
+        "version": "0.16.6.1"
     },
     "helium_macos": {
         "cargoLock": null,
@@ -105,11 +105,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-i+05Lp/WdkZ81I1oxr+uvFaRjGGgFePZHlVBF1CVTZs=",
+            "sha256": "sha256-N3tVzdYFTIyzxr6aG2sAjYyTYrXvhKoenc+JPvfL5Lg=",
             "type": "url",
-            "url": "https://github.com/imputnet/helium-macos/releases/download/0.16.5.1/helium_0.16.5.1_arm64-macos.dmg"
+            "url": "https://github.com/imputnet/helium-macos/releases/download/0.16.6.1/helium_0.16.6.1_arm64-macos.dmg"
         },
-        "version": "0.16.5.1"
+        "version": "0.16.6.1"
     },
     "jankyborders": {
         "cargoLock": null,
@@ -323,11 +323,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-Ok0IDslBU6jCS/gnVonF+UbZnjFLauD6tQYNaXD1Y4g=",
+            "sha256": "sha256-hMS1sF/6yanH4v95ZjYSSG93gWkN1ZsSoeYq7Nz6fCc=",
             "type": "url",
-            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.63/zotero-better-bibtex-9.0.63.xpi"
+            "url": "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.64/zotero-better-bibtex-9.0.64.xpi"
         },
-        "version": "9.0.63"
+        "version": "9.0.64"
     },
     "zotero-better-notes": {
         "cargoLock": null,
@@ -377,11 +377,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-8QCz5gy087tpFmV261fnb3ACsk/1JkjCpoJ9aLU1r44=",
+            "sha256": "sha256-k2JzTfNfTVOmDI7GOkE0o1ebvCI6XZfYSI7KbcjJ4L8=",
             "type": "url",
-            "url": "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.5.1/zotero-ocr-0.9.5.1.xpi"
+            "url": "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.6/zotero-ocr-0.9.6.xpi"
         },
-        "version": "0.9.5.1"
+        "version": "0.9.6"
     },
     "zotero-papersgpt": {
         "cargoLock": null,
@@ -393,7 +393,7 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-+2WzpKZxg9/PLc8DgohkvCHzT8iDRwSKkrdAFJ9rCx4=",
+            "sha256": "sha256-z7WOXTKkXDUq3IhPyf3i4lzbxUX9qxkfS3Ps7z5p0r4=",
             "type": "url",
             "url": "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.2.0/papersgpt-v1.2.0.xpi"
         },
