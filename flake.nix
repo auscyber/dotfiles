@@ -63,6 +63,7 @@
       };
 
   nixConfig = {
+    allow-import-from-derivation = true;
     extra-substituters = [
       "https://cache.ivymect.in/main"
       "https://cache.nixos.org"

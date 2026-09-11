@@ -468,5 +468,11 @@ in
   flake-file.nixConfig = {
     extra-substituters = builtins.attrNames caches;
     extra-trusted-public-keys = builtins.attrValues caches;
+    # Several aspects (celler's cargo vendoring, agenix-rekey's patched
+    # input, the `cellerdSettings` throwaway fixpoint above) resolve
+    # derivations during evaluation. Without this, eval fails outright
+    # ("cannot build ... because 'allow-import-from-derivation' is
+    # disabled") on any machine that hasn't set it in its own nix.conf.
+    allow-import-from-derivation = true;
   };
 }

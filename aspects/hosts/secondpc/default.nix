@@ -49,7 +49,12 @@
       den.aspects.facter
       den.aspects.secondpc-web
       den.aspects.searchix
-      (den.batteries.unfree [ "intel-ocl" ])
+      den.aspects.plex
+      den.aspects.samba
+      (den.batteries.unfree [
+        "intel-ocl"
+        "plexmediaserver"
+      ])
     ];
 
     # Render wg0 as a networkd netdev rather than a wg-quick unit. This host
@@ -225,7 +230,6 @@
           1080
           8080
           8081
-          8096
           8501
           21115
           21116
@@ -240,8 +244,6 @@
           68
           69
           853
-          1900
-          7359
           19132
           21116
           51820
@@ -263,58 +265,6 @@
         programs.nix-ld.enable = true;
         services.logrotate.checkConfig = false;
         services.accounts-daemon.enable = true;
-
-        # Time machine + zeroconf
-        services.netatalk = {
-          enable = true;
-          settings = {
-            Homes = {
-              "basedir regex" = "/home";
-              path = "netatalk";
-            };
-            time-machine = {
-              path = "/timemachine";
-              "valid users" = "ivypierlot";
-              "time machine" = true;
-            };
-          };
-        };
-        services.avahi = {
-          enable = true;
-          nssmdns = true;
-          publish = {
-            enable = true;
-            userServices = true;
-          };
-        };
-
-        # Samba shares
-        services.samba = {
-          enable = true;
-          securityType = "user";
-          openFirewall = true;
-          settings = {
-            global = {
-              "workgroup" = "WORKGROUP";
-              "server string" = "smbnix";
-              "netbios name" = "smbnix";
-              "security" = "user";
-              "hosts allow" = "192.168.0. 127.0.0.1 localhost 100.64.0.";
-              "hosts deny" = "0.0.0.0/0";
-              "guest account" = "nobody";
-              "map to guest" = "bad user";
-            };
-            hdd = {
-              "path" = "/mnt/hdd";
-              "browseable" = "yes";
-              "read only" = "no";
-              "guest ok" = "no";
-              "create mask" = "0644";
-              "directory mask" = "0755";
-              "force group" = "music";
-            };
-          };
-        };
 
         # Virtualisation
         virtualisation.docker.enable = true;

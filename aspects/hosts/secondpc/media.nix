@@ -20,23 +20,7 @@
         ...
       }:
       {
-        # Hardware accel (intel) — feeds jellyfin's LIBVA transcoding below.
-        hardware.graphics = {
-          enable = true;
-          extraPackages = with pkgs; [
-            intel-ocl
-            intel-vaapi-driver
-            libva-vdpau-driver
-          ];
-        };
-        systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "i965";
-        environment.sessionVariables.LIBVA_DRIVER_NAME = "i965";
-
         # Media + downloading
-        services.jellyfin = {
-          enable = true;
-          openFirewall = true;
-        };
         services.audiobookshelf.enable = true;
         users.groups.music = { };
         users.users.music = {
@@ -55,17 +39,44 @@
           enable = true;
           user = "music";
         };
+        # urlbase matches the nginx path-routing in web.nix's arr.ivymect.in
+        # vhost (freeform servarr setting -> config.xml's <UrlBase>).
+        services.sonarr = {
+          enable = true;
+          settings.server.urlbase = "/sonarr";
+        };
+        services.radarr = {
+          enable = true;
+          settings.server.urlbase = "/radarr";
+        };
+        services.bazarr.enable = true;
+        # Indexer manager: holds the actual indexer/tracker definitions and
+        # syncs them out to sonarr/radarr/lidarr's Indexers via its "Apps"
+        # sync -- there is no declarative NixOS option for indexers
+        # themselves, so add them through the prowlarr web UI post-deploy.
+        services.prowlarr = {
+          enable = true;
+          settings.server.urlbase = "/prowlarr";
+        };
         services.qbittorrent = {
           enable = true;
           webuiPort = 9090;
           openFirewall = true;
         };
+        # Request frontend (browse/request shows+movies, forwards to
+        # sonarr/radarr) -- nixpkgs merged jellyseerr/overseerr into one
+        # package, still supports Plex as its backend via its own setup
+        # wizard. Plex stats/monitoring dashboard alongside it.
+        services.seerr.enable = true;
+        services.tautulli.enable = true;
 
-        environment.systemPackages = with pkgs; [
-          jellyfin
-          jellyfin-web
-          jellyfin-ffmpeg
-        ];
+        # *arr apps and the download client all need write access to the
+        # shared library at /mnt/hdd/Media (owned by the `media` group, see
+        # plex.nix) so imports/hardlinks land where plex/jellyfin can see them.
+        users.users.sonarr.extraGroups = [ "media" ];
+        users.users.radarr.extraGroups = [ "media" ];
+        users.users.bazarr.extraGroups = [ "media" ];
+        users.users.qbittorrent.extraGroups = [ "media" ];
 
         # --- user password: ivy-password (source, intermediary) hashed into
         #     ivy-pwd-hash (generated via openssl passwd -6). ---

@@ -109,6 +109,17 @@ let
   # agenix-rekey's storageMode nags this way until it is set explicitly.
   abortingOptions = [ "age.rekey.storageMode" ];
 
+  # Options whose default forces a derivation to actually BUILD (import-from-
+  # derivation) rather than just failing to evaluate. `renderable`'s `tryEval`
+  # catches a `throw`, but a build failure during IFD (e.g. "wrong platform for
+  # this derivation") propagates straight through it — so like `abortingOptions`,
+  # these have to be dropped by name before `renderable` ever sees them.
+  # paneru's `configFile` default reads back `config.services.paneru.config`,
+  # which on the darwin/ivypierlot home-manager tree is built from
+  # `stylix.base16Scheme` — forcing stylix to generate `palette.json`, an
+  # aarch64-darwin-only derivation, while docs are built on any other platform.
+  unbuildableOptions = [ "services.paneru.configFile" ];
+
   # Options that throw when forced (agenix-rekey's secrets derivation: "Accessing
   # the secrets derivation is only possible when `storageMode` is set to
   # `derivation`"). One of them would otherwise take down the whole source.
@@ -120,7 +131,11 @@ let
   # their own `lib/`, so testing repo-relative paths would claim them as ours).
   optionsOf =
     options:
-    renderable (removeAttrs (pkgs.nixosOptionsDoc { inherit options; }).optionsNix abortingOptions);
+    renderable (
+      removeAttrs (pkgs.nixosOptionsDoc { inherit options; }).optionsNix (
+        abortingOptions ++ unbuildableOptions
+      )
+    );
 
   # Options declared by this repo, as opposed to ones we inherit from an input.
   # Two shapes count as ours:
