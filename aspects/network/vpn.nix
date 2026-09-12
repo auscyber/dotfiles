@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (import ./_lib.nix { inherit lib den; })
+  inherit (import ./_lib.nix { inherit lib; })
     pubKey
     clientNames
     tunnelIpByName
@@ -196,6 +196,15 @@ in
         cfg = config.vpn;
         ip = tunnelIp cfg host;
         peers = tunnelPeers cfg host;
+        # 1500 (the underlying link's MTU) leaves no room for the
+        # WireGuard/UDP/IP encapsulation overhead, and on a path that
+        # already has its own overhead (e.g. PPPoE) the result is a silent
+        # black hole: oversized packets are dropped with no
+        # fragmentation-needed ICMP, so PMTUD never kicks in and anything
+        # past the TCP handshake (SMB negotiate, TLS, ...) just hangs. 1420
+        # is WireGuard's own conventional safe default and matches what
+        # wg-quick's clients auto-negotiate.
+        mtu = "1420";
       in
       {
         config = lib.mkIf (cfg.backend == "networkd") {
@@ -216,7 +225,7 @@ in
             netdevConfig = {
               Kind = "wireguard";
               Name = cfg.interface;
-              MTUBytes = "1500";
+              MTUBytes = mtu;
             };
             wireguardConfig = {
               PrivateKeyFile = scoped.vpn-secrets.secrets.wireguard_key.path;
@@ -229,6 +238,13 @@ in
           systemd.network.networks.${cfg.interface} = {
             matchConfig.Name = cfg.interface;
             address = [ "${ip}/24" ];
+            # netdev's MTUBytes only takes effect when networkd itself
+            # creates the device, so it never touches an already-existing
+            # wg0 (e.g. after this value changes on a host that already
+            # switched once before). [Link] MTUBytes here is the one
+            # networkd re-applies via `ip link set mtu` on every
+            # (re)configure, live interface included.
+            linkConfig.MTUBytes = mtu;
           }
           // lib.optionalAttrs (cfg.role == "server") {
             networkConfig = {

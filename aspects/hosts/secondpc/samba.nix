@@ -57,13 +57,20 @@
           '';
         };
 
-        # Samba password database for `auscyber`, seeded from the same
-        # ivy-password intermediary secret as ivy-pwd-hash/htpasswd (see
-        # user-pwd.nix / media.nix) -- built at generation time with pdbedit
-        # against a scratch smb.conf, so the plaintext password never lands
-        # on this host, only the resulting tdbsam hash database.
-        age.secrets."samba-passdb.tdb" = {
-          owner = "root";
+        # Samba's NT hash for `auscyber`, derived from the same ivy-password
+        # intermediary secret as ivy-pwd-hash/htpasswd (see user-pwd.nix /
+        # media.nix) -- just MD4(UTF-16LE(password)), a one-way value like
+        # ivy-pwd-hash's sha512-crypt, safe to deploy normally.
+        #
+        # This intentionally does NOT try to build the tdbsam database itself
+        # at generation time: `pdbedit -a` requires resolving `auscyber` via
+        # getpwnam(), which doesn't exist in the generator's build sandbox.
+        # Faking it there (e.g. via nss_wrapper) is possible but produces a
+        # static blob that has to be redeployed whole and re-diverges from
+        # the live system; instead `samba-passdb-sync` below injects this
+        # hash into the real, persistent passdb on the real host, where
+        # `auscyber` is an actual account and no faking is needed.
+        age.secrets."ivy-nt-hash" = {
           generator = {
             dependencies = { inherit (scoped.user-pwd.secrets) ivy-password; };
             script =
@@ -75,20 +82,33 @@
                 ...
               }:
               ''
-                workdir=$(mktemp -d)
-                trap 'rm -rf "$workdir"' EXIT
-                mkdir -p "$workdir/private"
-                cat > "$workdir/smb.conf" <<EOF
-                [global]
-                  private dir = $workdir/private
-                  passdb backend = tdbsam:$workdir/private/passdb.tdb
-                EOF
                 pw="$(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})"
-                printf '%s\n%s\n' "$pw" "$pw" | \
-                  ${pkgs.samba}/bin/pdbedit -a -u auscyber -t -s "$workdir/smb.conf"
-                cat "$workdir/private/passdb.tdb"
+                printf '%s' "$pw" | ${pkgs.libiconv}/bin/iconv -f UTF-8 -t UTF-16LE | \
+                  ${pkgs.openssl}/bin/openssl dgst -md4 -provider legacy -provider default | \
+                  awk '{print toupper($NF)}'
               '';
           };
+        };
+
+        # Applies ivy-nt-hash to the real passdb (creating the `auscyber`
+        # Samba account first if this is the first run) every activation, so
+        # it can never drift from ivy-password and never needs to be
+        # re-applied by hand after a switch/reboot the way `smbpasswd -a`
+        # did. `-a` alone would prompt for -- and briefly hold -- a real
+        # password, so it seeds a throwaway one that's immediately
+        # overwritten by `--set-nt-hash`, which never sees the plaintext.
+        systemd.services.samba-passdb-sync = {
+          description = "Sync the auscyber Samba account to ivy-nt-hash";
+          before = [ "samba-smbd.service" ];
+          requiredBy = [ "samba-smbd.service" ];
+          serviceConfig.Type = "oneshot";
+          path = [ pkgs.samba ];
+          script = ''
+            if ! pdbedit -L -u auscyber >/dev/null 2>&1; then
+              printf 'placeholder\nplaceholder\n' | pdbedit -a -u auscyber -t
+            fi
+            pdbedit -r -u auscyber --set-nt-hash="$(cat ${config.age.secrets."ivy-nt-hash".path})"
+          '';
         };
 
         services.samba = {
@@ -102,7 +122,11 @@
               "netbios name" = "smbnix";
               "security" = "user";
               "server min protocol" = "SMB2";
-              "passdb backend" = "tdbsam:${config.age.secrets."samba-passdb.tdb".path}";
+              # Default log level is effectively silent -- it logs smbd
+              # startup and nothing else, not even auth failures. auth_audit
+              # puts a one-line NOTICE-level pass/fail per login attempt in
+              # log.smbd without the noise of a blanket higher log level.
+              "log level" = "1 auth_audit:3";
               # 192.168.0.0/24 (LAN), 100.64.0.0/10 (unused/reserved), and
               # 10.100.0.0/24 (the wireguard tunnel -- see aspects/network/vpn.nix
               # -- lets the Mac reach this share from a different network).
@@ -118,7 +142,7 @@
               "guest ok" = "no";
               "create mask" = "0644";
               "directory mask" = "0755";
-              "force group" = "music";
+              "force group" = "media";
             };
             timemachine = {
               "path" = "/mnt/hdd/timemachine";

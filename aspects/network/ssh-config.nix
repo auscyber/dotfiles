@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (import ./_lib.nix { inherit lib den; }) clientNames tunnelIpByName;
+  inherit (import ./_lib.nix { inherit lib; }) clientNames tunnelIpByName;
 
   # Metadata the VPN module doesn't carry: the login user on each peer, and
   # the peer's own UID (needed for its gpg-agent socket path when forwarding

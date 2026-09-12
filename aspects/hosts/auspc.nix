@@ -291,11 +291,12 @@
       den.aspects.claude
       (den.batteries.unfree [ "castlabs-electron" ])
       den.aspects.celler-push
-      den.aspects.lix
     ];
 
     provides.auspc = {
       includes = [
+
+        den.aspects.lix
         den.aspects.plasma
         den.batteries.primary-user
         #        den.aspects.zotero

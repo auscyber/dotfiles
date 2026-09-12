@@ -22,22 +22,22 @@
       {
         # Media + downloading
         services.audiobookshelf.enable = true;
-        users.groups.music = { };
-        users.users.music = {
+        users.groups.media = { };
+        users.users.media = {
           isSystemUser = true;
-          group = "music";
+          group = "media";
         };
         services.navidrome = {
           enable = true;
-          group = "music";
+          group = "media";
           settings = {
-            user = "music";
+            user = "media";
             MusicFolder = "/mnt/hdd/Music";
           };
         };
         services.lidarr = {
           enable = true;
-          user = "music";
+          user = "media";
         };
         # urlbase matches the nginx path-routing in web.nix's arr.ivymect.in
         # vhost (freeform servarr setting -> config.xml's <UrlBase>).
