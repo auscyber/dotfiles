@@ -151,7 +151,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    import-tree.url = "github:vic/import-tree";
+    import-tree.url = "github:denful/import-tree";
     ivixlib = {
       url = "github:auscyber/ivixlib";
       inputs = {

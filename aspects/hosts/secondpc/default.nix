@@ -84,6 +84,9 @@
         # Zone the gated service aspects publish under; they name only their
         # own subdomain, so this is the one place the domain appears.
         gateway.domain = "ivymect.in";
+        # Everyone in this group reaches every gated service through a browser;
+        # the per-service `svc-*` groups are for machine callers.
+        gateway.humanGroups = [ "media-users" ];
 
         # Hardware detection (kernel modules, microcode, ...) comes from the
         # `facter` aspect reading this report instead of a hand-written

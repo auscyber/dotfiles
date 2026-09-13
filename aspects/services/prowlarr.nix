@@ -76,46 +76,50 @@ in
                   ];
                 };
                 script = ''
-                  key="$(printenv PROWLARR__AUTH__APIKEY)"
-                  base="${config.gateway.services.prowlarr.url}/api/v1"
+                      key="$(printenv PROWLARR__AUTH__APIKEY)"
+                  # Prowlarr's own service-account credential: one key, presented to
+                  # every *arr it syncs to, swapped for that *arr's internal key by
+                  # nginx on the way through.
+                  key_out="$(printenv PROWLARR_KEY)"
+                      base="${config.gateway.services.prowlarr.url}/api/v1"
 
-                  for _ in $(seq 60); do
-                    if curl -sfS -H "X-Api-Key: $key" "$base/system/status" >/dev/null 2>&1; then
-                      break
-                    fi
-                    sleep 2
-                  done
+                      for _ in $(seq 60); do
+                        if curl -sfS -H "X-Api-Key: $key" "$base/system/status" >/dev/null 2>&1; then
+                          break
+                        fi
+                        sleep 2
+                      done
 
-                  upsert() {
-                    local name="$1" impl="$2" target="$3" targetkey="$4"
-                    local desired id
-                    desired=$(jq -n                   --arg name "$name" --arg impl "$impl"                   --arg prowlarr "${config.gateway.services.prowlarr.url}"                   --arg base "$target" --arg key "$targetkey" '{
-                        name: $name,
-                        implementation: $impl,
-                        configContract: ($impl + "Settings"),
-                        syncLevel: "fullSync",
-                        fields: [
-                          { name: "prowlarrUrl", value: $prowlarr },
-                          { name: "baseUrl",     value: $base },
-                          { name: "apiKey",      value: $key }
-                        ]
-                      }')
-                    id=$(curl -sfS -H "X-Api-Key: $key" "$base/applications" 2>/dev/null                   | jq -r --arg n "$name" '.[] | select(.name == $n) | .id' | head -n1)
-                    if [ -n "$id" ]; then
-                      curl -sfS -X PUT -H "X-Api-Key: $key" -H 'Content-Type: application/json'                     -d "$(printf '%s' "$desired" | jq --argjson id "$id" '. + {id: $id}')"                     "$base/applications/$id" >/dev/null
-                    else
-                      curl -sfS -X POST -H "X-Api-Key: $key" -H 'Content-Type: application/json'                     -d "$desired" "$base/applications" >/dev/null
-                    fi
-                  }
+                      upsert() {
+                        local name="$1" impl="$2" target="$3" targetkey="$4"
+                        local desired id
+                        desired=$(jq -n                   --arg name "$name" --arg impl "$impl"                   --arg prowlarr "${config.gateway.services.prowlarr.url}"                   --arg base "$target" --arg key "$targetkey" '{
+                            name: $name,
+                            implementation: $impl,
+                            configContract: ($impl + "Settings"),
+                            syncLevel: "fullSync",
+                            fields: [
+                              { name: "prowlarrUrl", value: $prowlarr },
+                              { name: "baseUrl",     value: $base },
+                              { name: "apiKey",      value: $key }
+                            ]
+                          }')
+                        id=$(curl -sfS -H "X-Api-Key: $key" "$base/applications" 2>/dev/null                   | jq -r --arg n "$name" '.[] | select(.name == $n) | .id' | head -n1)
+                        if [ -n "$id" ]; then
+                          curl -sfS -X PUT -H "X-Api-Key: $key" -H 'Content-Type: application/json'                     -d "$(printf '%s' "$desired" | jq --argjson id "$id" '. + {id: $id}')"                     "$base/applications/$id" >/dev/null
+                        else
+                          curl -sfS -X POST -H "X-Api-Key: $key" -H 'Content-Type: application/json'                     -d "$desired" "$base/applications" >/dev/null
+                        fi
+                      }
 
-                  ${lib.concatMapStringsSep "
+                      ${lib.concatMapStringsSep "
 " (n: ''
-                    upsert ${lib.escapeShellArg n} ${
-                      lib.escapeShellArg (lib.toUpper (lib.substring 0 1 n) + lib.substring 1 (lib.stringLength n) n)
-                    }                   ${
-                      lib.escapeShellArg config.gateway.services.${n}.url
-                    }                   "$(printenv PROWLARR_${lib.toUpper n}_KEY)"
-                  '') (lib.attrNames targets)}
+                        upsert ${lib.escapeShellArg n} ${
+                          lib.escapeShellArg (lib.toUpper (lib.substring 0 1 n) + lib.substring 1 (lib.stringLength n) n)
+                        }                   ${
+                          lib.escapeShellArg config.gateway.services.${n}.url
+                        }                   "$key_out"
+                      '') (lib.attrNames targets)}
                 '';
               };
 

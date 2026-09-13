@@ -45,7 +45,9 @@
           widget = {
             type = name;
             url = config.gateway.services.${name}.url;
-            key = "{{HOMEPAGE_VAR_${lib.toUpper name}_KEY}}";
+            # One key for every widget homepage draws -- the account's own
+            # credential, not one minted per target.
+            key = "{{HOMEPAGE_VAR_KEY}}";
           };
         };
       };

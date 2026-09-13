@@ -103,11 +103,28 @@ in
         );
         gated = lib.filter (e: e.api.enable) entries;
 
-        keyNames = e: lib.optional e.api.internalKey "internal" ++ e.api.clients;
-        secretName = e: client: "gateway/${e.name}-${client}";
+        # Exactly two keys are in play for a service: the one it ACCEPTS
+        # (`<svc>-internal`, handed to the service itself) and the one it
+        # PRESENTS when calling something else (`account-<svc>`, the credential
+        # of its service account). A caller that is not a service of its own --
+        # homepage, seerr, soularr -- has only the second.
+        #
+        # One credential per principal, not per (caller, service) pair: the same
+        # account key appears in every map whose service admits that account, so
+        # access is granted by map membership rather than by minting another
+        # secret, and revoking one service's access never rotates a key the
+        # account still needs elsewhere.
+        internalSecret = e: "gateway/${e.name}-internal";
+        accountSecret = account: "gateway/account-${account}";
 
-        # Every (caller, service) pair that needs a key, plus each service's own.
-        allKeys = lib.concatMap (e: map (client: { inherit e client; }) (keyNames e)) gated;
+        accounts = lib.attrNames config.gateway.serviceAccounts;
+
+        # Services this account may call, which is what its key has to open.
+        callableBy = account: lib.filter (e: lib.elem account e.api.clients) gated;
+
+        # An account's key is presented differently depending on the target, so
+        # the attribution table needs one entry per distinct scheme it uses.
+        prefixesFor = account: lib.unique (map (e: e.api.headerPrefix) (callableBy account));
 
         randomKey =
           {
@@ -134,6 +151,17 @@ in
             Zone the gated services are published under. Service aspects name
             only their subdomain, so the zone stays a host-level decision and
             an aspect can move between hosts unchanged.
+          '';
+        };
+
+        options.gateway.humanGroups = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          example = [ "media-users" ];
+          description = ''
+            Groups whose people may reach every gated service through a browser.
+            Folded into each service's `groups`, because a per-service machine
+            group on its own would lock out the humans the service is for.
           '';
         };
 
@@ -261,8 +289,8 @@ in
                   };
                   groups = mkOption {
                     type = types.listOf types.str;
-                    default = [ "svc-${name}" ];
-                    defaultText = "[ \"svc-\u2039name\u203a\" ]";
+                    default = outer.gateway.humanGroups ++ [ "svc-${name}" ];
+                    defaultText = "gateway.humanGroups ++ [ \"svc-\u2039name\u203a\" ]";
                     description = ''
                       kanidm groups allowed to reach this service. oauth2-proxy
                       checks them for a browser session and, with
@@ -368,9 +396,15 @@ in
               '';
             }) e.api.clients
           ) gated;
-          age.secrets = lib.listToAttrs (
-            map (k: lib.nameValuePair (secretName k.e k.client) { generator.script = randomKey; }) allKeys
-          );
+          age.secrets =
+            lib.listToAttrs (
+              map (account: lib.nameValuePair (accountSecret account) { generator.script = randomKey; }) accounts
+            )
+            // lib.listToAttrs (
+              map (e: lib.nameValuePair (internalSecret e) { generator.script = randomKey; }) (
+                lib.filter (e: e.api.internalKey) gated
+              )
+            );
 
           age.templates =
             # Per-service rewrite table: caller key -> internal key. A key absent
@@ -382,34 +416,45 @@ in
                 lib.nameValuePair "gateway/${e.name}.map" (
                   nginxOwned
                   // {
-                    dependencies = lib.listToAttrs (
-                      map (client: lib.nameValuePair client config.age.secrets.${secretName e client}) (keyNames e)
-                    );
+                    dependencies =
+                      lib.listToAttrs (
+                        map (client: lib.nameValuePair client config.age.secrets.${accountSecret client}) e.api.clients
+                      )
+                      // lib.optionalAttrs e.api.internalKey {
+                        internal = config.age.secrets.${internalSecret e};
+                      };
                     content =
                       { placeholders, ... }:
+                      let
+                        target = if e.api.internalKey then placeholders.internal else "1";
+                      in
                       lib.concatMapStrings (client: ''
-                        "${e.api.headerPrefix}${placeholders.${client}}" "${
-                          if e.api.internalKey then placeholders.internal else "1"
-                        }";
-                      '') (keyNames e);
+                        "${e.api.headerPrefix}${placeholders.${client}}" "${target}";
+                      '') e.api.clients
+                      # The service's own key maps to itself, so its web UI --
+                      # which embeds that key in the page -- keeps working.
+                      + lib.optionalString e.api.internalKey ''
+                        "${e.api.headerPrefix}${placeholders.internal}" "${target}";
+                      '';
                   }
                 )
               ) gated
             )
             # One global caller table, so a single log_format can name whoever
             # made the call regardless of which service it was aimed at.
-            // lib.optionalAttrs (allKeys != [ ]) {
+            // lib.optionalAttrs (accounts != [ ]) {
               "gateway/callers.map" = nginxOwned // {
                 dependencies = lib.listToAttrs (
-                  map (
-                    k: lib.nameValuePair "${k.e.name}_${k.client}" config.age.secrets.${secretName k.e k.client}
-                  ) allKeys
+                  map (a: lib.nameValuePair a config.age.secrets.${accountSecret a}) accounts
                 );
                 content =
                   { placeholders, ... }:
-                  lib.concatMapStrings (k: ''
-                    "${k.e.api.headerPrefix}${placeholders."${k.e.name}_${k.client}"}" "${k.client}->${k.e.name}";
-                  '') allKeys;
+                  lib.concatMapStrings (
+                    account:
+                    lib.concatMapStrings (prefix: ''
+                      "${prefix}${placeholders.${account}}" "${account}";
+                    '') (prefixesFor account)
+                  ) accounts;
               };
             }
             # One env file per account that asked for one, holding every key
@@ -417,20 +462,11 @@ in
             // lib.listToAttrs (
               map (
                 account:
-                let
-                  held = lib.filter (e: lib.elem account e.api.clients) gated;
-                in
                 lib.nameValuePair "gateway/account-${account}.env" {
-                  dependencies = lib.listToAttrs (
-                    map (e: lib.nameValuePair e.name config.age.secrets.${secretName e account}) held
-                  );
-                  content =
-                    { placeholders, ... }:
-                    lib.concatMapStrings (e: ''
-                      ${
-                        config.gateway.serviceAccounts.${account}.envPrefix
-                      }${lib.toUpper e.name}_KEY=${placeholders.${e.name}}
-                    '') held;
+                  dependencies.key = config.age.secrets.${accountSecret account};
+                  content = { placeholders, ... }: ''
+                    ${config.gateway.serviceAccounts.${account}.envPrefix}KEY=${placeholders.key}
+                  '';
                 }
               ) (lib.attrNames (lib.filterAttrs (_: a: a.envPrefix != null) config.gateway.serviceAccounts))
             )
@@ -441,7 +477,7 @@ in
                 lib.nameValuePair "gateway/${e.name}.env" {
                   owner = e.api.owner;
                   restartUnits = [ "${e.name}.service" ];
-                  dependencies.internal = config.age.secrets.${secretName e "internal"};
+                  dependencies.internal = config.age.secrets.${internalSecret e};
                   content = { placeholders, ... }: ''
                     ${e.api.internalEnv}=${placeholders.internal}
                   '';
@@ -529,7 +565,7 @@ in
               lib.nameValuePair "svc-${e.name}" {
                 members = e.api.clients;
               }
-            ) gated
+            ) entries
           );
         };
       };

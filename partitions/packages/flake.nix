@@ -12,6 +12,6 @@
   outputs = _: { };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/17de0b976395537756f30a3e78f2f06e5cec89ed";
+    nixpkgs.url = "github:nixos/nixpkgs/aff8a0b28396750446e5537a96461bc4facdb287";
   };
 }
