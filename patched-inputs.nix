@@ -32,6 +32,9 @@
     ./patches/agenix-rekey/stat-portable.patch
     ./patches/agenix-rekey/rekey-mkdir-p.patch
   ];
+  arion.patches = [
+    ./patches/arion/journald-console.patch
+  ];
   celler.patches = [
     ./patches/celler/edit.patch
   ];
@@ -55,7 +58,7 @@
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
   celler.hash = "sha256-wiXwS/2fO55S63MlgBxPnVQbcSv8nlCn8jbeNpISSKE=";
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
-  home-manager.hash = "sha256-zpS5yAvQwBxhJDmvOspYVC+ozbH1aej/Ix4dIDpqOoE=";
+  home-manager.hash = "sha256-l+UrrvcwK9s4BKLVjx2PbKjZAhsQE84sxKipD1BkqxE=";
   nh.hash = "sha256-ndrDgkv1aQO2n9qCB77hPm55mb/FnsgqrmapB3V9OMo=";
   pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
   zen-browser.hash = null;

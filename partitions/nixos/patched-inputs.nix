@@ -6,5 +6,6 @@
 # partition. A missing entry just means "build it locally".
 {
 
+  arion.hash = "sha256-XM8sEWDiEAwjWL1onvSuxrkgyHxL0SAwsD6dXx992NM=";
   home-manager.hash = "sha256-M6qBzHj882YZyVctZ2kUO4eRxjpjkLlRhb4oOnFBBPM=";
 }

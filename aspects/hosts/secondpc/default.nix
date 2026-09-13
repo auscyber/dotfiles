@@ -13,6 +13,11 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
   };
 
+  # arion's container-systemd module still sets `services.journald.console`,
+  # which nixpkgs removed; its Haskell test suite evaluates that module, so the
+  # package no longer builds without ../../../patches/arion.
+  patchedInputs.arion = { };
+
   den.hosts.x86_64-linux.secondpc = {
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICj7wlOxTp0NQJoUhRtj7k8gtDC0lCr5MJqLV5LxG9Yf root@kexec-minimal";
 
