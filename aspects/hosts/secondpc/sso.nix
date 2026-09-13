@@ -118,20 +118,21 @@
     provision = { scoped, ... }: {
       groups.media-users = { };
 
-      # kanidm's own admin groups already exist, so these entries add a member to
-      # them rather than declaring them. `overwriteMembers = false` is not
-      # optional here: the default REPLACES the member list, which would evict
-      # the built-in `idm_admin` account and leave nobody able to recover the
-      # instance.
+      # kanidm's own admin group already exists, so this entry adds a member to
+      # it rather than declaring it. `overwriteMembers = false` is not optional:
+      # the default REPLACES the member list, which would evict the built-in
+      # `idm_admin` account and leave nobody able to recover the instance.
+      #
+      # `system_admins` is deliberately absent. kanidm splits its admin roles --
+      # `idm_admin` owns identity (people, groups, oauth2), `admin` owns the
+      # server (domain rename, replication, recovery) -- and provisioning runs as
+      # `idm_admin`, so a write to `system_admins` is denied outright:
+      # "requested_pres: {Member} !⊆ allowed: {}". Membership there has to be
+      # granted by hand as `admin`, and is rarely what you actually want.
       groups.idm_admins = {
         members = [ "auscyber" ];
         overwriteMembers = false;
       };
-      groups.system_admins = {
-        members = [ "auscyber" ];
-        overwriteMembers = false;
-      };
-
       # One person, named for the unix account it lines up with -- NSS serves
       # the same name from kanidm, and samba's passdb syncs to it.
       persons.auscyber = {
@@ -140,7 +141,6 @@
         groups = [
           "media-users"
           "idm_admins"
-          "system_admins"
         ];
       };
 
