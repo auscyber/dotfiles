@@ -83,7 +83,17 @@ in
         # nginx lowercases header names and turns '-' into '_' to build $http_*;
         # the same sanitising keeps generated variable names legal.
         nginxName = lib.replaceStrings [ "-" "." ] [ "_" "_" ];
-        headerVar = header: "$http_${nginxName (lib.toLower header)}";
+        # Both the header AND the `?apikey=` query parameter, concatenated:
+        # exactly one is populated in practice, so the joined value equals
+        # whichever form the caller used and matches the table either way.
+        # Homepage's *arr widgets call `{url}/api/v3/{endpoint}?apikey={key}`,
+        # so a header-only map never sees their key and they fall through to the
+        # SSO gate and get an HTML login page back.
+        #
+        # Only the header is rewritten on the way out, which is enough: servarr
+        # reads `X-Api-Key` first and falls back to the query parameter, so the
+        # stale one left in the query string is ignored.
+        headerVar = header: "$http_${nginxName (lib.toLower header)}$arg_apikey";
 
         # nginx wants a trailing slash on both sides of a prefix proxy, but
         # writing one in every aspect is noise -- so accept either spelling.
@@ -215,6 +225,18 @@ in
                 description = mkOption {
                   type = types.str;
                   default = "";
+                };
+                restartUnits = mkOption {
+                  type = types.listOf types.str;
+                  default = [ ];
+                  example = [ "homepage-dashboard.service" ];
+                  description = ''
+                    Units to restart when this account's key file changes. A
+                    consumer that reads the key from its environment holds it for
+                    the life of the process, so without this the file is rewritten
+                    and the service keeps presenting the key it started with --
+                    which looks exactly like the key being wrong.
+                  '';
                 };
                 envPrefix = mkOption {
                   type = types.nullOr types.str;
@@ -507,6 +529,7 @@ in
               map (
                 account:
                 lib.nameValuePair "gateway/account-${account}.env" {
+                  inherit (config.gateway.serviceAccounts.${account}) restartUnits;
                   dependencies.key = config.age.secrets.${accountSecret account};
                   content = { placeholders, ... }: ''
                     ${config.gateway.serviceAccounts.${account}.envPrefix}KEY=${placeholders.key}
@@ -562,7 +585,7 @@ in
             (lib.mkIf (gated != [ ]) ''
               log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
 
-              map "$http_x_api_key$http_authorization" $gw_caller {
+              map "$http_x_api_key$http_authorization$arg_apikey" $gw_caller {
                   default "-";
                   include ${globFile "callers"};
               }
@@ -638,6 +661,13 @@ in
                       proxyPass = "${e.upstream}${e.api.subpath}";
                       # A longer prefix than the UI location, so it wins.
                       extraConfig = ''
+                        # An API location must not inherit the vhost's login
+                        # redirect: a caller presenting a bad or absent key then
+                        # gets a 302 chain ending in kanidm's HTML login page,
+                        # which it dutifully parses as the API response. That is
+                        # unreadable as a failure -- say 401 and mean it.
+                        error_page 401 =401 @gatewayApiUnauthorized;
+
                         auth_request /gw-auth-${nginxName e.name};
                         proxy_set_header ${e.api.header} ${
                           if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
@@ -685,6 +715,11 @@ in
                 proxy_buffer_size 16k;
                 proxy_buffers 8 16k;
                 proxy_busy_buffers_size 32k;
+              '';
+              locations."@gatewayApiUnauthorized".extraConfig = ''
+                auth_request off;
+                default_type application/json;
+                return 401 '{"error":"unauthorized","detail":"missing or unrecognised API key"}';
               '';
               locations."@gatewayForbidden".extraConfig = ''
                 auth_request off;

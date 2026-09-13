@@ -68,8 +68,11 @@
           seerr.description = "Request frontend, talks to sonarr and radarr";
           homepage = {
             description = "Dashboard widgets";
-            # Its widgets read the keys from the environment.
+            # Its widgets read the key from the environment, so it has to be
+            # restarted when the key file is rewritten -- a running process keeps
+            # the environment it started with.
             envPrefix = "HOMEPAGE_VAR_";
+            restartUnits = [ "homepage-dashboard.service" ];
           };
         };
 

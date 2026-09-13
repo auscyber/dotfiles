@@ -44,7 +44,11 @@ in
             # Prowlarr is a caller of every *arr it syncs to, so it holds one key per
             # target. `envPrefix` renders them into a single env file as
             # PROWLARR_<SERVICE>_KEY, which the reconcile unit below reads.
-            gateway.serviceAccounts.prowlarr.envPrefix = "PROWLARR_";
+            gateway.serviceAccounts.prowlarr = {
+              envPrefix = "PROWLARR_";
+              # The reconcile unit reads the key from its environment.
+              restartUnits = [ "prowlarr-connect.service" ];
+            };
 
             # The Applications list is a table in prowlarr's database with no
             # config.xml or env equivalent, so it gets reconciled over prowlarr's own
