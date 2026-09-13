@@ -382,6 +382,23 @@ in
                         rather than a bare header (qBittorrent 5.1+).
                       '';
                     };
+                    sessionFallback = mkOption {
+                      type = types.bool;
+                      default = !config.api.internalKey;
+                      defaultText = "!internalKey";
+                      description = ''
+                        Let a browser SESSION satisfy the API location as well as
+                        a key, via an `auth_request` subrequest.
+
+                        Off by default for a service that holds its own key,
+                        because a subrequest does NOT inherit the query string --
+                        only headers -- so `?apikey=` can only ever be matched in
+                        the main request. Such a service embeds its key in its own
+                        web UI, so the key check covers the browser too and
+                        nothing is lost. Needed only where the UI drives its API
+                        with a cookie and no key, as qbittorrent's does.
+                      '';
+                    };
                     internalKey = mkOption {
                       type = types.bool;
                       default = config.api.internalEnv != null;
@@ -631,7 +648,7 @@ in
                       '';
                     })
                   ]
-                  ++ lib.optional e.api.enable (
+                  ++ lib.optional (e.api.enable && e.api.sessionFallback) (
                     lib.nameValuePair "= /gw-auth-${nginxName e.name}" {
                       # Either credential will do: a valid key short-circuits to
                       # 204, anything else falls through to oauth2-proxy. Without
@@ -668,7 +685,15 @@ in
                         # unreadable as a failure -- say 401 and mean it.
                         error_page 401 =401 @gatewayApiUnauthorized;
 
-                        auth_request /gw-auth-${nginxName e.name};
+                        ${
+                          if e.api.sessionFallback then
+                            "auth_request /gw-auth-${nginxName e.name};"
+                          else
+                            ''
+                              auth_request off;
+                              if ($gw_key_${nginxName e.name} = "") { return 401; }
+                            ''
+                        }
                         proxy_set_header ${e.api.header} ${
                           if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
                         };
