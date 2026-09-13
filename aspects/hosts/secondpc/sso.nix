@@ -18,6 +18,11 @@
       den.aspects.secondpc-web
       # `provision` and `gated` classes.
       den.aspects.gateway
+      # Service accounts are not in upstream kanidm-provision's schema, and
+      # stock serde SKIPS unknown fields rather than erroring -- so without this
+      # overlay the accounts are silently never created and the `svc-*` group
+      # memberships fail referential integrity instead.
+      den.aspects.packages.kanidm-provision
     ];
 
     secrets = {
@@ -235,6 +240,47 @@
         # the cert's group and to restart when the cert is renewed.
         users.users.kanidm.extraGroups = [ config.security.acme.certs."ivymect.in".group ];
         security.acme.certs."ivymect.in".reloadServices = [ "kanidm.service" ];
+        # `server.settings` is a freeform TOML submodule -- it declares almost
+        # nothing, so a key upstream renamed, removed or version-gated evaluates
+        # cleanly and only fails when kanidmd parses its own config at startup.
+        # That is how `trust_x_forward_for` (a v1 key, on a v2 config) reached a
+        # deploy.
+        #
+        # `kanidmd configtest` is the authority on that, so run it at BUILD time
+        # over the same settings. It checks file accessibility as well as the
+        # schema, hence the sandbox paths and the throwaway certificate: what is
+        # under test is the KEY NAMES, not whether /var/lib/acme is populated.
+        system.checks = [
+          (
+            let
+              kcfg = config.services.kanidm;
+              toml = (pkgs.formats.toml { }).generate "server-configtest.toml" (
+                lib.converge (lib.filterAttrsRecursive (_: v: v != null)) (
+                  kcfg.server.settings
+                  // {
+                    tls_chain = "@sandbox@/chain.pem";
+                    tls_key = "@sandbox@/key.pem";
+                    db_path = "@sandbox@/kanidm.db";
+                  }
+                )
+              );
+            in
+            pkgs.runCommand "kanidm-configtest" { nativeBuildInputs = [ kcfg.package ]; } ''
+              install -m600 ${toml} server.toml
+              substituteInPlace server.toml --replace-fail '@sandbox@' "$PWD"
+
+              # kanidm's own throwaway cert, so this needs nothing but kanidm.
+              kanidmd cert-generate -c server.toml >/dev/null 2>&1 || true
+
+              if ! out=$(kanidmd configtest -c server.toml 2>&1); then
+                echo "kanidm rejected the generated server.toml:" >&2
+                echo "$out" >&2
+                exit 1
+              fi
+              touch $out
+            ''
+          )
+        ];
 
         # --- kanidm as the host's POSIX identity source ---
         #
