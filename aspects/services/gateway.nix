@@ -527,7 +527,12 @@ in
           # Map bodies are globbed in rather than written inline: the key values
           # are secrets, and a glob matching nothing keeps the build-time
           # `nginx -t` happy before agenix has ever run.
-          services.nginx.appendHttpConfig = lib.mkMerge [
+          # `commonHttpConfig`, NOT the append variant: that one is emitted after
+          # the server blocks, and everything defined here -- the log format, the
+          # key maps, the cache zone -- is referenced from inside them. nginx
+          # parses in order, so defining them later is simply "unknown log format
+          # gw_api" / "unknown variable $gw_key_sonarr" at startup.
+          services.nginx.commonHttpConfig = lib.mkMerge [
             (lib.mkIf (config.gateway.authCacheTtl != null) ''
               # Keyed on the whole credential AND the host: two callers must
               # never share an entry, and a verdict for one vhost must not
