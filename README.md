@@ -35,6 +35,7 @@
 - batteries/sources/os
 - browsers
 - browsers/zen
+- builders
 - ccache
 - ccache/Ivys-MacBook-Pro
 - celler-push
@@ -116,6 +117,7 @@ graph LR
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
   ccache__Ivys_MacBook_Pro[/"ccache/Ivys-MacBook-Pro"\]:::ccache__Ivys_MacBook_Pro_c
   agenix_rekey_host_Ivys_MacBook_Pro["agenix-rekey"]:::agenix_rekey_host_Ivys_MacBook_Pro_c
+  builders["builders"]:::builders_c
   ccache["ccache"]:::ccache_c
   codesign["codesign"]:::codesign_c
   codesign_identity["codesign-identity"]:::codesign_identity_c
@@ -280,6 +282,7 @@ graph LR
   classDef agenix_rekey_host_Ivys_MacBook_Pro_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef ccache_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -392,6 +395,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/sources/os
 - bootlogo
 - builder-server
+- builders
 - cachyos-kernel
 - ccache
 - ccache/auspc
@@ -459,6 +463,7 @@ graph LR
   ccache__auspc[/"ccache/auspc"\]:::ccache__auspc_c
   bootlogo["bootlogo"]:::bootlogo_c
   builder_server["builder-server"]:::builder_server_c
+  builders["builders"]:::builders_c
   cachyos_kernel["cachyos-kernel"]:::cachyos_kernel_c
   ccache["ccache"]:::ccache_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
@@ -594,6 +599,7 @@ graph LR
   classDef ccache__auspc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef bootlogo_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef builder_server_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef cachyos_kernel_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef ccache_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
@@ -682,6 +688,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- builders
 - fish
 - gpg
 - home-base
@@ -727,6 +734,7 @@ graph LR
 
   subgraph ctx_host_lora_pi["host: lora-pi"]
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
+  builders["builders"]:::builders_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__ivy_lora_pi{{"batteries/define-user/ivy@lora-pi"}}:::den__batteries__define_user__ivy_lora_pi_c
   home_base["home-base"]:::home_base_c
@@ -808,6 +816,7 @@ graph LR
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__ivy_lora_pi_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
@@ -880,6 +889,7 @@ style ctx_user_ivy fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/sources/os
 - browsers
 - browsers/zen
+- builders
 - celler-push
 - claude
 - cotabby
@@ -947,6 +957,7 @@ graph LR
 
   subgraph ctx_host_macmini["host: macmini"]
   agenix_rekey_host_macmini["agenix-rekey"]:::agenix_rekey_host_macmini_c
+  builders["builders"]:::builders_c
   darwin_base["darwin-base"]:::darwin_base_c
   darwin_finder["darwin-finder"]:::darwin_finder_c
   darwin_general["darwin-general"]:::darwin_general_c
@@ -1081,6 +1092,7 @@ graph LR
   classDef agenix_rekey_host_macmini_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cotabby_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1175,6 +1187,7 @@ style ctx_user_ivypierlot fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- builders
 - home-base
 - insecure-predicate
 - insecure-predicate/os
@@ -1207,6 +1220,7 @@ graph LR
 
   subgraph ctx_host_pentestvm["host: pentestvm"]
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
+  builders["builders"]:::builders_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__admin_pentestvm{{"batteries/define-user/admin@pentestvm"}}:::den__batteries__define_user__admin_pentestvm_c
   home_base["home-base"]:::home_base_c
@@ -1266,6 +1280,7 @@ graph LR
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef admin_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__admin_pentestvm_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1643,6 +1658,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- builders
 - celler-push
 - claude
 - fish
@@ -1687,6 +1703,7 @@ graph LR
 
   subgraph ctx_host_surfacelaptop["host: surfacelaptop"]
   agenix_rekey_host_surfacelaptop["agenix-rekey"]:::agenix_rekey_host_surfacelaptop_c
+  builders["builders"]:::builders_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__auscyber_surfacelaptop{{"batteries/define-user/auscyber@surfacelaptop"}}:::den__batteries__define_user__auscyber_surfacelaptop_c
   home_base["home-base"]:::home_base_c
@@ -1775,6 +1792,7 @@ graph LR
   classDef agenix_rekey_user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef auscyber__surfacelaptop_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_push_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -1843,6 +1861,7 @@ style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- builders
 - fish
 - home-base
 - insecure-predicate
@@ -1879,6 +1898,7 @@ graph LR
 
   subgraph ctx_host_wsl_nixos["host: wsl-nixos"]
   agenix_rekey["agenix-rekey"]:::agenix_rekey_c
+  builders["builders"]:::builders_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__nixos_wsl_nixos{{"batteries/define-user/nixos@wsl-nixos"}}:::den__batteries__define_user__nixos_wsl_nixos_c
   home_base["home-base"]:::home_base_c
@@ -1942,6 +1962,7 @@ graph LR
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user__nixos_wsl_nixos_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
