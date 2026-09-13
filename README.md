@@ -1353,10 +1353,13 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - openssh
 - overlays
 - pam-rssh
+- plex
+- plex/to-users
 - provides/unfree(castlabs-electron)
 - provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
-- provides/unfree(intel-ocl)
+- provides/unfree(intel-ocl,plexmediaserver)
+- samba
 - searchix
 - secondpc-web
 - shell
@@ -1405,6 +1408,8 @@ graph LR
   openssh["openssh"]:::openssh_c
   overlays["overlays"]:::overlays_c
   pam_rssh_host_secondpc["pam-rssh"]:::pam_rssh_host_secondpc_c
+  plex["plex"]:::plex_c
+  samba["samba"]:::samba_c
   searchix["searchix"]:::searchix_c
   secondpc_web["secondpc-web"]:::secondpc_web_c
   den__batteries__self_[/"batteries/self'"\]:::den__batteries__self__c
@@ -1413,8 +1418,9 @@ graph LR
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   starship["starship"]:::starship_c
+  plex__to_users[/"plex/to-users"\]:::plex__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
-  den__provides__unfree_intel_ocl_{{"provides/unfree(intel-ocl)"}}:::den__provides__unfree_intel_ocl__c
+  den__provides__unfree_intel_ocl_plexmediaserver_{{"provides/unfree(intel-ocl,plexmediaserver)"}}:::den__provides__unfree_intel_ocl_plexmediaserver__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__os{{"unfree-predicate/os"}}:::unfree_predicate__os_c
   unfree_predicate__user{{"unfree-predicate/user"}}:::unfree_predicate__user_c
@@ -1436,9 +1442,11 @@ graph LR
   secondpc --> local
   secondpc --> nginx_host_secondpc
   secondpc --> nix
+  secondpc --> plex
+  secondpc --> samba
   secondpc --> searchix
   secondpc --> secondpc_web
-  secondpc --> den__provides__unfree_intel_ocl_
+  secondpc --> den__provides__unfree_intel_ocl_plexmediaserver_
   secondpc --> vpn_server
   shell_host_secondpc --> jujutsu
   shell_host_secondpc --> nix_index
@@ -1448,6 +1456,7 @@ graph LR
   vpn --> vpn_secrets
   vpn_secrets --> agenix_rekey_host_secondpc
   vpn_server --> vpn
+  plex -.->|provides| plex__to_users
   end
   subgraph ctx_user_auscyber["user: auscyber"]
   agenix_rekey_user_auscyber["agenix-rekey"]:::agenix_rekey_user_auscyber_c
@@ -1535,7 +1544,9 @@ graph LR
   classDef overlays_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_host_secondpc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef pam_rssh_user_auscyber_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef plex_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__primary_user_auscyber_secondpc__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
+  classDef samba_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef searchix_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef secondpc_web_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
@@ -1547,10 +1558,11 @@ graph LR
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef plex__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
-  classDef den__provides__unfree_intel_ocl__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_intel_ocl_plexmediaserver__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
