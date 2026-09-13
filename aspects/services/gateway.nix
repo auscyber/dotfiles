@@ -336,7 +336,12 @@ in
                     };
                     subpath = mkOption {
                       type = types.str;
-                      default = "${config.subpath}/api";
+                      # removeSuffix, not plain concatenation: `subpath` is "/"
+                      # for a service at the root of its own vhost, and "/" +
+                      # "/api" is `//api` -- a location nginx will never match,
+                      # so every API call falls through to the UI location and
+                      # gets sent to oauth2-proxy instead of the key map.
+                      default = "${lib.removeSuffix "/" config.subpath}/api";
                       defaultText = "\${subpath}/api";
                     };
                     header = mkOption {
@@ -657,6 +662,21 @@ in
                 '';
               })
             ))
+
+            # A 403 from oauth2-proxy means AUTHENTICATED but not authorised -- a
+            # valid session whose token lacks the group. nginx only wires 401 to
+            # the login redirect, so without this a stale or under-privileged
+            # session is a permanent blank 403 with nothing explaining it.
+            # Deliberately not a redirect: sending 403 back to /start loops,
+            # because the login succeeds and the group check fails again.
+            (lib.genAttrs (lib.unique (map (e: e.domain) (lib.filter (e: e.sso) entries))) (_: {
+              extraConfig = "error_page 403 = @gatewayForbidden;";
+              locations."@gatewayForbidden".extraConfig = ''
+                auth_request off;
+                default_type text/html;
+                return 403 '<!doctype html><meta charset=utf-8><title>Not authorised</title><body style="font:16px/1.5 system-ui,sans-serif;max-width:34em;margin:4em auto;padding:0 1em"><h1>Not authorised</h1><p>You are signed in, but your account is not in a group permitted to reach this service.<p><a href="https://${config.services.oauth2-proxy.nginx.domain}/oauth2/sign_out?rd=https%3A%2F%2F${config.services.oauth2-proxy.nginx.domain}%2Fsigned-out">Sign out</a> and try another account.</body>';
+              '';
+            }))
           ];
 
           # Anything on this host that calls a gated service has to use the

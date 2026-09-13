@@ -112,6 +112,19 @@
       "sso.ivymect.in" = {
         useACMEHost = "ivymect.in";
         forceSSL = true;
+
+        # A bare /oauth2/sign_out loops: the module's /oauth2/ location sets
+        # `X-Auth-Request-Redirect` to the current URL, which for sign_out is
+        # sign_out itself, so oauth2-proxy redirects there forever. It only
+        # terminates with an explicit `rd`, so give it one.
+        locations."= /logout".return = "302 /oauth2/sign_out?rd=https%3A%2F%2Fsso.ivymect.in%2Fsigned-out";
+
+        locations."= /signed-out" = {
+          extraConfig = ''
+            default_type text/html;
+            return 200 '<!doctype html><meta charset=utf-8><title>Signed out</title><body style="font:16px/1.5 system-ui,sans-serif;max-width:34em;margin:4em auto;padding:0 1em"><h1>Signed out</h1><p>Your session has been cleared. Open any service again to sign back in.</body>';
+          '';
+        };
       };
     };
 
