@@ -530,6 +530,16 @@ in
           # nginx's own option rather than a hand-written proxy_cache_path: it
           # emits the directive in the right place and the directory comes from
           # the unit's `CacheDirectory`, which a hand-rolled path does not get.
+          # Through the module's options rather than raw directives: `lines`
+          # concatenates every definition, so a raw `map_hash_bucket_size` is a
+          # duplicate the moment anything else emits one, whereas an int option
+          # merges. Every key in the tables below is 64 hex characters, and a
+          # `Bearer` service's carry a 7-character prefix on top -- past nginx's
+          # 64-byte default bucket, reported at startup as "could not build
+          # map_hash". Powers of two only.
+          services.nginx.mapHashBucketSize = lib.mkDefault 256;
+          services.nginx.mapHashMaxSize = lib.mkDefault 4096;
+
           services.nginx.proxyCachePath.gateway-auth = lib.mkIf (config.gateway.authCacheTtl != null) {
             enable = true;
             keysZoneName = "gateway_auth";
@@ -545,14 +555,6 @@ in
           # gw_api" / "unknown variable $gw_key_sonarr" at startup.
           services.nginx.commonHttpConfig = lib.mkMerge [
             (lib.mkIf (gated != [ ]) ''
-              # Every key in the tables below is 64 hex characters, and the ones
-              # for a `Bearer` service carry a 7-character scheme prefix on top.
-              # That is past nginx's 64-byte default bucket, which it reports at
-              # startup as "could not build map_hash, you should increase
-              # map_hash_bucket_size". Must stay a power of two.
-              map_hash_bucket_size 256;
-              map_hash_max_size 4096;
-
               log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
 
               map "$http_x_api_key$http_authorization" $gw_caller {
