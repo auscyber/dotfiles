@@ -57,6 +57,7 @@ in
       {
         config,
         lib,
+        pkgs,
         ...
       }:
       let
@@ -620,6 +621,36 @@ in
           services.oauth2-proxy.nginx.virtualHosts = lib.mapAttrs (_: es: {
             allowed_groups = lib.unique (lib.concatMap (e: e.groups) es);
           }) (lib.groupBy (e: e.domain) (lib.filter (e: e.sso) entries));
+
+          # The service accounts themselves. They go in through `extraJsonFile`
+          # rather than a typed option because upstream's schema has no entity
+          # for them -- that is what patches/kanidm-provision adds. A side
+          # effect worth knowing: setting `extraJsonFile` also switches off the
+          # module's entity assertions, which is the only reason the group
+          # memberships below are accepted at all (the module cannot see that a
+          # service account named `prowlarr` exists).
+          #
+          # No `apiTokens` yet: minting one per account is a single line here,
+          # but nothing consumes them until the oauth2-proxy bearer path is
+          # confirmed against a live kanidm, and an unused token is a credential
+          # sitting on disk for no reason.
+          services.kanidm.provision.extraJsonFile = pkgs.writeText "gateway-service-accounts.json" (
+            builtins.toJSON {
+              serviceAccounts = lib.listToAttrs (
+                map (
+                  account:
+                  lib.nameValuePair account {
+                    displayName =
+                      let
+                        d = config.gateway.serviceAccounts.${account}.description;
+                      in
+                      if d == "" then account else d;
+                    entryManagedBy = "idm_admins";
+                  }
+                ) accounts
+              );
+            }
+          );
 
           # One kanidm group per service, holding the machine callers that may
           # reach it. Declared here rather than per-aspect so a service cannot

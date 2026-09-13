@@ -174,11 +174,17 @@
         # believe it) are the whole server-side story. Changing `domain` later
         # invalidates every enrolled passkey.
         services.kanidm = {
-          enableServer = true;
+          server.enable = true;
           # Pinned, not left to the stateVersion default, because kanidm only
           # upgrades one minor at a time -- an unpinned jump would strand the
-          # database. `.withSecretProvisioning` is required by `basicSecretFile`
-          # below; the plain package refuses it.
+          # database. 1.11 specifically because it is the only branch not past
+          # end-of-life: 1.9 EOL'd 2026-05-31 and 1.10 on 2026-08-31, and
+          # nixpkgs turns an EOL branch into `knownVulnerabilities`, so the
+          # older pins fail to evaluate. Starting here is fine because this is a
+          # fresh instance; an existing one would have to walk up minor by minor.
+          #
+          # `.withSecretProvisioning` is required by `basicSecretFile` below;
+          # the plain package asserts against it.
           package = pkgs.kanidm_1_11.withSecretProvisioning;
 
           serverSettings = {
@@ -236,9 +242,11 @@
         # read-only with no Samba schema, so `ldapsam` is not an option -- see
         # samba.nix.
         services.kanidm = {
-          enablePam = true;
+          unix.enable = true;
           clientSettings.uri = "https://auth.${config.gateway.domain}";
-          unixSettings.pam_allowed_login_groups = [ "media-users" ];
+          # Nested under `kanidm.` -- the flat spelling is a renamed option and
+          # asserts rather than warning.
+          unix.settings.kanidm.pam_allowed_login_groups = [ "media-users" ];
         };
 
         # kanidm-unixd talks to the server on this same box. Resolving the

@@ -13,8 +13,20 @@
       websockets = true; # live tail / streaming panels
     };
 
+    # Grafana signs its session cookies with this; nixpkgs removed the default
+    # precisely so nobody ships the well-known one.
+    secrets.secret-key.generator.script =
+      {
+        pkgs,
+        lib,
+        ...
+      }:
+      ''
+        ${lib.getExe pkgs.openssl} rand -hex 32 | ${pkgs.coreutils}/bin/tr -d '\n'
+      '';
+
     nixos =
-      { config, ... }:
+      { config, scoped, ... }:
       let
         inherit (config.services.prometheus) port;
         url = "https://grafana.${config.gateway.domain}";
@@ -45,6 +57,9 @@
             };
             users.auto_assign_org_role = "Admin";
             analytics.reporting_enabled = false;
+            # `$__file{}` is grafana's own file provider, so the value is read
+            # at startup rather than baked into the store-readable config.
+            security.secret_key = "$__file{${scoped.grafana.secrets.secret-key.path}}";
           };
 
           provision.datasources.settings.datasources = [
