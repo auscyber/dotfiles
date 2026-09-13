@@ -287,7 +287,7 @@ in
               token = "${placeholders.celler_token}"
             '';
         };
-        home.packages = [ pkgs.celler ];
+        home.packages = [ pkgs.celler-client ];
       };
 
     secrets =
@@ -364,7 +364,7 @@ in
               set -eu
               set -f # disable globbing
               export IFS=' '
-              export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler}/bin:${pkgs.ts}/bin"
+              export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler-client}/bin:${pkgs.ts}/bin"
               celler login central https://${vhost} "$(cat ${scoped.celler-push.secrets.celler_token.path})"
 
               echo "Uploading paths" $OUT_PATHS
@@ -402,7 +402,7 @@ in
       updateCellerKeys = pkgs.writeShellApplication {
         name = "update-celler-keys";
         runtimeInputs = [
-          pkgs.celler
+          pkgs.celler-client
           pkgs.jq
           pkgs.gnused
           pkgs.coreutils
@@ -455,7 +455,11 @@ in
         program = lib.getExe updateCellerKeys;
       };
     };
-  patchedInputs.celler = { };
+  patchedInputs.celler = {
+    patches = [
+      ../../patches/celler/split.patch
+    ];
+  };
 
   ff.celler = {
     url = "github:blitz/celler/main";

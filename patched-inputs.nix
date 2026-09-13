@@ -36,7 +36,7 @@
     ./patches/arion/journald-console.patch
   ];
   celler.patches = [
-    ./patches/celler/edit.patch
+    ./patches/celler/split.patch
   ];
   darwin.patches = [
     ./patches/darwin/karabiner.patch
@@ -56,7 +56,7 @@
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
   agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
-  celler.hash = "sha256-wiXwS/2fO55S63MlgBxPnVQbcSv8nlCn8jbeNpISSKE=";
+  celler.hash = "sha256-1nQI40WXQwDCQHazLapsf0NmTtJkHX/XyZP5vJOFIug=";
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
   home-manager.hash = "sha256-l+UrrvcwK9s4BKLVjx2PbKjZAhsQE84sxKipD1BkqxE=";
   nh.hash = "sha256-ndrDgkv1aQO2n9qCB77hPm55mb/FnsgqrmapB3V9OMo=";

@@ -74,7 +74,7 @@ in
       den.aspects.paneru
       den.aspects.jankyborders
       den.aspects.kanata
-      den.aspects.rsbar
+      den.aspects.sketchybar
     ];
 
     # "study": everything that is not study, gone. The browser half of this
@@ -237,7 +237,7 @@ in
       den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
-      den.aspects.rsbar
+      den.aspects.sketchybar
       <browsers/zen>
       den.aspects.gui
       den.aspects.gpg

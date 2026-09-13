@@ -1,0 +1,342 @@
+diff --git a/crane.nix b/crane.nix
+index 90f4d88b58..4b6cd4573b 100644
+--- a/crane.nix
++++ b/crane.nix
+@@ -6,6 +6,9 @@
+ , craneLib
+ , installShellFiles
+ , jq
++
++# Build the server with the S3 storage backend, pulling in aws-sdk-s3.
++, withS3 ? true
+ }:
+ 
+ let
+@@ -19,14 +22,16 @@
+     "target"
+   ];
+ 
++  src = lib.cleanSourceWith {
++    filter = name: type: !(type == "directory" && builtins.elem (baseNameOf name) ignoredPaths);
++    src = lib.cleanSource ./.;
++  };
++
+   commonArgs = {
+     pname = "celler";
+     version = "0.1.0";
+ 
+-    src = lib.cleanSourceWith {
+-      filter = name: type: !(type == "directory" && builtins.elem (baseNameOf name) ignoredPaths);
+-      src = lib.cleanSource ./.;
+-    };
++    inherit src;
+ 
+     nativeBuildInputs = [
+       # pkg-config
+@@ -42,11 +47,48 @@
+     CELLER_DISTRIBUTOR = "celler";
+   };
+ 
+-  cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+-
+-  celler = craneLib.buildPackage (commonArgs // {
+-
+-    inherit cargoArtifacts;
++  # Vendored once and shared by every derivation below, so the registry is not
++  # realised twice.
++  cargoVendorDir = craneLib.vendorCargoDeps { inherit src; };
++
++  depsArgs = commonArgs // { inherit cargoVendorDir; };
++
++  # Feature selection for the whole-workspace build. Must match between a deps
++  # layer and the package built on top of it, or the artifacts are refingerprinted.
++  workspaceCargoArgsFor = s3: "--locked"
++    + lib.optionalString (!s3) " --no-default-features --features attic/chunking,attic/io";
++
++  workspaceCargoArgs = workspaceCargoArgsFor withS3;
++
++  # Layer 1: only what the client binary needs.
++  celler-client-deps = craneLib.buildDepsOnly (depsArgs // {
++    pname = "celler-client";
++    cargoExtraArgs = "--locked --package attic-client";
++  });
++
++  # Layer 2: the rest of the workspace, stacked on top of layer 1. Crane's
++  # `buildDepsOnly` hardcodes `cargoArtifacts = null`, so drive
++  # `mkCargoDerivation` directly to inherit the client's target directory
++  # instead of rebuilding the shared dependencies.
++  cellerDepsFor = s3: craneLib.mkCargoDerivation (depsArgs // {
++    pnameSuffix = "-deps";
++    src = craneLib.mkDummySrc commonArgs;
++
++    cargoArtifacts = celler-client-deps;
++    doInstallCargoArtifacts = true;
++
++    buildPhaseCargoCommand = ''
++      cargoWithProfile check ${workspaceCargoArgsFor s3}
++      cargoWithProfile build ${workspaceCargoArgsFor s3}
++    '';
++
++    env.CRANE_BUILD_DEPS_ONLY = 1;
++  });
++
++  celler-deps = cellerDepsFor withS3;
++
++  mkCeller = { pname, cargoArtifacts, cargoExtraArgs }: craneLib.buildPackage (depsArgs // {
++    inherit pname cargoArtifacts cargoExtraArgs;
+ 
+     postInstall = lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
+       if [[ -f $out/bin/celler ]]; then
+@@ -67,21 +109,35 @@
+     };
+   });
+ 
++  celler-client = mkCeller {
++    pname = "celler-client";
++    cargoArtifacts = celler-client-deps;
++    cargoExtraArgs = "--locked --package attic-client";
++  };
++
++  # Overridable per-derivation, so `celler.override { withS3 = false; }` works
++  # through the overlay too, not just on the package set.
++  celler = lib.makeOverridable (args: mkCeller {
++    pname = "celler";
++    cargoArtifacts = cellerDepsFor args.withS3;
++    cargoExtraArgs = workspaceCargoArgsFor args.withS3;
++  }) { inherit withS3; };
++
+   # Celler interacts with Nix directly and its tests require trusted-user access
+   # to nix-daemon to import NARs, which is not possible in the build sandbox.
+   # In the CI pipeline, we build the test executable inside the sandbox, then
+   # run it outside.
+-  celler-tests = craneLib.mkCargoDerivation (commonArgs // {
++  celler-tests = craneLib.mkCargoDerivation (depsArgs // {
+     pname = "celler-tests";
+ 
+-    inherit cargoArtifacts;
++    cargoArtifacts = celler-deps;
+ 
+     nativeBuildInputs = commonArgs.nativeBuildInputs ++ [ jq ];
+ 
+     doCheck = true;
+ 
+     buildPhaseCargoCommand = "";
+-    checkPhaseCargoCommand = "cargoWithProfile test --no-run --message-format=json >cargo-test.json";
++    checkPhaseCargoCommand = "cargoWithProfile test ${workspaceCargoArgs} --no-run --message-format=json >cargo-test.json";
+     doInstallCargoArtifacts = false;
+ 
+     installPhase = ''
+@@ -95,5 +151,5 @@
+     '';
+   });
+ in {
+-  inherit celler celler-tests;
++  inherit celler celler-client celler-tests celler-deps celler-client-deps;
+ }
+diff --git a/flake/overlays.nix b/flake/overlays.nix
+index 94988314ee..06880a04e0 100644
+--- a/flake/overlays.nix
++++ b/flake/overlays.nix
+@@ -6,6 +6,7 @@
+     in {
+       inherit (cranePkgs)
+         celler
++        celler-client
+         ;
+     };
+   };
+diff --git a/flake/packages.nix b/flake/packages.nix
+index d23f906b54..9f55591c9c 100644
+--- a/flake/packages.nix
++++ b/flake/packages.nix
+@@ -28,9 +28,15 @@
+ 
+           inherit (cranePkgs)
+             celler
++            celler-client
+             celler-tests
++            celler-deps
++            celler-client-deps
+           ;
+ 
++          # Server without the S3 storage backend, dropping aws-sdk-s3.
++          celler-no-s3 = cranePkgs.celler.override { withS3 = false; };
++
+           book = pkgs.callPackage ../book {
+             celler = self'.packages.celler;
+           };
+diff --git a/server/Cargo.toml b/server/Cargo.toml
+index 4bc90413d6..939cb88630 100644
+--- a/server/Cargo.toml
++++ b/server/Cargo.toml
+@@ -4,6 +4,12 @@
+ edition.workspace = true
+ publish = false
+ 
++[features]
++default = ["s3"]
++
++# S3-compatible object storage backend.
++s3 = ["dep:aws-config", "dep:aws-sdk-s3"]
++
+ [lib]
+ name = "attic_server"
+ path = "src/lib.rs"
+@@ -46,8 +52,8 @@
+ xdg.workspace = true
+ 
+ async-trait = "0.1.88"
+-aws-config = "1.8.16"
+-aws-sdk-s3 = "1.131.0"
++aws-config = { version = "1.8.16", optional = true }
++aws-sdk-s3 = { version = "1.131.0", optional = true }
+ axum = "0.8.9"
+ axum-macros = "0.5.0"
+ console-subscriber = "0.5.0"
+diff --git a/server/src/lib.rs b/server/src/lib.rs
+index 28428fa680..f573f34231 100644
+--- a/server/src/lib.rs
++++ b/server/src/lib.rs
+@@ -51,7 +51,10 @@
+ use database::migration::{Migrator, MigratorTrait};
+ use error::{ErrorKind, ServerError, ServerResult};
+ use middleware::{init_request_state, restrict_host, set_visibility_header};
+-use storage::{LocalBackend, S3Backend, StorageBackend};
++use storage::{LocalBackend, StorageBackend};
++
++#[cfg(feature = "s3")]
++use storage::S3Backend;
+ 
+ type State = Arc<StateInner>;
+ type RequestState = Arc<RequestStateInner>;
+@@ -145,11 +148,17 @@
+                         let boxed: Box<dyn StorageBackend> = Box::new(local);
+                         Ok(Arc::new(boxed))
+                     }
++                    #[cfg(feature = "s3")]
+                     StorageConfig::S3(s3_config) => {
+                         let s3 = S3Backend::new(s3_config.clone()).await?;
+                         let boxed: Box<dyn StorageBackend> = Box::new(s3);
+                         Ok(Arc::new(boxed))
+                     }
++                    #[cfg(not(feature = "s3"))]
++                    StorageConfig::S3(_) => Err(ErrorKind::StorageError(anyhow::anyhow!(
++                        "this cellerd was built without S3 support (cargo feature \"s3\")"
++                    ))
++                    .into()),
+                 }
+             })
+             .await
+diff --git a/server/src/storage/mod.rs b/server/src/storage/mod.rs
+index 8a844baa6a..0b172d332b 100644
+--- a/server/src/storage/mod.rs
++++ b/server/src/storage/mod.rs
+@@ -9,7 +9,10 @@
+ use crate::error::ServerResult;
+ 
+ pub(crate) use self::local::{LocalBackend, LocalRemoteFile, LocalStorageConfig};
+-pub(crate) use self::s3::{S3Backend, S3RemoteFile, S3StorageConfig};
++pub(crate) use self::s3::{S3RemoteFile, S3StorageConfig};
++
++#[cfg(feature = "s3")]
++pub(crate) use self::s3::S3Backend;
+ 
+ /// Reference to a location where a NAR is stored.
+ ///
+@@ -34,6 +37,7 @@
+ /// Way to download a file.
+ pub enum Download {
+     /// A possibly ephemeral URL.
++    #[cfg_attr(not(feature = "s3"), allow(dead_code))]
+     Url(String),
+ 
+     /// An AsyncRead.
+diff --git a/server/src/storage/s3.rs b/server/src/storage/s3.rs
+index 75630e127d..acafcdea9a 100644
+--- a/server/src/storage/s3.rs
++++ b/server/src/storage/s3.rs
+@@ -1,30 +1,34 @@
+ //! S3 remote files.
+ 
+-use std::time::Duration;
++use serde::{Deserialize, Serialize};
+ 
+-use async_trait::async_trait;
+-use aws_config::{retry::RetryConfig, BehaviorVersion};
+-use aws_sdk_s3::{
+-    config::{Builder as S3ConfigBuilder, Credentials, Region, StalledStreamProtectionConfig},
+-    operation::get_object::builders::GetObjectFluentBuilder,
+-    presigning::PresigningConfig,
+-    types::{CompletedMultipartUpload, CompletedPart},
+-    Client,
++#[cfg(feature = "s3")]
++use {
++    super::{Download, RemoteFile, StorageBackend},
++    crate::error::{ErrorKind, ServerError, ServerResult},
++    attic::io::read_chunk_async,
++    attic::util::Finally,
++    async_trait::async_trait,
++    aws_config::{retry::RetryConfig, BehaviorVersion},
++    aws_sdk_s3::{
++        config::{Builder as S3ConfigBuilder, Credentials, Region, StalledStreamProtectionConfig},
++        operation::get_object::builders::GetObjectFluentBuilder,
++        presigning::PresigningConfig,
++        types::{CompletedMultipartUpload, CompletedPart},
++        Client,
++    },
++    bytes::BytesMut,
++    futures::future::join_all,
++    std::time::Duration,
++    tokio::io::AsyncRead,
+ };
+-use bytes::BytesMut;
+-use futures::future::join_all;
+-use serde::{Deserialize, Serialize};
+-use tokio::io::AsyncRead;
+-
+-use super::{Download, RemoteFile, StorageBackend};
+-use crate::error::{ErrorKind, ServerError, ServerResult};
+-use attic::io::read_chunk_async;
+-use attic::util::Finally;
+ 
+ /// The chunk size for each part in a multipart upload.
++#[cfg(feature = "s3")]
+ const CHUNK_SIZE: usize = 8 * 1024 * 1024;
+ 
+ /// The S3 remote file storage backend.
++#[cfg(feature = "s3")]
+ #[derive(Debug)]
+ pub struct S3Backend {
+     client: Client,
+@@ -32,6 +36,7 @@
+ }
+ 
+ /// S3 remote file storage configuration.
++#[cfg_attr(not(feature = "s3"), allow(dead_code))]
+ #[derive(Debug, Clone, Deserialize)]
+ pub struct S3StorageConfig {
+     /// The AWS region.
+@@ -53,6 +58,7 @@
+ }
+ 
+ /// S3 credential configuration.
++#[cfg_attr(not(feature = "s3"), allow(dead_code))]
+ #[derive(Debug, Clone, Deserialize)]
+ pub struct S3CredentialsConfig {
+     /// Access key ID.
+@@ -77,6 +83,7 @@
+     pub key: String,
+ }
+ 
++#[cfg(feature = "s3")]
+ impl S3Backend {
+     pub async fn new(config: S3StorageConfig) -> ServerResult<Self> {
+         let stalled_stream_protection = StalledStreamProtectionConfig::enabled()
+@@ -171,6 +178,7 @@
+     }
+ }
+ 
++#[cfg(feature = "s3")]
+ #[async_trait]
+ impl StorageBackend for S3Backend {
+     async fn upload_file(
