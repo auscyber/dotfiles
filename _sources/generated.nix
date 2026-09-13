@@ -61,6 +61,14 @@
       finalImageTag = "v3.5.2";
     };
   };
+  ghostty-tip = {
+    pname = "ghostty-tip";
+    version = "e2e53f861482e080bf45054ba49ef471f9849937";
+    src = fetchurl {
+      url = "https://tip.files.ghostty.org/e2e53f861482e080bf45054ba49ef471f9849937/Ghostty.dmg";
+      sha256 = "sha256-UM3RpqZlWYEN7Vi4xl0FFxOuoIDoaZx7kf+SK9sPZLI=";
+    };
+  };
   helium_linux = {
     pname = "helium_linux";
     version = "0.17.0.1";

@@ -56,6 +56,25 @@ in
             # themselves (`mkColorsModule`/`mkIconMapModule`) are shared —
             # both aspects push the same `colors`/`icon_map` shape onto a
             # sketchybar-Lua-compatible require path.
+            # Which bar this user runs, decided from OPTIONS alone.
+            #
+            # It has to be options and not `config.programs.<bar>.enable`: the
+            # branches below are structural (`optionalAttrs`, `optionals`,
+            # `optionalString`), so a config-valued condition decides what this
+            # module *defines* — and this module also carries `imports`, which
+            # makes reading any `config` value to build it an infinite
+            # recursion. Options carry no such dependency.
+            #
+            # `programs.sketchybar` is declared by home-manager itself on every
+            # darwin config, so on its own it says "this is a Mac", not "this
+            # host runs sketchybar". `programs.rsbar` is narrower: the option
+            # exists only where den.aspects.rsbar imported rsbar's module,
+            # which is exactly the hosts that chose rsbar. So rsbar wins where
+            # it is present and sketchybar is the fallback — a host includes
+            # one bar aspect or the other, never both.
+            hasRsbar = options.programs ? rsbar;
+            hasSketchybar = (options.programs ? sketchybar) && !hasRsbar;
+
             colourConfig =
               let
                 colors = config.stylix.base16Scheme;
@@ -82,6 +101,8 @@ in
             inherit (import ../../desktop/sketchybar/_lua-modules.nix { inherit pkgs lib; })
               mkColorsModule
               mkIconMapModule
+              colorsFile
+              iconMapFile
               ;
 
             # A single .lua file as a Lua module named `name`, for either host's
@@ -353,12 +374,20 @@ in
                           -- patterns, registers the placement/hide-on-focus-loss hooks and
                           -- binds each pad's chord.
                 require("paneru_scratchpad").setup(require("paneru_scratchpad_spec"))
-                          ${lib.optionalString (options.programs ? sketchybar) ''
+                          ${lib.optionalString hasSketchybar ''
                             -- Incremental bar repaints, driven from paneru's own event loop
                             -- (services.paneru.extraLuaPackages, below). Creating the items and
                             -- the initial paint are sketchybar's, in sketchybar's process — see
                             -- sketchybar/wm.lua and sketchybar/paneru-events.lua.
                             require("paneru_events")
+                          ''}
+                          ${lib.optionalString hasRsbar ''
+                            -- The rsbar equivalent, and it only *triggers*: rsbar has no
+                            -- loadable Lua module for paneru's interpreter to draw through,
+                            -- so the repaint itself happens in rsbar's own process off a
+                            -- state query — see rsbar/paneru-events.lua and
+                            -- sketchybar/wm.lua (which rsbar loads too).
+                            require("paneru_rsbar_events")
                           ''}
 
               '';
@@ -377,6 +406,15 @@ in
             # the raw Mach-O three hops further in. Identical to the call in
             # `aspects/darwin/codesign.nix`'s activation script (same inputs
             # -> same derivation), which is what plants it.
+            # paneru's loadable client module, built for the interpreter
+            # rsbar-lua vendors (LuaJIT). `.modulePath` is the `paneru.so`
+            # file itself, which is what gets linked next to `rsbarrc` --
+            # rsbar's cpath entry is `<config dir>/?.so`, a directory of files
+            # rather than a Lua package set.
+            paneruLuaModuleForRsbar = config.services.paneru.finalPackage.passthru.luaModule.override {
+              lua = pkgs.luajit;
+            };
+
             paneruSigned = flakeParts.flake.lib.codesign.mkSignedWrapper pkgs {
               package = config.services.paneru.finalPackage;
               entitlements = flakeParts.flake.lib.codesign.entitlementsFor.paneru or { };
@@ -455,7 +493,7 @@ in
                 )
               ];
             })
-            (lib.optionalAttrs (options.programs ? sketchybar) {
+            (lib.optionalAttrs hasSketchybar {
               # sketchybar's own config stays WM-agnostic; the paneru-specific
               # half arrives as the `wm` module its `require("wm")` picks up,
               # exactly as den.aspects.rift does it. That module creates the
@@ -476,13 +514,47 @@ in
                 (mkLuaFileModule "wm" ./sketchybar/wm.lua luaPs)
               ];
             })
+            (lib.optionalAttrs hasRsbar {
+              # The rsbar half of the same WM-provider contract. rsbar answers
+              # to `sbar`/`require("sketchybar")` exactly as SbarLua does, so
+              # `wm` and `paneru_bar` are the SAME files sketchybar loads --
+              # only how they get onto the require path differs.
+              #
+              # rsbar has no `extraLuaPackages`: it runs `rsbarrc` as a
+              # subprocess and appends that file's own directory to
+              # `package.path`/`package.cpath` (`rsbar_lua::host`), so a module
+              # is a file dropped next to `rsbarrc` and a C module is a `.so`
+              # dropped there too. That is also what makes `require("paneru")`
+              # work inside rsbar: the client module is built against LuaJIT,
+              # which is the interpreter rsbar-lua vendors, and its `lua_*`
+              # symbols resolve flat-namespace against the host binary at
+              # dlopen time (paneru's `nix/package.nix` builds it with mlua's
+              # `module` feature precisely so they are left undefined).
+              xdg.configFile = {
+                "rsbar/colors.lua".source = colorsFile colourConfig;
+                "rsbar/icon_map.lua".source = iconMapFile;
+                "rsbar/paneru_bar.lua".source = ./sketchybar/paneru-bar.lua;
+                "rsbar/wm.lua".source = ./sketchybar/wm.lua;
+                "rsbar/paneru.so".source = paneruLuaModuleForRsbar.modulePath;
+              };
+
+              # `paneru` on rsbar's PATH, for the `sbar.exec` calls a config
+              # makes -- the same reason the sketchybar branch above adds it.
+              programs.rsbar.extraPackages = [ config.services.paneru.finalPackage ];
+            })
             {
               services.paneru = {
                 enable = true;
                 package = pkgs.paneru;
-                lua = lib.mkIf (options.programs ? sketchybar) config.programs.sketchybar.luaPackage;
+                lua = lib.mkIf hasSketchybar config.programs.sketchybar.luaPackage;
                 luaConfig.enable = true;
-                extraPackages = [ pkgs.sketchybar ];
+                extraPackages = [
+                  pkgs.sketchybar
+                ]
+                # `rsbar/paneru-events.lua` shells out to `rsbard --trigger`,
+                # so the binary has to be on the PATH paneru's launchd agent
+                # hands its children.
+                ++ lib.optional hasRsbar pkgs.rsbar;
                 # `paneru_scratchpad` is unconditional — init.lua always
                 # requires it. Only the bar-drawing half is gated on the
                 # sketchybar aspect being present.
@@ -492,12 +564,15 @@ in
                     (mkLuaFileModule "paneru_scratchpad" ./scratchpad.lua luaPs)
                     (mkLuaFileModule "paneru_scratchpad_spec" scratchpadSpecFile luaPs)
                   ]
-                  ++ lib.optionals (options.programs ? sketchybar) [
+                  ++ lib.optionals hasSketchybar [
                     (pkgs.sbarlua.override { luaPackages = luaPs; })
                     (mkColorsModule colourConfig luaPs)
                     (mkIconMapModule luaPs)
                     (mkLuaFileModule "paneru_bar" ./sketchybar/paneru-bar.lua luaPs)
                     (mkLuaFileModule "paneru_events" ./sketchybar/paneru-events.lua luaPs)
+                  ]
+                  ++ lib.optionals hasRsbar [
+                    (mkLuaFileModule "paneru_rsbar_events" ./rsbar/paneru-events.lua luaPs)
                   ];
                 # Everything else is declared from Lua instead (`paneru.setup`
                 # in `config`), which takes precedence over a paneru.toml. The

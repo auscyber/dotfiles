@@ -13,6 +13,7 @@
 
   inputs = {
     crane.url = "github:ipetkov/crane/eb35abda9f232cc6610b1d1e3200d15c49b7ac54";
+    flake-parts.url = "github:hercules-ci/flake-parts/31729ca8cbdb4fa927b34e5f4353e6a83f39e993";
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
@@ -43,5 +44,15 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    rsbar = {
+      url = "github:auscyber/rsbar";
+      inputs = {
+        crane.follows = "crane";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        rust-overlay.follows = "rust-overlay";
+      };
+    };
+    rust-overlay.url = "github:oxalica/rust-overlay/228ecefb6329d5a531b77b46b581a2f0c26ee056";
   };
 }

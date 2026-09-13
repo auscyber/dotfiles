@@ -25,6 +25,7 @@
       "darwin/homebrew.nix"
       "darwin/gaming.nix"
       "wms/paneru/default.nix"
+      "desktop/rsbar/rsbar.nix"
       "programs/zotero.nix"
       "hosts/laptop.nix"
       "hosts/macmini.nix"

@@ -637,6 +637,15 @@ in
                 get = _: mkSignedWrapper pkgs { package = user.programs.sketchybar.finalPackage; };
               }
               {
+                on = user.programs.rsbar.enable or false;
+                # Same shape and same reason again: rsbar's own home-manager
+                # module (`nix/hm-module.nix`) wraps `programs.rsbar.package`
+                # (left unsigned -- see `signed` above) a second time for
+                # `extraPackages`, so `finalPackage` is what needs signing.
+                # Matching call in `aspects/desktop/rsbar/rsbar.nix`.
+                get = _: mkSignedWrapper pkgs { package = user.programs.rsbar.finalPackage; };
+              }
+              {
                 on = user.programs.kanata.enable or false;
                 get = _: user.programs.kanata.package;
               }

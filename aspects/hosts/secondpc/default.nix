@@ -3,6 +3,12 @@
   lib,
   ...
 }:
+let
+  # Host identity lives in ../_registry.nix, so the key this host is built with
+  # and the key its peers pin in `knownHosts` are one value. See that file for
+  # why it cannot be read off `den.hosts`.
+  registry = import ../_registry.nix;
+in
 {
   ff = {
     celler.url = "github:blitz/celler/main";
@@ -19,23 +25,15 @@
   patchedInputs.arion = { };
 
   den.hosts.x86_64-linux.secondpc = {
-    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICj7wlOxTp0NQJoUhRtj7k8gtDC0lCr5MJqLV5LxG9Yf root@kexec-minimal";
+    # From ../_registry.nix, so the key this host is built with and the key its
+    # peers pin in `knownHosts` are one value.
+    inherit (registry.secondpc) hostPublicKey;
 
     # Advertise as a build machine — auspc/laptop including `den.aspects.builders`
-    # will discover this entry and add it to their nix.buildMachines.
-    builder = {
-      ipAddress = "10.100.0.1";
-      publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUNqN3dsT3hUcDBOUUpvVWhSdGo3azhndERDMGxDcjVNSnFMVjVMeEc5WWY=";
-      systems = [ "x86_64-linux" ];
-      maxJobs = 5;
-      speedFactor = 5;
-      features = [
-        "big-parallel"
-        "cached-compilation"
-        "kvm"
-      ];
-      sshUser = "builder";
-    };
+    # will discover this entry and add it to their nix.buildMachines. The record
+    # is in ../_registry.nix rather than here so a host in another partition
+    # (the Mac) can actually see it.
+    inherit (registry.secondpc) builder;
 
     users.auscyber = {
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/+SE8omiIJ7VBQKgMLsgyADUVtY37o0kn0g0uwQVKi auscyber@secondpc";

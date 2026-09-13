@@ -3,9 +3,15 @@
   __findFile,
   ...
 }:
+let
+  # Host identity lives in ./_registry.nix, so the key this host is built with
+  # and the key its peers pin in `knownHosts` are one value. See that file for
+  # why it cannot be read off `den.hosts`.
+  registry = import ./_registry.nix;
+in
 {
   den.hosts.x86_64-linux.auspc = {
-    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYM1mZ3fYfOjhyMhIiKbUOLYTQifG82P2NnGWHyIwHt root@nixos";
+    inherit (registry.auspc) hostPublicKey;
     gpu = "nvidia";
     roles = [
       "gui"
@@ -13,20 +19,9 @@
       "dev"
     ];
 
-    # auspc has 4 cores reserved for builds and is the fastest box.
-    builder = {
-      ipAddress = "10.100.0.2";
-      publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZZTTFtWjNmWWZPamh5TWhJaUtiVU9MWVRRaWZHODJQMk5uR1dIeUl3SHQgcm9vdEBuaXhvcw==";
-      systems = [ "x86_64-linux" ];
-      maxJobs = 10;
-      speedFactor = 20;
-      features = [
-        "big-parallel"
-        "cached-compilation"
-        "kvm"
-      ];
-      sshUser = "builder";
-    };
+    # Advertised to every host that includes `den.aspects.builders`. The record
+    # itself is in ./_registry.nix so a host in another partition can see it.
+    inherit (registry.auspc) builder;
     users.auscyber = {
       wallpaper = builtins.path {
         name = "wallpaper";

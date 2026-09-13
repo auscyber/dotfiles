@@ -5,58 +5,72 @@
 # Kept here rather than duplicated per-aspect since both the sketchybar config
 # itself and any WM that drives sketchybar directly from its own Lua runtime
 # (paneru) need the same theme colours and app-icon lookup.
+#
+# Both come in two shapes. The `*File` ones are the bare `.lua` file, for a
+# host that resolves modules by *directory* rather than by a Lua package set:
+# rsbar runs its config as a subprocess and appends the config's own directory
+# to `package.path`, so its modules are files dropped next to `rsbarrc` and
+# there is no `extraLuaPackages` to push a nixpkgs Lua package onto. The
+# `mk*Module` ones wrap the same file as a Lua package for the hosts that do
+# have one.
 {
   pkgs,
   lib,
 }:
-{
+rec {
   # `colourConfig` is a stylix base16-derived attrset of bare hex strings
   # (e.g. `{ foreground = "e6e8ef"; ... }`); the generated module prefixes
   # full alpha, merges in a fallback for any missing key, and adds
   # `colors.with_alpha`.
+  colorsFile =
+    colourConfig:
+    pkgs.writeText "colors.lua" ''
+      local raw = ${lib.generators.toLua { } colourConfig}
+      local colors = {}
+      for key, value in pairs(raw) do
+      	colors[key] = tonumber("0x" .. "ff" .. value)
+      end
+
+      local fallback = {
+      	foreground = 0xffe6e8ef,
+      	background = 0xff101418,
+      	yellow = 0xfff2c14e,
+      	selection = 0xff2b3544,
+      	black = 0xff000000,
+      	white = 0xffffffff,
+      }
+
+      for key, value in pairs(fallback) do
+      	if type(colors[key]) ~= "number" then
+      		colors[key] = value
+      	end
+      end
+
+      colors.transparent = 0x00000000
+      local bit = require("bit")
+
+      function colors.with_alpha(color, alpha)
+      	if type(color) ~= "number" or type(alpha) ~= "number" then
+      		return color
+      	end
+      	if alpha > 1.0 or alpha < 0.0 then
+      		return color
+      	end
+      	local base = bit.band(color, 0x00ffffff)
+      	local a = bit.band(math.floor(alpha * 255.0), 0xff)
+      	return bit.bor(bit.lshift(a, 24), base)
+      end
+
+      return colors
+    '';
+
+  iconMapFile = "${pkgs.sketchybar-app-font}/lib/sketchybar-app-font/icon_map.lua";
+
   mkColorsModule =
     colourConfig: luaPs:
     luaPs.toLuaModule (
       pkgs.runCommandLocal "sketchybar-colors" { } ''
-        install -Dm644${" "}${pkgs.writeText "colors.lua" ''
-          local raw = ${lib.generators.toLua { } colourConfig}
-          local colors = {}
-          for key, value in pairs(raw) do
-          	colors[key] = tonumber("0x" .. "ff" .. value)
-          end
-
-          local fallback = {
-          	foreground = 0xffe6e8ef,
-          	background = 0xff101418,
-          	yellow = 0xfff2c14e,
-          	selection = 0xff2b3544,
-          	black = 0xff000000,
-          	white = 0xffffffff,
-          }
-
-          for key, value in pairs(fallback) do
-          	if type(colors[key]) ~= "number" then
-          		colors[key] = value
-          	end
-          end
-
-          colors.transparent = 0x00000000
-          local bit = require("bit")
-
-          function colors.with_alpha(color, alpha)
-          	if type(color) ~= "number" or type(alpha) ~= "number" then
-          		return color
-          	end
-          	if alpha > 1.0 or alpha < 0.0 then
-          		return color
-          	end
-          	local base = bit.band(color, 0x00ffffff)
-          	local a = bit.band(math.floor(alpha * 255.0), 0xff)
-          	return bit.bor(bit.lshift(a, 24), base)
-          end
-
-          return colors
-        ''} "$out/share/lua/${luaPs.lua.luaversion}/colors.lua"
+        install -Dm644 ${colorsFile colourConfig} "$out/share/lua/${luaPs.lua.luaversion}/colors.lua"
       ''
     );
 
@@ -64,7 +78,7 @@
     luaPs:
     luaPs.toLuaModule (
       pkgs.runCommandLocal "sketchybar-icon-map" { } ''
-        install -Dm644 ${pkgs.sketchybar-app-font}/lib/sketchybar-app-font/icon_map.lua "$out/share/lua/${luaPs.lua.luaversion}/icon_map.lua"
+        install -Dm644 ${iconMapFile} "$out/share/lua/${luaPs.lua.luaversion}/icon_map.lua"
       ''
     );
 }

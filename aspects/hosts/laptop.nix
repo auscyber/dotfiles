@@ -3,9 +3,15 @@
   __findFile,
   ...
 }:
+let
+  # Host identity lives in ./_registry.nix, so the key this host is built with
+  # and the key its peers pin in `knownHosts` are one value. See that file for
+  # why it cannot be read off `den.hosts`.
+  registry = import ./_registry.nix;
+in
 {
   den.hosts.aarch64-darwin.Ivys-MacBook-Pro = {
-    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
+    inherit (registry.Ivys-MacBook-Pro) hostPublicKey;
     roles = [
       "study"
       "gui"
@@ -68,7 +74,7 @@
       den.aspects.paneru
       den.aspects.jankyborders
       den.aspects.kanata
-      den.aspects.sketchybar
+      den.aspects.rsbar
     ];
 
     # "study": everything that is not study, gone. The browser half of this
@@ -231,7 +237,7 @@
       den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
-      den.aspects.sketchybar
+      den.aspects.rsbar
       <browsers/zen>
       den.aspects.gui
       den.aspects.gpg

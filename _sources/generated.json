@@ -101,6 +101,22 @@
         },
         "version": "v3.5.2"
     },
+    "ghostty-tip": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "ghostty-tip",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-UM3RpqZlWYEN7Vi4xl0FFxOuoIDoaZx7kf+SK9sPZLI=",
+            "type": "url",
+            "url": "https://tip.files.ghostty.org/e2e53f861482e080bf45054ba49ef471f9849937/Ghostty.dmg"
+        },
+        "version": "e2e53f861482e080bf45054ba49ef471f9849937"
+    },
     "helium_linux": {
         "cargoLock": null,
         "date": null,
