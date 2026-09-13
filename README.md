@@ -1311,6 +1311,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 
 ### Aspects
 - agenix-rekey
+- alloy
 - auscyber
 - auscyber/secondpc
 - batteries/define-user
@@ -1324,6 +1325,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - batteries/self&#39;/os
 - batteries/sources
 - batteries/sources/os
+- bazarr
 - builder-server
 - builders
 - celler
@@ -1331,14 +1333,18 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - claude
 - disko
 - fish
+- gateway
 - gpg
+- grafana
 - home-base
+- homepage
 - insecure-predicate
 - insecure-predicate/os
 - insecure-predicate/user
 - ivy-fetch
 - jujutsu
 - lib
+- lidarr
 - local
 - lspmux
 - main-ssh-key
@@ -1359,11 +1365,17 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server,cmp-copilot)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
 - provides/unfree(intel-ocl,plexmediaserver)
+- prowlarr
+- qbittorrent
+- radarr
 - samba
 - searchix
 - secondpc-web
 - shell
 - shell/to-users
+- slskd
+- sonarr
+- sso
 - starship
 - stylix
 - unfree-predicate
@@ -1384,12 +1396,17 @@ graph LR
 
   subgraph ctx_host_secondpc["host: secondpc"]
   agenix_rekey_host_secondpc["agenix-rekey"]:::agenix_rekey_host_secondpc_c
+  alloy["alloy"]:::alloy_c
+  bazarr["bazarr"]:::bazarr_c
   builder_server["builder-server"]:::builder_server_c
   builders["builders"]:::builders_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   den__batteries__define_user__auscyber_secondpc{{"batteries/define-user/auscyber@secondpc"}}:::den__batteries__define_user__auscyber_secondpc_c
   disko["disko"]:::disko_c
+  gateway["gateway"]:::gateway_c
+  grafana["grafana"]:::grafana_c
   home_base["home-base"]:::home_base_c
+  homepage["homepage"]:::homepage_c
   den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
   den__batteries__hostname__os{{"batteries/hostname/os"}}:::den__batteries__hostname__os_c
   den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
@@ -1399,6 +1416,7 @@ graph LR
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
   jujutsu["jujutsu"]:::jujutsu_c
   lib["lib"]:::lib_c
+  lidarr["lidarr"]:::lidarr_c
   local["local"]:::local_c
   nginx_host_secondpc["nginx"]:::nginx_host_secondpc_c
   nix["nix"]:::nix_c
@@ -1409,14 +1427,20 @@ graph LR
   overlays["overlays"]:::overlays_c
   pam_rssh_host_secondpc["pam-rssh"]:::pam_rssh_host_secondpc_c
   plex["plex"]:::plex_c
+  prowlarr["prowlarr"]:::prowlarr_c
+  qbittorrent["qbittorrent"]:::qbittorrent_c
+  radarr["radarr"]:::radarr_c
   samba["samba"]:::samba_c
   searchix["searchix"]:::searchix_c
   secondpc_web["secondpc-web"]:::secondpc_web_c
   den__batteries__self_[/"batteries/self'"\]:::den__batteries__self__c
   den__batteries__self___os{{"batteries/self'/os"}}:::den__batteries__self___os_c
   shell_host_secondpc["shell"]:::shell_host_secondpc_c
+  slskd["slskd"]:::slskd_c
+  sonarr["sonarr"]:::sonarr_c
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
+  sso["sso"]:::sso_c
   starship["starship"]:::starship_c
   plex__to_users[/"plex/to-users"\]:::plex__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
@@ -1436,21 +1460,33 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   nixpkgs_config_host_secondpc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  plex --> gateway
+  plex --> homepage
+  secondpc --> alloy
+  secondpc --> bazarr
   secondpc --> builder_server
   secondpc --> builders
   secondpc --> disko
+  secondpc --> grafana
   secondpc --> local
   secondpc --> nginx_host_secondpc
   secondpc --> nix
   secondpc --> plex
+  secondpc --> prowlarr
+  secondpc --> qbittorrent
+  secondpc --> radarr
   secondpc --> samba
   secondpc --> searchix
   secondpc --> secondpc_web
+  secondpc --> slskd
+  secondpc --> sonarr
+  secondpc --> sso
   secondpc --> den__provides__unfree_intel_ocl_plexmediaserver_
   secondpc --> vpn_server
   shell_host_secondpc --> jujutsu
   shell_host_secondpc --> nix_index
   shell_host_secondpc --> starship
+  slskd --> lidarr
   unfree_predicate --> unfree_predicate__os
   unfree_predicate --> unfree_predicate__user
   vpn --> vpn_secrets
@@ -1505,8 +1541,10 @@ graph LR
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef agenix_rekey_host_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef alloy_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef auscyber__secondpc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef bazarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef builder_server_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef builders_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef celler_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -1516,8 +1554,11 @@ graph LR
   classDef den__batteries__define_user__auscyber_secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef disko_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef gateway_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef grafana_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef home_base_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef homepage_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__hostname__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
@@ -1528,6 +1569,7 @@ graph LR
   classDef ivy_fetch_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef lidarr_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef local_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef lspmux_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
@@ -1546,6 +1588,9 @@ graph LR
   classDef pam_rssh_user_auscyber_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef plex_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__primary_user_auscyber_secondpc__c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
+  classDef prowlarr_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef qbittorrent_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef radarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef samba_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef searchix_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef secondpc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
@@ -1554,8 +1599,11 @@ graph LR
   classDef den__batteries__self___os_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
   classDef shell_host_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef shell__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef slskd_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef sonarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__sources_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef sso_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef plex__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
@@ -1944,6 +1992,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 |---------|---------|-------------|
 | celler | `0.1.0` | Multi-tenant Nix binary cache system |
 | cotabby | `v0.6.2-beta` |  |
+| flaresolverr | `3.5.0` | Proxy server to bypass Cloudflare protection |
 | ghostty | `1.3.1` | Fast, native, feature-rich terminal emulator pushing modern features |
 | helium | `0.16.5.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
@@ -1951,6 +2000,7 @@ style ctx_user_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
 | kanata-ls | `2122eb6090195434edf02774dc83a8aebcf77693` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
+| kanidm-provision | `1.3.0` | Small utility to help with kanidm provisioning |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
 | ms-365-mcp-server | `0.145.1` | Microsoft 365 / Outlook MCP server (mail, calendar, OneDrive, Excel) over Microsoft Graph |
 | proton-ge-bin | `GE-Proton11-6` | Compatibility tool for Steam Play based on Wine and additional components.
