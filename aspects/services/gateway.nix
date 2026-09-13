@@ -545,6 +545,14 @@ in
           # gw_api" / "unknown variable $gw_key_sonarr" at startup.
           services.nginx.commonHttpConfig = lib.mkMerge [
             (lib.mkIf (gated != [ ]) ''
+              # Every key in the tables below is 64 hex characters, and the ones
+              # for a `Bearer` service carry a 7-character scheme prefix on top.
+              # That is past nginx's 64-byte default bucket, which it reports at
+              # startup as "could not build map_hash, you should increase
+              # map_hash_bucket_size". Must stay a power of two.
+              map_hash_bucket_size 256;
+              map_hash_max_size 4096;
+
               log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
 
               map "$http_x_api_key$http_authorization" $gw_caller {
