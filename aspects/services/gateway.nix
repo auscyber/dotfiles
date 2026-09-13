@@ -674,7 +674,18 @@ in
               # 200. A handler that returns 403 itself re-enters this same
               # error_page and nginx aborts the request with "rewrite or internal
               # redirection cycle" -- i.e. a 500 on every gated service.
-              extraConfig = "error_page 403 =403 @gatewayForbidden;";
+              extraConfig = ''
+                error_page 403 =403 @gatewayForbidden;
+
+                # oauth2-proxy's reply to the auth subrequest carries the session
+                # cookie -- the whole ID token -- plus the X-Auth-Request-*
+                # headers. With a groups claim that overruns nginx's 4k/8k
+                # default, which nginx reports as "upstream sent too big header",
+                # fails the subrequest with 502, and the client sees a 500.
+                proxy_buffer_size 16k;
+                proxy_buffers 8 16k;
+                proxy_busy_buffers_size 32k;
+              '';
               locations."@gatewayForbidden".extraConfig = ''
                 auth_request off;
                 default_type text/html;

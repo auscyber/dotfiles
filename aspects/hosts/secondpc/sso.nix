@@ -113,6 +113,15 @@
         useACMEHost = "ivymect.in";
         forceSSL = true;
 
+        # The callback sets the session cookie, which is the ID token -- large
+        # enough with a groups claim to overrun nginx's default proxy buffers on
+        # the way back from oauth2-proxy.
+        extraConfig = ''
+          proxy_buffer_size 16k;
+          proxy_buffers 8 16k;
+          proxy_busy_buffers_size 32k;
+        '';
+
         # A bare /oauth2/sign_out loops: the module's /oauth2/ location sets
         # `X-Auth-Request-Redirect` to the current URL, which for sign_out is
         # sign_out itself, so oauth2-proxy redirects there forever. It only
