@@ -31,9 +31,10 @@
           proxyWebsockets = true;
         };
       };
-      # lidarr / arr / bazarr / qbittorrent are absent on purpose: the gateway
-      # builds those vhosts, certificate included, from each service aspect's
-      # own `gated` entry.
+      # lidarr / arr / bazarr / qbittorrent / tautulli / grafana / homepage are
+      # absent on purpose: the gateway builds those vhosts, certificate
+      # included, from each service aspect's own `gated` entry. Declaring one
+      # here as well is a proxyPass conflict, not an override.
       # loki, on the same apex as everything else so one oauth2-proxy cookie
       # covers it (see sso.nix). The older logs.pierlot.com.au vhost in
       # media.nix stays on basic auth for whatever is already pointed at it.
@@ -49,11 +50,6 @@
         useACMEHost = "ivymect.in";
         forceSSL = true;
         locations."/".proxyPass = "http://127.0.0.1:5055"; # seerr (ex-overseerr/jellyseerr) default
-      };
-      "tautulli.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:8181"; # tautulli default
       };
       "bitwarden.ivymect.in" = {
         useACMEHost = "ivymect.in";
