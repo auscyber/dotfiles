@@ -272,12 +272,15 @@
               # kanidm's own throwaway cert, so this needs nothing but kanidm.
               kanidmd cert-generate -c server.toml >/dev/null 2>&1 || true
 
-              if ! out=$(kanidmd configtest -c server.toml 2>&1); then
+              # NOT `out=` -- that shadows the output path nix puts in $out, and
+              # the `touch` below then tries to create a file named after
+              # configtest's output.
+              if ! report=$(kanidmd configtest -c server.toml 2>&1); then
                 echo "kanidm rejected the generated server.toml:" >&2
-                echo "$out" >&2
+                echo "$report" >&2
                 exit 1
               fi
-              touch $out
+              touch "$out"
             ''
           )
         ];
