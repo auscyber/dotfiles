@@ -170,9 +170,9 @@
         # Passkeys: kanidm is WebAuthn-first and needs no switch turned on, but
         # it derives the WebAuthn relying-party ID from `domain` and checks the
         # browser's origin against `origin` exactly -- so those two, the https
-        # front, and `trust_x_forward_for` (nginx terminates TLS, kanidm has to
-        # believe it) are the whole server-side story. Changing `domain` later
-        # invalidates every enrolled passkey.
+        # front, and `http_client_address_info` (nginx terminates TLS, kanidm has
+        # to believe it about the client) are the whole server-side story.
+        # Changing `domain` later invalidates every enrolled passkey.
         services.kanidm = {
           server.enable = true;
           # Pinned, not left to the stateVersion default, because kanidm only
@@ -191,7 +191,10 @@
             domain = "auth.ivymect.in";
             origin = "https://auth.ivymect.in";
             bindaddress = "127.0.0.1:8443";
-            trust_x_forward_for = true;
+            # Replaced `trust_x_forward_for` in newer kanidm, and it takes the
+            # addresses to trust rather than a bool -- so only nginx on loopback
+            # can claim a client IP, not anything that reaches the port.
+            http_client_address_info."x-forward-for" = [ "127.0.0.1" ];
             tls_chain = "/var/lib/acme/ivymect.in/fullchain.pem";
             tls_key = "/var/lib/acme/ivymect.in/key.pem";
           };
