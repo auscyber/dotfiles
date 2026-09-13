@@ -26,7 +26,7 @@
       };
     };
     flake-parts.url = "github:hercules-ci/flake-parts/31729ca8cbdb4fa927b34e5f4353e6a83f39e993";
-    home-manager.url = "github:nix-community/home-manager/73d6a67161df12bfbf327afc2b8e065174f46258";
+    home-manager.url = "github:nix-community/home-manager/fdc36b12804b0179b24a5ffd282e4c95c37072e2";
     impermanence.url = "github:nix-community/impermanence";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";

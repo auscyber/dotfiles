@@ -19,6 +19,7 @@
 # or bumping a patched input. `checks.patched-inputs-generated-current`
 # fails if the patch lists here drift from the aspects' declarations.
 {
+
   age-plugin-gpg.patches = [
     ./patches/age-plugin-gpg/age-plugin-gpg.patch
   ];
@@ -52,10 +53,10 @@
   age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
   agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
   agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
-  celler.hash = "sha256-0AtelSDZFXruBvBxMS7wfrE0AEJFXj2grsnn9llsxHE=";
+  celler.hash = "sha256-wiXwS/2fO55S63MlgBxPnVQbcSv8nlCn8jbeNpISSKE=";
   darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
-  home-manager.hash = "sha256-M6qBzHj882YZyVctZ2kUO4eRxjpjkLlRhb4oOnFBBPM=";
-  nh.hash = "sha256-u9wS/Kv7ixNm66fymZ1QPDnIcJFkj28BM9jIEmQxUr0=";
+  home-manager.hash = "sha256-zpS5yAvQwBxhJDmvOspYVC+ozbH1aej/Ix4dIDpqOoE=";
+  nh.hash = "sha256-ndrDgkv1aQO2n9qCB77hPm55mb/FnsgqrmapB3V9OMo=";
   pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
   zen-browser.hash = null;
 }
