@@ -8,7 +8,7 @@
 # that is no longer declared here (`autoRemove` defaults to true).
 #
 # Post-deploy, once: `nix run .#rekey && nix run .#gen-secrets`, then log in as
-# idm_admin (password in the kanidm/idm-admin secret) and issue ivy a credential
+# idm_admin (password in the sso/idm-admin secret) and issue auscyber a credential
 # reset link -- kanidm has no way to provision a person's own password, by design.
 {
   den.aspects.sso = {

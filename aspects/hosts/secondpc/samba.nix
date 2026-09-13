@@ -14,8 +14,8 @@
 # on the assumption kanidm replaced it: SMB authentication needs an NT hash,
 # and kanidm's LDAP gateway is read-only with none of the Samba schema, so
 # `ldapsam` against it is not a backend at any version. What kanidm changes is
-# WHOSE hash it is -- `ivy`, the kanidm person, rather than a separate local
-# account -- not whether one is needed.
+# WHOSE identity it belongs to -- `auscyber` is one account now, the unix user
+# and the kanidm person both -- not whether a hash is needed.
 #
 # kanidm/kanidm#2627 is the epic for real kanidm<->samba auth (SID mapping plus
 # kerberos, not NTLM). It is research-stage, so when it lands the NT hash and

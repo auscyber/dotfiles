@@ -137,7 +137,7 @@
         gateway.serviceAccounts.soularr.description = "slskd <-> lidarr bridge";
         age.templates.soularr = {
           dependencies = {
-            lidar_key = config.age.secrets."gateway/account-soularr";
+            lidar_key = config.age.secrets."soularr/api-key";
             slskd_api_key = config.age.secrets.slskd_soularr_apikey;
           };
           content =

@@ -114,8 +114,14 @@ in
         # access is granted by map membership rather than by minting another
         # secret, and revoking one service's access never rotates a key the
         # account still needs elsewhere.
-        internalSecret = e: "gateway/${e.name}-internal";
-        accountSecret = account: "gateway/account-${account}";
+        # Scoped by WHOSE credential it is, not by what consumes it: a key lives
+        # under the principal that holds it, so `sonarr/api-key` is sonarr's to
+        # present and `sonarr/internal` is sonarr's to accept. Everything that
+        # needs one -- the nginx maps, the env files -- takes it as an agenix
+        # DEPENDENCY, which references the one secret rather than minting a copy
+        # per consumer. So a key shared by several readers is one `.age` file.
+        internalSecret = e: "${e.name}/internal";
+        accountSecret = account: "${account}/api-key";
 
         accounts = lib.attrNames config.gateway.serviceAccounts;
 
@@ -411,15 +417,32 @@ in
               '';
             }) e.api.clients
           ) gated;
-          age.secrets =
-            lib.listToAttrs (
-              map (account: lib.nameValuePair (accountSecret account) { generator.script = randomKey; }) accounts
-            )
-            // lib.listToAttrs (
-              map (e: lib.nameValuePair (internalSecret e) { generator.script = randomKey; }) (
-                lib.filter (e: e.api.internalKey) gated
-              )
-            );
+          # `age.scoped.<principal>` rather than raw `age.secrets`: the scope
+          # supplies the `<principal>/` prefix, and for a scope named after a
+          # real service it also infers that service's owner, group and
+          # restartUnits -- so sonarr restarts when the key it accepts changes.
+          age.scoped = lib.mkMerge (
+            map (account: {
+              ${account} = {
+                # `service = null` disables inference, and it has to be off here:
+                # inferring would read `services.<name>` while that service's own
+                # `environmentFiles` is being computed from a template that
+                # depends on this very secret. That is the loop lib/age-scoped.nix
+                # documents, and this is the escape hatch it prescribes --
+                # explicit `settings` instead of a derived owner and restart.
+                service = null;
+                secrets.api-key.generator.script = randomKey;
+              };
+            }) accounts
+            ++ map (e: {
+              ${e.name} = {
+                service = null;
+                # Named literally rather than looked up, so nothing is forced.
+                settings.restartUnits = [ "${e.name}.service" ];
+                secrets.internal.generator.script = randomKey;
+              };
+            }) (lib.filter (e: e.api.internalKey) gated)
+          );
 
           age.templates =
             # Per-service rewrite table: caller key -> internal key. A key absent
