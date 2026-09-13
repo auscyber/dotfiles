@@ -147,7 +147,11 @@
       systems.oauth2.oauth2-proxy = {
         displayName = "Media services";
         originUrl = "https://sso.ivymect.in/oauth2/callback";
-        originLanding = "https://sso.ivymect.in/";
+        # Where kanidm's Apps tile sends you. NOT sso.ivymect.in -- that vhost
+        # exists only to host oauth2-proxy's /oauth2/ endpoints and serves
+        # nothing at /, so the tile was a dead end. The dashboard is the sensible
+        # landing page, and it is behind the same gate.
+        originLanding = "https://homepage.ivymect.in/";
         basicSecretFile = scoped.sso.secrets.oauth2-client-secret.path;
         preferShortUsername = true;
         # This scope map is the first gate: kanidm refuses to issue a token to
@@ -319,7 +323,12 @@
           provider = "oidc";
           oidcIssuerUrl = "https://auth.ivymect.in/oauth2/openid/oauth2-proxy";
           redirectURL = "https://sso.ivymect.in/oauth2/callback";
-          scope = "openid profile email";
+          # `groups_name` is load bearing: without a groups scope kanidm emits no
+          # groups claim, oauth2-proxy sees an empty group set, and every
+          # per-vhost `allowed_groups` check fails with a bare 403 -- which nginx
+          # renders as a near-blank page, since only 401 is wired to the login
+          # redirect.
+          scope = "openid profile email groups_name";
           # Authorisation is kanidm's scope map, not an email allowlist here.
           email.domains = [ "*" ];
           setXauthrequest = true;
