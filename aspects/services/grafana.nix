@@ -15,6 +15,10 @@
 
     # Grafana signs its session cookies with this; nixpkgs removed the default
     # precisely so nobody ships the well-known one.
+    # Owner spelled out: `services.grafana` has no top-level `user` option (the
+    # unit hardcodes `User = "grafana"`), so scope inference finds nothing and
+    # the secret would deploy root-owned and unreadable by the service.
+    secrets.secret-key.owner = "grafana";
     secrets.secret-key.generator.script =
       {
         pkgs,

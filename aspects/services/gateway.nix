@@ -527,19 +527,23 @@ in
           # Map bodies are globbed in rather than written inline: the key values
           # are secrets, and a glob matching nothing keeps the build-time
           # `nginx -t` happy before agenix has ever run.
+          # nginx's own option rather than a hand-written proxy_cache_path: it
+          # emits the directive in the right place and the directory comes from
+          # the unit's `CacheDirectory`, which a hand-rolled path does not get.
+          services.nginx.proxyCachePath.gateway-auth = lib.mkIf (config.gateway.authCacheTtl != null) {
+            enable = true;
+            keysZoneName = "gateway_auth";
+            keysZoneSize = "4m";
+            maxSize = "32m";
+            inactive = "10m";
+          };
+
           # `commonHttpConfig`, NOT the append variant: that one is emitted after
           # the server blocks, and everything defined here -- the log format, the
           # key maps, the cache zone -- is referenced from inside them. nginx
           # parses in order, so defining them later is simply "unknown log format
           # gw_api" / "unknown variable $gw_key_sonarr" at startup.
           services.nginx.commonHttpConfig = lib.mkMerge [
-            (lib.mkIf (config.gateway.authCacheTtl != null) ''
-              # Keyed on the whole credential AND the host: two callers must
-              # never share an entry, and a verdict for one vhost must not
-              # answer for another, since `allowed_groups` differs between them.
-              proxy_cache_path /var/cache/nginx/gateway-auth levels=1:2 keys_zone=gateway_auth:4m
-                               max_size=32m inactive=10m use_temp_path=off;
-            '')
             (lib.mkIf (gated != [ ]) ''
               log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
 
@@ -582,13 +586,36 @@ in
                     })
                   ]
                   ++ lib.optional e.api.enable (
+                    lib.nameValuePair "= /gw-auth-${nginxName e.name}" {
+                      # Either credential will do: a valid key short-circuits to
+                      # 204, anything else falls through to oauth2-proxy. Without
+                      # this, an app whose own web UI drives its API from the
+                      # browser -- qbittorrent's does, for everything -- 401s on
+                      # every request, because a browser carries a session and
+                      # not a key.
+                      #
+                      # `if` here is the safe form: it holds only a `return`, and
+                      # proxy_pass sits outside it.
+                      proxyPass = "${config.services.oauth2-proxy.nginx.proxy}/oauth2/auth${
+                        lib.optionalString (e.groups != [ ])
+                          "?allowed_groups=${lib.concatMapStringsSep "," lib.escapeURL e.groups}"
+                      }";
+                      extraConfig = ''
+                        internal;
+                        auth_request off;
+                        if ($gw_key_${nginxName e.name} != "") { return 204; }
+                        proxy_set_header X-Scheme       $scheme;
+                        proxy_set_header Content-Length "";
+                        proxy_pass_request_body         off;
+                      '';
+                    }
+                  )
+                  ++ lib.optional e.api.enable (
                     lib.nameValuePair e.api.subpath {
                       proxyPass = "${e.upstream}${e.api.subpath}";
-                      # A longer prefix than the UI location, so it wins; the key
-                      # check replaces the session check rather than adding to it.
+                      # A longer prefix than the UI location, so it wins.
                       extraConfig = ''
-                        auth_request off;
-                        if ($gw_key_${nginxName e.name} = "") { return 401; }
+                        auth_request /gw-auth-${nginxName e.name};
                         proxy_set_header ${e.api.header} ${
                           if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
                         };
