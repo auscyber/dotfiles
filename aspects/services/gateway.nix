@@ -587,11 +587,19 @@ in
                       proxyWebsockets = e.websockets;
                       # sub_filter cannot match through gzip, so the upstream has
                       # to be asked for plaintext before anything can be injected.
+                      # The banner text is XML-escaped, not interpolated raw: an
+                      # apostrophe in it ('qBittorrent's settings...') closes
+                      # nginx's single-quoted string early, which nginx reports
+                      # as an "unexpected" token on the following word. Escaping
+                      # also keeps it from injecting markup into the page.
+                      #
+                      # `sub_filter_types` is deliberately absent: text/html is
+                      # already in its default, and naming it again is a
+                      # "duplicate MIME type" warning at startup.
                       extraConfig = lib.optionalString (e.banner != null) ''
                         proxy_set_header Accept-Encoding "";
                         sub_filter_once on;
-                        sub_filter_types text/html;
-                        sub_filter '</body>' '<div style="position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:6px 12px;font:600 13px/1.4 system-ui,sans-serif;text-align:center;color:#1b1b1b;background:#f5c451;box-shadow:0 -1px 4px rgba(0,0,0,.3)">${e.banner}</div></body>';
+                        sub_filter '</body>' '<div style="position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:6px 12px;font:600 13px/1.4 system-ui,sans-serif;text-align:center;color:#1b1b1b;background:#f5c451;box-shadow:0 -1px 4px rgba(0,0,0,.3)">${lib.escapeXML e.banner}</div></body>';
                       '';
                     })
                   ]
