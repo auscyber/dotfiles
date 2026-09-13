@@ -233,6 +233,9 @@
             # addresses to trust rather than a bool -- so only nginx on loopback
             # can claim a client IP, not anything that reaches the port.
             http_client_address_info."x-forward-for" = [ "127.0.0.1" ];
+            # Traces to tempo, which grafana reads. Host:port only -- kanidm
+            # takes a gRPC endpoint here, not a URL, and rejects a scheme.
+            otel_grpc_endpoint = "127.0.0.1:4317";
             tls_chain = "/var/lib/acme/ivymect.in/fullchain.pem";
             tls_key = "/var/lib/acme/ivymect.in/key.pem";
           };

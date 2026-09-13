@@ -310,6 +310,19 @@ in
                       service has never heard of.
                     '';
                   };
+                  localUrl = mkOption {
+                    type = types.str;
+                    readOnly = true;
+                    default = "${config.upstream}${lib.removeSuffix "/" config.subpath}";
+                    defaultText = "\${upstream}\${subpath}";
+                    description = ''
+                      Where this service is reachable on the host itself,
+                      bypassing nginx. For the rare call that cannot carry a key
+                      -- an app validating a callback URL, say -- where going
+                      through the gate would fail for want of a credential.
+                      Prefer `url`: this leg is unauthenticated and unattributed.
+                    '';
+                  };
                   upstream = mkOption {
                     type = types.str;
                     example = "http://127.0.0.1:8989";

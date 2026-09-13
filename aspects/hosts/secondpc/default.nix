@@ -55,6 +55,7 @@ in
       den.aspects.plex
       den.aspects.gateway
       den.aspects.grafana
+      den.aspects.tempo
       den.aspects.alloy
       den.aspects.homepage
       den.aspects.prowlarr

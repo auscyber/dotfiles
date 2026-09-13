@@ -113,7 +113,7 @@ in
 
                         desired=$(printf '%s' "$tmpl" | jq \
                           --arg name "$label" \
-                          --arg prowlarr "${config.gateway.services.prowlarr.url}" \
+                          --arg prowlarr "${config.gateway.services.prowlarr.localUrl}" \
                           --arg base "$target" --arg key "$targetkey" '
                             .name = $name
                             | .syncLevel = "fullSync"
@@ -123,6 +123,14 @@ in
                                 elif .name == "apiKey"      then .value = $key
                                 else . end))')
 
+                        # `prowlarrUrl` is the LOOPBACK url, unlike `baseUrl`:
+                        # prowlarr validates the app by making the *arr call back
+                        # to it, and that callback carries no key, so through the
+                        # gate it is just an unauthenticated request that gets
+                        # refused -- "Prowlarr URL is invalid, <app> cannot
+                        # connect". `baseUrl` stays public because that leg does
+                        # carry prowlarr's per-caller key.
+                        #
                         # Matched on implementation: an entry added through the
                         # UI is named "Sonarr", so a name lookup misses it and
                         # the POST then collides with it.

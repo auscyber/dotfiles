@@ -80,6 +80,12 @@
               uid = "loki";
               url = "http://127.0.0.1:3100";
             }
+            {
+              name = "Tempo";
+              type = "tempo";
+              uid = "tempo";
+              url = "http://127.0.0.1:3200";
+            }
           ];
         };
       };
