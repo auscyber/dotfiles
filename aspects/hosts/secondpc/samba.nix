@@ -35,8 +35,8 @@
     ];
 
     # Access to the backup share, declared here because this is the only thing
-    # that uses it. `ivy` is the person sso.nix provisions.
-    provision.groups.timemachine-users.members = [ "ivy" ];
+    # that uses it. `auscyber` is the person sso.nix provisions.
+    provision.groups.timemachine-users.members = [ "auscyber" ];
 
     nixos =
       {
@@ -68,7 +68,8 @@
           hostname = "smbnix";
         };
 
-        # Samba's NT hash for `ivy` -- the same name as the kanidm person, so
+        # Samba's NT hash for `auscyber` -- the same name as both the unix
+        # account and the kanidm person, so
         # the SMB login and the SSO login are one identity even though the hash
         # has to live in its own store. Derived from the same ivy-password
         # intermediary secret as ivy-pwd-hash/htpasswd (see user-pwd.nix /
@@ -76,13 +77,13 @@
         # ivy-pwd-hash's sha512-crypt, safe to deploy normally.
         #
         # This intentionally does NOT try to build the tdbsam database itself
-        # at generation time: `pdbedit -a` requires resolving `ivy` via
+        # at generation time: `pdbedit -a` requires resolving `auscyber` via
         # getpwnam(), which doesn't exist in the generator's build sandbox.
         # Faking it there (e.g. via nss_wrapper) is possible but produces a
         # static blob that has to be redeployed whole and re-diverges from
         # the live system; instead `samba-passdb-sync` below injects this
-        # hash into the real, persistent passdb on the real host, where `ivy`
-        # resolves through kanidm's NSS and no faking is needed.
+        # hash into the real, persistent passdb on the real host, where
+        # `auscyber` actually resolves and no faking is needed.
         age.secrets."ivy-nt-hash" = {
           generator = {
             dependencies = { inherit (scoped.user-pwd.secrets) ivy-password; };
@@ -111,20 +112,21 @@
         # password, so it seeds a throwaway one that's immediately
         # overwritten by `--set-nt-hash`, which never sees the plaintext.
         systemd.services.samba-passdb-sync = {
-          description = "Sync the ivy Samba account to ivy-nt-hash";
+          description = "Sync the auscyber Samba account to ivy-nt-hash";
           before = [ "samba-smbd.service" ];
           requiredBy = [ "samba-smbd.service" ];
-          # `pdbedit -a` resolves the account through getpwnam, and `ivy` comes
-          # from kanidm -- so this cannot run before kanidm-unixd answers.
+          # `pdbedit -a` resolves the account through getpwnam. `auscyber` is a
+          # local account so this would work regardless, but kanidm also serves
+          # it -- order after unixd so both views agree on the same uid.
           after = [ "kanidm-unixd.service" ];
           wants = [ "kanidm-unixd.service" ];
           serviceConfig.Type = "oneshot";
           path = [ pkgs.samba ];
           script = ''
-            if ! pdbedit -L -u ivy >/dev/null 2>&1; then
-              printf 'placeholder\nplaceholder\n' | pdbedit -a -u ivy -t
+            if ! pdbedit -L -u auscyber >/dev/null 2>&1; then
+              printf 'placeholder\nplaceholder\n' | pdbedit -a -u auscyber -t
             fi
-            pdbedit -r -u ivy --set-nt-hash="$(cat ${config.age.secrets."ivy-nt-hash".path})"
+            pdbedit -r -u auscyber --set-nt-hash="$(cat ${config.age.secrets."ivy-nt-hash".path})"
           '';
         };
 

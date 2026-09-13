@@ -130,13 +130,14 @@
         # --- soularr: lidarr<->slskd bridge. config.ini is an agenix template
         #     with the lidarr + slskd api keys injected as placeholders. ---
         #
-        # soularr is a caller of lidarr's API, so it gets a key of its own from
-        # the gateway rather than lidarr's real one, and reaches lidarr through
-        # nginx so the access log attributes the calls to it.
+        # soularr is a caller of lidarr's API, so it presents its own service
+        # account's key rather than lidarr's real one, and reaches lidarr through
+        # nginx so the access log attributes the calls to it. One key per
+        # principal, so this is the same credential it would use anywhere else.
         gateway.serviceAccounts.soularr.description = "slskd <-> lidarr bridge";
         age.templates.soularr = {
           dependencies = {
-            lidar_key = config.age.secrets."gateway/lidarr-soularr";
+            lidar_key = config.age.secrets."gateway/account-soularr";
             slskd_api_key = config.age.secrets.slskd_soularr_apikey;
           };
           content =

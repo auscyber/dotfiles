@@ -113,10 +113,30 @@
     provision = { scoped, ... }: {
       groups.media-users = { };
 
-      persons.ivy = {
-        displayName = "Ivy";
-        mailAddresses = [ "pierlotchris@gmail.com" ];
-        groups = [ "media-users" ];
+      # kanidm's own admin groups already exist, so these entries add a member to
+      # them rather than declaring them. `overwriteMembers = false` is not
+      # optional here: the default REPLACES the member list, which would evict
+      # the built-in `idm_admin` account and leave nobody able to recover the
+      # instance.
+      groups.idm_admins = {
+        members = [ "auscyber" ];
+        overwriteMembers = false;
+      };
+      groups.system_admins = {
+        members = [ "auscyber" ];
+        overwriteMembers = false;
+      };
+
+      # One person, named for the unix account it lines up with -- NSS serves
+      # the same name from kanidm, and samba's passdb syncs to it.
+      persons.auscyber = {
+        displayName = "Ivy Pierlot";
+        mailAddresses = [ "ivyp@outlook.com.au" ];
+        groups = [
+          "media-users"
+          "idm_admins"
+          "system_admins"
+        ];
       };
 
       systems.oauth2.oauth2-proxy = {
@@ -181,7 +201,7 @@
         # first deploy, on the host:
         #
         #   kanidm login -D idm_admin            # password: the idm-admin secret
-        #   kanidm person credential create-reset-token ivy
+        #   kanidm person credential create-reset-token auscyber
         #
         # then open the printed link and register the passkey. To make passkeys
         # the only accepted credential rather than one option among several:
@@ -195,7 +215,7 @@
         # either -- so an account only becomes visible to NSS after:
         #
         #   kanidm group posix set media-users
-        #   kanidm person posix set ivy
+        #   kanidm person posix set auscyber
         services.kanidm = {
         };
 

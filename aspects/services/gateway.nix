@@ -165,6 +165,21 @@ in
           '';
         };
 
+        options.gateway.authCacheTtl = mkOption {
+          type = types.nullOr types.str;
+          default = "1m";
+          example = "30s";
+          description = ''
+            How long an oauth2-proxy verdict is reused before asking again.
+            Without this every request -- including each of the dozens a single
+            page load makes -- costs a subrequest, and with
+            `skip-jwt-bearer-tokens` that means a kanidm round trip per API call.
+
+            The cost is revocation lag: a removed group or a revoked token stays
+            usable for up to this long. Set to null to disable caching.
+          '';
+        };
+
         options.gateway.acmeHost = mkOption {
           type = types.nullOr types.str;
           default = outer.gateway.domain;
@@ -488,60 +503,87 @@ in
           # Map bodies are globbed in rather than written inline: the key values
           # are secrets, and a glob matching nothing keeps the build-time
           # `nginx -t` happy before agenix has ever run.
-          services.nginx.appendHttpConfig = lib.mkIf (gated != [ ]) ''
-            log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
+          services.nginx.appendHttpConfig = lib.mkMerge [
+            (lib.mkIf (config.gateway.authCacheTtl != null) ''
+              # Keyed on the whole credential AND the host: two callers must
+              # never share an entry, and a verdict for one vhost must not
+              # answer for another, since `allowed_groups` differs between them.
+              proxy_cache_path /var/cache/nginx/gateway-auth levels=1:2 keys_zone=gateway_auth:4m
+                               max_size=32m inactive=10m use_temp_path=off;
+            '')
+            (lib.mkIf (gated != [ ]) ''
+              log_format gw_api '$remote_addr $gw_caller "$request" $status $body_bytes_sent $request_time';
 
-            map "$http_x_api_key$http_authorization" $gw_caller {
-                default "-";
-                include ${globFile "callers"};
-            }
-
-            ${lib.concatMapStrings (e: ''
-              map ${headerVar e.api.header} $gw_key_${nginxName e.name} {
-                  default "";
-                  include ${globFile e.name};
+              map "$http_x_api_key$http_authorization" $gw_caller {
+                  default "-";
+                  include ${globFile "callers"};
               }
-            '') gated}
-          '';
 
-          services.nginx.virtualHosts = lib.mapAttrs (_: es: {
-            useACMEHost = config.gateway.acmeHost;
-            forceSSL = true;
-            locations = lib.listToAttrs (
-              lib.concatMap (
-                e:
-                [
-                  (lib.nameValuePair e.subpath {
-                    proxyPass = "${e.upstream}${e.subpath}";
-                    proxyWebsockets = e.websockets;
-                    # sub_filter cannot match through gzip, so the upstream has
-                    # to be asked for plaintext before anything can be injected.
-                    extraConfig = lib.optionalString (e.banner != null) ''
-                      proxy_set_header Accept-Encoding "";
-                      sub_filter_once on;
-                      sub_filter_types text/html;
-                      sub_filter '</body>' '<div style="position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:6px 12px;font:600 13px/1.4 system-ui,sans-serif;text-align:center;color:#1b1b1b;background:#f5c451;box-shadow:0 -1px 4px rgba(0,0,0,.3)">${e.banner}</div></body>';
-                    '';
-                  })
-                ]
-                ++ lib.optional e.api.enable (
-                  lib.nameValuePair e.api.subpath {
-                    proxyPass = "${e.upstream}${e.api.subpath}";
-                    # A longer prefix than the UI location, so it wins; the key
-                    # check replaces the session check rather than adding to it.
-                    extraConfig = ''
-                      auth_request off;
-                      if ($gw_key_${nginxName e.name} = "") { return 401; }
-                      proxy_set_header ${e.api.header} ${
-                        if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
-                      };
-                      access_log /var/log/nginx/api.log gw_api;
-                    '';
+                ${lib.concatMapStrings (e: ''
+                  map ${headerVar e.api.header} $gw_key_${nginxName e.name} {
+                      default "";
+                      include ${globFile e.name};
                   }
-                )
-              ) es
-            );
-          }) (lib.groupBy (e: e.domain) entries);
+                '') gated}
+            '')
+          ];
+
+          # Fold the auth cache onto the subrequest location the oauth2-proxy
+          # module writes. `extraConfig` is `types.lines`, so this appends to
+          # what that module already put there rather than replacing it.
+          services.nginx.virtualHosts = lib.mkMerge [
+            (lib.mapAttrs (_: es: {
+              useACMEHost = config.gateway.acmeHost;
+              forceSSL = true;
+              locations = lib.listToAttrs (
+                lib.concatMap (
+                  e:
+                  [
+                    (lib.nameValuePair e.subpath {
+                      proxyPass = "${e.upstream}${e.subpath}";
+                      proxyWebsockets = e.websockets;
+                      # sub_filter cannot match through gzip, so the upstream has
+                      # to be asked for plaintext before anything can be injected.
+                      extraConfig = lib.optionalString (e.banner != null) ''
+                        proxy_set_header Accept-Encoding "";
+                        sub_filter_once on;
+                        sub_filter_types text/html;
+                        sub_filter '</body>' '<div style="position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:6px 12px;font:600 13px/1.4 system-ui,sans-serif;text-align:center;color:#1b1b1b;background:#f5c451;box-shadow:0 -1px 4px rgba(0,0,0,.3)">${e.banner}</div></body>';
+                      '';
+                    })
+                  ]
+                  ++ lib.optional e.api.enable (
+                    lib.nameValuePair e.api.subpath {
+                      proxyPass = "${e.upstream}${e.api.subpath}";
+                      # A longer prefix than the UI location, so it wins; the key
+                      # check replaces the session check rather than adding to it.
+                      extraConfig = ''
+                        auth_request off;
+                        if ($gw_key_${nginxName e.name} = "") { return 401; }
+                        proxy_set_header ${e.api.header} ${
+                          if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
+                        };
+                        access_log /var/log/nginx/api.log gw_api;
+                      '';
+                    }
+                  )
+                ) es
+              );
+            }) (lib.groupBy (e: e.domain) entries))
+            (lib.mkIf (config.gateway.authCacheTtl != null) (
+              lib.genAttrs (lib.unique (map (e: e.domain) (lib.filter (e: e.sso) entries))) (_: {
+                locations."= /oauth2/auth".extraConfig = ''
+                  proxy_cache gateway_auth;
+                  proxy_cache_key "$host$http_authorization$http_cookie";
+                  proxy_cache_valid 200 204 ${config.gateway.authCacheTtl};
+                  # Denials are cached far more briefly: a newly granted group
+                  # should take effect quickly, a revoked one is bounded above.
+                  proxy_cache_valid 401 403 5s;
+                  proxy_cache_use_stale error timeout;
+                '';
+              })
+            ))
+          ];
 
           # Anything on this host that calls a gated service has to use the
           # public name so nginx can swap its key -- homepage's widgets are the
