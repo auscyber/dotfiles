@@ -679,6 +679,12 @@ in
                       extraConfig = ''
                         internal;
                         auth_request off;
+                        # Named explicitly: the default span name is just
+                        # this location's own path ("/gw-auth-${e.name}"),
+                        # which reads as the check having happened but not
+                        # who it actually asked -- oauth2-proxy, via the
+                        # proxy_pass two lines up.
+                        otel_span_name "gw-auth ${e.name} -> oauth2-proxy";
                         if ($gw_key_${nginxName e.name} != "") { return 204; }
                         proxy_set_header X-Scheme       $scheme;
                         proxy_set_header Content-Length "";

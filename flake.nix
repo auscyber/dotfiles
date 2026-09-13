@@ -105,7 +105,7 @@
       };
     };
     celler = {
-      url = "github:blitz/celler/main";
+      url = "github:auscyber/celler/main";
       inputs = {
         crane.follows = "crane";
         flake-compat.follows = "flake-compat";

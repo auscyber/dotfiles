@@ -186,15 +186,15 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1788721593,
-        "narHash": "sha256-6CqLm8zuAqBsmvm01uyJ3YdM6I6nblvo/ER9ZneEChg=",
-        "owner": "blitz",
+        "lastModified": 1789362579,
+        "narHash": "sha256-YDJ+t+hpJHgpTaGVGgqQFqFe5IzTWwlkROHm4Ia7D34=",
+        "owner": "auscyber",
         "repo": "celler",
-        "rev": "02a61c88c89080a43ad8f186711a548fe394c4c2",
+        "rev": "997c9dbaccb76a7a6082f839448b87dcda635240",
         "type": "github"
       },
       "original": {
-        "owner": "blitz",
+        "owner": "auscyber",
         "ref": "main",
         "repo": "celler",
         "type": "github"

@@ -54,12 +54,13 @@ in
       den.aspects.searchix
       den.aspects.plex
       den.aspects.gateway
+      den.aspects.service-accounts
       den.aspects.grafana
       den.aspects.tempo
       den.aspects.alloy
       den.aspects.homepage
       den.aspects.prowlarr
-      den.aspects.slskd
+      #      den.aspects.slskd
       den.aspects.sso
       den.aspects.samba
       (den.batteries.unfree [

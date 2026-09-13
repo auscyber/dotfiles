@@ -55,7 +55,7 @@ in
       apiOwner = "media";
       clients = [
         "prowlarr"
-        "soularr"
+        #        "soularr"
         "homepage"
       ];
     };

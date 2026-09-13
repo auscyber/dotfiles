@@ -144,6 +144,14 @@ in
       };
       server.addr = "0.0.0.0:8501";
       prometheus.enable = true;
+      # Traces to tempo, loopback and plaintext like kanidm's -- "insecure"
+      # is the scheme ncps's own grpcURL doc asks for to mean exactly that
+      # (unqualified/"https" would mean TLS, which tempo's receiver doesn't
+      # speak).
+      openTelemetry = {
+        enable = true;
+        grpcURL = "insecure://127.0.0.1:4317";
+      };
     };
   };
 
@@ -223,6 +231,15 @@ in
           environmentFile = scoped.celler.templates.env.path;
           useFlakeCompatOverlay = false;
           settings = {
+            tracing = {
+              serviceName = "cellerd";
+              otlp = {
+                enable = true;
+                endpoint = "insecure://127.0.0.1:4317";
+                protocol = "grpc";
+                headers.x-scope-orgid = "celler";
+              };
+            };
             listen = "[::]:${toString port}";
             storage = {
               type = "local";
@@ -455,14 +472,14 @@ in
         program = lib.getExe updateCellerKeys;
       };
     };
-  patchedInputs.celler = {
-    patches = [
-      ../../patches/celler/split.patch
-    ];
-  };
+  #  patchedInputs.celler = {
+  #    patches = [
+  #      ../../patches/celler/split.patch
+  #    ];
+  #  };
 
   ff.celler = {
-    url = "github:blitz/celler/main";
+    url = "github:auscyber/celler/main";
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.crane.follows = "crane";
     inputs.flake-parts.follows = "flake-parts";

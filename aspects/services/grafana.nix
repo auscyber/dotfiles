@@ -30,13 +30,30 @@
       '';
 
     nixos =
-      { config, scoped, ... }:
+      {
+        config,
+        lib,
+        scoped,
+        ...
+      }:
       let
         inherit (config.services.prometheus) port;
         url = "https://grafana.${config.gateway.domain}";
       in
       {
-        services.grafana = {
+        options.grafana.tempoCorrelations = lib.mkOption {
+          type = lib.types.listOf lib.types.attrs;
+          default = [ ];
+          description = ''
+            Extra entries for the Tempo datasource's `jsonData.correlations`.
+            An extension point rather than something to fill in here: a
+            correlation is specific to whatever it links tempo TO (e.g.
+            kanidm's opid-matched link lives in sso.nix, next to the kanidm
+            config it depends on, not here).
+          '';
+        };
+
+        config.services.grafana = {
           enable = true;
           settings = {
             server = {
@@ -85,6 +102,29 @@
               type = "tempo";
               uid = "tempo";
               url = "http://127.0.0.1:3200";
+              # Top-level, NOT under jsonData -- confirmed against grafana's
+              # own devenv/datasources.yaml example. Grafana silently
+              # ignores it as an unrecognised jsonData key if nested there,
+              # which is why this did nothing the first time.
+              correlations = config.grafana.tempoCorrelations;
+              jsonData = {
+                # Jump from a span to the logs around it. Filtered on trace ID
+                # rather than a derived field on the Loki side, since nothing
+                # here guarantees every log line carries one.
+                tracesToLogsV2 = {
+                  datasourceUid = "loki";
+                  spanStartTimeShift = "-5m";
+                  spanEndTimeShift = "5m";
+                  filterByTraceID = true;
+                };
+                # Jump from a span to its rate/error/duration metrics, and the
+                # service graph panel on the Tempo datasource page. Both read
+                # span-metrics / service-graph series that tempo's own
+                # metrics-generator has to be writing to prometheus for --
+                # nothing here turns that generation on by itself.
+                tracesToMetrics.datasourceUid = "prometheus";
+                serviceMap.datasourceUid = "prometheus";
+              };
             }
           ];
         };

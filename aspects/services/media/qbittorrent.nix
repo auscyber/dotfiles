@@ -42,7 +42,13 @@ in
         headerPrefix = "Bearer ";
         internalKey = false;
         clients = [
-          "prowlarr"
+          # Not "prowlarr": prowlarr has no download client of its own
+          # (downloadClient = false in prowlarr.nix) and never calls
+          # qbittorrent, so granting it a key here only fed a false positive
+          # into prowlarr-connect's target selection -- which reads "prowlarr
+          # holds a key for X" as "X belongs in prowlarr's Applications list"
+          # and then 400s because qbittorrent has no Applications schema
+          # entry to sync (it's a download client, not an indexer-sync app).
           "sonarr"
           "radarr"
           "lidarr"

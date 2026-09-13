@@ -97,7 +97,13 @@
               }:
               ''
                 pw="$(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})"
-                printf '%s' "$pw" | ${pkgs.libiconv}/bin/iconv -f UTF-8 -t UTF-16LE | \
+                # Not pkgs.libiconv: on glibc, that's headers only (glibc
+                # provides iconv natively, so the separate library is a
+                # link-time no-op there) -- no bin/iconv in its closure.
+                # And not bare pkgs.glibc either -- its default output is the
+                # library only; the executables (including iconv) are the
+                # separate `.bin` output.
+                printf '%s' "$pw" | ${pkgs.glibc.bin}/bin/iconv -f UTF-8 -t UTF-16LE | \
                   ${pkgs.openssl}/bin/openssl dgst -md4 -provider legacy -provider default | \
                   awk '{print toupper($NF)}'
               '';

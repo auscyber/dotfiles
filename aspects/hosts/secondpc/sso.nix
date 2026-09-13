@@ -101,6 +101,15 @@
           extraConfig = ''
             proxy_ssl_server_name on;
             proxy_ssl_name auth.ivymect.in;
+            # kanidm doesn't extract an incoming traceparent (checked: its
+            # own spans always root a fresh trace, so nginx.nix's
+            # `otel_trace_context propagate` can't actually join the two)
+            # -- but it does echo a per-request X-Kanidm-Opid header that
+            # equals the `kopid` attribute on its own root span. Scoped to
+            # this location rather than global: nowhere else proxies to
+            # kanidm, so `$upstream_http_x_kanidm_opid` would just be a
+            # silently-empty attribute everywhere else.
+            otel_span_attr "kanidm.opid" "$upstream_http_x_kanidm_opid";
           '';
         };
       };
@@ -233,9 +242,13 @@
             # addresses to trust rather than a bool -- so only nginx on loopback
             # can claim a client IP, not anything that reaches the port.
             http_client_address_info."x-forward-for" = [ "127.0.0.1" ];
-            # Traces to tempo, which grafana reads. Host:port only -- kanidm
-            # takes a gRPC endpoint here, not a URL, and rejects a scheme.
-            otel_grpc_endpoint = "127.0.0.1:4317";
+            # Traces to tempo, which grafana reads. Needs the scheme: kanidm
+            # hands this straight to tonic's OTLP exporter, which parses it as
+            # a URI. A bare host:port is accepted at config-parse time (this
+            # is what "rejects a scheme" used to be based on) but the
+            # exporter then fails to connect with no error surfaced anywhere
+            # kanidm logs -- it just never ships a span.
+            otel_grpc_endpoint = "http://127.0.0.1:4317";
             tls_chain = "/var/lib/acme/ivymect.in/fullchain.pem";
             tls_key = "/var/lib/acme/ivymect.in/key.pem";
           };
@@ -385,6 +398,76 @@
             ] (_: { });
           };
         };
+
+        # Neither is implied by `services.oauth2-proxy.enable` on its own.
+        # `oidcIssuerUrl` above is the PUBLIC https:// URL, not kanidm's
+        # loopback port, so oauth2-proxy's own startup (it fetches the OIDC
+        # discovery document immediately) goes through nginx to reach kanidm
+        # -- both have to be up, not just kanidm, or that fetch fails and
+        # oauth2-proxy comes up with no working provider until its next
+        # restart.
+        systemd.services.oauth2-proxy = {
+          after = [
+            "nginx.service"
+            "kanidm.service"
+          ];
+          wants = [
+            "nginx.service"
+            "kanidm.service"
+          ];
+          # See kanidm.service below for why. oauth2-proxy's own module
+          # already sets Restart=always and its own startLimit*; mkForce
+          # the latter two, or eval fails on the conflicting definitions
+          # (Restart itself needs no override -- "always" is already at
+          # least as aggressive as "on-failure").
+          serviceConfig.RestartSec = lib.mkForce "2s";
+          startLimitIntervalSec = lib.mkForce 120;
+          startLimitBurst = lib.mkForce 30;
+        };
+
+        # agenix's own activation script restarts a secret's `restartUnits`
+        # BEFORE it chowns the freshly-decrypted files to their configured
+        # owner (chown is deliberately deferred until after NixOS's own
+        # `users`/`groups` activation, in case the owner is a user being
+        # created in this same switch -- see
+        # /nix/store/*-agenix-patched/modules/age.nix, `agenixChown.deps`).
+        # kanidm's ExecStartPost reads `sso/idm-admin` immediately on start,
+        # so every switch that touches it races kanidm's restart against
+        # that chown and can lose -- observed taking up to ~2 minutes to
+        # resolve on a busy switch. systemd's bare defaults
+        # (StartLimitBurst=5 in 10s) don't give it enough attempts to
+        # outlast that; this does, so it self-heals instead of dying
+        # start-limit-hit and needing a manual `systemctl reset-failed`.
+        systemd.services.kanidm.serviceConfig = {
+          Restart = "on-failure";
+          RestartSec = "2s";
+        };
+        systemd.services.kanidm.startLimitIntervalSec = 120;
+        systemd.services.kanidm.startLimitBurst = 30;
+
+        # Click-through from an nginx span straight to kanidm's own trace
+        # for that request, rather than hunting by timestamp -- see the
+        # `otel_span_attr "kanidm.opid"` above for the value both sides
+        # agree on. `grafana.tempoCorrelations` is a bare extension point
+        # (grafana.nix); the correlation is kanidm-specific, so it's
+        # declared here, next to the config it depends on.
+        grafana.tempoCorrelations = [
+          {
+            targetUID = "tempo";
+            label = "kanidm trace (opid-matched)";
+            description = "kanidm roots its own trace per request; this is the same request by kopid, not the same trace.";
+            # `type` nests under `config`, not a sibling of it -- confirmed
+            # against grafana's own devenv/datasources.yaml example.
+            config = {
+              type = "query";
+              field = "kanidm.opid";
+              target = {
+                queryType = "traceql";
+                query = "{kopid=\"\${__value.raw}\"}";
+              };
+            };
+          }
+        ];
       };
   };
 }
