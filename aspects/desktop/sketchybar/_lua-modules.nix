@@ -5,7 +5,10 @@
 # Kept here rather than duplicated per-aspect since both the sketchybar config
 # itself and any WM that drives sketchybar directly from its own Lua runtime
 # (paneru) need the same theme colours and app-icon lookup.
-{ pkgs, lib }:
+{
+  pkgs,
+  lib,
+}:
 {
   # `colourConfig` is a stylix base16-derived attrset of bare hex strings
   # (e.g. `{ foreground = "e6e8ef"; ... }`); the generated module prefixes

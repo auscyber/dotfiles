@@ -5,6 +5,5 @@
 # patch LISTS live in ../../patched-inputs.nix; only the hashes differ per
 # partition. A missing entry just means "build it locally".
 {
-
   home-manager.hash = "sha256-M6qBzHj882YZyVctZ2kUO4eRxjpjkLlRhb4oOnFBBPM=";
 }

@@ -107,7 +107,6 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
       outputHashes = {
-        
       };
     };
     date = "2026-03-11";
@@ -125,7 +124,6 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-y25d7gccIdatEDycieRtXfWOqzkfzZBWOUEKS5AXPb8=/Cargo.lock";
       outputHashes = {
-        
       };
     };
   };

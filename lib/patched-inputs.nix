@@ -33,7 +33,9 @@ let
   # an `attribute '<input>' missing`. So drop any input-spec whose input isn't in
   # THIS flake's `realInputs` before anything forces it. `isInput = false` entries
   # patch non-input trees and carry their own `src`, so they're kept regardless.
-  applicableSpecs = lib.filterAttrs (name: spec: (spec.isInput or true) -> (realInputs ? ${name})) patchSpecs;
+  applicableSpecs = lib.filterAttrs (
+    name: spec: (spec.isInput or true) -> (realInputs ? ${name})
+  ) patchSpecs;
 
   # Fill in the same defaults the `patchedInputModule` option declarations
   # provide, so a spec only has to carry what differs.

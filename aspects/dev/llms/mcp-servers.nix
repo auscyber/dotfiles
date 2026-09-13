@@ -34,18 +34,16 @@
     # Disabled until that secret exists -- see above.
     # secrets.cloudflare_token.rekeyFile = ../../../secrets/cloudflare_token.age;
 
-    homeManager =
-      { pkgs, ... }:
-      {
-        programs.mcp = {
-          enable = true;
-          servers.zotero = {
-            command = "${pkgs.zotero-mcp}/bin/zotero-mcp";
-            args = [ "serve" ];
-            env.ZOTERO_LOCAL = "true"; # local API at localhost:23119, no creds
-          };
-          servers.deepwiki.url = "https://mcp.deepwiki.com/mcp";
+    homeManager = { pkgs, ... }: {
+      programs.mcp = {
+        enable = true;
+        servers.zotero = {
+          command = "${pkgs.zotero-mcp}/bin/zotero-mcp";
+          args = [ "serve" ];
+          env.ZOTERO_LOCAL = "true"; # local API at localhost:23119, no creds
         };
+        servers.deepwiki.url = "https://mcp.deepwiki.com/mcp";
       };
+    };
   };
 }

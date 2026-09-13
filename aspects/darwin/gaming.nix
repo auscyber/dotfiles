@@ -11,40 +11,38 @@
       taps.gcenx = "gcenx/homebrew-wine";
       casks = [ "gcenx/wine/game-porting-toolkit" ];
     };
-    darwin =
-      { pkgs, ... }:
-      {
-        # No `nix-homebrew` block here: enable/enableRosetta/user/mutableTaps/
-        # autoMigrate come from the included `homebrew` aspect, and trust is
-        # derived there from `brew.taps`/`brew.casks` -- declaring
-        # `taps.gcenx` and the fully-qualified cask above is enough to get
-        # both `gcenx/wine` trusted as a tap and
-        # `gcenx/wine/game-porting-toolkit` trusted as a cask.
-        environment.systemPackages = [
-          (pkgs.writeShellApplication {
-            name = "gpt-init-prefix";
-            text = ''
-              # Bootstraps a Wine prefix for the gcenx/wine game-porting-toolkit
-              # cask. Its wine64 needs Rosetta (nix-homebrew.enableRosetta,
-              # aspects/darwin/homebrew.nix, already turns that on) and the
-              # cask's own postflight handles de-quarantining/codesigning the
-              # app, so this only needs to run winecfg.
-              wine64="/Applications/Game Porting Toolkit.app/Contents/Resources/wine/bin/wine64"
-              prefix="''${GPT_PREFIX:-$HOME/my-game-prefix}"
+    darwin = { pkgs, ... }: {
+      # No `nix-homebrew` block here: enable/enableRosetta/user/mutableTaps/
+      # autoMigrate come from the included `homebrew` aspect, and trust is
+      # derived there from `brew.taps`/`brew.casks` -- declaring
+      # `taps.gcenx` and the fully-qualified cask above is enough to get
+      # both `gcenx/wine` trusted as a tap and
+      # `gcenx/wine/game-porting-toolkit` trusted as a cask.
+      environment.systemPackages = [
+        (pkgs.writeShellApplication {
+          name = "gpt-init-prefix";
+          text = ''
+            # Bootstraps a Wine prefix for the gcenx/wine game-porting-toolkit
+            # cask. Its wine64 needs Rosetta (nix-homebrew.enableRosetta,
+            # aspects/darwin/homebrew.nix, already turns that on) and the
+            # cask's own postflight handles de-quarantining/codesigning the
+            # app, so this only needs to run winecfg.
+            wine64="/Applications/Game Porting Toolkit.app/Contents/Resources/wine/bin/wine64"
+            prefix="''${GPT_PREFIX:-$HOME/my-game-prefix}"
 
-              if [[ ! -x "$wine64" ]]; then
-              	echo "wine64 not found at '$wine64' -- is the game-porting-toolkit cask installed?" >&2
-              	exit 1
-              fi
+            if [[ ! -x "$wine64" ]]; then
+            	echo "wine64 not found at '$wine64' -- is the game-porting-toolkit cask installed?" >&2
+            	exit 1
+            fi
 
-              echo "Opening winecfg for '$prefix' -- select 'Windows 10' as the OS, then close it."
-              WINEPREFIX="$prefix" arch -x86_64 "$wine64" winecfg
+            echo "Opening winecfg for '$prefix' -- select 'Windows 10' as the OS, then close it."
+            WINEPREFIX="$prefix" arch -x86_64 "$wine64" winecfg
 
-              echo "Prefix ready. Install/run a Windows app in it with:"
-              echo "  WINEPREFIX='$prefix' arch -x86_64 '$wine64' /path/to/installer.exe"
-            '';
-          })
-        ];
-      };
+            echo "Prefix ready. Install/run a Windows app in it with:"
+            echo "  WINEPREFIX='$prefix' arch -x86_64 '$wine64' /path/to/installer.exe"
+          '';
+        })
+      ];
+    };
   };
 }

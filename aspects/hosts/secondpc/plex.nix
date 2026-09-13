@@ -5,7 +5,40 @@
 # `jellyfin.nix` is kept around (unincluded) in case we ever switch back.
 {
   den.aspects.plex = {
-    includes = [ den.aspects.secondpc-web ];
+    includes = [
+      den.aspects.secondpc-web
+      den.aspects.gateway
+      den.aspects.homepage
+    ];
+
+    # Tautulli watches plex's activity and history, so it is plex's business
+    # rather than a service in its own right -- it has nothing to do if plex is
+    # not here, and its `enable` follows from the entry name, so turning plex
+    # off does not leave it advertising a dead vhost.
+    gated.tautulli.upstream = "http://127.0.0.1:8181";
+
+    homepage =
+      { config, ... }:
+      {
+        plex = {
+          group = "Media";
+          href = "https://media.pierlot.com.au";
+          icon = "plex.svg";
+          # Plex uses an X-Plex-Token minted by signing in, so unlike the *arr
+          # keys it cannot be provisioned -- paste one to light this up.
+          widget = {
+            type = "plex";
+            url = "http://127.0.0.1:32400";
+          };
+        };
+        # Tautulli generates its own API key on first run with no way to set
+        # it, so this stays a link until a key is pasted in.
+        tautulli = {
+          group = "Media";
+          href = config.gateway.services.tautulli.url;
+          icon = "tautulli.svg";
+        };
+      };
 
     vhosts."media.pierlot.com.au" = {
       useACMEHost = "media.pierlot.com.au";
@@ -59,6 +92,15 @@
           openFirewall = true;
         };
 
+        # Loopback only: nginx is the way in and oauth2-proxy is in front of it.
+        # `media` gets it read access to the library so its per-file stats line
+        # up with what plex sees.
+        services.tautulli = {
+          enable = true;
+          port = 8181;
+          group = "media";
+        };
+
         # Shared group for the media library: plex plus whoever should browse
         # it locally get read/write onto /mnt/hdd/Media through it.
         users.groups.media = { };
@@ -68,10 +110,12 @@
         # port) run at boot without auscyber needing an active login session.
         users.users.auscyber.linger = true;
 
+        # setgid, so every directory the *arr stack or qbittorrent creates
+        # underneath inherits `media` instead of the creator's own group.
         systemd.tmpfiles.settings.media."/mnt/hdd/Media"."d" = {
           user = "plex";
           group = "media";
-          mode = "0770";
+          mode = "2770";
         };
 
         security.acme.certs."media.pierlot.com.au" = {

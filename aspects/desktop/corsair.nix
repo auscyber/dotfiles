@@ -1,15 +1,20 @@
-{ den, lib, ... }:
 {
-
+  den,
+  lib,
+  ...
+}:
+{
   den.aspects.corsair.includes = [ den.aspects.rgb ];
   den.aspects.corsair.gui.nixos =
-    { pkgs, user, ... }:
+    {
+      pkgs,
+      user,
+      ...
+    }:
     let
       installDir = "/home/${user.name}/.openlinkhub";
     in
-
     {
-
       services.udev.packages = with pkgs; [ openlinkhub ];
       environment.systemPackages = with pkgs; [ openlinkhub ];
       systemd.services.openlinkhub = {

@@ -43,7 +43,6 @@
   den.aspects.qemu = {
     provides.to-users.homeManager = { pkgs, ... }: {
       home.packages = with pkgs; [ virt-manager ];
-
     };
 
     nixos = {
@@ -58,7 +57,6 @@
       # Enable USB redirection (optional)
       virtualisation.spiceUSBRedirection.enable = true;
       users.users.auscyber.extraGroups = [ "libvirtd" ];
-
     };
   };
   den.aspects.auspc = {
@@ -295,7 +293,6 @@
 
     provides.auspc = {
       includes = [
-
         den.aspects.lix
         den.aspects.plasma
         den.batteries.primary-user

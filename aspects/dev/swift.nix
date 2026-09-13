@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 {
   den.aspects.swift = {
     includes = [ den.aspects.lspmux ];
@@ -10,6 +14,5 @@
         opencode = "swift-ls";
       };
     };
-
   };
 }

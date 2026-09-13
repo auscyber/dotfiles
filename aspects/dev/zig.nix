@@ -4,7 +4,6 @@
   ...
 }:
 {
-
   den.aspects.zig = {
     includes = [ den.aspects.lspmux ];
     lsp-servers = { pkgs, ... }: {
@@ -19,7 +18,5 @@
     homeManager = { pkgs, ... }: {
       home.packages = with pkgs; [ zig ];
     };
-
   };
-
 }

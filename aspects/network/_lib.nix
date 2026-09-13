@@ -1,6 +1,4 @@
-{
-  lib,
-}:
+{ lib }:
 let
   # 6 hex chars of sha256 → integer in 2..254. Server lives at .1.
   hexToInt = s: (builtins.fromTOML "v=0x${s}").v;

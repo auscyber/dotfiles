@@ -50,6 +50,13 @@
       den.aspects.secondpc-web
       den.aspects.searchix
       den.aspects.plex
+      den.aspects.gateway
+      den.aspects.grafana
+      den.aspects.alloy
+      den.aspects.homepage
+      den.aspects.prowlarr
+      den.aspects.slskd
+      den.aspects.sso
       den.aspects.samba
       (den.batteries.unfree [
         "intel-ocl"
@@ -73,6 +80,10 @@
       {
         # Host identity / boot
         networking.hostId = "4f6f802e";
+
+        # Zone the gated service aspects publish under; they name only their
+        # own subdomain, so this is the one place the domain appears.
+        gateway.domain = "ivymect.in";
 
         # Hardware detection (kernel modules, microcode, ...) comes from the
         # `facter` aspect reading this report instead of a hand-written

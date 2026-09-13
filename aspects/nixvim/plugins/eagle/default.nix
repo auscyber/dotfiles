@@ -1,8 +1,4 @@
-{
-  den,
-  ...
-}:
-{
+{ den, ... }: {
   den.aspects.nixvim = {
     nvim =
       { lib, ... }:

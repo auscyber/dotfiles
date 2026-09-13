@@ -1,5 +1,4 @@
 {
   den.aspects.agentic-code = {
-
   };
 }

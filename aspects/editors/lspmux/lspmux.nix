@@ -128,15 +128,20 @@ let
     darwin = "Library/Application Support/lspmux";
   };
   socketOf = home: dir: "${home}/${dir}/lspmux.sock";
-  mkLspmuxConfig = socket: lspmux // {
-    listen = socket;
-    connect = socket;
-  };
+  mkLspmuxConfig =
+    socket:
+    lspmux
+    // {
+      listen = socket;
+      connect = socket;
+    };
 
   # Env var names `lspmux client` strips before forwarding during its handshake
   # (the `!`-prefixed `pass_environment` entries). nvim's direct-socket path
   # rebuilds the forwarded env itself, so it filters by the same list.
-  droppedEnv = map (lib.removePrefix "!") (builtins.filter (lib.hasPrefix "!") lspmux.pass_environment);
+  droppedEnv = map (lib.removePrefix "!") (
+    builtins.filter (lib.hasPrefix "!") lspmux.pass_environment
+  );
 
   # opencode's built-in LSP server ids. Only these can have their `command`
   # overridden with the shim without also supplying `extensions`, so the opencode
@@ -596,7 +601,7 @@ in
       }:
       let
         socketRel = if pkgs.stdenv.hostPlatform.isDarwin then lspmuxDir.darwin else lspmuxDir.linux;
-        socketExpr = ''vim.env.HOME .. ${builtins.toJSON "/${socketRel}/lspmux.sock"}'';
+        socketExpr = "vim.env.HOME .. ${builtins.toJSON "/${socketRel}/lspmux.sock"}";
 
         # The env `lspmux client` would forward during its handshake, rebuilt for
         # the direct-socket connection: nvim's full environment minus the names

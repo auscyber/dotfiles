@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}:
+{ lib, ... }:
 let
   # Identifies our own entry in a kernel's `kernelPatches` so `untrimmed` can
   # strip it back off again before measuring.
@@ -66,7 +63,10 @@ let
   # after `make localmodconfig`, both from one source tree so the diff cannot
   # straddle two kernel versions.
   localmodconfig =
-    { kernel, lsmod }:
+    {
+      kernel,
+      lsmod,
+    }:
     (untrimmed kernel).configfile.overrideAttrs (old: {
       pname = "linux-config-localmodconfig";
       buildPhase = old.buildPhase + ''
@@ -108,27 +108,25 @@ in
       ;
   };
 
-  perSystem =
-    { pkgs, ... }:
-    {
-      # Regenerates aspects/hosts/<host>/kernel-trim.json. Must run ON the host
-      # being trimmed — it reads that machine's modprobed.db.
-      apps.gen-kernel-trim = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "gen-kernel-trim";
-            runtimeInputs = with pkgs; [
-              nix
-              jq
-              gawk
-              coreutils
-            ];
-            text = builtins.readFile ../../../scripts/gen-kernel-trim.sh;
-          }
-        );
-      };
+  perSystem = { pkgs, ... }: {
+    # Regenerates aspects/hosts/<host>/kernel-trim.json. Must run ON the host
+    # being trimmed — it reads that machine's modprobed.db.
+    apps.gen-kernel-trim = {
+      type = "app";
+      program = lib.getExe (
+        pkgs.writeShellApplication {
+          name = "gen-kernel-trim";
+          runtimeInputs = with pkgs; [
+            nix
+            jq
+            gawk
+            coreutils
+          ];
+          text = builtins.readFile ../../../scripts/gen-kernel-trim.sh;
+        }
+      );
     };
+  };
 
   # Shrink the kernel down to the drivers this machine actually loads, by
   # feeding `make localmodconfig` a module list built from modprobed.db plus the
@@ -152,6 +150,8 @@ in
     in
     {
       # Inert until `nix run .#gen-kernel-trim`, run on that host, writes it.
-      boot.kernelPatches = lib.optional (builtins.pathExists file) (patch { inherit file; });
+      boot.kernelPatches = lib.optional (builtins.pathExists file) (patch {
+        inherit file;
+      });
     };
 }

@@ -22,12 +22,16 @@
   };
 
   den.aspects.razer = {
-    gui.nixos = { user, pkgs, ... }: {
-      hardware.openrazer.enable = true;
-      users.users.${user.name}.extraGroups = [ "openrazer" ];
-
-    };
-
+    gui.nixos =
+      {
+        user,
+        pkgs,
+        ...
+      }:
+      {
+        hardware.openrazer.enable = true;
+        users.users.${user.name}.extraGroups = [ "openrazer" ];
+      };
   };
 
   # Lets 8BitDo's Windows Firmware Updater tool (run under Wine) see the

@@ -130,7 +130,9 @@ let
         aspects = prev.aspects ++ builtins.attrNames declared;
         nestedAspects =
           prev.nestedAspects
-          ++ builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (builtins.attrNames declared);
+          ++ builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (
+            builtins.attrNames declared
+          );
         # A file's raw `den.hosts.<system>.<name>` definition carries no resolved
         # `class` (that is den-injected), so look the host up in the resolved
         # `allHosts` by name to read its authoritative class.
@@ -230,13 +232,20 @@ let
   # walk above finds nothing to stub -- while a dozen base aspects do write
   # `den.aspects.packages.<name>`. Read those definitions straight off their own
   # `den.*` locations instead.
-  packageStubs = builtins.concatMap (
-    d:
-    let
-      declared = d.value.aspects or { };
-    in
-    builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (builtins.attrNames declared)
-  ) (builtins.filter (d: (builtins.match ".*/packages/.*" d.file) != null) options.den.definitionsWithLocations);
+  packageStubs =
+    builtins.concatMap
+      (
+        d:
+        let
+          declared = d.value.aspects or { };
+        in
+        builtins.concatMap (name: aspectLeafPaths [ name ] declared.${name}) (builtins.attrNames declared)
+      )
+      (
+        builtins.filter (
+          d: (builtins.match ".*/packages/.*" d.file) != null
+        ) options.den.definitionsWithLocations
+      );
 
   stubs = lib.sort (a: b: a < b) (
     lib.unique (
@@ -269,11 +278,9 @@ let
     # evaluated with another bucket's aspects imported as well.'';
 
   bucketBlock =
-    name: paths:
-    "    ${name} = [\n${lib.concatMapStringsSep "\n" (p: "      \"${p}\"") paths}\n    ];";
+    name: paths: "    ${name} = [\n${lib.concatMapStringsSep "\n" (p: "      \"${p}\"") paths}\n    ];";
 
-  depsBlock =
-    name: names: "    ${name} = [ ${lib.concatMapStringsSep " " (n: "\"${n}\"") names} ];";
+  depsBlock = name: names: "    ${name} = [ ${lib.concatMapStringsSep " " (n: "\"${n}\"") names} ];";
 
   partitionMapText = ''
     ${fileHeader}
@@ -301,30 +308,28 @@ in
     map = bucketMap;
   };
 
-  perSystem =
-    { pkgs, ... }:
-    {
-      apps.write-partition-map = {
-        type = "app";
-        program = lib.getExe (
-          pkgs.writeShellApplication {
-            name = "write-partition-map";
-            runtimeInputs = [ pkgs.coreutils ];
-            text = ''
-              set -euo pipefail
-              repo="$PWD"
-              if [ ! -e "$repo/flake.nix" ]; then
-              	echo "error: run from the flake root (no flake.nix in $repo)" >&2
-              	exit 2
-              fi
-              cat >"$repo/partition-map.nix" <<'PARTITIONMAP'
-              ${partitionMapText}
-              PARTITIONMAP
-              echo "wrote $repo/partition-map.nix"
-              echo "now run 'nix run .#write-flake' and confirm the base evaluation still succeeds." >&2
-            '';
-          }
-        );
-      };
+  perSystem = { pkgs, ... }: {
+    apps.write-partition-map = {
+      type = "app";
+      program = lib.getExe (
+        pkgs.writeShellApplication {
+          name = "write-partition-map";
+          runtimeInputs = [ pkgs.coreutils ];
+          text = ''
+            set -euo pipefail
+            repo="$PWD"
+            if [ ! -e "$repo/flake.nix" ]; then
+            	echo "error: run from the flake root (no flake.nix in $repo)" >&2
+            	exit 2
+            fi
+            cat >"$repo/partition-map.nix" <<'PARTITIONMAP'
+            ${partitionMapText}
+            PARTITIONMAP
+            echo "wrote $repo/partition-map.nix"
+            echo "now run 'nix run .#write-flake' and confirm the base evaluation still succeeds." >&2
+          '';
+        }
+      );
     };
+  };
 }

@@ -9,6 +9,12 @@
     includes = [
       den.aspects.agenix-rekey
       den.aspects.user-pwd
+      den.aspects.gateway
+      den.aspects.sonarr
+      den.aspects.radarr
+      den.aspects.lidarr
+      den.aspects.bazarr
+      den.aspects.qbittorrent
     ];
 
     nixos =
@@ -22,10 +28,14 @@
       {
         # Media + downloading
         services.audiobookshelf.enable = true;
-        users.groups.media = { };
+        # uid/gid pinned because the soularr container (slskd.nix) can only
+        # name the account numerically. On a host that already allocated `media`
+        # dynamically this needs a one-off `chown -R media:media /mnt/hdd`.
+        users.groups.media.gid = 700;
         users.users.media = {
           isSystemUser = true;
           group = "media";
+          uid = 700;
         };
         services.navidrome = {
           enable = true;
@@ -35,48 +45,27 @@
             MusicFolder = "/mnt/hdd/Music";
           };
         };
-        services.lidarr = {
-          enable = true;
-          user = "media";
-        };
-        # urlbase matches the nginx path-routing in web.nix's arr.ivymect.in
-        # vhost (freeform servarr setting -> config.xml's <UrlBase>).
-        services.sonarr = {
-          enable = true;
-          settings.server.urlbase = "/sonarr";
-        };
-        services.radarr = {
-          enable = true;
-          settings.server.urlbase = "/radarr";
-        };
-        services.bazarr.enable = true;
-        # Indexer manager: holds the actual indexer/tracker definitions and
-        # syncs them out to sonarr/radarr/lidarr's Indexers via its "Apps"
-        # sync -- there is no declarative NixOS option for indexers
-        # themselves, so add them through the prowlarr web UI post-deploy.
-        services.prowlarr = {
-          enable = true;
-          settings.server.urlbase = "/prowlarr";
-        };
-        services.qbittorrent = {
-          enable = true;
-          webuiPort = 9090;
-          openFirewall = true;
-        };
+        # sonarr / radarr / lidarr / bazarr / qbittorrent each live in their own
+        # aspect under ../../services/media, where their gateway entry and auth
+        # config sit next to the service itself. prowlarr is in
+        # ../../services/prowlarr.nix, with the flaresolverr it drives.
+
         # Request frontend (browse/request shows+movies, forwards to
         # sonarr/radarr) -- nixpkgs merged jellyseerr/overseerr into one
         # package, still supports Plex as its backend via its own setup
-        # wizard. Plex stats/monitoring dashboard alongside it.
+        # wizard. Tautulli moved to plex.nix, which is whose stats they are.
         services.seerr.enable = true;
-        services.tautulli.enable = true;
 
-        # *arr apps and the download client all need write access to the
-        # shared library at /mnt/hdd/Media (owned by the `media` group, see
-        # plex.nix) so imports/hardlinks land where plex/jellyfin can see them.
-        users.users.sonarr.extraGroups = [ "media" ];
-        users.users.radarr.extraGroups = [ "media" ];
-        users.users.bazarr.extraGroups = [ "media" ];
-        users.users.qbittorrent.extraGroups = [ "media" ];
+        # Callers of the gated APIs that are not gated services themselves, so
+        # nothing registers them automatically.
+        gateway.serviceAccounts = {
+          seerr.description = "Request frontend, talks to sonarr and radarr";
+          homepage = {
+            description = "Dashboard widgets";
+            # Its widgets read the keys from the environment.
+            envPrefix = "HOMEPAGE_VAR_";
+          };
+        };
 
         # --- user password: ivy-password (source, intermediary) hashed into
         #     ivy-pwd-hash (generated via openssl passwd -6). ---
@@ -94,15 +83,15 @@
           '';
         services.vaultwarden.environmentFile = config.age.secrets."vaultwarden.env".path;
 
-        systemd.tmpfiles.settings.music = {
+        systemd.tmpfiles.settings.media = {
           "/mnt/hdd/AudioBooks"."d" = {
             user = "audiobookshelf";
-            group = "music";
+            group = "media";
             mode = "0770";
           };
           "/mnt/hdd/Music/Downloads"."d" = {
-            user = "music";
-            group = "music";
+            user = "media";
+            group = "media";
             mode = "0770";
           };
         };

@@ -97,7 +97,6 @@ let
   # aspect's `secrets.identity` deploys here. Never a store path: the key stays
   # out of the binary cache, and `root:nixbld 0640` is what lets a build read it
   # and nothing else.
-
   identityFile = "/run/agenix/secrets/codesign/identity";
 
   # What TCC records as the client for every shimmed program, so it is as
@@ -489,7 +488,11 @@ in
   # the `optionalAttrs` out of the body and into the attribute keeps the guard
   # and breaks the cycle.
   perSystem =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      ...
+    }:
     {
       # The darwin guard lives under `packages` as `mkIf`, not at the module's
       # top level: a `perSystem` body of `optionalAttrs pkgs.<x> { ... }` forces
@@ -565,7 +568,11 @@ in
     ];
 
     darwin =
-      { config, pkgs, ... }:
+      {
+        config,
+        pkgs,
+        ...
+      }:
       {
         # What gets PLANTED, as opposed to `signed` above which is what gets
         # signed. They are different questions and cannot share a list.

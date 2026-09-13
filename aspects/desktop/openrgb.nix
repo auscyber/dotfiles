@@ -6,7 +6,6 @@
       motherboard = "amd";
       server.port = 6742;
     };
-
   };
 
   den.aspects.rgb.gui.provides.to-users.homeManager = { pkgs, ... }: {

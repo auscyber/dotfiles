@@ -31,43 +31,19 @@
           proxyWebsockets = true;
         };
       };
-      "lidarr.ivymect.in" = {
+      # lidarr / arr / bazarr / qbittorrent are absent on purpose: the gateway
+      # builds those vhosts, certificate included, from each service aspect's
+      # own `gated` entry.
+      # loki, on the same apex as everything else so one oauth2-proxy cookie
+      # covers it (see sso.nix). The older logs.pierlot.com.au vhost in
+      # media.nix stays on basic auth for whatever is already pointed at it.
+      "logs.ivymect.in" = {
         useACMEHost = "ivymect.in";
         forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:8686"; # lidarr default
-      };
-      # sonarr/radarr/prowlarr share one vhost, path-routed, each configured
-      # (media.nix) with a matching `settings.server.urlbase` so the app
-      # itself generates links/assets under that prefix -- location and
-      # proxyPass both end in the same "/<app>/" so nginx passes the path
-      # through unchanged. bazarr has no urlBase option in its NixOS module
-      # (or upstream config), so it can't be path-routed the same way and
-      # keeps its own subdomain below.
-      "arr.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/sonarr/" = {
-          proxyPass = "http://127.0.0.1:8989/sonarr/";
-          proxyWebsockets = true; # SignalR live updates
+        locations."/" = {
+          proxyPass = "http://localhost:3100";
+          recommendedProxySettings = true;
         };
-        locations."/radarr/" = {
-          proxyPass = "http://127.0.0.1:7878/radarr/";
-          proxyWebsockets = true;
-        };
-        locations."/prowlarr/" = {
-          proxyPass = "http://127.0.0.1:9696/prowlarr/";
-          proxyWebsockets = true;
-        };
-      };
-      "bazarr.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:6767"; # bazarr default
-      };
-      "qbittorrent.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:9090"; # qbittorrent webui
       };
       "requests.ivymect.in" = {
         useACMEHost = "ivymect.in";
@@ -161,13 +137,12 @@
 
         # AriaNg (static UI) + aria2's JSON-RPC (same-origin, so the
         # magnet-handler page needs no CORS setup) + the magnet-handler page
-        # itself. basicAuthFile reuses media.nix's `ivy` htpasswd secret,
-        # since aria2's RPC has no auth of its own beyond binding to
-        # loopback -- this vhost is the only thing that can reach it.
+        # itself. aria2's RPC has no auth of its own beyond binding to
+        # loopback, so this vhost is the only thing that can reach it -- and
+        # sso.nix puts the whole vhost behind oauth2-proxy.
         services.nginx.virtualHosts."aria2.ivymect.in" = {
           useACMEHost = "ivymect.in";
           forceSSL = true;
-          basicAuthFile = config.age.secrets.htpasswd.path;
           root = pkgs.ariang;
           locations."/jsonrpc".proxyPass = "http://127.0.0.1:6800/jsonrpc";
           locations."/magnet-handler/".alias = "${magnetHandler}/";

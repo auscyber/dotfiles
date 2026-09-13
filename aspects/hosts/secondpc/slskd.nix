@@ -3,16 +3,22 @@
   inputs,
   ...
 }:
-# slskd (soulseek daemon) + its soularr (lidarr<->slskd) bridge, split out of the
-# secondpc media stack into a standalone aspect. Nothing includes this — add
-# `den.aspects.slskd` to a host's includes to run it. Secrets here (slskd.env,
-# slskd_soularr_apikey, slskd_secrets_env, lidar_key) still need `nix run .#rekey`
-# and `nix run .#gen-secrets` on whichever host picks it up.
+# slskd (soulseek daemon) + its soularr (lidarr<->slskd) bridge. Everything here
+# runs as `music`, the same user lidarr and navidrome use, so a grab lands in
+# /mnt/hdd/Music/Downloads already owned by the account that imports it.
+# Secrets (slskd.env, slskd_soularr_apikey, slskd_secrets_env, lidar_key) need
+# `nix run .#rekey` and `nix run .#gen-secrets` before deploy.
 {
   den.aspects.slskd = {
     includes = [
       den.aspects.agenix-rekey
       den.aspects.user-pwd
+      den.aspects.gateway
+      den.aspects.lidarr
+      # /mnt/hdd/Music, the `music` user and lidarr itself live in media.nix,
+      # which the secondpc host aspect carries; secondpc-web owns the wildcard
+      # `ivymect.in` cert the vhost below rides on.
+      den.aspects.secondpc-web
     ];
 
     nixos =
@@ -23,47 +29,51 @@
         scoped,
         ...
       }:
+      let
+        downloads = "/mnt/hdd/Music/Downloads";
+        # The container can only name the account numerically, hence the pinned
+        # uid/gid in media.nix.
+        mediaId = "${toString config.users.users.media.uid}:${toString config.users.groups.media.gid}";
+      in
       {
         imports = [ inputs.arion.nixosModules.arion ];
 
         services.slskd = {
           enable = true;
           openFirewall = true;
-          user = "music";
+          user = "media";
+          group = "media";
           settings = {
             shares.directories = [ "/mnt/hdd/Music" ];
-            directories.downloads = "/mnt/hdd/Music/Downloads";
+            directories.downloads = downloads;
             web.ip_address = "0.0.0.0";
             web.logging = true;
           };
         };
+        systemd.services.slskd.serviceConfig.UMask = "0002";
 
         # --- soularr container (arion/docker), replaces the old compose stack ---
         virtualisation.arion = {
           backend = "docker";
           projects.soularr = {
             serviceName = "soularr";
-            settings = {
-              networks.main.ipam = {
-                driver = "default";
-                config = [ { subnet = "172.28.0.0/24"; } ];
+            settings.services.soularr.service = {
+              image = "mrusse08/soularr:latest";
+              container_name = "soularr";
+              hostname = "soularr";
+              user = mediaId;
+              environment = {
+                TZ = "Australia/Melbourne";
+                SCRIPT_INTERVAL = 300;
               };
-              services.soularr.service = {
-                image = "mrusse08/soularr:latest";
-                container_name = "soularr";
-                hostname = "soularr";
-                user = "1000:1000";
-                environment = {
-                  TZ = "Australia/Melbourne";
-                  SCRIPT_INTERVAL = 300;
-                };
-                volumes = [
-                  "/mnt/hdd/Music/Downloads:/downloads"
-                  "/var/lib/soularr:/data"
-                ];
-                network_mode = "host";
-                restart = "unless-stopped";
-              };
+              volumes = [
+                "${downloads}:/downloads"
+                "/var/lib/soularr:/data"
+              ];
+              # Host networking is what lets config.ini below talk to lidarr and
+              # slskd over loopback instead of back out through nginx.
+              network_mode = "host";
+              restart = "unless-stopped";
             };
           };
         };
@@ -84,7 +94,8 @@
             ${lib.getExe pkgs.openssl} rand -base64 48
           '';
         age.secrets."slskd.env" = {
-          owner = "music";
+          owner = "media";
+          group = "media";
           restartUnits = [ "slskd.service" ];
           generator = {
             dependencies = {
@@ -118,10 +129,14 @@
 
         # --- soularr: lidarr<->slskd bridge. config.ini is an agenix template
         #     with the lidarr + slskd api keys injected as placeholders. ---
-        age.secrets.lidar_key.rekeyFile = ./lidar_key.age;
+        #
+        # soularr is a caller of lidarr's API, so it gets a key of its own from
+        # the gateway rather than lidarr's real one, and reaches lidarr through
+        # nginx so the access log attributes the calls to it.
+        gateway.serviceAccounts.soularr.description = "slskd <-> lidarr bridge";
         age.templates.soularr = {
           dependencies = {
-            lidar_key = config.age.secrets.lidar_key;
+            lidar_key = config.age.secrets."gateway/lidarr-soularr";
             slskd_api_key = config.age.secrets.slskd_soularr_apikey;
           };
           content =
@@ -133,15 +148,15 @@
             pkgs.lib.generators.toINI { } {
               Lidarr = {
                 api_key = placeholders.lidar_key;
-                host_url = "https://lidarr.ivymect.in";
-                download_dir = "/mnt/hdd/Music/Downloads";
+                host_url = "https://lidarr.${config.gateway.domain}";
+                download_dir = downloads;
                 disable_sync = "False";
               };
               Slskd = {
                 api_key = placeholders.slskd_api_key;
-                host_url = "http://127.0.0.1:5030";
+                host_url = "http://127.0.0.1:${toString config.services.slskd.settings.web.port}";
                 url_base = "/";
-                download_dir = "/mnt/hdd/Music/Downloads";
+                download_dir = downloads;
                 delete_searches = "False";
                 stalled_timeout = 3600;
               };
@@ -174,14 +189,14 @@
             };
           restartUnits = [ "soularr.service" ];
           symlink = false;
-          owner = "1000";
-          group = "1000";
+          owner = "media";
+          group = "media";
           path = "/var/lib/soularr/config.ini";
         };
 
         systemd.tmpfiles.settings.soularr."/var/lib/soularr"."d" = {
-          user = "1000";
-          group = "1000";
+          user = "media";
+          group = "media";
           mode = "0770";
         };
       };

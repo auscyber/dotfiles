@@ -18,7 +18,6 @@ let
     "secrets"
     "templates"
   ];
-
   # ---------------------------------------------------------------------------
   # Why terminal class bodies (nixos / darwin / homeManager) must name the scope
   # -- `scoped.<aspect>.secrets.<key>` -- while `secrets`/`templates` bodies do
@@ -46,7 +45,6 @@ let
   # the scope name stays explicit. `__entityKind` does not rescue it: the
   # os-from-user-scope case is ambiguous by construction.
   # ---------------------------------------------------------------------------
-
 in
 {
   den.classes.scoped = { };

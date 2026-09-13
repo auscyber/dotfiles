@@ -136,9 +136,9 @@ let
   # i.e. when a flake.nix is being written or checked, never during a host build.
   bucketOwn =
     bucket:
-    builtins.removeAttrs (ffLib.inputsExpr
-      config.partitions.${bucket}.module.flake-file.inputs
-    ) (baseInputNames ++ depInputNames bucket);
+    builtins.removeAttrs (ffLib.inputsExpr config.partitions.${bucket}.module.flake-file.inputs) (
+      baseInputNames ++ depInputNames bucket
+    );
 
   # Inputs a bucket sees only because it imports a dep's aspects. They belong to
   # the dep's sub-flake, so they must not count as this bucket's own: leaving
@@ -146,8 +146,7 @@ let
   # the `shared` test in `hoistedNames` below, hoisting a partitioned input all
   # the way back into the root flake.lock, which is the one thing the whole
   # partition mechanism exists to prevent.
-  depInputNames =
-    bucket: builtins.concatMap (d: builtins.attrNames (bucketOwn d)) (depsOf bucket);
+  depInputNames = bucket: builtins.concatMap (d: builtins.attrNames (bucketOwn d)) (depsOf bucket);
 
   followsTargetsOf =
     specs:
@@ -225,9 +224,7 @@ let
           # `ff.*` declarations are serialized here too. They are already
           # declared in the dep's own partitions/<dep>/flake.nix, and `subInputs`
           # merges them in from there -- writing them again would fork the lock.
-          own = builtins.removeAttrs serialized (
-            baseInputNames ++ hoistedNames ++ depInputNames bucket
-          );
+          own = builtins.removeAttrs serialized (baseInputNames ++ hoistedNames ++ depInputNames bucket);
 
           # A `follows` can only name an input of the flake it is written in, so
           # a base input that a bucket input follows has to be carried into the
