@@ -24,12 +24,14 @@
           group = "Media";
           href = "https://media.pierlot.com.au";
           icon = "plex.svg";
-          # Plex uses an X-Plex-Token minted by signing in, so unlike the *arr
-          # keys it cannot be provisioned -- paste one to light this up.
-          widget = {
-            type = "plex";
-            url = "http://127.0.0.1:32400";
-          };
+          # No widget on purpose. Plex authenticates with an X-Plex-Token,
+          # minted by signing in to plex.tv, so unlike the *arr keys it cannot
+          # be generated -- and a widget without one does not sit quiet, it
+          # 401s on every refresh and fills the journal. To enable it: add the
+          # token as an agenix secret, expose it through the homepage service
+          # account's env file, then set
+          #   widget = { type = "plex"; url = "http://127.0.0.1:32400";
+          #              key = "{{HOMEPAGE_VAR_PLEX_TOKEN}}"; };
         };
         # Tautulli generates its own API key on first run with no way to set
         # it, so this stays a link until a key is pasted in.

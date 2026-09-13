@@ -90,9 +90,9 @@ in
         # so a header-only map never sees their key and they fall through to the
         # SSO gate and get an HTML login page back.
         #
-        # Only the header is rewritten on the way out, which is enough: servarr
-        # reads `X-Api-Key` first and falls back to the query parameter, so the
-        # stale one left in the query string is ignored.
+        # Both forms are rewritten on the way out: servarr reads `?apikey=`
+        # FIRST and only then the header, so rewriting the header alone leaves
+        # the app authenticating against the caller's key and rejecting it.
         headerVar = header: "$http_${nginxName (lib.toLower header)}$arg_apikey";
 
         # nginx wants a trailing slash on both sides of a prefix proxy, but
@@ -697,6 +697,18 @@ in
                         proxy_set_header ${e.api.header} ${
                           if e.api.internalKey then "\"${e.api.headerPrefix}$gw_key_${nginxName e.name}\"" else "\"\""
                         };
+                        ${lib.optionalString e.api.internalKey ''
+                          # The query parameter must be rewritten as well as the
+                          # header: servarr reads `?apikey=` FIRST and only then
+                          # falls back to X-Api-Key, so leaving the caller's key
+                          # in the query means the app authenticates against THAT
+                          # and rejects it. `$args` is writable and proxy_pass
+                          # picks the change up, and the capture keeps every
+                          # other parameter intact.
+                          if ($args ~ "^(.*)apikey=[^&]*(.*)$") {
+                              set $args "$1apikey=$gw_key_${nginxName e.name}$2";
+                          }
+                        ''}
                         access_log /var/log/nginx/api.log gw_api;
                       '';
                     }
