@@ -179,7 +179,7 @@
           # upgrades one minor at a time -- an unpinned jump would strand the
           # database. `.withSecretProvisioning` is required by `basicSecretFile`
           # below; the plain package refuses it.
-          package = pkgs.kanidm_1_8.withSecretProvisioning;
+          package = pkgs.kanidm_1_11.withSecretProvisioning;
 
           serverSettings = {
             domain = "auth.ivymect.in";
