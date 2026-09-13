@@ -150,13 +150,20 @@
         originLanding = "https://sso.ivymect.in/";
         basicSecretFile = scoped.sso.secrets.oauth2-client-secret.path;
         preferShortUsername = true;
-        # This scope map IS the authorisation gate: kanidm refuses to issue a
-        # token to anyone outside `media-users`, so oauth2-proxy needs no
-        # `allowed_groups` of its own.
+        # This scope map is the first gate: kanidm refuses to issue a token to
+        # anyone outside `media-users`. The second is oauth2-proxy's per-vhost
+        # `allowed_groups`, which needs the groups to actually arrive in the
+        # token -- hence the scope below.
+        #
+        # `groups_name`, not `groups`: kanidm offers `groups` (uuid AND spn),
+        # `groups_spn`, and `groups_name` -- only the last yields bare names like
+        # `media-users`, which is what the gateway puts in `allowed_groups`. The
+        # SPN forms would arrive as `media-users@auth.ivymect.in` and never match.
         scopeMaps.media-users = [
           "openid"
           "profile"
           "email"
+          "groups_name"
         ];
       };
     };
