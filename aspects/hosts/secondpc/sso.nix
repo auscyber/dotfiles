@@ -175,8 +175,11 @@
         # invalidates every enrolled passkey.
         services.kanidm = {
           enableServer = true;
-          # `basicSecretFile` below needs the secret-provisioning patches.
-          package = pkgs.kanidm_1_7.withSecretProvisioning;
+          # Pinned, not left to the stateVersion default, because kanidm only
+          # upgrades one minor at a time -- an unpinned jump would strand the
+          # database. `.withSecretProvisioning` is required by `basicSecretFile`
+          # below; the plain package refuses it.
+          package = pkgs.kanidm_1_8.withSecretProvisioning;
 
           serverSettings = {
             domain = "auth.ivymect.in";
