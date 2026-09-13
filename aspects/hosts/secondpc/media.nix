@@ -31,7 +31,13 @@
         # uid/gid pinned because the soularr container (slskd.nix) can only
         # name the account numerically. On a host that already allocated `media`
         # dynamically this needs a one-off `chown -R media:media /mnt/hdd`.
-        users.groups.media.gid = 700;
+        # 1000, not a fresh number: the group predates this pin (plex.nix created
+        # it) and NixOS will not renumber an existing group -- it silently keeps
+        # the old gid while Nix believes the new one. That divergence is invisible
+        # until something reads the gid at eval time, as slskd.nix does to build
+        # the soularr container's numeric user, which then ran as a gid that does
+        # not exist. Aligning to reality also means no data has to be chowned.
+        users.groups.media.gid = 1000;
         users.users.media = {
           isSystemUser = true;
           group = "media";

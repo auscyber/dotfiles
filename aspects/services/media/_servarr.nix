@@ -135,34 +135,59 @@
               sleep 2
             done
 
-            desired=$(jq -n --arg cat "${category}" '{
-              enable: true,
-              protocol: "torrent",
-              priority: 1,
-              name: "qbittorrent",
-              implementation: "QBittorrent",
-              configContract: "QBittorrentSettings",
-              fields: [
-                { name: "host",     value: "127.0.0.1" },
-                { name: "port",     value: 9090 },
-                { name: "useSsl",   value: false },
-                { name: "username", value: "" },
-                { name: "password", value: "" },
-                { name: "category", value: $cat }
-              ]
-            }')
+            api() { curl -sS -H "X-Api-Key: $key" "$@"; }
 
-            id=$(curl -sfS -H "X-Api-Key: $key" "$base/downloadclient" \
-              | jq -r '.[] | select(.name == "qbittorrent") | .id' | head -n1)
-
-            if [ -n "$id" ]; then
-              curl -sfS -X PUT -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
-                -d "$(printf '%s' "$desired" | jq --argjson id "$id" '. + {id: $id}')" \
-                "$base/downloadclient/$id" >/dev/null
-            else
-              curl -sfS -X POST -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
-                -d "$desired" "$base/downloadclient" >/dev/null
+            # Build the body FROM the app's own schema rather than hand-writing
+            # it. A download client has required fields beyond the handful worth
+            # setting, and they differ between apps and versions -- omitting any
+            # of them is a flat 400 with no indication which. Taking the schema
+            # entry and overriding only what we care about keeps every default
+            # the app expects.
+            tmpl=$(api "$base/downloadclient/schema" \
+              | jq '[.[] | select(.implementation == "QBittorrent")] | .[0]')
+            if [ -z "$tmpl" ] || [ "$tmpl" = "null" ]; then
+              echo "${name}: no QBittorrent download client in its schema" >&2
+              exit 1
             fi
+
+            desired=$(printf '%s' "$tmpl" | jq --arg cat "${category}" '
+              .name = "qbittorrent"
+              | .enable = true
+              | .fields = (.fields | map(
+                  if   .name == "host"     then .value = "127.0.0.1"
+                  elif .name == "port"     then .value = 9090
+                  elif .name == "useSsl"   then .value = false
+                  elif .name == "category" then .value = $cat
+                  else . end))')
+
+            # Matched on implementation, not name: an entry added through the UI
+            # is called "qBittorrent" with a capital B, so a name lookup misses
+            # it, the POST below collides with it ("Name: Should be unique") and
+            # the stale entry -- pointing whereever it was originally pointed --
+            # keeps being polled.
+            id=$(api "$base/downloadclient" \
+              | jq -r '.[] | select(.implementation == "QBittorrent") | .id' | head -n1)
+
+            # No `curl -f`: it hides the response body, and the body is the only
+            # thing that says WHICH field the app objected to.
+            resp=$(mktemp)
+            if [ -n "$id" ]; then
+              desired=$(printf '%s' "$desired" | jq --argjson id "$id" '. + {id: $id}')
+              code=$(api -o "$resp" -w '%{http_code}' -X PUT \
+                -H 'Content-Type: application/json' -d "$desired" "$base/downloadclient/$id")
+            else
+              code=$(api -o "$resp" -w '%{http_code}' -X POST \
+                -H 'Content-Type: application/json' -d "$desired" "$base/downloadclient")
+            fi
+
+            case "$code" in
+              2*) ;;
+              *)
+                echo "${name} rejected the qbittorrent download client (HTTP $code):" >&2
+                cat "$resp" >&2
+                exit 1
+                ;;
+            esac
           '';
         };
       };
