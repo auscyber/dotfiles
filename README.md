@@ -1393,6 +1393,7 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - sso
 - starship
 - stylix
+- tempo
 - unfree-predicate
 - unfree-predicate/os
 - unfree-predicate/user
@@ -1457,6 +1458,7 @@ graph LR
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
   sso["sso"]:::sso_c
   starship["starship"]:::starship_c
+  tempo["tempo"]:::tempo_c
   plex__to_users[/"plex/to-users"\]:::plex__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
   den__provides__unfree_intel_ocl_plexmediaserver_{{"provides/unfree(intel-ocl,plexmediaserver)"}}:::den__provides__unfree_intel_ocl_plexmediaserver__c
@@ -1496,6 +1498,7 @@ graph LR
   secondpc --> slskd
   secondpc --> sonarr
   secondpc --> sso
+  secondpc --> tempo
   secondpc --> den__provides__unfree_intel_ocl_plexmediaserver_
   secondpc --> vpn_server
   shell_host_secondpc --> jujutsu
@@ -1621,6 +1624,7 @@ graph LR
   classDef sso_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef stylix_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
+  classDef tempo_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef plex__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef den__provides__unfree_castlabs_electron__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_cmp_copilot__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
