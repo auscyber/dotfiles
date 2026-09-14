@@ -234,7 +234,7 @@ in
             tracing = {
               serviceName = "cellerd";
               otlp = {
-                enable = true;
+                enabled = true;
                 endpoint = "insecure://127.0.0.1:4317";
                 protocol = "grpc";
                 headers.x-scope-orgid = "celler";
