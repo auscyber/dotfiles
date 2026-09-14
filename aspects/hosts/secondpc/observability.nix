@@ -41,6 +41,27 @@
             { targets = [ "localhost:8501" ]; }
           ];
         }
+        # sonarr/radarr/lidarr's own exportarr instances -- see
+        # media/servarr-metrics.nix. One job with per-target labels rather
+        # than three jobs, so a panel can select on `app` instead of
+        # juggling three job names.
+        {
+          job_name = "exportarr";
+          static_configs = [
+            {
+              targets = [ "localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}" ];
+              labels.app = "sonarr";
+            }
+            {
+              targets = [ "localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}" ];
+              labels.app = "radarr";
+            }
+            {
+              targets = [ "localhost:${toString config.services.prometheus.exporters.exportarr-lidarr.port}" ];
+              labels.app = "lidarr";
+            }
+          ];
+        }
       ];
     };
     services.loki = {

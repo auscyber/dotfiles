@@ -463,7 +463,12 @@
               field = "kanidm.opid";
               target = {
                 queryType = "traceql";
-                query = "{kopid=\"\${__value.raw}\"}";
+                # Bare `kopid` is invalid TraceQL ("unknown identifier") --
+                # confirmed by hand: attribute references have to be scoped.
+                # `.kopid` matches regardless of scope, which is what
+                # kanidm's own span actually uses (a plain span attribute,
+                # not under resource.*).
+                query = "{.kopid=\"\${__value.raw}\"}";
               };
             };
           }
