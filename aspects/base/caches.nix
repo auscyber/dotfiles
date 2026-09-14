@@ -232,12 +232,10 @@ in
           useFlakeCompatOverlay = false;
           settings = {
             tracing = {
-              serviceName = "cellerd";
               otlp = {
                 enabled = true;
                 endpoint = "insecure://127.0.0.1:4317";
                 protocol = "grpc";
-                headers.x-scope-orgid = "celler";
               };
             };
             listen = "[::]:${toString port}";
