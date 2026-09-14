@@ -252,7 +252,9 @@
             # is what "rejects a scheme" used to be based on) but the
             # exporter then fails to connect with no error surfaced anywhere
             # kanidm logs -- it just never ships a span.
-            otel_grpc_endpoint = "http://127.0.0.1:4317";
+            # alloy, not tempo directly: otel-fail2ban.nix taps this stream
+            # (same as nginx's) to feed fail2ban, then forwards it to tempo.
+            otel_grpc_endpoint = "http://127.0.0.1:4319";
             tls_chain = "/var/lib/acme/ivymect.in/fullchain.pem";
             tls_key = "/var/lib/acme/ivymect.in/key.pem";
           };

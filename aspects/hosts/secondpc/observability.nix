@@ -41,6 +41,12 @@
             { targets = [ "localhost:8501" ]; }
           ];
         }
+        {
+          job_name = "fail2ban";
+          static_configs = [
+            { targets = [ "localhost:${toString config.services.prometheus.exporters.fail2ban.port}" ]; }
+          ];
+        }
         # sonarr/radarr/lidarr's own exportarr instances -- see
         # media/servarr-metrics.nix. One job with per-target labels rather
         # than three jobs, so a panel can select on `app` instead of

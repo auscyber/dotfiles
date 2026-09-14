@@ -1,0 +1,132 @@
+diff --git a/modules/age.nix b/modules/age.nix
+index 5a34b20..6fe625d 100644
+--- a/modules/age.nix
++++ b/modules/age.nix
+@@ -245,41 +245,18 @@ let
+     ++ (map installTemplate (builtins.attrValues cfg.templates))
+     ++ [
+       cleanupAndLink
+-      (optionalString (!isDarwin) ''
+-        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
+-          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
+-          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
+-          ${pkgs.systemd}/bin/systemctl try-restart "''${UNIQUE_UNITS[@]}"
+-        fi
+-        if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
+-          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
+-          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
+-          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
+-             user="''${entry%%:*}"
+-             unit="''${entry#*:}"
+-             ${pkgs.systemd}/bin/systemctl --user -M "$user@" try-restart "$unit"
+-          done
+-        fi
+-      '')
+-      (optionalString isDarwin ''
++      # Units are RECORDED here, not restarted -- restartUnits (below) does
++      # that, after chownSecrets has run. Restarting here would race the
++      # chown: a unit could come up against a secret still owned root:root.
++      ''
++        rm -f /run/agenix-restart-units /run/agenix-restart-user-units
+         if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
+-          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
+-          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
+-          for unit in "''${UNIQUE_UNITS[@]}"; do
+-            launchctl kickstart -k "system/$unit"
+-          done
++          printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u > /run/agenix-restart-units
+         fi
+         if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
+-          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
+-          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
+-          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
+-             user="''${entry%%:*}"
+-             unit="''${entry#*:}"
+-             uid=$(id -u "$user")
+-             launchctl kickstart -k "gui/$uid/$unit"
+-          done
++          printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u > /run/agenix-restart-user-units
+         fi
+-      '')
++      ''
+     ]
+   );
+ 
+@@ -294,6 +271,43 @@ let
+     ++ (map chownSecret (builtins.attrValues cfg.secrets))
+     ++ (map chownSecret (builtins.attrValues cfg.templates))
+   );
++
++  # Reads what installSecrets recorded and restarts it -- called after
++  # chownSecrets everywhere installSecrets is, so a unit never starts back up
++  # against a secret still owned by root from before the chown.
++  restartUnits = ''
++    if [ -f /run/agenix-restart-units ]; then
++      echo "[agenix] restarting units: $(tr '\n' ' ' < /run/agenix-restart-units)"
++      ${
++        if isDarwin then
++          ''
++            while read -r unit; do
++              launchctl kickstart -k "system/$unit"
++            done < /run/agenix-restart-units
++          ''
++        else
++          ''
++            ${pkgs.systemd}/bin/systemctl try-restart $(cat /run/agenix-restart-units)
++          ''
++      }
++      rm -f /run/agenix-restart-units
++    fi
++    if [ -f /run/agenix-restart-user-units ]; then
++      echo "[agenix] restarting user units: $(tr '\n' ' ' < /run/agenix-restart-user-units)"
++      while IFS=: read -r user unit; do
++        ${
++          if isDarwin then
++            ''
++              uid=$(id -u "$user")
++              launchctl kickstart -k "gui/$uid/$unit"
++            ''
++          else
++            ''${pkgs.systemd}/bin/systemctl --user -M "$user@" try-restart "$unit"''
++        }
++      done < /run/agenix-restart-user-units
++      rm -f /run/agenix-restart-user-units
++    fi
++  '';
+   templateType = types.submodule (
+     { config, ... }:
+     {
+@@ -621,6 +635,7 @@ in
+             newGeneration
+             installSecrets
+             chownSecrets
++            restartUnits
+           ]);
+           RemainAfterExit = true;
+         };
+@@ -657,10 +672,16 @@ in
+           ];
+         };
+ 
++        # After chown, not from within agenixInstall -- see restartUnits.
++        agenixRestart = {
++          text = restartUnits;
++          deps = [ "agenixChown" ];
++        };
++
+         # So other activation scripts can depend on agenix being done.
+         agenix = {
+           text = "";
+-          deps = [ "agenixChown" ];
++          deps = [ "agenixRestart" ];
+         };
+       };
+     })
+@@ -674,6 +695,7 @@ in
+           ${newGeneration}
+           ${installSecrets}
+           ${chownSecrets}
++          ${restartUnits}
+           exit 0
+         '';
+         serviceConfig = {

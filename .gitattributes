@@ -1,5 +1,6 @@
 # noisy diffs
 flake.lock -diff
+patched-inputs.nix -diff
 
 README.md -diff
 screenshots/* -diff

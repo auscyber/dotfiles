@@ -75,7 +75,9 @@ in
           # plaintext like kanidm's and ncps's OTLP export.
           commonHttpConfig = ''
             otel_exporter {
-              endpoint 127.0.0.1:4317;
+              # alloy, not tempo directly: aspects/hosts/secondpc/otel-fail2ban.nix
+              # taps this stream to feed fail2ban, then forwards it on to tempo.
+              endpoint 127.0.0.1:4319;
             }
             otel_service_name nginx;
             otel_trace on;

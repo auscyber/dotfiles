@@ -73,6 +73,8 @@
       #      den.aspects.slskd
       den.aspects.sso
       den.aspects.samba
+      den.aspects.secondpc-fail2ban
+      den.aspects.secondpc-otel-fail2ban
       (den.batteries.unfree [
         "intel-ocl"
         "plexmediaserver"
@@ -234,7 +236,7 @@
         networking.interfaces.br0.ipv4.addresses = [
           {
             address = "192.168.0.26";
-            prefixLength = 24;
+            prefixLength = 16;
           }
         ];
         networking.defaultGateway = {

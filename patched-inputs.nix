@@ -116,7 +116,6 @@
       ./patches/pnpm-nix-provider/execute-bit.patch
     ];
     zen-browser.patches = [ ];
-
     age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
     agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
     agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
