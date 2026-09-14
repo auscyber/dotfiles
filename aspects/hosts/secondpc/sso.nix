@@ -23,6 +23,10 @@
       # overlay the accounts are silently never created and the `svc-*` group
       # memberships fail referential integrity instead.
       den.aspects.packages.kanidm-provision
+      # Temporarily disabled: the patched kanidm_1_11 build (remote, on
+      # faggot.sh) is still running and there's no need to block a celler
+      # rebuild on it. Re-add once that build is confirmed good.
+      den.aspects.packages.kanidm-trace-propagation
     ];
 
     secrets = {
@@ -325,9 +329,9 @@
               # the `touch` below then tries to create a file named after
               # configtest's output.
               if ! report=$(kanidmd configtest -c server.toml 2>&1); then
-                echo "kanidm rejected the generated server.toml:" >&2
-                echo "$report" >&2
-                exit 1
+              	echo "kanidm rejected the generated server.toml:" >&2
+              	echo "$report" >&2
+              	exit 1
               fi
               touch "$out"
             ''

@@ -1,0 +1,87 @@
+diff --git a/libs/sketching/src/pipeline.rs b/libs/sketching/src/pipeline.rs
+index 9b6627d..c0937d1 100644
+--- a/libs/sketching/src/pipeline.rs
++++ b/libs/sketching/src/pipeline.rs
+@@ -1,6 +1,7 @@
+ use opentelemetry::{global, trace::TracerProvider as _, KeyValue};
+ use opentelemetry_otlp::{tonic_types::metadata::MetadataMap, WithExportConfig, WithTonicConfig};
+ use opentelemetry_sdk::{
++    propagation::TraceContextPropagator,
+     trace::{Sampler, SdkTracerProvider},
+     Resource,
+ };
+@@ -139,6 +140,12 @@ pub fn start_logging_pipeline(
+         let provider_handle = provider.clone();
+ 
+         global::set_tracer_provider(provider.clone());
++        // Without this, `global::get_text_map_propagator` always hands back
++        // the no-op propagator, and an inbound W3C `traceparent` header is
++        // silently ignored no matter what the HTTP layer does with it --
++        // every request roots its own trace instead of continuing one a
++        // caller (e.g. a reverse proxy) already started.
++        global::set_text_map_propagator(TraceContextPropagator::new());
+         provider.tracer("tracing-otel-subscriber");
+ 
+         let registry = tracing_subscriber::registry()
+diff --git a/server/core/src/https/trace.rs b/server/core/src/https/trace.rs
+index a7e8a3e..91cd68c 100644
+--- a/server/core/src/https/trace.rs
++++ b/server/core/src/https/trace.rs
+@@ -3,6 +3,7 @@
+ use crate::https::LoggerType;
+ use axum::http::Request;
+ use kanidm_proto::constants::KOPID;
++use opentelemetry::{global, propagation::Extractor};
+ use tower_http::trace::OnRequest;
+ use tracing::{Level, Span};
+ use tracing_opentelemetry::OpenTelemetrySpanExt;
+@@ -13,6 +14,20 @@ pub struct SpanCreator {
+     pub(crate) log_engine: LoggerType,
+ }
+ 
++/// Reads a W3C `traceparent`/`tracestate` out of an inbound request's
++/// headers, so an extracted context can be set as a span's parent.
++struct HeaderExtractor<'a>(&'a axum::http::HeaderMap);
++
++impl Extractor for HeaderExtractor<'_> {
++    fn get(&self, key: &str) -> Option<&str> {
++        self.0.get(key).and_then(|v| v.to_str().ok())
++    }
++
++    fn keys(&self) -> Vec<&str> {
++        self.0.keys().map(|k| k.as_str()).collect()
++    }
++}
++
+ impl<B> tower_http::trace::MakeSpan<B> for SpanCreator {
+     fn make_span(&mut self, request: &Request<B>) -> Span {
+         // Needs to be at info to ensure that there is always a span for each
+@@ -27,7 +42,7 @@ impl<B> tower_http::trace::MakeSpan<B> for SpanCreator {
+         // to see.
+         let is_deferred = request.uri() == "/" || request.uri() == "/status";
+ 
+-        tracing::span!(
++        let span = tracing::span!(
+             Level::INFO,
+             "request",
+             method = %request.method(),
+@@ -40,7 +55,18 @@ impl<B> tower_http::trace::MakeSpan<B> for SpanCreator {
+             http.response.status_code = tracing::field::Empty, // filled in later, used by otel
+             latency = tracing::field::Empty, // filled in later
+             defer = is_deferred,
+-        )
++        );
++
++        // Continue the caller's trace if it sent one (W3C traceparent /
++        // tracestate), rather than always rooting a new one here. A no-op
++        // if the caller sent nothing, or if no propagator is registered
++        // (see libs/sketching/src/pipeline.rs).
++        let parent_cx = global::get_text_map_propagator(|propagator| {
++            propagator.extract(&HeaderExtractor(request.headers()))
++        });
++        let _ = span.set_parent(parent_cx);
++
++        span
+     }
+ }
+ 
