@@ -1386,9 +1386,9 @@ style ctx_user_admin fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - samba
 - searchix
 - secondpc-web
+- service-accounts
 - shell
 - shell/to-users
-- slskd
 - sonarr
 - sso
 - starship
@@ -1451,8 +1451,8 @@ graph LR
   secondpc_web["secondpc-web"]:::secondpc_web_c
   den__batteries__self_[/"batteries/self'"\]:::den__batteries__self__c
   den__batteries__self___os{{"batteries/self'/os"}}:::den__batteries__self___os_c
+  service_accounts["service-accounts"]:::service_accounts_c
   shell_host_secondpc["shell"]:::shell_host_secondpc_c
-  slskd["slskd"]:::slskd_c
   sonarr["sonarr"]:::sonarr_c
   den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
   den__batteries__sources__os{{"batteries/sources/os"}}:::den__batteries__sources__os_c
@@ -1485,6 +1485,7 @@ graph LR
   secondpc --> builders
   secondpc --> disko
   secondpc --> grafana
+  secondpc --> lidarr
   secondpc --> local
   secondpc --> nginx_host_secondpc
   secondpc --> nix
@@ -1495,7 +1496,7 @@ graph LR
   secondpc --> samba
   secondpc --> searchix
   secondpc --> secondpc_web
-  secondpc --> slskd
+  secondpc --> service_accounts
   secondpc --> sonarr
   secondpc --> sso
   secondpc --> tempo
@@ -1504,7 +1505,6 @@ graph LR
   shell_host_secondpc --> jujutsu
   shell_host_secondpc --> nix_index
   shell_host_secondpc --> starship
-  slskd --> lidarr
   unfree_predicate --> unfree_predicate__os
   unfree_predicate --> unfree_predicate__user
   vpn --> vpn_secrets
@@ -1615,9 +1615,9 @@ graph LR
   classDef secondpc_web_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef den__batteries__self__c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__self___os_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:2px
+  classDef service_accounts_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef shell_host_secondpc_c fill:#4d2d00,stroke:#4d2d00,color:#1f2328,stroke-width:3px
   classDef shell__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
-  classDef slskd_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef sonarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__sources_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__sources__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
