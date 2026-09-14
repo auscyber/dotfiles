@@ -13,6 +13,19 @@ local function shell_quote(value)
 	return "'" .. value:gsub("'", "'\\''") .. "'"
 end
 
+-- Clicking a mirrored menu-bar item has to press the REAL item behind it --
+-- the bar only draws a picture of it, so a click on the picture does nothing
+-- on its own.
+--
+-- `--press <item>` is the bar's own way of doing that and takes the alias
+-- item's name. helpers/menus/bin/menus (a SketchyBar-era helper binary, built
+-- from helpers/menus/menus.c) did the same job by driving the Accessibility
+-- API itself from outside; it is left in the tree for SketchyBar, which has no
+-- `--press`.
+local function press_script(alias_name)
+	return "sketchybar --press " .. shell_quote(alias_name)
+end
+
 local function split_alias_metadata(alias_name)
 	local owner, name, pid = alias_name:match("^([^,]+),(.+),(%d+)$")
 	if owner and name and pid then
@@ -38,9 +51,16 @@ end
 
 local control_centre_focus_modes_click_script = nil
 
-sbar.add("alias", "Amphetamine,Amphetamine", {
+-- macOS hosts third-party menu extras in the Control Centre process, so the
+-- alias owner is "Control Centre" and not the app itself -- check a name
+-- against `sketchybar --query default_menu_items` rather than guessing it, or
+-- the alias resolves to nothing and the real item falls through to the
+-- overflow popup instead.
+local amphetamine = "Control Centre,Amphetamine"
+
+sbar.add("alias", amphetamine, {
 	position = "right",
-	click_script = helpers_dir .. "/menus/bin/menus -s 'Amphetamine,Amphetamine'",
+	click_script = press_script(amphetamine),
 })
 
 sbar.add("alias", "Control Centre,FocusModes", {
@@ -48,8 +68,7 @@ sbar.add("alias", "Control Centre,FocusModes", {
 	padding_left = -15,
 	padding_right = -5,
 	alias = { color = colors.yellow },
-	click_script = control_centre_focus_modes_click_script
-		or helpers_dir .. "/menus/bin/menus -s 'Control Centre,FocusModes'",
+	click_script = control_centre_focus_modes_click_script or press_script("Control Centre,FocusModes"),
 })
 
 sbar.add("item", "clock", {
@@ -123,9 +142,13 @@ print("Subscribed to overflow click")
 
 local extra_mapping = {}
 
+-- Anything pinned above, so it is never drawn a second time inside the
+-- overflow popup. Both spellings of Amphetamine: the owner moved to Control
+-- Centre, and an entry that is already gone costs nothing.
 local alias_to_ignore = {
 	["Control Centre,FocusModes"] = true,
 	["Amphetamine,Amphetamine"] = true,
+	[amphetamine] = true,
 	["Fantastical Helper,Fantastical"] = true,
 	["Control Centre,Clock"] = true,
 	["Control Centre,BentoBox-0"] = true,
@@ -156,9 +179,7 @@ local function add_overflow_aliases(alias_list, owner_pids)
 			padding_left = -2,
 			padding_right = -2,
 			label = { drawing = false, string = display_alias },
-			click_script = helpers_dir .. "/menus/bin/menus -s " .. shell_quote(
-				owner .. "," .. name .. ((pid and ("," .. pid)) or "")
-			),
+			click_script = press_script(display_alias),
 		})
 		alias:subscribe("mouse.clicked", function()
 			overflow:set({ popup = { drawing = "off" } })
@@ -192,6 +213,32 @@ local function parse_alias_list_response(items)
 	return list
 end
 
+-- The right-hand cluster, in the order it is meant to be drawn.
+--
+-- Not left to creation order: an item keeps the ordering index it was first
+-- given, so anything created somewhere else first -- a pinned alias that a
+-- previous generation had put in the overflow popup, say -- comes back in that
+-- old place on the next reload rather than where this file adds it. Naming the
+-- whole group makes the order a property of the config instead of a property
+-- of the order things happened to be created in.
+local right_order = {
+	amphetamine,
+	"Control Centre,FocusModes",
+	"clock",
+	"volume",
+	"power",
+	"battery",
+	"overflow",
+}
+
+local function reorder_right_items()
+	local quoted = {}
+	for _, name in ipairs(right_order) do
+		table.insert(quoted, shell_quote(name))
+	end
+	sbar.exec("sketchybar --reorder " .. table.concat(quoted, " "))
+end
+
 local function load_overflow_aliases()
 	sbar.exec("sketchybar --query default_menu_items", function(fallback_items)
 		local items = parse_alias_list_response(fallback_items)
@@ -205,6 +252,11 @@ local function load_overflow_aliases()
 		end
 
 		add_overflow_aliases(items, owner_pids)
+
+		-- After the popup aliases, not before: adding them is what can pull a
+		-- pinned item out of place, so the order is asserted once everything
+		-- that touches it has run.
+		reorder_right_items()
 	end)
 end
 
@@ -225,7 +277,7 @@ sbar.add("bracket", "all_utils", {
 	"power",
 	"battery",
 	"Control Centre,FocusModes",
-	"Amphetamine,Amphetamine",
+	amphetamine,
 }, {
 	background = {
 		color = colors.yellow,

@@ -6,11 +6,12 @@
 }:
 {
   den.aspects.rift = {
+    # Only `gui` declared; the platform is inferred from the including hosts.
+    layers = [ "gui" ];
+
     # Declared on the aspect, not the file: the partition generator reads
     # which aspect owns an input, and which platforms pull that aspect in.
-    flake-file = _: {
-      inputs.rift.url = "github:auscyber/rift";
-    };
+    inputs.rift.url = "github:auscyber/rift";
 
     includes = [ den.aspects.jankyborders ];
     overlays = {

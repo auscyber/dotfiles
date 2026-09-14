@@ -44,9 +44,9 @@ in
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
     meta.addRegistry = true;
+    # Patches are auto-included from ./patches/home-manager/*.patch.
+    patch.enable = true;
   };
-  # Patches are auto-included from ./patches/home-manager/*.patch.
-  patchedInputs.home-manager = { };
   den.default.os.home-manager = {
     useGlobalPkgs = true;
     extraSpecialArgs.inputs = inputs;

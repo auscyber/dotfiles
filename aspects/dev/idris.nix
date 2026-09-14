@@ -5,11 +5,14 @@
 }:
 {
   den.aspects.idris = {
+    # A language toolchain, not a platform concern: only darwin hosts happen to
+    # pull it in today, but that is an accident of the fleet, not a property of
+    # idris. A declared layer SELECTS, so this pins it to `dev` regardless.
+    layers = [ "dev" ];
+
     # Declared on the aspect, not the file: the input set follows which
     # hosts pull this aspect in, and so does its partition.
-    flake-file = _: {
-      inputs.idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
-    };
+    inputs.idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
 
     # Multiplex idris2-lsp through lspmux, co-located with the language aspect: this
     # contributes the entry to the `lsp-servers` class, which the forward on
@@ -63,12 +66,23 @@
         };
       };
 
-    overlays = { inputs', ... }: {
+    # Plain `inputs` and `prev`'s own system, NOT `inputs'`.
+    #
+    # ../tooling/overlays.nix excludes the `inputs'`/`self'` batteries from the
+    # flake-parts scope where the `overlays` class is collected: they provide
+    # their args via `withSystem system`, which forces the very perSystem being
+    # built. Its comment asserts overlays never use `inputs'` -- this one did,
+    # and asking for it here yielded an unrelated "attribute 'idris2Packages'
+    # missing". It went unnoticed while partitioning meant this overlay was
+    # never collected for a host that resolves idris; one merged environment
+    # collects every overlay fleet-wide, so it is.
+    overlays = {
       idris2Packages = final: prev: {
         idris2Packages =
           let
             inherit (prev) lib;
-            upstream = inputs'.idris2Packages.packages.idris2Packages;
+            upstream =
+              inputs.idris2Packages.packages.${prev.stdenv.hostPlatform.system}.idris2Packages;
             # Idris2's own nix/package.nix writes `lib.optional cond [ pkg ]`,
             # which yields `[ [ pkg ] ]`. nixpkgs 26.05 deprecates nested lists
             # in dependency attributes, so every eval that forces idris2 traces

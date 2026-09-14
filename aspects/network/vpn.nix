@@ -31,7 +31,7 @@ let
 
   # Shared by the `os` (wg-quick) and `nixos` (networkd) modules below, which
   # are separate classes and so cannot share a `let`.
-  tunnelIp = cfg: host: if cfg.ipAddress != null then cfg.ipAddress else tunnelIpByName host.name;
+  tunnelIp = cfg: host: if cfg.ipAddress != null then cfg.ipAddress else tunnelIpByName host.hostName;
 
   # The server routes each client on its hash-derived address. A client that
   # overrides vpn.ipAddress would desync from this; the server has no view into
@@ -42,7 +42,7 @@ let
       map (name: {
         publicKey = pubKey name;
         allowedIPs = [ "${tunnelIpByName name}/32" ];
-      }) (clientNames host.name)
+      }) (clientNames host.hostName)
     else
       [
         {

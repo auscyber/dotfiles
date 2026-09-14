@@ -1,6 +1,7 @@
 {
   inputs,
   den,
+  lib,
   ...
 }:
 {
@@ -9,12 +10,24 @@
     # aspect owns an input, and hosts tell it which platforms pull that aspect
     # in. Do not override its nixpkgs input, otherwise there can be a mismatch
     # between patches and kernel version.
-    flake-file = _: {
-      inputs.nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-    };
+    inputs.nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     includes = [ den.aspects.ccache ];
-    overlays.cachyosKernels = inputs.nix-cachyos-kernel.overlays.pinned;
+    # Linux-guarded, and the guard has to be INSIDE the overlay function.
+    #
+    # `overlays` is routed into `_collectedOverlays` at the flake-parts level
+    # with `collectSubtree = true` (../../tooling/overlays.nix), so it is
+    # collected fleet-wide and applied to every system's `pkgs` -- including
+    # aarch64-darwin, which has no use for a CachyOS kernel. Written bare, that
+    # forced `inputs.nix-cachyos-kernel` on the darwin laptop and fetched a
+    # nixos-layer source (found with `TRACE_INPUTS=1`). `optionalAttrs` leaves
+    # its argument unevaluated when the condition is false, so on darwin the
+    # input is never touched.
+    overlays.cachyosKernels =
+      final: prev:
+      lib.optionalAttrs prev.stdenv.hostPlatform.isLinux (
+        inputs.nix-cachyos-kernel.overlays.pinned final prev
+      );
     nixos =
       {
         pkgs,

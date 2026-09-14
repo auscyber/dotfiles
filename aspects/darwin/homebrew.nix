@@ -15,9 +15,10 @@ let
   );
 in
 {
-  ff = {
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-  };
+  # Its own layer, not darwin: the generated tap inputs (one `flake = false`
+  # entry per tap) churn on their own schedule, and `nix-homebrew` is used by
+  # nothing else, so the whole set can move without touching the darwin lock.
+  den.aspects.homebrew.layers = [ "homebrew" ];
   den.policies.route-casks =
     { ... }:
     let
@@ -44,8 +45,21 @@ in
       speedtest = "teamookla/homebrew-speedtest";
       typewhisper = "typewhisper/homebrew-tap";
     };
-    flake-file = { brew, ... }: {
-      inputs = lib.listToAttrs (
+    # Derived from `brew.taps`, as a function over the aspect's own content.
+    #
+    # This CANNOT be evaluated from inside a fleet capture: the function reads
+    # `brew`, which is content on this same aspect, so collecting it requires
+    # resolving the aspect being collected -- infinite recursion.
+    #
+    # Which is why placement is written at generation time and read back as data
+    # (../../layer-map.nix): the generator evaluates this once, offline, with
+    # `brew` bound, and no build-time evaluation ever walks it.
+    inputs =
+      { brew, ... }:
+      {
+        nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+      }
+      // lib.listToAttrs (
         lib.concatMap (
           x:
           if x ? taps then
@@ -60,7 +74,6 @@ in
             [ ]
         ) brew
       );
-    };
 
     darwin =
       {

@@ -4,14 +4,15 @@
   ...
 }:
 {
-  ff.nix-openclaw = {
-    url = "github:openclaw/nix-openclaw";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.home-manager.follows = "home-manager";
-    inputs.nix-openclaw-tools.inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   den.aspects.openclaw = {
+    inputs.nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+      inputs.nix-openclaw-tools.inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     includes = [
       den.aspects.mcp-servers
       den.aspects.agenix-rekey

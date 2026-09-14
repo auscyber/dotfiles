@@ -42,18 +42,26 @@ in
       den.aspects.sccache
       den.aspects.lix
       den.aspects.laptop-dock
-      # Signs sketchybar/paneru/kanata and execs them from a fixed path so their
-      # TCC grants survive a rebuild. Host level, not user level: it is an
-      # overlay, and overlays only reach the host's `nixpkgs.overlays`.
+      # Signs coolabah/paneru/kanata and execs them from a fixed path so their
+      # TCC grants survive a rebuild, and (via `wrapperd`, which pulls in
+      # `codesign`) replants that fixed path at boot and orders the agents that
+      # exec it. Host level, not user level: it is an overlay, and overlays only
+      # reach the host's `nixpkgs.overlays`.
       #
-      # Two aspects on purpose: `codesign` cannot build until the identity
-      # `codesign-identity` deploys is already on disk, and a switch builds
-      # before it activates. To bootstrap (or to recover if the identity is ever
-      # lost), comment out `den.aspects.codesign`, switch, then restore it.
-      # `codesign-identity` also carries `sandbox = "relaxed"`, which is what
+      # Two aspects on purpose: `codesign` (via `wrapperd`) cannot build until
+      # the identity `codesign-identity` deploys is already on disk, and a switch
+      # builds before it activates. To bootstrap (or to recover if the identity
+      # is ever lost), comment out `den.aspects.wrapperd`, switch, then restore
+      # it. `codesign-identity` also carries `sandbox = "relaxed"`, which is what
       # keeps every other derivation from reading the signing key.
       den.aspects.codesign-identity
-      den.aspects.codesign
+      den.aspects.wrapperd
+      # Host level, not user level: tailscaled is a root launchd daemon and its
+      # auth key has to be readable by root, so the secret belongs to the host's
+      # agenix scope. The user-level `t3code` aspect probes for this one with
+      # `whenAspect` (ancestors count), and grows its `t3 serve
+      # --tailscale-serve` agent only when it is present.
+      den.aspects.tailscale
       #      den.aspects.builders
     ];
 
@@ -69,12 +77,29 @@ in
     # Activate with the generation's own script:
     #   /run/current-system/specialisation/assessment/activate
     specialisations.assessment.excludes = [
+      # No Linux builder in a specialisation.
+      #
+      # `nix.linux-builder.package` carries an `apply` that re-`override`s the
+      # guest NixOS system inside every darwin fixpoint, so each specialisation
+      # evaluates a COMPLETE NixOS system of its own -- measured at ~1670
+      # `evalModules` from `pam.nix` alone, per profile. Four configurations on
+      # this host meant four guests.
+      #
+      # A profile switched into for an exam, a study session or a focused dock
+      # has no reason to cross-build Linux; `darwin-rebuild switch` back to the
+      # base configuration restores it. Possible because ../darwin/linux-builder.nix
+      # is its own aspect rather than part of `den.aspects.nix`.
+      den.aspects.linux-builder
+      # Same reasoning: nixvim's lazyload runs ~458 `evalModules` per
+      # configuration and nixpkgs' neovim plugin submodule another ~249, and an
+      # exam profile has no use for the editor. `vim` remains via nixpkgs.
+      den.aspects.neovim
       den.aspects.karabiner-driver
       den.aspects.vpn
       den.aspects.paneru
       den.aspects.jankyborders
       den.aspects.kanata
-      den.aspects.sketchybar
+      den.aspects.coolabah
     ];
 
     # "study": everything that is not study, gone. The browser half of this
@@ -84,11 +109,21 @@ in
     # drop. Zotero, the class/timetable integration and the rest of the `study`
     # role content stay: they are what the profile is for.
     specialisations.study.excludes = [
+      den.aspects.linux-builder # see `assessment` above
+      # Also nixvim: ~458 `evalModules` + ~249 neovim plugin submodules for this
+      # profile alone. The most reversible of these three exclusions -- if you
+      # want an editor in the study profile, delete this line and pay ~10% of the
+      # host's evaluation for it.
+      den.aspects.neovim
       den.aspects.darwin-gaming
       den.aspects.laptop-brew # steam/discord/beeper casks
-      den.aspects.llama-cpp
+      #      den.aspects.llama-cpp
       den.aspects.cotabby
       den.aspects.opencode
+      # Same reasoning as the two above -- and dropping it also takes the
+      # `t3 serve --tailscale-serve` agent down with it, so the machine is not
+      # quietly reachable from a phone during an exam profile.
+      den.aspects.t3code
     ];
 
     # "life-project": the machine with a dock that is only the life-project
@@ -97,6 +132,8 @@ in
     # everyday dock can grow entries without this profile inheriting them.
     specialisations.life-project = {
       excludes = [
+        den.aspects.linux-builder # see `assessment` above
+        den.aspects.neovim # ditto -- this profile is a dock, not a dev shell
         den.aspects.laptop-dock
         den.aspects.darwin-gaming
       ];
@@ -237,7 +274,7 @@ in
       den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
-      den.aspects.sketchybar
+      den.aspects.coolabah
       <browsers/zen>
       den.aspects.gui
       den.aspects.gpg
@@ -246,8 +283,12 @@ in
       den.aspects.kanata
       den.aspects.dev
       den.aspects.opencode
+      # Pulls in the claude / opencode / jujutsu provider wiring by itself, via
+      # whenAspect -- it reacts to what this user already has rather than
+      # forcing any of them on.
+      den.aspects.t3code
       #      den.aspects.openclaw
-      den.aspects.llama-cpp
+      #      den.aspects.llama-cpp
       # zeroclaw-daemon depends on a rust-src component that fails to build
       # (rust-src-stable-2026-08-20.drv), taking the whole system switch down
       # with it. Dropped until that's fixed upstream.

@@ -4,7 +4,10 @@
   ...
 }:
 {
-  ff.pnpm-nix-provider = {
+  den.aspects.js = {
+    layers = [ "dev" ];
+
+    inputs.pnpm-nix-provider = {
     url = "github:wmertens/pnpm-nix-provider";
     inputs.nixpkgs.follows = "nixpkgs";
     # patches/pnpm-nix-provider/execute-bit.patch: chmod -R u+w after
@@ -15,7 +18,6 @@
     patch.enable = true;
   };
 
-  den.aspects.js = {
     # pnpm's `packageProvider` hook, so `pnpm install` materializes node_modules
     # out of the Nix store instead of downloading tarballs. The upstream module
     # brings the provider, the provider-aware pnpm build (released pnpm has no

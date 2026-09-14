@@ -186,9 +186,125 @@ rec {
     else
       captured;
 
+  # EVERY specialisation of one entity, resolved in a SINGLE walk.
+  #
+  # `instantiateArgsFor` runs one `lib.evalModules` over den's whole flake-output
+  # module set per specialisation, so a host with three of them pays four full
+  # system evaluations (base + 3). Measured on the laptop with
+  # `--trace-function-calls`: nixvim's lazyload alone went 458 -> 1374
+  # `evalModules`, and NixOS's `pam.nix` 1667 -> 3334, purely from the repeats.
+  #
+  # Nothing forces them to be separate walks. Each composed entity already parks
+  # its result at its own output path (`specIntoAttr`, `<attr>@<name>`), which is
+  # exactly how den keeps many hosts apart in one ordinary fleet walk -- so one
+  # root carrying one policy per specialisation resolves all of them at once and
+  # each is read back by its own path.
+  #
+  # Same root, same policies, same machinery: this is a batching change, NOT the
+  # `resolveEntity` + `resolveWithPaths` shortcut this file's header rejects.
+  # That one is cheaper still and measurably lower fidelity, because
+  # `provide`-delivered modules never reach a user's home-manager subtree
+  # through it. Fidelity here is unchanged because the walk is unchanged.
+  instantiateArgsForAll =
+    {
+      kind,
+      entity,
+      specs,
+    }:
+    let
+      specEntities = lib.mapAttrs (
+        name: contributions:
+        composedEntity {
+          inherit kind entity name contributions;
+        }
+        // {
+          instantiate = lib.id;
+        }
+      ) specs;
+
+      root = (den.lib.resolveEntity "flake-system" { inherit (entity) system; }) // {
+        includes = lib.mapAttrsToList (
+          _: specEntity:
+          mkPolicy "specialisation:${lib.concatStringsSep "." specEntity.intoAttr}" (_: [
+            (resolve.to kind { ${kind} = specEntity; })
+            (instantiate specEntity)
+          ])
+        ) specEntities;
+      };
+
+      flake =
+        (lib.evalModules {
+          modules = [
+            (den.lib.aspects.resolve "flake" root)
+            inputs.den.flakeOutputs.flake
+          ];
+          specialArgs.inputs = inputs;
+        }).config.flake;
+    in
+    lib.mapAttrs (
+      name: specEntity:
+      let
+        captured = lib.getAttrFromPath specEntity.intoAttr flake;
+      in
+      if (captured.modules or [ ]) == [ ] then
+        throw "specialisations: composing '${name}' for ${entity.name or kind} produced no modules — den's walk did not reach the entity"
+      else
+        captured
+    ) specEntities;
+
+  mkBuilt =
+    kind: entity: parentPkgs: instantiateArgs:
+    let
+      # Reuse the parent's package set. nix-darwin pins `_module.args.pkgs` at
+      # `defaultOverridePriority` precisely so an override here short-circuits
+      # `finalPkgs` and no second nixpkgs is instantiated.
+      shared = lib.optional (parentPkgs != null) {
+        _module.args.pkgs = lib.mkForce parentPkgs;
+      };
+      built = entity.instantiate (
+        instantiateArgs // { modules = instantiateArgs.modules ++ shared; }
+      );
+    in
+    {
+      configuration = built;
+      package = if kind == "home" then built.activationPackage else built.config.system.build.toplevel;
+      inherit (instantiateArgs) modules;
+    };
+
+  # name -> { configuration; package; modules; } for every specialisation, off
+  # the single shared walk above.
+  # One walk PER specialisation. Batching them onto a single root is both wrong
+  # and pointless: compositions collapse onto one scope (`mkScopeId` keys on
+  # `__scopeName`/`name`, `push-scope` keeps the first context under an id), and
+  # overriding `__scopeName` per composition separates them from the base but
+  # not from each other. Measured at 30.28s batched vs 29.87s here -- the cost
+  # is evaluating N systems, not N walks, so there was never anything to win.
+  buildAll =
+    {
+      kind,
+      entity,
+      specs,
+      parentPkgs ? null,
+    }:
+    lib.mapAttrs (
+      name: contributions:
+      mkBuilt kind entity parentPkgs (instantiateArgsFor {
+        inherit
+          kind
+          entity
+          name
+          contributions
+          ;
+      })
+    ) specs;
+
   # The built specialisation, as den would have built it had this composition
   # been a declared entity: `.config`, `.system.build.toplevel` /
   # `.activationPackage`, everything.
+  #
+  # Single-specialisation entry point, kept for callers that want just one; it
+  # goes through the batched walk so using it for several still costs one walk
+  # each. `buildAll` is what the repo uses.
   buildFor =
     args@{
       kind,

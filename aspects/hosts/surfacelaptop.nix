@@ -4,11 +4,6 @@
   ...
 }:
 {
-  ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
-  # Without this, nixos-hardware pulls its own full nixpkgs (a separate
-  # releases.nixos.org nixexprs.tar.xz) rather than reusing ours.
-  ff.nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
-
   den.hosts.x86_64-linux.surfacelaptop = {
     roles = [
       "gui"
@@ -24,10 +19,22 @@
   };
 
   den.aspects.surfacelaptop = {
-    nixos.imports = [
-      inputs.nixos-hardware.nixosModules.microsoft-surface-common
-      inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd
-    ];
+    layers = [ "nixos" ];
+
+    # Declared once, in ../nixos/nvidia.nix -- den rejects the same input being
+    # declared by two aspects, identical specs included.
+    includes = [ den.aspects.nixos-hardware ];
+
+    # A module FUNCTION: a bare attrset here is evaluated while den COLLECTS
+    # class content during fleet resolution, so `inputs.nixos-hardware` -- a
+    # nixos-layer input -- was forced by darwin evaluations too. Same fix as
+    # ./wsl-nixos.nix; found by `checks.layer-isolation`.
+    nixos = _: {
+      imports = [
+        inputs.nixos-hardware.nixosModules.microsoft-surface-common
+        inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd
+      ];
+    };
   };
 
   den.aspects.auscyber.provides.surfacelaptop = {

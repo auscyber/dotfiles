@@ -5,24 +5,18 @@
   ...
 }:
 {
-  flake-file = {
-    inputs = {
-      zen-browser.url = "github:0xc000022070/zen-browser-flake";
-      zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-      zen-browser.inputs.home-manager.follows = "home-manager";
-      nur = {
-        url = "github:nix-community/NUR";
-        inputs.nixpkgs.follows = "nixpkgs";
-        inputs.flake-parts.follows = "flake-parts";
-      };
-    };
-  };
-  patchedInputs.zen-browser = {
-    patches = [ ];
-  };
-
   den.aspects.browsers.zen = {
+    layers = [ "gui" ];
+
+    inputs.zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    # No diffs of its own: listing it re-evaluates it against the PATCHED
+    # dependency graph (it follows home-manager, which is patched).
+    inputs.zen-browser.patch.enable = true;
+    inputs.zen-browser.patch.patches = [ ];
+    inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    inputs.zen-browser.inputs.home-manager.follows = "home-manager";
     includes = [
+      den.aspects.nur
       (den.lib.whenAspect den.aspects.onepassword {
         provides.to-hosts = { host, ... }: {
           nixos.environment.etc."1password/custom_allowed_browsers" = {

@@ -1,6 +1,24 @@
+{ den, ... }:
 {
+  # Its OWN aspect, not part of `den.aspects.nix`.
+  #
+  # nix-darwin's `nix.linux-builder.package` carries
+  # `apply = pkg: pkg.override { modules = old.modules ++ [ cfg.config ]; }`,
+  # so the guest NixOS system is re-evaluated inside every darwin fixpoint --
+  # unconditionally, even with an empty `config`, and regardless of whether the
+  # package is precomputed, because nix memoises thunks rather than function
+  # applications. On this laptop that is four evaluations of a full NixOS system
+  # (base plus three specialisations), and it is where the bulk of a host eval
+  # goes: `pam.nix` alone reaches 1667 `evalModules` per guest.
+  #
+  # Welded into `den.aspects.nix` there was no way to opt out, because nothing
+  # can exclude the `nix` aspect. As its own aspect a specialisation can drop it
+  #   den.aspects.<host>.specialisations.study.excludes = [ den.aspects.linux-builder ];
+  # which is worth doing for any profile that has no reason to build Linux.
+  den.aspects.nix.includes = [ den.aspects.linux-builder ];
+
   # Patches are auto-included from ./patches/darwin/*.patch.
-  den.aspects.nix.darwin = { pkgs, ... }: {
+  den.aspects.linux-builder.darwin = { pkgs, ... }: {
     nix.distributedBuilds = true;
 
     nix.linux-builder = {
@@ -22,10 +40,24 @@
       # commented out below anyway).
       package = pkgs.darwin.linux-builder-vz;
       systems = [
-        #      "x86_64-linux"
+        "x86_64-linux"
         "aarch64-linux"
       ];
-      #    config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+      config.boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+
+      # A builder VM has no reader, and NixOS's documentation machinery is not
+      # cheap: `make-options-doc` re-evaluates the whole module set to render
+      # option docs, which showed up as ~2000 `evalModules` inside a plain
+      # `darwinConfigurations.<host>.system.drvPath` (measured with
+      # `--trace-function-calls`). Nothing in the guest serves man pages or the
+      # manual, so none of it is reachable at runtime either.
+      config.documentation = {
+        enable = false;
+        nixos.enable = false;
+        man.enable = false;
+        info.enable = false;
+        doc.enable = false;
+      };
     };
   };
 }

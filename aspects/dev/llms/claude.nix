@@ -1,7 +1,10 @@
 { inputs, ... }: {
-  ff.claude-code.url = "github:sadjow/claude-code-nix";
-  ff.claude-code.inputs.nixpkgs.follows = "nixpkgs";
   den.aspects.claude = {
+    layers = [ "dev" ];
+
+    inputs.claude-code.url = "github:sadjow/claude-code-nix";
+    inputs.claude-code.inputs.nixpkgs.follows = "nixpkgs";
+
     secrets.claude_token.rekeyFile = ./token.age;
     secrets.dad_token.rekeyFile = ./other_token.age;
     overlays.claude-code = inputs.claude-code.overlays.default;

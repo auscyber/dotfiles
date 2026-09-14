@@ -9,6 +9,7 @@
 let
   inherit (den.lib.policy) route;
 
+
   overlayFn = lib.mkOptionType {
     name = "overlay-function";
     description = "nixpkgs overlay (final: prev: { ... })";
@@ -197,15 +198,15 @@ in
       # (and may read `pkgs`). Provide both from a *bare* `inputs.nixpkgs` — never
       # the perSystem `pkgs`/`sources` in `args`, since those are what these very
       # overlays build. Forwarding the overlaid pkgs back in is infinite recursion.
+      # `sources` is resolved against the package set these overlays build, not
+      # a second bare instantiation. Both are thunks: a configurator reads them
+      # inside its `self: super:` body, which runs once the fixpoint exists.
       adaptArgs =
         args:
-        let
-          basePkgs = inputs.nixpkgs.legacyPackages.${args.system};
-        in
         args
         // {
-          pkgs = basePkgs;
-          sources = config.flake.lib.withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
+          pkgs = config.allSystems.${args.system}._finalPkgs;
+          sources = config.allSystems.${args.system}._sources;
         };
     })
   ];
@@ -233,20 +234,44 @@ in
       ...
     }:
     let
-      basePkgs = inputs.nixpkgs.legacyPackages.${system};
-      sources = self.lib.withExtra (basePkgs.callPackage ../../_sources/generated.nix { });
+      sources = config.flake.lib.withExtra (
+        finalPkgs.callPackage ../../_sources/generated.nix { }
+      );
 
       # Registry walk over `den.aspects.packages` (configurator shapes that are
       # not included into any entity, so the class route below never sees them).
-      packageOverlays = collectPackageOverlays sources system basePkgs;
+      packageOverlays = collectPackageOverlays sources system finalPkgs;
 
       # Class-collected overlays from every other aspect (celler, auspc, zen,
       # gaming, nh, rift, kanata, …), routed in via `overlays-to-flake-parts`.
       classOverlays = config._collectedOverlays;
 
       allOverlays = packageOverlays // classOverlays;
+
+      # Self-referential on purpose: `sources` comes from the package set the
+      # overlays build, not from a second bare instantiation. Legal because no
+      # configurator forces `sources`/`pkgs` while its overlay ATTRIBUTE NAMES
+      # are computed -- every one of them reads them inside a `self: super:`
+      # body, which runs after the fixpoint exists.
+      finalPkgs = import inputs.nixpkgs {
+        inherit system;
+        overlays = tagOverlaySet allOverlays;
+        config = {
+          allowUnfree = true;
+        };
+      };
     in
     {
+      options._finalPkgs = lib.mkOption {
+        type = lib.types.raw;
+        internal = true;
+        description = "This system's package set, built from every collected overlay.";
+      };
+      options._sources = lib.mkOption {
+        type = lib.types.raw;
+        internal = true;
+        description = "nvfetcher sources, resolved against `_finalPkgs`.";
+      };
       options._collectedOverlays = lib.mkOption {
         type = lib.types.attrsOf (lib.types.either overlayFn (lib.types.listOf overlayFn));
         default = { };
@@ -254,15 +279,9 @@ in
       };
 
       config = {
-        _module.args.pkgs = lib.mkForce (
-          import inputs.nixpkgs {
-            inherit system;
-            overlays = tagOverlaySet allOverlays;
-            config = {
-              allowUnfree = true;
-            };
-          }
-        );
+        _finalPkgs = finalPkgs;
+        _sources = sources;
+        _module.args.pkgs = lib.mkForce finalPkgs;
         _module.args.overlays = tagOverlaySet allOverlays;
       };
     };

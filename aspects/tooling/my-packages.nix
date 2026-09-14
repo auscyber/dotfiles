@@ -11,7 +11,6 @@ let
   # under kernelPackageExtensions, zotero-extensions is an attrset).
   declaredPackageNames = builtins.attrNames (den.aspects.packages or { });
 
-  isBuildable = pkg: lib.isDerivation pkg;
 in
 {
   # x86_64-linux/aarch64-darwin already come from aspects/framework/flake-file.nix;
@@ -25,13 +24,25 @@ in
   ];
   perSystem =
     { pkgs, ... }:
-    let
-      collected = lib.genAttrs declaredPackageNames (name: pkgs.${name} or null);
-    in
     {
       # Use legacyPackages so we can nest under `my` — flake-parts' packages
       # output requires each entry to be a flat derivation. `nix build .#my.X`
       # still resolves through legacyPackages.
-      legacyPackages.my = lib.filterAttrs (_: v: v != null && isBuildable v) collected;
+      #
+      # Filtered by NAME, never by value. `filterAttrs (_: v: isDerivation v)`
+      # forces every value to test the predicate, so merely listing this output
+      # evaluated every package this repo declares -- against the fully overlaid
+      # `pkgs`, on every system, on every host evaluation. `pkgs ? ${name}` is an
+      # attribute-existence test and forces nothing.
+      #
+      # The cost of the weaker filter: an entry that exists but is not a
+      # derivation (eagle-nvim lives under vimPlugins, alx-wol under
+      # kernelPackageExtensions, zotero-extensions is an attrset) now appears
+      # here. `legacyPackages` is explicitly the un-checked output -- that is why
+      # it is used rather than `packages` -- so a non-derivation is inert until
+      # someone asks for it by name.
+      legacyPackages.my = lib.genAttrs (lib.filter (n: pkgs ? ${n}) declaredPackageNames) (
+        name: pkgs.${name}
+      );
     };
 }

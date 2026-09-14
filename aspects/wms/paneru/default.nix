@@ -23,17 +23,28 @@ in
   #  patchedInputs.paneru = { };
 
   den.aspects.paneru = {
+    # Only `gui` declared; the platform is inferred from the including hosts.
+    layers = [ "gui" ];
+
     # Declared on the aspect, not the file: the partition generator reads
     # which aspect owns an input, and which platforms pull that aspect in.
-    flake-file = _: {
-      inputs.paneru.url = "github:auscyber/paneru?ref=testing";
-      inputs.paneru.inputs.nixpkgs.follows = "nixpkgs";
-      inputs.paneru.inputs.crane.follows = "crane";
-    };
+    inputs.paneru.url = "github:auscyber/paneru?ref=testing";
+    inputs.paneru.inputs.nixpkgs.follows = "nixpkgs";
+    inputs.paneru.inputs.crane.follows = "crane";
 
     #    includes = [ den.aspects.jankyborders ];
-    overlays = {
-      paneru = lib.optional (inputs ? paneru) inputs.paneru.overlays.default;
+    # Darwin-guarded INSIDE the overlay function, not around it.
+    #
+    # `overlays` is routed into `_collectedOverlays` at the flake-parts level
+    # with `collectSubtree = true` (../../tooling/overlays.nix), so it is
+    # collected fleet-wide and applied to every system's `pkgs`. Written as a
+    # bare value, `inputs.paneru` -- a darwin-gui layer input -- was forced while
+    # evaluating `nixosConfigurations.secondpc`, which
+    # `checks.layer-isolation` catches. `optionalAttrs` leaves its argument
+    # unevaluated when the condition is false, so on Linux the input is never
+    # touched. Same shape as ../../nixos/kernels/cachyos.nix.
+    overlays = _: {
+      paneru = inputs.paneru.overlays.default;
     };
     homeManager =
       {
@@ -67,13 +78,13 @@ in
             #
             # `programs.sketchybar` is declared by home-manager itself on every
             # darwin config, so on its own it says "this is a Mac", not "this
-            # host runs sketchybar". `programs.rsbar` is narrower: the option
-            # exists only where den.aspects.rsbar imported rsbar's module,
-            # which is exactly the hosts that chose rsbar. So rsbar wins where
-            # it is present and sketchybar is the fallback — a host includes
-            # one bar aspect or the other, never both.
-            hasRsbar = options.programs ? rsbar;
-            hasSketchybar = (options.programs ? sketchybar) && !hasRsbar;
+            # host runs sketchybar". `programs.coolabah` is narrower: the option
+            # exists only where den.aspects.coolabah imported coolabah's module,
+            # which is exactly the hosts that chose coolabah. So coolabah wins
+            # where it is present and sketchybar is the fallback — a host
+            # includes one bar aspect or the other, never both.
+            hasCoolabah = options.programs ? coolabah;
+            hasSketchybar = (options.programs ? sketchybar) && !hasCoolabah;
 
             colourConfig =
               let
@@ -365,30 +376,31 @@ in
               # lua
               ''
 
-                          -- Generated from aspects/wms/paneru/default.nix — do not edit by hand.
-                          paneru.setup ${lib.generators.toLua { } setupConfig}
+                                                          -- Generated from aspects/wms/paneru/default.nix — do not edit by hand.
+                                                          paneru.setup ${lib.generators.toLua { } setupConfig}
 
-                          -- Named scratchpads (aspects/wms/paneru/scratchpad.lua, shipped as
-                          -- the `paneru_scratchpad` module via services.paneru
-                          -- .extraLuaPackages below). `setup` compiles each pad's match
-                          -- patterns, registers the placement/hide-on-focus-loss hooks and
-                          -- binds each pad's chord.
-                require("paneru_scratchpad").setup(require("paneru_scratchpad_spec"))
-                          ${lib.optionalString hasSketchybar ''
-                            -- Incremental bar repaints, driven from paneru's own event loop
-                            -- (services.paneru.extraLuaPackages, below). Creating the items and
-                            -- the initial paint are sketchybar's, in sketchybar's process — see
-                            -- sketchybar/wm.lua and sketchybar/paneru-events.lua.
-                            require("paneru_events")
-                          ''}
-                          ${lib.optionalString hasRsbar ''
-                            -- The rsbar equivalent, and it only *triggers*: rsbar has no
-                            -- loadable Lua module for paneru's interpreter to draw through,
-                            -- so the repaint itself happens in rsbar's own process off a
-                            -- state query — see rsbar/paneru-events.lua and
-                            -- sketchybar/wm.lua (which rsbar loads too).
-                            require("paneru_rsbar_events")
-                          ''}
+                                                          -- Named scratchpads (aspects/wms/paneru/scratchpad.lua, shipped as
+                                                          -- the `paneru_scratchpad` module via services.paneru
+                                                          -- .extraLuaPackages below). `setup` compiles each pad's match
+                                                          -- patterns, registers the placement/hide-on-focus-loss hooks and
+                                                          -- binds each pad's chord.
+                                                require("paneru_scratchpad").setup(require("paneru_scratchpad_spec"))
+                                                          ${lib.optionalString hasSketchybar ''
+                                                            -- Incremental bar repaints, driven from paneru's own event loop
+                                                            -- (services.paneru.extraLuaPackages, below). Creating the items and
+                                                            -- the initial paint are sketchybar's, in sketchybar's process — see
+                                                            -- sketchybar/wm.lua and sketchybar/paneru-events.lua.
+                                                            require("paneru_events")
+                                                          ''}
+
+                ${lib.optionalString hasCoolabah ''
+                  -- The coolabah equivalent, and it only *triggers*: coolabah has
+                  -- no loadable Lua module for paneru's interpreter to draw
+                  -- through, so the repaint itself happens in coolabah's own
+                  -- process off a state query — see coolabah/paneru-events.lua and
+                  -- sketchybar/wm.lua (which coolabah loads too).
+                  require("paneru_coolabah_events")
+                ''}
 
               '';
 
@@ -407,11 +419,11 @@ in
             # `aspects/darwin/codesign.nix`'s activation script (same inputs
             # -> same derivation), which is what plants it.
             # paneru's loadable client module, built for the interpreter
-            # rsbar-lua vendors (LuaJIT). `.modulePath` is the `paneru.so`
-            # file itself, which is what gets linked next to `rsbarrc` --
-            # rsbar's cpath entry is `<config dir>/?.so`, a directory of files
+            # coolabah-lua links (LuaJIT). `.modulePath` is the `paneru.so`
+            # file itself, which is what gets linked next to `coolabahrc` --
+            # coolabah's cpath entry is `<config dir>/?.so`, a directory of files
             # rather than a Lua package set.
-            paneruLuaModuleForRsbar = config.services.paneru.finalPackage.passthru.luaModule.override {
+            paneruLuaModuleForCoolabah = config.services.paneru.finalPackage.passthru.luaModule.override {
               lua = pkgs.luajit;
             };
 
@@ -514,33 +526,36 @@ in
                 (mkLuaFileModule "wm" ./sketchybar/wm.lua luaPs)
               ];
             })
-            (lib.optionalAttrs hasRsbar {
-              # The rsbar half of the same WM-provider contract. rsbar answers
-              # to `sbar`/`require("sketchybar")` exactly as SbarLua does, so
-              # `wm` and `paneru_bar` are the SAME files sketchybar loads --
-              # only how they get onto the require path differs.
+            (lib.optionalAttrs hasCoolabah {
+              # The coolabah half of the same WM-provider contract. coolabah
+              # answers to `sbar`/`require("sketchybar")` exactly as SbarLua
+              # does, so `wm` and `paneru_bar` are the SAME files sketchybar
+              # loads -- only how they get onto the require path differs.
               #
-              # rsbar has no `extraLuaPackages`: it runs `rsbarrc` as a
+              # coolabah has no `extraLuaPackages`: it runs `coolabahrc` as a
               # subprocess and appends that file's own directory to
-              # `package.path`/`package.cpath` (`rsbar_lua::host`), so a module
-              # is a file dropped next to `rsbarrc` and a C module is a `.so`
-              # dropped there too. That is also what makes `require("paneru")`
-              # work inside rsbar: the client module is built against LuaJIT,
-              # which is the interpreter rsbar-lua vendors, and its `lua_*`
-              # symbols resolve flat-namespace against the host binary at
-              # dlopen time (paneru's `nix/package.nix` builds it with mlua's
-              # `module` feature precisely so they are left undefined).
+              # `package.path`/`package.cpath` (`coolabah_lua::host`), so a
+              # module is a file dropped next to `coolabahrc` and a C module is
+              # a `.so` dropped there too. That is also what makes
+              # `require("paneru")` work inside coolabah: the client module is
+              # built against LuaJIT, which is the interpreter coolabah-lua
+              # links, and its `lua_*` symbols resolve flat-namespace against
+              # the host binary at dlopen time (paneru's `nix/package.nix`
+              # builds it with mlua's `module` feature precisely so they are
+              # left undefined).
+              # `colors`/`icon_map` are NOT here: the bar aspect owns the theme
+              # on its own config path, exactly as the sketchybar branch above
+              # leaves them to aspects/desktop/sketchybar. This drops only the
+              # WM half of the contract.
               xdg.configFile = {
-                "rsbar/colors.lua".source = colorsFile colourConfig;
-                "rsbar/icon_map.lua".source = iconMapFile;
-                "rsbar/paneru_bar.lua".source = ./sketchybar/paneru-bar.lua;
-                "rsbar/wm.lua".source = ./sketchybar/wm.lua;
-                "rsbar/paneru.so".source = paneruLuaModuleForRsbar.modulePath;
+                "coolabah/paneru_bar.lua".source = ./sketchybar/paneru-bar.lua;
+                "coolabah/wm.lua".source = ./sketchybar/wm.lua;
+                "coolabah/paneru.so".source = paneruLuaModuleForCoolabah.modulePath;
               };
 
-              # `paneru` on rsbar's PATH, for the `sbar.exec` calls a config
+              # `paneru` on coolabah's PATH, for the `sbar.exec` calls a config
               # makes -- the same reason the sketchybar branch above adds it.
-              programs.rsbar.extraPackages = [ config.services.paneru.finalPackage ];
+              programs.coolabah.extraPackages = [ config.services.paneru.finalPackage ];
             })
             {
               services.paneru = {
@@ -551,10 +566,10 @@ in
                 extraPackages = [
                   pkgs.sketchybar
                 ]
-                # `rsbar/paneru-events.lua` shells out to `rsbard --trigger`,
-                # so the binary has to be on the PATH paneru's launchd agent
-                # hands its children.
-                ++ lib.optional hasRsbar pkgs.rsbar;
+                # `coolabah/paneru-events.lua` shells out to `coolabah
+                # --trigger`, so the binary has to be on the PATH paneru's
+                # launchd agent hands its children.
+                ++ lib.optional hasCoolabah pkgs.coolabah;
                 # `paneru_scratchpad` is unconditional — init.lua always
                 # requires it. Only the bar-drawing half is gated on the
                 # sketchybar aspect being present.
@@ -571,8 +586,8 @@ in
                     (mkLuaFileModule "paneru_bar" ./sketchybar/paneru-bar.lua luaPs)
                     (mkLuaFileModule "paneru_events" ./sketchybar/paneru-events.lua luaPs)
                   ]
-                  ++ lib.optionals hasRsbar [
-                    (mkLuaFileModule "paneru_rsbar_events" ./rsbar/paneru-events.lua luaPs)
+                  ++ lib.optionals hasCoolabah [
+                    (mkLuaFileModule "paneru_coolabah_events" ./coolabah/paneru-events.lua luaPs)
                   ];
                 # Everything else is declared from Lua instead (`paneru.setup`
                 # in `config`), which takes precedence over a paneru.toml. The
@@ -585,15 +600,20 @@ in
 
               # `services.paneru`'s own home-manager module (nix/home.nix)
               # points this launchd job's `Program` at
-              # `services.paneru.finalPackage` directly, which is the
-              # UNSIGNED wrapPaneru wrap (see `paneruSigned` above). Forced
-              # to the signed equivalent instead, so the process launchd
-              # actually execs bottoms out at `${trustedDir}/paneru` rather
-              # than a raw, rebuild-varying store path -- TCC's Accessibility
-              # grant is worthless to a client whose path never survives a
-              # rebuild. Only `Program` is overridden; `Label`, `KeepAlive`
-              # and the rest keep whatever that module set.
-              launchd.agents.paneru.config.Program = lib.mkForce (lib.getExe paneruSigned);
+              # `services.paneru.finalPackage` directly, which is the UNSIGNED
+              # wrapPaneru wrap (see `paneruSigned` above). Routed through
+              # `wrapperd-wait` instead, so the job blocks until `wrapperd` has
+              # planted the wrappers (it does not at boot otherwise -- see
+              # `aspects/darwin/wrapperd.nix`) and then execs the signed copy at
+              # `${trustedDir}/paneru`. TCC's Accessibility grant is worthless to
+              # a client whose path never survives a rebuild, and worthless again
+              # if the path is missing after a reboot. `Label`, `KeepAlive` and
+              # the rest keep whatever that module set.
+              launchd.agents.paneru.config = flakeParts.flake.lib.wrapperd.waitConfig {
+                inherit pkgs;
+                label = "paneru";
+                name = "paneru";
+              };
 
               # Stop macOS from also acting on a 3-finger vertical swipe
               # (Mission Control up / App Expose down) so paneru's vertical

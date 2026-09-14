@@ -1,0 +1,28 @@
+[package]
+name = "wrapperd"
+version = "0.1.0"
+edition = "2021"
+description = "Boot-time wrapper planter and Mach-ports launchd ordering orchestrator for darwin"
+license = "MIT"
+
+[lib]
+name = "wrapperd"
+path = "src/lib.rs"
+
+[[bin]]
+name = "wrapperd"
+path = "src/main.rs"
+
+[[bin]]
+name = "wrapperd-wait"
+path = "src/bin/wrapperd-wait.rs"
+
+[dependencies]
+async-mach-ports = "0.3"
+serde = { version = "1", features = ["derive"] }
+postcard = { version = "1", features = ["use-std"] }
+toml = "0.8"
+futures-lite = "2.6"
+
+[profile.release]
+strip = true

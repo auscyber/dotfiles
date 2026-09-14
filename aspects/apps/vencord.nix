@@ -1,12 +1,15 @@
 { den, ... }: {
-  ff.nixcord = {
-    url = "github:kaylorben/nixcord";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.flake-parts.follows = "flake-parts";
-    inputs.treefmt-nix.follows = "treefmt-nix";
-  };
 
   den.aspects.vencord = {
+    inputs.nixcord = {
+      url = "github:kaylorben/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
+
+    layers = [ "gui" ];
+
     homeManager = { ... }: {
       programs.nixcord = {
         enable = true;

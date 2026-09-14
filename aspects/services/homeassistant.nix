@@ -5,14 +5,26 @@
   ...
 }:
 {
-  ff.nixvirt = {
-    url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
-    inputs.nixpkgs.follows = "nixpkgs";
+  den.aspects.libvirt = {
+    layers = [ "nixos" ];
+    inputs.nixvirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # A module FUNCTION, like the other 49 class-content sites in this tree.
+    #
+    # den's effect trampoline deepSeqs its handler state at every step (fx
+    # src/trampoline.nix: `k = builtins.deepSeq newState (step.key + 1)`, for
+    # stack safety), so class content written as a bare attrset is fully forced
+    # -- including an `inputs.<x>` buried in an `imports` list. `deepSeq` on a
+    # function forces the closure, not its body, so the function form defers it
+    # to when this host actually builds. `nixvirt` is a nixos-layer input; left
+    # as an attrset it is one aspect-inclusion away from being forced by darwin
+    # evaluations too, which is what `checks.layer-isolation` catches.
+    nixos = _: {
+      imports = lib.optional (inputs ? nixvirt) inputs.nixvirt.nixosModules.default;
+    };
   };
-
-  den.aspects.libvirt.nixos.imports = lib.optional (
-    inputs ? nixvirt
-  ) inputs.nixvirt.nixosModules.default;
 
   den.aspects.homeassistant = {
     includes = [ den.aspects.libvirt ];

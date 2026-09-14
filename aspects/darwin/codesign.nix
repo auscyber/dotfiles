@@ -103,21 +103,17 @@ let
   # permanent as the grants. Shares `/run/wrappers/bin` with
   # `extraModules/darwin/wrappers`'s `security.wrappers` -- the same
   # NixOS-`security.wrapperDir`-flavoured stable bin directory, one fixed path
-  # regardless of what happens to land in it. It inherits that module's own
-  # documented reboot gap: `/run` is a synthetic firmlink macOS clears on
-  # boot, and nix-darwin activation only reruns at `darwin-rebuild` time, not
-  # at boot (`org.nixos.activate-system`'s `RunAtLoad` job only relinks
-  # `/run/current-system` and `/etc`, it does not rerun `activate`) -- so
-  # every shim here is missing until the next switch after a reboot, exactly
-  # like the setuid wrappers already are. Accepted for consistency: one
-  # stable-bin convention instead of two.
+  # regardless of what happens to land in it.
   #
-  # Sharing the directory means sharing its lifecycle too: that module's own
-  # `postActivation` does `rm -rf ${wrapperDir}` before repopulating it with
-  # just its own wrappers, so this aspect's own planting step (below) has to
-  # run in `postActivation` as well, ordered strictly after that with
-  # `lib.mkAfter` -- in `extraActivation` (which runs earlier) it would get
-  # wiped by that `rm -rf` on every single activation.
+  # `/run` is a synthetic firmlink macOS clears on boot, and nix-darwin
+  # activation only reruns at `darwin-rebuild` time, not at boot
+  # (`org.nixos.activate-system`'s `RunAtLoad` job only relinks
+  # `/run/current-system` and `/etc`, it does not rerun `activate`) -- so a
+  # naive planter leaves every shim missing until the next switch after a
+  # reboot. `den.aspects.wrapperd` (`aspects/darwin/wrapperd.nix`) is what
+  # closes that gap: it replants at boot from a LaunchDaemon and gates the
+  # dependent agents on it. This aspect only produces the signed binaries; it
+  # no longer plants them.
   trustedDir = "/run/wrappers/bin";
 
   subject = "Dendritic Local Codesign";
@@ -567,124 +563,14 @@ in
       )
     ];
 
-    darwin =
-      {
-        config,
-        pkgs,
-        ...
-      }:
-      {
-        # What gets PLANTED, as opposed to `signed` above which is what gets
-        # signed. They are different questions and cannot share a list.
-        #
-        # `pkgs.<name>` is the wrong source: a module usually runs a derived
-        # package, not the attribute the overlay named. `services.paneru` builds
-        # `paneru-with-lua` via `.override` and then wraps it for `LUA_PATH`, so
-        # this host's closure holds three paths carrying `trusted/paneru` --
-        # the base build, the lua build, and the wrapper -- and `${pkgs.paneru}`
-        # is the lua-LESS one. Planting that put a paneru with no lua at the
-        # shim's target.
-        #
-        # Walking the closure for `trusted/` does not disambiguate either:
-        # there are four `sketchybar` and three `kanata` paths in it, counting
-        # `.override` variants and `home-manager-path` (a buildEnv that
-        # aggregates them). Nothing in the store says which one runs.
-        #
-        # The config does. These are the packages the launchd jobs actually
-        # exec, and a wrapper package carries `trusted` through as a symlink
-        # to the real build -- so taking the final package gets the right binary
-        # without touching a single launchd job. `or null` throughout: a host
-        # without one of these modules simply contributes nothing.
-        # `postActivation`, not `extraActivation`: `trustedDir` is now
-        # `/run/wrappers/bin`, shared with `extraModules/darwin/wrappers`,
-        # whose own `postActivation` text does `rm -rf ${wrapperDir}` before
-        # replanting just its own setuid wrappers. `extraActivation` runs
-        # earlier, so anything planted there would be wiped by that `rm -rf`
-        # on every activation. `lib.mkAfter` guarantees this text sorts after
-        # that module's (untagged, default-priority) text within
-        # `postActivation` regardless of module declaration order.
-        system.activationScripts.postActivation.text = lib.mkAfter (
-          let
-            # Gated on `enable`, not written as `x.finalPackage or null`. These
-            # options exist even where the module is switched off, so a bare
-            # read still hits an option with no value defined and aborts the
-            # whole evaluation -- which is exactly what the `assessment`
-            # specialisation does, since it excludes sketchybar/paneru/kanata.
-            fromUser = user: [
-              {
-                on = user.services.paneru.enable or false;
-                # `finalPackage` is wrapPaneru's own LUA_PATH wrap, applied
-                # *after* `services.paneru.package` (left unsigned -- see
-                # `signed` above) -- a single hidden-sibling layer over the
-                # real Mach-O, the shape `mkSignedWrapper` already handles.
-                # Signed here directly rather than through the generic
-                # `signed` list/overlay above, since nothing upstream of this
-                # point ever sees the fully-wrapped package to sign it.
-                # `aspects/wms/paneru/default.nix` calls this identically
-                # (same inputs) to point the launchd job's `Program` at the
-                # signed result instead of `finalPackage` itself.
-                get = _: mkSignedWrapper pkgs { package = user.services.paneru.finalPackage; };
-              }
-              {
-                on = user.programs.sketchybar.enable or false;
-                # Same shape and same reason as paneru above:
-                # `programs.sketchybar.finalPackage`
-                # (modules/programs/sketchybar.nix) wraps `programs.sketchybar
-                # .package` (left unsigned -- see `signed` above) again for
-                # `extraPackages`/`extraLuaPackages`, so it's what needs
-                # signing here, not the pre-wrap package. Matching call in
-                # `aspects/desktop/sketchybar/sketchybar.nix`.
-                get = _: mkSignedWrapper pkgs { package = user.programs.sketchybar.finalPackage; };
-              }
-              {
-                on = user.programs.rsbar.enable or false;
-                # Same shape and same reason again: rsbar's own home-manager
-                # module (`nix/hm-module.nix`) wraps `programs.rsbar.package`
-                # (left unsigned -- see `signed` above) a second time for
-                # `extraPackages`, so `finalPackage` is what needs signing.
-                # Matching call in `aspects/desktop/rsbar/rsbar.nix`.
-                get = _: mkSignedWrapper pkgs { package = user.programs.rsbar.finalPackage; };
-              }
-              {
-                on = user.programs.kanata.enable or false;
-                get = _: user.programs.kanata.package;
-              }
-            ];
-
-            runs =
-              map (e: e.get null) (
-                lib.filter (e: e.on) (lib.concatMap fromUser (lib.attrValues (config.home-manager.users or { })))
-              )
-              # No override variant of this one exists, so the plain attribute
-              # is unambiguous.
-              ++ lib.optional (pkgs ? kanata-vk-agent) pkgs.kanata-vk-agent;
-          in
-          ''
-            install -d -m 0755 ${trustedDir}
-            for src in ${lib.concatMapStringsSep " " (p: "${p}/trusted/* ${p}/trusted/.*-wrapped") runs}; do
-              # A source can legitimately carry no `trusted/` -- a package with
-              # no `bin/` signs nothing -- and `.*-wrapped` matches nothing for a
-              # program that was never wrapped. Skip rather than fail the whole
-              # activation on an unmatched glob.
-              [ -e "$src" ] || continue
-
-              codesignName=$(basename "$src")
-
-              # Skip an unchanged binary. Not for speed -- the copy is a few
-              # milliseconds -- but so that a running program is only replaced
-              # when it actually differs, and so the log says what changed.
-              if cmp -s "$src" "${trustedDir}/$codesignName"; then
-                continue
-              fi
-
-              # Staged and renamed because a running executable cannot be written
-              # in place; rename leaves the running process on its own vnode.
-              install -m 0755 "$src" ${trustedDir}/.staged
-              mv -f ${trustedDir}/.staged "${trustedDir}/$codesignName"
-              echo "codesign: planted $codesignName in ${trustedDir}"
-            done
-          ''
-        );
-      };
+    # Planting -- copying each signed `trusted/<name>` into `trustedDir` -- used
+    # to live here in `postActivation`. It moved to `den.aspects.wrapperd`
+    # (`aspects/darwin/wrapperd.nix`), which owns the whole
+    # `trustedDir`/reboot-gap story: it generates a manifest from the same
+    # `enable`-gated `finalPackage` collection this aspect used, plants it on
+    # activation AND at boot (via a LaunchDaemon -- activation does not rerun at
+    # boot), and gates the launchd agents on that planter over a Mach service.
+    # This aspect is now purely the signer: `mkSignedWrapper`, the entitlements
+    # map, and the `zzz-codesign` overlay above.
   };
 }

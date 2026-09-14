@@ -1,7 +1,8 @@
 { inputs, ... }: {
-  ff = {
-    deploy-rs.url = "github:serokell/deploy-rs";
-    deploy-rs.inputs.nixpkgs.follows = "nixpkgs";
+  den.aspects.deploy = {
+    layers = [ "dev" ];
+    inputs.deploy-rs.url = "github:serokell/deploy-rs";
+    inputs.deploy-rs.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   perSystem = { pkgs, ... }: {

@@ -11,55 +11,42 @@
     let
       lib = inputs.nixpkgs.lib.extend (import ./lib);
 
-      # The patched `inputs`, computed WITHOUT running the flake-parts module
-      # system. This used to be `(inputsFn inputs).newInputs`, i.e. a complete
-      # mkFlake over all of ./aspects purely to learn which inputs to patch —
-      # after which the whole thing ran a SECOND time with the result. The two
-      # passes are separate module fixpoints, so Nix shared nothing between
-      # them and every aspect was evaluated twice.
+      # ONE call, one file: ./lib/inputs.nix resolves every
+      # partitions/<layer>/flake.lock as DATA, merges each layer over the
+      # root's own inputs, and patches the result. Layer nodes never enter
+      # this flake's lock and stay `fetchTree` thunks only forced if something
+      # references them; a shared pin resolves to the root's already-resolved
+      # value rather than being fetched twice.
       #
       # ./patched-inputs.nix is generated (`nix run .#write-patched-inputs`)
       # and holds the only part that genuinely needs the module system: which
-      # inputs are patched, and with which patches. Everything else is derived
-      # purely here. `checks.patched-inputs-generated-current` fails if it goes
-      # stale.
-      patchedInputs =
-        (import ./lib/patched-inputs.nix {
+      # inputs are patched, and with which patches.
+      # `checks.patched-inputs-generated-current` fails if it goes stale.
+      #
+      # Which layer an input is locked in comes from the `layers` tag on the
+      # aspect declaring it (aspects/framework/layers.nix), never from a file
+      # path. The layer DIRECTORIES are discovered, because resolving a
+      # layer's lock is what produces `inputs` -- it happens before any
+      # evaluation could read a tag.
+      mergedInputs =
+        (import ./lib/inputs.nix {
           inherit inputs lib;
           rootPath = ./.;
-          patchSpecs = import ./patched-inputs.nix;
+          patchSpecs = (import ./patched-inputs.nix).inputs;
         }).newInputs;
-
-      # All *.nix under ./aspects (except ones starting with '_'), split into
-      # the base import list and one list per flake-parts partition. Anything
-      # claimed by ./partition-map.nix is deliberately NOT imported here: that
-      # is what keeps its `ff.*` inputs out of this file and out of flake.lock.
-      # See aspects/framework/partitions.nix.
-      partitionMap = import ./partition-map.nix;
-
-      aspectPartitions = lib.aspectPartitions {
-        dir = ./aspects;
-        map = partitionMap.buckets;
-        # A bucket every host needs (./packages) is imported back into the
-        # buckets the hosts live in; see aspects/framework/partitions.nix.
-        inherit (partitionMap) deps;
-      };
     in
     inputs.flake-parts.lib.mkFlake
       {
-        inputs = patchedInputs;
+        inputs = mergedInputs;
         specialArgs = {
           realInputs = inputs;
           inherit lib;
         };
       }
       {
-        imports = aspectPartitions.base;
+        imports = lib.aspectFiles ./aspects;
 
         _module.args.rootPath = ./.;
-        _module.args.aspectPartitions = aspectPartitions // {
-          inherit (partitionMap) stubs;
-        };
       };
 
   nixConfig = {
@@ -113,29 +100,14 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-    claude-code = {
-      url = "github:sadjow/claude-code-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     crane.url = "github:ipetkov/crane";
     darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    den.url = "github:denful/den/latest";
+    den.url = "github:denful/den/main";
     devshell = {
       url = "github:numtide/devshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    emacs = {
-      url = "github:nix-community/emacs-overlay";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nixpkgs-stable.follows = "nixpkgs";
-      };
-    };
-    fenix = {
-      url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-compat = {
@@ -174,25 +146,6 @@
       url = "github:isabelroses/izlix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    kanata = {
-      url = "github:auscyber/kanata";
-      inputs = {
-        crane.follows = "crane";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    my-nur = {
-      url = "github:auscyber/nur-packages";
-      inputs = {
-        fenix.follows = "fenix";
-        nixpkgs.follows = "nixpkgs";
-        nvfetcher.inputs.nixpkgs.follows = "nixpkgs";
-      };
-    };
-    neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nh = {
       url = "github:nix-community/nh";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -201,74 +154,14 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-openclaw = {
-      url = "github:openclaw/nix-openclaw";
-      inputs = {
-        home-manager.follows = "home-manager";
-        nix-openclaw-tools.inputs.nixpkgs.follows = "nixpkgs";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nixcord = {
-      url = "github:kaylorben/nixcord";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-    };
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nur = {
-      url = "github:nix-community/NUR";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    op-shell-plugins = {
-      url = "github:1Password/shell-plugins";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    pnpm-nix-provider = {
-      url = "github:wmertens/pnpm-nix-provider";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-        nur.follows = "nur";
-      };
-    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs = {
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    zeroclaw = {
-      url = "github:zeroclaw-labs/zeroclaw";
-      inputs = {
-        fenix.follows = "fenix";
-        nixpkgs.follows = "nixpkgs";
-      };
     };
   };
 }

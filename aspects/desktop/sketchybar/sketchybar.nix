@@ -96,13 +96,18 @@ in
         # home-manager's own module (modules/programs/sketchybar.nix) points
         # this launchd job's `Program` at `programs.sketchybar.finalPackage`
         # directly, which is the UNSIGNED wrapProgram wrap (see
-        # `sketchybarSigned` above). Forced to the signed equivalent instead,
-        # so the process launchd actually execs bottoms out at
-        # `${trustedDir}/sketchybar` rather than a raw, rebuild-varying store
-        # path -- TCC's Accessibility/Screen-Recording grants are worthless to
-        # a client whose path never survives a rebuild. Only `Program` is
-        # overridden; `KeepAlive` and the rest keep whatever that module set.
-        launchd.agents.sketchybar.config.Program = lib.mkForce (lib.getExe sketchybarSigned);
+        # `sketchybarSigned` above). Routed through `wrapperd-wait` instead, so
+        # the job blocks until `wrapperd` has planted the wrappers and then execs
+        # the signed copy at `${trustedDir}/sketchybar` -- TCC's
+        # Accessibility/Screen-Recording grants are worthless to a client whose
+        # path never survives a rebuild, or is missing after a reboot (see
+        # `aspects/darwin/wrapperd.nix`). `KeepAlive` and the rest keep whatever
+        # that module set.
+        launchd.agents.sketchybar.config = flakeParts.flake.lib.wrapperd.waitConfig {
+          inherit pkgs;
+          label = "sketchybar";
+          name = "sketchybar";
+        };
       };
     includes = [
       den.aspects.packages.sketchybar

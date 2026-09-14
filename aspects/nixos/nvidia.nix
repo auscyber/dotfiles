@@ -5,8 +5,23 @@
   ...
 }:
 {
-  ff.nixos-hardware.url = "github:NixOS/nixos-hardware";
+  den.aspects.gpus.layers = [ "nixos" ];
+  # An input may be declared by exactly ONE aspect -- den errors on duplicate
+  # declarations even when the specs are byte-identical. Both `gpus` and
+  # ../hosts/surfacelaptop.nix need nixos-hardware, so it gets an aspect of its
+  # own that each includes.
+  #
+  # The `follows` is load-bearing: without it nixos-hardware pulls its own full
+  # nixpkgs (a separate releases.nixos.org nixexprs.tar.xz) instead of reusing ours.
+  den.aspects.nixos-hardware = {
+    layers = [ "nixos" ];
+    inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
+    inputs.nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+
   den.aspects.gpus.includes = [
+    den.aspects.nixos-hardware
     (
       { host, ... }:
       lib.optionalAttrs (host ? gpu && host.gpu == "nvidia" && inputs ? nixos-hardware) {

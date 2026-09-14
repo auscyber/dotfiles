@@ -10,20 +10,6 @@ let
   registry = import ../_registry.nix;
 in
 {
-  ff = {
-    celler.url = "github:blitz/celler/main";
-    celler.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
-    arion.url = "github:hercules-ci/arion";
-    impermanence.url = "github:nix-community/impermanence";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/";
-  };
-
-  # arion's container-systemd module still sets `services.journald.console`,
-  # which nixpkgs removed; its Haskell test suite evaluates that module, so the
-  # package no longer builds without ../../../patches/arion.
-  patchedInputs.arion = { };
-
   den.hosts.x86_64-linux.secondpc = {
     # From ../_registry.nix, so the key this host is built with and the key its
     # peers pin in `knownHosts` are one value.
@@ -41,6 +27,24 @@ in
   };
 
   den.aspects.secondpc = {
+    layers = [ "nixos" ];
+
+    # `celler` used to be declared here as `github:blitz/celler/main` while
+    # ../../base/caches.nix declares `github:auscyber/celler/main`. Two forks,
+    # invisible to each other in separate partition fixpoints, so this host
+    # built against a celler nothing else used. One merged environment turns
+    # that into a hard conflict, which is how it was found. caches.nix is
+    # canonical; this declaration is gone.
+
+    inputs.nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+    # arion's container-systemd module still sets `services.journald.console`,
+    # which nixpkgs removed; its Haskell test suite evaluates that module, so
+    # the package no longer builds without ../../../patches/arion.
+    inputs.arion.url = "github:hercules-ci/arion";
+    inputs.arion.patch.enable = true;
+    inputs.impermanence.url = "github:nix-community/impermanence";
+    inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/";
+
     includes = [
       den.aspects.nginx
       den.aspects.nix

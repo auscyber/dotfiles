@@ -21,17 +21,18 @@
   # But its bundled flake.lock pins a stale fenix (rust 1.93.1) that cannot build
   # the current source (0.8.3 onwards requires rust 1.96.1), so override fenix to
   # a fresh rev via `follows` — verified to clear the toolchain check and compile.
-  ff.fenix = {
-    url = "github:nix-community/fenix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-  ff.zeroclaw = {
-    url = "github:zeroclaw-labs/zeroclaw";
-    inputs.fenix.follows = "fenix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   den.aspects.zeroclaw = {
+    inputs.fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    inputs.zeroclaw = {
+      url = "github:zeroclaw-labs/zeroclaw";
+      inputs.fenix.follows = "fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     includes = [
       # Only for `pkgs.zotero-mcp` and the one `programs.mcp.servers.zotero`
       # entry reused below. The rest of that registry (jujutsu, deepwiki, nixos)

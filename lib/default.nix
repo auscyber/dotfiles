@@ -16,6 +16,16 @@ final: prev: {
   # the sub-flake: each bucket still locks its own inputs, and partitions.nix
   # subtracts a dep's inputs from the dependent's generated flake.nix so the same
   # input is never declared (or locked) twice.
+  # Every aspect under `dir`, in one list. The merged-environment successor to
+  # `aspectPartitions`: no map, no buckets, no deps -- a file's layer comes from
+  # the `layers` tag on the aspects it defines (aspects/framework/layers.nix),
+  # never from its path.
+  aspectFiles =
+    dir:
+    dir
+    |> prev.fileset.fileFilter (file: file.hasExt "nix" && !prev.hasPrefix "_" file.name)
+    |> prev.fileset.toList;
+
   aspectPartitions =
     {
       dir,

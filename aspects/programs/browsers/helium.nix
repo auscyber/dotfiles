@@ -44,15 +44,10 @@ let
   };
 in
 {
-  ff.my-nur = {
-    url = "github:auscyber/nur-packages";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.fenix.follows = "fenix";
-    inputs.nvfetcher.inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   den.aspects.browsers.helium = { user, ... }: {
     includes = [
+      den.aspects.nur
       den.aspects.stylix
       den.aspects.packages.helium
     ];

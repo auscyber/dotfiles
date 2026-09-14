@@ -26,7 +26,7 @@
   root ? ../.,
 }:
 let
-  patched = import (root + "/patched-inputs.nix");
+  patched = (import (root + "/patched-inputs.nix")).inputs;
   lock = builtins.fromJSON (builtins.readFile (root + "/flake.lock"));
   rootInputs = lock.nodes.${lock.root}.inputs or { };
 

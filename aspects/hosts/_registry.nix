@@ -140,4 +140,19 @@
     user = "ivypierlot";
     uid = 501;
   };
+
+  # --- devices ---
+  #
+  # Fleet members with a `device` attr and no `system`: phones and the like.
+  # ../network/tailscale.nix builds its enrolment list from these. The other
+  # consumers key off `builder` / `hostPublicKey` / a generated wireguard
+  # keypair, so a device is inert in all of them.
+  #
+  # This is only the identity half. The phone IS a den host -- see
+  # ../hosts/iphone.nix and ../framework/mobile.nix -- it just lands in
+  # `mobileConfigurations` rather than `darwinConfigurations`.
+  iphone = {
+    user = "ivypierlot";
+    device.description = "iPhone (Tailscale app)";
+  };
 }

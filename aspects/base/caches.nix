@@ -117,6 +117,23 @@ in
   ) inputs.celler.overlays.default;
 
   den.default.nix.settings = {
+    # An unreachable substituter is not a reason to fail; it is a reason to
+    # build the thing.
+    #
+    # nix defaults this to false, which makes a narinfo fetch that cannot
+    # connect FATAL rather than a miss. The practical effect is that whenever
+    # `vhost` above is down -- a box we run, on a home connection, so this is
+    # not rare -- every nix command that touches an uncached path dies after
+    # ~25s of retries, including ones with nothing to do with building:
+    # `secret-edit` could not open a secret, and `nix run .#tailscale-client-key`
+    # could not mint a key, purely because a cache was unreachable.
+    #
+    # The cost is the honest one: a broken *upstream* cache now also degrades to
+    # a local build, so an outage at cache.nixos.org buys a long rebuild instead
+    # of a loud error. That is the better failure for this fleet -- every host
+    # here can build what it substitutes, and none of them would rather stop.
+    fallback = true;
+
     trusted-substituters = builtins.attrNames caches;
     substituters = builtins.attrNames caches;
     trusted-public-keys = builtins.attrValues caches;
@@ -125,6 +142,27 @@ in
   # secondpc runs the ncps binary cache (served directly on :8501) plus celler
   # (the attic-style cache behind cache.ivymect.in). Attached to the `nix`
   # aspect's per-host provider so they only land on secondpc.
+  # The `celler` input, owned by one aspect that every consumer includes.
+  #
+  # It used to be declared on `den.aspects.nix.provides.secondpc` -- a
+  # nixos-only provider -- while being consumed fleet-wide, because
+  # `den.aspects.packages.celler` below puts celler's overlay in a registry
+  # `collectPackageOverlays` walks regardless of inclusion. Placement reads
+  # where an input is DECLARED, so the darwin laptop ended up resolving a
+  # nixos-layer input (found with `TRACE_INPUTS=1`).
+  #
+  # Declared here instead and included by `celler` and `celler-push`, the layer
+  # falls out of the fleet rather than needing an `inputLayers` override:
+  # `celler-push` is on the laptop (darwin) and auspc (nixos), so the two
+  # intersect to nothing and the input is shared.
+  den.aspects.celler-input.inputs.celler = {
+    url = "github:auscyber/celler/main";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.crane.follows = "crane";
+    inputs.flake-parts.follows = "flake-parts";
+    inputs.flake-compat.follows = "flake-compat";
+  };
+
   den.aspects.nix.provides.secondpc = {
     includes = [
       den.aspects.nginx
@@ -160,7 +198,10 @@ in
       port = 8069;
     in
     {
-      includes = [ den.aspects.packages.celler ];
+      includes = [
+        den.aspects.celler-input
+        den.aspects.packages.celler
+      ];
 
       vhosts.${vhost} = {
         useACMEHost = "ivymect.in";
@@ -267,6 +308,7 @@ in
   den.aspects.celler-push = {
     includes = [
       den.aspects.agenix-rekey
+      den.aspects.celler-input
       den.aspects.packages.celler
     ];
     homeManager =
@@ -476,13 +518,6 @@ in
   #    ];
   #  };
 
-  ff.celler = {
-    url = "github:auscyber/celler/main";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.crane.follows = "crane";
-    inputs.flake-parts.follows = "flake-parts";
-    inputs.flake-compat.follows = "flake-compat";
-  };
 
   flake-file.nixConfig = {
     extra-substituters = builtins.attrNames caches;

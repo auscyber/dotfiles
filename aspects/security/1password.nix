@@ -5,10 +5,6 @@
   ...
 }:
 {
-  ff.op-shell-plugins = {
-    url = "github:1Password/shell-plugins";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
 
   den.aspects.gui = {
     homeManager =
@@ -44,6 +40,13 @@
   };
 
   den.aspects.onepassword = {
+    layers = [ "dev" ];
+
+    inputs.op-shell-plugins = {
+    url = "github:1Password/shell-plugins";
+    inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     includes = [
       (den.batteries.unfree [ "onepassword-password-manager" ])
 

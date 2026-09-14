@@ -5,7 +5,7 @@
 }:
 # `flake.ciMatrix` -- split out of ./ci.nix because it is the only thing here that
 # needs `nix-github-actions`, and it lives in the `dev` partition so that input
-# stays out of the root flake.lock (see ../../partition-map.nix).
+# stays out of the root flake.lock (see ../framework/layers.nix).
 #
 #   * `.#ciMatrix.checks.<system>` is what CI actually consumes: an attrset of
 #     buildable toplevels for that system, keyed `"<class>-<name>"`. The three
@@ -77,9 +77,12 @@ let
     ) (keep (self.darwinConfigurations or { }))) (keep (self.homeConfigurations or { }));
 in
 {
-  ff.nix-github-actions = {
-    url = "github:nix-community/nix-github-actions";
-    inputs.nixpkgs.follows = "nixpkgs";
+  den.aspects.ci-matrix = {
+    layers = [ "dev" ];
+    inputs.nix-github-actions = {
+      url = "github:nix-community/nix-github-actions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # attrPrefix -> the flake attr each matrix row builds: since mkGithubMatrix

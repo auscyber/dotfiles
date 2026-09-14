@@ -5,9 +5,12 @@
   ...
 }:
 {
-  ff.neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-  ff.neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
   den.aspects.neovim = {
+    layers = [ "dev" ];
+
+    inputs.neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    inputs.neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
     includes = [
       den.aspects.nixvim
       den.aspects.stylix

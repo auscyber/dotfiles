@@ -146,7 +146,7 @@ in
   den.aspects.kernel-trim.nixos =
     { host, ... }:
     let
-      file = ../../hosts + "/${host.name}/kernel-trim.json";
+      file = ../../hosts + "/${host.hostName}/kernel-trim.json";
     in
     {
       # Inert until `nix run .#gen-kernel-trim`, run on that host, writes it.

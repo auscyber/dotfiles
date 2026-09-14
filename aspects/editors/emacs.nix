@@ -4,13 +4,16 @@
   ...
 }:
 {
-  ff.emacs = {
+
+  den.aspects.emacs = {
+    layers = [ "dev" ];
+
+    inputs.emacs = {
     url = "github:nix-community/emacs-overlay";
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.nixpkgs-stable.follows = "nixpkgs";
-  };
+    };
 
-  den.aspects.emacs = {
     overlays.emacs = inputs.emacs.overlays.default or (_: _: { });
 
     homeManager = { pkgs, ... }: {

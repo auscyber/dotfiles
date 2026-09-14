@@ -1,16 +1,23 @@
 {
   den,
   lib,
+  inputs,
   ...
 }:
 {
-  ff.darwin = {
-    url = "github:nix-darwin/nix-darwin";
-    inputs.nixpkgs.follows = "nixpkgs";
-    meta.addRegistry = true;
-    patch.enable = true;
-  };
   den.aspects.darwin-base = {
+    inputs.darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+      patch.enable = true;
+    };
+
+    # Declared here rather than as `meta.addRegistry`: that shorthand is read
+    # back off `flake-file.inputsWithMeta`, which only sees inputs still
+    # declared at file level. An aspect-declared input would need the layer plan
+    # to be forced on every build to be seen at all.
+    nix.registry.darwin.flake = inputs.darwin;
+
     includes = [
       den.aspects.darwin-finder
       den.aspects.darwin-general
@@ -45,9 +52,17 @@
       # (many terminal/editor sessions, nix-build allocating one per builder to
       # give tools a tty for colored output). Once the pool fills, every new
       # pty request -- including nix-build's -- fails with "opening
-      # pseudoterminal master: Device not configured". `activate-system` reruns
-      # this at every boot and `darwin-rebuild switch`, so it doesn't need a
-      # dedicated launchd daemon.
+      # pseudoterminal master: Device not configured".
+      #
+      # This runs at every `darwin-rebuild switch`, NOT at boot: the boot job
+      # `org.nixos.activate-system` execs `activate-system-start`, which only
+      # relinks `/run/current-system`, sets gcroots, checks the nixbld users and
+      # rebuilds `/etc` -- it does not rerun `activate`, so neither
+      # `extraActivation` nor `postActivation` fire at boot. The kernel keeps the
+      # raised limit until the next reboot, after which it is back to the default
+      # until the first switch. (This is the same reboot gap `wrapperd` exists to
+      # close for `/run/wrappers/bin`; a plain sysctl has not warranted the same
+      # treatment.)
       system.activationScripts.extraActivation.text = ''
         /usr/sbin/sysctl -w kern.tty.ptmx_max=970 || true
       '';

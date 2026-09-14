@@ -48,7 +48,7 @@ let
     if pkgs.stdenv.hostPlatform.isDarwin then
       "/private/var/run/org.nix-community.home.gpg-agent/S.gpg-agent.extra"
     else
-      "/run/user/${toString (hostMeta.${host.name}.uid or 1000)}/gnupg/S.gpg-agent.extra";
+      "/run/user/${toString (hostMeta.${host.hostName}.uid or 1000)}/gnupg/S.gpg-agent.extra";
 in
 {
   den.aspects.vpn.includes = [ den.aspects.vpn-ssh-config ];
@@ -82,12 +82,12 @@ in
         ]
         ++ lib.optional (hasKey peerName) (tunnelIpByName peerName);
         publicKey = meta.hostPublicKey;
-      }) (lib.filterAttrs (peerName: meta: meta ? hostPublicKey && peerName != host.name) registry);
+      }) (lib.filterAttrs (peerName: meta: meta ? hostPublicKey && peerName != host.hostName) registry);
     };
 
     provides.to-users = { host, ... }: {
       homeManager = { pkgs, ... }: {
-        programs.ssh.settings = lib.genAttrs (clientNames host.name) (
+        programs.ssh.settings = lib.genAttrs (clientNames host.hostName) (
           peerName:
           {
             hostname = tunnelIpByName peerName;

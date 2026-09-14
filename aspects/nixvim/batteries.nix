@@ -23,12 +23,17 @@ let
       ];
       fromAspect = _: sourceAspect;
     };
+
 in
 {
-  ff.nixvim = {
-    url = "github:nix-community/nixvim";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.flake-parts.follows = "flake-parts";
+  den.aspects.nvim = {
+    layers = [ "dev" ];
+
+    inputs.nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
   };
 
   # Register the nvim class
@@ -81,17 +86,25 @@ in
   # Policies
   # ---------------------------------------------------------------------------
 
-  # Provide nixvim HM module to users with homeManager class
-  den.policies.nixvim-hm-module =
-    { host, ... }:
-    (den.lib.policy.provide {
-      class = "homeManager";
-      module = {
-        key = "den:nixvim-hm-module";
-        imports = [ inputs.nixvim.homeModules.nixvim ];
-        programs.nixvim.enable = lib.mkDefault true;
-      };
-    });
+  # OPT-IN, not fleet-wide.
+  #
+  # This was a policy in `den.default.includes`, so EVERY homeManager user got
+  # the nixvim module plus `enable = mkDefault true`. Measured with
+  # `--trace-function-calls`: nixvim's lazyload runs 458 `evalModules` and
+  # nixpkgs' neovim plugin submodule another 249, on every host, whether or not
+  # anything there wanted an editor.
+  #
+  # It bought nothing even for the users who did want it: all seven hosts using
+  # neovim already include `den.aspects.neovim`, whose own `homeManager` sets
+  # `programs.nixvim.enable = true` outright. So the module import moves onto
+  # `den.aspects.nixvim` -- which `den.aspects.neovim` includes -- and arrives
+  # exactly where the class is declared.
+  #
+  # Not `den.lib.whenAspect`: that guard takes aspect-shaped content and rejects
+  # policies outright ("policies are dispatched before guards run and would
+  # never see `hasAspect`"), so gating meant moving the content out of the
+  # policy rather than wrapping it.
+  den.aspects.nixvim.homeManager.imports = [ inputs.nixvim.homeModules.nixvim ];
 
   den.policies.nixvim-include-global-pkgs =
     ctx:
@@ -126,7 +139,11 @@ in
   #  den.aspects.nixvim.includes = [ den.policies.nixvim-hm-module den.policies.nixvim-user-forward ];
 
   den.default.includes = [
-    den.policies.nixvim-hm-module
+    # The aspect that DECLARES `inputs.nixvim`. Without it the aspect is
+    # included by nothing, so the input reaches no layer and no root entry and
+    # `inputs.nixvim` is simply absent. Declaration only -- enabling nixvim is
+    # `den.aspects.neovim`'s job, per host.
+    den.aspects.nvim
     den.policies.nixvim-include-global-pkgs
     den.policies.nixvim-user-forward
     den.policies.nixvim-home-forward

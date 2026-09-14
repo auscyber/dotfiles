@@ -8,8 +8,9 @@
 #
 # Both come in two shapes. The `*File` ones are the bare `.lua` file, for a
 # host that resolves modules by *directory* rather than by a Lua package set:
-# rsbar runs its config as a subprocess and appends the config's own directory
-# to `package.path`, so its modules are files dropped next to `rsbarrc` and
+# coolabah runs its config as a subprocess and appends the config's own
+# directory to `package.path`, so its modules are files dropped next to
+# `coolabahrc` and
 # there is no `extraLuaPackages` to push a nixpkgs Lua package onto. The
 # `mk*Module` ones wrap the same file as a Lua package for the hosts that do
 # have one.

@@ -5,7 +5,13 @@
   den.aspects.nixvim.includes = [ den.aspects.rust ];
 
   den.aspects.rust = {
-    flake-file = _: { inputs.crane.url = "github:ipetkov/crane"; };
+    layers = [ "dev" ];
+
+    # crane stays at the root: celler, kanata and age-plugin-gpg all `follows`
+    # it from root-level aspects, so it cannot live in a layer they cannot see.
+    inputLayers.crane = [ ];
+
+    inputs.crane.url = "github:ipetkov/crane";
 
     includes = [ den.aspects.lspmux ];
 

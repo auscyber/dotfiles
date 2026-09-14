@@ -13,7 +13,7 @@
   # standalone-home guard + scope-identity fixes therefore live config-level (see
   # aspects/base/home-standalone.nix). patches/den/*.patch document the intended
   # upstream changes but stay dormant (no patch.enable).
-  ff.den.url = "github:denful/den/latest";
+  ff.den.url = "github:denful/den/main";
   imports = [
     (inputs.flake-file.flakeModules.dendritic or { })
     #    inputs.den.flakeModules.strict

@@ -69,7 +69,7 @@ let
     {
       nix.distributedBuilds = true;
       nix.extraOptions = builderOptions;
-      nix.buildMachines = buildMachinesFor host.name scoped.builder-ssh-key.secrets.fargonekey.path;
+      nix.buildMachines = buildMachinesFor host.hostName scoped.builder-ssh-key.secrets.fargonekey.path;
     };
 in
 {

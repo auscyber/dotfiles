@@ -5,7 +5,7 @@
     # (and owns the `programs.llama-cpp.port` option read below).
     includes = [
       den.aspects.packages.cotabby
-      den.aspects.llama-cpp
+      #   den.aspects.llama-cpp
     ];
 
     # Cotabby has no config file -- every Settings pane control is an
@@ -38,8 +38,8 @@
         targets.darwin.defaults."com.jacobfu.tabby" = {
           cotabbySelectedEngine = "openAICompatible";
           cotabbyOpenAICompatibleAPIMode = "chatCompletions";
-          cotabbyOpenAICompatibleBaseURL = "http://127.0.0.1:${toString config.programs.llama-cpp.port}/v1";
-          cotabbyOpenAICompatibleModelName = "${config.programs.llama-cpp.alias}";
+          #          cotabbyOpenAICompatibleBaseURL = "http://127.0.0.1:${toString config.programs.llama-cpp.port}/v1";
+          #          cotabbyOpenAICompatibleModelName = "${config.programs.llama-cpp.alias}";
         };
       };
   };

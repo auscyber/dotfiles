@@ -24,11 +24,9 @@ in
   den.aspects.searchix = {
     # Declared on the aspect, not the file: the input set follows which
     # hosts pull this aspect in, and so does its partition.
-    flake-file = _: {
-      inputs.searchix = {
-        url = "git+https://git.sr.ht/~alanpearce/searchix";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
+    inputs.searchix = {
+      url = "git+https://git.sr.ht/~alanpearce/searchix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     includes = [ den.aspects.nginx ];

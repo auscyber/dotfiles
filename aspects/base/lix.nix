@@ -4,7 +4,14 @@
   ...
 }:
 {
-  ff = {
+
+  # The entire Lix build lives in the `ivylix` flake (sourced via nvfetcher through
+  # the shared `ivixlib` mechanism). We reuse its scope *builder* rather than its
+  # pre-built packages, so the whole scope compiles against ONE Lix — ccache-wrapped
+  # on hosts that run the ccache aspect. (Injecting the flat `ivylix.packages` and
+  # then ccache-wrapping only `pkgs.lix` would build Lix twice: the wrapped one for
+  # `nix.package`, and the plain one `nil`/etc. still depend on.)
+  den.aspects.lix.inputs = {
     izlix.url = "github:isabelroses/izlix";
     izlix.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -20,12 +27,6 @@
     ivixlib.inputs.flake-parts.follows = "flake-parts";
   };
 
-  # The entire Lix build lives in the `ivylix` flake (sourced via nvfetcher through
-  # the shared `ivixlib` mechanism). We reuse its scope *builder* rather than its
-  # pre-built packages, so the whole scope compiles against ONE Lix — ccache-wrapped
-  # on hosts that run the ccache aspect. (Injecting the flat `ivylix.packages` and
-  # then ccache-wrapping only `pkgs.lix` would build Lix twice: the wrapped one for
-  # `nix.package`, and the plain one `nil`/etc. still depend on.)
   den.aspects.lix.os =
     {
       pkgs,

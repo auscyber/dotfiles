@@ -7,20 +7,6 @@
 let
 in
 {
-  ff = {
-    nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
-      # Upstream pins nixos-25.11; follow root nixpkgs so stylix (which targets
-      # 26.11) can define options like services.displayManager.generic here.
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
-    nixos-images = {
-      url = "github:nvmd/nixos-images/sdimage-installer";
-      inputs.nixos-stable.follows = "nixpkgs-nvmd";
-      inputs.nixos-unstable.follows = "nixpkgs-nvmd";
-    };
-  };
 
   den.lib.raspberry-pi-builder =
     args:
@@ -36,6 +22,21 @@ in
     );
 
   den.aspects.nixos-raspberrypi = {
+    inputs = {
+      nixos-raspberrypi = {
+        url = "github:nvmd/nixos-raspberrypi/main";
+        # Upstream pins nixos-25.11; follow root nixpkgs so stylix (which targets
+        # 26.11) can define options like services.displayManager.generic here.
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      nixpkgs-nvmd.url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
+      nixos-images = {
+        url = "github:nvmd/nixos-images/sdimage-installer";
+        inputs.nixos-stable.follows = "nixpkgs-nvmd";
+        inputs.nixos-unstable.follows = "nixpkgs-nvmd";
+      };
+    };
+
     nixos = {
       imports = with inputs.nixos-raspberrypi.nixosModules; [
         raspberry-pi-5.base

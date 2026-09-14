@@ -5,11 +5,6 @@
   ...
 }:
 {
-  ff.kanata = {
-    url = "github:auscyber/kanata";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.crane.follows = "crane";
-  };
   den.aspects.kanata = { user, ... }: {
     includes = [
       den.aspects.packages.kanata-tray

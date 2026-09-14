@@ -52,19 +52,18 @@ let
   active = entity: config: !(entity.__isSpecialisation or false) && config.denSpecialisations != { };
 
   # name -> { configuration; package; }, for every declared specialisation.
+  #
+  # `buildAll`, not `buildFor` per name: every specialisation is resolved in ONE
+  # den walk rather than one walk each. A host with three of them was paying four
+  # full system evaluations, and each of those drags in the whole linux-builder
+  # NixOS guest -- 1667 -> 5001 `evalModules` from `pam.nix` alone, measured with
+  # `--trace-function-calls`.
   builtByName =
-    kind: entity: config:
-    lib.mapAttrs (
-      name: contributions:
-      specialisations.buildFor {
-        inherit
-          kind
-          entity
-          name
-          contributions
-          ;
-      }
-    ) config.denSpecialisations;
+    kind: entity: config: parentPkgs:
+    specialisations.buildAll {
+      inherit kind entity parentPkgs;
+      specs = config.denSpecialisations;
+    };
 
   # `mkdir -p`, not `mkdir`: harmless if the directory is already there.
   linkCommands =
@@ -144,7 +143,7 @@ in
         specialisation = lib.mapAttrs (_: spec: {
           inheritParentConfig = false;
           configuration.imports = spec.modules;
-        }) (builtByName "host" host config);
+        }) (builtByName "host" host config null);
       };
     };
 
@@ -154,11 +153,11 @@ in
     # den instantiates a host and link its toplevel into the same place the
     # patched module would have -- the on-disk layout is what activation reads,
     # so `/run/current-system/specialisation/<name>/activate` is unchanged.
-    darwin = { config, ... }: {
+    darwin = { config, pkgs, ... }: {
       options.denSpecialisations = contributionsOption;
       config = lib.mkIf (active host config) (
         let
-          built = builtByName "host" host config;
+          built = builtByName "host" host config pkgs;
         in
         {
           assertions = [ (noOverlapAssertion config) ];

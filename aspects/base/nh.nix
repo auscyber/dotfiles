@@ -25,9 +25,8 @@ in
   # releases.nixos.org nixexprs.tar.xz), fetched and re-checked independently
   # of the one everything else already uses.
   ff.nh.inputs.nixpkgs.follows = "nixpkgs";
-  patchedInputs.nh = {
-    patches = [ ../../patches/nh/edit.patch ];
-  };
+  ff.nh.patch.enable = true;
+  ff.nh.patch.patches = [ ../../patches/nh/edit.patch ];
 
   den.default = {
     overlays = {

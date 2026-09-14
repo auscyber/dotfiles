@@ -20,6 +20,32 @@ let
       }
     )
   );
+
+  # Gate a darwin launchd job on `wrapperd` (aspects/darwin/wrapperd.nix): block
+  # on its Mach service until the signed wrappers are planted -- which does NOT
+  # happen at boot otherwise, `/run/wrappers/bin` being wiped and activation not
+  # rerun -- then exec the original command. kanata and kanata-vk-agent are both
+  # signed for stable TCC (Input Monitoring / Accessibility) paths, so the same
+  # reboot gap that bites the bars bites them. `cfg.package`'s bin is a shim onto
+  # `${trustedDir}/kanata`, so the command is left as-is; only the wait is added.
+  #
+  # The service name is `flake.lib.wrapperd.service`; this is a plain
+  # home-manager module with no access to the flake-parts scope, so it is spelled
+  # out here. Only ever forced on darwin (used under `mkIf isDarwin`).
+  wrapperdService = "in.ivymect.wrapperd";
+  gateOnWrapperd =
+    label: command:
+    [
+      (lib.getExe' pkgs.wrapperd "wrapperd-wait")
+      "--label"
+      label
+      "--service"
+      wrapperdService
+      "--then"
+      (builtins.head command)
+      "--"
+    ]
+    ++ builtins.tail command;
 in
 {
   options.programs.kanata = with lib.types; {
@@ -137,17 +163,19 @@ in
           enable = true;
           config = {
             Label = "org.nixos.kanata-vk-agent";
-            ProgramArguments = [
-              "${pkgs.kanata-vk-agent}/bin/kanata-vk-agent"
-              "-p"
-              "${builtins.toString cfg.kanataPort}"
-              "-b"
-              "${builtins.concatStringsSep "," cfg.appBundleIds}"
-            ]
-            ++ (lib.optionals (cfg.extraCommandPiping != null) [
-              "-e"
-              (builtins.toString cfg.extraCommandPiping)
-            ]);
+            ProgramArguments = gateOnWrapperd "kanata-vk-agent" (
+              [
+                "${pkgs.kanata-vk-agent}/bin/kanata-vk-agent"
+                "-p"
+                "${builtins.toString cfg.kanataPort}"
+                "-b"
+                "${builtins.concatStringsSep "," cfg.appBundleIds}"
+              ]
+              ++ (lib.optionals (cfg.extraCommandPiping != null) [
+                "-e"
+                (builtins.toString cfg.extraCommandPiping)
+              ])
+            );
             RunAtLoad = true;
             KeepAlive = {
               Crashed = true;
@@ -160,11 +188,13 @@ in
         launchd.agents.kanata_tray = {
           enable = cfg.tray.enable;
           config = {
-            ProgramArguments = [
-              "/usr/bin/sudo"
-              "-E"
-            ]
-            ++ cfg.tray.command;
+            ProgramArguments = gateOnWrapperd "kanata-tray" (
+              [
+                "/usr/bin/sudo"
+                "-E"
+              ]
+              ++ cfg.tray.command
+            );
             StandardErrorPath = "/tmp/kanata_tray.err";
             StandardOutPath = "/tmp/kanata_tray.out";
             RunAtLoad = true;
@@ -181,11 +211,13 @@ in
         launchd.agents.kanata = {
           enable = !cfg.tray.enable;
           config = {
-            ProgramArguments = [
-              "/usr/bin/sudo"
-              "-E"
-            ]
-            ++ cfg.kanataCommand;
+            ProgramArguments = gateOnWrapperd "kanata" (
+              [
+                "/usr/bin/sudo"
+                "-E"
+              ]
+              ++ cfg.kanataCommand
+            );
             StandardErrorPath = "/tmp/kanata_tray.err";
             StandardOutPath = "/tmp/kanata_tray.out";
             RunAtLoad = true;

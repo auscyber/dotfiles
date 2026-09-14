@@ -2,12 +2,12 @@
 --
 -- Shipped by den.aspects.paneru as the `wm` Lua module on the bar's require
 -- path — programs.sketchybar.extraLuaPackages for sketchybar, or as a plain
--- file next to `rsbarrc` for rsbar — so the base config's `require("wm")`
+-- file next to `coolabahrc` for coolabah — so the base config's `require("wm")`
 -- resolves to this when paneru is the enabled WM. The same contract
 -- aspects/wms/rift/sketchybar/wm.lua fulfils for rift, and the reason a bar's
 -- own config stays WM-agnostic.
 --
--- One file for both bars: rsbar installs its API under `sbar` (and
+-- One file for both bars: coolabah installs its API under `sbar` (and
 -- `require("sketchybar")`) exactly as SbarLua does, so nothing here has to know
 -- which of the two it is running in.
 --
@@ -28,9 +28,9 @@
 --   * sketchybar — they never fire. paneru repaints sketchybar from its own
 --     process, through the same `paneru_bar` module, because SbarLua is
 --     loadable into paneru's interpreter. See ../sketchybar/paneru-events.lua.
---   * rsbar — nothing loadable exists for paneru to draw with, so paneru only
+--   * coolabah — nothing loadable exists for paneru to draw with, so paneru only
 --     triggers, and the redraw happens here off a state query. See
---     ../rsbar/paneru-events.lua.
+--     ../coolabah/paneru-events.lua.
 --
 -- Relies on globals set by the base config: `sbar` (init.lua),
 -- `_G.reorder_left_items` (items/left.lua), `_G.secondary_window_name_items`
@@ -40,7 +40,7 @@
 local bar = require("paneru_bar")
 
 -- Triggered by paneru itself (../sketchybar/paneru-events.lua,
--- ../rsbar/paneru-events.lua), so a restarted daemon resyncs the bar rather
+-- ../coolabah/paneru-events.lua), so a restarted daemon resyncs the bar rather
 -- than leaving it showing the state it had when the daemon died.
 local repaints = {
 	paneru_load = bar.render,

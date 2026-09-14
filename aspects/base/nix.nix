@@ -18,10 +18,6 @@
       };
     })
   ];
-  ff = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    # all your other inputs
-  };
 
   # A convenience `nix` class, forwarded into the host's `nix.*` on both NixOS
   # and nix-Darwin. Modeled exactly on the built-in `os` class (`os-to-host`)
@@ -63,6 +59,12 @@
           path = [ "nix" ];
         }
       );
+
+  # Bootstrap: nixpkgs stays at the ROOT, declared at file level like
+  # ../framework/inputs.nix's flake-parts. Everything `follows` it, and the root
+  # flake is evaluated before any layer lock is resolved, so it cannot live in a
+  # layer without the layer needing itself to load.
+  ff.nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
 
   den.aspects.extra-registry = {
     # `nix.registry` here is picked up by the `nix-to-host` policy above (no
@@ -110,7 +112,16 @@
       #      ];
     };
 
-    nix.registry.dotfiles.flake = inputs.self;
+    # `to`, with just the path -- not `flake = inputs.self`.
+    #
+    # `flake = <flake>` hands the registry the whole flake value; the registry
+    # only ever needs somewhere to point. Referencing `inputs.self` also means
+    # every host config embeds the flake's own output attrset, which is a
+    # self-reference this config has no reason to take.
+    nix.registry.dotfiles.to = {
+      type = "path";
+      path = inputs.self.outPath;
+    };
     hmStandalone = { pkgs, ... }: {
       nix.package = lib.mkDefault pkgs.nix;
     };
