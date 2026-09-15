@@ -13,6 +13,10 @@
     # Declared on the aspect, not the file: the input set follows which
     # hosts pull this aspect in, and so does its partition.
     inputs.idris2Packages.url = "github:mattpolzin/nix-idris2-packages";
+    # Without this it locks its OWN nixpkgs, so a host eval builds a second
+    # package set at a different rev -- measured as the top non-primop entry in
+    # an exclusive-time profile (`lib/sources.nix` source scans).
+    inputs.idris2Packages.inputs.nixpkgs.follows = "nixpkgs";
 
     # Multiplex idris2-lsp through lspmux, co-located with the language aspect: this
     # contributes the entry to the `lsp-servers` class, which the forward on

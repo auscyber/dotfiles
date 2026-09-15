@@ -37,12 +37,15 @@ in
     # canonical; this declaration is gone.
 
     inputs.nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+    inputs.nixos-mailserver.inputs.nixpkgs.follows = "nixpkgs";
     # arion's container-systemd module still sets `services.journald.console`,
     # which nixpkgs removed; its Haskell test suite evaluates that module, so
     # the package no longer builds without ../../../patches/arion.
     inputs.arion.url = "github:hercules-ci/arion";
+    inputs.arion.inputs.nixpkgs.follows = "nixpkgs";
     inputs.arion.patch.enable = true;
     inputs.impermanence.url = "github:nix-community/impermanence";
+    inputs.impermanence.inputs.nixpkgs.follows = "nixpkgs";
     inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
     includes = [

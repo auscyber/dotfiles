@@ -14,6 +14,7 @@
   inputs = {
     arion = {
       url = "github:hercules-ci/arion";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
       url = "github:nix-community/disko";
@@ -33,6 +34,7 @@
     };
     impermanence = {
       url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
@@ -40,6 +42,7 @@
     };
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/";
@@ -57,6 +60,7 @@
     };
     nixos-mailserver = {
       url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
@@ -64,6 +68,7 @@
     };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs = {
       url = "path:../../lib/stub";

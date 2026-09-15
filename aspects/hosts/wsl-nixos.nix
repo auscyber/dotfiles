@@ -11,6 +11,7 @@
   den.aspects.wsl-nixos = {
     layers = [ "nixos" ];
     inputs.nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    inputs.nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     # A module FUNCTION, not a bare attrset.
     #
     # Class content written as an attrset is evaluated while den COLLECTS it

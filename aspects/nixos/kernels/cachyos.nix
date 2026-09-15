@@ -11,6 +11,7 @@
     # in. Do not override its nixpkgs input, otherwise there can be a mismatch
     # between patches and kernel version.
     inputs.nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    inputs.nix-cachyos-kernel.inputs.nixpkgs.follows = "nixpkgs";
 
     includes = [ den.aspects.ccache ];
     # Linux-guarded, and the guard has to be INSIDE the overlay function.

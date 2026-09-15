@@ -14,6 +14,7 @@
   inputs = {
     idris2Packages = {
       url = "github:mattpolzin/nix-idris2-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs = {
       url = "path:../../lib/stub";

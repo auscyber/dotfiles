@@ -136,6 +136,13 @@ let
       exit 1
     fi
 
+    # The key description is validated control-side against a set narrower than
+    # JSON's -- parentheses are rejected -- and all you get back is HTTP 400
+    # "description had invalid characters", which reads like an auth problem and
+    # is not one. Fold anything outside the safe set to a hyphen and cap the
+    # length, so a hostname can never wedge the daemon into a retry loop.
+    ts_description="$(printf '%s' "$ts_description" | tr -c 'A-Za-z0-9 ._-' '-' | cut -c1-50)"
+
     # Built with jq rather than a Nix-side toJSON so `ts_description` can be a
     # runtime value, and so the description is escaped by something that
     # actually knows JSON.
@@ -257,7 +264,7 @@ in
                 # `uname -n`, not `hostname`: coreutils is already pinned onto
                 # PATH here and ships the former, while `hostname` on darwin
                 # lives outside the closure in /usr/bin.
-                ts_description="$(uname -n) (nix autoconnect)"
+                ts_description="$(uname -n) nix autoconnect"
                 ${mintKeyScript}
 
                 # The key reaches tailscaled as an argument, which is visible in

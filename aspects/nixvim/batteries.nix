@@ -144,6 +144,18 @@ in
     # `inputs.nixvim` is simply absent. Declaration only -- enabling nixvim is
     # `den.aspects.neovim`'s job, per host.
     den.aspects.nvim
+  ];
+
+  # The forwards fire UNCONDITIONALLY -- `nvimForward` uses
+  # `each = lib.singleton true`, so every entity they reach gets a
+  # `programs.nixvim` definition whether or not it has any nvim content. At
+  # default scope that is every user and every home, while the module itself is
+  # imported by `den.aspects.nixvim` alone: entities without the aspect end up
+  # with definitions and no option tree ("the option `programs.nixvim' does not
+  # exist" -- measured on pentestvm/admin and wsl-nixos/nixos, via searchix's
+  # option-docs rebuild). Scope them to the aspect that supplies the module, so
+  # definitions and declarations always travel together.
+  den.aspects.nixvim.includes = [
     den.policies.nixvim-include-global-pkgs
     den.policies.nixvim-user-forward
     den.policies.nixvim-home-forward

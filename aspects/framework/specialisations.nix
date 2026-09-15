@@ -49,7 +49,15 @@ let
 
   # A specialisation's eval re-collects this same class, so the delivery has to
   # go inert inside one (see lib/specialisations.nix `__isSpecialisation`).
-  active = entity: config: !(entity.__isSpecialisation or false) && config.denSpecialisations != { };
+  # `DEN_NO_SPECIALISATIONS=1` skips building them: measured 28.7s -> 20.5s on
+  # the laptop, which is what an iteration loop pays for three profiles it is
+  # not editing. Off by default, so a switch always builds the real set. Same
+  # env-var idiom as TRACE_INPUTS / LAYER_GATE_DENY / PATCH_HASHES.
+  skipAll = builtins.getEnv "DEN_NO_SPECIALISATIONS" == "1";
+
+  active =
+    entity: config:
+    !skipAll && !(entity.__isSpecialisation or false) && config.denSpecialisations != { };
 
   # name -> { configuration; package; }, for every declared specialisation.
   #
