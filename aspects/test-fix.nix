@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   #patchedInputs.nixpkgs.patches = [ ../patches/nixpkgs/fix-vscode.patch ];
 
   # Upstream https://github.com/NixOS/nixpkgs/pull/560020: inline-snapshot's

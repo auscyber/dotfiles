@@ -85,8 +85,7 @@
         idris2Packages =
           let
             inherit (prev) lib;
-            upstream =
-              inputs.idris2Packages.packages.${prev.stdenv.hostPlatform.system}.idris2Packages;
+            upstream = inputs.idris2Packages.packages.${prev.stdenv.hostPlatform.system}.idris2Packages;
             # Idris2's own nix/package.nix writes `lib.optional cond [ pkg ]`,
             # which yields `[ [ pkg ] ]`. nixpkgs 26.05 deprecates nested lists
             # in dependency attributes, so every eval that forces idris2 traces

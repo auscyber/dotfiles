@@ -1,5 +1,4 @@
 { den, ... }: {
-
   den.aspects.vencord = {
     inputs.nixcord = {
       url = "github:kaylorben/nixcord";

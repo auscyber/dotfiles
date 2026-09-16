@@ -14,12 +14,12 @@
             "name": null,
             "owner": "AndiWeiss",
             "repo": "alx-wol",
-            "rev": "alx-wol-3.1",
-            "sha256": "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=",
+            "rev": "alx-wol-3.2",
+            "sha256": "sha256-gdYRMJD8+JwjqZckZFYBp3PQhnHgaGxg0IQohC6p8Bg=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "alx-wol-3.1"
+        "version": "alx-wol-3.2"
     },
     "app_font": {
         "cargoLock": null,
@@ -111,11 +111,11 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-UM3RpqZlWYEN7Vi4xl0FFxOuoIDoaZx7kf+SK9sPZLI=",
+            "sha256": "sha256-nJbaNuBGBbF36YkRswpLjwTCxnNczmwcJDelO3bpSwc=",
             "type": "url",
-            "url": "https://tip.files.ghostty.org/e2e53f861482e080bf45054ba49ef471f9849937/Ghostty.dmg"
+            "url": "https://tip.files.ghostty.org/661e1e77f445057312666a74d9f5002e82f81764/Ghostty.dmg"
         },
-        "version": "e2e53f861482e080bf45054ba49ef471f9849937"
+        "version": "661e1e77f445057312666a74d9f5002e82f81764"
     },
     "helium_linux": {
         "cargoLock": null,
@@ -253,11 +253,11 @@
         "pinned": false,
         "prefetch": null,
         "src": {
-            "sha256": "sha256-rX27DUrrrHtR1cgyr/424m9JPjrdASIisVGv2vWzMAs=",
+            "sha256": "sha256-ftW0vE45v2JsbaYqo/So0ZFfvdtakHX0XEXEE4TdxLk=",
             "type": "tarball",
-            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6-x86_64.tar.gz"
+            "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.tar.gz"
         },
-        "version": "GE-Proton11-6"
+        "version": "GE-Proton11-7"
     },
     "sketchybar": {
         "cargoLock": null,
@@ -446,10 +446,10 @@
         "prefetch": null,
         "src": {
             "name": null,
-            "sha256": "sha256-T3CGoDZr83+G984oEADitWAtzUlu8rz6UgEnsZqeBhQ=",
+            "sha256": "sha256-nvU/7MH4U3NRsbJhxowr5H9qpWZLwKGTRgv3/UossTY=",
             "type": "url",
-            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.4/zotlit-zotero-2.1.4.xpi"
+            "url": "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.0-beta.0/zotlit-zotero-2.2.0-beta.0.xpi"
         },
-        "version": "2.1.4"
+        "version": "2.2.0-beta.0"
     }
 }

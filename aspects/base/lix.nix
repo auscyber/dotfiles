@@ -4,7 +4,6 @@
   ...
 }:
 {
-
   # The entire Lix build lives in the `ivylix` flake (sourced via nvfetcher through
   # the shared `ivixlib` mechanism). We reuse its scope *builder* rather than its
   # pre-built packages, so the whole scope compiles against ONE Lix — ccache-wrapped

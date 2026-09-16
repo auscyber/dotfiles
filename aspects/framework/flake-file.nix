@@ -57,14 +57,14 @@
     # Host scope: `host` IS bound here, so the route path is chosen per layer
     # and a darwin host's inputs are never added to `flake-file.inputs` at all.
     policies.host-inputs-to-layers =
-      { host ? { }, ... }:
+      {
+        host ? { },
+        ...
+      }:
       let
         hostLayers = host.layers or [ ];
         layer =
-          if hostLayers == [ ] then
-            null
-          else
-            lib.concatStringsSep "-" (lib.sort (a: b: a < b) hostLayers);
+          if hostLayers == [ ] then null else lib.concatStringsSep "-" (lib.sort (a: b: a < b) hostLayers);
       in
       [
         (den.lib.policy.route {

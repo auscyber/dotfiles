@@ -7,14 +7,12 @@
   # Sent upstream? Not yet. kanidm/kanidm#2627 is the tracking epic for the
   # wider kanidm<->service integration story this belongs to.
   den.aspects.packages.kanidm-provision = {
-    overlays =
-      { ... }:
-      {
-        kanidm-provision = _self: super: {
-          kanidm-provision = super.kanidm-provision.overrideAttrs (old: {
-            patches = (old.patches or [ ]) ++ [ ../patches/kanidm-provision/service-accounts.patch ];
-          });
-        };
+    overlays = { ... }: {
+      kanidm-provision = _self: super: {
+        kanidm-provision = super.kanidm-provision.overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [ ../patches/kanidm-provision/service-accounts.patch ];
+        });
       };
+    };
   };
 }

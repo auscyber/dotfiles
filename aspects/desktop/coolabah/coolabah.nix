@@ -150,16 +150,19 @@ in
             # `coolabahrc`, generated from `programs.coolabah.config` below;
             # dotfiles because a `.gitignore` in a config directory is clutter
             # that coolabah would never read.
-            sharedConfig = lib.mapAttrs' (
-              name: _:
-              lib.nameValuePair "coolabah/${name}" {
-                source = config.lib.file.linkLocalPath (../../../sketchybar + "/${name}");
-              }
-            ) (
-              lib.filterAttrs (name: _: name != "sketchybarrc" && !(lib.hasPrefix "." name)) (
-                builtins.readDir ../../../sketchybar
-              )
-            );
+            sharedConfig =
+              lib.mapAttrs'
+                (
+                  name: _:
+                  lib.nameValuePair "coolabah/${name}" {
+                    source = config.lib.file.linkLocalPath (../../../sketchybar + "/${name}");
+                  }
+                )
+                (
+                  lib.filterAttrs (name: _: name != "sketchybarrc" && !(lib.hasPrefix "." name)) (
+                    builtins.readDir ../../../sketchybar
+                  )
+                );
 
             # `programs.coolabah.finalPackage` (coolabah's own home-manager
             # module, `nix/hm-module.nix`) wraps `programs.coolabah.package` a

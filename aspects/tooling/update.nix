@@ -133,33 +133,30 @@ in
         apps.update = {
           type = "app";
           program = pkgs.writeShellScriptBin "update" ''
-                                                                                                                                                                                                          #!${pkgs.runtimeShell}
-                                                                                                                                                                                                          set -euo pipefail
-                                                                                                                                                                                                          ${
-                                                                                                                                                                                                            lib.optionalString
-                                                                                                                                                                                                            (config.update-hooks.preFlake != [ ])
-                                                                                                                                                                                                            ''
-                                                                                                                                                                                                                echo "Running pre-flake hooks..."
-                                                                                                                                                                                                              ${makeHookText config.update-hooks.preFlake}
-                                                                                                                                                                                                            ''
-                                                                                                                                                                                                          }
-                                                                                                                                                                                                          echo "Updating flake inputs..."
-                                                                                                                                                                                                          nix flake update
+            set -euo pipefail
+
+            ${lib.optionalString (config.update-hooks.preFlake != [ ]) ''
+              echo "Running pre-flake hooks..."
+              ${makeHookText config.update-hooks.preFlake}
+            ''}
+
+            echo "Updating flake inputs..."
+            nix flake update
+
             ${lib.optionalString (config.update-hooks.postFlake != [ ]) ''
-                echo "Running post-flake hooks..."
+              echo "Running post-flake hooks..."
               ${makeHookText config.update-hooks.postFlake}
             ''}
 
             ${lib.optionalString (config.update-hooks.flake != [ ]) ''
-                echo "Running interwined flake hooks..."
+              echo "Running intertwined flake hooks..."
               ${makeHookText config.update-hooks.flake}
             ''}
 
             ${lib.optionalString (config.update-hooks.finalPostParse != [ ]) ''
-                echo "Running final post-parse hooks..."
+              echo "Running final post-parse hooks..."
               ${makeHookText config.update-hooks.finalPostParse}
             ''}
-
           '';
         };
       };

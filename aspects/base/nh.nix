@@ -48,7 +48,20 @@ in
       # (`nh`), whose drvPath is identical in `pkgs` and in the extended set,
       # and all 10 packages `denPackages` returns have identical names and
       # identical drvPaths either way.
-      nhPackages = den.lib.nh.denPackages { fromFlake = true; } pkgs;
+      # den's nh lib dispatches on `.${host.class}` with only `darwin`/`nixos`
+      # keys, so a host in any other class (the `ios` phone) throws when its
+      # derivation is realised. `denPackages` itself only forces `item.name`,
+      # which is why this survived eval and died on `attrValues`.
+      nhDispatchable =
+        h:
+        lib.elem (h.class or "") [
+          "darwin"
+          "nixos"
+        ];
+      unsupportedHosts = map (h: h.name) (
+        lib.filter (h: !nhDispatchable h) (lib.concatMap lib.attrValues (lib.attrValues den.hosts))
+      );
+      nhPackages = removeAttrs (den.lib.nh.denPackages { fromFlake = true; } pkgs) unsupportedHosts;
     in
     {
       packages = nhPackages;

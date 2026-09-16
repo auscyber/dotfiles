@@ -451,11 +451,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789094282,
-        "narHash": "sha256-NZiDs6KnRTTK6LoUnhfGAF1yfardyGp072V94OIZj5s=",
+        "lastModified": 1790127766,
+        "narHash": "sha256-/7afUlyaQ+YdeQTOt3hOZR72QgTHluQAQ2akR3jVELY=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "b4dd4621f4359738ebd798929032100ba9c8498d",
+        "rev": "d2483a658d0113b36a93dac4d1a8c9052bcad0b6",
         "type": "github"
       },
       "original": {
@@ -545,11 +545,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789387191,
-        "narHash": "sha256-UWMvwIlLV3zF2Mkwus17NfLyBzwBsR/5pHFxrWWGyaA=",
+        "lastModified": 1790101991,
+        "narHash": "sha256-bNnRLtCtn2kCMeoQ/F1SBW4ltv4moQOPZ8YT0BWsoT0=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "6a281d7c09c0ed6450c5c948ee9a387390285317",
+        "rev": "6be82ac04e6713849ae23ec45cd606d96f3174d7",
         "type": "github"
       },
       "original": {

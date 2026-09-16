@@ -72,7 +72,11 @@ assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
   };
 
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       packages.iphone-deploy = pkgs.writeShellApplication {
         name = "iphone-deploy";
@@ -128,7 +132,9 @@ assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
           pkgs.coreutils
         ];
         text = ''
-          manifest=${pkgs.writeText "${name}-manifest.json" flakeConfig.flake.mobileConfigurations.${name}.manifest}
+          manifest=${
+            pkgs.writeText "${name}-manifest.json" flakeConfig.flake.mobileConfigurations.${name}.manifest
+          }
 
           if ! xcrun --find devicectl >/dev/null 2>&1; then
             echo "iphone-apps: devicectl not found -- it ships with Xcode 15+, not the CLT." >&2
@@ -211,7 +217,9 @@ assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
           pkgs.coreutils
         ];
         text = ''
-          manifest=${pkgs.writeText "${name}-manifest.json" flakeConfig.flake.mobileConfigurations.${name}.manifest}
+          manifest=${
+            pkgs.writeText "${name}-manifest.json" flakeConfig.flake.mobileConfigurations.${name}.manifest
+          }
 
           if [ "$(jq -r '.webClips | length' "$manifest")" -eq 0 ]; then
             echo "iphone-webclips: none declared in device.webClips" >&2

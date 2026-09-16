@@ -161,24 +161,30 @@ in
     # den instantiates a host and link its toplevel into the same place the
     # patched module would have -- the on-disk layout is what activation reads,
     # so `/run/current-system/specialisation/<name>/activate` is unchanged.
-    darwin = { config, pkgs, ... }: {
-      options.denSpecialisations = contributionsOption;
-      config = lib.mkIf (active host config) (
-        let
-          built = builtByName "host" host config pkgs;
-        in
-        {
-          assertions = [ (noOverlapAssertion config) ];
-          system.systemBuilderCommands = linkCommands built;
-          # The same handle NixOS gives you via
-          # `specialisation.<n>.configuration.…`: `system.build` is
-          # nix-darwin's escape hatch for exactly this, and eval-only checks
-          # (or a quick `nix eval`) need to reach inside a specialisation
-          # without building it.
-          system.build.specialisations = lib.mapAttrs (_: spec: spec.configuration) built;
-        }
-      );
-    };
+    darwin =
+      {
+        config,
+        pkgs,
+        ...
+      }:
+      {
+        options.denSpecialisations = contributionsOption;
+        config = lib.mkIf (active host config) (
+          let
+            built = builtByName "host" host config pkgs;
+          in
+          {
+            assertions = [ (noOverlapAssertion config) ];
+            system.systemBuilderCommands = linkCommands built;
+            # The same handle NixOS gives you via
+            # `specialisation.<n>.configuration.…`: `system.build` is
+            # nix-darwin's escape hatch for exactly this, and eval-only checks
+            # (or a quick `nix eval`) need to reach inside a specialisation
+            # without building it.
+            system.build.specialisations = lib.mapAttrs (_: spec: spec.configuration) built;
+          }
+        );
+      };
   };
 
   # Standalone homes (`den.homes.<system>.<name>`). home-manager's own

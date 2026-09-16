@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.bazarr = {
     includes = [
       den.aspects.gateway
@@ -22,20 +21,18 @@
       };
     };
 
-    homepage =
-      { config, ... }:
-      {
-        bazarr = {
-          group = "Media";
-          href = config.gateway.services.bazarr.url;
-          icon = "bazarr.svg";
-          widget = {
-            type = "bazarr";
-            url = config.gateway.services.bazarr.url;
-            key = "{{HOMEPAGE_VAR_KEY}}";
-          };
+    homepage = { config, ... }: {
+      bazarr = {
+        group = "Media";
+        href = config.gateway.services.bazarr.url;
+        icon = "bazarr.svg";
+        widget = {
+          type = "bazarr";
+          url = config.gateway.services.bazarr.url;
+          key = "{{HOMEPAGE_VAR_KEY}}";
         };
       };
+    };
 
     nixos =
       {

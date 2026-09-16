@@ -11,16 +11,29 @@
 {
   outputs = _: { };
 
-  inputs = { homebrew-cask = { url = "github:homebrew/homebrew-cask";
-flake = false; };
-homebrew-core = { url = "github:homebrew/homebrew-core";
-flake = false; };
-homebrew-gcenx = { url = "github:gcenx/homebrew-wine";
-flake = false; };
-homebrew-speedtest = { url = "github:teamookla/homebrew-speedtest";
-flake = false; };
-homebrew-typewhisper = { url = "github:typewhisper/homebrew-tap";
-flake = false; };
-nix-homebrew = { url = "github:zhaofengli/nix-homebrew"; }; };
+  inputs = {
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-gcenx = {
+      url = "github:gcenx/homebrew-wine";
+      flake = false;
+    };
+    homebrew-speedtest = {
+      url = "github:teamookla/homebrew-speedtest";
+      flake = false;
+    };
+    homebrew-typewhisper = {
+      url = "github:typewhisper/homebrew-tap";
+      flake = false;
+    };
+    nix-homebrew = {
+      url = "github:zhaofengli/nix-homebrew";
+    };
+  };
 }
-

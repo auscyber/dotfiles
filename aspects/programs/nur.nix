@@ -9,8 +9,7 @@
 #
 # One declaration with one owner, included by both, so the input exists exactly
 # when a consumer does.
-{ den, ... }:
-{
+{ den, ... }: {
   den.aspects.nur = {
     layers = [ "gui" ];
 

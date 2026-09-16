@@ -17,30 +17,28 @@
     # off does not leave it advertising a dead vhost.
     gated.tautulli.upstream = "http://127.0.0.1:8181";
 
-    homepage =
-      { config, ... }:
-      {
-        plex = {
-          group = "Media";
-          href = "https://media.pierlot.com.au";
-          icon = "plex.svg";
-          # No widget on purpose. Plex authenticates with an X-Plex-Token,
-          # minted by signing in to plex.tv, so unlike the *arr keys it cannot
-          # be generated -- and a widget without one does not sit quiet, it
-          # 401s on every refresh and fills the journal. To enable it: add the
-          # token as an agenix secret, expose it through the homepage service
-          # account's env file, then set
-          #   widget = { type = "plex"; url = "http://127.0.0.1:32400";
-          #              key = "{{HOMEPAGE_VAR_PLEX_TOKEN}}"; };
-        };
-        # Tautulli generates its own API key on first run with no way to set
-        # it, so this stays a link until a key is pasted in.
-        tautulli = {
-          group = "Media";
-          href = config.gateway.services.tautulli.url;
-          icon = "tautulli.svg";
-        };
+    homepage = { config, ... }: {
+      plex = {
+        group = "Media";
+        href = "https://media.pierlot.com.au";
+        icon = "plex.svg";
+        # No widget on purpose. Plex authenticates with an X-Plex-Token,
+        # minted by signing in to plex.tv, so unlike the *arr keys it cannot
+        # be generated -- and a widget without one does not sit quiet, it
+        # 401s on every refresh and fills the journal. To enable it: add the
+        # token as an agenix secret, expose it through the homepage service
+        # account's env file, then set
+        #   widget = { type = "plex"; url = "http://127.0.0.1:32400";
+        #              key = "{{HOMEPAGE_VAR_PLEX_TOKEN}}"; };
       };
+      # Tautulli generates its own API key on first run with no way to set
+      # it, so this stays a link until a key is pasted in.
+      tautulli = {
+        group = "Media";
+        href = config.gateway.services.tautulli.url;
+        icon = "tautulli.svg";
+      };
+    };
 
     vhosts."media.pierlot.com.au" = {
       useACMEHost = "media.pierlot.com.au";

@@ -1,6 +1,33 @@
 { den, ... }: {
   # Shared MCP registry: opencode reads programs.mcp.servers natively, OpenClaw
   # via its adapter, so a server declared here reaches both.
+  den.aspects.zotero-mcp = {
+    homeManager = { pkgs, ... }: {
+      programs.mcp = {
+        enable = true;
+        servers.zotero = {
+          command = "${pkgs.zotero-mcp}/bin/zotero-mcp";
+          args = [ "serve" ];
+          env.ZOTERO_LOCAL = "true"; # local API at localhost:23119, no creds
+        };
+      };
+    };
+  };
+  den.aspects.mcp-servers.kagi = {
+    includes = [
+      den.aspects.agenix-rekey
+    ];
+    homeManager = { secrets, ... }: {
+      programs.mcp.servers.kagi = {
+        url = "https://mcp.kagi.com/mcp";
+        headers.KAGI_TOKEN.file = secrets.kagi_token.path;
+        headers.Authorization = "Bearer \${env:KAGI_TOKEN}";
+      };
+    };
+
+    secrets.kagi_token.rekeyFile = ../../../secrets/kagi_token.age;
+  };
+
   den.aspects.mcp-servers = {
     # Package overlays only reach a host's pkgs when their aspect is included.
     includes = [
@@ -34,16 +61,20 @@
     # Disabled until that secret exists -- see above.
     # secrets.cloudflare_token.rekeyFile = ../../../secrets/cloudflare_token.age;
 
-    homeManager = { pkgs, ... }: {
-      programs.mcp = {
-        enable = true;
-        #        servers.zotero = {
-        #          command = "${pkgs.zotero-mcp}/bin/zotero-mcp";
-        #          args = [ "serve" ];
-        #          env.ZOTERO_LOCAL = "true"; # local API at localhost:23119, no creds
-        #        };
-        servers.deepwiki.url = "https://mcp.deepwiki.com/mcp";
+    homeManager =
+      {
+        pkgs,
+        config,
+        secrets,
+        ...
+      }:
+      {
+        programs.mcp = {
+          enable = true;
+          servers = {
+            deepwiki.url = "https://mcp.deepwiki.com/mcp";
+          };
+        };
       };
-    };
   };
 }

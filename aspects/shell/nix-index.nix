@@ -5,7 +5,6 @@ let
   };
 in
 {
-
   den.aspects.nix-index = {
     inputs = {
       nix-index-database.url = "github:nix-community/nix-index-database";

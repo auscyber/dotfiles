@@ -17,8 +17,7 @@
 # process tree. Ours goes LAST in the variable, since later nix.conf lines win.
 #
 # Set DENDRITIC_USE_CELLER=1 to opt back in for one invocation.
-{ lib }:
-rec {
+{ lib }: rec {
   vhost = "cache.ivymect.in";
 
   # `grep -F`: the vhost is a fixed string, and an unescaped `.` in a regex

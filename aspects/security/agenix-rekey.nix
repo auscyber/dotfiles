@@ -42,8 +42,8 @@ let
     ++ rename;
     age.rekey.storageMode = "local";
     age.rekey.hostPubkey = lib.mkIf (anyUser.hostPublicKey != null) anyUser.hostPublicKey;
-    age.rekey.generatedSecretsDir = ../../secrets/generated + "/${anyUser.host.hostName}-${anyUser.name}";
-    age.rekey.localStorageDir = ../../secrets/rekeyed + "/${anyUser.host.hostName}-${anyUser.name}";
+    age.rekey.generatedSecretsDir = ../../secrets/generated + "/${anyUser.host.name}-${anyUser.name}";
+    age.rekey.localStorageDir = ../../secrets/rekeyed + "/${anyUser.host.name}-${anyUser.name}";
   };
   # Register your custom classes
   # Create routing policies for each kind → system combination
@@ -124,7 +124,7 @@ in
         ../../patches/agenix/templates.patch
         ../../patches/agenix/edit.patch
       ];
-    
+
       agenix-rekey = {
         url = "github:oddlama/agenix-rekey";
         patch.enable = true;
@@ -157,7 +157,7 @@ in
         inputs.nixpkgs.follows = "nixpkgs";
         inputs.rust-overlay.follows = "rust-overlay";
         inputs.crane.follows = "crane";
-    
+
         patch.patches = [ ../../patches/age-plugin-gpg/age-plugin-gpg.patch ];
         patch.enable = true;
       };

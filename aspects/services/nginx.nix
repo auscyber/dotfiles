@@ -29,7 +29,11 @@ in
       den.aspects.packages.nginx-otel-module
     ];
     nixos =
-      { pkgs, lib, ... }:
+      {
+        pkgs,
+        lib,
+        ...
+      }:
       {
         security.acme = {
           acceptTerms = true;

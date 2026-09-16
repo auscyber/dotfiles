@@ -19,7 +19,6 @@
     inputs.nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-
   den.aspects.gpus.includes = [
     den.aspects.nixos-hardware
     (

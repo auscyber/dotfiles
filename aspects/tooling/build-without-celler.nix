@@ -26,7 +26,11 @@ let
 in
 {
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       # Package as well as app: writeShellApplication runs shellcheck in its
       # builder, and an `apps.<x>.program` string cannot be built directly, so

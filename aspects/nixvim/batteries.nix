@@ -23,7 +23,6 @@ let
       ];
       fromAspect = _: sourceAspect;
     };
-
 in
 {
   den.aspects.nvim = {

@@ -21,10 +21,10 @@ index 22babd9ca9..492020b5d3 100644
  
  impl DarwinRebuildArgs {
 diff --git a/crates/nh-darwin/src/darwin.rs b/crates/nh-darwin/src/darwin.rs
-index cab3abdce0..0ff1687d09 100644
+index 5f55d66c91..1aecb9d02f 100644
 --- a/crates/nh-darwin/src/darwin.rs
 +++ b/crates/nh-darwin/src/darwin.rs
-@@ -21,6 +21,9 @@
+@@ -26,6 +26,9 @@
  const SYSTEM_PROFILE: &str = "/nix/var/nix/profiles/system";
  const CURRENT_PROFILE: &str = "/run/current-system";
  
@@ -34,7 +34,7 @@ index cab3abdce0..0ff1687d09 100644
  impl DarwinArgs {
    /// Run the `darwin` subcommand.
    ///
-@@ -85,7 +88,7 @@
+@@ -90,7 +93,7 @@
          (dir.as_ref().join("result"), Some(dir))
        };
  
@@ -43,7 +43,7 @@ index cab3abdce0..0ff1687d09 100644
  
      let installable = self
        .common
-@@ -147,6 +150,26 @@
+@@ -158,6 +161,26 @@
      let target_profile = out_path.clone();
  
      target_profile.try_exists().context("Doesn't exist")?;
@@ -70,26 +70,21 @@ index cab3abdce0..0ff1687d09 100644
  
      debug!(
        "Comparing with target profile: {}",
-@@ -183,9 +206,14 @@
-         .with_required_env()
+@@ -200,8 +223,10 @@
          .run()
          .wrap_err("Failed to set Darwin system profile")?;
--
--      let darwin_rebuild = out_path.join("sw/bin/darwin-rebuild");
+ 
+-      let activate = out_path.join("activate");
 -      let activate_user = out_path.join("activate-user");
-+      
-+
-+
-+
-+      let darwin_rebuild = target_profile.join("sw/bin/darwin-rebuild");
++      let activate = target_profile.join("activate");
 +      let activate_user = target_profile.join("activate-user");
 +
-+      debug!("Darwin rebuild path: {}", darwin_rebuild.display());
++      debug!("Activation path: {}", activate.display());
  
        // Determine if we need to elevate privileges
        let needs_elevation = !activate_user
 diff --git a/flake.lock b/flake.lock
-index 72440fe8ee..11e9b6e07a 100644
+index 2032e0e443..d2a5734727 100644
 --- a/flake.lock
 +++ b/flake.lock
 @@ -1,5 +1,20 @@
@@ -112,7 +107,7 @@ index 72440fe8ee..11e9b6e07a 100644
 +    },
      "nixpkgs": {
        "locked": {
-         "lastModified": 1785828668,
+         "lastModified": 1787498568,
 @@ -15,6 +30,7 @@
      },
      "root": {

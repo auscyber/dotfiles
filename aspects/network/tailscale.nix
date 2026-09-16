@@ -204,14 +204,92 @@ in
     # It bites this aspect and not ./vpn.nix because a scope only reaches for
     # launchd at all on darwin, and `vpn-secrets` is not a name any of this
     # resolves against. Nothing is lost by switching inference off: the only
-    # consumer is the `tailscale-autoconnect` daemon below, which reads the
-    # credentials at boot rather than needing a reload when they change.
+    # consumer is the `tailscale-autoconnect` unit below, which reads the
+    # credentials at boot rather than needing a reload when they change. The
+    # setting is aspect-wide, so the nixos branch inherits it -- harmlessly,
+    # for the same reason.
     secretSettings.service = null;
 
     # Hand-written rather than generated: an OAuth client is minted in the admin
     # console and has no offline derivation, so there is nothing for a generator
     # to compute.
     secrets.auth.rekeyFile = ../../secrets/tailscale_auth.age;
+
+    # NixOS does have `services.tailscale.authKeyFile`, which is why darwin
+    # needs a launchd daemon and this does not need an equivalent -- but it
+    # still cannot point at the stored secret, because what is stored is an
+    # OAuth *client* (CLIENT_ID/CLIENT_SECRET), not a key. So the same shared
+    # minting script runs once at boot, guarded by the backend state so an
+    # already-enrolled node never mints a key it will not spend.
+    nixos =
+      {
+        config,
+        lib,
+        pkgs,
+        scoped,
+        ...
+      }:
+      let
+        envFile = scoped.tailscale.secrets.auth.path;
+      in
+      {
+        services.tailscale = {
+          enable = true;
+          openFirewall = true;
+          # `--accept-routes` below only does anything with this on.
+          useRoutingFeatures = lib.mkDefault "client";
+        };
+
+        systemd.services.tailscale-autoconnect = {
+          after = [
+            "tailscaled.service"
+            "network-online.target"
+          ];
+          wants = [
+            "tailscaled.service"
+            "network-online.target"
+          ];
+          wantedBy = [ "multi-user.target" ];
+          path = [
+            config.services.tailscale.package
+            pkgs.coreutils
+            pkgs.curl
+            pkgs.jq
+          ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            # Every attempt mints a NEW key, so a persistent failure (an ACL
+            # missing ${nodeTag} being the likely one) must not retry tightly.
+            Restart = "on-failure";
+            RestartSec = 60;
+          };
+          script = ''
+            set -eu
+
+            for _ in $(seq 1 60); do
+              if tailscale status --json >/dev/null 2>&1; then break; fi
+              sleep 1
+            done
+
+            state="$(tailscale status --json 2>/dev/null | jq -r '.BackendState // "NoState"' || echo NoState)"
+            if [ "$state" != "NeedsLogin" ] && [ "$state" != "NoState" ]; then
+              echo "tailscale: backend is ''${state:-unknown}, nothing to do"
+              exit 0
+            fi
+
+            ts_env_file=${lib.escapeShellArg envFile}
+            ts_description="$(uname -n) nix autoconnect"
+            ${mintKeyScript}
+
+            tailscale up \
+              --auth-key "$authkey" \
+              --advertise-tags ${lib.escapeShellArg nodeTag} \
+              --accept-routes
+            echo "tailscale: up as ${nodeTag}"
+          '';
+        };
+      };
 
     darwin =
       {
@@ -312,7 +390,11 @@ in
   # laptop's deployed copy, so this works from any checkout the Yubikey is
   # plugged into, not only from the machine the secret was rekeyed onto.
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       # A package as well as an app, deliberately. `apps.<x>.program` is a
       # string, so there is no way to `nix build` it -- and writeShellApplication

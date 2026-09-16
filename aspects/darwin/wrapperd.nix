@@ -115,7 +115,11 @@ in
         # literal, NOT `baseNameOf (lib.getExe pkg)`, which would carry the store
         # path as string context and is rejected as an attribute key.
         entriesFor =
-          { name, wrapped, pkg }:
+          {
+            name,
+            wrapped,
+            pkg,
+          }:
           {
             "${name}" = "${pkg}/trusted/${name}";
           }

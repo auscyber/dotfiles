@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{ den, ... }: {
   # Its OWN aspect, not part of `den.aspects.nix`.
   #
   # nix-darwin's `nix.linux-builder.package` carries

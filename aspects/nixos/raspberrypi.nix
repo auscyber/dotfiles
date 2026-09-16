@@ -7,7 +7,6 @@
 let
 in
 {
-
   den.lib.raspberry-pi-builder =
     args:
     inputs.nixos-raspberrypi.lib.nixosSystem (

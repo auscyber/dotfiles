@@ -52,7 +52,7 @@
   nixConfig = {
     allow-import-from-derivation = true;
     extra-substituters = [
-      "https://cache.ivymect.in/main"
+      #      "https://cache.ivymect.in/main"
       "https://cache.nixos.org"
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"

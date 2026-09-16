@@ -8,13 +8,13 @@
 {
   alx-wol = {
     pname = "alx-wol";
-    version = "alx-wol-3.1";
+    version = "alx-wol-3.2";
     src = fetchFromGitHub {
       owner = "AndiWeiss";
       repo = "alx-wol";
-      rev = "alx-wol-3.1";
+      rev = "alx-wol-3.2";
       fetchSubmodules = false;
-      sha256 = "sha256-Sfq1vnf+UXNtSSBjGPe0Ignu6G8clp4RrVpeT8F5Xw8=";
+      sha256 = "sha256-gdYRMJD8+JwjqZckZFYBp3PQhnHgaGxg0IQohC6p8Bg=";
     };
   };
   app_font = {
@@ -63,10 +63,10 @@
   };
   ghostty-tip = {
     pname = "ghostty-tip";
-    version = "e2e53f861482e080bf45054ba49ef471f9849937";
+    version = "661e1e77f445057312666a74d9f5002e82f81764";
     src = fetchurl {
-      url = "https://tip.files.ghostty.org/e2e53f861482e080bf45054ba49ef471f9849937/Ghostty.dmg";
-      sha256 = "sha256-UM3RpqZlWYEN7Vi4xl0FFxOuoIDoaZx7kf+SK9sPZLI=";
+      url = "https://tip.files.ghostty.org/661e1e77f445057312666a74d9f5002e82f81764/Ghostty.dmg";
+      sha256 = "sha256-nJbaNuBGBbF36YkRswpLjwTCxnNczmwcJDelO3bpSwc=";
     };
   };
   helium_linux = {
@@ -125,7 +125,6 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
       outputHashes = {
-        
       };
     };
     date = "2026-03-11";
@@ -143,16 +142,15 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-y25d7gccIdatEDycieRtXfWOqzkfzZBWOUEKS5AXPb8=/Cargo.lock";
       outputHashes = {
-        
       };
     };
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton11-6";
+    version = "GE-Proton11-7";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6-x86_64.tar.gz";
-      sha256 = "sha256-rX27DUrrrHtR1cgyr/424m9JPjrdASIisVGv2vWzMAs=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.tar.gz";
+      sha256 = "sha256-ftW0vE45v2JsbaYqo/So0ZFfvdtakHX0XEXEE4TdxLk=";
     };
   };
   sketchybar = {
@@ -251,10 +249,10 @@
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.1.4";
+    version = "2.2.0-beta.0";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.1.4/zotlit-zotero-2.1.4.xpi";
-      sha256 = "sha256-T3CGoDZr83+G984oEADitWAtzUlu8rz6UgEnsZqeBhQ=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.0-beta.0/zotlit-zotero-2.2.0-beta.0.xpi";
+      sha256 = "sha256-nvU/7MH4U3NRsbJhxowr5H9qpWZLwKGTRgv3/UossTY=";
     };
   };
 }

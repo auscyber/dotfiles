@@ -8,15 +8,15 @@
     layers = [ "dev" ];
 
     inputs.pnpm-nix-provider = {
-    url = "github:wmertens/pnpm-nix-provider";
-    inputs.nixpkgs.follows = "nixpkgs";
-    # patches/pnpm-nix-provider/execute-bit.patch: chmod -R u+w after
-    # unpacking a tarball never adds the execute bit, so a package whose
-    # published tarball stores directories without it (pngjs 4.0.1-7.0.0,
-    # at least) ends up with an untraversable directory that later crashes
-    # anything walking or removing the tree.
-    patch.enable = true;
-  };
+      url = "github:wmertens/pnpm-nix-provider";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # patches/pnpm-nix-provider/execute-bit.patch: chmod -R u+w after
+      # unpacking a tarball never adds the execute bit, so a package whose
+      # published tarball stores directories without it (pngjs 4.0.1-7.0.0,
+      # at least) ends up with an untraversable directory that later crashes
+      # anything walking or removing the tree.
+      patch.enable = true;
+    };
 
     # pnpm's `packageProvider` hook, so `pnpm install` materializes node_modules
     # out of the Nix store instead of downloading tarballs. The upstream module

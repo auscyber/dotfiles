@@ -9,6 +9,10 @@
 let
   inherit (den.lib.policy) route;
 
+  # `perSystem` rebinds `config` to its own scope, which has no `flake`; the
+  # nvfetcher helper lives on the flake-level one. Same shadowing trap as
+  # ../hosts/iphone.nix.
+  flakeConfig = config;
 
   overlayFn = lib.mkOptionType {
     name = "overlay-function";
@@ -234,9 +238,7 @@ in
       ...
     }:
     let
-      sources = config.flake.lib.withExtra (
-        finalPkgs.callPackage ../../_sources/generated.nix { }
-      );
+      sources = flakeConfig.flake.lib.withExtra (finalPkgs.callPackage ../../_sources/generated.nix { });
 
       # Registry walk over `den.aspects.packages` (configurator shapes that are
       # not included into any entity, so the class route below never sees them).

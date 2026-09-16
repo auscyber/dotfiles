@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   den.aspects.disko = {
     # nixos-only, and the inputs are declared on the aspect so that follows from
     # the aspect rather than from a path list.

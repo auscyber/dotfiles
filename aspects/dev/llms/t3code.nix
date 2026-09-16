@@ -19,56 +19,52 @@ in
       # entry pointing at it. Without the override the provider is configured but
       # unlaunchable; without the instance the binary is present but unused.
       (den.lib.whenAspect den.aspects.claude {
-        homeManager =
-          { config, ... }:
-          {
-            t3code.runtimeTools.enableClaude = true;
-            programs.t3code.userSettings.providerInstances.claude = {
-              driver = "claudeAgent";
-              displayName = "Claude Code";
+        homeManager = { config, ... }: {
+          t3code.runtimeTools.enableClaude = true;
+          programs.t3code.userSettings.providerInstances.claude = {
+            driver = "claudeAgent";
+            displayName = "Claude Code";
+            enabled = true;
+            config = {
+              # `enabled` twice is not a mistake, and it is what the module's
+              # own `userSettings` example does. The outer one gates the
+              # *instance*; this one is the claudeAgent driver's own setting,
+              # carried over from the legacy `providers.<kind>` block that
+              # t3code still migrates from. Setting only the outer one leaves
+              # the driver reading a default of `false` on that path.
               enabled = true;
-              config = {
-                # `enabled` twice is not a mistake, and it is what the module's
-                # own `userSettings` example does. The outer one gates the
-                # *instance*; this one is the claudeAgent driver's own setting,
-                # carried over from the legacy `providers.<kind>` block that
-                # t3code still migrates from. Setting only the outer one leaves
-                # the driver reading a default of `false` on that path.
-                enabled = true;
-                binaryPath = binOf config.programs.claude-code.package "claude";
-                # Empty, not unset: the driver treats "" as "use the default"
-                # and a missing key as a parse failure on some versions.
-                homePath = "";
-                launchArgs = "";
-                autoCompactWindow = "";
-                customModels = [ ];
-              };
+              binaryPath = binOf config.programs.claude-code.package "claude";
+              # Empty, not unset: the driver treats "" as "use the default"
+              # and a missing key as a parse failure on some versions.
+              homePath = "";
+              launchArgs = "";
+              autoCompactWindow = "";
+              customModels = [ ];
             };
           };
+        };
       })
 
       # `serverUrl = ""` is what makes t3code spawn its own `opencode serve` on
       # demand; setting it would point the driver at an externally managed
       # server instead, which nothing here runs.
       (den.lib.whenAspect den.aspects.opencode {
-        homeManager =
-          { config, ... }:
-          {
-            t3code.runtimeTools.enableOpencode = true;
-            programs.t3code.userSettings.providerInstances.opencode = {
-              driver = "opencode";
-              displayName = "opencode";
+        homeManager = { config, ... }: {
+          t3code.runtimeTools.enableOpencode = true;
+          programs.t3code.userSettings.providerInstances.opencode = {
+            driver = "opencode";
+            displayName = "opencode";
+            enabled = true;
+            config = {
+              # Same doubling as the claude instance above -- see the note there.
               enabled = true;
-              config = {
-                # Same doubling as the claude instance above -- see the note there.
-                enabled = true;
-                binaryPath = binOf config.programs.opencode.package "opencode";
-                serverUrl = "";
-                serverPassword = "";
-                customModels = [ ];
-              };
+              binaryPath = binOf config.programs.opencode.package "opencode";
+              serverUrl = "";
+              serverPassword = "";
+              customModels = [ ];
             };
           };
+        };
       })
 
       (den.lib.whenAspect den.aspects.jujutsu {
@@ -177,7 +173,11 @@ in
   # something anyone wants to retype. `-t ANSIUTF8` renders with half-block
   # characters so it stays scannable in a normal-sized terminal.
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       # Package as well as app: writeShellApplication runs shellcheck in its
       # builder, and an `apps.<x>.program` string cannot be built directly, so

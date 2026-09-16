@@ -62,8 +62,7 @@ let
   traceOn = builtins.getEnv "TRACE_INPUTS" == "1";
   traceAs = label: v: if traceOn then builtins.trace label v else v;
 
-  readLock =
-    path: traceAs "LOCK_READ ${toString path}" (builtins.fromJSON (builtins.readFile path));
+  readLock = path: traceAs "LOCK_READ ${toString path}" (builtins.fromJSON (builtins.readFile path));
 
   # ── Lock-graph resolution ────────────────────────────────────────────────────
 
@@ -505,7 +504,12 @@ let
       # need to re-derive the whole graph per entry.
       allNodes = sharedTopNodes // {
         ${name} = mkResolvedNode {
-          inherit lockFile passedInputs allNodes flakePath;
+          inherit
+            lockFile
+            passedInputs
+            allNodes
+            flakePath
+            ;
           rootKey = name;
           backupNode = backupNodes.${backupLockFile.root};
           patchSrc = "${patchedSrc}";
@@ -710,7 +714,6 @@ let
     lib.mapAttrs (
       name: raw: gateInput name (traceAs "INPUT_EVAL ${name}" (patched.${name} or raw))
     ) mergedRaw;
-
 in
 {
   inherit

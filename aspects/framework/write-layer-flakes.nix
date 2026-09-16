@@ -43,7 +43,11 @@ in
   ];
 
   perSystem =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       # The rendered text as a STORE FILE, not a nested `nix eval`.
       #
@@ -157,19 +161,14 @@ in
       # `nix run .#update` bumps the root lock; every layer lock has to move
       # with it or a shared pin drifts between them -- which is exactly how
       # partitions/nixos ended up six days behind the root on nixpkgs.
-      update-hooks.postFlake = [
-        {
-          name = "layer-locks";
-          script = ''
-            repo="$(git rev-parse --show-toplevel)"
-            for d in "$repo"/partitions/*/; do
-              [ -f "$d/flake.nix" ] || continue
-              echo "Updating $(basename "$d") lock..."
-              nix flake update --flake "$d"
-            done
-          '';
-        }
-      ];
+      update-hooks.postFlake.layer-locks = ''
+        repo="$(git rev-parse --show-toplevel)"
+        for d in "$repo"/partitions/*/; do
+          [ -f "$d/flake.nix" ] || continue
+          echo "Updating $(basename "$d") lock..."
+          nix flake update --flake "$d"
+        done
+      '';
       # `nix run .#check-layer-isolation` -- assert a host never forces an input
       # from a layer belonging to another platform.
       #
@@ -282,13 +281,16 @@ in
       # invariant it tests is not visible to evaluation from the outside, so
       # there is no pure formulation: the only way to know what a host forces is
       # to force it. (`sandbox = relaxed` is what permits this.)
-      checks.layer-isolation = pkgs.runCommand "layer-isolation" {
-        __noChroot = true;
-        nativeBuildInputs = [ config.packages.check-layer-isolation ];
-      } ''
-        check-layer-isolation ${self} >&2
-        touch "$out"
-      '';
+      checks.layer-isolation =
+        pkgs.runCommand "layer-isolation"
+          {
+            __noChroot = true;
+            nativeBuildInputs = [ config.packages.check-layer-isolation ];
+          }
+          ''
+            check-layer-isolation ${self} >&2
+            touch "$out"
+          '';
 
       apps.write-layer-flakes = {
         type = "app";

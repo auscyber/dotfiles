@@ -212,9 +212,7 @@ let
     config.flake.layerPlan
     |> lib.mapAttrsToList (
       layer: specs:
-      "    ${layer} = [ ${
-        lib.concatMapStringsSep " " (n: "\"${n}\"") (lib.attrNames specs)
-      } ];"
+      "    ${layer} = [ ${lib.concatMapStringsSep " " (n: "\"${n}\"") (lib.attrNames specs)} ];"
     )
     |> lib.concatStringsSep "\n";
 
@@ -739,9 +737,7 @@ in
               ''printf '    %s.hash = "%s";\n' ${lib.escapeShellArg n} "$(nix --extra-experimental-features nix-command hash path --sri ${drv})"''
             ) (patchedDrvsUnhashed pkgs);
 
-            nullCmds = map (
-              n: ''printf '    %s.hash = null;\n' ${lib.escapeShellArg n}''
-            ) nullHashNames;
+            nullCmds = map (n: ''printf '    %s.hash = null;\n' ${lib.escapeShellArg n}'') nullHashNames;
           in
           pkgs.runCommand "patched-inputs.nix" { nativeBuildInputs = [ pkgs.nix ]; } ''
             {
@@ -774,7 +770,7 @@ in
 
         apps.write-patched-inputs = {
           type = "app";
-          program = lib.getExe config.packages.write-patched-inputs;
+          program = lib.getExe args.config.packages.write-patched-inputs;
         };
 
         # `nix run .#update` — bump the inputs, then regenerate
@@ -788,7 +784,7 @@ in
         # builds, which evaluate fine and are what the generator hashes anyway.
         # `--impure` is required for `builtins.getEnv` to see the variable.
 
-        update-hooks.flake = ''
+        update-hooks.flake.patched-inputs = ''
           echo "Updating patched-inputs.nix…"
           PATCH_HASHES=ignore ${args.config.apps.write-patched-inputs.program}
         '';
@@ -853,16 +849,15 @@ in
             # the format later would silently escape it too. `cmp` cannot: if
             # `nix run .#write-flake` would produce different bytes, this fails
             # and prints the diff.
-            patched-inputs-generated-current =
-              pkgs.runCommand "patched-inputs-generated-current" { } ''
-                if cmp -s ${args.config.packages.patched-inputs-file} ${self}/patched-inputs.nix; then
-                  touch "$out"
-                else
-                  echo "./patched-inputs.nix is out of date -- run \`nix run .#write-flake\`" >&2
-                  diff -u ${self}/patched-inputs.nix ${args.config.packages.patched-inputs-file} >&2 || true
-                  exit 1
-                fi
-              '';
+            patched-inputs-generated-current = pkgs.runCommand "patched-inputs-generated-current" { } ''
+              if cmp -s ${args.config.packages.patched-inputs-file} ${self}/patched-inputs.nix; then
+                touch "$out"
+              else
+                echo "./patched-inputs.nix is out of date -- run \`nix run .#write-flake\`" >&2
+                diff -u ${self}/patched-inputs.nix ${args.config.packages.patched-inputs-file} >&2 || true
+                exit 1
+              fi
+            '';
 
             patched-inputs-intertwined =
               let

@@ -271,7 +271,7 @@ in
       # is nothing on the other end of either.
       den.aspects.lspmux
       den.aspects.fish
-      den.aspects.celler-push
+      #      den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.coolabah

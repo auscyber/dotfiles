@@ -1,16 +1,13 @@
 { den, ... }:
 let
-  # The public half of the SSH key whose private key lives in the user's
-  # 1Password vault and never touches disk.
-  #
   # Used for both:
   #   1. pam_rssh sudo authentication (via /etc/authorized_keys/<u>.keys)
   #   2. OpenSSH login (via users.users.<u>.openssh.authorizedKeys.keys on nixos)
   #
   # Intentionally distinct from `hostPublicKey`: `hostPublicKey` is the
-  # *on-system* identity (agenix encryption target). This one is *off-system* —
+  # *on-system* identity (agenix encryption target). This one is *off-system* --
   # a credential the user authenticates *with*.
-  mainKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILeCdR16VYTNmoEekYk/b1sskC+trPx9tpOBJoKML17H";
+  mainKey = import ./_main-key.nix;
 in
 {
   den.aspects.main-ssh-key = {

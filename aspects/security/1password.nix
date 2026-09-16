@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   den.aspects.gui = {
     homeManager =
       {
@@ -43,8 +42,8 @@
     layers = [ "dev" ];
 
     inputs.op-shell-plugins = {
-    url = "github:1Password/shell-plugins";
-    inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:1Password/shell-plugins";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     includes = [

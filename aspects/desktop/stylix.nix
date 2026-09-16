@@ -26,7 +26,6 @@ let
       true;
 in
 {
-
   # Policy: inject stylix HM module for standalone users
   den.policies.stylix-standalone-hm =
     ctx@{

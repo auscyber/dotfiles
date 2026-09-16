@@ -44,11 +44,12 @@ in
     inputs.arion.url = "github:hercules-ci/arion";
     inputs.arion.inputs.nixpkgs.follows = "nixpkgs";
     inputs.arion.patch.enable = true;
-    inputs.impermanence.url = "github:nix-community/impermanence";
-    inputs.impermanence.inputs.nixpkgs.follows = "nixpkgs";
     inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
     includes = [
+      # Declared in ../../nixos/impermanence.nix now, so birdsarentreal can
+      # have it too; den rejects an input declared twice.
+      den.aspects.impermanence
       den.aspects.nginx
       den.aspects.nix
       den.aspects.local

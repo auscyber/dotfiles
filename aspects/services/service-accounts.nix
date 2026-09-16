@@ -1,4 +1,8 @@
-{ den, lib, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 # Bare gateway callers -- a caller with no gated API of its own, so it would
 # otherwise need its own `gateway.serviceAccounts.<name>` and `api.clients`
 # edits hand-written into some other aspect's file. `scripts/mint-service-
@@ -20,17 +24,16 @@ let
   # gateway.services.<target>.api.clients rather than three, each clobbering
   # the last.
   targets = lib.foldlAttrs (
-    acc: name: entry: lib.foldl' (acc': svc: acc' // { ${svc} = (acc'.${svc} or [ ]) ++ [ name ]; }) acc entry.clientOf
+    acc: name: entry:
+    lib.foldl' (acc': svc: acc' // { ${svc} = (acc'.${svc} or [ ]) ++ [ name ]; }) acc entry.clientOf
   ) { } registry;
 in
 {
   den.aspects.service-accounts = {
     includes = [ den.aspects.gateway ];
-    nixos =
-      { lib, ... }:
-      {
-        gateway.serviceAccounts = lib.mapAttrs (_: entry: { description = entry.description; }) registry;
-        gateway.services = lib.mapAttrs (_: clients: { api.clients = clients; }) targets;
-      };
+    nixos = { lib, ... }: {
+      gateway.serviceAccounts = lib.mapAttrs (_: entry: { description = entry.description; }) registry;
+      gateway.services = lib.mapAttrs (_: clients: { api.clients = clients; }) targets;
+    };
   };
 }

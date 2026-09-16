@@ -94,9 +94,14 @@ in
               fi
 
               # `  cmd = { 'pyright-langserver', '--stdio' },` -> `pyright-langserver --stdio`
+              #
+              # Upstream writes the list on one line or spread over several
+              # (lsp/copilot.lua), so accumulate from `cmd = {` up to the first
+              # line carrying the closing brace and pull the quoted words out of
+              # that -- a single-line entry closes on its own first line.
               got=$(
-                sed -n "s/^[[:space:]]*cmd = {\(.*\)}.*/\1/p" "$lua" \
-                  | head -1 \
+                awk '/^[[:space:]]*cmd = \{/ { f = 1 }
+                     f { buf = buf " " $0; if (/\}/) { print buf; exit } }' "$lua" \
                   | grep -o "'[^']*'" \
                   | tr -d "'" \
                   | tr '\n' ' ' \

@@ -13,17 +13,15 @@ in
     # a username and password, not a key -- so the browser gate is the whole
     # story at the edge, and the bypasses below are what keep the *arr apps and
     # nginx from needing a credential at all.
-    homepage =
-      { config, ... }:
-      {
-        qbittorrent = {
-          group = "Downloads";
-          href = config.gateway.services.qbittorrent.url;
-          icon = "qbittorrent.svg";
-          # No widget: qbittorrent's widget wants a username and password,
-          # and LocalHostAuth means there is no longer an account to give it.
-        };
+    homepage = { config, ... }: {
+      qbittorrent = {
+        group = "Downloads";
+        href = config.gateway.services.qbittorrent.url;
+        icon = "qbittorrent.svg";
+        # No widget: qbittorrent's widget wants a username and password,
+        # and LocalHostAuth means there is no longer an account to give it.
       };
+    };
 
     gated.qbittorrent = {
       upstream = "http://127.0.0.1:${toString port}";
@@ -61,7 +59,6 @@ in
     };
 
     nixos = { config, ... }: {
-
       services.qbittorrent = {
         enable = true;
         # `media` as the PRIMARY group, not a supplementary one, so everything

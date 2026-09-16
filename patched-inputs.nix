@@ -26,16 +26,64 @@
 # `checks.patched-inputs-generated-current` fails if the patch lists here
 # drift from the aspects' declarations.
 {
-
   layers = {
-    darwin-dev = [ "idris2Packages" "pnpm-nix-provider" ];
-    darwin-gui = [ "coolabah" "paneru" "zen-browser" ];
-    dev = [ "claude-code" "neovim-nightly-overlay" "nixvim" "op-shell-plugins" ];
-    gui = [ "my-nur" "nur" "stylix" ];
+    darwin-dev = [
+      "idris2Packages"
+      "pnpm-nix-provider"
+    ];
+    darwin-gui = [
+      "coolabah"
+      "paneru"
+      "zen-browser"
+    ];
+    dev = [
+      "claude-code"
+      "neovim-nightly-overlay"
+      "nixvim"
+      "op-shell-plugins"
+    ];
+    gui = [
+      "my-nur"
+      "nur"
+      "stylix"
+    ];
     gui-nixos = [ "plasma-manager" ];
-    homebrew = [ "homebrew-cask" "homebrew-core" "homebrew-gcenx" "homebrew-speedtest" "homebrew-typewhisper" "nix-homebrew" ];
-    nixos = [ "arion" "disko" "disko-zfs" "impermanence" "lanzaboote" "nix-cachyos-kernel" "nix-flatpak" "nixos-hardware" "nixos-images" "nixos-mailserver" "nixos-raspberrypi" "nixos-wsl" "nixpkgs-nvmd" "searchix" ];
-    root = [ "age-plugin-gpg" "agenix" "agenix-rekey" "celler" "crane" "darwin" "ivixlib" "ivylix" "izlix" "nix-index-database" ];
+    homebrew = [
+      "homebrew-cask"
+      "homebrew-core"
+      "homebrew-gcenx"
+      "homebrew-speedtest"
+      "homebrew-typewhisper"
+      "nix-homebrew"
+    ];
+    nixos = [
+      "arion"
+      "disko"
+      "disko-zfs"
+      "impermanence"
+      "lanzaboote"
+      "nix-cachyos-kernel"
+      "nix-flatpak"
+      "nixos-hardware"
+      "nixos-images"
+      "nixos-mailserver"
+      "nixos-raspberrypi"
+      "nixos-wsl"
+      "nixpkgs-nvmd"
+      "searchix"
+    ];
+    root = [
+      "age-plugin-gpg"
+      "agenix"
+      "agenix-rekey"
+      "celler"
+      "crane"
+      "darwin"
+      "ivixlib"
+      "ivylix"
+      "izlix"
+      "nix-index-database"
+    ];
   };
 
   inputs = {
@@ -74,8 +122,8 @@
     agenix-rekey.hash = "sha256-wP42oef9cVSdnGxD7VlDblRAZWtAHPiZ2pwXk7e6PCo=";
     arion.hash = "sha256-XM8sEWDiEAwjWL1onvSuxrkgyHxL0SAwsD6dXx992NM=";
     darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
-    home-manager.hash = "sha256-l+UrrvcwK9s4BKLVjx2PbKjZAhsQE84sxKipD1BkqxE=";
-    nh.hash = "sha256-ndrDgkv1aQO2n9qCB77hPm55mb/FnsgqrmapB3V9OMo=";
+    home-manager.hash = "sha256-aWy+wfpH3jYd8FaTtnLOGpUoSGIeypMSXkUiELZuzhc=";
+    nh.hash = "sha256-sU0B7F6Vz6eaeTCtitPrE/h4K5Qldfaw0POoA9CtS1c=";
     pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
     zen-browser.hash = null;
   };

@@ -4,14 +4,13 @@
   ...
 }:
 {
-
   den.aspects.emacs = {
     layers = [ "dev" ];
 
     inputs.emacs = {
-    url = "github:nix-community/emacs-overlay";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.nixpkgs-stable.follows = "nixpkgs";
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
     overlays.emacs = inputs.emacs.overlays.default or (_: _: { });

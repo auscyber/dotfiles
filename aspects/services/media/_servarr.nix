@@ -1,4 +1,7 @@
-{ den, lib }:
+{
+  den,
+  lib,
+}:
 # The shape every servarr app shares: a gateway entry, a dashboard entry,
 # `External` auth so the app shows no login form of its own behind oauth2-proxy,
 # its own API key handed in through `environmentFiles`, and a reconcile unit for
@@ -35,22 +38,20 @@
     # the PUBLIC url with homepage's own per-caller key, so nginx does the swap
     # and the dashboard shows up in the api log as `homepage->${name}` like any
     # other caller.
-    homepage =
-      { config, ... }:
-      {
-        ${name} = {
-          group = "Media";
-          href = config.gateway.services.${name}.url;
-          icon = "${name}.svg";
-          widget = {
-            type = name;
-            url = config.gateway.services.${name}.url;
-            # One key for every widget homepage draws -- the account's own
-            # credential, not one minted per target.
-            key = "{{HOMEPAGE_VAR_KEY}}";
-          };
+    homepage = { config, ... }: {
+      ${name} = {
+        group = "Media";
+        href = config.gateway.services.${name}.url;
+        icon = "${name}.svg";
+        widget = {
+          type = name;
+          url = config.gateway.services.${name}.url;
+          # One key for every widget homepage draws -- the account's own
+          # credential, not one minted per target.
+          key = "{{HOMEPAGE_VAR_KEY}}";
         };
       };
+    };
 
     gated.${name} = {
       inherit subpath;

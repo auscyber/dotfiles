@@ -215,7 +215,12 @@ rec {
       specEntities = lib.mapAttrs (
         name: contributions:
         composedEntity {
-          inherit kind entity name contributions;
+          inherit
+            kind
+            entity
+            name
+            contributions
+            ;
         }
         // {
           instantiate = lib.id;
@@ -261,9 +266,7 @@ rec {
       shared = lib.optional (parentPkgs != null) {
         _module.args.pkgs = lib.mkForce parentPkgs;
       };
-      built = entity.instantiate (
-        instantiateArgs // { modules = instantiateArgs.modules ++ shared; }
-      );
+      built = entity.instantiate (instantiateArgs // { modules = instantiateArgs.modules ++ shared; });
     in
     {
       configuration = built;

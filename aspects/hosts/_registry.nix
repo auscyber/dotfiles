@@ -124,6 +124,16 @@
     uid = 1000;
   };
 
+  # HP Chromebook running NixOS. No `hostPublicKey` yet -- the machine has not
+  # been installed, so there is no ed25519 host key to pin. Add it here (and
+  # rerun `agenix rekey`) once `ssh-keyscan birdsarentreal` returns one.
+  # No `builder`: it is a Kodi/AirPlay appliance, not a build machine.
+  birdsarentreal = {
+    system = "x86_64-linux";
+    user = "ivy";
+    uid = 1000;
+  };
+
   Ivys-MacBook-Pro = {
     system = "aarch64-darwin";
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";

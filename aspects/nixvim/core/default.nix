@@ -7,14 +7,11 @@
     (den.batteries.unfree [
       "cmp-nvim-lsp-document-symbol"
       "copilot-language-server"
-      "cmp-copilot"
     ])
     den.aspects.wakatime
   ];
   den.aspects.nixvim.unfreeAllowed = [
-    "cmp-copilot"
     "copilot-language-server"
-    "copilot.vim"
     "idris2-vim"
     "presence.nvim"
     "copilot-lua"
@@ -405,6 +402,9 @@
               { name = "buffer"; }
               { name = "path"; }
               { name = "nvim_lua"; }
+              # copilot-cmp, auto-enabled by nixvim's `cmpSourcePlugins.copilot`,
+              # which in turn enables copilot-lua. cmp-copilot (the copilot.vim
+              # source) registered this same name and is deliberately gone.
               { name = "copilot"; }
             ];
           };
@@ -623,7 +623,6 @@
         cmp-nvim-lua
         cmp-nvim-lsp
         cmp-dictionary
-        cmp-copilot
         crates-nvim
         luasnip
 

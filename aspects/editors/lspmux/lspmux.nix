@@ -315,6 +315,18 @@ in
   # declared twice. As a named aspect it dedupes by name from either scope.
   den.aspects.lspmux = {
     includes = [
+      # `copilot` in the registry below resolves `pkgs.copilot-language-server`
+      # inside the overlay, i.e. against the host's package set -- so the
+      # allowance has to travel with lspmux rather than relying on the nixvim
+      # aspect that happens to declare the same name.
+      #
+      # Both spellings: `wrapLspMux` rebuilds the derivation as `<name>-lspmux`
+      # and carries the wrapped package's `meta` (and so its license) across, so
+      # the shim is checked under its own name, not the one it wraps.
+      (den.batteries.unfree [
+        "copilot-language-server"
+        "copilot-language-server-lspmux"
+      ])
       den.aspects.packages.lspmux
       #        den.aspects.packages.kanata-ls
       lspServersToOverlays
@@ -344,6 +356,25 @@ in
           ".hpp" = "cpp";
           ".hh" = "cpp";
         };
+      };
+      # GitHub Copilot's server. Registered for the shim alone: copilot.lua spawns
+      # it (`server.type = "binary"` -- see aspects/nixvim/plugins/copilot), so the
+      # nvim body must not also wire it into `lsp.servers`, and it is a completion
+      # provider rather than a language server, so it is surfaced to no other editor
+      # -- `zed`/`opencode` null and `extensionToLanguage` empty, which is what keeps
+      # it out of zed's `lsp.<name>` table, opencode's servers and claude-code's
+      # `.lsp.json`.
+      #
+      # Multiplexing is the whole point: copilot.lua's own default spawns a bundled
+      # ~220MB node server per nvim, and copilot's auth lives in a single sqlite db
+      # that every one of those processes opens.
+      copilot = {
+        package = pkgs.copilot-language-server;
+        exe = "copilot-language-server";
+        args = [ "--stdio" ];
+        nvim = false;
+        zed = null;
+        opencode = null;
       };
       dhall_lsp_server = {
         package = pkgs.dhall-lsp-server;

@@ -4,7 +4,6 @@
   ...
 }:
 {
-
   den.aspects.openclaw = {
     inputs.nix-openclaw = {
       url = "github:openclaw/nix-openclaw";
