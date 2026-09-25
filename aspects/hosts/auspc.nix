@@ -278,12 +278,15 @@ in
   };
 
   den.aspects.auscyber = {
+    celler-use = {
+      secondpc = [ "main" ];
+      celler2 = [ "main" ];
+    };
     includes = [
       den.aspects.fish
       den.aspects.lspmux
       den.aspects.claude
       (den.batteries.unfree [ "castlabs-electron" ])
-      den.aspects.celler-push
     ];
 
     provides.auspc = {

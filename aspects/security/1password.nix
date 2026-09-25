@@ -48,18 +48,19 @@
 
     includes = [
       (den.batteries.unfree [ "onepassword-password-manager" ])
-
-      # Zen ships the 1Password addon only because 1Password is in play — so the
-      # dependency belongs here, not in the browser aspect. Fires only on
-      # entities that actually resolved the zen aspect.
-      (den.lib.whenAspect den.aspects.browsers.zen {
-        homeManager = { pkgs, ... }: {
-          programs.zen-browser._internalProfile.extensions.packages = [
-            pkgs.firefox-addons.onepassword-password-manager
-          ];
-        };
-      })
     ];
+
+    # Zen ships the 1Password addon only because 1Password is in play — so the
+    # dependency belongs here, not in the browser aspect. `optionalAttrs` rather
+    # than `mkIf`: `programs.zen-browser` only exists where zen is, and a `mkIf`
+    # still defines it.
+    homeManager =
+      { pkgs, host, ... }:
+      lib.optionalAttrs (host.hasAspect den.aspects.browsers.zen) {
+        programs.zen-browser._internalProfile.extensions.packages = [
+          pkgs.firefox-addons.onepassword-password-manager
+        ];
+      };
     gui = {
       provides.to-hosts.os.programs._1password-gui.enable = true;
 
@@ -139,8 +140,6 @@
         };
       };
     };
-    homeManager = {
-      #    programs._1password.enable = true;
-    };
+    #    homeManager.programs._1password.enable = true;
   };
 }

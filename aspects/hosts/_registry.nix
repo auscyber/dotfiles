@@ -142,6 +142,12 @@
     uid = 501;
   };
 
+  # The celler2 container (hosts/celler2.nix). Its hostPublicKey is the public
+  # half of the key `docker run` mounts in; add it once generated.
+  celler2 = {
+    system = "x86_64-linux";
+  };
+
   # Likewise no host key has ever been declared here. Listed anyway: leaving it
   # out would make this file quietly incomplete, and `hostPublicKey`'s absence
   # is the fact worth recording.

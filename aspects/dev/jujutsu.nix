@@ -5,7 +5,7 @@
     includes = [
       den.aspects.difftastic
 
-      #      (den.lib.whenAspect den.aspects.llama-cpp { homeManager =
+      #      { homeManager = # lib.mkIf (host.hasAspect den.aspects.llama-cpp)
       #          {
       #            config,
       #            pkgs,

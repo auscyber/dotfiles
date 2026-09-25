@@ -140,6 +140,13 @@ in
       includes = [ den.aspects.laptop-dock-focused ];
     };
 
+    # "no-celler": no celler caches at all, for when they are down -- nothing
+    # substituted from them, nothing pushed to them.
+    specialisations.no-celler.excludes = [
+      den.aspects.celler-host
+      den.aspects.celler-user
+    ];
+
     vpn = { };
     nix.settings = {
       min-free = 1024 * 1024 * 1024; # 1 GiB
@@ -254,6 +261,10 @@ in
   };
 
   den.aspects.ivypierlot = {
+    celler-use = {
+      secondpc = [ "main" ];
+      celler2 = [ "main" ];
+    };
     study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.zig
@@ -271,7 +282,6 @@ in
       # is nothing on the other end of either.
       den.aspects.lspmux
       den.aspects.fish
-      #      den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.coolabah
