@@ -77,7 +77,7 @@ in
         in
         {
           name = host.name;
-          inherit (config.services.cellerd.expose) endpoint;
+          inherit (config.services.cellerd.expose) endpoint addresses;
           keys = k;
           caches = if k == { } then [ "main" ] else builtins.attrNames k;
         };

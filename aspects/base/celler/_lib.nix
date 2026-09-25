@@ -3,10 +3,12 @@ rec {
   # The servers and caches a scope declared on `celler-use`, picked out of
   # every server's `celler-caches` record. A declaration is
   #   { <server> = [ <cache> ... ]; }                     pull and push
-  #   { <server> = { pull = [ ... ]; push = [ ... ]; }; }
-  # and every aspect's declarations merge. Each result is the server's record
-  # with `pull` (everything it may read, pushes included), `push`, and `keys`
-  # narrowed to `pull`. Naming a server that does not exist is an error.
+  #   { <server> = { pull = [ ... ]; push = [ ... ]; via = "tailscale"; }; }
+  # and every aspect's declarations merge. `via` picks which of the server's
+  # addresses to reach it at (virtualHost, cloudflared, tailscale); without it,
+  # the server's own `consumeVia`. Each result is the server's record with
+  # `pull` (everything it may read, pushes included), `push`, `endpoint` at the
+  # chosen address, and `keys` narrowed to `pull`. Naming a server that does not exist is an error.
   use =
     celler-caches: celler-use:
     let
@@ -32,6 +34,7 @@ rec {
         {
           inherit push;
           pull = lib.unique (lib.concatMap (n: n.pull) ns ++ push);
+          via = lib.findFirst (v: v != null) null (map (n: n.via or null) ns);
         }
       ) celler-use;
       servers = builtins.listToAttrs (map (c: lib.nameValuePair c.name c) celler-caches);
@@ -44,9 +47,14 @@ rec {
             or (throw "celler-use: no celler server `${name}` (servers: ${toString (builtins.attrNames servers)})");
       in
       server
-      // want
       // {
+        inherit (want) pull push;
         keys = lib.getAttrs (builtins.filter (c: server.keys ? ${c}) want.pull) server.keys;
+      }
+      // lib.optionalAttrs (want.via != null) {
+        endpoint =
+          server.addresses.${want.via}
+            or (throw "celler-use: ${name} is not reachable via ${want.via} (addresses: ${toString (builtins.attrNames server.addresses)})");
       }
     ) merged;
 

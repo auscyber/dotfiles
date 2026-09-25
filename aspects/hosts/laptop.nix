@@ -263,7 +263,10 @@ in
   };
 
   den.aspects.ivypierlot = {
-    celler-use.celler2 = [ "main" ];
+    celler-use.celler2 = {
+      push = [ "main" ];
+      via = "tailscale";
+    };
     study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.zig
