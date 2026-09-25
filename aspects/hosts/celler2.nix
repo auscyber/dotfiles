@@ -5,7 +5,7 @@
 #
 # Its only runtime input is its ssh host key, mounted at /keys. Setup, once:
 #   ssh-keygen -t ed25519 -N "" -C celler2 -f ~/.ssh/celler2
-#   # ~/.ssh/celler2.pub -> hosts/_registry.nix as celler2.hostPublicKey
+#   # ~/.ssh/celler2.pub -> `hostPublicKey` on den.hosts.x86_64-linux.celler2 below
 #   agenix edit aspects/hosts/celler2/ts_authkey.age
 #   agenix edit aspects/hosts/celler2/cf_token.age
 #   nix run .#rekey
@@ -16,23 +16,20 @@
   ...
 }:
 let
-  registry = import ./_registry.nix;
   host = "celler2";
   key = "/keys/ssh_host_ed25519_key";
 in
 {
-  den.hosts.x86_64-linux.${host} =
-    lib.optionalAttrs (registry.${host} ? hostPublicKey) { inherit (registry.${host}) hostPublicKey; }
-    // {
-      # Still a nixosSystem, so den and deploy tooling see an ordinary host;
-      # nix-oci re-evaluates the same modules into the image.
-      instantiate =
-        args:
-        inputs.nixpkgs.lib.nixosSystem args
-        // {
-          ociModules = args.modules ++ [ { _module.args = args.specialArgs or { }; } ];
-        };
-    };
+  den.hosts.x86_64-linux.${host} = {
+    # Still a nixosSystem, so den and deploy tooling see an ordinary host;
+    # nix-oci re-evaluates the same modules into the image.
+    instantiate =
+      args:
+      inputs.nixpkgs.lib.nixosSystem args
+      // {
+        ociModules = args.modules ++ [ { _module.args = args.specialArgs or { }; } ];
+      };
+  };
 
   den.aspects.${host} = {
     includes = [ den.aspects.celler-server._.nixos ];

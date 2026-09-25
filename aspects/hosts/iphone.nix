@@ -16,14 +16,12 @@
   ...
 }:
 let
-  registry = import ./_registry.nix;
   name = "iphone";
+  description = "iPhone (Tailscale app)";
   # perSystem rebinds `config` to its own scope; the device's merged manifest
   # lives on the flake-level one.
   flakeConfig = config;
 in
-assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
-  "aspects/hosts/iphone.nix: '${name}' must be a `device` entry in ./_registry.nix (../network/tailscale.nix builds its client list from those)";
 {
   # FLAT form on purpose. den only treats a key as a system group when it is in
   # `lib.systems.flakeExposed`, so `den.hosts.aarch64-ios.iphone` is read as a
@@ -31,6 +29,10 @@ assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
   # never asks whether the system is real.
   den.hosts.${name} = {
     system = "aarch64-ios";
+
+    # A tailscale client with nothing built for it: ../network/tailscale.nix
+    # offers it to `.#tailscale-client-key`.
+    device = { inherit description; };
 
     # `ios` is the concrete class; aspects write `mobile` and it is forwarded
     # here, the way `os` forwards into `nixos`/`darwin`. See ../framework/mobile.nix.
@@ -51,7 +53,7 @@ assert lib.assertMsg (registry ? ${name} && registry.${name} ? device)
   # Ordinary aspect content in the `mobile` class -- the point of doing this as
   # a den host: anything in the tree can contribute to the phone normally.
   den.aspects.${name}.mobile = {
-    device.description = registry.${name}.device.description;
+    device.description = description;
     device.deviceName = "Ivy’s iPhone";
     device.tailscale.enable = true;
 

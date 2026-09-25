@@ -3,15 +3,9 @@
   __findFile,
   ...
 }:
-let
-  # Host identity lives in ./_registry.nix, so the key this host is built with
-  # and the key its peers pin in `knownHosts` are one value. See that file for
-  # why it cannot be read off `den.hosts`.
-  registry = import ./_registry.nix;
-in
 {
   den.hosts.aarch64-darwin.Ivys-MacBook-Pro = {
-    inherit (registry.Ivys-MacBook-Pro) hostPublicKey;
+    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
     roles = [
       "study"
       "gui"

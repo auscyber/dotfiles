@@ -2,6 +2,7 @@
   den,
   lib,
   rootPath,
+  fleet,
   ...
 }:
 # Remote build machines.
@@ -14,22 +15,16 @@
 # working around. It declares both a `nixos` and a `darwin` class and reaches
 # for no NixOS-only input, so base is where it belongs.
 let
-  # Every machine that advertises a `builder` record.
-  #
-  # From ../hosts/_registry.nix, NOT `den.hosts`. `den.hosts` is scoped to the
-  # partition doing the evaluating, so walking it here meant a darwin host's
-  # `nix.buildMachines` could only ever contain darwin builders -- of which
-  # there are none. The registry is a plain data file every partition can
-  # import, so the same walk now sees the whole fleet.
-  registry = import ../hosts/_registry.nix;
+  # Every machine in the fleet (../hosts/fleet.nix) that advertises a `builder`
+  # record.
 
   # `hostName` is what ssh dials. `ipAddress` is the older spelling and still
   # works; an external builder reached by DNS (faggot.sh) sets `hostName`.
   dialled = b: b.hostName or b.ipAddress or "";
 
   collectBuilders = lib.filterAttrs (
-    _: host: host ? builder && host.builder != null && dialled host.builder != ""
-  ) registry;
+    _: host: (host.builder or null) != null && dialled host.builder != ""
+  ) fleet;
 
   mkBuildMachine = sshKey: host: {
     protocol = "ssh-ng";
@@ -117,7 +112,7 @@ in
     };
   };
 
-  # `builders` capability. Populates `nix.buildMachines` from every registry
+  # `builders` capability. Populates `nix.buildMachines` from every fleet
   # entry carrying a `.builder` record.
   den.aspects.builders = {
     includes = [ den.aspects.builder-ssh-key ];
@@ -125,8 +120,8 @@ in
     darwin = clientConfig;
   };
 
-  # Every host is a build client. Declared here rather than per-host so adding a
-  # builder to the registry is the only edit needed to give the whole fleet
+  # Every host is a build client. Declared here rather than per-host so giving a
+  # host a `builder` record is the only edit needed to give the whole fleet
   # access to it.
   #
   # Note that the two Linux builders are only reachable over the wireguard
