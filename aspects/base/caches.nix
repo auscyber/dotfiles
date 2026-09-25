@@ -22,18 +22,10 @@ in
 {
   debug = true;
 
-  # The celler overlay lives in the `packages` registry, not on the celler
-  # aspects. The class route that feeds the perSystem `pkgs`
-  # (`overlays-to-flake-parts` in ../tooling/overlays.nix) only sees aspects that
-  # are *resolved* in the flake-parts scope, which it populates by resolving
-  # `den.hosts` -- and every host that includes a celler aspect (secondpc, auspc,
-  # laptop) lives in a partition, so the base evaluation resolved none of them and
-  # collected no celler overlay at all.
-  #
-  # `den.aspects.packages.*` is exempt: overlays.nix walks that registry directly
-  # (`collectPackageOverlays`) regardless of inclusion, so the overlay reaches the
-  # perSystem `pkgs` unconditionally. Hosts still get it the normal way, by
-  # `includes`-ing it -- the same shape as ./ivy-fetch.nix.
+  # In the `packages` registry, which overlays.nix walks regardless of
+  # inclusion, so the perSystem `pkgs` (update-celler-keys, celler-token) has
+  # `pkgs.celler` whether or not any host is resolved there. Hosts get it the
+  # normal way, by `includes`-ing it -- the same shape as ./ivy-fetch.nix.
   den.aspects.packages.celler.overlays.celler = lib.optional (
     inputs ? celler
   ) inputs.celler.overlays.default;

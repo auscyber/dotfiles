@@ -5,15 +5,8 @@
   fleet,
   ...
 }:
-# Remote build machines.
-#
-# In aspects/base rather than aspects/nixos, even though the aspect names
-# NixOS-shaped options: ../../partition-map.nix claims the whole `nixos`
-# directory for the nixos bucket, so while this lived there `den.aspects
-# .builders` did not exist in the darwin partition at all and the Mac could not
-# include it -- which is what the commented-out line in ../hosts/laptop.nix was
-# working around. It declares both a `nixos` and a `darwin` class and reaches
-# for no NixOS-only input, so base is where it belongs.
+# Remote build machines. In aspects/base rather than aspects/nixos because it
+# declares both a `nixos` and a `darwin` class.
 let
   # Every machine in the fleet (../hosts/fleet.nix) that advertises a `builder`
   # record.
