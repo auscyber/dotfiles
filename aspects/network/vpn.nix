@@ -1,10 +1,11 @@
 {
   den,
   lib,
+  fleet,
   ...
 }:
 let
-  inherit (import ./_lib.nix { inherit lib; })
+  inherit (import ./_lib.nix { inherit lib fleet; })
     pubKey
     clientNames
     tunnelIpByName

@@ -38,6 +38,6 @@
             };
           };
         }
-      ) config.nixosConfigurations;
+      ) (lib.filterAttrs (_: c: !c.config.boot.isContainer) config.nixosConfigurations);
     };
 }

@@ -18,9 +18,14 @@
 #
 # Set DENDRITIC_USE_CELLER=1 to opt back in for one invocation.
 { lib }: rec {
-  vhost = "cache.ivymect.in";
+  # Every celler server's host as consumers reach it
+  # (aspects/base/celler/server.nix).
+  hosts = [
+    "cache.ivymect.in"
+    "celler2"
+  ];
 
-  # `grep -F`: the vhost is a fixed string, and an unescaped `.` in a regex
+  # `grep -F`: each host is a fixed string, and an unescaped `.` in a regex
   # would also match `cache-ivymect-in`.
   deps = pkgs: [
     pkgs.coreutils
@@ -39,7 +44,7 @@
       celler_free_substituters="$(nix config show substituters 2>/dev/null \
         | tr ' ' '\n' \
         | grep -v '^$' \
-        | grep -vF ${lib.escapeShellArg vhost} \
+        | grep -vF ${lib.concatMapStringsSep " " (h: "-e ${lib.escapeShellArg "://${h}"}") hosts} \
         | awk '!seen[$0]++' \
         | tr '\n' ' ')"
       celler_free_substituters="''${celler_free_substituters% }"

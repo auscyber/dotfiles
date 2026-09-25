@@ -64,7 +64,7 @@ let
         # Note what is NOT here, and never was: den's entity context. A routed
         # class body becomes a plain module in the target config, so `host` /
         # `user` / `anyUser` are not bound and asking for one fails eval with
-        # "attribute 'host' missing" (which is what `den.aspects.celler-push`
+        # "attribute 'host' missing" (which is what `den.aspects.celler-user`
         # did). Take the identity off `config` instead.
         args
         // rec {
