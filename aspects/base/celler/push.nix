@@ -60,8 +60,10 @@ in
     den.aspects.celler-user
   ];
 
-  # Every host substitutes from secondpc's main cache unless it says otherwise.
-  den.default.celler-use.secondpc.pull = [ "main" ];
+  # Every host substitutes from secondpc's main cache; a host that should not
+  # excludes this aspect.
+  den.aspects.celler-default.celler-use.secondpc.pull = [ "main" ];
+  den.default.includes = [ den.aspects.celler-default ];
 
   # The host side: every declared cache as a substituter next to the fleet-wide
   # caches in ../caches.nix, a netrc with the host's token for the servers it

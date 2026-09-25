@@ -32,6 +32,8 @@ in
   };
 
   den.aspects.Ivys-MacBook-Pro = {
+    # celler2 only (see ivypierlot's `celler-use`), not the fleet's secondpc.
+    excludes = [ den.aspects.celler-default ];
     includes = [
       den.aspects.js
       den.aspects.vpn
@@ -261,10 +263,7 @@ in
   };
 
   den.aspects.ivypierlot = {
-    celler-use = {
-      secondpc = [ "main" ];
-      celler2 = [ "main" ];
-    };
+    celler-use.celler2 = [ "main" ];
     study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.zig
