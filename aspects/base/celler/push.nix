@@ -41,8 +41,35 @@ let
     );
 
   tokenOf = name: "celler_token_${name}";
+
+  # `secrets` and `templates` are ROUTED classes: their bodies become plain
+  # modules in the target config and see that config's module args, never den's
+  # pipe values -- see `adaptArgs` in ../../security/agenix-rekey.nix, which
+  # says so and names this aspect as the thing that tripped on it. So the two
+  # quirks `tokenSecrets` reads have to be handed to the target config.
+  #
+  # A host carries them for its users as well: a host-managed user's `secrets`
+  # route into the HOST's config, so that is the only arg namespace they have.
+  # The values coincide in practice -- `celler-use` is declared on the user and
+  # reaches the host by `celler-use-to-host` below -- and a standalone home gets
+  # its own from the homeManager definition.
+  quirkArgs =
+    {
+      celler-caches,
+      celler-use,
+      ...
+    }:
+    {
+      _module.args = { inherit celler-caches celler-use; };
+    };
 in
 {
+  den.aspects.celler-quirk-args = {
+    includes = [ den.policies.celler-caches ];
+    os = quirkArgs;
+    homeManager = quirkArgs;
+  };
+
   # Pulls every celler server's `celler-caches` record (./server.nix) into the
   # scope that includes it.
   den.policies.celler-caches = { host, ... }: [
@@ -74,6 +101,7 @@ in
       den.aspects.celler-input
       den.aspects.packages.celler
       den.policies.celler-caches
+      den.aspects.celler-quirk-args
     ];
 
     secrets = tokenSecrets;
@@ -165,6 +193,7 @@ in
       den.aspects.celler-input
       den.aspects.packages.celler
       den.policies.celler-caches
+      den.aspects.celler-quirk-args
     ];
 
     secrets = tokenSecrets;

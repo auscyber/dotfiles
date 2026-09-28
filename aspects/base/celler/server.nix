@@ -48,30 +48,55 @@ in
       ];
       secretScope = "celler";
 
+      # The unit is `cellerd`, not the scope name, so nothing would be inferred
+      # -- and inference has to stay off rather than be pointed at `cellerd`:
+      # `services.cellerd.user` is a DynamicUser, so there is no account to
+      # chown to, and systemd reads the EnvironmentFile as root anyway. Same
+      # escape hatch ../../services/gateway.nix uses: a literal unit name.
+      secretSettings = {
+        service = null;
+        settings.restartUnits = [ "cellerd.service" ];
+      };
+
       # Named after the host by where agenix puts its generated secrets, the
       # one thing a `secrets` body can see.
-      secrets =
-        { age, ... }:
-        {
-          signing_key = celler.signingKey (baseNameOf age.rekey.generatedSecretsDir);
-        };
+      secrets = { age, ... }: {
+        signing_key = celler.signingKey (baseNameOf age.rekey.generatedSecretsDir);
+      };
 
       # In the `templates` class rather than raw in `nixos`, because only the
       # classes an aspect re-emits get scope-local args: `secrets` here is the
       # `celler` scope, keyed by short name.
-      templates.env =
-        { secrets, ... }:
-        {
-          dependencies.signing_key = secrets.signing_key;
-          content =
-            { placeholders, ... }:
-            ''
-              CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.signing_key}
-            '';
-        };
+      # The env file is the only part of cellerd's configuration that does not
+      # end up world-readable in the store, so everything secret goes here --
+      # the signing key always, and the R2 credentials on a server whose
+      # storage is a bucket.
+      #
+      # Those are picked up rather than passed: a template implicitly depends
+      # on every secret in its scope (../../../lib/age-scoped.nix), so a server
+      # that declares `r2_access_key_id` in its own `celler` scope gets the
+      # lines for free and one that does not has no mention of them. The AWS
+      # SDK reads exactly these two names when celler's `[storage]` omits
+      # `credentials`, which is how the keys stay out of the TOML.
+      templates.env = { secrets, ... }: {
+        dependencies.signing_key = secrets.signing_key;
+        content =
+          { placeholders, ... }:
+          ''
+            CELLER_SERVER_TOKEN_RS256_SECRET_BASE64=${placeholders.signing_key}
+          ''
+          + lib.optionalString (secrets ? r2_access_key_id) ''
+            AWS_ACCESS_KEY_ID=${placeholders.r2_access_key_id}
+            AWS_SECRET_ACCESS_KEY=${placeholders.r2_secret_access_key}
+          '';
+      };
 
       celler-caches =
-        { config, host, ... }:
+        {
+          config,
+          host,
+          ...
+        }:
         let
           k = keys.${host.name} or { };
         in
@@ -102,11 +127,19 @@ in
         {
           config,
           pkgs,
+          host,
           scoped,
           ...
         }:
         let
           cfg = config.services.cellerd.expose;
+          # The caches this server is meant to serve, by the same rule
+          # `celler-caches` above publishes them.
+          serverCaches =
+            let
+              k = keys.${host.name} or { };
+            in
+            if k == { } then [ "main" ] else builtins.attrNames k;
           local = [
             "http://localhost:${toString cfg.port}"
             "http://127.0.0.1:${toString cfg.port}"
@@ -191,12 +224,75 @@ in
               };
             };
 
+            # Create the caches this server serves, with a token it mints from
+            # its own signing key -- so a fresh server (or a fresh R2 bucket)
+            # comes up serving the caches ./celler-keys.json says it has,
+            # rather than 404ing until someone runs `celler cache create` by
+            # hand.
+            #
+            # `postStart`, NOT `preStart`: creating a cache is an API call to
+            # this very server, so it cannot run before the listener exists.
+            # The loop is still needed because the unit is `exec`-started --
+            # systemd considers it up once the process is spawned, which is
+            # earlier than the first accepted connection.
+            #
+            # Idempotent by asking first: `cache create` on an existing cache
+            # is an error, and `|| true` would swallow real ones too.
+            systemd.services.cellerd.postStart = ''
+              for _ in $(seq 1 60); do
+                if ${lib.getExe pkgs.curl} -sf -o /dev/null \
+                  http://localhost:${toString cfg.port}/; then break; fi
+                sleep 1
+              done
+
+              # Short validity and a throwaway subject: this token exists for
+              # the length of this script and is never written anywhere. Full
+              # permissions because it is the server administering itself.
+              token="$(${lib.getExe' pkgs.celler "celleradm"} -f ${celler.tokenConfig pkgs} make-token \
+                --sub cellerd-caches --validity 5m \
+                --pull '*' --push '*' --delete '*' \
+                --create-cache '*' --configure-cache '*' \
+                --configure-cache-retention '*' --destroy-cache '*')"
+
+              # The client keeps its config under XDG_CONFIG_HOME; cellerd is a
+              # DynamicUser with no home, so point it at the runtime dir.
+              export XDG_CONFIG_HOME="$RUNTIME_DIRECTORY/client"
+              mkdir -p "$XDG_CONFIG_HOME"
+              ${lib.getExe pkgs.celler-client} login self \
+                http://localhost:${toString cfg.port} "$token"
+
+              ${lib.concatMapStrings (c: ''
+                if ${lib.getExe pkgs.celler-client} cache info ${lib.escapeShellArg "self:${c}"} \
+                  >/dev/null 2>&1
+                then
+                  echo "cellerd: cache ${c} already exists"
+                else
+                  echo "cellerd: creating cache ${c}"
+                  ${lib.getExe pkgs.celler-client} cache create ${lib.escapeShellArg "self:${c}"}
+                fi
+              '') serverCaches}
+            '';
+            systemd.services.cellerd.serviceConfig.RuntimeDirectory = "cellerd";
+
             systemd.services.cloudflared-tunnel = lib.mkIf (cfg.cloudflared.hostname != null) {
               wantedBy = [ "multi-user.target" ];
               after = [ "network-online.target" ];
               wants = [ "network-online.target" ];
               serviceConfig = {
-                ExecStart = "${lib.getExe pkgs.cloudflared} tunnel --no-autoupdate run";
+                # `--config`: the tunnels this flake mints are
+                # `config_src: "local"` (../../network/cloudflare.nix), so the
+                # routes come from the closure and not from the account.
+                ExecStart = "${lib.getExe pkgs.cloudflared} tunnel --no-autoupdate --config ${
+                  (pkgs.formats.yaml { }).generate "cloudflared.yml" {
+                    ingress = [
+                      {
+                        hostname = cfg.cloudflared.hostname;
+                        service = "http://localhost:${toString cfg.port}";
+                      }
+                      { service = "http_status:404"; }
+                    ];
+                  }
+                } run";
                 EnvironmentFile = cfg.cloudflared.environmentFile;
                 DynamicUser = true;
                 Restart = "always";
@@ -224,28 +320,90 @@ in
           client_max_body_size 15g;
         '';
       };
-      nixos.services.cellerd.expose.port = port;
-
-      cellerd = {
-        storage = {
-          type = "local";
-          path = "/mnt/hdd/attic";
-        };
-        tracing.otlp = {
-          enabled = true;
-          endpoint = "insecure://127.0.0.1:4317";
-          protocol = "grpc";
-        };
+      # A cloudflared tunnel to the same cellerd, as a third way in next to the
+      # nginx vhost and the tailnet. Remotely managed (the dashboard holds the
+      # route to http://localhost:${toString port}), so all this side needs is
+      # the connector token -- `cloudflared tunnel run` reads TUNNEL_TOKEN from
+      # the environment and asks Cloudflare what to serve.
+      #
+      # `consumeVia` is left alone: it still resolves to `virtualHost`, so
+      # adding this changes nothing for existing consumers. It is the way in for
+      # anything that can reach neither the LAN nor the tailnet.
+      # Consumers reach it over the tailnet, like ../../hosts/celler2.nix.
+      # Pushing is what decides this: Cloudflare caps a proxied request body at
+      # 100MB and `celler push` sends NARs far past it (the vhost above says
+      # `client_max_body_size 15g`), and the public vhost is a home connection
+      # either way. The tailnet has neither limit, and it is reachable from off
+      # the LAN, which the LAN address is not.
+      #
+      # `cache.ivymect.in` stays up and stays a direct A record -- it is
+      # excluded from the host's tunnel in ../../hosts/secondpc/default.nix.
+      nixos.services.cellerd.expose = {
+        inherit port;
+        consumeVia = "tailscale";
       };
+
+      cellerd =
+        { host, ... }:
+        let
+          # Written by the `r2-token` generator next to its own secret
+          # (../../network/cloudflare.nix). The account id is only knowable by
+          # asking the API, and `endpoint` is needed at EVALUATION time, so the
+          # generator leaves it in plaintext here rather than it being a
+          # constant somebody has to look up and paste.
+          #
+          # Absent before the first `gen-secrets`, which is deliberate: the
+          # server keeps local storage until the bucket and its credentials
+          # actually exist, and the rebuild after that picks R2 up.
+          meta = ../../../secrets/generated + "/${host.name}/r2.json";
+          r2 = if builtins.pathExists meta then lib.importJSON meta else null;
+        in
+        {
+          # `/mnt/hdd/attic` is not retired by this. A NAR's backend is
+          # recorded per file (celler's `RemoteFile` is `S3 | Local | Http`),
+          # so everything already uploaded keeps being served from the disk
+          # while new uploads go to the bucket -- which is also why that path
+          # has to stay readable rather than being cleaned up.
+          storage =
+            if r2 == null then
+              {
+                type = "local";
+                path = "/mnt/hdd/attic";
+              }
+            else
+              {
+                type = "s3";
+                # R2 has one region and calls it this.
+                region = "auto";
+                inherit (r2) bucket endpoint;
+                # No `credentials`: they would land in the world-readable
+                # store. The AWS SDK reads AWS_ACCESS_KEY_ID and
+                # AWS_SECRET_ACCESS_KEY, which `templates.env` above puts in
+                # the env file instead.
+              };
+          tracing.otlp = {
+            enabled = true;
+            endpoint = "insecure://127.0.0.1:4317";
+            protocol = "grpc";
+          };
+        };
 
       # CI push token for GitHub Actions (sub=github, push=main).
       # `nix run .#sync-ci-secrets` uploads it as the CELLER_TOKEN secret that
       # auscyber/celler-action pushes with.
+      # R2 credentials for the bucket this server stores NARs in, minted from
+      # the account token and scoped to that one bucket. The two usable halves
+      # are named for `templates.env` above, which picks them up because a
+      # template depends on every secret in its scope.
+      #
       secrets =
-        { secrets, ... }:
-        {
+        args@{ secrets, ... }:
+        den.lib.cloudflare.r2Secrets { bucket = "celler-main"; } args
+        // {
           github_cache_key = {
             rekeyFile = ../github_cache_key.age;
+            # Shares the `celler` scope, but the server never reads it.
+            restartUnits = [ ];
             generator = {
               tags = [ "github_cache_key" ];
               dependencies.signing_key = secrets.signing_key;
@@ -262,7 +420,11 @@ in
   # mints a token for <server> by hand (e.g. to `celler cache create` on it),
   # decrypting its generated signing key with the master identity.
   perSystem =
-    { pkgs, system, ... }:
+    {
+      pkgs,
+      system,
+      ...
+    }:
     let
       mintToken = pkgs.writeShellApplication {
         name = "celler-token";

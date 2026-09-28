@@ -17,7 +17,6 @@ let
     #      "auscyber.cachix.org-1:RPlENxXc/irvLimM0Yz8Au3ntk/sxZ8bwXPwuXL3v5c=";
     #    "https://attic.xuyh0120.win/lantian" = "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=";
   };
-
 in
 {
   debug = true;
@@ -59,12 +58,23 @@ in
   den.aspects.nix.provides.secondpc = {
     includes = [
       den.aspects.nginx
-      den.aspects.celler
+      # `den.aspects.celler` is NOT here, though this is where it belongs by
+      # subject. Its `celler-caches` record is a config thunk, and den resolves
+      # one against `hostConfigs` keyed by SCOPE id (den
+      # fx/assemble-pipes.nix): emitted from a provider sub-scope there is no
+      # host config to resolve it against, so every OTHER host's fleet-wide
+      # collect silently dropped secondpc and then threw `no celler server
+      # secondpc`. It is included straight on the host aspect instead --
+      # the shape ../hosts/celler2.nix already had.
       den.policies.celler-caches
       {
         celler-use.secondpc.pull = [ "main" ];
         nixos =
-          { celler-caches, celler-use, ... }:
+          {
+            celler-caches,
+            celler-use,
+            ...
+          }:
           let
             used = celler.use celler-caches celler-use;
           in

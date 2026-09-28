@@ -54,8 +54,20 @@
       den.aspects.impermanence
       den.aspects.nginx
       den.aspects.nix
+      # cache.ivymect.in (../../base/celler/server.nix). On the host aspect
+      # rather than on `den.aspects.nix.provides.secondpc` with the ncps cache
+      # next to it -- see the note there.
+      den.aspects.celler
       den.aspects.local
       den.aspects.vpn-server
+      # Alongside ../../network/vpn.nix's wireguard, not instead of it: the
+      # wireguard hub is this box, so a client that cannot reach its fixed
+      # endpoint has nothing, and the tailnet is what the laptop uses to reach
+      # the celler here from outside the LAN.
+      den.aspects.tailscale
+      # One tunnel in front of this box's nginx, so every *.ivymect.in vhost is
+      # reachable without a port forward. See ../../network/cloudflare.nix.
+      den.aspects.cloudflare-tunnel
       den.aspects.builders
       den.aspects.builder-server
       den.aspects.disko
@@ -97,6 +109,11 @@
       {
         # Host identity / boot
         networking.hostId = "4f6f802e";
+
+        # The nix cache stays a direct A record. Cloudflare caps a proxied
+        # request body at 100MB and `celler push` sends NARs far past it, so
+        # tunnelling this one would break pushing while pulls kept working.
+        services.cloudflared-tunnel.exclude = [ "cache.ivymect.in" ];
 
         # Zone the gated service aspects publish under; they name only their
         # own subdomain, so this is the one place the domain appears.

@@ -1,0 +1,185 @@
+diff --git a/apps/generate.nix b/apps/generate.nix
+index c3da7d2095..780197a4ce 100644
+--- a/apps/generate.nix
++++ b/apps/generate.nix
+@@ -41,6 +41,18 @@
+       "Cannot generate ${fileStr} as it isn't a direct subpath of the flake directory ${userFlakeDir}, meaning this script cannot determine its true origin!";
+     "." + removePrefix userFlakeDir fileStr;
+ 
++  # A `derivedFrom` entry is either another secret -- hashed from its file when the
++  # script runs, so it reflects the regeneration that just happened -- or a
++  # plain value, hashed here at evaluation time.
++  isSecretRef = v: builtins.isAttrs v && v ? rekeyFile && v.rekeyFile != null;
++  derivedSecretFiles =
++    generator: map (v: relativeToFlake v.rekeyFile) (filter isSecretRef (attrValues generator.derivedFrom));
++  derivedValueHash =
++    generator:
++    builtins.hashString "sha256" (
++      builtins.toJSON (filterAttrs (_: v: !isSecretRef v) generator.derivedFrom)
++    );
++
+   mapListOrAttrs = f: x: if builtins.isList x then map f x else mapAttrs (_: f) x;
+   mapListOrAttrValues = f: x: if builtins.isList x then map f x else mapAttrsToList (_: f) x;
+   filterListOrAttrValues = f: x: if builtins.isList x then filter f x else filterAttrs (_: f) x;
+@@ -104,6 +116,8 @@
+             secretName
+             script
+             ;
++          derivedFiles = derivedSecretFiles secret.generator;
++          derivedHash = derivedValueHash secret.generator;
+           defs = (set.${sourceFile}.defs or [ ]) ++ [ "${host}:${secretName}" ];
+         };
+       };
+@@ -117,6 +131,40 @@
+   # The command that actually generates a secret.
+   secretGenerationCommand = contextSecret: ''
+     if wants_secret ${escapeShellArg contextSecret.sourceFile} ${escapeShellArg (concatStringsSep "," contextSecret.secret.generator.tags)} ; then
++      # `derivedFrom`: this secret is a function of the values and secrets named
++      # there, so it is stale as soon as their combined hash moves. The hash
++      # lives beside it in <file>.derived-from.
++      #
++      # Staleness is expressed by backdating the target rather than by widening
++      # the condition below: the existing rule already regenerates anything
++      # older than its newest dependency, and `dep_mtimes` always holds a 1, so
++      # an mtime of 0 is unconditionally stale. Nothing is deleted, so a
++      # generator that fails leaves the previous secret intact.
++      derived_stamp=""
++      ${
++        if contextSecret.secret.generator.derivedFrom == { } then
++          ""
++        else
++          ''
++            derived_stamp="$(
++              {
++                printf '%s\n' ${escapeShellArg contextSecret.derivedHash}
++                ${concatStringsSep "\n" (
++                  map (
++                    f: "${pkgs.coreutils}/bin/sha256sum ${escapeShellArg f} 2>/dev/null || echo ${escapeShellArg "missing ${f}"}"
++                  ) contextSecret.derivedFiles
++                )}
++              } | ${pkgs.coreutils}/bin/sha256sum | ${pkgs.coreutils}/bin/cut -d' ' -f1
++            )"
++            if [[ -e ${escapeShellArg contextSecret.sourceFile} ]] \
++              && [[ "$derived_stamp" != "$(${pkgs.coreutils}/bin/cat ${
++                escapeShellArg (contextSecret.sourceFile + ".derived-from")
++              } 2>/dev/null || echo "")" ]]; then
++              ${pkgs.coreutils}/bin/touch -d @0 ${escapeShellArg contextSecret.sourceFile}
++            fi
++          ''
++      }
++
+       # If the secret has dependencies, force regeneration if any
+       # dependency was modified since its last generation
+       dep_mtimes=(
+@@ -144,9 +192,17 @@
+         } | ${ageMasterEncrypt} -o ${escapeShellArg contextSecret.sourceFile} \
+           || die "Failed to generate or encrypt secret."
+ 
++        if [[ -n "$derived_stamp" ]]; then
++          printf '%s\n' "$derived_stamp" > ${escapeShellArg (contextSecret.sourceFile + ".derived-from")}
++        fi
++
+         if [[ "$ADD_TO_GIT" == true ]]; then
+           git add ${escapeShellArg contextSecret.sourceFile} \
+             || die "Failed to add generated secret to git"
++          if [[ -n "$derived_stamp" ]]; then
++            git add ${escapeShellArg (contextSecret.sourceFile + ".derived-from")} \
++              || die "Failed to add derivation stamp to git"
++          fi
+         fi
+       else
+         echo "[1;90m    Skipping[m [90m[already exists] "${escapeShellArg contextSecret.sourceFile}" ("${concatStringsSep "', '" (map escapeShellArg contextSecret.defs)}")[m"
+diff --git a/modules/agenix-rekey.nix b/modules/agenix-rekey.nix
+index bc16ca49f0..61b440ff3b 100644
+--- a/modules/agenix-rekey.nix
++++ b/modules/agenix-rekey.nix
+@@ -52,6 +52,30 @@
+     hostConfig = config;
+   };
+ 
++  # Must agree with `isSecretRef` in apps/generate.nix: an entry that names
++  # another secret is hashed there, from its FILE, once that secret has been
++  # regenerated. Only the plain values can be hashed here, where nothing has
++  # been decrypted yet.
++  #
++  # `lib.filterAttrs`, qualified: this module's `inherit (lib)` list does not
++  # carry it, and widening that list is a bigger diff than the one call needs.
++  derivedPlainValues =
++    generator:
++    lib.filterAttrs (_: v: !(isAttrs v && v ? rekeyFile && v.rekeyFile != null)) generator.derivedFrom;
++
++  # Eight hex characters: this discriminates between a handful of variants of
++  # one secret, it is not a security boundary, and a full sha256 in every path
++  # makes a generated-secrets directory unreadable.
++  derivedNameSuffix =
++    generator:
++    let
++      plain = derivedPlainValues generator;
++    in
++    if plain == { } then
++      ""
++    else
++      "-" + builtins.substring 0 8 (builtins.hashString "sha256" (builtins.toJSON plain));
++
+   # A decryptable dummy secret that is used as a replacement when a secret specifies `intermediary = true`.
+   pubkeyOpt = x: if isAbsolutePath x then "-R ${escapeShellArg x}" else "-r ${escapeShellArg x}";
+   dummySecret = pkgs.runCommand "generate-dummy-secret-${target}.age" { } ''
+@@ -182,6 +206,48 @@
+             submod.config.script;
+       };
+ 
++      derivedFrom = mkOption {
++        type = types.attrsOf types.unspecified;
++        default = { };
++        example = literalExpression ''
++          {
++            scope = {
++              pull = [ "main" ];
++              push = [ "main" ];
++            };
++            signingKey = config.age.secrets.signing_key;
++          }
++        '';
++        description = ''
++          What this secret is a function of. It is regenerated whenever any of
++          these changes, rather than only when its file is missing.
++
++          Each value is either a plain, JSON-representable value or another
++          secret definition (anything carrying a `rekeyFile`). The two are
++          handled differently, because only one of them can be read before
++          anything has been decrypted:
++
++          - Plain values are hashed at EVALUATION time and folded into the
++            default `rekeyFile` name, so a change leaves no file at the new
++            path and the ordinary "generate what is missing" rule mints it.
++            The previous secret stays on disk, so what is already deployed
++            keeps working until the new one is. A secret that sets `rekeyFile`
++            explicitly opts out of this and relies on the stamp below.
++
++          - A named secret's encrypted file is hashed while `agenix generate`
++            runs, after that secret has itself been regenerated (dependencies
++            are ordered first). The combined hash is recorded beside the
++            generated secret as `<rekeyFile>.derived-from`, and a mismatch
++            forces regeneration in place. age encryption is not deterministic,
++            so naming a secret here means "whenever that secret is
++            regenerated", not "whenever its plaintext changes".
++
++          Stronger than `dependencies`, which only orders generation and
++          compares mtimes -- and a value that is not a secret cannot be
++          expressed as a dependency at all.
++        '';
++      };
++
+       tags = mkOption {
+         type = types.listOf types.str;
+         default = [ ];
+@@ -363,7 +429,8 @@
+               default =
+                 if submod.config.generator != null then
+                   if config.age.rekey.generatedSecretsDir != null then
+-                    config.age.rekey.generatedSecretsDir + "/${submod.config.id}.age"
++                    config.age.rekey.generatedSecretsDir
++                    + "/${submod.config.id}${derivedNameSuffix submod.config.generator}.age"
+                   else
+                     null
+                 else if config.age.rekey.secretsDir != null then

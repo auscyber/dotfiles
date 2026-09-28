@@ -125,7 +125,7 @@
           };
         };
         security.acme.certs."logs.pierlot.com.au" = {
-          environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
+          environmentFile = scoped.cloudflare.secrets.acme_env.path;
           group = config.services.nginx.group;
         };
         services.nginx.virtualHosts."logs.pierlot.com.au" = {

@@ -97,14 +97,21 @@
               }:
               ''
                 pw="$(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})"
-                # Not pkgs.libiconv: on glibc, that's headers only (glibc
-                # provides iconv natively, so the separate library is a
-                # link-time no-op there) -- no bin/iconv in its closure.
-                # And not bare pkgs.glibc either -- its default output is the
-                # library only; the executables (including iconv) are the
-                # separate `.bin` output.
-                printf '%s' "$pw" | ${pkgs.glibc.bin}/bin/iconv -f UTF-8 -t UTF-16LE | \
-                  ${pkgs.openssl}/bin/openssl dgst -md4 -provider legacy -provider default | \
+                # UTF-16LE then MD4 -- that is what an NT hash is.
+                #
+                # perl, not iconv, because a generator's `pkgs` is the ADMIN
+                # host's and not the target's: `agenix-generate` is built for
+                # the machine you run `nix run .#gen-secrets` on. Naming an
+                # iconv here means naming one that exists on every machine that
+                # might run it, and there isn't one -- on Linux the binary is
+                # in `glibc.bin` (glibc provides iconv natively, so pkgs.libiconv
+                # is headers only and has no bin/iconv), while on darwin
+                # `pkgs.glibc` refuses to evaluate at all. Encode is core perl,
+                # so this needs no platform branch and no second closure.
+                printf '%s' "$pw" \
+                  | ${pkgs.perl}/bin/perl -MEncode -0777 -ne \
+                      'print encode("UTF-16LE", decode("UTF-8", $_))' \
+                  | ${pkgs.openssl}/bin/openssl dgst -md4 -provider legacy -provider default | \
                   awk '{print toupper($NF)}'
               '';
           };

@@ -7,11 +7,17 @@
 # from behind a NAT that neither end controls -- because it negotiates directly
 # and falls back to a DERP relay when it cannot.
 #
-# Credentials are an OAuth client, not a pre-auth key, which is why nothing here
-# stores a key per device. An OAuth client does not expire the way an auth key
-# does (90 days at the outside), and keys minted from it are made on demand and
-# thrown away -- so a phone is enrolled by minting one at that moment rather
-# than by decrypting something that has been sitting in the repo going stale.
+# Credentials are an OAuth client, not a pre-auth key, which is why no machine
+# that can mint at boot stores a key of its own. An OAuth client does not expire
+# the way an auth key does (90 days at the outside), and keys minted from it are
+# made on demand and thrown away -- so a phone is enrolled by minting one at that
+# moment rather than by decrypting something that has been sitting in the repo
+# going stale.
+#
+# The exception is a host that cannot reach the API at boot: `authKeySecret`
+# mints it one key at `gen-secrets` time instead, which does go stale on the
+# same 90-day clock -- re-running `gen-secrets` after deleting the generated
+# file is what refreshes it.
 #
 # BOOTSTRAP:
 #
@@ -83,106 +89,220 @@ let
   # point this at a temp file it made at runtime, and so the description can
   # carry the real hostname instead of whatever the module system thinks it is
   # at eval time.
-  mintKeyScript = ''
-    if [ ! -r "$ts_env_file" ]; then
-      echo "tailscale: $ts_env_file is not readable" >&2
-      exit 1
-    fi
+  #
+  # `reusable` is the one axis that differs between the two ways this is used.
+  # A daemon that mints at every boot spends its key immediately, so a
+  # single-use one is strictly better; a key minted ONCE by `gen-secrets` and
+  # stored for a host (see `authKeySecret`) is replayed on every restart, so a
+  # single-use one would authenticate that host exactly once.
+  mkMintKeyScript =
+    {
+      reusable ? false,
+    }:
+    ''
+      if [ ! -r "$ts_env_file" ]; then
+        echo "tailscale: $ts_env_file is not readable" >&2
+        exit 1
+      fi
 
-    # Sourced in a subshell-free way but scrubbed immediately after: CLIENT_ID
-    # and CLIENT_SECRET are the long-lived credential and have no business
-    # staying in the environment of anything this later execs.
-    # The source has to sit on its own line with the directive immediately
-    # above it. As `set -a; . "$f"; set +a` on one line, shellcheck attaches the
-    # disable to `set -a` and still fails the build on SC1090 -- which it does
-    # at *build* time, so it passes eval and only bites on switch.
-    set -a
-    # shellcheck disable=SC1090
-    . "$ts_env_file"
-    set +a
+      # Sourced in a subshell-free way but scrubbed immediately after: CLIENT_ID
+      # and CLIENT_SECRET are the long-lived credential and have no business
+      # staying in the environment of anything this later execs.
+      # The source has to sit on its own line with the directive immediately
+      # above it. As `set -a; . "$f"; set +a` on one line, shellcheck attaches the
+      # disable to `set -a` and still fails the build on SC1090 -- which it does
+      # at *build* time, so it passes eval and only bites on switch.
+      set -a
+      # shellcheck disable=SC1090
+      . "$ts_env_file"
+      set +a
 
-    if [ -z "''${CLIENT_ID:-}" ] || [ -z "''${CLIENT_SECRET:-}" ]; then
-      echo "tailscale: $ts_env_file must set CLIENT_ID and CLIENT_SECRET" >&2
-      exit 1
-    fi
+      if [ -z "''${CLIENT_ID:-}" ] || [ -z "''${CLIENT_SECRET:-}" ]; then
+        echo "tailscale: $ts_env_file must set CLIENT_ID and CLIENT_SECRET" >&2
+        exit 1
+      fi
 
-    # NOT `curl -f`. writeShellApplication sets `errexit`, so a `-f` curl inside
-    # a command substitution kills the script AT THE ASSIGNMENT -- which made
-    # every diagnostic below this point dead code and turned a real API error
-    # into 199 log lines reading only "curl: (22)". Capture the status and the
-    # body instead, and say what the API actually objected to.
-    token_body="$(mktemp)"
-    token_code="$(curl -sS -o "$token_body" -w '%{http_code}' \
-      -d "client_id=$CLIENT_ID" \
-      -d "client_secret=$CLIENT_SECRET" \
-      https://api.tailscale.com/api/v2/oauth/token || echo 000)"
+      # NOT `curl -f`. writeShellApplication sets `errexit`, so a `-f` curl inside
+      # a command substitution kills the script AT THE ASSIGNMENT -- which made
+      # every diagnostic below this point dead code and turned a real API error
+      # into 199 log lines reading only "curl: (22)". Capture the status and the
+      # body instead, and say what the API actually objected to.
+      token_body="$(mktemp)"
+      token_code="$(curl -sS -o "$token_body" -w '%{http_code}' \
+        -d "client_id=$CLIENT_ID" \
+        -d "client_secret=$CLIENT_SECRET" \
+        https://api.tailscale.com/api/v2/oauth/token || echo 000)"
 
-    if [ "$token_code" != "200" ]; then
-      echo "tailscale: OAuth token exchange failed (HTTP $token_code)" >&2
-      echo "  response: $(head -c 500 "$token_body")" >&2
-      echo "  check CLIENT_ID/CLIENT_SECRET in $ts_env_file" >&2
+      if [ "$token_code" != "200" ]; then
+        echo "tailscale: OAuth token exchange failed (HTTP $token_code)" >&2
+        echo "  response: $(head -c 500 "$token_body")" >&2
+        echo "  check CLIENT_ID/CLIENT_SECRET in $ts_env_file" >&2
+        rm -f "$token_body"
+        exit 1
+      fi
+
+      access_token="$(jq -r '.access_token // empty' <"$token_body")"
       rm -f "$token_body"
-      exit 1
-    fi
 
-    access_token="$(jq -r '.access_token // empty' <"$token_body")"
-    rm -f "$token_body"
+      if [ -z "$access_token" ]; then
+        echo "tailscale: token endpoint returned 200 but no access_token" >&2
+        exit 1
+      fi
 
-    if [ -z "$access_token" ]; then
-      echo "tailscale: token endpoint returned 200 but no access_token" >&2
-      exit 1
-    fi
+      # The key description is validated control-side against a set narrower than
+      # JSON's -- parentheses are rejected -- and all you get back is HTTP 400
+      # "description had invalid characters", which reads like an auth problem and
+      # is not one. Fold anything outside the safe set to a hyphen and cap the
+      # length, so a hostname can never wedge the daemon into a retry loop.
+      ts_description="$(printf '%s' "$ts_description" | tr -c 'A-Za-z0-9 ._-' '-' | cut -c1-50)"
 
-    # The key description is validated control-side against a set narrower than
-    # JSON's -- parentheses are rejected -- and all you get back is HTTP 400
-    # "description had invalid characters", which reads like an auth problem and
-    # is not one. Fold anything outside the safe set to a hyphen and cap the
-    # length, so a hostname can never wedge the daemon into a retry loop.
-    ts_description="$(printf '%s' "$ts_description" | tr -c 'A-Za-z0-9 ._-' '-' | cut -c1-50)"
+      # Built with jq rather than a Nix-side toJSON so `ts_description` can be a
+      # runtime value, and so the description is escaped by something that
+      # actually knows JSON.
+      payload="$(jq -n \
+        --arg description "$ts_description" \
+        --arg tag ${lib.escapeShellArg nodeTag} \
+        '{description: $description,
+          capabilities: {devices: {create: {
+            reusable: ${lib.boolToString reusable},
+            ephemeral: false,
+            preauthorized: true,
+            tags: [$tag]}}}}')"
 
-    # Built with jq rather than a Nix-side toJSON so `ts_description` can be a
-    # runtime value, and so the description is escaped by something that
-    # actually knows JSON.
-    payload="$(jq -n \
-      --arg description "$ts_description" \
-      --arg tag ${lib.escapeShellArg nodeTag} \
-      '{description: $description,
-        capabilities: {devices: {create: {
-          reusable: false,
-          ephemeral: false,
-          preauthorized: true,
-          tags: [$tag]}}}}')"
+      # `-` means "the tailnet these credentials belong to", so this never has to
+      # name the tailnet.
+      key_body="$(mktemp)"
+      key_code="$(curl -sS -o "$key_body" -w '%{http_code}' \
+        -H "Authorization: Bearer $access_token" \
+        -H "Content-Type: application/json" \
+        -d "$payload" \
+        https://api.tailscale.com/api/v2/tailnet/-/keys || echo 000)"
 
-    # `-` means "the tailnet these credentials belong to", so this never has to
-    # name the tailnet.
-    key_body="$(mktemp)"
-    key_code="$(curl -sS -o "$key_body" -w '%{http_code}' \
-      -H "Authorization: Bearer $access_token" \
-      -H "Content-Type: application/json" \
-      -d "$payload" \
-      https://api.tailscale.com/api/v2/tailnet/-/keys || echo 000)"
+      unset CLIENT_ID CLIENT_SECRET access_token
 
-    unset CLIENT_ID CLIENT_SECRET access_token
+      if [ "$key_code" != "200" ]; then
+        echo "tailscale: minting an auth key failed (HTTP $key_code)" >&2
+        echo "  response: $(head -c 500 "$key_body")" >&2
+        echo "  request:  $payload" >&2
+        echo "  check ${nodeTag} is in the ACL's tagOwners and the client has auth_keys write" >&2
+        rm -f "$key_body"
+        exit 1
+      fi
 
-    if [ "$key_code" != "200" ]; then
-      echo "tailscale: minting an auth key failed (HTTP $key_code)" >&2
-      echo "  response: $(head -c 500 "$key_body")" >&2
-      echo "  request:  $payload" >&2
-      echo "  check ${nodeTag} is in the ACL's tagOwners and the client has auth_keys write" >&2
+      authkey="$(jq -r '.key // empty' <"$key_body")"
       rm -f "$key_body"
-      exit 1
-    fi
 
-    authkey="$(jq -r '.key // empty' <"$key_body")"
-    rm -f "$key_body"
+      if [ -z "$authkey" ]; then
+        echo "tailscale: key endpoint returned 200 but no key field" >&2
+        exit 1
+      fi
+    '';
 
-    if [ -z "$authkey" ]; then
-      echo "tailscale: key endpoint returned 200 but no key field" >&2
-      exit 1
-    fi
-  '';
+  mintKeyScript = mkMintKeyScript { };
+
+  # One name per machine: the tailnet hostname, the admin-console nickname and
+  # the auth key's description are all the machine's own hostname, so nothing
+  # downstream has to learn a second name for the same box. Shared by both
+  # backends so the flag the daemon runs with and the flag
+  # `services.tailscale.extraUpFlags` publishes cannot drift apart.
+  upFlagsFor = config: rec {
+    hostName = config.networking.hostName;
+    upFlags = [ "--hostname=${hostName}" ];
+  };
+
+  # An authkey for one host, minted ONCE by `nix run .#gen-secrets` from the
+  # shared OAuth client and kept master-encrypted at
+  # secrets/generated/<host>/tailscale_authkey.age.
+  #
+  # For a host that cannot run the boot-time minting daemon above: the nix-oci
+  # container image (../hosts/celler2.nix) starts tailscaled by hand from
+  # cellerd's preStart, and baking curl/jq into the image to re-mint on every
+  # restart buys nothing when the admin host can mint it once instead. The
+  # OAuth client never reaches the target -- only the key it produced does.
+  # A PER-ENTRY module function, which is what lets the dependency be found
+  # rather than passed: `age.secrets.<n>` is a submodule, so lib/age-scoped.nix
+  # binds `secrets` to the enclosing scope keyed by short name
+  # (`entryType`'s `_module.args`). So the generator picks the scope's own
+  # `auth` entry up itself, and that entry is a real `age.secrets` value --
+  # which it has to be, because apps/generate.nix reads `dep.id`,
+  # `dep.generator` and `dep.rekeyFile` off a dependency and a literal
+  # `{ rekeyFile = ...; }` fails with `attribute 'generator' missing`.
+  #
+  # The contract is just the name: whatever scope declares this must also
+  # declare the OAuth client as `auth`, the way `den.aspects.tailscale` does.
+  # ONE script for every stored authkey, registered as `age.generators` and
+  # named by `generator.script = "tailscale-authkey"`. Its per-secret
+  # parameters come off `secret.settings`, upstream's channel for exactly
+  # this, so nothing here closes over a call-site argument.
+  authKeyScript =
+    {
+      secret,
+      pkgs,
+      decrypt,
+      deps,
+      ...
+    }:
+    ''
+      export PATH=${
+        lib.makeBinPath [
+          pkgs.coreutils
+          pkgs.curl
+          pkgs.jq
+        ]
+      }:$PATH
+
+      ts_env_file="$(mktemp)"
+      trap 'rm -f "$ts_env_file"' EXIT
+      ${decrypt} ${lib.escapeShellArg deps.oauth.file} > "$ts_env_file"
+
+      # The device shows on the tailnet under its own hostname, so the key is
+      # described by the same name rather than a decorated variant.
+      ts_description=${lib.escapeShellArg secret.settings.device}
+      ${mkMintKeyScript { reusable = true; }}
+
+      printf '%s\n' "$authkey"
+    '';
+
+  # What a call site writes. No `rekeyFile`: the default puts it under the
+  # host's `generatedSecretsDir` with the eval-time half of `derivedFrom`
+  # folded into the name.
+  #
+  # `settings` is both the generator's parameters and what the key is a
+  # function of, so `derivedFrom` is just `settings`. `nodeTag` is in there
+  # because the key is minted FOR that tag and a node cannot advertise one its
+  # key does not carry -- so a changed tag has to mint a new key, and being in
+  # the filename is what makes `agenix generate` do it, leaving the old key
+  # intact until it is pruned.
+  authKeySecret =
+    device:
+    # Still a per-entry module function, for `secrets.auth`: a generator
+    # dependency has to be a real `age.secrets` entry, and this is where the
+    # enclosing scope's entries are bound.
+    { secrets, ... }:
+    let
+      settings = {
+        inherit device nodeTag;
+      };
+    in
+    {
+      inherit settings;
+      generator = {
+        tags = [ "tailscale_authkey" ];
+        script = "tailscale-authkey";
+        dependencies.oauth = secrets.auth;
+        derivedFrom = settings;
+      };
+    };
 in
 {
+  # The shared generator, registered once for the whole fleet rather than on
+  # `den.aspects.tailscale`: ../hosts/celler2.nix stores an authkey without
+  # including that aspect (it has no boot-time daemon to run), and a named
+  # generator has to be registered wherever a secret names it. It costs
+  # nothing to carry -- an unapplied function that is never run unless some
+  # secret's `generator.script` asks for it.
+  den.default.age.generators.tailscale-authkey = authKeyScript;
+
   den.aspects.tailscale = {
     includes = [ den.aspects.agenix-rekey ];
 
@@ -228,6 +348,7 @@ in
       }:
       let
         envFile = scoped.tailscale.secrets.auth.path;
+        inherit (upFlagsFor config) upFlags hostName;
       in
       {
         services.tailscale = {
@@ -235,6 +356,13 @@ in
           openFirewall = true;
           # `--accept-routes` below only does anything with this on.
           useRoutingFeatures = lib.mkDefault "client";
+          # Inert on its own here -- nixpkgs only passes `extraUpFlags` to its
+          # own autoconnect unit, which needs an `authKeyFile` this host does
+          # not have. It is declared because it is also the published record of
+          # how this node joins: ../base/celler/server.nix reads the
+          # `--hostname=` back out of it to build the tailscale address it hands
+          # consumers, and the daemon below is passed the same list.
+          extraUpFlags = upFlags;
         };
 
         systemd.services.tailscale-autoconnect = {
@@ -276,14 +404,15 @@ in
             fi
 
             ts_env_file=${lib.escapeShellArg envFile}
-            ts_description="$(uname -n) nix autoconnect"
+            ts_description=${lib.escapeShellArg hostName}
             ${mintKeyScript}
 
             tailscale up \
               --auth-key "$authkey" \
               --advertise-tags ${lib.escapeShellArg nodeTag} \
-              --accept-routes
-            echo "tailscale: up as ${nodeTag}"
+              --accept-routes \
+              ${lib.escapeShellArgs upFlags}
+            echo "tailscale: up as ${hostName} (${nodeTag})"
           '';
         };
       };
@@ -297,6 +426,7 @@ in
       }:
       let
         envFile = scoped.tailscale.secrets.auth.path;
+        inherit (upFlagsFor config) upFlags hostName;
       in
       {
         services.tailscale.enable = true;
@@ -336,10 +466,7 @@ in
                 fi
 
                 ts_env_file=${lib.escapeShellArg envFile}
-                # `uname -n`, not `hostname`: coreutils is already pinned onto
-                # PATH here and ships the former, while `hostname` on darwin
-                # lives outside the closure in /usr/bin.
-                ts_description="$(uname -n) nix autoconnect"
+                ts_description=${lib.escapeShellArg hostName}
                 ${mintKeyScript}
 
                 # The key reaches tailscaled as an argument, which is visible in
@@ -356,9 +483,10 @@ in
                 if tailscale up \
                   --auth-key "$authkey" \
                   --advertise-tags ${lib.escapeShellArg nodeTag} \
-                  --accept-routes
+                  --accept-routes \
+                  ${lib.escapeShellArgs upFlags}
                 then
-                  echo "tailscale: up as ${nodeTag}"
+                  echo "tailscale: up as ${hostName} (${nodeTag})"
                   exit 0
                 fi
 
@@ -377,6 +505,13 @@ in
           };
         };
       };
+  };
+
+  # For hosts that authenticate from a stored key rather than the boot-time
+  # daemon above. `nodeTag` comes with it because `tailscale up` has to
+  # advertise the same tag the key was minted for.
+  den.lib.tailscale = {
+    inherit authKeySecret nodeTag;
   };
 
   # Mint a key for a device this flake does not build -- a phone, a tablet, a

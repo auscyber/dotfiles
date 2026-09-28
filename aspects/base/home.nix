@@ -47,10 +47,23 @@ in
     # Patches are auto-included from ./patches/home-manager/*.patch.
     patch.enable = true;
   };
-  den.default.os.home-manager = {
-    useGlobalPkgs = true;
-    extraSpecialArgs.inputs = inputs;
-  };
+  # Gated on the same host option den's home-manager battery uses to decide
+  # whether to import the module at all (it defaults to "this host has a user
+  # with the homeManager class"). A host with no users -- celler2, a bare
+  # container -- never gets the module, and an unconditional definition here
+  # faulted its whole evaluation with "the option `home-manager' does not
+  # exist", which took `gen-secrets` down with it for the entire fleet.
+  #
+  # `host` is the den entity, not the OS fixpoint, so reading it here is not
+  # recursive the way testing `options ? home-manager` would be.
+  den.default.os =
+    { host, ... }:
+    lib.optionalAttrs host.home-manager.enable {
+      home-manager = {
+        useGlobalPkgs = true;
+        extraSpecialArgs.inputs = inputs;
+      };
+    };
   den.schema.home =
     {
       name,

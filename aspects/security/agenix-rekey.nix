@@ -142,6 +142,11 @@ in
           # so the target directory does not exist and reencrypt fails. (Already a
           # latent bug for aspects/services/rclone.nix, which has never been rekeyed.)
           ../../patches/agenix-rekey/rekey-mkdir-p.patch
+          # `generator.derivedFrom`: regenerate a secret when the things it is a
+          # function of change, not only when its file is missing. Upstream can
+          # express "after this other secret" (`dependencies`, ordering plus an
+          # mtime compare) but not "because this value changed".
+          ../../patches/agenix-rekey/derivedFrom.patch
         ];
         inputs.nixpkgs.follows = "nixpkgs";
         inputs.devshell.follows = "devshell";

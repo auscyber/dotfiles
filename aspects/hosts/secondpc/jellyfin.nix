@@ -49,7 +49,7 @@
         ];
 
         security.acme.certs."jellyfin.pierlot.com.au" = {
-          environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
+          environmentFile = scoped.cloudflare.secrets.acme_env.path;
           group = config.services.nginx.group;
         };
       };

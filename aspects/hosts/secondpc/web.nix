@@ -8,12 +8,25 @@
     includes = [
       den.aspects.nginx
       den.aspects.agenix-rekey
+      den.aspects.cloudflare
     ];
 
-    # Cloudflare API credentials for DNS-01 (shared by every cert below).
-    secrets."acme_cloudflare.env".rekeyFile = ./acme_cloudflare.age;
-    # navidrome external-integration env (LastFM/Spotify keys, etc.).
-    secrets.navidrome_env.rekeyFile = ./navidrome.age;
+    # No cloudflare credential of its own any more: the DNS-01 environment file
+    # is generated from the fleet's one account token
+    # (`scoped.cloudflare.secrets.acme_env`, ../../network/cloudflare.nix),
+    # which is the same token the tunnels are minted with. This aspect used to
+    # own `acme_cloudflare.age`, holding that token already wrapped in lego's
+    # variable name; the token moved up and the wrapping became a generator --
+    # so the token itself is `intermediary` and never lands on this box.
+    #
+    # navidrome external-integration env (LastFM/Spotify keys, etc.) -- the one
+    # secret left in this scope. `restartUnits` is still named per secret
+    # rather than inferred: the scope is `secondpc-web`, which is not a
+    # service, so there is nothing for inference to find.
+    secrets.navidrome_env = {
+      rekeyFile = ./navidrome.age;
+      restartUnits = [ "navidrome.service" ];
+    };
 
     # nginx virtualHosts (forwarded to services.nginx.virtualHosts by the nginx
     # aspect's `vhosts` class). Ports mirror the services enabled in secondpc.nix.
@@ -121,11 +134,11 @@
         security.acme.certs = {
           "ivymect.in" = {
             domain = "*.ivymect.in";
-            environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
+            environmentFile = scoped.cloudflare.secrets.acme_env.path;
             group = config.services.nginx.group;
           };
           # jitsi auto-creates the meet.ivymect.in cert; just supply DNS creds.
-          "meet.ivymect.in".environmentFile = scoped.secondpc-web.secrets."acme_cloudflare.env".path;
+          "meet.ivymect.in".environmentFile = scoped.cloudflare.secrets.acme_env.path;
         };
 
         # navidrome reads its external API keys from the rekeyed env file.
