@@ -81,25 +81,28 @@
     den.aspects.extra-registry
   ];
 
+  # The pipe-operator experimental feature is named differently by each nix
+  # implementation -- Lix calls it `pipe-operator` (singular), CppNix
+  # `pipe-operators` (plural). The wrong name fails nix.conf validation
+  # (`nix.conf.drv`: "unknown experimental feature ..."), so pick the name by
+  # whether the `lix` aspect is present on the host. On the host schema rather
+  # than `den.aspects.nix`, which every user scope also includes: this must be
+  # decided once, by the host.
+  den.aspects.nix-pipe-operator.os =
+    { host, ... }:
+    {
+      nix.settings.experimental-features =
+        if host.hasAspect den.aspects.lix then
+          [
+            "pipe-operator"
+            "flake-self-attrs"
+          ]
+        else
+          [ "pipe-operators" ];
+    };
+  den.schema.host.includes = [ den.aspects.nix-pipe-operator ];
+
   den.aspects.nix = {
-    includes = [
-      # The pipe-operator experimental feature is named differently by each nix
-      # implementation -- Lix calls it `pipe-operator` (singular), CppNix
-      # `pipe-operators` (plural). The wrong name fails nix.conf validation
-      # (`nix.conf.drv`: "unknown experimental feature ..."), so pick the name by
-      # whether the `lix` aspect is present on the host. Injected into the `os`
-      # class so it reaches both nixos and darwin `nix.settings`; list-valued
-      # options merge by concatenation, so this appends to the base list below.
-      (den.lib.whenAspect den.aspects.lix {
-        os.nix.settings.experimental-features = [
-          "pipe-operator"
-          "flake-self-attrs"
-        ];
-      })
-      (den.lib.unlessAspect den.aspects.lix {
-        os.nix.settings.experimental-features = [ "pipe-operators" ];
-      })
-    ];
     nixos.nix.settings.trusted-users = [ "@wheel" ];
     os.nix = {
       gc.automatic = true;

@@ -43,6 +43,7 @@
 {
   den,
   lib,
+  fleet,
   ...
 }:
 let
@@ -57,18 +58,14 @@ let
   # rather than free-form so `.#tailscale-client-key` can offer a list and so a
   # typo mints a key described as "mobil" instead of failing.
   #
-  # Read out of ../hosts/_registry.nix rather than written here, so a device is
-  # declared in the one file that already is the fleet's identity, next to the
-  # machines it sits alongside. The registry is a plain data file with no
-  # partition scoping (that is the whole point of it), so this stays readable
-  # from wherever this aspect is evaluated.
+  # Read out of the fleet (../hosts/fleet.nix): a device is a den host with a
+  # `device` record, declared next to the machines it sits alongside.
   #
   # Nothing is stored per client: the key is minted at the moment you enrol the
-  # device and is single-use, so the list costs nothing to extend -- add a
-  # `device` entry to the registry and it appears here.
-  registry = import ../hosts/_registry.nix;
+  # device and is single-use, so the list costs nothing to extend -- give a
+  # host a `device` record and it appears here.
   clients = lib.mapAttrs (_: meta: meta.device.description) (
-    lib.filterAttrs (_: meta: meta ? device) registry
+    lib.filterAttrs (_: meta: (meta.device or null) != null) fleet
   );
   clientNames = lib.attrNames clients;
 
@@ -441,9 +438,9 @@ in
           done
           if [ "$matched" -ne 1 ]; then
             echo "unknown device '$name' -- known: ''${known[*]}" >&2
-            # The list is derived from the registry now, so that is where a new
-            # device goes; there is no list in this file to edit any more.
-            echo "(add a \`device\` entry to aspects/hosts/_registry.nix)" >&2
+            # The list is derived from the fleet, so that is where a new device
+            # goes; there is no list in this file to edit.
+            echo "(give its den host a \`device\` record, e.g. aspects/hosts/iphone.nix)" >&2
             exit 2
           fi
 

@@ -12,82 +12,113 @@ let
 in
 {
   den.aspects.t3code = {
-    includes = [
-      # Each guard fires only if that aspect resolved onto the same entity, and
-      # contributes two things: the `pkgs.t3code.override` flag that puts the
-      # agent's binary on t3code's PATH, and the matching `providerInstances`
-      # entry pointing at it. Without the override the provider is configured but
-      # unlaunchable; without the instance the binary is present but unused.
-      (den.lib.whenAspect den.aspects.claude {
-        homeManager = { config, ... }: {
-          t3code.runtimeTools.enableClaude = true;
-          programs.t3code.userSettings.providerInstances.claude = {
-            driver = "claudeAgent";
-            displayName = "Claude Code";
-            enabled = true;
-            config = {
-              # `enabled` twice is not a mistake, and it is what the module's
-              # own `userSettings` example does. The outer one gates the
-              # *instance*; this one is the claudeAgent driver's own setting,
-              # carried over from the legacy `providers.<kind>` block that
-              # t3code still migrates from. Setting only the outer one leaves
-              # the driver reading a default of `false` on that path.
-              enabled = true;
-              binaryPath = binOf config.programs.claude-code.package "claude";
-              # Empty, not unset: the driver treats "" as "use the default"
-              # and a missing key as a parse failure on some versions.
-              homePath = "";
-              launchArgs = "";
-              autoCompactWindow = "";
-              customModels = [ ];
-            };
-          };
+    homeManager =
+      {
+        config,
+        pkgs,
+        host,
+        ...
+      }:
+      {
+        options.t3code.runtimeTools = lib.mkOption {
+          type = lib.types.attrsOf lib.types.bool;
+          default = { };
+          description = ''
+            `pkgs.t3code.override` flags, accumulated by the per-agent blocks
+            below. An attrset rather than a list so two blocks asking for the
+            same tool merge instead of colliding, and so the value can be handed
+            to `override` unchanged.
+          '';
         };
-      })
 
-      # `serverUrl = ""` is what makes t3code spawn its own `opencode serve` on
-      # demand; setting it would point the driver at an externally managed
-      # server instead, which nothing here runs.
-      (den.lib.whenAspect den.aspects.opencode {
-        homeManager = { config, ... }: {
-          t3code.runtimeTools.enableOpencode = true;
-          programs.t3code.userSettings.providerInstances.opencode = {
-            driver = "opencode";
-            displayName = "opencode";
-            enabled = true;
-            config = {
-              # Same doubling as the claude instance above -- see the note there.
-              enabled = true;
-              binaryPath = binOf config.programs.opencode.package "opencode";
-              serverUrl = "";
-              serverPassword = "";
-              customModels = [ ];
+        # Each agent block applies only if that aspect is on the host, and
+        # contributes two things: the `pkgs.t3code.override` flag that puts the
+        # agent's binary on t3code's PATH, and the matching `providerInstances`
+        # entry pointing at it. Without the override the provider is configured
+        # but unlaunchable; without the instance the binary is present but
+        # unused.
+        config = lib.mkMerge [
+          {
+            programs.t3code = {
+              enable = true;
+              package = pkgs.t3code.override config.t3code.runtimeTools;
+
+              # The activation script jq-merges these over whatever t3code wrote
+              # itself, so settings changed in the GUI survive a switch and only
+              # the keys named here are forced back.
+              mutableUserSettings = true;
+              mutableClientSettings = true;
+
+              userSettings = {
+                enableAssistantStreaming = true;
+              };
+
+              clientSettings.settings = {
+                sidebarProjectGroupingMode = "repository";
+                timestampFormat = "locale";
+              };
             };
-          };
-        };
-      })
+          }
 
-      (den.lib.whenAspect den.aspects.jujutsu {
-        homeManager.t3code.runtimeTools.enableJujutsu = true;
-      })
+          (lib.mkIf (host.hasAspect den.aspects.claude) {
+            t3code.runtimeTools.enableClaude = true;
+            programs.t3code.userSettings.providerInstances.claude = {
+              driver = "claudeAgent";
+              displayName = "Claude Code";
+              enabled = true;
+              config = {
+                # `enabled` twice is not a mistake, and it is what the module's
+                # own `userSettings` example does. The outer one gates the
+                # *instance*; this one is the claudeAgent driver's own setting,
+                # carried over from the legacy `providers.<kind>` block that
+                # t3code still migrates from. Setting only the outer one leaves
+                # the driver reading a default of `false` on that path.
+                enabled = true;
+                binaryPath = binOf config.programs.claude-code.package "claude";
+                # Empty, not unset: the driver treats "" as "use the default"
+                # and a missing key as a parse failure on some versions.
+                homePath = "";
+                launchArgs = "";
+                autoCompactWindow = "";
+                customModels = [ ];
+              };
+            };
+          })
 
-      # Remote access. `t3 serve --tailscale-serve` puts the UI behind the
-      # tailnet's own HTTPS at https://<machine>.<tailnet>.ts.net/ -- which is
-      # what mobile needs, since app.t3.codes refuses a plain-HTTP origin.
-      #
-      # Deliberately NOT gated on den.aspects.vpn: the wireguard tunnel only
-      # works while the server at `vpn.endpoint` is reachable, and the whole
-      # point of reaching this from a phone is that it works when it is not.
-      # Tailscale falls back to a DERP relay, so the laptop stays reachable
-      # from anywhere without depending on that box being up.
-      (den.lib.whenAspect den.aspects.tailscale {
-        homeManager =
-          {
-            config,
-            pkgs,
-            ...
-          }:
-          {
+          # `serverUrl = ""` is what makes t3code spawn its own `opencode serve`
+          # on demand; setting it would point the driver at an externally
+          # managed server instead, which nothing here runs.
+          (lib.mkIf (host.hasAspect den.aspects.opencode) {
+            t3code.runtimeTools.enableOpencode = true;
+            programs.t3code.userSettings.providerInstances.opencode = {
+              driver = "opencode";
+              displayName = "opencode";
+              enabled = true;
+              config = {
+                # Same doubling as the claude instance above -- see the note there.
+                enabled = true;
+                binaryPath = binOf config.programs.opencode.package "opencode";
+                serverUrl = "";
+                serverPassword = "";
+                customModels = [ ];
+              };
+            };
+          })
+
+          (lib.mkIf (host.hasAspect den.aspects.jujutsu) {
+            t3code.runtimeTools.enableJujutsu = true;
+          })
+
+          # Remote access. `t3 serve --tailscale-serve` puts the UI behind the
+          # tailnet's own HTTPS at https://<machine>.<tailnet>.ts.net/ -- which
+          # is what mobile needs, since app.t3.codes refuses a plain-HTTP origin.
+          #
+          # Deliberately NOT gated on den.aspects.vpn: the wireguard tunnel only
+          # works while the server at `vpn.endpoint` is reachable, and the whole
+          # point of reaching this from a phone is that it works when it is not.
+          # Tailscale falls back to a DERP relay, so the laptop stays reachable
+          # from anywhere without depending on that box being up.
+          (lib.mkIf (host.hasAspect den.aspects.tailscale) {
             launchd.agents.t3code-serve = {
               enable = true;
               config = {
@@ -109,49 +140,8 @@ in
                 StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/t3code-serve.log";
               };
             };
-          };
-      })
-    ];
-
-    homeManager =
-      {
-        config,
-        pkgs,
-        ...
-      }:
-      {
-        options.t3code.runtimeTools = lib.mkOption {
-          type = lib.types.attrsOf lib.types.bool;
-          default = { };
-          description = ''
-            `pkgs.t3code.override` flags, accumulated by the `whenAspect` guards
-            above. An attrset rather than a list so two guards asking for the
-            same tool merge instead of colliding, and so the value can be handed
-            to `override` unchanged.
-          '';
-        };
-
-        config = {
-          programs.t3code = {
-            enable = true;
-            package = pkgs.t3code.override config.t3code.runtimeTools;
-
-            # The activation script jq-merges these over whatever t3code wrote
-            # itself, so settings changed in the GUI survive a switch and only
-            # the keys named here are forced back.
-            mutableUserSettings = true;
-            mutableClientSettings = true;
-
-            userSettings = {
-              enableAssistantStreaming = true;
-            };
-
-            clientSettings.settings = {
-              sidebarProjectGroupingMode = "repository";
-              timestampFormat = "locale";
-            };
-          };
-        };
+          })
+        ];
       };
   };
 

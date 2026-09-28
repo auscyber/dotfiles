@@ -140,7 +140,7 @@ let
 
       perAspect = name: aspect: if aspect ? overlays then invoke aspect.overlays else { };
 
-      # Strip den-internal keys (e.g. `__provider`, `__providesForwarded`)
+      # Strip den-internal keys (e.g. `__aspectChain`, `__providesForwarded`)
       # so we only keep real overlay-fn entries.
       stripInternal = lib.filterAttrs (n: _: !(lib.hasPrefix "_" n));
     in

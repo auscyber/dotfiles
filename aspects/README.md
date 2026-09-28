@@ -39,8 +39,10 @@ the aspect itself or in a host file under `hosts/`), and can fan out
 host-specific overrides via `provides.<hostname>.<class>` (see
 [`framework/roles.nix`](framework/roles.nix) for why `provides` rather than
 `policy.when` is required for that fan-out). Conditional inclusion uses
-`den.lib.whenAspect` / `whenAnyAspect` / `unlessAspect`, documented in
-[`framework/when-aspect.nix`](framework/when-aspect.nix).
+den's `entity.hasAspect`, read in a class body: `{ host, ... }:` then
+`lib.mkIf (host.hasAspect den.aspects.foo)`, or `lib.optionalAttrs` when the
+content touches options that only exist alongside the probed aspect. See
+[structural introspection](https://den.denful.dev/explanation/structural-introspection/#reading-structure-entityhasaspect).
 
 ## The `_` prefix convention
 

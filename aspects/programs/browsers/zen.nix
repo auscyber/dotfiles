@@ -17,19 +17,23 @@
     inputs.zen-browser.inputs.home-manager.follows = "home-manager";
     includes = [
       den.aspects.nur
-      (den.lib.whenAspect den.aspects.onepassword {
-        provides.to-hosts = { host, ... }: {
-          nixos.environment.etc."1password/custom_allowed_browsers" = {
-            text = lib.mkAfter ''
-              .zen
-              zen-browser
-              .zen-browser-unwrapped
-              .zen-unwrapped
-            '';
-            mode = "0755";
+      {
+        provides.to-hosts.nixos =
+          { host, ... }:
+          {
+            config = lib.mkIf (host.hasAspect den.aspects.onepassword) {
+              environment.etc."1password/custom_allowed_browsers" = {
+                text = lib.mkAfter ''
+                  .zen
+                  zen-browser
+                  .zen-browser-unwrapped
+                  .zen-unwrapped
+                '';
+                mode = "0755";
+              };
+            };
           };
-        };
-      })
+      }
       den.aspects.stylix
       (
         { aspect-chain }:

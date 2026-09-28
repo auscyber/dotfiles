@@ -1,22 +1,20 @@
 {
   den,
   lib,
+  fleet,
   ...
 }:
 let
-  inherit (import ./_lib.nix { inherit lib; })
-    registry
+  inherit (import ./_lib.nix { inherit lib fleet; })
     clientNames
     hasKey
     tunnelIpByName
     ;
 
   # The login user on each peer, and the peer's own UID (needed for its
-  # gpg-agent socket path when forwarding GPG over the tunnel). Both come from
-  # ../hosts/_registry.nix, which is readable from every partition — the reason
-  # this used to be a hand-kept table here is that a darwin host cannot see a
-  # NixOS host's `den.hosts` entry to ask.
-  hostMeta = registry;
+  # gpg-agent socket path when forwarding GPG over the tunnel), from the fleet
+  # (../hosts/fleet.nix).
+  hostMeta = fleet;
 
   # gpg-agent's extra socket (`services.gpg-agent.enableExtraSocket`, see
   # ../security/gpg.nix), mirrored to the peer's real agent socket path via
@@ -25,9 +23,8 @@ let
   # sockets live under the systemd runtime dir (per-uid), Darwin's live under
   # a single fixed launchd-managed directory.
   # The same formula on the PEER's side, for `RemoteForward`'s bind address.
-  # Which half of it applies is a fact about the peer's platform, and until the
-  # registry existed there was no way to ask: a peer was only ever a name here,
-  # so every peer got the Linux path and forwarding into a Mac bound a
+  # Which half of it applies is a fact about the peer's platform: every peer
+  # getting the Linux path meant forwarding into a Mac bound a
   # `/run/user/<uid>` that does not exist on macOS at all.
   peerAgentSocket =
     peerName:
@@ -54,7 +51,7 @@ in
   den.aspects.vpn.includes = [ den.aspects.vpn-ssh-config ];
 
   den.aspects.vpn-ssh-config = {
-    # Host keys, pinned from the same registry the aliases come from.
+    # Host keys, pinned from the same fleet the aliases come from.
     #
     # Without this `ssh secondpc` is trust-on-first-use: the first connection
     # from a fresh machine (or after `~/.ssh/known_hosts` is cleared, or after
@@ -74,7 +71,7 @@ in
         # Both spellings of the peer: the bare alias the config below defines,
         # and the tunnel address it resolves to — ssh checks known_hosts
         # against whatever it actually connected to. The tunnel address only
-        # for an actual peer: an external machine in the registry (faggot.sh)
+        # for an actual peer: an external machine in the fleet (faggot.sh)
         # is dialled by DNS, and `tunnelIpByName` would invent an address for
         # it that nothing listens on.
         hostNames = [
@@ -82,7 +79,7 @@ in
         ]
         ++ lib.optional (hasKey peerName) (tunnelIpByName peerName);
         publicKey = meta.hostPublicKey;
-      }) (lib.filterAttrs (peerName: meta: meta ? hostPublicKey && peerName != host.hostName) registry);
+      }) (lib.filterAttrs (peerName: meta: meta ? hostPublicKey && peerName != host.hostName) fleet);
     };
 
     provides.to-users = { host, ... }: {
@@ -97,7 +94,7 @@ in
               host.address = localExtraSocket { inherit pkgs host; };
             };
           }
-          // lib.optionalAttrs (builtins.hasAttr peerName hostMeta) {
+          // lib.optionalAttrs ((hostMeta.${peerName}.user or null) != null) {
             user = hostMeta.${peerName}.user;
           }
         );

@@ -38,7 +38,7 @@
       # Cloudflare MCP integration disabled: secrets/cloudflare_token.age was
       # never created (`nix run .#secret-edit -- secrets/cloudflare_token.age`).
       # Re-enable this block once that secret exists.
-      # (den.lib.whenAspect den.aspects.claude {
+      # { # homeManager: lib.mkIf (host.hasAspect den.aspects.claude)
       #   homeManager = {
       #     programs.claude-code.mcpServers = {
       #       cloudflare = {

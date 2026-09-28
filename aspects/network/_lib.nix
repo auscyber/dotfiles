@@ -1,8 +1,5 @@
-{ lib }:
+{ lib, fleet }:
 let
-  # The fleet as plain data, readable from any partition. See its header for
-  # why this cannot be `den.hosts`.
-  registry = import ../hosts/_registry.nix;
 
   # 6 hex chars of sha256 → integer in 2..254. Server lives at .1.
   hexToInt = s: (builtins.fromTOML "v=0x${s}").v;
@@ -18,14 +15,11 @@ let
   # keypair for it. Hosts without the vpn aspect have no such file.
   hasKey = name: builtins.pathExists (pubKeyFile name);
 
-  # Names come from the registry rather than `den.hosts` (partition-scoped, so
-  # it drops every host in another bucket) and rather than a `readDir` of
-  # secrets/generated (partition-agnostic, but it discovers hosts by the side
-  # effect of a secret having been generated for them — which is a fact about
-  # the secrets tree, not a declaration, and says nothing about a host that
-  # has no keypair yet). `hasKey` still gates membership: a host listed here
-  # but never `agenix generate`d has no public key to put in a peer entry.
-  allHostNames = lib.filter hasKey (lib.attrNames registry);
+  # Names come from the fleet (../hosts/fleet.nix) rather than a `readDir` of
+  # secrets/generated, which would discover hosts by the side effect of a
+  # secret having been generated for them. `hasKey` still gates membership: a
+  # host never `agenix generate`d has no public key to put in a peer entry.
+  allHostNames = lib.filter hasKey (lib.attrNames fleet);
   clientNames = name: lib.filter (n: n != name) allHostNames;
 
   # Mirrors `vpn.nix`'s `tunnelIp`, but by name only: a peer's own
@@ -38,7 +32,6 @@ let
 in
 {
   inherit
-    registry
     hexToInt
     hostOctet
     pubKeyFile

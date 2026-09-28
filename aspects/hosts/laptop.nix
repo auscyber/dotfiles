@@ -3,15 +3,9 @@
   __findFile,
   ...
 }:
-let
-  # Host identity lives in ./_registry.nix, so the key this host is built with
-  # and the key its peers pin in `knownHosts` are one value. See that file for
-  # why it cannot be read off `den.hosts`.
-  registry = import ./_registry.nix;
-in
 {
   den.hosts.aarch64-darwin.Ivys-MacBook-Pro = {
-    inherit (registry.Ivys-MacBook-Pro) hostPublicKey;
+    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
     roles = [
       "study"
       "gui"
@@ -32,6 +26,8 @@ in
   };
 
   den.aspects.Ivys-MacBook-Pro = {
+    # celler2 only (see ivypierlot's `celler-use`), not the fleet's secondpc.
+    excludes = [ den.aspects.celler-default ];
     includes = [
       den.aspects.js
       den.aspects.vpn
@@ -139,6 +135,13 @@ in
       ];
       includes = [ den.aspects.laptop-dock-focused ];
     };
+
+    # "no-celler": no celler caches at all, for when they are down -- nothing
+    # substituted from them, nothing pushed to them.
+    specialisations.no-celler.excludes = [
+      den.aspects.celler-host
+      den.aspects.celler-user
+    ];
 
     vpn = { };
     nix.settings = {
@@ -254,6 +257,10 @@ in
   };
 
   den.aspects.ivypierlot = {
+    celler-use.celler2 = {
+      push = [ "main" ];
+      via = "tailscale";
+    };
     study.includes = [ den.aspects.zotero ];
     includes = [
       den.aspects.zig
@@ -271,7 +278,6 @@ in
       # is nothing on the other end of either.
       den.aspects.lspmux
       den.aspects.fish
-      #      den.aspects.celler-push
       den.aspects.nushell
       den.aspects.ghostty
       den.aspects.coolabah

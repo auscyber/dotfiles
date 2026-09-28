@@ -14,7 +14,7 @@
 #
 # The agenix wrappers (aspects/security/agenix-rekey.nix) apply the same filter
 # unconditionally, since a dead cache breaking `secret-edit` is never useful.
-# Both share lib/without-celler.nix so the vhost is named once.
+# Both share lib/without-celler.nix so the celler hosts are named once.
 #
 # It does NOT drop the celler public keys from trusted-public-keys: a path
 # already in the local store, or one another substituter happens to serve, stays

@@ -9,11 +9,15 @@
   den.aspects.opencode.includes = [
     den.aspects.claude
     den.aspects.mcp-servers
-    (den.lib.whenAspect den.aspects.jujutsu {
-      homeManager = { pkgs, ... }: {
-        programs.mcp.servers.mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
-      };
-    })
+    {
+      homeManager =
+        { pkgs, host, ... }:
+        {
+          config = lib.mkIf (host.hasAspect den.aspects.jujutsu) {
+            programs.mcp.servers.mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
+          };
+        };
+    }
   ];
 
   # jj-mcp-server built from source (importNpmLock vendors its deps from the

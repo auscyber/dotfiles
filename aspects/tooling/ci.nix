@@ -15,7 +15,7 @@
 #     the only part of CI that needs the `nix-github-actions` input.
 #   * The build jobs run against THIS flake with `accept-flake-config`, so they
 #     pick up substituters + trusted-public-keys straight from the flake's
-#     nixConfig -- everything derived from aspects/base/celler-keys.json -- with
+#     nixConfig -- everything derived from aspects/base/celler/celler-keys.json -- with
 #     nothing hardcoded in the workflow.
 #   * Per-host build targets are `.#ciMatrix.checks.<system>."<class>-<name>"`.
 #     There used to be `packages.<class>-<name>` aliases for the same

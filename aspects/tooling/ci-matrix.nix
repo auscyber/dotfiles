@@ -20,7 +20,7 @@
 #     for anything that does want a row per host.
 #   * The build jobs run against THIS flake with `accept-flake-config`, so they
 #     pick up substituters + trusted-public-keys straight from the flake's
-#     nixConfig -- everything derived from aspects/base/celler-keys.json -- with
+#     nixConfig -- everything derived from aspects/base/celler/celler-keys.json -- with
 #     nothing hardcoded in the workflow.
 let
   self = inputs.self;
@@ -28,7 +28,8 @@ let
   # Escape hatch: hosts to leave out of CI entirely. Empty by default -- a host
   # that fails to build does not stop its siblings (nix-fast-build does not fail
   # fast unless asked to), it just turns that system's job red at the end.
-  excludeHosts = [ ];
+  # celler2 until its host key and secrets exist (see ../hosts/celler2.nix).
+  excludeHosts = [ "celler2" ];
 
   systemOf = cfg: cfg.config.nixpkgs.hostPlatform.system;
   # Standalone home-manager configs don't carry `config.nixpkgs.hostPlatform`

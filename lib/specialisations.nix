@@ -63,14 +63,14 @@ rec {
       excludes = lib.concatMap (c: c.excludes or [ ]) contributions;
 
       # A contribution read out of the routed class content is content-wrapped:
-      # it carries its provenance in `__provider` but no `name`, so its identity
+      # it carries its provenance in `__aspectChain` but no `name`, so its identity
       # collapses to "<anon>" (den fx/identity.nix `aspectPath`). Reconstruct the
       # name den's own `unwrapContent` would give it, so each contribution is a
       # distinct, named node in the composed tree.
       named = lib.imap0 (
         i: c:
         let
-          prov = c.__provider or [ ];
+          prov = c.__aspectChain or [ ];
         in
         if builtins.isAttrs c && prov != [ ] && !(c ? name) then
           c
