@@ -123,7 +123,7 @@
     arion.hash = "sha256-XM8sEWDiEAwjWL1onvSuxrkgyHxL0SAwsD6dXx992NM=";
     darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
     home-manager.hash = "sha256-aWy+wfpH3jYd8FaTtnLOGpUoSGIeypMSXkUiELZuzhc=";
-    nh.hash = "sha256-sU0B7F6Vz6eaeTCtitPrE/h4K5Qldfaw0POoA9CtS1c=";
+    nh.hash = "sha256-/Wx2bgNWIwvUS+L7swiQpoDEZAq4yEKSFAGcIz2z1JQ=";
     pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
     zen-browser.hash = null;
   };

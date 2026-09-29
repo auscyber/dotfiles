@@ -27,10 +27,10 @@ permissions:
 jobs:
   push:
     runs-on: ubuntu-24.04
-    env:
-      REGISTRY_AUTH_FILE: ${{ runner.temp }}/containers-auth.json
     steps:
       - uses: actions/checkout@v4
+
+      - run: echo "REGISTRY_AUTH_FILE=$RUNNER_TEMP/containers-auth.json" >> "$GITHUB_ENV"
 
       # Until celler2's secrets have been rekeyed to its host key the host does
       # not evaluate; skip rather than fail.
