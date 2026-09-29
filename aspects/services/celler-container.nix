@@ -3,11 +3,12 @@
 # the entrypoint; the host's container-only preStart decrypts its secrets with
 # the mounted ssh key and starts tailscaled and cloudflared next to it.
 #
-#   nix run .#oci-load-docker-celler2
+#   docker pull ghcr.io/auscyber/celler2:latest   # pushed by .github/workflows/celler2-image.yml
+#   # or build it locally: nix run .#oci-load-docker-celler2
 #   docker run -d --name celler2 --restart unless-stopped \
 #     -v ~/.ssh/celler2:/keys/ssh_host_ed25519_key:ro \
 #     -v celler2:/var/lib \
-#     celler2:latest
+#     ghcr.io/auscyber/celler2:latest
 #
 # First use of the input: `nix run .#write-flake && nix flake lock`.
 {

@@ -153,9 +153,15 @@ runs:
     # runner's own pkgs, never a foreign builder -- means the host builds below
     # always find `newInputs`' single-`patchSystem` realisation already in the
     # store. See aspects/tooling/patch-inputs.nix.
+    #
+    # `--impure` for this one step: evaluating the flake at all already realises
+    # `newInputs`, and under pure eval `patchSystem` falls back to x86_64-linux,
+    # so on any other runner this step needs the very outputs it exists to
+    # produce (the cache miss when cache.ivymect.in is down fails with "platform
+    # mismatch"). Impure, `builtins.currentSystem` is this runner's.
     - name: Warm patched-input FODs
       shell: bash
-      run: nix build --no-link --fallback .#patched-inputs-warm
+      run: nix build --no-link --fallback --impure .#patched-inputs-warm
 
     # `.#nix-fast-build` rather than plain `nixpkgs#nix-fast-build`: ours carries
     # patches/nix-fast-build/celler.patch, which adds `--celler-cache`. Uploads

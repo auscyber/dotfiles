@@ -1,0 +1,74 @@
+name: "celler2 image"
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - aspects/hosts/celler2.nix
+      - aspects/hosts/celler2/**
+      - aspects/base/celler/**
+      - aspects/services/celler-container.nix
+      - secrets/rekeyed/celler2/**
+      - flake.lock
+  workflow_dispatch:
+
+# Builds the celler2 OCI image (aspects/services/celler-container.nix) and
+# pushes it to ghcr.io/<owner>/celler2, so the box that runs it only has to
+#
+#   docker pull ghcr.io/auscyber/celler2:latest
+#
+# The image holds nothing readable without celler2's ssh host key: its secrets
+# are the agenix files rekeyed to that key.
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  push:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "REGISTRY_AUTH_FILE=$RUNNER_TEMP/containers-auth.json" >> "$GITHUB_ENV"
+
+      # Until celler2's secrets have been rekeyed to its host key the host does
+      # not evaluate; skip rather than fail.
+      - name: Check celler2 is set up
+        id: ready
+        run: |
+          if [ -d secrets/rekeyed/celler2 ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::secrets/rekeyed/celler2 does not exist yet -- nothing to push"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: ${{ steps.ready.outputs.ready == 'true' }}
+        uses: wimpysworld/nothing-but-nix@main
+        with:
+          hatchet-protocol: cleave
+
+      - if: ${{ steps.ready.outputs.ready == 'true' }}
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            fallback = true
+            connect-timeout = 5
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to ghcr.io
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$TOKEN" |
+            nix run nixpkgs#skopeo -- login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Build and push
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        env:
+          NIX_OCI_REGISTRY: ghcr.io/${{ github.repository_owner }}
+        run: nix run .#oci-push-celler2
