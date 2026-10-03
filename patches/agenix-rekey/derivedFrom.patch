@@ -90,23 +90,31 @@ index c3da7d2095..780197a4ce 100644
        else
          echo "[1;90m    Skipping[m [90m[already exists] "${escapeShellArg contextSecret.sourceFile}" ("${concatStringsSep "', '" (map escapeShellArg contextSecret.defs)}")[m"
 diff --git a/modules/agenix-rekey.nix b/modules/agenix-rekey.nix
-index bc16ca49f0..61b440ff3b 100644
+index bc16ca49f0..eb827f9807 100644
 --- a/modules/agenix-rekey.nix
 +++ b/modules/agenix-rekey.nix
-@@ -52,6 +52,30 @@
+@@ -52,6 +52,38 @@
      hostConfig = config;
    };
  
-+  # Must agree with `isSecretRef` in apps/generate.nix: an entry that names
-+  # another secret is hashed there, from its FILE, once that secret has been
-+  # regenerated. Only the plain values can be hashed here, where nothing has
-+  # been decrypted yet.
++  # What of `derivedFrom` can be hashed at EVALUATION time.
 +  #
-+  # `lib.filterAttrs`, qualified: this module's `inherit (lib)` list does not
-+  # carry it, and widening that list is a bigger diff than the one call needs.
-+  derivedPlainValues =
++  # A plain value is hashed as itself. An entry naming another secret is
++  # hashed as that secret's `id`: its CONTENT is not readable here, since
++  # nothing has been decrypted yet, but WHICH secret it is, is. So retargeting
++  # a dependency moves the filename, while a rotation of the same dependency
++  # keeps it and is caught by the `<file>.derived-from` stamp in
++  # apps/generate.nix instead -- the two halves cover the two ways a reference
++  # can change.
++  #
++  # Reading `id` cannot recurse into the referenced secret's own `rekeyFile`:
++  # it defaults to the attribute name and is `readOnly`, so it is not computed
++  # from anything.
++  derivedHashable =
 +    generator:
-+    lib.filterAttrs (_: v: !(isAttrs v && v ? rekeyFile && v.rekeyFile != null)) generator.derivedFrom;
++    mapAttrs (
++      _: v: if isAttrs v && v ? rekeyFile && v.rekeyFile != null then { inherit (v) id; } else v
++    ) generator.derivedFrom;
 +
 +  # Eight hex characters: this discriminates between a handful of variants of
 +  # one secret, it is not a security boundary, and a full sha256 in every path
@@ -114,17 +122,17 @@ index bc16ca49f0..61b440ff3b 100644
 +  derivedNameSuffix =
 +    generator:
 +    let
-+      plain = derivedPlainValues generator;
++      hashable = derivedHashable generator;
 +    in
-+    if plain == { } then
++    if hashable == { } then
 +      ""
 +    else
-+      "-" + builtins.substring 0 8 (builtins.hashString "sha256" (builtins.toJSON plain));
++      "-" + builtins.substring 0 8 (builtins.hashString "sha256" (builtins.toJSON hashable));
 +
    # A decryptable dummy secret that is used as a replacement when a secret specifies `intermediary = true`.
    pubkeyOpt = x: if isAbsolutePath x then "-R ${escapeShellArg x}" else "-r ${escapeShellArg x}";
    dummySecret = pkgs.runCommand "generate-dummy-secret-${target}.age" { } ''
-@@ -182,6 +206,48 @@
+@@ -182,6 +214,51 @@
              submod.config.script;
        };
  
@@ -156,13 +164,16 @@ index bc16ca49f0..61b440ff3b 100644
 +            keeps working until the new one is. A secret that sets `rekeyFile`
 +            explicitly opts out of this and relies on the stamp below.
 +
-+          - A named secret's encrypted file is hashed while `agenix generate`
-+            runs, after that secret has itself been regenerated (dependencies
-+            are ordered first). The combined hash is recorded beside the
-+            generated secret as `<rekeyFile>.derived-from`, and a mismatch
-+            forces regeneration in place. age encryption is not deterministic,
-+            so naming a secret here means "whenever that secret is
-+            regenerated", not "whenever its plaintext changes".
++          - A named secret contributes twice. Its `id` joins the
++            evaluation-time hash above, so pointing the entry at a DIFFERENT
++            secret moves the filename. Its encrypted FILE is hashed while
++            `agenix generate` runs, after that secret has itself been
++            regenerated (dependencies are ordered first); that hash is
++            recorded beside the generated secret as `<rekeyFile>.derived-from`
++            and a mismatch forces regeneration in place, which is what catches
++            the same secret being rotated. age encryption is not
++            deterministic, so naming a secret here means "whenever that secret
++            is regenerated", not "whenever its plaintext changes".
 +
 +          Stronger than `dependencies`, which only orders generation and
 +          compares mtimes -- and a value that is not a secret cannot be
@@ -173,7 +184,7 @@ index bc16ca49f0..61b440ff3b 100644
        tags = mkOption {
          type = types.listOf types.str;
          default = [ ];
-@@ -363,7 +429,8 @@
+@@ -363,7 +440,8 @@
                default =
                  if submod.config.generator != null then
                    if config.age.rekey.generatedSecretsDir != null then

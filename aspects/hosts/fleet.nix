@@ -60,11 +60,20 @@ in
           };
           # Read instead of `hostPublicKey` itself, whose `apply` warns when it
           # is unset: walking the fleet would warn once per keyless host.
+          #
+          # `or false`, because `isDefined` is only there on an EVALUATED
+          # option. den also introspects this schema standalone -- the same
+          # thing ../security/age-scope.nix guards against with
+          # `options ? includes` -- and there `options.hostPublicKey` is the
+          # raw `mkOption` declaration, which has no `isDefined` and threw
+          # `attribute 'isDefined' missing` from a stack nowhere near here.
+          # Nothing real reads the fleet during that pass, so `false` is the
+          # right answer for it.
           hasHostPublicKey = mkOption {
             type = types.bool;
             readOnly = true;
             internal = true;
-            default = options.hostPublicKey.isDefined;
+            default = options.hostPublicKey.isDefined or false;
           };
         };
       };
