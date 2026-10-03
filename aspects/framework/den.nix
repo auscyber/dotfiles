@@ -22,10 +22,16 @@
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.default = {
-    nixos.system.stateVersion = "23.11"; # Did you read the comment?
-    darwin.system.stateVersion = 5;
+    # `mkDefault`, so a host can state its own. These are fleet-wide floors for
+    # machines that predate caring; a box installed later says so itself
+    # (../hosts/celler2.nix is "25.11") and without the lower priority that is
+    # a flat conflict, which only shows when something forces the whole
+    # config -- `age.secrets` does not, so it surfaced as a failed BUILD rather
+    # than a failed eval.
+    nixos.system.stateVersion = lib.mkDefault "23.11"; # Did you read the comment?
+    darwin.system.stateVersion = lib.mkDefault 5;
 
-    homeManager.home.stateVersion = "24.05";
+    homeManager.home.stateVersion = lib.mkDefault "24.05";
     #    hmDarwin.targets.darwin.copyApps = true;
     includes = [
       den.batteries.inputs'

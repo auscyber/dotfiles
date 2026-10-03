@@ -8,28 +8,28 @@
 {
   alx-wol = {
     pname = "alx-wol";
-    version = "alx-wol-3.2";
+    version = "alx-wol-3.3";
     src = fetchFromGitHub {
       owner = "AndiWeiss";
       repo = "alx-wol";
-      rev = "alx-wol-3.2";
+      rev = "alx-wol-3.3";
       fetchSubmodules = false;
-      sha256 = "sha256-gdYRMJD8+JwjqZckZFYBp3PQhnHgaGxg0IQohC6p8Bg=";
+      sha256 = "sha256-Y0RxY6SaBUANSL52uCMDZX/1Ufz4Cu1N1hKXO76HrDM=";
     };
   };
   app_font = {
     pname = "app_font";
-    version = "949207df64f6e47164b574d9b33c36df6fa9abcb";
+    version = "cce60f7e80a42d0a2d20200c6aa3591e6844ceca";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "949207df64f6e47164b574d9b33c36df6fa9abcb";
+      rev = "cce60f7e80a42d0a2d20200c6aa3591e6844ceca";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-H1QPAhhODBjE+rK1FhrtK/oyMtmhHYYHHQUd+10QK7A=";
+      sha256 = "sha256-kFKX41tsSFr0kWlXtyrVpy7Y7o3lnBtt+JUybgoxvM0=";
     };
-    date = "2026-09-07";
+    date = "2026-09-29";
   };
   cotabby = {
     pname = "cotabby";
@@ -63,26 +63,26 @@
   };
   ghostty-tip = {
     pname = "ghostty-tip";
-    version = "661e1e77f445057312666a74d9f5002e82f81764";
+    version = "33da6848d63b3bba2b4f31ab1531d618f2795192";
     src = fetchurl {
-      url = "https://tip.files.ghostty.org/661e1e77f445057312666a74d9f5002e82f81764/Ghostty.dmg";
-      sha256 = "sha256-nJbaNuBGBbF36YkRswpLjwTCxnNczmwcJDelO3bpSwc=";
+      url = "https://tip.files.ghostty.org/33da6848d63b3bba2b4f31ab1531d618f2795192/Ghostty.dmg";
+      sha256 = "sha256-O9xKn6RwCqe3iiC0Hn4hTNIEOVY1duLZApBDkoqIY5Y=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.17.0.1";
+    version = "0.18.2.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.17.0.1/helium-0.17.0.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-2ljoj/5HlOflMQ06s+eqD0K2+xtsKXh/WL4JmMQUlmc=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.18.2.1/helium-0.18.2.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-QizbNVsqd21aCDulbtBccbYkK6jrvTpA6uphLWZ8YAg=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.17.0.1";
+    version = "0.18.2.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.17.0.1/helium_0.17.0.1_arm64-macos.dmg";
-      sha256 = "sha256-/8HOMvHzP8rSW06a0U5NGMldGJm8Q0a53ZBYDgsWBNY=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.18.2.1/helium_0.18.2.1_arm64-macos.dmg";
+      sha256 = "sha256-hpgtjfNA1aG/Ggx2raM9fSZ5fGw0JKRK+mdhWbaj4+s=";
     };
   };
   jankyborders = {
@@ -125,6 +125,7 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-OchqUe8GdBPL6tE3zpdaThfhzYZhYluagz1yXiexFT0=/Cargo.lock";
       outputHashes = {
+        
       };
     };
     date = "2026-03-11";
@@ -142,6 +143,7 @@
     cargoLock."Cargo.lock" = {
       lockFile = ./. + "/sha256-y25d7gccIdatEDycieRtXfWOqzkfzZBWOUEKS5AXPb8=/Cargo.lock";
       outputHashes = {
+        
       };
     };
   };
@@ -155,29 +157,29 @@
   };
   sketchybar = {
     pname = "sketchybar";
-    version = "6284ee816601486ace33ca48a0271832eec6de35";
+    version = "5f358ec94d117d3e0ccc515b21fafa325940ab2d";
     src = fetchFromGitHub {
       owner = "felixkratz";
       repo = "sketchybar";
-      rev = "6284ee816601486ace33ca48a0271832eec6de35";
+      rev = "5f358ec94d117d3e0ccc515b21fafa325940ab2d";
       fetchSubmodules = false;
-      sha256 = "sha256-5tyc/yYzdV/3JTtujuj7le/14XkC7TlN/nZg7tOZsNg=";
+      sha256 = "sha256-ks2S0JrcLBZqZ4b7P/kNdSOoYpJ96QytVPjE00gxRpg=";
     };
-    date = "2026-06-04";
+    date = "2026-09-16";
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "2122eb6090195434edf02774dc83a8aebcf77693";
+    version = "2e61fe4dbe34344c3c00c856d5215ba6ae8bc997";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "2122eb6090195434edf02774dc83a8aebcf77693";
+      rev = "2e61fe4dbe34344c3c00c856d5215ba6ae8bc997";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-eJYWkHm6/Oc/FtDSEtzOCTkfAAx3W+kCe2wmLpUYI4A=";
+      sha256 = "sha256-4hquXhJ7z/vfshffDdftaZdWzezGXFk3s9Mr6nluMYI=";
     };
-    date = "2026-09-02";
+    date = "2026-09-28";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
@@ -205,10 +207,10 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.64";
+    version = "9.0.68";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.64/zotero-better-bibtex-9.0.64.xpi";
-      sha256 = "sha256-hMS1sF/6yanH4v95ZjYSSG93gWkN1ZsSoeYq7Nz6fCc=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.68/zotero-better-bibtex-9.0.68.xpi";
+      sha256 = "sha256-02maNI8AEl85C1pp5aJjM0BELKx3in4Mjwm+r+HK6Lg=";
     };
   };
   zotero-better-notes = {
@@ -241,18 +243,18 @@
   };
   zotero-papersgpt = {
     pname = "zotero-papersgpt";
-    version = "papersgpt-v1.5.0";
+    version = "papersgpt-v1.7.0";
     src = fetchurl {
-      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.5.0/papersgpt-v1.5.0.xpi";
-      sha256 = "sha256-ZEygUXpWifkAa2viphKPQep/tdXBY85MDjO6Wh0YnfI=";
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.7.0/papersgpt-v1.7.0.xpi";
+      sha256 = "sha256-y5Qr9qa41ih2h3KI5YzB5zDA4gsc0cgELa0NmjlSt3I=";
     };
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.2.0-beta.0";
+    version = "2.2.0-beta.1";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.0-beta.0/zotlit-zotero-2.2.0-beta.0.xpi";
-      sha256 = "sha256-nvU/7MH4U3NRsbJhxowr5H9qpWZLwKGTRgv3/UossTY=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.0-beta.1/zotlit-zotero-2.2.0-beta.1.xpi";
+      sha256 = "sha256-t4suYgy5WpSWO4dQXmlqjK97+9AcUYTFYID0HLYpNFc=";
     };
   };
 }

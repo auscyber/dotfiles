@@ -788,7 +788,11 @@ in
             wants = [ "network-online.target" ];
             serviceConfig = {
               ExecStart = "${lib.getExe pkgs.cloudflared} tunnel --no-autoupdate --config ${configFile} run";
-              EnvironmentFile = scoped.cloudflare-tunnel.templates.env.path;
+              # `scoped.cloudflare`, not `scoped.cloudflare-tunnel`: this
+              # aspect sets `secretScope = "cloudflare"` so it can reach that
+              # scope's `api` entry, which puts its own secrets and templates
+              # there too.
+              EnvironmentFile = scoped.cloudflare.templates.env.path;
               DynamicUser = true;
               Restart = "always";
               RestartSec = 5;
