@@ -77,6 +77,10 @@
     nixpkgs-nvmd = {
       url = "github:nvmd/nixpkgs/modules-with-keys-25.11";
     };
+    nixvirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     searchix = {
       url = "git+https://git.sr.ht/~alanpearce/searchix";
       inputs.nixpkgs.follows = "nixpkgs";

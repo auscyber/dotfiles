@@ -117,7 +117,6 @@ in
           {
             boot.isContainer = true;
             networking.hostName = host;
-            system.stateVersion = "25.11";
 
             age.identityPaths = [ key ];
 

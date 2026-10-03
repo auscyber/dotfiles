@@ -71,6 +71,9 @@
       # above as one more `boot.kernelPatches` entry.
       #      den.aspects.kernel-trim
       den.aspects.bootlogo
+      # Turntable on the onboard Realtek line-in, sent to Music Assistant on
+      # secondpc over VBAN.
+      den.aspects.vban-turntable
       #      den.aspects.builders
       den.aspects.builder-server
       den.aspects.secure-boot

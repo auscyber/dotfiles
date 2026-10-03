@@ -45,6 +45,14 @@
         scoped,
         ...
       }:
+      let
+        # `settings.datadirectory` rather than `datadir`: the latter is the
+        # instance root (config/ + data/ + store-apps/), and only the former is
+        # where account files actually live.
+        ncData = config.services.nextcloud.settings.datadirectory;
+        ncUser = config.services.nextcloud.config.adminuser;
+        ncShared = config.nextcloud.sharedDir;
+      in
       {
         # Zeroconf: mDNS resolution plus service advertisement so LAN clients
         # (Finder, Time Machine's disk picker) discover the Samba shares
@@ -183,6 +191,64 @@
               # A kanidm group, resolved through NSS.
               "valid users" = "@media-users";
               "force group" = "media";
+            };
+            # WRITABLE, and pointed at the external-storage directory rather
+            # than at `datadirectory`. ../../services/nextcloud.nix registers
+            # the same path with Nextcloud as a `local` external storage and
+            # explains why that distinction is what makes writing safe: primary
+            # storage is indexed in `oc_filecache` and that index is
+            # authoritative, so a file written in through the filesystem is
+            # invisible until `occ files:scan` and may later be reconciled as a
+            # deletion. An external mount is rescanned on access instead, so
+            # both sides can write.
+            #
+            # It appears in Nextcloud as the "SMB" folder.
+            #
+            # `force user` is not cosmetic: it makes every file arrive owned by
+            # `nextcloud` whoever wrote it, which is what keeps Nextcloud able
+            # to read back what Samba put there. Combined with the directory's
+            # setgid bit, group stays put too.
+            nc-shared = {
+              "path" = ncShared;
+              "read only" = "no";
+              "browseable" = "yes";
+              "guest ok" = "no";
+              "valid users" = "@media-users";
+              "force user" = "nextcloud";
+              "force group" = "nextcloud";
+            };
+
+            # The account's own Nextcloud files, READ-WRITE.
+            #
+            # This is primary storage, which Nextcloud indexes in
+            # `oc_filecache` and treats that index as authoritative -- so a
+            # write arriving through the filesystem is NOT seen until a scan
+            # runs. ../../services/nextcloud.nix therefore runs
+            # `occ files:scan` on a timer against exactly this path, and the
+            # consequences that timer does not fix are listed there. Writing
+            # here is a deliberate choice, not an oversight; `nc-shared` above
+            # is the arrangement with no such caveats.
+            #
+            # `force user` makes every write land owned by `nextcloud`, which
+            # is both what lets Samba into a 0750 nextcloud:nextcloud tree and
+            # what keeps Nextcloud able to read back what Samba wrote.
+            #
+            # Not `%u`: samba's user here is `auscyber` (the unix account and
+            # the kanidm person both -- see the header) while Nextcloud's
+            # account is `ivy`, so `%u` would resolve to a directory that does
+            # not exist. Once those two names agree, `%u` is the better form
+            # and makes this share serve every account instead of one.
+            nc-data = {
+              "path" = "${ncData}/${ncUser}/files";
+              "read only" = "no";
+              "browseable" = "yes";
+              "guest ok" = "no";
+              "valid users" = "@media-users";
+              "force user" = "nextcloud";
+              "force group" = "nextcloud";
+              # The global `inherit owner = unix only` would hand new files to
+              # the directory's owner rather than to `force user`.
+              "inherit owner" = "no";
             };
             timemachine = {
               "path" = "/mnt/hdd/timemachine";

@@ -73,6 +73,9 @@
 
         zoteroAddons = {
           notero = prev.callPackage ./_notero.nix { source = sources.zotero-notero; };
+
+          # In-tree, not an upstream release -- see ./_webdav-password-zotero.nix.
+          webdav-password = prev.callPackage ./_webdav-password-zotero.nix { };
         }
         // prev.lib.mapAttrs (_: spec: final.fetchZoteroAddon spec) {
           better-notes = {

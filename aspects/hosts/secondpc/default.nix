@@ -3,8 +3,14 @@
   lib,
   ...
 }:
+let
+  # On the fleet record as well as on the interface below: hosts on the same
+  # switch reach this box here rather than through the wireguard tunnel.
+  lanAddress = "192.168.0.26";
+in
 {
   den.hosts.x86_64-linux.secondpc = {
+    inherit lanAddress;
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICj7wlOxTp0NQJoUhRtj7k8gtDC0lCr5MJqLV5LxG9Yf root@kexec-minimal";
 
     # Advertise as a build machine — auspc/laptop including `den.aspects.builders`
@@ -82,6 +88,8 @@
       den.aspects.alloy
       den.aspects.homepage
       den.aspects.prowlarr
+      den.aspects.homeassistant
+      den.aspects.nextcloud
       #      den.aspects.slskd
       den.aspects.sso
       den.aspects.samba
@@ -252,7 +260,7 @@
         networking.interfaces.br0.useDHCP = false;
         networking.interfaces.br0.ipv4.addresses = [
           {
-            address = "192.168.0.26";
+            address = lanAddress;
             prefixLength = 16;
           }
         ];

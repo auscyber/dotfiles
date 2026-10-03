@@ -11,6 +11,7 @@
 #     uid;             that account's uid (501 on darwin, 1000 elsewhere)
 #     builder;         `nix.buildMachines` record, or null
 #     device;          tailscale enrolment record, or null
+#     lanAddress;      fixed home-LAN address, or null
 #   }
 {
   den,
@@ -25,7 +26,12 @@ let
   fromHost =
     _: h:
     {
-      inherit (h) system builder device;
+      inherit (h)
+        system
+        builder
+        device
+        lanAddress
+        ;
       user = if h.users == { } then null else lib.head (builtins.attrNames h.users);
       uid = if lib.hasSuffix "darwin" h.system then 501 else 1000;
     }
@@ -55,6 +61,17 @@ in
           type = record;
           default = null;
           description = "Present iff the host is a tailscale client with nothing built for it (`description`); ../network/tailscale.nix enrols these.";
+        };
+        lanAddress = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            The host's fixed address on the home LAN, for the traffic that has
+            no business going through the tunnel -- `builder.ipAddress` is a
+            wireguard address, so it is the wrong thing to reach a box on the
+            same switch with. Null for anything that only has a tunnel
+            address or is dialled by name.
+          '';
         };
         # Read instead of `hostPublicKey` itself, whose `apply` warns when it
         # is unset: walking the fleet would warn once per keyless host.

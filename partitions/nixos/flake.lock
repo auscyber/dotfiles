@@ -234,15 +234,14 @@
     "flake-parts_2": {
       "flake": false,
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "flake-parts_3": {
       "inputs": {
@@ -636,15 +635,14 @@
     "nixpkgs": {
       "flake": false,
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "nixpkgs-lib": {
       "locked": {
@@ -675,6 +673,25 @@
         "ref": "modules-with-keys-25.11",
         "repo": "nixpkgs",
         "type": "github"
+      }
+    },
+    "nixvirt": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1748140003,
+        "narHash": "sha256-DNBZmuk1YRM2PmwbHzVdXumRjCUzQkMarg4iI/37rOQ=",
+        "rev": "5dfe108fd859b122f9a96981cb6bc12297653d6c",
+        "revCount": 407,
+        "type": "tarball",
+        "url": "https://api.flakehub.com/f/pinned/AshleyYakeley/NixVirt/0.6.0/0197059a-e45f-7446-86b5-411ccc894ab0/source.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://flakehub.com/f/AshleyYakeley/NixVirt/%2A.tar.gz"
       }
     },
     "pre-commit": {
@@ -740,6 +757,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
         "nixpkgs-nvmd": "nixpkgs-nvmd",
+        "nixvirt": "nixvirt",
         "searchix": "searchix"
       }
     },

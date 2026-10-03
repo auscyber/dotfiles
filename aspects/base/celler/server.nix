@@ -343,77 +343,60 @@ in
         consumeVia = "tailscale";
       };
 
-      cellerd =
-        { host, ... }:
-        let
-          # Written by the `r2-token` generator next to its own secret
-          # (../../network/cloudflare.nix). The account id is only knowable by
-          # asking the API, and `endpoint` is needed at EVALUATION time, so the
-          # generator leaves it in plaintext here rather than it being a
-          # constant somebody has to look up and paste.
-          #
-          # Absent before the first `gen-secrets`, which is deliberate: the
-          # server keeps local storage until the bucket and its credentials
-          # actually exist, and the rebuild after that picks R2 up.
-          meta = ../../../secrets/generated + "/${host.name}/r2.json";
-          r2 = if builtins.pathExists meta then lib.importJSON meta else null;
-        in
-        {
-          # `/mnt/hdd/attic` is not retired by this. A NAR's backend is
-          # recorded per file (celler's `RemoteFile` is `S3 | Local | Http`),
-          # so everything already uploaded keeps being served from the disk
-          # while new uploads go to the bucket -- which is also why that path
-          # has to stay readable rather than being cleaned up.
-          storage =
-            if r2 == null then
-              {
-                type = "local";
-                path = "/mnt/hdd/attic";
-              }
-            else
-              {
-                type = "s3";
-                # R2 has one region and calls it this.
-                region = "auto";
-                inherit (r2) bucket endpoint;
-                # No `credentials`: they would land in the world-readable
-                # store. The AWS SDK reads AWS_ACCESS_KEY_ID and
-                # AWS_SECRET_ACCESS_KEY, which `templates.env` above puts in
-                # the env file instead.
-              };
-          tracing.otlp = {
-            enabled = true;
-            endpoint = "insecure://127.0.0.1:4317";
-            protocol = "grpc";
-          };
+      cellerd = _: {
+        # Local storage on the ZFS data pool, deliberately rather than an
+        # object store. This used to be Cloudflare R2, selected through a
+        # `pathExists` check on the `r2-token` generator's plaintext metadata;
+        # that whole arrangement is gone, along with this host's dependence on
+        # a generated file being present before it would evaluate.
+        #
+        # A binary cache is regenerable by construction -- the cost of losing
+        # it is a rebuild, not lost data -- so paying an object store to hold
+        # it only buys durability that is not worth much here.
+        #
+        # One consequence worth stating: cache.ivymect.in is served publicly
+        # and is excluded from the cloudflare tunnel (see
+        # ../../hosts/secondpc/default.nix, where the exclusion exists because
+        # Cloudflare caps a proxied body at 100MB and `celler push` sends NARs
+        # past it). So cache egress now comes off the home connection with
+        # nothing in front of it.
+        #
+        # NARs already uploaded to R2 are not orphaned by this: a NAR's backend
+        # is recorded per file (celler's `RemoteFile` is `S3 | Local | Http`),
+        # so anything stored there keeps being served from there while new
+        # uploads land on disk.
+        storage = {
+          type = "local";
+          path = "/mnt/hdd/attic";
         };
+        tracing.otlp = {
+          enabled = true;
+          endpoint = "insecure://127.0.0.1:4317";
+          protocol = "grpc";
+        };
+      };
 
       # CI push token for GitHub Actions (sub=github, push=main).
       # `nix run .#sync-ci-secrets` uploads it as the CELLER_TOKEN secret that
       # auscyber/celler-action pushes with.
-      # R2 credentials for the bucket this server stores NARs in, minted from
-      # the account token and scoped to that one bucket. The two usable halves
-      # are named for `templates.env` above, which picks them up because a
-      # template depends on every secret in its scope.
-      #
-      secrets =
-        args@{ secrets, ... }:
-        den.lib.cloudflare.r2Secrets { bucket = "celler-main"; } args
-        // {
-          github_cache_key = {
-            rekeyFile = ../github_cache_key.age;
-            # Shares the `celler` scope, but the server never reads it.
-            restartUnits = [ ];
-            generator = {
-              tags = [ "github_cache_key" ];
-              dependencies.signing_key = secrets.signing_key;
-              script = celler.cellerTokenScript {
-                sub = "github";
-                push = [ "main" ];
-              };
+      # No R2 credentials any more -- `storage` above is local, so there is no
+      # bucket to authenticate against and `den.lib.cloudflare.r2Secrets` is
+      # not called from anywhere in this tree.
+      secrets = { secrets, ... }: {
+        github_cache_key = {
+          rekeyFile = ../github_cache_key.age;
+          # Shares the `celler` scope, but the server never reads it.
+          restartUnits = [ ];
+          generator = {
+            tags = [ "github_cache_key" ];
+            dependencies.signing_key = secrets.signing_key;
+            script = celler.cellerTokenScript {
+              sub = "github";
+              push = [ "main" ];
             };
           };
         };
+      };
     };
 
   # `nix run .#celler-token -- <server> --sub admin --pull '*' --push '*' --create-cache '*'`
