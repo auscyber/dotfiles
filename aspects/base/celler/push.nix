@@ -18,12 +18,12 @@ let
     {
       secrets,
       age,
-      celler-caches,
-      celler-use,
+      cellerHost,
       ...
     }:
     let
       dir = age.rekey.generatedSecretsDir;
+      inherit (cellerHost) celler-caches celler-use;
     in
     lib.listToAttrs (
       lib.concatMap (server: [
@@ -53,6 +53,14 @@ let
   # The values coincide in practice -- `celler-use` is declared on the user and
   # reaches the host by `celler-use-to-host` below -- and a standalone home gets
   # its own from the homeManager definition.
+  #
+  # ONE arg, named `cellerHost` and not the quirks themselves. Putting
+  # `celler-caches` into `_module.args` under its own name made every den class
+  # body that asks for it receive it twice -- once from den's context, once
+  # from the module system -- which den refuses with "class module arg
+  # 'celler-caches' collides with module-system arg". A name no quirk has
+  # cannot collide, and it says what this is: the snapshot taken at the host
+  # scope, which is not necessarily what a user scope would have seen.
   quirkArgs =
     {
       celler-caches,
@@ -60,7 +68,7 @@ let
       ...
     }:
     {
-      _module.args = { inherit celler-caches celler-use; };
+      _module.args.cellerHost = { inherit celler-caches celler-use; };
     };
 in
 {
@@ -109,12 +117,11 @@ in
     templates =
       {
         secrets,
-        celler-caches,
-        celler-use,
+        cellerHost,
         ...
       }:
       let
-        used = celler.use celler-caches celler-use;
+        used = celler.use cellerHost.celler-caches cellerHost.celler-use;
       in
       lib.optionalAttrs (used != [ ]) {
         netrc = {
