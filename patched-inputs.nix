@@ -69,9 +69,10 @@
       ./patches/pnpm-nix-provider/execute-bit.patch
     ];
     zen-browser.patches = [ ];
+
     age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
     agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
-    agenix-rekey.hash = "sha256-3yNZZMgRYYvZr950AC1ZWbnb4GLZ+eUufDvIVGoZT2c=";
+    agenix-rekey.hash = "sha256-p7m57B3lCFVj40SOubd09OqBa/7uSEJzZBO2+LNJjUg=";
     arion.hash = "sha256-XM8sEWDiEAwjWL1onvSuxrkgyHxL0SAwsD6dXx992NM=";
     darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
     home-manager.hash = "sha256-xW6fGD1Q3/zBzI3hctmdfFe1XJ06l8Jo5ouJoRgdSGQ=";
