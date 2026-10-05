@@ -1,7 +1,7 @@
 {
   # Every addon here is an upstream GitHub release xpi. The `addonId` in the
   # overlay below must match `manifest.applications.zotero.id` inside the xpi —
-  # fetchZoteroAddon asserts this at build time, so a silent upstream id change
+  # buildZoteroAddon asserts this at build time, so a silent upstream id change
   # fails the build instead of quietly not loading in Zotero.
   nvfetcher.sources = {
     zotero-better-notes = {
@@ -66,16 +66,17 @@
   den.aspects.zotero = {
     overlays = { sources, ... }: {
       zotero-addons = final: prev: {
-        fetchZoteroAddon = prev.callPackage ./_fetch-zotero-addon.nix { };
+        buildZoteroAddon = prev.callPackage ./_build-zotero-addon.nix { };
+        fetchZoteroAddon = final.callPackage ./_fetch-zotero-addon.nix { };
 
-        # Built from source; already installs into share/zotero/extensions, so it
-        # sits alongside the fetchZoteroAddon outputs below.
-
+        # These two produce their own xpi instead of fetching a released one, so
+        # they call buildZoteroAddon directly; the install layout and the id
+        # assertion are the same ones fetchZoteroAddon gets.
         zoteroAddons = {
-          notero = prev.callPackage ./_notero.nix { source = sources.zotero-notero; };
+          notero = final.callPackage ./_notero.nix { source = sources.zotero-notero; };
 
           # In-tree, not an upstream release -- see ./_webdav-password-zotero.nix.
-          webdav-password = prev.callPackage ./_webdav-password-zotero.nix { };
+          webdav-password = final.callPackage ./_webdav-password-zotero.nix { };
         }
         // prev.lib.mapAttrs (_: spec: final.fetchZoteroAddon spec) {
           better-notes = {

@@ -42,7 +42,7 @@ in
     # "${env}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",
     # the Firefox vendor layout. Zotero has no such dir: it scans
     # <profile>/extensions directly for <addon-id>.xpi, which is where
-    # fetchZoteroAddon installs (share/zotero/extensions). Override the link.
+    # buildZoteroAddon installs (share/zotero/extensions). Override the link.
     #
     # Dropping xpis into that dir is necessary but not sufficient: Zotero (like
     # Gecko) only *loads* add-ons recorded in <profile>/extensions.json, the
