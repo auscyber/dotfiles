@@ -1,0 +1,45 @@
+--- a/apps/update-masterkeys.nix	2026-10-28 16:30:25
++++ b/apps/update-masterkeys.nix	2026-10-28 16:30:58
+@@ -19,6 +19,10 @@
+     die "Please execute this script from your flake's root directory."
+   fi
+ 
++  # A source no master can decrypt is skipped and named at the end, rather
++  # than aborting every file after it.
++  UNREADABLE=()
++
+   ${builtins.concatStringsSep "" (
+     builtins.map (
+       path: # bash
+@@ -33,8 +37,7 @@
+ 
+         shasum_before="$(${pkgs.coreutils}/bin/sha512sum "${path}")"
+ 
+-        ${ageMasterDecrypt} -o "$CLEARTEXT_FILE" "${path}" \
+-            || die "Failed to decrypt file. Aborting."
++        if ${ageMasterDecrypt} -o "$CLEARTEXT_FILE" "${path}"; then
+         ${ageMasterEncrypt} -o "$ENCRYPTED_FILE" "$CLEARTEXT_FILE" \
+             || die "Failed to re-encrypt file. Aborting."
+ 
+@@ -45,10 +48,19 @@
+           ${pkgs.coreutils}/bin/cp --no-preserve=all "$ENCRYPTED_FILE" "${path}" # cp instead of mv preserves original attributes and permissions
+           echo "[1;32m    Updated masterkeys of[m [34m"${path}"[m"
+         fi
++        else
++          echo "    Unreadable [no master decrypts it] ${path}" >&2
++          UNREADABLE+=("${path}")
++        fi
+ 
+-        rm "$CLEARTEXT_FILE"
+-        rm "$ENCRYPTED_FILE"
++        rm -f "$CLEARTEXT_FILE"
++        rm -f "$ENCRYPTED_FILE"
+       '') validRelativeSecretPaths
+   )}
++  if [[ ''${#UNREADABLE[@]} -gt 0 ]]; then
++    echo "''${#UNREADABLE[@]} source(s) left unchanged, no master could decrypt them:" >&2
++    printf '  %s\n' "''${UNREADABLE[@]}" >&2
++    exit 1
++  fi
+   exit 0
+ ''

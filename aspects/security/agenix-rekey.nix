@@ -6,6 +6,32 @@
   ...
 }:
 let
+  # The enclave master as a TAG recipient: the same key, but age >= 1.3 and
+  # rage encrypt to it natively, so a machine without `age-plugin-se` (a Linux
+  # runner) can still write a secret it will be able to read.
+  enclaveMaster = "age1tag1qtu7ycpgpl79gzdflwuywxc6qttaqldmyvv3w8yqhq5m7alk2fqd25safn7";
+
+  # The CI master (.github/workflows/secrets.yml), present once
+  # `nix run .#ci-master-init` has written its public half.
+  ciMasterPub = ./ci-master.pub;
+  ciMaster =
+    if builtins.pathExists ciMasterPub then lib.trim (builtins.readFile ciMasterPub) else null;
+  ciMasterIdentity = "/tmp/agenix-ci/master.txt";
+
+  # ── THE SESSION MASTER (`nix run .#unlock`) ──
+  # A software key whose private half is kept in the repo encrypted to the
+  # enclave and the backup. Unlocking decrypts it once, with one Touch ID, for
+  # the life of one shell; inside it the wrappers decrypt with it instead of
+  # asking the enclave for every file.
+  sessionMasterPub = ./session-master.pub;
+  sessionMaster =
+    if builtins.pathExists sessionMasterPub then
+      lib.trim (builtins.readFile sessionMasterPub)
+    else
+      null;
+  sessionDir = "/Users/ivypierlot/Library/agenix/session";
+  sessionIdentity = "${sessionDir}/master.txt";
+
   pF =
     p:
     if p.kind == "age" then
@@ -42,7 +68,11 @@ let
     ++ rename;
     age.rekey.storageMode = "local";
     age.rekey.hostPubkey = lib.mkIf (anyUser.hostPublicKey != null) anyUser.hostPublicKey;
-    age.rekey.generatedSecretsDir = ../../secrets/generated + "/${anyUser.host.name}-${anyUser.name}";
+    # ONE directory for the fleet; the entity is the default `scope` of each
+    # secret instead (../../lib/age-scoped.nix), which is what lets the two
+    # ends of a credential name one file.
+    age.rekey.generatedSecretsDir = ../../secrets/generated;
+    age.scopedEntity = "${anyUser.host.name}-${anyUser.name}";
     age.rekey.localStorageDir = ../../secrets/rekeyed + "/${anyUser.host.name}-${anyUser.name}";
   };
   # Register your custom classes
@@ -129,6 +159,22 @@ in
         url = "github:oddlama/agenix-rekey";
         patch.enable = true;
         patch.patches = [
+          # ⚠ KEEP THIS PATCH FREE OF FORMATTING-ONLY HUNKS. It carried a third
+          # hunk for `modules/agenix-rekey.nix` that reindented the
+          # `assertions = [ ... ] ++ flatten (...)` block and changed nothing
+          # else -- 21 removed lines against 20 added, byte-identical once
+          # whitespace is stripped, which is a nixfmt reflow captured by
+          # `git format-patch`. Upstream then reformatted the same block, the
+          # hunk stopped applying (`Hunk #2 FAILED at 203`), and that took
+          # `nix run .#update` out entirely: ../tooling/update.nix builds its
+          # script with the `patched-inputs` hook's store paths interpolated
+          # INTO the text, so an unappliable patch means the app cannot be
+          # built and `nix flake update` never runs at all. The failure arrives
+          # as a build error about `update.drv`, naming neither this file nor
+          # the patch.
+          #
+          # So a cosmetic hunk here is not free: it buys nothing and breaks on
+          # every upstream reflow, with a diagnostic pointing somewhere else.
           ../../patches/agenix-rekey/template.patch
           # macOS ships BSD `stat`, which rejects the GNU `-c %Y` the generate
           # script uses for its mtime freshness check. On failure both lookups fall
@@ -147,6 +193,10 @@ in
           # express "after this other secret" (`dependencies`, ordering plus an
           # mtime compare) but not "because this value changed".
           ../../patches/agenix-rekey/derivedFrom.patch
+          # A master identity absent from this machine is skipped on decrypt.
+          ../../patches/agenix-rekey/skip-absent-identities.patch
+          # A source no master can read is skipped and listed, not fatal.
+          ../../patches/agenix-rekey/update-masterkeys-skip-unreadable.patch
         ];
         inputs.nixpkgs.follows = "nixpkgs";
         inputs.devshell.follows = "devshell";
@@ -155,8 +205,6 @@ in
       };
       agenix.url = "github:ryantm/agenix";
       agenix.inputs.nixpkgs.follows = "nixpkgs";
-      agenix.inputs.darwin.follows = "darwin";
-      agenix.inputs.home-manager.follows = "home-manager";
       age-plugin-gpg = {
         url = "github:certainlach/age-plugin-gpg";
         inputs.nixpkgs.follows = "nixpkgs";
@@ -212,9 +260,11 @@ in
       }:
       {
         imports = rename;
+        age.scopedEntity = host.hostName;
         age.rekey = {
           hostPubkey = lib.mkIf (host.hostPublicKey != null) host.hostPublicKey;
-          generatedSecretsDir = ../../secrets/generated + "/${host.hostName}/";
+          # ONE directory for the fleet; see the home-manager half above.
+          generatedSecretsDir = ../../secrets/generated;
           localStorageDir = ../../secrets/rekeyed + "/${host.hostName}/";
         };
       };
@@ -224,21 +274,56 @@ in
     ];
 
     rekey = {
+      # TWO masters, and the second one is the lesson from the first.
+      #
+      # The gpg-yubikey identity that used to be the only entry here became
+      # unusable, and every `secrets/static/*.age` was encrypted to it alone --
+      # so nothing could be decrypted and nothing could be rekeyed (rekeying
+      # reads the static sources). What saved the recoverable half was that the
+      # per-host `secrets/rekeyed/` copies are encrypted to each host's own ssh
+      # key, which we still had. See ./recover-master.sh.
       masterIdentities = [
-        { identity = ./gpg-yubikey.pub; }
-        #        {
-        #          # Apple Secure Enclave master key — usable only on this Mac, and
-        #          # decryption is gated by Touch ID (any-biometry). The identity is the
-        #          # enclave-bound private-key reference, so it is kept OUT of the repo
-        #          # (at an absolute path) and only the recipient below is committed.
-        #          # An explicit pubkey keeps eval independent of the file's presence
-        #          # (host builds never read it) and avoids an extra biometry prompt when
-        #          # encrypting; the file is read only by the rekey CLI on this Mac.
-        #          identity = "/Users/ivypierlot/Library/agenix/se-identity.txt";
-        #          pubkey = "age1se1qgnzav6c967adnfme32lr827v0vp8ddus96l78s4h4yqtnc0tuydyqee780";
-        #        }
-      ];
+        {
+          # Apple Secure Enclave, gated by Touch ID (any-biometry). The private
+          # key cannot leave this Mac's enclave, so the identity file is only a
+          # reference to it and is kept OUT of the repo. The explicit `pubkey`
+          # keeps evaluation independent of that file existing -- host builds
+          # never read it -- and avoids a biometry prompt when merely
+          # ENCRYPTING; the file is read only by the rekey CLI on this Mac.
+          identity = "/Users/ivypierlot/Library/agenix/se-identity.txt";
+          pubkey = enclaveMaster;
+        }
+      ]
+      # ── THE CI MASTER ──
+      # A software key held only as a GitHub environment secret, so the
+      # `secrets` workflow can generate and rekey. Its file exists only on the
+      # runner; every local wrapper pins the enclave as the one identity to
+      # try, so nothing here ever looks for it.
+      ++ lib.optional (ciMaster != null) {
+        identity = ciMasterIdentity;
+        pubkey = ciMaster;
+      }
+      ++ lib.optional (sessionMaster != null) {
+        identity = sessionIdentity;
+        pubkey = sessionMaster;
+      };
+
+      # The portable half, and the whole point of having two: an enclave key
+      # dies with the machine. `extraEncryptionPubkeys` rather than a second
+      # `masterIdentities` entry, because that is the option built for exactly
+      # this -- upstream's words: "a backup identity that must be able to
+      # decrypt all secrets but should not be used when attempting regular
+      # decryption". Everything is encrypted to it, but rage is never handed it
+      # as an identity to try (the private half is in 1Password and is
+      # deliberately not on this disk, so an attempt could only fail).
+      extraEncryptionPubkeys = [ ./backup-master.pub ];
       storageMode = "local";
+      # Emptied deliberately: upstream defaults this to `age-plugin-yubikey`,
+      # which is not the plugin this fleet uses and would be a dead dependency
+      # in the rekey derivation. The plugins that are actually needed
+      # (`age-plugin-se` for the enclave master) are put on PATH by the
+      # `rekey`/`secret-edit`/`secret-view` wrappers below, which is where
+      # decryption actually happens -- see `agePlugins` in the perSystem block.
       agePlugins = [ ];
     };
   };
@@ -284,6 +369,10 @@ in
           runtimeInputs = [ agenixRekeyPkg ] ++ agePlugins ++ withoutCeller.deps pkgs;
           text = ''
             ${withoutCeller.snippet}
+            # One identity per run: the enclave here, unless `unlock`'s shell or
+            # the CI runner has already chosen one.
+            export AGENIX_REKEY_PRIMARY_IDENTITY="''${AGENIX_REKEY_PRIMARY_IDENTITY:-${enclaveMaster}}"
+            export AGENIX_REKEY_PRIMARY_IDENTITY_ONLY="''${AGENIX_REKEY_PRIMARY_IDENTITY_ONLY:-true}"
             exec agenix ${argv} "$@"
           '';
         };
@@ -300,6 +389,125 @@ in
       packages.secret-view = mkAgenix "secret-view" "view";
       packages.gen-secrets = mkAgenix "gen-secrets" "generate -a";
       packages.update-masterkeys = mkAgenix "update-masterkeys" "update-masterkeys";
+
+      # ── MINT THE CI MASTER ──
+      # The private half goes straight from age-keygen into the `secrets`
+      # environment's GitHub secret and is shredded; only the public half is
+      # written to the repo. Run once, then `update-masterkeys` so the existing
+      # sources are readable by it.
+      # ── ONE TOUCH ID, FOR ONE SHELL ──
+      # `nix run .#unlock` decrypts the session master once and opens a shell
+      # that decrypts with it; leaving that shell deletes it. `lock` clears a
+      # copy left by a shell that was killed outright.
+      packages.unlock = pkgs.writeShellApplication {
+        name = "unlock";
+        runtimeInputs = agePlugins ++ [ pkgs.coreutils ];
+        text = ''
+          if [ -n "''${AGENIX_REKEY_PRIMARY_IDENTITY:-}" ]; then
+            echo "unlock: already inside an unlocked shell" >&2
+            exit 1
+          fi
+          if [ ! -e aspects/security/session-master.age ] || [ ! -e aspects/security/session-master.pub ]; then
+            echo "unlock: run from the repo root, after nix run .#session-master-init" >&2
+            exit 1
+          fi
+          install -d -m 700 ${sessionDir}
+          trap 'rm -f ${sessionIdentity}' EXIT HUP INT TERM
+          (
+            umask 077
+            rage -d -i ${lib.escapeShellArg "/Users/ivypierlot/Library/agenix/se-identity.txt"} \
+              -o ${sessionIdentity} aspects/security/session-master.age
+          )
+          echo "unlocked; exit this shell to lock" >&2
+          AGENIX_REKEY_PRIMARY_IDENTITY="$(tr -d '\n' < aspects/security/session-master.pub)" \
+            AGENIX_REKEY_PRIMARY_IDENTITY_ONLY=true \
+            AGENIX_UNLOCKED=1 \
+            "''${SHELL:-${pkgs.bashInteractive}/bin/bash}" || true
+          echo "locked" >&2
+        '';
+      };
+      packages.lock = pkgs.writeShellApplication {
+        name = "lock";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = ''
+          rm -f ${sessionIdentity}
+          echo "locked" >&2
+        '';
+      };
+
+      # Mint the session master: its private half goes straight into
+      # `session-master.age`, encrypted to the enclave and the backup, never
+      # anywhere else. Then `update-masterkeys` once so everything is readable
+      # by it -- the last run that prompts per file.
+      packages.session-master-init = pkgs.writeShellApplication {
+        name = "session-master-init";
+        runtimeInputs = [
+          pkgs.age
+          pkgs.rage
+          pkgs.coreutils
+        ];
+        text = ''
+          if [ ! -e flake.nix ]; then
+            echo "session-master-init: run this from the repo root" >&2
+            exit 1
+          fi
+          if [ -e aspects/security/session-master.pub ]; then
+            echo "session-master-init: aspects/security/session-master.pub exists; delete it and session-master.age to rotate" >&2
+            exit 1
+          fi
+          dir="$(mktemp -d)"
+          trap 'rm -rf "$dir"' EXIT
+          age-keygen -o "$dir/key" 2>/dev/null
+          pub="$(age-keygen -y "$dir/key")"
+          rage -e -r ${enclaveMaster} -R aspects/security/backup-master.pub \
+            -o aspects/security/session-master.age "$dir/key"
+          shred -u "$dir/key" 2>/dev/null || rm -f "$dir/key"
+          printf '%s\n' "$pub" > aspects/security/session-master.pub
+          echo "wrote session-master.{age,pub}; now: jj file track them, then nix run .#update-masterkeys" >&2
+        '';
+      };
+
+      packages.ci-master-init = pkgs.writeShellApplication {
+        name = "ci-master-init";
+        runtimeInputs = [
+          pkgs.age
+          pkgs.gh
+          pkgs.coreutils
+        ];
+        text = ''
+          if [ ! -e flake.nix ]; then
+            echo "ci-master-init: run this from the repo root" >&2
+            exit 1
+          fi
+          if [ -e aspects/security/ci-master.pub ]; then
+            echo "ci-master-init: aspects/security/ci-master.pub exists; delete it to rotate" >&2
+            exit 1
+          fi
+          repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+
+          # The environment, deployable from `master` alone: that rule is what
+          # keeps the key from any other ref.
+          gh api -X PUT "repos/$repo/environments/secrets" --input - >/dev/null <<'JSON'
+          {"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}
+          JSON
+          if ! gh api "repos/$repo/environments/secrets/deployment-branch-policies" \
+            -q '.branch_policies[].name' | grep -qx master; then
+            gh api -X POST "repos/$repo/environments/secrets/deployment-branch-policies" \
+              -f name=master -f type=branch >/dev/null
+          fi
+
+          dir="$(mktemp -d)"
+          trap 'rm -rf "$dir"' EXIT
+          age-keygen -o "$dir/key" 2>/dev/null
+          # The public half is written only once the private half is stored, so
+          # a failed upload leaves no recipient whose key is gone.
+          pub="$(age-keygen -y "$dir/key")"
+          gh secret set AGENIX_CI_MASTER --env secrets --repo "$repo" < "$dir/key"
+          shred -u "$dir/key" 2>/dev/null || rm -f "$dir/key"
+          printf '%s\n' "$pub" > aspects/security/ci-master.pub
+          echo "wrote aspects/security/ci-master.pub; now: jj file track it, then nix run .#update-masterkeys" >&2
+        '';
+      };
 
       # Mobile devices join the node set. Merged into `homeConfigurations`
       # because select-nodes.nix prefixes the platform sets (`darwin:<name>`)

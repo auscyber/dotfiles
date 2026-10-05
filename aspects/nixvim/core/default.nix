@@ -1,6 +1,48 @@
 { den, ... }: {
-  perSystem = { pkgs, ... }: {
-    packages.nvim = den.lib.nixvim.mkPackage { inherit pkgs; };
+  perSystem = { config, pkgs, ... }: {
+    # ── THE BARE APP GETS THE LANGUAGE SERVERS TOO ──
+    #
+    # `mkPackage` resolves the `nvim` class off ONE aspect, and the servers are
+    # not written on `den.aspects.nixvim`: they are the `lsp-servers` registry
+    # routed into the nvim module system by `den.aspects.lspmux`
+    # (../../editors/lspmux/lspmux.nix). Measured before this -- `nix run .#nvim`
+    # on a .nix file attached `copilot` and nothing else, because nixd was never
+    # in this package to begin with.
+    #
+    # Composed HERE rather than written as `den.aspects.nixvim.includes = [
+    # den.aspects.lspmux ]`, because only the `nvim` class is resolved from this
+    # aspect: the servers come and lspmux's homeManager half -- the launchd
+    # agent, its config file, the opencode and claude-code feeds -- stays off
+    # every home-manager user who only wanted an editor.
+    #
+    # The servers are reached by the store path of their `lspmux client` shim,
+    # so this app is self-contained: nothing has to be on $PATH and no lspmux
+    # daemon has to be running.
+    # ── AND THE REGISTRY HAS TO BE HANDED OVER, NOT WAITED FOR ──
+    #
+    # `lspmux.servers` is normally filled by `den.policies.lsp-servers-to-nvim`,
+    # and a policy is replicated into ENTITY scopes -- host and user. This
+    # package is resolved by `den.lib.aspects.resolve "nvim"` with no entity at
+    # all, so that policy never runs and the registry came back empty: measured,
+    # the built `init.lua` contained zero occurrences of `nixd` and `vim.lsp
+    # .enable` was called only for the servers nixvim's own `plugins.lsp` writes.
+    #
+    # `_lspServers` is the same class collected into a perSystem option by
+    # `den.policies.lsp-servers-to-flake-parts` (../../editors/lspmux/
+    # lspmux-check.nix declares it), already resolved against this system's
+    # `pkgs` -- 18 servers, nixd among them. So the one scope that does have the
+    # answer hands it to the one that cannot derive it.
+    packages.nvim = den.lib.nixvim.mkPackage {
+      inherit pkgs;
+      aspect = {
+        name = "nvim-standalone";
+        includes = [
+          den.aspects.nixvim
+          den.aspects.lspmux
+        ];
+        nvim.lspmux.servers = config._lspServers;
+      };
+    };
   };
 
   den.aspects.nixvim.includes = [
@@ -66,6 +108,11 @@
         relativenumber = true;
 
         completeopt = "menu,menuone,noselect";
+
+        # Source a project's own `.nvim.lua` (`:h 'exrc'`). nvim asks to
+        # `:trust` each file once, so this is not a blanket "run any repo's
+        # lua". The dendritic repo generates one -- ../../tooling/nixd.nix.
+        exrc = true;
       };
 
       colorscheme = "pink_ocean";

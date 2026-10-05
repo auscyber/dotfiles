@@ -1,6 +1,8 @@
 {
   den,
   lib,
+  capability,
+  accessLib,
   ...
 }:
 # Indexer manager. The servarr shape it shares with sonarr/radarr/lidarr comes
@@ -11,7 +13,14 @@
 # It has no download client of its own (`downloadClient = false`): it hands
 # releases to the *arr apps, which have theirs.
 let
-  servarr = import ./media/_servarr.nix { inherit den lib; };
+  servarr = import ./media/_servarr.nix {
+    inherit
+      den
+      lib
+      capability
+      accessLib
+      ;
+  };
 in
 {
   imports = [
@@ -19,13 +28,22 @@ in
       den.aspects = servarr {
         name = "prowlarr";
         port = 9696;
+        # One grant covers the whole *arr stack; see the generator.
+        serviceGroup = "arr";
+        # nixpkgs runs prowlarr with `DynamicUser`, whose uid no rule can name,
+        # so it is pinned to a static account.
+        route = {
+          segment = "internet";
+          private = true;
+          user = "prowlarr";
+        };
         apiVersion = "v1";
         downloadClient = false;
-        # Shares the arr vhost with sonarr/radarr, so links have to be generated
-        # at the path nginx routes on.
+        # Shares the arr vhost with sonarr/radarr/lidarr/bazarr. `/indexers`
+        # rather than `/prowlarr`: the siblings are named after what they manage
+        # (/tv, /movies, /music, /subs) and this is the indexer manager.
         domain = "arr";
-        subpath = "/prowlarr";
-        urlbase = "/prowlarr";
+        subpath = "/indexers";
         clients = [ "homepage" ];
       };
     }
@@ -34,6 +52,24 @@ in
       den.aspects.prowlarr = {
         includes = [ den.aspects.packages.flaresolverr ];
 
+        # ── PROWLARR IS A CALLER TOO, AND THAT HALF IS ITS OWN FACT ──
+        #
+        # It holds one key and presents it to every *arr it syncs to, so the
+        # account comes from the siblings that name `prowlarr` in their
+        # `api.clients` (./media/servarr.nix) and ../services/gateway.nix
+        # derives it. What is left is how THIS end reads the key: rendered into
+        # one env file under this prefix, and read from the environment by the
+        # reconcile unit below -- which therefore has to be restarted when the
+        # file is rewritten.
+        #
+        # Was `gateway.serviceAccounts.prowlarr` in the `nixos` body below. The
+        # facts are the same; stating them as a take is what keeps them from
+        # also being what BRINGS the account into being.
+        takes.credential = {
+          envPrefix = "PROWLARR_";
+          restartUnits = [ "prowlarr-connect.service" ];
+        };
+
         nixos =
           {
             config,
@@ -41,15 +77,6 @@ in
             ...
           }:
           {
-            # Prowlarr is a caller of every *arr it syncs to, so it holds one key per
-            # target. `envPrefix` renders them into a single env file as
-            # PROWLARR_<SERVICE>_KEY, which the reconcile unit below reads.
-            gateway.serviceAccounts.prowlarr = {
-              envPrefix = "PROWLARR_";
-              # The reconcile unit reads the key from its environment.
-              restartUnits = [ "prowlarr-connect.service" ];
-            };
-
             # The Applications list is a table in prowlarr's database with no
             # config.xml or env equivalent, so it gets reconciled over prowlarr's own
             # API. This is the entry that makes the per-caller keys earn their keep:

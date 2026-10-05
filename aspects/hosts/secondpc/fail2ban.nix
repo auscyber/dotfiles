@@ -35,8 +35,33 @@
         ignoreIP = [
           "127.0.0.0/8"
           "::1"
-          "192.168.0.0/24" # home LAN
+          # /16, matching `br0`'s actual prefix (192.168.0.26/16 -- see
+          # `lanAddress` in ./default.nix). This was `192.168.0.0/32`, which is
+          # a single address and so exempted nothing: a LAN host on
+          # 192.168.1.x or 192.168.2.x was fully bannable, and one SSH attempt
+          # that fell back to password auth was enough to lose port 22 until
+          # the jail was cleared by hand.
+          # READ OFF THE CARRIER, not written again: the segment declares its
+          # own CIDR (../../network/segments.nix) and this is the same fact.
+          den.aspects.lan-home.prefix
+
           "10.100.0.0/24" # wireguard tunnel, aspects/network/vpn.nix
+
+          # ── THE TAILNET, WHICH WAS THE REMAINING HOLE ──
+          #
+          # Same trap the `/16` note above records, for the other wire: an ssh
+          # attempt arriving over the tunnel that fell back to password auth
+          # was enough to lose port 22 from the tailnet until the jail was
+          # cleared by hand. Measured elsewhere today -- a failed publickey
+          # against another box in this fleet produced exactly that, and the
+          # ban reads as `No route to host` on 22 while every other port stays
+          # open, which is nothing like an obvious ban.
+          #
+          # Ignoring the whole tailnet is the intended breadth: membership is
+          # already authenticated by the coordination server, so there is no
+          # brute force to rate-limit there. ../../network/tailscale.nix
+          # declares the range.
+          den.aspects.tailscale.prefix
         ];
 
         jails = {

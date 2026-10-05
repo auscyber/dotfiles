@@ -7,6 +7,10 @@
 }:
 let
   celler = import ./celler/_lib.nix { inherit lib; };
+
+  # The local cache's port, named once: the bind address and the `gives` that
+  # opens it read the same number.
+  ncpsPort = 8501;
   caches = {
     "https://nix-community.cachix.org" =
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
@@ -29,7 +33,19 @@ in
     inputs ? celler
   ) inputs.celler.overlays.default;
 
-  den.default.nix.settings = {
+  # ── HOST SCOPE ONLY, OR EVERY ENTRY APPEARS TWICE ──
+  #
+  # `den.default` lands in every scope -- the host AND each user -- and
+  # ./nix.nix's `nix-to-host` policy deliberately routes from every scope a host
+  # is bound in, which is what stops a user-included aspect's cache being
+  # dropped. The two together put each substituter in the host's list once per
+  # scope.
+  #
+  # `den.schema.host.includes` lands on hosts only, so these are declared once
+  # and the policy still picks up user-scope caches as before.
+  den.schema.host.includes = [ den.aspects.public-caches ];
+
+  den.aspects.public-caches.nix.settings = {
     # An unreachable substituter is not a reason to fail; it is a reason to
     # build the thing.
     #
@@ -55,9 +71,39 @@ in
   # secondpc runs the ncps binary cache (served directly on :8501) plus celler
   # (cache.ivymect.in, ./celler/server.nix). Attached to the `nix` aspect's
   # per-host provider so they only land on secondpc.
+  # ── THE LOCAL CACHE'S PORT, DECLARED ──
+  #
+  # 8501 was a literal in the serving host's
+  # `networking.firewall.allowedTCPPorts` -- nixpkgs' pseudo-interface
+  # `default`, no `-i`, so it sat on every wire that box has. `server.addr`
+  # below binds 0.0.0.0 because the rest of the fleet pulls from it; the lan
+  # and the tunnel are how the fleet reaches it, and ./firewall.nix opens it on
+  # exactly those two interfaces.
+  #
+  # ITS OWN ASPECT, so the port has a giver `capability.providersFor` can find.
+  # A `gives` written on the provider sub-scope below is INERT -- measured:
+  # `providersFor secondpc "tcp"` did not list it.
+  den.aspects.ncps.gives =
+    { self, ... }:
+    {
+      tcp = _: {
+        name = self.name;
+        ports.http = {
+          port = ncpsPort;
+          meta.description = "The local binary cache, dialed as a substituter by the rest of the fleet over the lan or the tailnet.";
+          expose = [
+            "lan-home"
+            "tailscale"
+          ];
+        };
+        carrier = self.name;
+      };
+    };
+
   den.aspects.nix.provides.secondpc = {
     includes = [
       den.aspects.nginx
+      den.aspects.ncps
       # `den.aspects.celler` is NOT here, though this is where it belongs by
       # subject. Its `celler-caches` record is a config thunk, and den resolves
       # one against `hostConfigs` keyed by SCOPE id (den
@@ -68,7 +114,13 @@ in
       # the shape ../hosts/celler2.nix already had.
       den.policies.celler-caches
       {
-        celler-use.secondpc.pull = [ "main" ];
+        # NO `celler-use` HERE ANY MORE. This was `celler-use.secondpc.pull =
+        # [ "main" ]`, and it is now derived: `den.aspects.celler-default`'s
+        # nested take resolves the celler, its cache and that cache's pull, and
+        # ./celler/push.nix's `usedBy` folds the answer into `celler-use`.
+        # Verified by removing this line -- the substituter, its signing key and
+        # the netrc all survived, which is what says the derivation is doing the
+        # work rather than being shadowed by this.
         nixos =
           {
             celler-caches,
@@ -98,7 +150,7 @@ in
           publicKeys = builtins.attrValues caches;
         };
       };
-      server.addr = "0.0.0.0:8501";
+      server.addr = "0.0.0.0:${toString ncpsPort}";
       prometheus.enable = true;
       # Traces to tempo, loopback and plaintext like kanidm's -- "insecure"
       # is the scheme ncps's own grpcURL doc asks for to mean exactly that

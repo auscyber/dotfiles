@@ -6,7 +6,11 @@
 {
   den.hosts.aarch64-linux.lora-pi = {
     instantiate = den.lib.raspberry-pi-builder;
-    users.ivy = { };
+    users.ivy = {
+      # The human behind this account (../../persons/ivy.nix). The link
+      # points account -> person, never the reverse; ../../base/person.nix says why.
+      person = den.persons.ivy;
+    };
   };
 
   den.aspects.lora-pi = {

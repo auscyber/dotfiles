@@ -1,0 +1,39 @@
+Surface the emitting aspect's identity on quirk entries.
+
+A quirk entry is built with the emitting aspect's `identity` already on it
+(nix/lib/aspects/fx/handlers/emit-classes.nix, `mkEntry`), but assembly drops
+every field except `module` on the first line that touches it, so a collector
+can never tell two emitters apart.
+
+`pipe.withProvenance` partly covers this, but only at SCOPE granularity: local
+emissions are all tagged with `currentScopeId`, so two aspects emitting into one
+pipe at the same host scope are indistinguishable. That is the gap -- a
+provider that mints one credential per consumer cannot do so when two aspects on
+one host are separate consumers.
+
+This preserves the entry's identity alongside the value, under `__emitter`, for
+pipes that ask for it. The default path is unchanged: `extractValue` still
+returns the bare module, so every existing collector sees exactly what it saw
+before.
+
+--- a/nix/lib/aspects/fx/assemble-pipes.nix
++++ b/nix/lib/aspects/fx/assemble-pipes.nix
+@@ -12,7 +12,17 @@
+   # Extract raw quirk value from a pipe entry.
+   # Pipe entries are raw emit-class params with __isPipeEntry = true.
+   # The actual quirk value is in the `module` field.
+   extractValue = entry: entry.module or entry;
++
++  # The same, keeping the EMITTER's identity beside the value.
++  #
++  # `mkEntry` in handlers/emit-classes.nix already stamps each entry with the
++  # emitting aspect's `identity`; `extractValue` above discards it. A collector
++  # that mints one thing per emitter -- a credential per consumer, say -- needs
++  # finer granularity than `withProvenance`, whose tag is the emitting SCOPE and
++  # so cannot separate two aspects at one host.
++  extractValueWithEmitter =
++    entry:
++    if entry ? module && entry ? identity then
++      { __emitter = entry.identity; value = entry.module; }
++    else
++      entry;

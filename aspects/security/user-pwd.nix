@@ -3,7 +3,7 @@
     includes = [ den.aspects.agenix-rekey ];
     secrets = { scoped, ... }: {
       ivy-password = {
-        rekeyFile = ./ivy-password.age;
+        rekeyFile = ../../secrets/static/ivy_password.age;
         intermediary = true;
       };
       ivy-pwd-hash.generator = {

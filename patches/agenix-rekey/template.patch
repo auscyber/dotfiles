@@ -61,54 +61,6 @@ index 7f86ffa..f43ace0 100644
  
        script = mkOption {
          type = types.either types.str (types.functionTo types.str);
-@@ -198,27 +203,26 @@ let
- in
- {
-   config = {
--    assertions =
--      [
--        {
--          assertion = config.age.rekey.masterIdentities != [ ];
--          message = "rekey.masterIdentities must be set.";
--        }
--      ]
--      ++ flatten (
--        flip mapAttrsToList config.age.secrets (
--          secretName: secretCfg: [
--            {
--              assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
--              message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
--            }
--            {
--              assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
--              message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
--            }
--          ]
--        )
--      );
-+    assertions = [
-+      {
-+        assertion = config.age.rekey.masterIdentities != [ ];
-+        message = "rekey.masterIdentities must be set.";
-+      }
-+    ]
-+    ++ flatten (
-+      flip mapAttrsToList config.age.secrets (
-+        secretName: secretCfg: [
-+          {
-+            assertion = isString secretCfg.generator -> hasAttr secretCfg.generator config.age.generators;
-+            message = "age.secrets.${secretName}: generator '`${secretCfg.generator}`' is not defined in `age.generators`.";
-+          }
-+          {
-+            assertion = secretCfg.generator != null -> secretCfg.rekeyFile != null;
-+            message = "age.secrets.${secretName}: `rekeyFile` must be set when using a generator.";
-+          }
-+        ]
-+      )
-+    );
- 
-     warnings =
-       let
 
 From 88d006d55d9f941a670192511628ce9542d0ce78 Mon Sep 17 00:00:00 2001
 From: Ivy Pierlot <ivyp@outlook.com.au>

@@ -45,6 +45,10 @@
 let
   inherit (lib) mkOption types;
 
+  # The enclosing configuration, under a name the `age.secrets` submodule
+  # below does not shadow with its own `config`.
+  osConfig = config;
+
   # The service's declared config, or null when the scope is not a service at
   # all. `config.services` is a plain attrset of evaluated options, so `or` is
   # safe on an undeclared name.
@@ -67,20 +71,40 @@ let
     in
     if builtins.isString user && user != "" then user else null;
 
-  # `owner` plus the matching primary group, when the user is actually declared.
-  # A service running as a user it does not declare (`owner = "1000"`) still
-  # gets the owner, just no group.
+  # `owner` plus the group the service module declares for itself.
+  #
+  # `services.<s>.group`, NOT `config.users.users.${owner}.group`. The latter was
+  # tried and is an infinite recursion: `?`/`.` on `config.users.users` forces
+  # that option's ATTRIBUTE NAMES, and one of its definitions is
+  # ../aspects/security/user-pwd.nix's `users.users.<u>.hashedPasswordFile =
+  # <age secret>.path` -- so `users.users` is defined in terms of `age.secrets`,
+  # which is defined in terms of this inference. It fires for any aspect whose
+  # name matches an ENABLED `services.<n>` that declares a `user`, and it takes
+  # `system.build.toplevel` for the whole host with it, not just that aspect.
+  # audiobookshelf is the first service here to hit it; grafana and vikunja
+  # escape only because neither declares `user`.
+  #
+  # `services.<s>.group` is a cheap leaf reached through `or`, which is exactly
+  # what this file's header permits ("may only touch cheap leaves (`.enable`,
+  # `.user`) reached through `or`, and must never force the attribute names of
+  # `systemd.services`") -- the same hazard, one option over.
+  #
+  # Cost: a service that declares `user` but not `group` now gets no inferred
+  # group and falls back to agenix's own default. Any secret that needs a
+  # specific group sets it per entry, which several already do (see
+  # ../aspects/services/nextcloud.nix).
   ownership =
     service:
     let
       owner = serviceOwner service;
+      group = (serviceCfg service).group or null;
     in
     lib.optionalAttrs (owner != null) (
       {
         inherit owner;
       }
-      // lib.optionalAttrs (config.users.users ? ${owner}) {
-        inherit (config.users.users.${owner}) group;
+      // lib.optionalAttrs (builtins.isString group && group != "") {
+        inherit group;
       }
     );
 
@@ -282,6 +306,69 @@ let
     ) cfg;
 in
 {
+  # ── WHICH ENTITY A GENERATED SECRET BELONGS TO ──
+  #
+  # agenix-rekey generates once per unique `rekeyFile` path, and the patched
+  # default is `generatedSecretsDir + "/<id><derivedFrom suffix>.age"`
+  # (../patches/agenix-rekey/derivedFrom.patch). `generatedSecretsDir` is one
+  # directory for the whole fleet, so that two hosts can name one file -- which
+  # a credential has to. That makes the ENTITY a fact the name must carry, or
+  # every host's same-named secret would be one file generated once for all.
+  #
+  # It goes in through `derivedFrom`, the same as every other variant here,
+  # rather than through a path written by hand -- see `mkSecret` below.
+  options.age.scopedEntity = mkOption {
+    type = types.nullOr types.str;
+    default = null;
+    description = "The entity this configuration belongs to -- a host, or host-user -- which generated secrets are filed under.";
+  };
+
+  # ── `scope` PER SECRET, AND THE ONE PLACE ITS PATH IS BUILT ──
+  #
+  # `scope` is the folder a generated secret is filed under. It defaults to the
+  # ENTITY plus the secret's own group (`secondpc/builder-ssh-key`), which is
+  # the layout every existing secret already has, so none of them moves. A
+  # credential sets it to the LINK instead (`secondpc-auspc/builder-ssh-key`):
+  # both ends then name one file and agenix generates it once.
+  #
+  # The suffix is the patch's own `derivedNameSuffix`, read rather than
+  # re-derived, so `generator.derivedFrom` keeps working exactly as it does
+  # upstream and nothing here restates its hash.
+  #
+  # EXTENDS agenix's `age.secrets` submodule rather than patching the path into
+  # it: a second declaration of an `attrsOf submodule` option merges its
+  # modules, so this reaches scoped and unscoped secrets alike, and a stated
+  # `rekeyFile` still wins by priority.
+  options.age.secrets = mkOption {
+    type = types.attrsOf (
+      types.submodule (
+        { name, config, ... }:
+        let
+          id = config.id or name;
+          entity = osConfig.age.scopedEntity;
+          dir = osConfig.age.rekey.generatedSecretsDir or null;
+          group = if lib.hasInfix "/" id then dirOf id else null;
+        in
+        {
+          options.scope = mkOption {
+            type = types.nullOr types.str;
+            default = if entity == null then null else entity + lib.optionalString (group != null) "/${group}";
+            defaultText = lib.literalExpression ''"<entity>/<group>"'';
+            description = ''
+              The folder this secret is filed under when generated. Defaults to
+              the entity and the secret's group; a credential sets it to the
+              link it belongs to, so both ends share one file.
+            '';
+          };
+
+          config.rekeyFile = lib.mkIf (
+            (config.generator or null) != null && dir != null && config.scope != null
+          ) (lib.mkDefault (dir + "/${config.scope}/${baseNameOf id}${config.derivedNameSuffix or ""}.age"));
+        }
+      )
+    );
+  };
+
   options.age.scoped = mkOption {
     type = types.attrsOf scopeType;
     default = { };

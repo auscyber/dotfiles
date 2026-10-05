@@ -6,7 +6,7 @@
 # One tunnel per host, in front of that host's one nginx -- so the ingress is
 # every vhost the box serves, and adding a service needs no second list.
 #
-# ONE TOKEN, and it is the whole secret: secrets/cloudflare_api.age holds the
+# ONE TOKEN, and it is the whole secret: secrets/static/cloudflare_api.age holds the
 # token and nothing else -- no `KEY=`, no trailing newline required. Everything
 # that wants it in some other shape derives that shape with a template, which
 # is why `acme_env` below exists rather than a second credential for the same
@@ -37,7 +37,7 @@
 #
 # BOOTSTRAP:
 #
-#   1. nix run .#secret-edit -- secrets/cloudflare_api.age
+#   1. nix run .#secret-edit -- secrets/static/cloudflare_api.age
 #      The bare token, on its own, with no `KEY=` prefix.
 #   2. nix run .#gen-secrets     # tunnels, bucket, every sub-token
 #   3. nix run .#rekey
@@ -57,10 +57,22 @@
 {
   den,
   lib,
+  capability,
+  caps,
+  carrierAttachment,
   ...
 }:
 let
   api = "https://api.cloudflare.com/client/v4";
+
+  # ── THE ONE NUMBER, DECLARED ONCE ──
+  #
+  # Cloudflare's cap on a proxied request body. Read by the public carrier's
+  # `maxBodyBytes` (so a flow that sends bodies cannot resolve to this route)
+  # and by `excluded` below (so a vhost that accepts more cannot be published
+  # through it). Two consequences of one fact, which is why it is a binding
+  # rather than a literal in each.
+  tunnelBodyCap = 100 * 1000 * 1000;
 
   # Every API call in this file goes through `cf`, which writes the response's
   # `result` to STDOUT -- which for a generator script is the secret itself, so
@@ -232,7 +244,7 @@ let
     esac
   '';
 
-  apiFile = ../../secrets/cloudflare_api.age;
+  apiFile = ../../secrets/static/cloudflare_api.age;
 
   # A connector token for one tunnel, generated once and kept
   # master-encrypted at secrets/generated/<host>/<key>.age.
@@ -367,7 +379,22 @@ let
         exit 1
       fi
 
-      printf 'CLOUDFLARE_DNS_API_TOKEN=%s\nCLOUDFLARE_ZONE_API_TOKEN=%s\n' "$value" "$value"
+      # ── TWO SHAPES, ONE SCOPE ──
+      #
+      # lego reads an ENVIRONMENT FILE and wants the token under both names
+      # (`CLOUDFLARE_ZONE_API_TOKEN` is what lets it find the zone for a name).
+      # ddclient reads a PASSWORD FILE and wants the bare value with no `KEY=`
+      # and nothing else in it. Same mint, same permissions, same zone -- only
+      # the rendering differs, so it is a setting rather than a second
+      # generator that could drift in scope.
+      case "${secret.settings.format or "env"}" in
+        bare)
+          printf '%s' "$value"
+          ;;
+        *)
+          printf 'CLOUDFLARE_DNS_API_TOKEN=%s\nCLOUDFLARE_ZONE_API_TOKEN=%s\n' "$value" "$value"
+          ;;
+      esac
     '';
 
   # ---------------------------------------------------------------- R2
@@ -598,12 +625,122 @@ let
         derivedFrom = settings;
       };
     };
+
+  # ── THE SAME THING FOR A DNS SUB-TOKEN, AND IT EXISTS FOR ONE REASON ──
+  #
+  # `dnsTokenScript` above reads `deps.api.file`, so a secret naming
+  # `cloudflare-dns-token` MUST declare `dependencies.api`. agenix-rekey's
+  # `dependencies` defaults to `[ ]` and accepts either a list or an attrset,
+  # so omitting it does not fail as a missing option -- the script selects
+  # `api` on the empty LIST, and the whole `agenix generate` run dies with
+  # `expected a set but found a list: [ ]` naming no secret and no file.
+  # ../services/mail-ddns.nix omitted it and that is exactly what happened.
+  #
+  # So the wiring is here, beside the script that depends on it, rather than
+  # retyped at each call site where it can be left out again -- which is the
+  # same reason `tunnelSecret` above exists.
+  dnsTokenSecret =
+    settings:
+    { secrets, ... }:
+    {
+      inherit settings;
+      generator = {
+        tags = [ "cloudflare_dns_token" ];
+        script = "cloudflare-dns-token";
+        dependencies.api = secrets.api;
+        derivedFrom = settings;
+      };
+    };
 in
 {
+  # ── THE ZONE, AS A CAPABILITY, DECLARED WHERE IT IS SERVED ──
+  #
+  # Moved out of ../base/capability-types.nix, which held every definition in
+  # one file: "we should honestly define our capability-types in where they are
+  # actually declared instead of in one big capability-types file as it means
+  # ownership and editing becomes odd". This aspect holds the credential and
+  # the zone, so it is the only honest provider of `dns` -- and the file a
+  # change to what a record IS should be edited in.
+  #
+  # The base vocabulary (`address`, `tcp`, `credential`, `carried`) stays
+  # central, because it is what every other definition narrows.
+  # ── A ZONE, AND THE RECORDS ITS CONSUMERS NEED PUT IN IT ──
+  #
+  # "we should treat dns records as a capability type of deal so we can push
+  # and pull them around to be consumed by ddclient".
+  #
+  # Publishing a record is the same SHAPE as every other mutual
+  # configuration here: the consumer knows what it needs (an MX, an SPF
+  # string, a name whose address moves) and the provider knows how to write
+  # it (which zone, which credential, which API). Before this it was a
+  # service writing a NixOS option that one shell script happened to read --
+  # a parallel channel with no taker identity in it, which is exactly what
+  # `share` and `gated` stopped being.
+  #
+  # THE GIVER furnishes the zone it can write. ../network/cloudflare.nix's
+  # `publish-ivymect-in` is the one that does, and it is already the provider
+  # half of `http` for the same zone -- one aspect, two capabilities, because
+  # "I can publish a name here" and "I can carry a request to it" are
+  # different claims. A host with no such aspect has nowhere to put a record
+  # and a take for `dns` finds no provider, which is louder than a record
+  # silently never appearing.
+  #
+  # THE TAKERS contribute. `records` is a union, so twenty services asking
+  # for names in one zone produce one record set and no file has to collect
+  # them; `dynamic` is the subset whose ADDRESS is not knowable at evaluation
+  # -- a residential IP -- which is what ddclient consumes and what keeps a
+  # moving address out of the static record list.
+  den.capabilities.dns = {
+    meta.description = "A DNS zone the giver can publish records into.";
+    includes = [ caps.carried ];
+
+    options = {
+      zone = lib.mkOption {
+        type = lib.types.str;
+        description = "The zone this giver can write, as the registrar spells it.";
+      };
+    };
+
+    taker.options = {
+      # Cloudflare API bodies, because that is what the thing applying them
+      # takes. Typed as raw rather than a record submodule deliberately: an
+      # SRV carries `data`, a TXT carries `content` and an MX carries
+      # `priority`, and a submodule covering all three would either reject a
+      # valid record or accept a nonsense one.
+      records = lib.mkOption {
+        type = lib.types.listOf (lib.types.attrsOf lib.types.raw);
+        default = [ ];
+        # The zone is one file: two takers asking for the same record must not
+        # write it twice. `listOf` concatenates, `apply` dedupes.
+        apply = lib.unique;
+      };
+
+      # Names whose address is updated at RUN time rather than written at
+      # deploy. The record's existence is still declared here; only its value
+      # is not, which is the whole distinction ddclient exists for.
+      dynamic = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        apply = lib.unique;
+      };
+    };
+
+    # ONE ZONE, so the giver reads one list rather than one per taker.
+    takerMerged = [
+      "records"
+      "dynamic"
+    ];
+  };
+
   # For a host that fronts a tunnel with something other than nginx -- see
   # ../hosts/celler2.nix, a container with cellerd and nothing else.
   den.lib.cloudflare = {
-    inherit tunnelSecret r2Secrets r2Endpoint;
+    inherit
+      tunnelSecret
+      dnsTokenSecret
+      r2Secrets
+      r2Endpoint
+      ;
   };
 
   # The account token, and the shapes other things want it in. Included by
@@ -713,6 +850,10 @@ in
         config,
         pkgs,
         scoped,
+        # The host entity, for `excluded` below: which services asked to be
+        # proxied here is a question about the aspect graph, not about this
+        # host's evaluated config.
+        host ? { },
         ...
       }:
       let
@@ -747,8 +888,49 @@ in
             default = [ ];
             description = ''
               Hostnames to keep off the tunnel, for anything that has to stay a
-              direct A record.
+              direct A record. Hand-written entries only -- the body-size
+              exclusions are DERIVED, see `excluded` below.
             '';
+          };
+
+          # ── EXCLUSIONS DERIVED FROM THE BODY CAP ──
+          #
+          # Cloudflare caps a proxied request body at 100MB, so a service whose
+          # proxy accepts more than that CANNOT be published through the tunnel:
+          # the vhost says it will take the upload and the tunnel refuses it
+          # mid-flight, which fails at run time rather than at eval.
+          #
+          # This is a LIVE BUG being fixed, not a hypothetical.
+          # `cache.ivymect.in` is in `exclude` by hand because `celler push`
+          # sends NARs far past the cap, and the vhost says
+          # `client_max_body_size 15g`. `cloud.ivymect.in` is NOT excluded while
+          # ../services/nextcloud.nix sets `maxUploadSize = "10G"` and notes the
+          # cap in prose -- same constraint, same host, one caught and one
+          # missed. Derived from the number, both are caught.
+          #
+          # Read off `takes.proxy.maxBodyBytes` (which `takes.gated` also
+          # contributes, since gated narrows proxy), so the limit is declared
+          # once by the service that needs it.
+          excluded = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            readOnly = true;
+            default =
+              let
+                limits = capability.contributions host "proxy";
+                subs = limits.subdomain or { };
+                caps = limits.maxBodyBytes or { };
+                zone = config.gateway.domain;
+
+                # OVER THE CAP, or unbounded. Null means "no limit stated by the
+                # service", which is not the same as "fits": a service that has
+                # not said is left on the tunnel, because excluding everything
+                # unstated would take every vhost off it.
+                tooBig = lib.filter (
+                  n: (subs.${n} or null) != null && (caps.${n} or null) != null && caps.${n} > tunnelBodyCap
+                ) (lib.attrNames subs);
+              in
+              if zone == null then [ ] else map (n: "${subs.${n}}.${zone}") tooBig;
+            description = "Published names whose declared body limit exceeds the tunnel's cap.";
           };
 
           ingress = lib.mkOption {
@@ -759,10 +941,12 @@ in
               # `searchix-sources`, which as an ingress rule would have asked
               # Cloudflare for a CNAME by that name.
               builtins.filter (n: lib.hasInfix "." n) (
-                lib.subtractLists cfg.exclude (builtins.attrNames config.services.nginx.virtualHosts)
+                lib.subtractLists (cfg.exclude ++ cfg.excluded) (
+                  builtins.attrNames config.services.nginx.virtualHosts
+                )
               )
             ) (_: cfg.origin);
-            defaultText = "every nginx vhost on this host that is a domain name, less `exclude`";
+            defaultText = "every nginx vhost on this host that is a domain name, less `exclude` and `excluded`";
             description = ''
               Public hostname -> local service. Derived from nginx rather than
               from the `vhosts` den class, which would miss every vhost
@@ -872,7 +1056,7 @@ in
             exit 1
           fi
 
-          src="secrets/cloudflare_api.age"
+          src="secrets/static/cloudflare_api.age"
           cf_token_file="$(mktemp)"
           trap 'rm -f "$cf_token_file" ''${plan:-}' EXIT
           if ! (umask 077; secret-view "$src" > "$cf_token_file" 2>/dev/null); then
@@ -951,4 +1135,202 @@ in
         program = lib.getExe syncTunnels;
       };
     };
+
+  # ── A ZONE IS A CARRIER ──
+  #
+  # `publish-ivymect-in` is the public route into this house, and a host
+  # publishes under that zone by INCLUDING this aspect. Membership is inclusion,
+  # so it cannot disagree with reality -- the same reasoning ./segments.nix
+  # applies to the home lan, and a second zone is a second aspect rather than a
+  # second field somewhere.
+  #
+  # ── WHY NOT ON THE HOST ENTITY, AND NOT IN `os` CONFIG ──
+  #
+  # It was briefly ../hosts/fleet.nix's `publicZone`, on the reasoning that a
+  # zone is like `lanAddress`: a fact nothing can derive which a fleet-wide
+  # reader must reach. That is true of an ADDRESS and false of a zone, because a
+  # zone is a thing several hosts can attach to -- which is a carrier.
+  #
+  # And it cannot be ../services/gateway.nix's `gateway.domain` alone, because
+  # that is an `os`-class option: it lives in a host's EVALUATED CONFIG, so the
+  # only way another host could read it is
+  # `inputs.self.nixosConfigurations.<other>.config` -- the coupling only
+  # ../base/celler/server.nix does deliberately. The question here is
+  # cross-host by construction ("where do I reach a service published by that
+  # box"), so the answer cannot live there.
+  #
+  # ONE SOURCE: this aspect SETS `gateway.domain` through its own class content,
+  # so including it both makes the host publish under the zone and tells the
+  # gateway which zone that is. There is no second declaration to drift.
+  den.aspects.publish-ivymect-in = {
+    includes = [ den.aspects.cloudflare-tunnel ];
+
+    domain = "ivymect.in";
+
+    # ONE-SIDED. The serving host publishes; a client reaching
+    # `cache.ivymect.in` from a cafe includes nothing and needs to -- so
+    # requiring both ends, as a wire does, would make this route resolve for
+    # nobody. ../base/capability-types.nix's `attachment` is where that rule
+    # lives.
+    attachment = "provider";
+
+    # A TLS connection over the internet, and THE NUMBER THIS CARRIER EXISTS TO
+    # STATE: Cloudflare caps a proxied request body at 100MB, which is why
+    # `cache.ivymect.in` is in `cloudflared-tunnel.exclude` -- `celler push`
+    # sends NARs far past it. On the aspect rather than inside `gives.http` for
+    # ./carrier-attachment.nix's reason: neither number varies by host.
+    mtu = 1500;
+    maxBodyBytes = tunnelBodyCap;
+
+    # LAST IN PREFERENCE. A longer route acquires dependencies the call did not
+    # have -- DNS, TLS and the tunnel being up -- which is why
+    # ../services/nextcloud.nix scrapes its own metrics over loopback rather
+    # than through its public vhost.
+    preference = 60;
+
+    gives =
+      { self, ... }:
+      {
+        # THE ZONE, NOT AN ADDRESS, and not a per-host name. A tunnel has no
+        # address of its own: cloudflared dials OUT, and the published name
+        # resolves to Cloudflare's edge. The name is also per SERVICE rather
+        # than per host -- `cache.ivymect.in`, where secondpc has around twenty
+        # vhosts -- so this furnishes the zone and the service's endpoint half
+        # furnishes its subdomain. ../base/capability.nix composes them, and
+        # neither half holds the string `cache.ivymect.in`.
+        # THE ZONE AS A CAPABILITY, so a service that needs a record declares
+        # `takes.dns.records` and this aspect is the one that can write it.
+        # ../base/capability-types.nix's `dns` has the reasoning; what matters
+        # here is that this aspect already holds the credential and the zone,
+        # so it is the only honest provider.
+        dns = _: {
+          zone = self.domain;
+          carrier = self.name;
+        };
+
+        http = _: {
+          address = null;
+          inherit (self) domain;
+          protocol = "https://";
+          port = 443;
+          # Not a socket on any host in the fleet -- see `address = null` above.
+          ports.http.meta.description = "https at Cloudflare's edge, where a published name resolves and where cloudflared's outbound tunnel surfaces; no host listens on it.";
+          # A TLS connection over the internet, not a tunnel interface. Read
+          # off the aspect for ./carrier-attachment.nix's reason: both numbers
+          # are the same for every host publishing under this zone.
+          inherit (self) mtu;
+          # THE FACT THIS CARRIER EXISTS TO STATE. Cloudflare caps a proxied
+          # request body at 100MB, which is why `cache.ivymect.in` is in
+          # `cloudflared-tunnel.exclude` -- `celler push` sends NARs far past
+          # it. `cloud.ivymect.in` is NOT excluded while
+          # ../services/nextcloud.nix sets `maxUploadSize = "10G"` and notes the
+          # cap in prose: same constraint, same host, one resolved by hand and
+          # one not. From the number, both are answered the same way.
+          inherit (self) maxBodyBytes;
+          carrier = self.name;
+        };
+      };
+
+    # The gateway's own zone, from the one place it is named -- and the records
+    # its takers asked for, folded.
+    nixos =
+      {
+        lib,
+        host ? { },
+        ...
+      }:
+      let
+        # WHO ASKED. `contributions` reads each taker's `takes.dns` off the
+        # taking aspect and folds by the merge strategy
+        # ../base/capability-types.nix declares -- `union` for both, so twenty
+        # services wanting names in this zone produce one record set and no
+        # file collects them. Same call `cloudflare-tunnel` makes for `proxy`
+        # limits above.
+        asked = capability.contributions host "dns";
+      in
+      {
+        gateway.domain = "ivymect.in";
+
+        # ── THE RECORD SET, AS AN OPTION RATHER THAN A STRING IN A SCRIPT ──
+        #
+        # Declared here because this is the aspect that can WRITE the zone, and
+        # read from OUTSIDE the fixpoint by the sync app -- the same shape and
+        # the same reason as `cloudflared-tunnel.ingress` above (see the note
+        # at the top of this file on why computing it inside a generator closes
+        # `age.secrets -> nginx.virtualHosts -> age.secrets`).
+        #
+        # A LIST that merges rather than a `readOnly` derived value: most
+        # records follow from a take, but one cannot -- a DKIM public key lives
+        # in a file whose path contains the host's name, and a take is a plain
+        # attrset with no host in scope. So the host-dependent ones are
+        # appended by the aspect that owns them (../services/mail.nix) and land
+        # in the same list.
+        imports = [
+          {
+            options.dns = {
+              records = lib.mkOption {
+                type = lib.types.listOf (lib.types.attrsOf lib.types.raw);
+                default = [ ];
+                description = ''
+                  Records to publish in this host's zone, as Cloudflare API
+                  bodies. Seeded from every `takes.dns.records` on this host
+                  and appended to by anything whose record is host-dependent.
+                  Applied by `nix run .#sync-dns`.
+                '';
+              };
+
+              dynamic = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = ''
+                  Names in this zone whose ADDRESS is updated at run time
+                  rather than written at deploy -- what ../services/mail-ddns.nix
+                  hands to ddclient. The record is still declared through
+                  `takes.dns`; only its value is not.
+                '';
+              };
+            };
+          }
+        ];
+
+        dns.records = asked.records;
+        dns.dynamic = asked.dynamic;
+      };
+  };
+
+  # ── THE ZONE'S HALF OF AN ATTACHMENT ──
+  #
+  # See ./carrier-attachment.nix. A ZONE HAS NO ADDRESS, and that is the fact
+  # rather than a gap: cloudflared dials OUT, so there is nothing to dial but a
+  # name, and the name is per SERVICE rather than per host
+  # (`cache.ivymect.in`, where secondpc has around twenty vhosts) -- so the
+  # subdomain comes from the service's endpoint half and never from here.
+  # `hostnameAt` is therefore null too: this carrier furnishes no `hostname`
+  # capability at all, only `dns` and `http`.
+  #
+  # ONE-SIDED, so the roster's fold needs `attachment = "provider"` off the
+  # aspect to admit it for a host that holds no half of its own -- a client
+  # reaching `cache.ivymect.in` from a cafe includes nothing and needs to.
+  # That is the same clause ../base/capability.nix's `shared` applies, and the
+  # same reason.
+  den.carrierAttachments.publish-ivymect-in = {
+    # NO `attachesVia` AND NO INTERFACE: cloudflared dials OUT, so this route
+    # arrives over whatever wire the host already has rather than over one of
+    # its own -- which is what ../base/capability-types.nix's `interface`
+    # description calls "a published name resolving to somebody else's edge".
+    attachesVia = [ ];
+
+    # `extra`, because the generic assembler has no slot for either: the ZONE
+    # is what a `dns` take is answered with, and `https://` on 443 is what this
+    # route is by construction. Facts, not logic.
+    extra.dns.zone = den.aspects.publish-ivymect-in.domain;
+    extra.http = {
+      protocol = "https://";
+      port = 443;
+    };
+  };
+
+  den.aspects.publish-ivymect-in.carrier-attachment =
+    { host, ... }:
+    [ (carrierAttachment.half "publish-ivymect-in" host) ];
 }

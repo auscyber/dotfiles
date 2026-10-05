@@ -1,4 +1,8 @@
-{ den, ... }:
+{
+  den,
+  lib,
+  ...
+}:
 # Single sign-on for the services that have no usable auth of their own.
 #
 # kanidm is the identity provider (auth.ivymect.in); oauth2-proxy is the nginx
@@ -12,6 +16,25 @@
 # reset link -- kanidm has no way to provision a person's own password, by design.
 {
   den.aspects.sso = {
+    # ── TWO NAMES THIS HOST PUBLISHES THAT NOTHING CAN DERIVE ──
+    #
+    # `auth.ivymect.in` (kanidm) and `sso.ivymect.in` (oauth2-proxy) are RAW
+    # `services.nginx.virtualHosts` entries below, not `takes.proxy`, so
+    # ../../services/proxy-nginx.nix's `emits` is false for them and
+    # `capability.contributions secondpc "proxy"` does not know they exist --
+    # measured: 25 published names come out of that fold and neither of these
+    # is among them.
+    #
+    # Declared as SUBDOMAINS, with the zone still coming from the host's zone
+    # carrier (../../network/cloudflare.nix), so this stays true if the zone
+    # moves. ../../network/roaming-resolver.nix is the reader today; anything
+    # else that wants "which names does this box publish" gets them from the
+    # same place rather than from a second list.
+    alsoPublishes = [
+      "sso"
+      "auth"
+    ];
+
     includes = [
       den.aspects.agenix-rekey
       # Wildcard `ivymect.in` cert + the nginx aspect.
@@ -27,6 +50,11 @@
       # faggot.sh) is still running and there's no need to block a celler
       # rebuild on it. Re-add once that build is confirmed good.
       den.aspects.packages.kanidm-trace-propagation
+      # Application passwords that can be PROVISIONED rather than only minted,
+      # which is what lets ../../programs/zotero.nix hold ivy's WebDAV
+      # credential as an ordinary generated secret. See
+      # packages/kanidm-set-application-password.nix -- a from-source build.
+      den.aspects.packages.kanidm-set-application-password
     ];
 
     secrets = {
@@ -35,15 +63,7 @@
       idm-admin = {
         owner = "kanidm";
         restartUnits = [ "kanidm.service" ];
-        generator.script =
-          {
-            pkgs,
-            lib,
-            ...
-          }:
-          ''
-            ${lib.getExe pkgs.openssl} rand -hex 32 | ${pkgs.coreutils}/bin/tr -d '\n'
-          '';
+        generator.script = "random-hex-32";
       };
 
       # The OAuth2 client secret. kanidm reads this file directly
@@ -53,28 +73,12 @@
       oauth2-client-secret = {
         owner = "kanidm";
         restartUnits = [ "kanidm.service" ];
-        generator.script =
-          {
-            pkgs,
-            lib,
-            ...
-          }:
-          ''
-            ${lib.getExe pkgs.openssl} rand -hex 32 | ${pkgs.coreutils}/bin/tr -d '\n'
-          '';
+        generator.script = "random-hex-32";
       };
 
       # oauth2-proxy's cookie AES key: must be exactly 16, 24 or 32 bytes, so
       # 16 hex bytes rendered as 32 characters.
-      oauth2-cookie-secret.generator.script =
-        {
-          pkgs,
-          lib,
-          ...
-        }:
-        ''
-          ${lib.getExe pkgs.openssl} rand -hex 16 | ${pkgs.coreutils}/bin/tr -d '\n'
-        '';
+      oauth2-cookie-secret.generator.script = "random-hex-16";
     };
 
     # oauth2-proxy takes its credentials as an EnvironmentFile rather than from
@@ -150,6 +154,33 @@
       };
     };
 
+    # The client name must be `oauth2-proxy` while this aspect is `sso`. The
+    # `provision` class below stays for the things declared exactly once
+    # (`enable`, `idmAdminPasswordFile`) and for the groups and the person. The
+    # shared OIDC shape is defaulted by `gateway.oidcClients`.
+    kanidmClients.oauth2-proxy = {
+      displayName = "Media services";
+      subdomain = "sso";
+      callback = "/oauth2/callback";
+      # Where kanidm's Apps tile sends you. NOT the sso vhost -- that exists
+      # only to host oauth2-proxy's /oauth2/ endpoints and serves nothing at
+      # /, so the tile was a dead end. The dashboard is the sensible landing
+      # page, and it is behind the same gate.
+      #
+      # A subdomain, not a URL: the `homepage.ivymect.in` literal this used
+      # to carry is exactly what makes a service unable to move.
+      landingSubdomain = "homepage";
+      # Not `oauth2-proxy/oidc-client-secret`: this one predates the
+      # convention and lives in the `sso` scope under its own name.
+      secretScope = "sso";
+      secretName = "oauth2-client-secret";
+      # This client's scope map is the FIRST gate: kanidm refuses to issue a
+      # token to anyone outside `media-users`. The second is oauth2-proxy's
+      # per-vhost `allowed_groups`, which needs the group names to actually
+      # arrive in the token -- hence `groupsName`.
+      groupsName = true;
+    };
+
     provision = { scoped, ... }: {
       groups.media-users = { };
 
@@ -164,47 +195,20 @@
       # `idm_admin`, so a write to `system_admins` is denied outright:
       # "requested_pres: {Member} !⊆ allowed: {}". Membership there has to be
       # granted by hand as `admin`, and is rarely what you actually want.
-      groups.idm_admins = {
-        members = [ "auscyber" ];
-        overwriteMembers = false;
-      };
-      # One person, named for the unix account it lines up with -- NSS serves
-      # the same name from kanidm, and samba's passdb syncs to it.
-      persons.auscyber = {
-        displayName = "Ivy Pierlot";
-        mailAddresses = [ "ivyp@outlook.com.au" ];
-        groups = [
-          "media-users"
-          "idm_admins"
-        ];
-      };
+      #
+      # NO `members` LIST. Membership comes from the PERSON
+      # (`den.persons.<p>.kanidm.groups`, provisioned by
+      # ../../services/kanidm.nix): nixpkgs' module folds every person's
+      # `groups` into the group's members, so this entry exists only to carry
+      # the flag -- which is exactly what it is for.
+      groups.idm_admins.overwriteMembers = false;
 
-      systems.oauth2.oauth2-proxy = {
-        displayName = "Media services";
-        originUrl = "https://sso.ivymect.in/oauth2/callback";
-        # Where kanidm's Apps tile sends you. NOT sso.ivymect.in -- that vhost
-        # exists only to host oauth2-proxy's /oauth2/ endpoints and serves
-        # nothing at /, so the tile was a dead end. The dashboard is the sensible
-        # landing page, and it is behind the same gate.
-        originLanding = "https://homepage.ivymect.in/";
-        basicSecretFile = scoped.sso.secrets.oauth2-client-secret.path;
-        preferShortUsername = true;
-        # This scope map is the first gate: kanidm refuses to issue a token to
-        # anyone outside `media-users`. The second is oauth2-proxy's per-vhost
-        # `allowed_groups`, which needs the groups to actually arrive in the
-        # token -- hence the scope below.
-        #
-        # `groups_name`, not `groups`: kanidm offers `groups` (uuid AND spn),
-        # `groups_spn`, and `groups_name` -- only the last yields bare names like
-        # `media-users`, which is what the gateway puts in `allowed_groups`. The
-        # SPN forms would arrive as `media-users@auth.ivymect.in` and never match.
-        scopeMaps.media-users = [
-          "openid"
-          "profile"
-          "email"
-          "groups_name"
-        ];
-      };
+      # NO `persons` BLOCK EITHER. It listed one person with their display
+      # name, mail address and groups written out a second time, while
+      # ../../base/person.nix's registry -- which already holds all three --
+      # described people kanidm had never heard of. ../../services/kanidm.nix
+      # provisions from the registry now, so a person is declared in
+      # ../../persons/<name>.nix and nowhere else.
     };
 
     nixos =
@@ -242,6 +246,27 @@
             domain = "auth.ivymect.in";
             origin = "https://auth.ivymect.in";
             bindaddress = "127.0.0.1:8443";
+
+            # ── THE LDAP GATEWAY ──
+            #
+            # Off until something needed it; ../../services/mail.nix does --
+            # dovecot authenticates a mailbox by BINDING as that person, which
+            # is the only authentication kanidm's gateway can serve (it is
+            # read-only and hands out no password material, which is also why
+            # samba still needs its own NT hash -- see samba.nix).
+            #
+            # LOOPBACK, and the name is what makes that work: kanidm serves
+            # LDAPS here under the same wildcard certificate as everything
+            # else, so a client has to dial a name the certificate covers.
+            # `networking.hosts` below already points `auth.ivymect.in` at
+            # 127.0.0.1 for kanidm-unixd, so `ldaps://auth.ivymect.in:3636`
+            # both resolves locally and verifies -- where a bare `127.0.0.1`
+            # URI would fail the hostname check.
+            #
+            # 3636 is kanidm's own default for LDAPS. The port is declared in
+            # the capability layer on `den.aspects.kanidm` (not exposed), so
+            # ../../base/firewall.nix leaves it shut.
+            ldapbindaddress = "127.0.0.1:3636";
             # Replaced `trust_x_forward_for` in newer kanidm, and it takes the
             # addresses to trust rather than a bool -- so only nginx on loopback
             # can claim a client IP, not anything that reaches the port.
@@ -351,6 +376,30 @@
         services.kanidm = {
           unix.enable = true;
           clientSettings.uri = "https://auth.${config.gateway.domain}";
+
+          # ── SSH LOGIN FOR SOMEBODY WITH NO LOCAL ACCOUNT ──
+          #
+          # This is the consuming half of
+          # ../../../patches/kanidm-provision/ssh-keys.patch. nixpkgs wires it
+          # for us: `unix.sshIntegration` sets
+          # `services.openssh.settings.AuthorizedKeysCommand` to
+          # `kanidm_ssh_authorizedkeys %u` behind a setuid wrapper, so sshd asks
+          # kanidm for a user's keys instead of reading
+          # `~/.ssh/authorized_keys`.
+          #
+          # WHAT IT UNLOCKS, and it is the thing that was asked for: a person
+          # who is a kanidm POSIX user but NOT a den user -- no
+          # `den.hosts.<sys>.<host>.users.<n>` entry, no home-manager
+          # generation, nothing in this repo naming them per host -- can still
+          # log in here, because their keys travel with their identity rather
+          # than with a per-host account.
+          #
+          # It does NOT replace ../../security/main-ssh-key.nix, which writes
+          # `openssh.authorizedKeys.keys` for accounts this repo DOES declare.
+          # sshd consults both: the file for declared accounts, the command for
+          # everyone else. Two channels, one source -- `den.persons.<n>.sshKeys`
+          # feeds both (../../services/kanidm.nix's `gateway.personSshKeys`).
+          unix.sshIntegration = true;
           # Nested under `kanidm.` -- the flat spelling is a renamed option and
           # asserts rather than warning.
           unix.settings.kanidm.pam_allowed_login_groups = [ "media-users" ];
@@ -431,19 +480,12 @@
           startLimitBurst = lib.mkForce 30;
         };
 
-        # agenix's own activation script restarts a secret's `restartUnits`
-        # BEFORE it chowns the freshly-decrypted files to their configured
-        # owner (chown is deliberately deferred until after NixOS's own
-        # `users`/`groups` activation, in case the owner is a user being
-        # created in this same switch -- see
-        # /nix/store/*-agenix-patched/modules/age.nix, `agenixChown.deps`).
-        # kanidm's ExecStartPost reads `sso/idm-admin` immediately on start,
-        # so every switch that touches it races kanidm's restart against
-        # that chown and can lose -- observed taking up to ~2 minutes to
-        # resolve on a busy switch. systemd's bare defaults
-        # (StartLimitBurst=5 in 10s) don't give it enough attempts to
-        # outlast that; this does, so it self-heals instead of dying
-        # start-limit-hit and needing a manual `systemctl reset-failed`.
+        # agenix now restarts a secret's `restartUnits` only after the chown
+        # (patches/agenix/templates.patch, `agenixRestart`), so kanidm's
+        # ExecStartPost no longer races the chown of `sso/idm-admin`. Kept
+        # as a safety net: systemd's bare defaults (StartLimitBurst=5 in
+        # 10s) leave it dying start-limit-hit on any other transient
+        # failure, needing a manual `systemctl reset-failed`.
         systemd.services.kanidm.serviceConfig = {
           Restart = "on-failure";
           RestartSec = "2s";

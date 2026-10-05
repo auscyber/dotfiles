@@ -168,17 +168,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1788873705,
-        "narHash": "sha256-8TbnwsMMk6fCtzLU2P4Wjw2Kco8fP5st3MJhHpmIBtY=",
+        "lastModified": 1791982112,
+        "narHash": "sha256-t0uQ4ujYXF3SJaJUjV+ujUJOT5+GzVdXOtnHmavdOMg=",
         "owner": "idris-lang",
         "repo": "idris2",
-        "rev": "1c630e67c386629a0fbbc6b78a59176fde7f0a76",
+        "rev": "89ba32eb5eb325909bacd0d5411076ac28d166bb",
         "type": "github"
       },
       "original": {
         "owner": "idris-lang",
         "repo": "idris2",
-        "rev": "1c630e67c386629a0fbbc6b78a59176fde7f0a76",
+        "rev": "89ba32eb5eb325909bacd0d5411076ac28d166bb",
         "type": "github"
       }
     },
@@ -392,14 +392,15 @@
     "nixpkgs": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "pnpm-nix-provider": {
       "inputs": {

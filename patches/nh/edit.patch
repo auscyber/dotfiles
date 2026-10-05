@@ -1,30 +1,28 @@
-diff --git a/crates/nh-darwin/src/args.rs b/crates/nh-darwin/src/args.rs
-index 22babd9ca9..492020b5d3 100644
---- a/crates/nh-darwin/src/args.rs
-+++ b/crates/nh-darwin/src/args.rs
-@@ -78,6 +78,17 @@
+diff -ruN a/crates/nh-darwin/src/args.rs b/crates/nh-darwin/src/args.rs
+--- a/crates/nh-darwin/src/args.rs	2026-10-28 16:34:37
++++ b/crates/nh-darwin/src/args.rs	2026-10-28 16:34:37
+@@ -92,6 +92,17 @@
    /// Build the configuration on a different host over SSH
-   #[arg(long)]
+   #[pound(long, parse = str::parse::<RemoteHost>)]
    pub build_host: Option<RemoteHost>,
 +
 +
 +  /// Explicitly select some specialisation
-+  #[arg(long, short)]
++  #[pound(long, short = 's')]
 +  pub specialisation: Option<String>,
 +
 +  /// Ignore specialisations
-+  #[arg(long, short = 'S')]
++  #[pound(long, short = 'S')]
 +  pub no_specialisation: bool,
 +
 +
  }
  
  impl DarwinRebuildArgs {
-diff --git a/crates/nh-darwin/src/darwin.rs b/crates/nh-darwin/src/darwin.rs
-index 5f55d66c91..1aecb9d02f 100644
---- a/crates/nh-darwin/src/darwin.rs
-+++ b/crates/nh-darwin/src/darwin.rs
-@@ -26,6 +26,9 @@
+diff -ruN a/crates/nh-darwin/src/darwin.rs b/crates/nh-darwin/src/darwin.rs
+--- a/crates/nh-darwin/src/darwin.rs	2026-10-28 16:34:37
++++ b/crates/nh-darwin/src/darwin.rs	2026-10-28 16:34:37
+@@ -22,6 +22,9 @@
  const SYSTEM_PROFILE: &str = "/nix/var/nix/profiles/system";
  const CURRENT_PROFILE: &str = "/run/current-system";
  
@@ -34,7 +32,7 @@ index 5f55d66c91..1aecb9d02f 100644
  impl DarwinArgs {
    /// Run the `darwin` subcommand.
    ///
-@@ -90,7 +93,7 @@
+@@ -86,7 +89,7 @@
          (dir.as_ref().join("result"), Some(dir))
        };
  
@@ -43,14 +41,14 @@ index 5f55d66c91..1aecb9d02f 100644
  
      let installable = self
        .common
-@@ -158,6 +161,26 @@
+@@ -126,7 +129,27 @@
      let target_profile = out_path.clone();
  
      target_profile.try_exists().context("Doesn't exist")?;
 +  let current_specialisation = std::fs::read_to_string(SPEC_LOCATION)
 +      .ok()
 +      .map(|s| s.trim().to_owned()).filter(|s| !s.is_empty());
-+
+ 
 +
 +    let target_specialisation = if self.no_specialisation {
 +      None
@@ -67,12 +65,13 @@ index 5f55d66c91..1aecb9d02f 100644
 +    debug!("target_specialisation: {target_specialisation:?}");
 +
 +  
- 
++
      debug!(
        "Comparing with target profile: {}",
-@@ -200,8 +223,10 @@
+       target_profile.display()
+@@ -168,8 +191,10 @@
          .run()
-         .wrap_err("Failed to set Darwin system profile")?;
+         .context("Failed to set Darwin system profile")?;
  
 -      let activate = out_path.join("activate");
 -      let activate_user = out_path.join("activate-user");
@@ -83,10 +82,9 @@ index 5f55d66c91..1aecb9d02f 100644
  
        // Determine if we need to elevate privileges
        let needs_elevation = !activate_user
-diff --git a/flake.lock b/flake.lock
-index 2032e0e443..d2a5734727 100644
---- a/flake.lock
-+++ b/flake.lock
+diff -ruN a/flake.lock b/flake.lock
+--- a/flake.lock	2026-10-28 16:34:37
++++ b/flake.lock	2026-10-28 16:34:37
 @@ -1,5 +1,20 @@
  {
    "nodes": {
@@ -107,7 +105,7 @@ index 2032e0e443..d2a5734727 100644
 +    },
      "nixpkgs": {
        "locked": {
-         "lastModified": 1787498568,
+         "lastModified": 1790822859,
 @@ -15,6 +30,7 @@
      },
      "root": {
@@ -116,10 +114,9 @@ index 2032e0e443..d2a5734727 100644
          "nixpkgs": "nixpkgs"
        }
      }
-diff --git a/flake.nix b/flake.nix
-index c4d799836f..19d3b523f5 100644
---- a/flake.nix
-+++ b/flake.nix
+diff -ruN a/flake.nix b/flake.nix
+--- a/flake.nix	2026-10-28 16:34:37
++++ b/flake.nix	2026-10-28 16:34:37
 @@ -1,10 +1,14 @@
  {
 -  inputs.nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
@@ -157,31 +154,28 @@ index c4d799836f..19d3b523f5 100644
          default = self.packages.${pkgs.stdenv.hostPlatform.system}.nh;
        });
  
-diff --git a/package.nix b/package.nix
-index de78ad5bed..8376bb3b62 100644
---- a/package.nix
-+++ b/package.nix
-@@ -1,24 +1,16 @@
+diff -ruN a/package.nix b/package.nix
+--- a/package.nix	2026-10-28 16:34:37
++++ b/package.nix	2026-10-28 16:34:37
+@@ -1,19 +1,16 @@
  {
 -  lib,
 -  stdenv,
 -  rustPlatform,
--  makeBinaryWrapper,
 -  installShellFiles,
 -  versionCheckHook,
 -  sudo,
 +  pkgs,
 +  crane,
-+  rev ? "dirty",
-   use-nom ? true,
-   nix-output-monitor ? null,
--  rev ? "dirty",
+   rev ? "dirty",
++  use-nom ? true,
++  nix-output-monitor ? null,
  }:
- assert use-nom -> nix-output-monitor != null;
++assert use-nom -> nix-output-monitor != null;
  let
 +  lib = pkgs.lib;
 +  craneLib = crane.mkLib pkgs;
-   runtimeDeps = lib.optionals use-nom [ nix-output-monitor ];
++  runtimeDeps = lib.optionals use-nom [ nix-output-monitor ];
    cargoToml = lib.importTOML ./Cargo.toml;
 -in
 -rustPlatform.buildRustPackage (finalAttrs: {
@@ -191,20 +185,62 @@ index de78ad5bed..8376bb3b62 100644
    src = lib.fileset.toSource {
      root = ./.;
      fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource ./.)) (
-@@ -30,104 +22,102 @@
-         ./Cargo.lock
+@@ -26,97 +23,100 @@
        ]
      );
--  };
--
+   };
++  skipTests = lib.concatStringsSep " " (
++    [
++      # These do not work in Nix's sandbox
++      "--skip test_get_build_image_variants_expression"
++      "--skip test_get_build_image_variants_file"
++      "--skip test_get_build_image_variants_flake"
++    ]
++    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
++      # Tests that require sudo in PATH (not available on Darwin)
++      "--skip test_build_sudo_cmd_basic"
++      "--skip test_build_sudo_cmd_with_preserve_vars"
++      "--skip test_build_sudo_cmd_with_preserve_vars_disabled"
++      "--skip test_build_sudo_cmd_with_set_vars"
++      "--skip test_build_sudo_cmd_force_no_stdin"
++      "--skip test_build_sudo_cmd_with_remove_vars"
++      "--skip test_build_sudo_cmd_with_askpass"
++      "--skip test_build_sudo_cmd_env_added_once"
++      "--skip test_elevation_strategy_passwordless_resolves"
++      "--skip test_build_sudo_cmd_with_nix_config_spaces"
++    ]
++  );
++  commonArgs = {
++    inherit src;
++    pname = "nh";
++    version = "${cargoToml.workspace.package.version}-${rev}";
++    strictDeps = true;
++    cargoExtraArgs = "--workspace";
++    buildInputs = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.libiconv ];
+ 
 -  strictDeps = true;
 -  nativeBuildInputs = [
 -    installShellFiles
--    makeBinaryWrapper
 -  ];
--
++    # pkgs.sudo is not available on the Darwin platform, and thus breaks build
++    # if added to nativeCheckInputs. We must manually disable the tests that
++    # *require* it, because they will fail when sudo is missing.
++    nativeCheckInputs = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.sudo ];
++    env.NH_REV = rev;
++  };
++  cargoArtifacts = craneLib.buildDepsOnly commonArgs;
++in
++craneLib.buildPackage (
++  commonArgs
++  // {
++    inherit cargoArtifacts;
+ 
 -  cargoLock.lockFile = ./Cargo.lock;
--
++    nativeBuildInputs = [
++      pkgs.installShellFiles
++      pkgs.makeBinaryWrapper
++    ];
+ 
 -  postInstall =
 -    lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
 -      # Run both shell completion and manpage generation tasks. Unlike the
@@ -212,7 +248,8 @@ index de78ad5bed..8376bb3b62 100644
 -      # path but that's fine, because we can simply install them from the implicit
 -      # output directories.
 -      $out/bin/xtask dist
--
++    cargoTestExtraArgs = "-- ${skipTests}";
+ 
 -      # The dist task above should've created
 -      #  1. Shell completions in comp/
 -      #  2. The NH manpage (nh.1) in man/
@@ -228,17 +265,35 @@ index de78ad5bed..8376bb3b62 100644
 -      # Avoid populating PATH with an 'xtask' cmd
 -      rm $out/bin/xtask
 -    '';
--
--  postFixup = ''
--    wrapProgram $out/bin/nh \
--      --prefix PATH : ${lib.makeBinPath runtimeDeps}
--  '';
--
++    postInstall =
++      lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
++        # Run both shell completion and manpage generation tasks. Unlike the
++        # fine-grained variants, the 'dist' command doesn't allow specifying the
++        # path but that's fine, because we can simply install them from the implicit
++        # output directories.
++        chmod +x $out/bin/xtask
++        $out/bin/xtask dist
+ 
 -  nativeInstallCheckInputs = [ versionCheckHook ];
 -  doInstallCheck = false; # FIXME: --version includes 'dirty' and the hook doesn't let us change the assertion
 -  versionCheckProgram = "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}";
 -  versionCheckProgramArg = "--version";
--
++        # The dist task above should've created
++        #  1. Shell completions in comp/
++        #  2. The NH manpage (nh.1) in man/
++        # Let's install those.
++        # The important thing to note here is that installShellCompletion cannot
++        # actually load *all* shell completions we generate with 'xtask dist'.
++        # Elvish, for example isn't supported. So we have to be very explicit
++        # about what we're installing, or this will fail.
++        installShellCompletion --cmd nh ./comp/*.{bash,fish,zsh,nu}
++        installManPage ./man/nh.1
++      ''
++      + ''
++        # Avoid populating PATH with an 'xtask' cmd
++        rm $out/bin/xtask
++      '';
+ 
 -  # pkgs.sudo is not available on the Darwin platform, and thus breaks build
 -  # if added to nativeCheckInputs. We must manually disable the tests that
 -  # *require* it, because they will fail when sudo is missing.
@@ -275,13 +330,21 @@ index de78ad5bed..8376bb3b62 100644
 -    "--skip"
 -    "test_build_sudo_cmd_with_nix_config_spaces"
 -  ];
--
++    postFixup = ''
++      wrapProgram $out/bin/nh \
++        --prefix PATH : ${lib.makeBinPath runtimeDeps}
++    '';
+ 
 -  # Besides the install check, we have a bunch of tests to run. Nextest is
 -  # the fastest way of running those since it's significantly faster than
 -  # `cargo test`, and has a nicer UI with CI-friendly characteristics.
 -  useNextest = true;
 -  cargoTestFlags = [ "--workspace" ];
--
++    nativeInstallCheckInputs = [ pkgs.versionCheckHook ];
++    doInstallCheck = false; # FIXME: --version includes 'dirty' and the hook doesn't let us change the assertion
++    versionCheckProgram = "${placeholder "out"}/bin/nh";
++    versionCheckProgramArg = "--version";
+ 
 -  env.NH_REV = rev;
 -
 -  meta = {
@@ -293,94 +356,9 @@ index de78ad5bed..8376bb3b62 100644
 -      drupol
 -      faukah
 -      NotAShelf
-+
-+  };
-+  skipTests = lib.concatStringsSep " " (
-+    [
-+      # These do not work in Nix's sandbox
-+      "--skip test_get_build_image_variants_expression"
-+      "--skip test_get_build_image_variants_file"
-+      "--skip test_get_build_image_variants_flake"
-+    ]
-+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-+      # Tests that require sudo in PATH (not available on Darwin)
-+      "--skip test_build_sudo_cmd_basic"
-+      "--skip test_build_sudo_cmd_with_preserve_vars"
-+      "--skip test_build_sudo_cmd_with_preserve_vars_disabled"
-+      "--skip test_build_sudo_cmd_with_set_vars"
-+      "--skip test_build_sudo_cmd_force_no_stdin"
-+      "--skip test_build_sudo_cmd_with_remove_vars"
-+      "--skip test_build_sudo_cmd_with_askpass"
-+      "--skip test_build_sudo_cmd_env_added_once"
-+      "--skip test_elevation_strategy_passwordless_resolves"
-+      "--skip test_build_sudo_cmd_with_nix_config_spaces"
-+    ]
-+  );
-+  commonArgs = {
-+    inherit src;
-+    pname = "nh";
-+    version = "${cargoToml.workspace.package.version}-${rev}";
-+    strictDeps = true;
-+    cargoExtraArgs = "--workspace";
-+    buildInputs = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.libiconv ];
-+
-+    # pkgs.sudo is not available on the Darwin platform, and thus breaks build
-+    # if added to nativeCheckInputs. We must manually disable the tests that
-+    # *require* it, because they will fail when sudo is missing.
-+    nativeCheckInputs = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.sudo ];
-+    env.NH_REV = rev;
-+  };
-+  cargoArtifacts = craneLib.buildDepsOnly commonArgs;
-+in
-+craneLib.buildPackage (
-+  commonArgs
-+  // {
-+    inherit cargoArtifacts;
-+
-+    nativeBuildInputs = [
-+      pkgs.installShellFiles
-+      pkgs.makeBinaryWrapper
-     ];
+-    ];
 -  };
 -})
-+
-+    cargoTestExtraArgs = "-- ${skipTests}";
-+
-+    postInstall =
-+      lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
-+        # Run both shell completion and manpage generation tasks. Unlike the
-+        # fine-grained variants, the 'dist' command doesn't allow specifying the
-+        # path but that's fine, because we can simply install them from the implicit
-+        # output directories.
-+        chmod +x $out/bin/xtask
-+        $out/bin/xtask dist
-+
-+        # The dist task above should've created
-+        #  1. Shell completions in comp/
-+        #  2. The NH manpage (nh.1) in man/
-+        # Let's install those.
-+        # The important thing to note here is that installShellCompletion cannot
-+        # actually load *all* shell completions we generate with 'xtask dist'.
-+        # Elvish, for example isn't supported. So we have to be very explicit
-+        # about what we're installing, or this will fail.
-+        installShellCompletion --cmd nh ./comp/*.{bash,fish,zsh,nu}
-+        installManPage ./man/nh.1
-+      ''
-+      + ''
-+        # Avoid populating PATH with an 'xtask' cmd
-+        rm $out/bin/xtask
-+      '';
-+
-+    postFixup = ''
-+      wrapProgram $out/bin/nh \
-+        --prefix PATH : ${lib.makeBinPath runtimeDeps}
-+    '';
-+
-+    nativeInstallCheckInputs = [ pkgs.versionCheckHook ];
-+    doInstallCheck = false; # FIXME: --version includes 'dirty' and the hook doesn't let us change the assertion
-+    versionCheckProgram = "${placeholder "out"}/bin/nh";
-+    versionCheckProgramArg = "--version";
-+
 +    meta = {
 +      description = "Yet another nix cli helper";
 +      homepage = "https://github.com/nix-community/nh";

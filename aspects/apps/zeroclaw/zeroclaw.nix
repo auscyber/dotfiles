@@ -178,7 +178,7 @@
         # credential gates both its own env line and the server that needs it.
         # Create one with `nix run .#secret-edit secrets/<name>.age`, then
         # `nix run .#rekey`, and it switches itself on at the next build.
-        secretFile = name: rootPath + "/secrets/${name}.age";
+        secretFile = name: rootPath + "/secrets/static/${name}.age";
         hasSecret = name: builtins.pathExists (secretFile name);
 
         home = config.home.homeDirectory;
@@ -718,7 +718,7 @@
             # TLS is self-signed and would need a trust dance in a daemon.
             #
             # MANUAL PREREQUISITE: install the plugin into ~/Work/Work, enable
-            # "Enable HTTP server", and put its API key in secrets/obsidian_rest_key.age.
+            # "Enable HTTP server", and put its API key in secrets/static/obsidian_rest_key.age.
             # Until then the server is simply unreachable, which ZeroClaw reports
             # as a non-fatal warning at session start.
             #

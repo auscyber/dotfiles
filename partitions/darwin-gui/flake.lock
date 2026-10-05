@@ -71,14 +71,15 @@
     "crane": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "crate2nix": {
       "flake": false,
@@ -177,14 +178,15 @@
     "flake-parts_2": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "flake-parts_3": {
       "inputs": {
@@ -251,14 +253,15 @@
     "home-manager": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "import-tree": {
       "locked": {
@@ -425,14 +428,15 @@
     "nixpkgs_2": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "paneru": {
       "inputs": {
@@ -447,11 +451,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790127766,
-        "narHash": "sha256-/7afUlyaQ+YdeQTOt3hOZR72QgTHluQAQ2akR3jVELY=",
+        "lastModified": 1792547732,
+        "narHash": "sha256-mq7hVXQkr6GRRVdeILDlfwGeWAAyZlNdEaap+TRgA6Y=",
         "owner": "auscyber",
         "repo": "paneru",
-        "rev": "d2483a658d0113b36a93dac4d1a8c9052bcad0b6",
+        "rev": "3b64900583749a96b32adc4538f059b0fc2c4760",
         "type": "github"
       },
       "original": {
@@ -498,14 +502,15 @@
     "rust-overlay_2": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "treefmt-nix": {
       "inputs": {

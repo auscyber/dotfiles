@@ -22,6 +22,10 @@ let
 in
 {
   den.aspects.searchix = {
+    # `search.<zone>`, from the `domain` literal above rather than from a
+    # `takes.proxy` -- so ../network/roaming-resolver.nix cannot derive it.
+    alsoPublishes = [ "search" ];
+
     # Declared on the aspect, not the file: the input set follows which
     # hosts pull this aspect in, and so does its partition.
     inputs.searchix = {

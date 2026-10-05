@@ -1,4 +1,9 @@
-{ lib, ... }:
+{
+  den,
+  lib,
+  checkLib,
+  ...
+}:
 # Automatic per-aspect scoping for the `secrets` / `templates` den classes.
 #
 # `den.schema.aspect` is imported into *every* aspect submodule (den
@@ -48,6 +53,76 @@ let
 in
 {
   den.classes.scoped = { };
+
+  # ── TWO ENTRIES, ONE INSTALLED PATH ──
+  #
+  # Scoping is what makes a collision possible and therefore what owes the
+  # check. A flat `age.secrets.<name>` is unique because the attribute name is;
+  # the installed PATH is not -- it defaults from the name but every entry may
+  # set it, `secretSettings.separator` changes how the scope prefix is spelt,
+  # and secrets and templates install into one directory (the agenix templates
+  # patch: "the path holds secrets AND templates"). secondpc renders 75 secrets
+  # and 24 templates into that one namespace.
+  #
+  # Two entries landing on one path is SILENT: the activation script writes both
+  # in attribute order and the second wins, so a service reads a file that holds
+  # somebody else's value. Nothing fails, and the symptom is an authentication
+  # error in a component whose own secret looks correct.
+  #
+  # ── AN ASSERTION, AND IT HAS TO BE ──
+  #
+  # The path is rendered config: it is `secretsDir` crossed with a scope's
+  # `separator` and whatever an entry overrode, and none of that exists until
+  # the host's module system has run. So this is the shape ../../CLAUDE.md
+  # reserves for a fact only knowable from a host -- and the host is already
+  # paying for its own evaluation, so asking costs nothing extra. A flake-level
+  # version would have to evaluate every machine.
+  #
+  # AN ERROR AND NOT A WARNING, unlike ../hosts/fleet.nix's attachment check:
+  # there is no reading under which two entries wanting one file is intended,
+  # and the thing that happens otherwise is a service silently holding the wrong
+  # secret.
+  den.aspects.secret-path-collision = {
+    description = "Refuses two age entries installing to one path.";
+
+    os =
+      {
+        config,
+        host ? { },
+        ...
+      }:
+      {
+        assertions =
+          let
+            me = checkLib.entityFor host;
+
+            # `or { }` is CORRECT here and the reason is ../../CLAUDE.md's first
+            # trap read the right way round: `config.age` is an evaluated
+            # attrset, so a module system without the templates patch has no
+            # `templates` KEY at all -- genuinely absent, not null -- and this
+            # must not throw on it.
+            entriesOf =
+              kind:
+              lib.mapAttrsToList (n: v: {
+                inherit kind;
+                name = n;
+                inherit (v) path;
+              }) (config.age.${kind} or { });
+
+            clashes = lib.filterAttrs (_: es: lib.length es > 1) (
+              lib.groupBy (e: toString e.path) (entriesOf "secrets" ++ entriesOf "templates")
+            );
+          in
+          lib.mapAttrsToList (path: es: {
+            assertion = false;
+            message = "age: ${toString (lib.length es)} entries on ${me.name or "this host"} install to ${path} -- ${
+              lib.concatMapStringsSep ", " (e: "age.${e.kind}.\"${e.name}\"") es
+            }. The activation script writes them in attribute order and the last one wins, so whichever service reads that file gets somebody else's value. Give one of them its own `path`, or a distinct `age.scoped.<scope>` whose `separator`/`name` does not collapse onto the other's.";
+          }) clashes;
+      };
+  };
+
+  den.schema.host.includes = [ den.aspects.secret-path-collision ];
 
   den.schema.aspect =
     {

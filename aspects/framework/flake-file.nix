@@ -159,6 +159,125 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # The `gen` family, under github:sini rather than github:denful. Locked and
+    # available; NOTHING IN THIS REPO CONSUMES THEM YET.
+    #
+    # The one-line descriptions on denful.dev/ecosystem/gen are MARKETING, not
+    # API, and several are stale against the source as of 2026-10-05. Verified
+    # corrections, so nobody re-reads the website and believes it:
+    #
+    #   * gen-graph's label-resolution surface (`query`, `regex`, `labeledFrom`,
+    #     `boundedBy`) is RETIRED TOMBSTONES that throw and point at gen-scope,
+    #     and its own source withdraws the Arntzenius 2016 attribution for the
+    #     reverse queries ("this library's own; the attribution that stood here
+    #     is withdrawn"). Only `fixpoint`'s Lemma 4 survives. So
+    #     multi-hop-with-label-precedence is a gen-SCOPE adoption, not gen-graph.
+    #   * gen-derive's own README is titled gen-DISPATCH, and states the
+    #     convergence loop "belongs to gen-resolve". "with fixpoint convergence"
+    #     is wrong.
+    #   * gen-select has NO edge attributes. Its context is five NODE accessors
+    #     (`data`/`parent`/`children`/`ancestors`/`siblings`) -- there is no edge
+    #     in the vocabulary to hang an attribute on. "Attributed graph positions"
+    #     means NODE positions carrying data.
+    #   * gen-algebra exports no search monad and no validators; that tier
+    #     "relocated to gen-schema". It exports `either`, `record`, `term` and an
+    #     intensional-identity family.
+    #   * gen-link is cross-flake aspect FEDERATION (Backpack-style imports and
+    #     signatures), not links-as-edges. gen-class is byte-identical class
+    #     SHARE dedup, not den's `den.classes.<n>`. gen-memo is reuse ACROSS
+    #     evaluations needing hashable values -- a value carrying a function is
+    #     "always-dirty", and service instances carry modules.
+    #
+    # And den itself uses almost none of this: its flake is
+    # `{ outputs = _: import ./nix; }` with NO inputs, and its only gen
+    # consumption is `nix/lib/schema.nix` taking `roster.schema` (gen-schema's
+    # `mkInstanceType`). The gen names in den's templates/ci/flake.lock are a
+    # lockfile closure, never evaluated. So adopting the rest here would put
+    # this repo ahead of its own framework.
+    #
+    # Worth knowing for later: `nix/lib/schema.nix:33` is
+    # `if inputs ? gen then inputs.gen.lib.mkGenLibs { } else import genSrc { }`
+    # -- den ACCEPTS a `gen` input if one is passed, which is the supported
+    # integration point.
+    # ONE input: the gen HUB, not the members individually.
+    #
+    # den's `nix/lib/schema.nix` is explicit that this is not a preference:
+    # "the hub binds every sibling's `gen-*` input with `follows`, so one input
+    # yields one revision per library. Pinning gen-schema directly leaves den
+    # holding its transitive closure -- measured at the bump that motivated this
+    # file: three revisions of gen-prelude and two of gen-schema in one lock,
+    # which reads as one value while being several builds."
+    #
+    # Measured here too. Eleven individual inputs gave 18 gen-prelude nodes, 7
+    # gen-graph, 7 gen-identity and 3 gen-scope; adding top-level `follows` only
+    # got them to 14/6/6/3, because it cannot reach the deeper transitive copies.
+    # gen-scope's own flake says why that matters: "Two instances of gen-scope in
+    # one evaluation are two identity formulas for the same node -- a failure
+    # measured in a shipped consumer, not a hazard imagined here."
+    #
+    # It is also the supported integration with den, which does
+    # `roster = if inputs ? gen then inputs.gen.lib.mkGenLibs { } else <CI-lock
+    # fallback>` -- so declaring it here makes den mint identities with OUR
+    # pinned revision instead of the one frozen in its templates/ci/flake.lock.
+    #
+    # Members are read as `(inputs.gen.lib.mkGenLibs { }).<member>` -- `scope`,
+    # `graph`, `identity`, `schema`, and so on.
+    # NOT `inputs.gen`, and this was measured rather than chosen.
+    #
+    # den does `roster = if inputs ? gen then inputs.gen.lib.mkGenLibs { } else
+    # <its CI-lock fallback>`, so DECLARING a `gen` input hands den our hub and
+    # it mints every entity identity through it. Its comment claims "two entry
+    # shapes for one roster", but they are not interchangeable: through
+    # `mkGenLibs` den's own wrapper
+    # (`mkInstanceType = kindValue: withLib (base.mkInstanceType kindValue)`)
+    # fails immediately with
+    #
+    #   error: gen-schema.mkInstanceType: '__functor' is not an option of this
+    #   door; the options are closed (accepted: 'extraModules', 'strict',
+    #   'specialArgs')
+    #
+    # and it fails identically at the hub revision den's OWN templates/ci/flake.lock
+    # pins (5f58e7bf), so it is not revision skew -- the `inputs ? gen` arm is
+    # broken against the pinned den. Fixing that is a den change, not ours.
+    #
+    # So den keeps its working fallback and we take only what our own code uses.
+    # The duplication that costs is duplication inside ONE evaluator's identity
+    # formulas; den's identities all come from its single fallback roster, and
+    # these copies are read only by ../base/scope-probe.nix.
+    inputs.gen-scope.url = "github:sini/gen-scope";
+    # For `record.foldLayers` -- a DECLARED per-field merge over ordered
+    # layers, with `"semilattice-set"` being the ACI join ("invariant under
+    # layer reordering and under duplicate contributions"). That is what
+    # merging capabilities across an inheritance chain needs, rather than
+    # hand-rolled `listToAttrs`/`concatLists`.
+    inputs.gen-algebra.url = "github:sini/gen-algebra";
+    # For `implement`'s bindings. A den aspect receives `{ host, user, service }`
+    # because den binds them; an `implement` body needs `{ http, cache, fiber }`
+    # -- the resolved edges by their own want names, the ancestors by class, and
+    # the fiber -- and nothing in den binds those.
+    #
+    # gen-bind is exactly that and not a near-miss: "it takes a module plus a set
+    # of named bindings and partially applies the bindings the module actually
+    # declares". So a body that asks for `{ http, ... }` gets the link and
+    # nothing else, by introspection rather than by being handed a fixed arg set.
+    #
+    # Three parts of it are load-bearing here rather than conveniences:
+    #   * `mkThunk` defers a binding that depends on the evaluated config
+    #     fixpoint, which is what a link's address is.
+    #   * `contract.hasFields` is a LAZY per-binding assertion, so a body asking
+    #     for a binding that resolution could not supply fails by name instead of
+    #     as a missing attribute three frames down.
+    #   * `mergeStrategy` / `mkMergeValidator` resolve a binding colliding with a
+    #     module-system arg WITH BLAME -- the `nix.settings.netrc-file` case,
+    #     where two edges of one fiber both write one singular option and the
+    #     silent outcome is last-writer-wins.
+    #
+    # KNOWINGLY ACCEPTING THE DUPLICATION. Eleven direct inputs measured 18
+    # gen-prelude nodes; the `gen` hub that collapses them fails against den's
+    # own pinned revision (`'__functor' is not an option of this door`), so the
+    # choice is a direct input or nothing. Revisit when den's hub arm works.
+    inputs.gen-bind.url = "github:sini/gen-bind";
     #    preProcess =
     #      serialized:
     #      let

@@ -1,0 +1,381 @@
+%%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#e85aad","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
+graph LR
+  secondpc([secondpc]):::root
+
+  subgraph ctx_host_secondpc["host: secondpc"]
+  audiobookshelf["audiobookshelf"]:::audiobookshelf_c
+  bazarr["bazarr"]:::bazarr_c
+  celler["celler"]:::celler_c
+  donetick["donetick"]:::donetick_c
+  esphome["esphome"]:::esphome_c
+  gated_oauth2_proxy["gated-oauth2-proxy"]:::gated_oauth2_proxy_c
+  grafana["grafana"]:::grafana_c
+  grocy["grocy"]:::grocy_c
+  homeassistant["homeassistant"]:::homeassistant_c
+  homepage["homepage"]:::homepage_c
+  immich["immich"]:::immich_c
+  kanidm["kanidm"]:::kanidm_c
+  lidarr["lidarr"]:::lidarr_c
+  loki["loki"]:::loki_c
+  mail["mail"]:::mail_c
+  mail_ddns["mail-ddns"]:::mail_ddns_c
+  matter_server["matter-server"]:::matter_server_c
+  mosquitto["mosquitto"]:::mosquitto_c
+  music_assistant["music-assistant"]:::music_assistant_c
+  navidrome["navidrome"]:::navidrome_c
+  nextcloud["nextcloud"]:::nextcloud_c
+  paperless["paperless"]:::paperless_c
+  postgres["postgres"]:::postgres_c
+  prowlarr["prowlarr"]:::prowlarr_c
+  publish_ivymect_in["publish-ivymect-in"]:::publish_ivymect_in_c
+  qbittorrent["qbittorrent"]:::qbittorrent_c
+  radarr["radarr"]:::radarr_c
+  seerr["seerr"]:::seerr_c
+  shares["shares"]:::shares_c
+  sonarr["sonarr"]:::sonarr_c
+  splitpro["splitpro"]:::splitpro_c
+  tandoor["tandoor"]:::tandoor_c
+  tautulli["tautulli"]:::tautulli_c
+  tempo["tempo"]:::tempo_c
+  vaultwarden["vaultwarden"]:::vaultwarden_c
+  vikunja["vikunja"]:::vikunja_c
+  cap_audiobookshelf_gated{{"gated oauthProxy=false, websockets=true"}}:::cap_audiobookshelf_gated_c
+  cap_auscyber_celler{{"celler"}}:::cap_auscyber_celler_c
+  cap_bazarr_gated{{"gated clients=(homepage), subpath=/subs"}}:::cap_bazarr_gated_c
+  cap_bazarr_nginx{{"nginx api=(...)"}}:::cap_bazarr_nginx_c
+  cap_celler_default_celler{{"celler"}}:::cap_celler_default_celler_c
+  cap_celler_default_celler_t["celler-default"]:::cap_celler_default_celler_t_c
+  cap_celler_proxy{{"proxy maxBodyBytes=15000000000, subdomain=cache"}}:::cap_celler_proxy_c
+  cap_donetick_gated{{"gated oauthProxy=false, websockets=true"}}:::cap_donetick_gated_c
+  cap_donetick_postgres{{"postgres services=(donetick), tcp=true"}}:::cap_donetick_postgres_c
+  cap_esphome_gated{{"gated websockets=true"}}:::cap_esphome_gated_c
+  cap_esphome_home_assistant{{"home-assistant extraComponents=(esphome)"}}:::cap_esphome_home_assistant_c
+  cap_esphome_mqtt{{"mqtt username=sendspin"}}:::cap_esphome_mqtt_c
+  cap_grafana_gated{{"gated websockets=true"}}:::cap_grafana_gated_c
+  cap_grafana_postgres{{"postgres services=(grafana)"}}:::cap_grafana_postgres_c
+  cap_grocy_gated{{"gated forwardUser=true, oauthProxy=true"}}:::cap_grocy_gated_c
+  cap_homeassistant_mqtt{{"mqtt"}}:::cap_homeassistant_mqtt_c
+  cap_homeassistant_postgres{{"postgres services=(home-assistant)"}}:::cap_homeassistant_postgres_c
+  cap_homepage_credential{{"credential description=Dashboard widgets, envPrefix=HOMEPAGE_VAR_, restartUnits=(homepage-dashboard.service)"}}:::cap_homepage_credential_c
+  cap_homepage_gated{{"gated forwardUser=true"}}:::cap_homepage_gated_c
+  cap_immich_gated{{"gated oauthProxy=false, websockets=true"}}:::cap_immich_gated_c
+  cap_immich_postgres{{"postgres services=(immich-server,immich-machine-learning)"}}:::cap_immich_postgres_c
+  cap_lidarr_gated{{"gated clients=(prowlarr,homepage), subpath=/music, websockets=true"}}:::cap_lidarr_gated_c
+  cap_lidarr_nginx{{"nginx api=(...)"}}:::cap_lidarr_nginx_c
+  cap_lidarr_tcp{{"tcp name=qbittorrent"}}:::cap_lidarr_tcp_c
+  cap_lidarr_tcp_wn0["49 other instances wrong instance: want qbittorrent"]:::cap_lidarr_tcp_wn0_c
+  cap_loki_proxy{{"proxy port=3100, subdomain=logs"}}:::cap_loki_proxy_c
+  cap_mail_ddns_dns{{"dns dynamic=(mail.ivymect.in)"}}:::cap_mail_ddns_dns_c
+  cap_mail_dns{{"dns records=((...),(...),(...),(...),(...),(...),(...),(...),(...),(...),(...))"}}:::cap_mail_dns_c
+  cap_mail_ldap{{"ldap application=mail, applicationGroup=media-users"}}:::cap_mail_ldap_c
+  cap_matter_server_home_assistant{{"home-assistant extraComponents=(matter,thread)"}}:::cap_matter_server_home_assistant_c
+  cap_mosquitto_home_assistant{{"home-assistant extraComponents=(mqtt)"}}:::cap_mosquitto_home_assistant_c
+  cap_music_assistant_gated{{"gated port=8095, websockets=true"}}:::cap_music_assistant_gated_c
+  cap_music_assistant_home_assistant{{"home-assistant extraComponents=(music_assistant)"}}:::cap_music_assistant_home_assistant_c
+  cap_music_assistant_mqtt{{"mqtt"}}:::cap_music_assistant_mqtt_c
+  cap_navidrome_proxy{{"proxy port=4533, subdomain=music"}}:::cap_navidrome_proxy_c
+  cap_nextcloud_postgres{{"postgres services=(nextcloud-setup)"}}:::cap_nextcloud_postgres_c
+  cap_nextcloud_proxy{{"proxy maxBodyBytes=10000000000, subdomain=cloud"}}:::cap_nextcloud_proxy_c
+  cap_nextcloud_smtp{{"smtp"}}:::cap_nextcloud_smtp_c
+  cap_paperless_gated{{"gated forwardUser=true, maxBodyBytes=50000000, oauthProxy=true, websockets=true"}}:::cap_paperless_gated_c
+  cap_paperless_postgres{{"postgres services=(paperless-scheduler,paperless-task-queue,paperless-consumer,paperless-web)"}}:::cap_paperless_postgres_c
+  cap_paperwork_share{{"share displayName=Paperwork, permissions=(read,write,share,delete)"}}:::cap_paperwork_share_c
+  cap_paperwork_share_t["paperwork"]:::cap_paperwork_share_t_c
+  cap_photos_share{{"share displayName=Photos, quota=200G"}}:::cap_photos_share_c
+  cap_photos_share_t["photos"]:::cap_photos_share_t_c
+  cap_postgres_unix{{"unix"}}:::cap_postgres_unix_c
+  cap_prowlarr_credential{{"credential envPrefix=PROWLARR_, restartUnits=(prowlarr-connect.service)"}}:::cap_prowlarr_credential_c
+  cap_prowlarr_gated{{"gated clients=(homepage), subpath=/indexers, websockets=true"}}:::cap_prowlarr_gated_c
+  cap_prowlarr_nginx{{"nginx api=(...)"}}:::cap_prowlarr_nginx_c
+  cap_qbittorrent_gated{{"gated banner=Read-only - qBittorrent's settings are declared in Nix; changes made here are discarded, clients=(sonarr,radarr,lidarr)"}}:::cap_qbittorrent_gated_c
+  cap_qbittorrent_nginx{{"nginx api=(...)"}}:::cap_qbittorrent_nginx_c
+  cap_radarr_gated{{"gated clients=(prowlarr,seerr,homepage), subpath=/movies, websockets=true"}}:::cap_radarr_gated_c
+  cap_radarr_nginx{{"nginx api=(...)"}}:::cap_radarr_nginx_c
+  cap_radarr_tcp{{"tcp name=qbittorrent"}}:::cap_radarr_tcp_c
+  cap_radarr_tcp_wn0["49 other instances wrong instance: want qbittorrent"]:::cap_radarr_tcp_wn0_c
+  cap_samba_user_samba_user{{"samba-user"}}:::cap_samba_user_samba_user_c
+  cap_samba_user_samba_user_t["samba-user"]:::cap_samba_user_samba_user_t_c
+  cap_seerr_credential{{"credential description=Request frontend, talks to sonarr and radarr"}}:::cap_seerr_credential_c
+  cap_seerr_proxy{{"proxy port=5055, subdomain=requests"}}:::cap_seerr_proxy_c
+  cap_sonarr_gated{{"gated clients=(prowlarr,seerr,homepage), subpath=/tv, websockets=true"}}:::cap_sonarr_gated_c
+  cap_sonarr_nginx{{"nginx api=(...)"}}:::cap_sonarr_nginx_c
+  cap_sonarr_tcp{{"tcp name=qbittorrent"}}:::cap_sonarr_tcp_c
+  cap_sonarr_tcp_wn0["49 other instances wrong instance: want qbittorrent"]:::cap_sonarr_tcp_wn0_c
+  cap_splitpro_gated{{"gated oauthProxy=false"}}:::cap_splitpro_gated_c
+  cap_splitpro_postgres{{"postgres extensions=(pg_cron), fromContainer=true, preload=(pg_cron), services=(docker-splitpro), settings=(...), tcp=true"}}:::cap_splitpro_postgres_c
+  cap_tandoor_gated{{"gated maxBodyBytes=67108864, oauthProxy=false"}}:::cap_tandoor_gated_c
+  cap_tandoor_postgres{{"postgres services=(tandoor-recipes)"}}:::cap_tandoor_postgres_c
+  cap_tautulli_gated{{"gated port=8181"}}:::cap_tautulli_gated_c
+  cap_tempo_gated{{"gated"}}:::cap_tempo_gated_c
+  cap_tempo_nginx{{"nginx api=(...)"}}:::cap_tempo_nginx_c
+  cap_vaultwarden_proxy{{"proxy port=8222, subdomain=bitwarden"}}:::cap_vaultwarden_proxy_c
+  cap_vaultwarden_smtp{{"smtp fromName=ivymect.in Bitwarden server, localPart=bitwarden"}}:::cap_vaultwarden_smtp_c
+  cap_vikunja_gated{{"gated oauthProxy=false"}}:::cap_vikunja_gated_c
+  cap_vikunja_postgres{{"postgres services=(vikunja)"}}:::cap_vikunja_postgres_c
+  homeassistant --> esphome
+  homeassistant --> matter_server
+  homeassistant --> mosquitto
+  homeassistant --> music_assistant
+  immich --> postgres
+  mail --> mail_ddns
+  nextcloud --> shares
+  audiobookshelf -.->|takes| cap_audiobookshelf_gated
+  cap_audiobookshelf_gated -.->|not routed| gated_oauth2_proxy
+  cap_auscyber_celler -.->|not routed| celler
+  bazarr -.->|takes| cap_bazarr_gated
+  cap_bazarr_gated -.->|not routed| gated_oauth2_proxy
+  bazarr -.->|takes| cap_bazarr_nginx
+  cap_bazarr_nginx -.->|not routed| gated_oauth2_proxy
+  celler -.->|takes| cap_celler_proxy
+  cap_celler_proxy -.->|not routed| gated_oauth2_proxy
+  cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
+  cap_celler_default_celler -.->|not routed| celler
+  donetick -.->|takes| cap_donetick_gated
+  cap_donetick_gated -.->|not routed| gated_oauth2_proxy
+  donetick -.->|takes| cap_donetick_postgres
+  cap_donetick_postgres -.->|not routed| postgres
+  esphome -.->|takes| cap_esphome_gated
+  cap_esphome_gated -.->|not routed| gated_oauth2_proxy
+  esphome -.->|takes| cap_esphome_home_assistant
+  cap_esphome_home_assistant -.->|not routed| homeassistant
+  esphome -.->|takes| cap_esphome_mqtt
+  cap_esphome_mqtt -.->|loopback 0 (same host)| mosquitto
+  grafana -.->|takes| cap_grafana_gated
+  cap_grafana_gated -.->|not routed| gated_oauth2_proxy
+  grafana -.->|takes| cap_grafana_postgres
+  cap_grafana_postgres -.->|not routed| postgres
+  grocy -.->|takes| cap_grocy_gated
+  cap_grocy_gated -.->|not routed| gated_oauth2_proxy
+  homeassistant -.->|takes| cap_homeassistant_mqtt
+  cap_homeassistant_mqtt -.->|loopback 0 (same host)| mosquitto
+  homeassistant -.->|takes| cap_homeassistant_postgres
+  cap_homeassistant_postgres -.->|not routed| postgres
+  homepage -.->|takes| cap_homepage_credential
+  cap_homepage_credential -.->|not routed| kanidm
+  homepage -.->|takes| cap_homepage_gated
+  cap_homepage_gated -.->|not routed| gated_oauth2_proxy
+  immich -.->|takes| cap_immich_gated
+  cap_immich_gated -.->|not routed| gated_oauth2_proxy
+  immich -.->|takes| cap_immich_postgres
+  cap_immich_postgres -.->|not routed| postgres
+  lidarr -.->|takes| cap_lidarr_gated
+  cap_lidarr_gated -.->|not routed| gated_oauth2_proxy
+  lidarr -.->|takes| cap_lidarr_nginx
+  cap_lidarr_nginx -.->|not routed| gated_oauth2_proxy
+  lidarr -.->|takes| cap_lidarr_tcp
+  cap_lidarr_tcp -.->|loopback 0 (same host)| qbittorrent
+  cap_lidarr_tcp -.-x cap_lidarr_tcp_wn0
+  loki -.->|takes| cap_loki_proxy
+  cap_loki_proxy -.->|not routed| gated_oauth2_proxy
+  mail -.->|takes| cap_mail_dns
+  cap_mail_dns -.->|not routed| publish_ivymect_in
+  mail -.->|takes| cap_mail_ldap
+  cap_mail_ldap -.->|loopback 0 (same host)| kanidm
+  mail_ddns -.->|takes| cap_mail_ddns_dns
+  cap_mail_ddns_dns -.->|not routed| publish_ivymect_in
+  matter_server -.->|takes| cap_matter_server_home_assistant
+  cap_matter_server_home_assistant -.->|not routed| homeassistant
+  mosquitto -.->|takes| cap_mosquitto_home_assistant
+  cap_mosquitto_home_assistant -.->|not routed| homeassistant
+  music_assistant -.->|takes| cap_music_assistant_gated
+  cap_music_assistant_gated -.->|not routed| gated_oauth2_proxy
+  music_assistant -.->|takes| cap_music_assistant_home_assistant
+  cap_music_assistant_home_assistant -.->|not routed| homeassistant
+  music_assistant -.->|takes| cap_music_assistant_mqtt
+  cap_music_assistant_mqtt -.->|loopback 0 (same host)| mosquitto
+  navidrome -.->|takes| cap_navidrome_proxy
+  cap_navidrome_proxy -.->|not routed| gated_oauth2_proxy
+  nextcloud -.->|takes| cap_nextcloud_postgres
+  cap_nextcloud_postgres -.->|not routed| postgres
+  nextcloud -.->|takes| cap_nextcloud_proxy
+  cap_nextcloud_proxy -.->|not routed| gated_oauth2_proxy
+  nextcloud -.->|takes| cap_nextcloud_smtp
+  cap_nextcloud_smtp -.->|loopback 0 (same host)| mail
+  paperless -.->|takes| cap_paperless_gated
+  cap_paperless_gated -.->|not routed| gated_oauth2_proxy
+  paperless -.->|takes| cap_paperless_postgres
+  cap_paperless_postgres -.->|not routed| postgres
+  cap_paperwork_share_t -.->|takes| cap_paperwork_share
+  cap_paperwork_share -.->|not routed| shares
+  cap_photos_share_t -.->|takes| cap_photos_share
+  cap_photos_share -.->|not routed| shares
+  postgres -.->|takes| cap_postgres_unix
+  prowlarr -.->|takes| cap_prowlarr_credential
+  cap_prowlarr_credential -.->|not routed| kanidm
+  prowlarr -.->|takes| cap_prowlarr_gated
+  cap_prowlarr_gated -.->|not routed| gated_oauth2_proxy
+  prowlarr -.->|takes| cap_prowlarr_nginx
+  cap_prowlarr_nginx -.->|not routed| gated_oauth2_proxy
+  qbittorrent -.->|takes| cap_qbittorrent_gated
+  cap_qbittorrent_gated -.->|not routed| gated_oauth2_proxy
+  qbittorrent -.->|takes| cap_qbittorrent_nginx
+  cap_qbittorrent_nginx -.->|not routed| gated_oauth2_proxy
+  radarr -.->|takes| cap_radarr_gated
+  cap_radarr_gated -.->|not routed| gated_oauth2_proxy
+  radarr -.->|takes| cap_radarr_nginx
+  cap_radarr_nginx -.->|not routed| gated_oauth2_proxy
+  radarr -.->|takes| cap_radarr_tcp
+  cap_radarr_tcp -.->|loopback 0 (same host)| qbittorrent
+  cap_radarr_tcp -.-x cap_radarr_tcp_wn0
+  cap_samba_user_samba_user_t -.-x cap_samba_user_samba_user
+  seerr -.->|takes| cap_seerr_credential
+  cap_seerr_credential -.->|not routed| kanidm
+  seerr -.->|takes| cap_seerr_proxy
+  cap_seerr_proxy -.->|not routed| gated_oauth2_proxy
+  sonarr -.->|takes| cap_sonarr_gated
+  cap_sonarr_gated -.->|not routed| gated_oauth2_proxy
+  sonarr -.->|takes| cap_sonarr_nginx
+  cap_sonarr_nginx -.->|not routed| gated_oauth2_proxy
+  sonarr -.->|takes| cap_sonarr_tcp
+  cap_sonarr_tcp -.->|loopback 0 (same host)| qbittorrent
+  cap_sonarr_tcp -.-x cap_sonarr_tcp_wn0
+  splitpro -.->|takes| cap_splitpro_gated
+  cap_splitpro_gated -.->|not routed| gated_oauth2_proxy
+  splitpro -.->|takes| cap_splitpro_postgres
+  cap_splitpro_postgres -.->|not routed| postgres
+  tandoor -.->|takes| cap_tandoor_gated
+  cap_tandoor_gated -.->|not routed| gated_oauth2_proxy
+  tandoor -.->|takes| cap_tandoor_postgres
+  cap_tandoor_postgres -.->|not routed| postgres
+  tautulli -.->|takes| cap_tautulli_gated
+  cap_tautulli_gated -.->|not routed| gated_oauth2_proxy
+  tempo -.->|takes| cap_tempo_gated
+  cap_tempo_gated -.->|not routed| gated_oauth2_proxy
+  tempo -.->|takes| cap_tempo_nginx
+  cap_tempo_nginx -.->|not routed| gated_oauth2_proxy
+  vaultwarden -.->|takes| cap_vaultwarden_proxy
+  cap_vaultwarden_proxy -.->|not routed| gated_oauth2_proxy
+  vaultwarden -.->|takes| cap_vaultwarden_smtp
+  cap_vaultwarden_smtp -.->|loopback 0 (same host)| mail
+  vikunja -.->|takes| cap_vikunja_gated
+  cap_vikunja_gated -.->|not routed| gated_oauth2_proxy
+  vikunja -.->|takes| cap_vikunja_postgres
+  cap_vikunja_postgres -.->|not routed| postgres
+  end
+  subgraph ctx_user_auscyber["user: auscyber"]
+  auscyber{{"auscyber"}}:::auscyber_c
+
+  end
+  subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
+  cap_postgres_unix_g_loopback[/"loopback on Ivys-MacBook-Pro"\]:::cap_postgres_unix_g_loopback_c
+
+  end
+
+  auscyber -.->|takes| cap_auscyber_celler
+  cap_postgres_unix -.->|not routed| cap_postgres_unix_g_loopback
+
+  classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
+  classDef audiobookshelf_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef bazarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef donetick_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef esphome_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef gated_oauth2_proxy_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef grafana_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef grocy_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef homepage_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef immich_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef kanidm_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef lidarr_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef loki_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef mail_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef mail_ddns_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef matter_server_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef mosquitto_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef music_assistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef navidrome_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef nextcloud_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef paperless_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef postgres_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef prowlarr_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef publish_ivymect_in_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef qbittorrent_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef radarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef seerr_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef shares_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef sonarr_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef splitpro_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef tandoor_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef tautulli_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef tempo_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef vaultwarden_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef vikunja_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef cap_audiobookshelf_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_auscyber_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_bazarr_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_bazarr_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_proxy_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_donetick_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_donetick_postgres_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_grafana_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_grafana_postgres_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_grocy_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_homeassistant_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_homeassistant_postgres_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_homepage_credential_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_homepage_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_immich_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_immich_postgres_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_lidarr_gated_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_lidarr_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_lidarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_lidarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_loki_proxy_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_mail_ddns_dns_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_mail_dns_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_mail_ldap_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_matter_server_home_assistant_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_mosquitto_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_music_assistant_gated_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_music_assistant_home_assistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_music_assistant_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_navidrome_proxy_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_nextcloud_postgres_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_nextcloud_proxy_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_nextcloud_smtp_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_paperless_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_paperless_postgres_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_paperwork_share_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_paperwork_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_photos_share_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_photos_share_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_postgres_unix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_postgres_unix_g_loopback_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_prowlarr_credential_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_prowlarr_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_prowlarr_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_qbittorrent_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_qbittorrent_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_radarr_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_radarr_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_radarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_radarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_samba_user_samba_user_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_samba_user_samba_user_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_seerr_credential_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_seerr_proxy_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_sonarr_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_sonarr_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_sonarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_sonarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_splitpro_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_splitpro_postgres_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_tandoor_gated_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_tandoor_postgres_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_tautulli_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_tempo_gated_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_tempo_nginx_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vaultwarden_proxy_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_vaultwarden_smtp_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vikunja_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_vikunja_postgres_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px

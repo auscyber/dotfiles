@@ -81,7 +81,9 @@
           imports = [ inputs.op-shell-plugins.hmModules.default ];
           config = lib.mkMerge [
             {
-              programs.zsh.initExtra = ''
+              # `initExtra` was removed; `initContent` with `mkOrder 1000` is
+              # the position it used to occupy.
+              programs.zsh.initContent = lib.mkOrder 1000 ''
                 [[ -n "$IN_GUI"  ]] && export SSH_AUTH_SOCK="${_1passwordSocket}"
               '';
 

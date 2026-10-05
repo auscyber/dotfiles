@@ -1,74 +1,56 @@
-diff --git a/README.md b/README.md
-index 8284e7e017..6e7d14b164 100644
---- a/README.md
-+++ b/README.md
-@@ -559,6 +559,12 @@
- Some programs do not like following symlinks (for example Java
- programs like Elasticsearch).
- 
-+If `age.secrets.<name>.path` points inside `age.secretsDir`, the secret
-+is created in the generation directory that `age.secretsDir` links to,
-+keeping any nested folders of the path. It is still a regular file (not
-+a symlink) at that path, but it is cleaned up with its generation like
-+any other secret.
-+
- Example:
- 
- ```nix
-@@ -678,6 +684,10 @@
- secrets are symlinked to `age.secrets.<name>.path`. If false, secrets
- are copied to `age.secrets.<name>.path`.
- 
-+If `age.secrets.<name>.path` points inside `age.secretsDir`, the secret
-+is created in the generation directory that `age.secretsDir` links to,
-+keeping any nested folders of the path.
-+
- #### `age.identityPaths`
- 
- `age.identityPaths` is a list of paths to SSH private keys to use for decryption.
-diff --git a/modules/age-home.nix b/modules/age-home.nix
-index 54695aeb8e..28ffbc9ead 100644
---- a/modules/age-home.nix
-+++ b/modules/age-home.nix
-@@ -11,21 +11,55 @@
+diff -ruN a/modules/age-home.nix b/modules/age-home.nix
+--- a/modules/age-home.nix	2026-10-28 16:37:55
++++ b/modules/age-home.nix	2026-10-28 16:37:55
+@@ -19,23 +19,69 @@
  
    ageBin = lib.getExe config.age.package;
  
 +  mapListOrAttrs = f: x: if builtins.isList x then map f x else lib.mapAttrs (_: f) x;
 +  mapListOrAttrsToList = f: x: if builtins.isList x then map f x else lib.mapAttrsToList (_: f) x;
 +
-+  secretsMountPoint = "/secrets";
-+  templatesMountPoint = "/templates";
++  # Subdirectory NAMES inside a generation. See the equivalent note in ./age.nix:
++  # secrets and templates each get their own directory so `age.secretsDir` and
++  # `age.templateDir` are two independent symlinks into one generation.
++  secretsSubdir = "secrets";
++  templatesSubdir = "templates";
++
++  # `secretsDir` points at <gen>/secrets, so the generation is one level further
++  # up. The numeric guard matters on a first activation, where the symlink does
++  # not exist and `basename "$(dirname "")"` is "." rather than a number.
++  currentGeneration = ''
++    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
++    if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]; then
++      _agenix_generation=0
++    fi
++  '';
 +
    newGeneration = ''
 -    _agenix_generation="$(basename "$(readlink "${cfg.secretsDir}")" || echo 0)"
--    (( ++_agenix_generation ))
--    echo "[agenix] creating new generation in ${cfg.secretsMountPoint}/$_agenix_generation"
++    ${currentGeneration}
+     (( ++_agenix_generation ))
+     ${optionalString (
+       verbosityLevel >= 2
+-    ) ''echo "[agenix] creating new generation in ${cfg.secretsMountPoint}/$_agenix_generation"''}
 -    mkdir -p "${cfg.secretsMountPoint}"
 -    chmod 0751 "${cfg.secretsMountPoint}"
 -    mkdir -p "${cfg.secretsMountPoint}/$_agenix_generation"
 -    chmod 0751 "${cfg.secretsMountPoint}/$_agenix_generation"
-+        _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
-+    	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
-+        then
-+    	  _agenix_generation=0
-+    fi
-+        (( ++_agenix_generation ))
-+        echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
-+        mkdir -p "${cfg.ageMountPoint}"
-+        chmod 0751 "${cfg.ageMountPoint}"
-+        mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
-+        chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
-+        mkdir -p "${cfg.ageMountPoint}/$_agenix_generation${secretsMountPoint}"
-+        mkdir -p "${cfg.ageMountPoint}/$_agenix_generation${templatesMountPoint}"
++    ) ''echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"''}
++    mkdir -p "${cfg.ageMountPoint}"
++    chmod 0751 "${cfg.ageMountPoint}"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
++    chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsSubdir}"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesSubdir}"
++    mkdir -p "$(dirname "${cfg.secretsDir}")"
++    mkdir -p "$(dirname "${cfg.templateDir}")"
    '';
  
 +  # The agenix managed directory a secret or template is exposed through, and
-+  # the mount point of that directory inside a generation.
++  # the subdirectory of that directory inside a generation.
 +  targetDir =
 +    secretType: toString (if secretType.type == "template" then cfg.templateDir else cfg.secretsDir);
-+  mountPoint =
-+    secretType: if secretType.type == "template" then templatesMountPoint else secretsMountPoint;
++  subdirOf = secretType: if secretType.type == "template" then templatesSubdir else secretsSubdir;
 +
 +  # Whether path points inside the agenix managed directory. That directory is
 +  # itself a symlink which only points at the new generation once everything is
@@ -77,7 +59,7 @@ index 54695aeb8e..28ffbc9ead 100644
 +  # in the new generation instead, keeping any nested folders of path.
 +  inTargetDir = secretType: hasPrefix "${targetDir secretType}/" secretType.path;
 +
-+  # Location of the file inside a generation, relative to its mount point.
++  # Location of the file inside a generation, relative to its subdirectory.
 +  generationPath =
 +    secretType:
 +    if inTargetDir secretType then
@@ -91,11 +73,13 @@ index 54695aeb8e..28ffbc9ead 100644
 +      if secretType.symlink || inTargetDir secretType then
          ''
 -          _truePath="${cfg.secretsMountPoint}/$_agenix_generation/${secretType.name}"
-+          _truePath="${cfg.ageMountPoint}/$_agenix_generation${mountPoint secretType}/${generationPath secretType}"
++          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${subdirOf secretType}/${
++            generationPath secretType
++          }"
          ''
        else
          ''
-@@ -34,15 +68,23 @@
+@@ -44,13 +90,21 @@
      }
    '';
  
@@ -111,88 +95,56 @@ index 54695aeb8e..28ffbc9ead 100644
 +
 +  setupStart = secretType: ''
      ${setTruePath secretType}
--    echo "decrypting '${secretType.file}' to '$_truePath'..."
-+    echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."
+     ${optionalString (
+       verbosityLevel >= 3
+-    ) ''echo "decrypting '${secretType.file}' to '$_truePath'..."''}
++    ) ''echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."''}
      TMP_FILE="$_truePath.tmp"
 -
      IDENTITIES=()
--    # shellcheck disable=2043
-     for identity in ${toString cfg.identityPaths}; do
-       test -r "$identity" || continue
-+      test -s "$identity" || continue
-       IDENTITIES+=(-i)
-       IDENTITIES+=("$identity")
-     done
-@@ -50,8 +92,52 @@
-     test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
+     _agenix_identity_paths=( ${toString cfg.identityPaths} )
+     for identity in "''${_agenix_identity_paths[@]}"; do
+@@ -62,8 +116,31 @@
+     test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!" >&2
  
      mkdir -p "$(dirname "$_truePath")"
 -    # shellcheck disable=SC2193,SC2050
 -    [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && mkdir -p "$(dirname "${secretType.path}")"
-+
 +  '';
 +
-+  installTemplate = templateType: ''
-+        ${setupStart templateType}
-+        echo "generating template '${templateType.name}' to '$_truePath'..."
-+        cp ${templateType.file} "$TMP_FILE"
++  recordRestarts = secretType: ''
++    ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
++  '';
 +
-+        ${builtins.concatStringsSep "\n" (
-+          lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
-+            echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."
-+            test -f "${dep.file}" || echo "[agenix] WARNING: dependency file ${dep.file} does not exist!"
-+
-+            _secret=$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})
-+            _secret="''${_secret//\\/\\\\}"
-+            _secret="''${_secret//|/\\|}"
-+            _secret="''${_secret//&/\\&}"
-+            _secret="''${_secret//$'\n'/\\n}"
-+            sed -i.bak "s|${dep.placeholder}|''${_secret}|g" "$TMP_FILE"
-+            rm -f "$TMP_FILE.bak"
-+          '')
-+        )}
-+        # check if the template changed then add units
-+        if [ -f "$_truePath" ]; then
-+          if cmp -s "$_truePath" "$TMP_FILE"; then
-+            :
-+          else
-+            echo "template ${templateType.name} changed."
-+            ${concatStringsSep "\n" (
-+              map (unit: "UNITS_TO_RESTART+=('${unit}')") templateType.restartUnits
-+            )}
-+          fi
-+        else
-+            echo "template ${templateType.name} is new."
-+            ${concatStringsSep "\n" (
-+              map (unit: "UNITS_TO_RESTART+=('${unit}')") templateType.restartUnits
-+            )}
-+        fi
-+
-+        chmod ${templateType.mode} "$TMP_FILE"
-+        mv -f "$TMP_FILE" "$_truePath"
-+    ${linkToPath templateType}
++  ifChanged = secretType: ''
++    if [ -f "$_truePath" ]; then
++      if ${pkgs.diffutils}/bin/cmp -s "$_truePath" "$TMP_FILE"; then
++        :
++      else
++        ${optionalString (verbosityLevel >= 3) ''echo "${secretType.type} ${secretType.name} changed."''}
++        ${recordRestarts secretType}
++      fi
++    else
++      ${optionalString (verbosityLevel >= 3) ''echo "${secretType.type} ${secretType.name} is new."''}
++      ${recordRestarts secretType}
++    fi
 +  '';
 +
 +  installSecret = secretType: ''
 +    ${setupStart secretType}
++    ${optionalString (
++      verbosityLevel >= 3
++    ) ''echo "decrypting '${secretType.file}' to '$_truePath'..."''}
      (
        umask u=r,g=,o=
-       test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -60,13 +146,21 @@
+       test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!' >&2
+@@ -72,44 +149,133 @@
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
-+    if [ -f "$_truePath" ]; then
-+      if cmp -s "$_truePath" "$TMP_FILE"; then
-+        :
-+      else
-+        echo "${secretType.name} changed."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
-+      fi
-+    else
-+        echo "${secretType.name} is new."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
-+    fi
++
++    ${ifChanged secretType}
++
      chmod ${secretType.mode} "$TMP_FILE"
      mv -f "$TMP_FILE" "$_truePath"
  
@@ -203,79 +155,182 @@ index 54695aeb8e..28ffbc9ead 100644
 +    ${linkToPath secretType}
    '';
  
++  installTemplate = templateType: ''
++    ${setupStart templateType}
++    ${optionalString (
++      verbosityLevel >= 3
++    ) ''echo "generating template '${templateType.name}' to '$_truePath'..."''}
++    cp ${templateType.file} "$TMP_FILE"
++
++    ${builtins.concatStringsSep "\n" (
++      lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
++        ${optionalString (
++          verbosityLevel >= 3
++        ) ''echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."''}
++        test -f "${dep.file}" || echo "[agenix] WARNING: dependency file ${dep.file} does not exist!" >&2
++
++        _secret=$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})
++        _secret="''${_secret//\\/\\\\}"
++        _secret="''${_secret//|/\\|}"
++        _secret="''${_secret//&/\\&}"
++        _secret="''${_secret//$'\n'/\\n}"
++        ${pkgs.gnused}/bin/sed -i.bak "s|${dep.placeholder}|''${_secret}|g" "$TMP_FILE"
++        rm -f "$TMP_FILE.bak"
++      '')
++    )}
++
++    ${ifChanged templateType}
++
++    chmod ${templateType.mode} "$TMP_FILE"
++    mv -f "$TMP_FILE" "$_truePath"
++
++    ${linkToPath templateType}
++  '';
++
    testIdentities = map (path: ''
-@@ -74,22 +168,139 @@
+     test -f ${path} || echo '[agenix] WARNING: config.age.identityPaths entry ${path} not present!' >&2
    '') cfg.identityPaths;
  
    cleanupAndLink = ''
 -    _agenix_generation="$(basename "$(readlink "${cfg.secretsDir}")" || echo 0)"
--    (( ++_agenix_generation ))
--    echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
++    ${currentGeneration}
+     (( ++_agenix_generation ))
+     ${optionalString (verbosityLevel >= 2)
+       ''echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."''
+     }
 -    ln -sfT "${cfg.secretsMountPoint}/$_agenix_generation" "${cfg.secretsDir}"
--
--    (( _agenix_generation > 1 )) && {
--    echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
++    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsSubdir}" "${cfg.secretsDir}"
++    ${optionalString (verbosityLevel >= 2)
++      ''echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."''
++    }
++    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesSubdir}" "${cfg.templateDir}"
+ 
+     (( _agenix_generation > 1 )) && {
+     ${optionalString (
+       verbosityLevel >= 2
+     ) ''echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."''}
 -    rm -rf "${cfg.secretsMountPoint}/$(( _agenix_generation - 1 ))"
--    }
-+        _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
-+    	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
-+        then
-+    	  _agenix_generation=0
-+    fi
-+
-+        (( ++_agenix_generation ))
-+        echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
-+         # Ensure parent dir exists (e.g. .../agenix if targets are .../agenix/secrets)
-+        [[ -d "$(dirname "${cfg.secretsDir}")" ]] || mkdir -p "$(dirname "${cfg.secretsDir}")"
-+        [[ -d "$(dirname "${cfg.templateDir}")" ]] || mkdir -p "$(dirname "${cfg.templateDir}")"
-+
-+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation${secretsMountPoint}" "${cfg.secretsDir}"
-+
-+        echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."
-+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation${templatesMountPoint}" "${cfg.templateDir}"
-+
-+        (( _agenix_generation > 1 )) && {
-+        echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
-+        rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
-+        }
++    rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
+     }
    '';
  
+   enabledSecrets = lib.filter (secret: secret.enable) (builtins.attrValues cfg.secrets);
++  enabledTemplates = lib.filter (template: template.enable) (builtins.attrValues cfg.templates);
+ 
++  # No chown step here -- a home-manager activation owns everything it writes --
++  # so unlike ./age.nix the restarts happen inline rather than through a file
++  # handed to a second unit.
    installSecrets = builtins.concatStringsSep "\n" (
--    [ "echo '[agenix] decrypting secrets...'" ]
-+    [
-+      "echo '[agenix] decrypting secrets...'"
-+      "UNITS_TO_RESTART=()"
-+    ]
+     (optional (verbosityLevel >= 1) "echo '[agenix] decrypting secrets...'")
++    ++ [ "UNITS_TO_RESTART=()" ]
      ++ testIdentities
-     ++ (map installSecret (builtins.attrValues cfg.secrets))
+     ++ (map installSecret enabledSecrets)
 -    ++ [ cleanupAndLink ]
-+    ++ (map installTemplate (builtins.attrValues cfg.templates))
++    ++ (map installTemplate enabledTemplates)
 +    ++ [
 +      cleanupAndLink
 +      ''
 +        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
 +          mapfile -t UNIQUE_UNITS < <(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u)
-+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
++          ${optionalString (verbosityLevel >= 1) ''echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"''}
 +          if [ "$(uname)" = "Darwin" ]; then
-+             for unit in "''${UNIQUE_UNITS[@]}"; do
-+               launchctl kickstart -k "gui/$(id -u)/$unit" || true
-+             done
++            for unit in "''${UNIQUE_UNITS[@]}"; do
++              launchctl kickstart -k "gui/$(id -u)/$unit" || true
++            done
 +          else
-+             systemctl --user try-restart "''${UNIQUE_UNITS[@]}"
++            systemctl --user try-restart "''${UNIQUE_UNITS[@]}"
 +          fi
 +        fi
 +      ''
 +    ]
+   );
+ 
++  # Options shared by a secret and a template.
++  commonOptions = config: name: {
++    enable = mkOption {
++      type = types.bool;
++      default = true;
++      description = "Whether to install this file.";
++    };
++    name = mkOption {
++      type = types.str;
++      default = name;
++      description = ''
++        Name of the file used in ''${cfg.secretsDir} or ''${cfg.templateDir}
++      '';
++    };
++    mode = mkOption {
++      type = types.str;
++      default = "0400";
++      description = ''
++        Permissions mode of the installed file in a format understood by chmod.
++      '';
++    };
++    restartUnits = mkOption {
++      type = types.listOf types.str;
++      default = [ ];
++      description = ''
++        List of user units to restart when this file's contents change. Compared
++        with `cmp` against the previous generation, so an unchanged file
++        restarts nothing.
++      '';
++    };
++  };
++
+   secretType = types.submodule (
+     {
+       config,
+@@ -117,19 +283,13 @@
+       ...
+     }:
+     {
+-      options = {
+-        enable = mkOption {
+-          type = types.bool;
+-          default = true;
+-          description = "Whether to decrypt and install this secret.";
++      options = commonOptions config name // {
++        type = mkOption {
++          type = types.enum [ "secret" ];
++          readOnly = true;
++          internal = true;
++          default = "secret";
+         };
+-        name = mkOption {
+-          type = types.str;
+-          default = name;
+-          description = ''
+-            Name of the file used in ''${cfg.secretsDir}
+-          '';
+-        };
+         file = mkOption {
+           type = types.path;
+           description = ''
+@@ -143,14 +303,92 @@
+             Path where the decrypted secret is installed.
+           '';
+         };
+-        mode = mkOption {
++        symlink = mkEnableOption "symlinking secrets to their destination" // {
++          default = true;
++        };
++      };
++    }
 +  );
 +
 +  templateType = types.submodule (
-+    { config, ... }:
 +    {
-+      options = {
-+        name = mkOption {
-+          type = types.str;
-+          default = config._module.args.name;
-+          description = "The name of this secret.";
++      config,
++      name,
++      ...
++    }:
++    {
++      options = commonOptions config name // {
++        type = mkOption {
++          type = types.enum [ "template" ];
++          readOnly = true;
++          internal = true;
++          default = "template";
 +        };
 +        dependencies = mkOption {
 +          type =
@@ -286,32 +341,21 @@ index 54695aeb8e..28ffbc9ead 100644
 +            ];
 +          default = [ ];
 +          description = ''
-+            Other secrets on which this template depends.
++            Other secrets on which this template depends. Their decrypted
++            plaintext is substituted into the rendered content at activation
++            time, via the opaque markers passed to `content` as `placeholders`.
 +          '';
 +        };
-+        restartUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of units to restart when this template is updated.
-+          '';
-+        };
-+        type = mkOption {
-+          type = types.enum [ "template" ];
-+          readOnly = true;
-+          internal = true;
-+          default = "template";
-+        };
-+
 +        content = mkOption {
 +          type = types.functionTo (types.str);
-+        };
-+        mode = mkOption {
-+          type = types.str;
-+          default = "0400";
++          description = ''
++            Function producing the template's text. Called with `pkgs`, `lib` and
++            `placeholders` -- the last matching the shape of `dependencies`.
++          '';
 +        };
 +        path = mkOption {
-+          type = types.str;
+           type = types.str;
+-          default = "0400";
 +          default = "${cfg.templateDir}/${config.name}";
 +          description = "The path where the generated file will be written to.";
 +        };
@@ -321,84 +365,76 @@ index 54695aeb8e..28ffbc9ead 100644
 +            dep:
 +            dep
 +            // {
-+              placeholder = "<AGE_PLACEHOLDER:${builtins.hashString "sha256" dep.name}:${builtins.hashString "sha256" (toString dep.file)}:>";
++              placeholder = "<AGE_PLACEHOLDER:${builtins.hashString "sha256" dep.name}:${
++                builtins.hashString "sha256" (toString dep.file)
++              }:>";
 +            }
 +          ) config.dependencies;
 +          internal = true;
 +          readOnly = true;
-+          description = ''
-+            Placeholders to be used in the content script.
-+          '';
-+        };
+           description = ''
+-            Permissions mode of the decrypted secret in a format understood by chmod.
++            Placeholders to be used in the content script. Each placeholder key will be
++            replaced by its corresponding value in the final generated secret content.
+           '';
+         };
+-        symlink = mkEnableOption "symlinking secrets to their destination" // {
 +        file = mkOption {
 +          type = types.path;
-+          internal = true;
 +          readOnly = true;
++          internal = true;
 +          default = "${pkgs.writeTextFile {
 +            name = "agenix-template-${config.name}-content";
 +            text = config.content {
 +              pkgs = pkgs;
 +              lib = lib;
 +              placeholders = mapListOrAttrs (dep: dep.placeholder) config.placeholderMap;
-+              deps = mapListOrAttrsToList (dep: dep.path) config.dependencies;
 +            };
 +          }}";
-+          description = "The path where the generated file will be written to.";
++          defaultText = literalExpression ''
++            pkgs.writeTextFile {
++              name = "agenix-template-''${config.name}-content";
++              text = config.content { inherit pkgs lib; placeholders = ...; };
++            }
++          '';
++          description = "The rendered template, with placeholders still in it.";
 +        };
 +        symlink = mkEnableOption "symlinking templates to their destination" // {
-+          default = true;
-+        };
-+
-+      };
-+
-+    }
-   );
- 
-   secretType = types.submodule (
-@@ -107,6 +318,12 @@
-             Name of the file used in ''${cfg.secretsDir}
-           '';
-         };
-+        type = mkOption {
-+          type = types.enum [ "secret" ];
-+          readOnly = true;
-+          internal = true;
-+          default = "secret";
-+        };
-         file = mkOption {
-           type = types.path;
-           description = ''
-@@ -127,6 +344,13 @@
-             Permissions mode of the decrypted secret in a format understood by chmod.
-           '';
-         };
-+        restartUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of units to restart when this secret is updated.
-+          '';
-+        };
-         symlink = mkEnableOption "symlinking secrets to their destination" // {
            default = true;
          };
-@@ -138,7 +362,14 @@
+       };
+@@ -161,7 +399,11 @@
      let
        app = pkgs.writeShellApplication {
          name = "agenix-home-manager-mount-secrets";
 -        runtimeInputs = with pkgs; [ coreutils ];
-+        runtimeInputs =
-+          with pkgs;
-+          [
-+            coreutils
-+            diffutils
-+            gnused
-+          ]
-+          ++ lib.optionals stdenv.isLinux [ systemd ];
++        runtimeInputs = with pkgs; [
++          coreutils
++          diffutils
++          gnused
++        ];
          text = ''
            ${newGeneration}
            ${installSecrets}
-@@ -175,6 +406,14 @@
+@@ -187,9 +429,16 @@
+     '';
+ in
+ {
++  imports = [
++    # See the equivalent note in ./age.nix: the path holds secrets AND templates
++    # now, so a name saying "secrets" describes one of its two children.
++    (mkRenamedOptionModule [ "age" "secretsMountPoint" ] [ "age" "ageMountPoint" ])
++  ];
++
+   options.age = {
+     enable = mkEnableOption "agenix" // {
+-      default = enabledSecrets != [ ];
++      default = enabledSecrets != [ ] || enabledTemplates != [ ];
++      defaultText = literalExpression "enabledSecrets != [ ] || enabledTemplates != [ ]";
+     };
+ 
+     package = mkPackageOption pkgs "age" { };
+@@ -218,6 +467,14 @@
        '';
      };
  
@@ -406,14 +442,14 @@ index 54695aeb8e..28ffbc9ead 100644
 +      type = types.attrsOf templateType;
 +      default = { };
 +      description = ''
-+        Attrset of templates.
++        Attrset of age secret templates to be generated.
 +      '';
 +    };
 +
      identityPaths = mkOption {
        type = types.listOf types.path;
        default = [
-@@ -194,23 +433,32 @@
+@@ -237,18 +494,28 @@
  
      secretsDir = mkOption {
        type = types.str;
@@ -432,7 +468,7 @@ index 54695aeb8e..28ffbc9ead 100644
 +      default = userDirectory "agenix/templates";
 +      defaultText = userDirectoryDescription "agenix/templates";
 +      description = ''
-+        Folder where templates are symlinked to.
++        Folder where rendered templates are symlinked to
 +      '';
 +    };
 +
@@ -441,33 +477,32 @@ index 54695aeb8e..28ffbc9ead 100644
        defaultText = userDirectoryDescription "agenix.d";
        description = ''
 -        Where secrets are created before they are symlinked to ''${cfg.secretsDir}
-+        Where secrets are created before they are symlinked to ''${cfg.secretsDir} and templates to ''${cfg.templateDir}.
++        Where secrets and templates are created before they are symlinked to
++        ''${cfg.secretsDir} and ''${cfg.templateDir}.
        '';
      };
    };
- 
--  config = mkIf (cfg.secrets != { }) {
-+  config = mkIf (cfg.secrets != { } || cfg.templates != { }) {
-     assertions = [
-       {
-         assertion = cfg.identityPaths != [ ];
-diff --git a/modules/age.nix b/modules/age.nix
-index acae79fe80..5a34b20f42 100644
---- a/modules/age.nix
-+++ b/modules/age.nix
-@@ -11,6 +11,11 @@
+diff -ruN a/modules/age.nix b/modules/age.nix
+--- a/modules/age.nix	2026-10-28 16:37:55
++++ b/modules/age.nix	2026-10-28 16:38:12
+@@ -19,6 +19,16 @@
  
    isDarwin = lib.attrsets.hasAttrByPath [ "environment" "darwinConfig" ] options;
  
 +  mapListOrAttrs = f: x: if builtins.isList x then map f x else lib.mapAttrs (_: f) x;
 +  mapListOrAttrsToList = f: x: if builtins.isList x then map f x else lib.mapAttrsToList (_: f) x;
-+  secretsMountPoint = "secrets";
-+  templatesMountPoint = "templates";
++
++  # Subdirectory NAMES inside a generation, not paths. `age.ageMountPoint` is the
++  # path; secrets and templates each get their own directory under a generation
++  # so `age.secretsDir` and `age.templateDir` can be two independent symlinks
++  # into the same atomically-created generation.
++  secretsSubdir = "secrets";
++  templatesSubdir = "templates";
 +
    ageBin = config.age.ageBin;
  
    users = config.users.users;
-@@ -24,41 +29,72 @@
+@@ -35,11 +45,11 @@
    mountCommand =
      if isDarwin then
        ''
@@ -480,6 +515,16 @@ index acae79fe80..5a34b20f42 100644
 +            mount -t hfs -o nobrowse,nodev,nosuid,-m=0751 "$dev" "${cfg.ageMountPoint}"
          fi
        ''
+     else if
+@@ -51,42 +61,79 @@
+       && lib.versionAtLeast config.boot.kernelPackages.kernel.version "6.4.0"
+     then
+       ''
+-        grep -q "${cfg.secretsMountPoint} tmpfs" /proc/mounts ||
+-          mount -t tmpfs none "${cfg.secretsMountPoint}" -o nodev,nosuid,mode=0751,noswap
++        grep -q "${cfg.ageMountPoint} tmpfs" /proc/mounts ||
++          mount -t tmpfs none "${cfg.ageMountPoint}" -o nodev,nosuid,mode=0751,noswap
+       ''
      else
        ''
 -        grep -q "${cfg.secretsMountPoint} ramfs" /proc/mounts ||
@@ -487,36 +532,45 @@ index acae79fe80..5a34b20f42 100644
 +        grep -q "${cfg.ageMountPoint} ramfs" /proc/mounts ||
 +          mount -t ramfs none "${cfg.ageMountPoint}" -o nodev,nosuid,mode=0751
        '';
-   newGeneration = ''
++
++  # `secretsDir` points at <gen>/secrets, so the generation number is one level
++  # further up than upstream's layout. The numeric guard matters: on a first
++  # activation the symlink does not exist, `readlink` fails, and `basename
++  # "$(dirname "")"` yields "." rather than a number -- which would then be used
++  # in arithmetic.
+   currentGeneration = ''
 -    _agenix_generation="$(basename "$(readlink ${cfg.secretsDir})" || echo 0)"
--    (( ++_agenix_generation ))
--    echo "[agenix] creating new generation in ${cfg.secretsMountPoint}/$_agenix_generation"
++    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
++    if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]; then
++      _agenix_generation=0
++    fi
+   '';
++
+   newGeneration = ''
+     ${currentGeneration}
+     (( ++_agenix_generation ))
+     ${optionalString (
+       verbosityLevel >= 2
+-    ) ''echo "[agenix] creating new generation in ${cfg.secretsMountPoint}/$_agenix_generation"''}
 -    mkdir -p "${cfg.secretsMountPoint}"
 -    chmod 0751 "${cfg.secretsMountPoint}"
--    ${mountCommand}
++    ) ''echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"''}
++    mkdir -p "${cfg.ageMountPoint}"
++    chmod 0751 "${cfg.ageMountPoint}"
+     ${mountCommand}
 -    mkdir -p "${cfg.secretsMountPoint}/$_agenix_generation"
 -    chmod 0751 "${cfg.secretsMountPoint}/$_agenix_generation"
-+        _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
-+    	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
-+        then
-+    	  _agenix_generation=0
-+    fi
-+            _old_generation="$_agenix_generation"
-+            (( ++_agenix_generation ))
-+            echo "[agenix] creating new generation in ${cfg.ageMountPoint}/$_agenix_generation"
-+            mkdir -p "${cfg.ageMountPoint}"
-+            chmod 0751 "${cfg.ageMountPoint}"
-+            ${mountCommand}
-+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
-+            chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
-+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}"
-+            mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}"
-+        	mkdir -p "$(dirname "${cfg.secretsDir}")"
-+        	mkdir -p "$(dirname "${cfg.templateDir}")"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation"
++    chmod 0751 "${cfg.ageMountPoint}/$_agenix_generation"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${secretsSubdir}"
++    mkdir -p "${cfg.ageMountPoint}/$_agenix_generation/${templatesSubdir}"
++    mkdir -p "$(dirname "${cfg.secretsDir}")"
++    mkdir -p "$(dirname "${cfg.templateDir}")"
    '';
  
    chownGroup = if isDarwin then "admin" else "keys";
-   # chown the secrets mountpoint and the current generation to the keys group
+-  # chown the secrets mountpoint and the current generation to the keys group
++  # chown the mountpoint and the current generation to the keys group
    # instead of leaving it root:root.
    chownMountPoint = ''
 -    chown :${chownGroup} "${cfg.secretsMountPoint}" "${cfg.secretsMountPoint}/$_agenix_generation"
@@ -524,11 +578,10 @@ index acae79fe80..5a34b20f42 100644
    '';
  
 +  # The agenix managed directory a secret or template is exposed through, and
-+  # the mount point of that directory inside a generation.
++  # the subdirectory of that directory inside a generation.
 +  targetDir =
 +    secretType: toString (if secretType.type == "template" then cfg.templateDir else cfg.secretsDir);
-+  mountPoint =
-+    secretType: if secretType.type == "template" then templatesMountPoint else secretsMountPoint;
++  subdirOf = secretType: if secretType.type == "template" then templatesSubdir else secretsSubdir;
 +
 +  # Whether path points inside the agenix managed directory. That directory is
 +  # itself a symlink which only points at the new generation once everything is
@@ -537,7 +590,7 @@ index acae79fe80..5a34b20f42 100644
 +  # in the new generation instead, keeping any nested folders of path.
 +  inTargetDir = secretType: hasPrefix "${targetDir secretType}/" secretType.path;
 +
-+  # Location of the file inside a generation, relative to its mount point.
++  # Location of the file inside a generation, relative to its subdirectory.
 +  generationPath =
 +    secretType:
 +    if inTargetDir secretType then
@@ -551,11 +604,13 @@ index acae79fe80..5a34b20f42 100644
 +      if secretType.symlink || inTargetDir secretType then
          ''
 -          _truePath="${cfg.secretsMountPoint}/$_agenix_generation/${secretType.name}"
-+          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${mountPoint secretType}/${generationPath secretType}"
++          _truePath="${cfg.ageMountPoint}/$_agenix_generation/${subdirOf secretType}/${
++            generationPath secretType
++          }"
          ''
        else
          ''
-@@ -67,11 +103,19 @@
+@@ -95,13 +142,23 @@
      }
    '';
  
@@ -569,96 +624,66 @@ index acae79fe80..5a34b20f42 100644
 +      ln -sfT "${targetDir secretType}/${secretType.name}" "${secretType.path}"
 +    '';
 +
++  # The prologue both secrets and templates need: where the file goes, a temp
++  # file beside it, and the readable identities.
 +  setupStart = secretType: ''
      ${setTruePath secretType}
--    echo "decrypting '${secretType.file}' to '$_truePath'..."
-+    echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."
+     ${optionalString (
+       verbosityLevel >= 3
+-    ) ''echo "decrypting '${secretType.file}' to '$_truePath'..."''}
++    ) ''echo "setting up ${secretType.type} '${secretType.name}' at '$_truePath'..."''}
      TMP_FILE="$_truePath.tmp"
 -
      IDENTITIES=()
      for identity in ${toString cfg.identityPaths}; do
        test -r "$identity" || continue
-@@ -83,7 +127,57 @@
-     test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!"
+@@ -113,7 +170,39 @@
+     test "''${#IDENTITIES[@]}" -eq 0 && echo "[agenix] WARNING: no readable identities found!" >&2
  
      mkdir -p "$(dirname "$_truePath")"
 -    [ "${secretType.path}" != "${cfg.secretsDir}/${secretType.name}" ] && mkdir -p "$(dirname "${secretType.path}")"
-+
 +  '';
 +
-+  installTemplate = templateType: ''
-+    ${setupStart templateType}
-+    echo "generating template '${templateType.name}' to '$_truePath'..."
-+    cp ${templateType.file} "$TMP_FILE"
-+
-+    ${builtins.concatStringsSep "\n" (
-+      lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
-+        echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."
-+        test -f "${dep.file}" || echo "[agenix] WARNING: dependency file ${dep.file} does not exist!"
-+
-+        _secret=$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})
-+        _secret="''${_secret//\\/\\\\}"
-+        _secret="''${_secret//|/\\|}"
-+        _secret="''${_secret//&/\\&}"
-+        _secret="''${_secret//$'\n'/\\n}"
-+        ${pkgs.gnused}/bin/sed -i.bak "s|${dep.placeholder}|''${_secret}|g" "$TMP_FILE"
-+        rm -f "$TMP_FILE.bak"
-+      '')
++  # Units to restart when a file's contents changed. Recorded into shell arrays
++  # during install and acted on by `restartUnits` after chowning, so a unit is
++  # not restarted before its secret is readable by the right user.
++  recordRestarts = secretType: ''
++    ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
++    ${concatStringsSep "\n" (
++      map (unit: "USER_UNITS_TO_RESTART+=('${secretType.owner}:${unit}')") secretType.restartUserUnits
 +    )}
-+    # check if the template changed then add units
++  '';
++
++  # `cmp` against what is already there, so a secret whose plaintext did not
++  # change does not restart its units on every activation.
++  ifChanged = secretType: ''
 +    if [ -f "$_truePath" ]; then
 +      if ${pkgs.diffutils}/bin/cmp -s "$_truePath" "$TMP_FILE"; then
 +        :
 +      else
-+        echo "template ${templateType.name} changed."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") templateType.restartUnits)}
-+        ${concatStringsSep "\n" (
-+          map (unit: "USER_UNITS_TO_RESTART+=('${templateType.owner}:${unit}')") templateType.restartUserUnits
-+        )}
++        ${optionalString (verbosityLevel >= 3) ''echo "${secretType.type} ${secretType.name} changed."''}
++        ${recordRestarts secretType}
 +      fi
 +    else
-+        echo "template ${templateType.name} is new."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") templateType.restartUnits)}
-+        ${concatStringsSep "\n" (
-+          map (unit: "USER_UNITS_TO_RESTART+=('${templateType.owner}:${unit}')") templateType.restartUserUnits
-+        )}
++      ${optionalString (verbosityLevel >= 3) ''echo "${secretType.type} ${secretType.name} is new."''}
++      ${recordRestarts secretType}
 +    fi
-+
-+
-+
-+    chmod ${templateType.mode} "$TMP_FILE"
-+    mv -f "$TMP_FILE" "$_truePath"
-+    ${linkToPath templateType}
 +  '';
 +
 +  installSecret = secretType: ''
 +    ${setupStart secretType}
-+    echo "decrypting '${secretType.file}' to '$_truePath'..."
++    ${optionalString (
++      verbosityLevel >= 3
++    ) ''echo "decrypting '${secretType.file}' to '$_truePath'..."''}
      (
        umask u=r,g=,o=
-       test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!'
-@@ -92,12 +186,29 @@
+       test -f "${secretType.file}" || echo '[agenix] WARNING: encrypted file ${secretType.file} does not exist!' >&2
+@@ -122,14 +211,47 @@
          config.i18n.defaultLocale or "C"
        } ${ageBin} --decrypt "''${IDENTITIES[@]}" -o "$TMP_FILE" "${secretType.file}"
      )
 +
-+    if [ -f "$_truePath" ]; then
-+      if ${pkgs.diffutils}/bin/cmp -s "$_truePath" "$TMP_FILE"; then
-+        :
-+      else
-+        echo "${secretType.name} changed."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
-+        ${concatStringsSep "\n" (
-+          map (unit: "USER_UNITS_TO_RESTART+=('${secretType.owner}:${unit}')") secretType.restartUserUnits
-+        )}
-+      fi
-+    else
-+        echo "${secretType.name} is new."
-+        ${concatStringsSep "\n" (map (unit: "UNITS_TO_RESTART+=('${unit}')") secretType.restartUnits)}
-+        ${concatStringsSep "\n" (
-+          map (unit: "USER_UNITS_TO_RESTART+=('${secretType.owner}:${unit}')") secretType.restartUserUnits
-+        )}
-+    fi
++    ${ifChanged secretType}
 +
      chmod ${secretType.mode} "$TMP_FILE"
      mv -f "$TMP_FILE" "$_truePath"
@@ -669,104 +694,248 @@ index acae79fe80..5a34b20f42 100644
 +    ${linkToPath secretType}
    '';
  
++  installTemplate = templateType: ''
++    ${setupStart templateType}
++    ${optionalString (
++      verbosityLevel >= 3
++    ) ''echo "generating template '${templateType.name}' to '$_truePath'..."''}
++    cp ${templateType.file} "$TMP_FILE"
++
++    ${builtins.concatStringsSep "\n" (
++      lib.flip mapListOrAttrsToList templateType.placeholderMap (dep: ''
++        ${optionalString (
++          verbosityLevel >= 3
++        ) ''echo "replacing placeholder ${dep.placeholder} in ${templateType.name}..."''}
++        test -f "${dep.file}" || echo "[agenix] WARNING: dependency file ${dep.file} does not exist!" >&2
++
++        _secret=$(${ageBin} --decrypt "''${IDENTITIES[@]}" ${lib.escapeShellArg dep.file})
++        _secret="''${_secret//\\/\\\\}"
++        _secret="''${_secret//|/\\|}"
++        _secret="''${_secret//&/\\&}"
++        _secret="''${_secret//$'\n'/\\n}"
++        ${pkgs.gnused}/bin/sed -i.bak "s|${dep.placeholder}|''${_secret}|g" "$TMP_FILE"
++        rm -f "$TMP_FILE.bak"
++      '')
++    )}
++
++    ${ifChanged templateType}
++
++    chmod ${templateType.mode} "$TMP_FILE"
++    mv -f "$TMP_FILE" "$_truePath"
++
++    ${linkToPath templateType}
++  '';
++
    testIdentities = map (path: ''
-@@ -105,22 +216,71 @@
+     test -f ${path} || echo '[agenix] WARNING: config.age.identityPaths entry ${path} not present!' >&2
    '') cfg.identityPaths;
- 
-   cleanupAndLink = ''
--    _agenix_generation="$(basename "$(readlink ${cfg.secretsDir})" || echo 0)"
--    (( ++_agenix_generation ))
--    echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
+@@ -140,23 +262,50 @@
+     ${optionalString (verbosityLevel >= 2)
+       ''echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."''
+     }
 -    ln -sfT "${cfg.secretsMountPoint}/$_agenix_generation" ${cfg.secretsDir}
--
--    (( _agenix_generation > 1 )) && {
--    echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
++    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsSubdir}" "${cfg.secretsDir}"
++    ${optionalString (verbosityLevel >= 2)
++      ''echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."''
++    }
++    ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesSubdir}" "${cfg.templateDir}"
+ 
+     (( _agenix_generation > 1 )) && {
+     ${optionalString (
+       verbosityLevel >= 2
+     ) ''echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."''}
 -    rm -rf "${cfg.secretsMountPoint}/$(( _agenix_generation - 1 ))"
--    }
-+    _agenix_generation="$(basename "$(dirname "$(readlink "${cfg.secretsDir}")")" || echo 0)"
-+        	if ! [[ "$_agenix_generation" =~ ^[0-9]+$ ]]
-+            then
-+        	  _agenix_generation=0
-+        fi
-+
-+        (( ++_agenix_generation ))
-+        echo "[agenix] symlinking new secrets to ${cfg.secretsDir} (generation $_agenix_generation)..."
-+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${secretsMountPoint}" ${cfg.secretsDir}
-+        echo "[agenix] symlinking new templates to ${cfg.templateDir} (generation $_agenix_generation)..."
-+        ln -sfT "${cfg.ageMountPoint}/$_agenix_generation/${templatesMountPoint}" ${cfg.templateDir}
-+
-+        (( _agenix_generation > 1 )) && {
-+        echo "[agenix] removing old secrets (generation $(( _agenix_generation - 1 )))..."
-+        rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
-+        }
++    rm -rf "${cfg.ageMountPoint}/$(( _agenix_generation - 1 ))"
+     }
    '';
  
+   enabledSecrets = lib.filter (secret: secret.enable) (builtins.attrValues cfg.secrets);
++  enabledTemplates = lib.filter (template: template.enable) (builtins.attrValues cfg.templates);
+ 
++  restartUnitsFile = "/run/agenix-restart-units";
++  restartUserUnitsFile = "/run/agenix-restart-user-units";
++
    installSecrets = builtins.concatStringsSep "\n" (
--    [ "echo '[agenix] decrypting secrets...'" ]
-+    [
-+      "echo '[agenix] decrypting secrets...'"
+     (optional (verbosityLevel >= 1) "echo '[agenix] decrypting secrets...'")
++    ++ [
 +      "UNITS_TO_RESTART=()"
 +      "USER_UNITS_TO_RESTART=()"
 +    ]
      ++ testIdentities
-     ++ (map installSecret (builtins.attrValues cfg.secrets))
+     ++ (map installSecret enabledSecrets)
 -    ++ [ cleanupAndLink ]
-+    ++ (map installTemplate (builtins.attrValues cfg.templates))
++    ++ (map installTemplate enabledTemplates)
 +    ++ [
 +      cleanupAndLink
-+      (optionalString (!isDarwin) ''
++      # Recorded here, acted on by `restartUnits` once chowning has run. A file
++      # rather than a shell variable because install and chown are separate
++      # units under sysusers, so the two scripts share no environment.
++      ''
++        rm -f ${restartUnitsFile} ${restartUserUnitsFile}
 +        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
-+          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
-+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
-+          ${pkgs.systemd}/bin/systemctl try-restart "''${UNIQUE_UNITS[@]}"
++          printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u > ${restartUnitsFile}
 +        fi
 +        if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
-+          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
-+          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
-+          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
-+             user="''${entry%%:*}"
-+             unit="''${entry#*:}"
-+             ${pkgs.systemd}/bin/systemctl --user -M "$user@" try-restart "$unit"
-+          done
++          printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u > ${restartUserUnitsFile}
 +        fi
-+      '')
-+      (optionalString isDarwin ''
-+        if [ "''${#UNITS_TO_RESTART[@]}" -ne 0 ]; then
-+          UNIQUE_UNITS=($(printf "%s\n" "''${UNITS_TO_RESTART[@]}" | sort -u))
-+          echo "[agenix] restarting units: ''${UNIQUE_UNITS[*]}"
-+          for unit in "''${UNIQUE_UNITS[@]}"; do
-+            launchctl kickstart -k "system/$unit"
-+          done
-+        fi
-+        if [ "''${#USER_UNITS_TO_RESTART[@]}" -ne 0 ]; then
-+          UNIQUE_USER_UNITS=($(printf "%s\n" "''${USER_UNITS_TO_RESTART[@]}" | sort -u))
-+          echo "[agenix] restarting user units: ''${UNIQUE_USER_UNITS[*]}"
-+          for entry in "''${UNIQUE_USER_UNITS[@]}"; do
-+             user="''${entry%%:*}"
-+             unit="''${entry#*:}"
-+             uid=$(id -u "$user")
-+             launchctl kickstart -k "gui/$uid/$unit"
-+          done
-+        fi
-+      '')
++      ''
 +    ]
    );
  
    chownSecret = secretType: ''
-@@ -132,6 +292,133 @@
-     [ "echo '[agenix] chowning...'" ]
+@@ -168,25 +317,116 @@
+     (optional (verbosityLevel >= 2) "echo '[agenix] chowning...'")
      ++ [ chownMountPoint ]
-     ++ (map chownSecret (builtins.attrValues cfg.secrets))
-+    ++ (map chownSecret (builtins.attrValues cfg.templates))
+     ++ (map chownSecret enabledSecrets)
++    ++ (map chownSecret enabledTemplates)
+   );
+ 
++  restartUnits = ''
++    if [ -s ${restartUnitsFile} ]; then
++      mapfile -t UNITS < ${restartUnitsFile}
++      rm -f ${restartUnitsFile}
++      ${optionalString (verbosityLevel >= 1) ''echo "[agenix] restarting units: ''${UNITS[*]}"''}
++      ${
++        if isDarwin then
++          ''
++            for unit in "''${UNITS[@]}"; do
++              launchctl kickstart -k "system/$unit"
++            done
++          ''
++        else
++          ''
++            ${pkgs.systemd}/bin/systemctl try-restart "''${UNITS[@]}"
++          ''
++      }
++    fi
++    if [ -s ${restartUserUnitsFile} ]; then
++      mapfile -t USER_UNITS < ${restartUserUnitsFile}
++      rm -f ${restartUserUnitsFile}
++      ${optionalString (verbosityLevel >= 1) ''echo "[agenix] restarting user units: ''${USER_UNITS[*]}"''}
++      for entry in "''${USER_UNITS[@]}"; do
++        user="''${entry%%:*}"
++        unit="''${entry#*:}"
++        ${
++          if isDarwin then
++            ''
++              launchctl kickstart -k "gui/$(id -u "$user")/$unit"
++            ''
++          else
++            ''
++              ${pkgs.systemd}/bin/systemctl --user -M "$user@" try-restart "$unit"
++            ''
++        }
++      done
++    fi
++  '';
++
++  # Options shared by a secret and a template: everything about WHERE the file
++  # lands and WHO may read it, which is identical for both.
++  commonOptions = config: {
++    enable = mkOption {
++      type = types.bool;
++      default = true;
++      description = "Whether to install this file.";
++    };
++    name = mkOption {
++      type = types.str;
++      default = config._module.args.name;
++      defaultText = literalExpression "config._module.args.name";
++      description = ''
++        Name of the file used in {option}`age.secretsDir` or {option}`age.templateDir`
++      '';
++    };
++    mode = mkOption {
++      type = types.str;
++      default = "0400";
++      description = ''
++        Permissions mode of the installed file in a format understood by chmod.
++      '';
++    };
++    owner = mkOption {
++      type = types.str;
++      default = "0";
++      description = ''
++        User of the installed file.
++      '';
++    };
++    group = mkOption {
++      type = types.str;
++      default = (findFirst (u: u.name == config.owner) { } (attrValues users)).group or "0";
++      defaultText = literalExpression ''
++        (findFirst (u: u.name == config.owner) { } (attrValues users)).group or "0"
++      '';
++      description = ''
++        Group of the installed file.
++      '';
++    };
++    restartUnits = mkOption {
++      type = types.listOf types.str;
++      default = [ ];
++      description = ''
++        List of units to restart when this file's contents change. Compared with
++        `cmp` against the previous generation, so an unchanged file restarts
++        nothing.
++      '';
++    };
++    restartUserUnits = mkOption {
++      type = types.listOf types.str;
++      default = [ ];
++      description = ''
++        List of user units of `owner` to restart when this file's contents change.
++      '';
++    };
++  };
++
+   secretType = types.submodule (
+     { config, ... }:
+     {
+-      options = {
+-        enable = mkOption {
+-          type = types.bool;
+-          default = true;
+-          description = "Whether to decrypt and install this secret.";
++      options = commonOptions config // {
++        type = mkOption {
++          type = types.enum [ "secret" ];
++          readOnly = true;
++          internal = true;
++          default = "secret";
+         };
+-        name = mkOption {
+-          type = types.str;
+-          default = config._module.args.name;
+-          defaultText = literalExpression "config._module.args.name";
+-          description = ''
+-            Name of the file used in {option}`age.secretsDir`
+-          '';
+-        };
+         file = mkOption {
+           type = types.path;
+           description = ''
+@@ -203,31 +443,101 @@
+             Path where the decrypted secret is installed.
+           '';
+         };
+-        mode = mkOption {
+-          type = types.str;
+-          default = "0400";
++        symlink = mkEnableOption "symlinking secrets to their destination" // {
++          default = true;
++        };
++      };
++    }
 +  );
++
 +  templateType = types.submodule (
 +    { config, ... }:
 +    {
-+      options = {
-+        name = mkOption {
-+          type = types.str;
-+          default = config._module.args.name;
-+          description = "The name of this secret.";
++      options = commonOptions config // {
++        type = mkOption {
++          type = types.enum [ "template" ];
++          readOnly = true;
++          internal = true;
++          default = "template";
 +        };
 +        dependencies = mkOption {
 +          type =
@@ -777,7 +946,8 @@ index acae79fe80..5a34b20f42 100644
 +            ];
 +          example = literalExpression "[ config.age.secrets.basicAuthPw1 nixosConfigurations.machine2.config.age.secrets.basicAuthPw ]";
 +          default = [ ];
-+          description = ''
+           description = ''
+-            Permissions mode of the decrypted secret in a format understood by chmod.
 +            Other secrets on which this template depends. This guarantees that in the final
 +            `agenix generate` script, all dependencies will be generated before
 +            this secret is generated, allowing you use their outputs via the passed `decrypt` function.
@@ -791,46 +961,28 @@ index acae79fe80..5a34b20f42 100644
 +
 +            You may refer to age secrets of other nixos hosts as long as all hosts
 +            are rekeyed via the same flake.
-+          '';
-+        };
-+        restartUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of units to restart when this template is updated.
-+          '';
-+        };
-+        restartUserUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of user units to restart when this template is updated.
-+          '';
-+        };
-+        type = mkOption {
-+          type = types.enum [ "template" ];
-+          readOnly = true;
-+          internal = true;
-+          default = "template";
-+        };
-+
+           '';
+         };
+-        owner = mkOption {
+-          type = types.str;
+-          default = "0";
 +        content = mkOption {
 +          type = types.functionTo (types.str);
-+        };
-+        owner = mkOption {
-+          type = types.str;
-+          default = "0";
-+        };
-+        group = mkOption {
-+          type = types.str;
-+          default = users.${config.owner}.group or "0";
-+        };
-+        mode = mkOption {
-+          type = types.str;
-+          default = "0400";
-+        };
+           description = ''
+-            User of the decrypted secret.
++            Function producing the template's text. Called with `pkgs`, `lib` and
++            `placeholders` -- the last being a list or attrset, matching the shape
++            of `dependencies`, of opaque markers replaced at activation time by
++            each dependency's decrypted plaintext.
+           '';
+         };
+-        group = mkOption {
 +        path = mkOption {
-+          type = types.str;
+           type = types.str;
+-          default = (findFirst (u: u.name == config.owner) { } (attrValues users)).group or "0";
+-          defaultText = literalExpression ''
+-            (findFirst (u: u.name == config.owner) { } (attrValues users)).group or "0"
+-          '';
 +          default = "${cfg.templateDir}/${config.name}";
 +          description = "The path where the generated file will be written to.";
 +        };
@@ -847,11 +999,13 @@ index acae79fe80..5a34b20f42 100644
 +          ) config.dependencies;
 +          internal = true;
 +          readOnly = true;
-+          description = ''
+           description = ''
+-            Group of the decrypted secret.
 +            Placeholders to be used in the content script. Each placeholder key will be
 +            replaced by its corresponding value in the final generated secret content.
-+          '';
-+        };
+           '';
+         };
+-        symlink = mkEnableOption "symlinking secrets to their destination" // {
 +        file = mkOption {
 +          type = types.path;
 +          readOnly = true;
@@ -865,66 +1019,41 @@ index acae79fe80..5a34b20f42 100644
 +            };
 +          }}";
 +          defaultText = literalExpression ''
-+                pkgs.writeTextFile {
-+                  name = "agenix-template-''${config.name}-content";
-+                  text = config.content {
-+                    pkgs = pkgs;
-+                    lib = lib;
-+                    deps = ''${mapListOrAttrsToList (dep: dep.path) config.dependencies};
-+                  };
-+                }
-+              description = "The path where the generated file will be written to.";
-+            };
++            pkgs.writeTextFile {
++              name = "agenix-template-''${config.name}-content";
++              text = config.content { inherit pkgs lib; placeholders = ...; };
++            }
 +          '';
++          description = "The rendered template, with placeholders still in it.";
 +        };
 +        symlink = mkEnableOption "symlinking templates to their destination" // {
-+          default = true;
-+        };
-+
-+      };
-+
-+    }
-   );
- 
-   secretType = types.submodule (
-@@ -146,6 +433,12 @@
-             Name of the file used in {option}`age.secretsDir`
-           '';
+           default = true;
          };
-+        type = mkOption {
-+          type = types.enum [ "secret" ];
-+          readOnly = true;
-+          internal = true;
-+          default = "secret";
-+        };
-         file = mkOption {
-           type = types.path;
-           description = ''
-@@ -169,6 +462,20 @@
-             Permissions mode of the decrypted secret in a format understood by chmod.
-           '';
-         };
-+        restartUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of units to restart when this secret is updated.
-+          '';
-+        };
-+        restartUserUnits = mkOption {
-+          type = types.listOf types.str;
-+          default = [ ];
-+          description = ''
-+            List of user units to restart when this secret is updated.
-+          '';
-+        };
-         owner = mkOption {
-           type = types.str;
-           default = "0";
-@@ -199,6 +506,14 @@
+       };
+@@ -237,11 +547,18 @@
+ {
+   imports = [
+     (mkRenamedOptionModule [ "age" "sshKeyPaths" ] [ "age" "identityPaths" ])
++    # `secretsMountPoint` became `ageMountPoint` when generations gained
++    # per-kind subdirectories: the path now holds secrets AND templates, so a
++    # name saying "secrets" describes one of its two children. Renamed rather
++    # than dropped, so a config still setting the old name is pointed at the new
++    # one instead of silently having no effect.
++    (mkRenamedOptionModule [ "age" "secretsMountPoint" ] [ "age" "ageMountPoint" ])
    ];
  
    options.age = {
+     enable = mkEnableOption "agenix" // {
+-      default = enabledSecrets != [ ];
++      default = enabledSecrets != [ ] || enabledTemplates != [ ];
++      defaultText = literalExpression "enabledSecrets != [ ] || enabledTemplates != [ ]";
+     };
+ 
+     ageBin = mkOption {
+@@ -276,14 +593,28 @@
+         Attrset of secrets.
+       '';
+     };
 +    templates = mkOption {
 +      type = types.attrsOf templateType;
 +      default = { };
@@ -932,12 +1061,6 @@ index acae79fe80..5a34b20f42 100644
 +        Attrset of age secret templates to be generated.
 +      '';
 +    };
-+
-     ageBin = mkOption {
-       type = types.str;
-       default = "${pkgs.age}/bin/age";
-@@ -218,12 +533,19 @@
-     };
      secretsDir = mkOption {
        type = types.path;
 -      default = "/run/agenix";
@@ -958,41 +1081,63 @@ index acae79fe80..5a34b20f42 100644
        type =
          types.addCheck types.str (
            s:
-@@ -266,9 +588,10 @@
-         Path to SSH keys to be used as identities in age decryption.
+@@ -295,7 +626,8 @@
+         };
+       default = "/run/agenix.d";
+       description = ''
+-        Where secrets are created before they are symlinked to {option}`age.secretsDir`
++        Where secrets and templates are created before they are symlinked to
++        {option}`age.secretsDir` and {option}`age.templateDir`
        '';
      };
-+
-   };
- 
--  config = mkIf (cfg.secrets != { }) (mkMerge [
-+  config = mkIf (cfg.secrets != { } || cfg.templates != { }) (mkMerge [
-     {
-       assertions = [
-         {
-@@ -277,6 +600,7 @@
-         }
-       ];
-     }
-+
-     (optionalAttrs (!isDarwin) {
-       # When using sysusers we no longer be started as an activation script
-       # because those are started in initrd while sysusers is started later.
-@@ -285,7 +609,12 @@
-         after = [ "systemd-sysusers.service" ];
+     identityPaths = mkOption {
+@@ -346,7 +678,11 @@
+         before = [ "systemd-sysusers.service" ];
          unitConfig.DefaultDependencies = "no";
  
 -        path = [ pkgs.mount ];
 +        path = [
 +          pkgs.mount
 +          pkgs.diffutils
-+          pkgs.systemd
 +          pkgs.gnused
 +        ];
          serviceConfig = {
            Type = "oneshot";
            ExecStart = pkgs.writeShellScript "agenix-install" (concatLines [
-@@ -341,7 +670,7 @@
+@@ -371,11 +707,15 @@
+         requires = [ "agenix-install-secrets.service" ];
+         unitConfig.DefaultDependencies = "no";
+ 
++        path = [ pkgs.systemd ];
+         serviceConfig = {
+           Type = "oneshot";
+           ExecStart = pkgs.writeShellScript "agenix-chown" (concatLines [
+             currentGeneration
+             chownSecrets
++            # AFTER chowning, never before: a unit restarted while its secret is
++            # still root-owned reads nothing and the restart is wasted.
++            restartUnits
+             # Don't fail the systemd unit if our script ended with a failing test.
+             "true"
+           ]);
+@@ -414,10 +754,15 @@
+           ];
+         };
+ 
++        agenixRestart = {
++          text = restartUnits;
++          deps = [ "agenixChown" ];
++        };
++
+         # So other activation scripts can depend on agenix being done.
+         agenix = {
+           text = "";
+-          deps = [ "agenixChown" ];
++          deps = [ "agenixRestart" ];
+         };
+       };
+     })
+@@ -427,10 +772,11 @@
          script = ''
            set -e
            set -o pipefail
@@ -1001,119 +1146,7 @@ index acae79fe80..5a34b20f42 100644
            ${newGeneration}
            ${installSecrets}
            ${chownSecrets}
-diff --git a/test/integration.nix b/test/integration.nix
-index 87210a7bc1..689ed56c05 100644
---- a/test/integration.nix
-+++ b/test/integration.nix
-@@ -28,6 +28,12 @@
-       age.secrets = {
-         passwordfile-user1.file = ../example/passwordfile-user1.age;
-         leading-hyphen.file = ../example/-leading-hyphen-filename.age;
-+        # a real file in a nested folder of secretsDir
-+        nested-hyphen = {
-+          file = ../example/-leading-hyphen-filename.age;
-+          symlink = false;
-+          path = "${config.age.secretsDir}/nested/dir/leading-hyphen";
-+        };
-       };
- 
-       age.identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
-@@ -49,7 +55,7 @@
-       };
- 
-       home-manager.users.user1 =
--        { options, ... }:
-+        { config, options, ... }:
-         {
-           imports = [
-             ../modules/age-home.nix
-@@ -70,6 +76,12 @@
-             secrets.armored-secret = {
-               file = ../example/armored-secret.age;
-             };
-+            # a real file in a nested folder of secretsDir
-+            secrets.nested-secret2 = {
-+              file = ../example/secret2.age;
-+              symlink = false;
-+              path = "${config.age.secretsDir}/nested/dir/secret2";
-+            };
-           };
-         };
-     };
-@@ -81,6 +93,7 @@
-       secret2 = "world!";
-       hyphen-secret = "filename started with hyphen";
-       armored-secret = "Hello World!";
-+      nested-secret-path = "/run/agenix/secrets/nested/dir/leading-hyphen";
-     in
-     ''
-       system1.wait_for_unit("multi-user.target")
-@@ -106,8 +119,16 @@
-       system1.wait_for_file("/tmp/3")
-       assert "${armored-secret}" in system1.succeed("cat /tmp/3")
- 
-+      system1.send_chars("cat /run/user/$(id -u)/agenix/secrets/nested/dir/secret2 > /tmp/4\n")
-+      system1.wait_for_file("/tmp/4")
-+      assert "${secret2}" in system1.succeed("cat /tmp/4")
-+
-       assert "${hyphen-secret}" in system1.succeed("cat /run/agenix/leading-hyphen")
- 
-+      # secrets in a nested folder of secretsDir are real files, not symlinks
-+      assert "${hyphen-secret}" in system1.succeed("cat ${nested-secret-path}")
-+      system1.fail("test -L ${nested-secret-path}")
-+
-       userDo = lambda input : f"sudo -u user1 -- bash -c 'set -eou pipefail; cd /tmp/secrets; {input}'"
- 
-       before_hash = system1.succeed(userDo('sha256sum passwordfile-user1.age')).split()
-diff --git a/test/integration_darwin.nix b/test/integration_darwin.nix
-index 92da8074fd..af49660fee 100644
---- a/test/integration_darwin.nix
-+++ b/test/integration_darwin.nix
-@@ -10,6 +10,8 @@
-     name = "agenix-integration";
-     text = ''
-       grep "${secret}" "${config.age.secrets.system-secret.path}"
-+      grep "${secret}" "${config.age.secrets.nested-system-secret.path}"
-+      test ! -L "${config.age.secrets.nested-system-secret.path}"
-     '';
-   };
- in
-@@ -22,6 +24,12 @@
-   age = {
-     identityPaths = options.age.identityPaths.default ++ [ "/etc/ssh/this_key_wont_exist" ];
-     secrets.system-secret.file = ../example/secret1.age;
-+    # a real file in a nested folder of secretsDir
-+    secrets.nested-system-secret = {
-+      file = ../example/secret1.age;
-+      symlink = false;
-+      path = "${config.age.secretsDir}/nested/dir/system-secret";
-+    };
-   };
- 
-   environment.systemPackages = [ testScript ];
-diff --git a/test/integration_hm_darwin.nix b/test/integration_hm_darwin.nix
-index 965057d5bc..fcf0609eef 100644
---- a/test/integration_hm_darwin.nix
-+++ b/test/integration_hm_darwin.nix
-@@ -11,6 +11,12 @@
-   age = {
-     identityPaths = options.age.identityPaths.default ++ [ "/Users/user1/.ssh/this_key_wont_exist" ];
-     secrets.user-secret.file = ../example/secret2.age;
-+    # a real file in a nested folder of secretsDir
-+    secrets.nested-user-secret = {
-+      file = ../example/secret2.age;
-+      symlink = false;
-+      path = "${config.age.secretsDir}/nested/dir/user-secret";
-+    };
-   };
- 
-   home = rec {
-@@ -32,6 +38,8 @@
-           in
-           ''
-             diff -q "${config.age.secrets.user-secret.path}" <(printf '${secret}\n')
-+            diff -q "${config.age.secrets.nested-user-secret.path}" <(printf '${secret}\n')
-+            test ! -L "${config.age.secrets.nested-user-secret.path}"
-           '';
-       };
-     };
++          ${restartUnits}
+           exit 0
+         '';
+         serviceConfig = {

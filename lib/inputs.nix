@@ -391,8 +391,37 @@ let
   # `getEnv` returns "" under pure eval, so this is inert everywhere else.
   ignoreHashes = builtins.getEnv "PATCH_HASHES" == "ignore";
 
+  # ── EACH PATCH IS CONTENT-ADDRESSED ON ITS OWN, NOT ON THE WHOLE TREE ──
+  #
+  # `./patches/foo.patch` inside a flake evaluates to
+  # `/nix/store/<FLAKE-narHash>-source/patches/foo.patch`, so the path changes
+  # whenever ANY file in this repo changes. Those paths are `applyPatches`
+  # inputs, so every edit anywhere invalidated every patched input's derivation
+  # and all of them rebuilt -- and with `hash = null` they carry
+  # `allowSubstitutes = false` / `preferLocalBuild = true`, hardcoded by
+  # `applyPatches`, so the rebuild is strictly local and cannot be fetched.
+  #
+  # `builtins.path` keys the store path on the FILE's own contents plus the
+  # `name`, so an unrelated edit leaves it byte-identical and nothing downstream
+  # rebuilds. A patch tree is also exactly what `builtins.path` is for: one file,
+  # named, no filtering.
+  #
+  # `name` is required, and must be stable: taking it from `baseNameOf` keeps it
+  # readable in a store path and in an `applyPatches` log. Two patches with the
+  # same basename in different inputs are fine -- the content hash differs, so
+  # they are different store paths that happen to share a suffix.
+  stablePatch =
+    p:
+    if builtins.isPath p then
+      builtins.path {
+        path = p;
+        name = baseNameOf p;
+      }
+    else
+      p;
+
   patchedInputs = lib.mapAttrs (name: spec: {
-    patches = spec.patches or [ ];
+    patches = map stablePatch (spec.patches or [ ]);
     prePatch = spec.prePatch or "";
     postPatch = spec.postPatch or "";
     isInput = spec.isInput or true;

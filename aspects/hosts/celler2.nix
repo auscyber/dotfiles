@@ -15,6 +15,7 @@
   den,
   inputs,
   lib,
+  cellerCapability,
   ...
 }:
 let
@@ -28,6 +29,19 @@ in
 {
   den.hosts.x86_64-linux.${host} = {
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP1gJPPu6Z4iOtWWYLBulSwmCYouYd8k26bHNlt0WEtf celler2";
+
+    # ── NO TUN, SO NO INTERFACE, SAID WHERE THE CARRIER CAN READ IT ──
+    #
+    # `services.tailscale.interfaceName` below is this same fact in this host's
+    # CONFIG, and the capability layer cannot read that -- ../network/tailscale.nix:
+    # "reading it back off the host's config would mean evaluating that host ...
+    # several GB for one string". So the entity carries it too, and the carrier
+    # furnishes `userspace-networking` rather than `tailscale0` for this host.
+    #
+    # No `address`: a `100.x` is assigned by the coordination server and is not
+    # knowable at eval time, which is why the tailnet carrier addresses its
+    # members by MagicDNS name instead.
+    attachments.tailscale.interface = "userspace-networking";
     # Still a nixosSystem, so den and deploy tooling see an ordinary host;
     # nix-oci re-evaluates the same modules into the image.
     instantiate =
@@ -38,8 +52,54 @@ in
       };
   };
 
+  # ── celler2 IS A CELLER, SAID SO ──
+  # No `takes.proxy`: this container publishes through its own cloudflared
+  # ingress below, not through an nginx that is not on this box. Everything else
+  # is the same shape secondpc's celler has, at the port this one serves.
+  den.aspects.celler-container = cellerCapability {
+    port = cellerPort;
+    subdomain = "cache2";
+  };
+
   den.aspects.${host} = {
-    includes = [ den.aspects.celler-server._.nixos ];
+    includes = [
+      den.aspects.celler-server._.nixos
+      # THE CACHE THIS CONTAINER SERVES, DECLARED. Its `celler-caches` record
+      # already said `main` -- by falling back to `[ "main" ]` for a host that
+      # declares no cache aspect -- so the fact was real and only the
+      # declaration was missing, which the capability chain cannot infer: a
+      # consumer asking for this celler's cache `main` finds nothing to resolve
+      # against unless an aspect here gives it.
+      #
+      # That gap is what dropped the laptop's and auspc's pushes the moment
+      # their hand-written `celler-use` became a take. It has no signing key in
+      # ../base/celler/celler-keys.json yet, which is why `caches` keeps the
+      # key-derived fallback and does not throw.
+      #
+      # `cache-main` and NOT `celler-main`: the latter also brings
+      # `den.aspects.celler`, whose `expose.port` is 8069 and conflicts with the
+      # 8080 this container serves on.
+      den.aspects.cache-main
+
+      # AND THE CELLER ITSELF, which is the root the cache hangs beneath. Its
+      # own declaration rather than `den.aspects.celler`, for that same port:
+      # the capability half is parametric (../base/celler/server.nix) so this
+      # states the number it actually serves on.
+      den.aspects.celler-container
+
+      # ── ON THE TAILNET, SAID SO ──
+      #
+      # The header has always claimed "reachable on the tailnet as `celler2`",
+      # and the preStart below really does run `tailscale up`. But membership in
+      # den is INCLUSION -- ../network/tailscale.nix: "a host that includes
+      # `den.aspects.tailscale` is on the tailnet, and there is nothing to
+      # declare and nothing that can disagree with reality". Without this line
+      # reality disagreed: `providersFor celler2 "tcp"` was
+      # `[ celler-container, loopback ]` with NO segment, so `linksBetween`
+      # found no route to this host from anywhere -- while `resolveChain` still
+      # offered `pull/main/celler@celler2` to all eleven hosts.
+      den.aspects.tailscale
+    ];
 
     # This container serves a cache; it does not consume one. The fleet-wide
     # default (../base/celler/push.nix) would have it substitute from secondpc
@@ -60,17 +120,25 @@ in
       # `intermediary`, so neither reaches the image: only the per-host key
       # and the connector token minted from them do.
       auth = {
-        rekeyFile = ../../secrets/tailscale_auth.age;
+        rekeyFile = ../../secrets/static/tailscale_auth.age;
         intermediary = true;
       };
       api = {
-        rekeyFile = ../../secrets/cloudflare_api.age;
+        rekeyFile = ../../secrets/static/cloudflare_api.age;
         intermediary = true;
       };
 
-      # Minted from the fleet's shared OAuth client at `gen-secrets` time --
-      # there is no per-host authkey to write by hand. See ../network/tailscale.nix.
-      ts_authkey = den.lib.tailscale.authKeySecret host;
+      # NO `ts_authkey` HERE ANY MORE: `den.aspects.tailscale` is included
+      # above, and it declares this same secret in its own scope. Declaring it
+      # here too made one logical secret into two -- identical generator and
+      # settings, so identical content hash, differing only in the scope
+      # directory:
+      #
+      #   secrets/generated/celler2/celler2/ts_authkey-4d017270.age   (this one)
+      #   secrets/generated/celler2/tailscale/ts_authkey-4d017270.age (the aspect's)
+      #
+      # agenix requires every DECLARED secret's rekeyFile to exist, so keeping
+      # both would mean minting and rekeying two keys for one tailnet node.
 
       # Likewise minted from the account API token, which creates the tunnel
       # too. See ../network/cloudflare.nix. Not `den.aspects.cloudflare-tunnel`:
@@ -96,7 +164,12 @@ in
         ...
       }:
       let
-        decrypt = name: "${lib.getExe pkgs.rage} -d -i ${key} ${config.age.secrets."${host}/${name}".file}";
+        # SCOPE-AWARE, because the secrets are no longer all in one scope:
+        # `ts_authkey` belongs to `den.aspects.tailscale` now, and
+        # lib/age-scoped.nix keys `age.secrets` by `<scope>/<name>`.
+        decryptIn =
+          scope: name: "${lib.getExe pkgs.rage} -d -i ${key} ${config.age.secrets."${scope}/${name}".file}";
+        decrypt = decryptIn host;
         tailscale = config.services.tailscale.package;
 
         # The tunnel is `config_src: "local"` (../network/cloudflare.nix), so
@@ -126,7 +199,9 @@ in
             services.tailscale = {
               enable = true;
               interfaceName = "userspace-networking";
-              authKeyFile = scoped.${host}.secrets.ts_authkey.path;
+              # `scoped.tailscale`, not `scoped.${host}`: the secret is the
+              # aspect's now, see the note where this host's `secrets` are.
+              authKeyFile = scoped.tailscale.secrets.ts_authkey.path;
               extraUpFlags = [ "--hostname=${host}" ];
             };
 
@@ -167,7 +242,7 @@ in
                 --tun=userspace-networking &
               until [ -S /run/tailscale/tailscaled.sock ]; do sleep 0.2; done
               ${tailscale}/bin/tailscale --socket=/run/tailscale/tailscaled.sock up \
-                --authkey="$(${decrypt "ts_authkey"})" \
+                --authkey="$(${decryptIn "tailscale" "ts_authkey"})" \
                 --advertise-tags=${lib.escapeShellArg den.lib.tailscale.nodeTag} \
                 --hostname=${host}
 

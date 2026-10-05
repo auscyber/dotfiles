@@ -58,6 +58,28 @@
         },
         "version": "v0.6.2-beta"
     },
+    "donetick": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "donetick",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "donetick",
+            "repo": "donetick",
+            "rev": "v0.1.80",
+            "sha256": "sha256-KJrMpUsyXqSVydzRSyYm2nsVpeauc1c3wkkizglY19s=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.1.80"
+    },
     "eagle-nvim": {
         "cargoLock": null,
         "date": "2026-08-13",
@@ -280,6 +302,27 @@
             "type": "github"
         },
         "version": "5f358ec94d117d3e0ccc515b21fafa325940ab2d"
+    },
+    "splitpro": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "splitpro",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "arch": null,
+            "finalImageName": null,
+            "finalImageTag": null,
+            "imageDigest": "sha256:efaa52b30d009573c4bf70e5711d6447536914469420db58680e1e6779acde6e",
+            "imageName": "docker.io/ossapps/splitpro",
+            "imageTag": "v2.1.5",
+            "os": null,
+            "sha256": "sha256-KGAvB+lG9Gcjif5o2vbGEZPcwcOAWupZSCqi+FaV9RA=",
+            "tlsVerify": null
+        },
+        "version": "v2.1.5"
     },
     "vscode-kanata": {
         "cargoLock": null,

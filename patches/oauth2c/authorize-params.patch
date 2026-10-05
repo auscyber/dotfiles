@@ -1,0 +1,153 @@
+diff -ruN --exclude=vendor a/cmd/oauth2.go b/cmd/oauth2.go
+--- a/cmd/oauth2.go
++++ b/cmd/oauth2.go
+@@ -93,6 +93,7 @@
+ 	cmd.PersistentFlags().StringSliceVar(&cconfig.ACRValues, "acr-values", []string{}, "ACR values")
+ 	cmd.PersistentFlags().StringVar(&cconfig.Purpose, "purpose", "", "string describing the purpose for obtaining End-User authorization")
+ 	cmd.PersistentFlags().StringSliceVar(&cconfig.Prompt, "prompt", []string{}, "end-user authorization purpose")
++	cmd.PersistentFlags().StringArrayVar(&cconfig.AuthorizeParams, "authorize-param", []string{}, "extra authorization request parameter, as key=value (repeatable)")
+ 	cmd.PersistentFlags().StringVar(&cconfig.MaxAge, "max-age", "", "maximum authentication age in seconds")
+ 	cmd.PersistentFlags().StringVar(&cconfig.AuthenticationCode, "authentication-code", "", "authentication code used for passwordless authentication")
+ 	cmd.PersistentFlags().BoolVar(&cconfig.NoOrigin, "no-origin", false, "do not include an Origin header")
+@@ -122,7 +123,10 @@
+ 				os.Exit(1)
+ 			}
+ 
+-			if err := mergo.Merge(&cconfig, config.ToClientConfig()); err != nil {
++			// `cconfig` is already a *ClientConfig, so `&cconfig` handed mergo a
++			// **ClientConfig and every config-file run died with "only structs,
++			// maps, and slices are supported" before reaching the flow.
++			if err := mergo.Merge(cconfig, config.ToClientConfig()); err != nil {
+ 				LogError(err)
+ 				os.Exit(1)
+ 			}
+diff -ruN --exclude=vendor a/cmd/oauth2_authorize_code.go b/cmd/oauth2_authorize_code.go
+--- a/cmd/oauth2_authorize_code.go
++++ b/cmd/oauth2_authorize_code.go
+@@ -13,6 +13,7 @@
+ 		parResponse      oauth2.PARResponse
+ 		authorizeRequest oauth2.Request
+ 		callbackRequest  oauth2.Request
++		sentState        string
+ 		tokenRequest     oauth2.Request
+ 		tokenResponse    oauth2.TokenResponse
+ 		codeVerifier     string
+@@ -34,6 +35,11 @@
+ 		LogRequestObject(parRequest)
+ 		LogRequestAndResponse(parRequest, parResponse)
+ 
++		// With PAR the authorization request parameters -- `state` among them --
++		// were POSTed to the PAR endpoint, and the authorize URL carries only
++		// client_id and request_uri. So the sent state lives in parRequest.
++		sentState = parRequest.Form.Get("state")
++
+ 		LogSection("Request authorization")
+ 
+ 		LogRequest(authorizeRequest)
+@@ -44,6 +50,11 @@
+ 			return err
+ 		}
+ 
++		// RequestAuthorization moves the form into the query string and then
++		// clears it, so the authorize URL is the only remaining record of the
++		// state it generated.
++		sentState = authorizeRequest.URL.Query().Get("state")
++
+ 		LogRequestObject(authorizeRequest)
+ 		LogRequest(authorizeRequest)
+ 	}
+@@ -68,6 +79,14 @@
+ 	LogRequest(callbackRequest)
+ 	LogJARM(callbackRequest)
+ 	Logln()
++
++	// Before the code is redeemed, and loudly. Get() reads a JARM claim, then
++	// the query string, then the posted form, so this covers response_mode
++	// query, form_post and jwt alike.
++	if err = oauth2.VerifyState(sentState, callbackRequest.Get("state")); err != nil {
++		callbackStatus("Rejected callback")
++		return err
++	}
+ 
+ 	callbackStatus("Obtained authorization code")
+ 
+diff -ruN --exclude=vendor a/internal/oauth2/oauth2.go b/internal/oauth2/oauth2.go
+--- a/internal/oauth2/oauth2.go
++++ b/internal/oauth2/oauth2.go
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"context"
++	"crypto/subtle"
+ 	"crypto/tls"
+ 	"encoding/base64"
+ 	"encoding/json"
+@@ -102,6 +103,7 @@
+ 	Prompt                 []string
+ 	MaxAge                 string
+ 	AuthenticationCode     string
++	AuthorizeParams        []string
+ }
+ 
+ func RequestAuthorization(cconfig ClientConfig, sconfig ServerConfig, hc *http.Client) (r Request, codeVerifier string, err error) {
+@@ -211,6 +213,37 @@
+ 	authorizeRequest.Method = http.MethodGet
+ 
+ 	return parRequest, parResponse, authorizeRequest, codeVerifier, nil
++}
++
++// VerifyState compares the state returned on the callback against the state
++// that was sent on the authorization request.
++//
++// RFC 6749 section 10.12 makes this the client's defence against an attacker
++// pasting their own authorization code into someone else's callback, and
++// section 4.1.2 makes `state` REQUIRED in the response whenever it was present
++// in the request. oauth2c always sends one, so a response that carries none is
++// a protocol violation rather than merely an unverifiable one -- both are
++// rejected, because "absent" is exactly what an injected redirect looks like.
++//
++// PKCE does not make this redundant. The code_challenge binds the code to this
++// CLIENT, which is a different property from binding the callback to the
++// authorization request this client actually started (RFC 6819 section
++// 4.4.1.8); a loopback listener narrows who can reach the callback, which is
++// mitigation rather than a substitute.
++func VerifyState(sent, got string) error {
++	if sent == "" {
++		return errors.New("state verification: no state was sent on the authorization request")
++	}
++
++	if got == "" {
++		return errors.New("state verification: the callback carried no state parameter")
++	}
++
++	if subtle.ConstantTimeCompare([]byte(sent), []byte(got)) != 1 {
++		return errors.New("state verification: the callback did not come from the authorization request this client started")
++	}
++
++	return nil
+ }
+ 
+ func WaitForCallback(clientConfig ClientConfig, serverConfig ServerConfig, hc *http.Client) (request Request, err error) {
+diff -ruN --exclude=vendor a/internal/oauth2/request.go b/internal/oauth2/request.go
+--- a/internal/oauth2/request.go
++++ b/internal/oauth2/request.go
+@@ -115,6 +115,19 @@
+ 		r.Form.Set("authorization_details", cconfig.RAR)
+ 	}
+ 
++	// Provider-specific authorization parameters that have no dedicated flag,
++	// e.g. Google's access_type=offline, which is the only way to be issued a
++	// refresh token. Applied last so an explicit --authorize-param always wins
++	// over a value derived from another flag.
++	for _, kv := range cconfig.AuthorizeParams {
++		key, value, found := strings.Cut(kv, "=")
++		if !found {
++			return "", errors.Errorf("authorize param %q is not in key=value form", kv)
++		}
++
++		r.Form.Set(key, value)
++	}
++
+ 	if cconfig.RequestObject || cconfig.EncryptedRequestObject {
+ 		claims := RequestObjectClaims(r.Form, sconfig, cconfig)
+ 

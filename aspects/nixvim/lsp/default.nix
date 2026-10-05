@@ -88,21 +88,21 @@
               };
             };
 
-            nil_ls = {
-              enable = true;
-
-              filetypes = [ "nix" ];
-
-              settings = {
-                nil = {
-                  nix = {
-                    flake = {
-                      autoArchive = true;
-                    };
-                  };
-                };
-              };
-            };
+            #            nil_ls = {
+            #              enable = true;
+            #
+            #              filetypes = [ "nix" ];
+            #
+            #              settings = {
+            #                nil = {
+            #                  nix = {
+            #                    flake = {
+            #                      autoArchive = true;
+            #                    };
+            #                  };
+            #                };
+            #              };
+            #            };
 
             ocamllsp.enable = true;
 

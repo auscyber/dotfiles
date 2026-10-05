@@ -14,10 +14,20 @@
   inputs,
   lib,
   den,
+  persons,
   ...
 }:
 let
-  mainKey = import ../security/_main-key.nix;
+  # IVY'S OWN KEYS, from the registry rather than from a constant. This is the
+  # one image whose whole point is that she can get into it, and the keys are
+  # declared on the human (../base/person.nix's `sshKeys`) -- so adding a key
+  # to the vault and to that list puts it on the installer too, where
+  # ../security/_main-key.nix could only ever carry the one.
+  #
+  # Read as a flake-level module arg: this is a standalone `nixosSystem` with
+  # no den host behind it (see the header), so there is no user scope to
+  # deliver them through the way ../security/main-ssh-key.nix does.
+  keys = persons.ivy.sshKeys;
 
   # Takes the perSystem `pkgs`, which ../tooling/overlays.nix has already built
   # with the repo's collected overlays. A bare `nixpkgs.lib.nixosSystem` has
@@ -48,9 +58,9 @@ let
         "networkmanager"
       ];
       initialHashedPassword = "";
-      openssh.authorizedKeys.keys = [ mainKey ];
+      openssh.authorizedKeys.keys = keys;
     };
-    users.users.root.openssh.authorizedKeys.keys = [ mainKey ];
+    users.users.root.openssh.authorizedKeys.keys = keys;
 
     # The installer profile autologins `nixos`; this image is ivy's.
     services.getty.autologinUser = lib.mkForce "ivy";

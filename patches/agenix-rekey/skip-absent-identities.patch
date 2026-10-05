@@ -1,0 +1,19 @@
+--- a/nix/lib.nix	2026-10-28 16:13:26
++++ b/nix/lib.nix	2026-10-28 16:13:26
+@@ -184,8 +184,14 @@
+         if [[ -n "''${AGENIX_REKEY_PRIMARY_IDENTITY:-}" ]] && [[ "''${AGENIX_REKEY_PRIMARY_IDENTITY_ONLY:-}" == true ]]; then
+           ${envPath} ${ageProgram} -d "''${primaryIdentityArgs[@]}" "''${@:2}"
+         else
+-          # splitting args is intentional here, files with spaces must be quoted by the user
+-          extraArgs=(${decryptionMasterIdentityArgs})
++          # Every master identity this machine actually holds. One that only
++          # exists elsewhere (a CI-only key) is skipped rather than handed to
++          # (r)age, which refuses a missing identity file outright.
++          extraArgs=()
++          # shellcheck disable=SC2043
++          for identity in ${concatStringsSep " " (map (x: escapeShellArg x.identity) mergedMasterIdentities)}; do
++            [[ -e "$identity" ]] && extraArgs+=("-i" "$identity")
++          done
+           ${envPath} ${ageProgram} -d "''${primaryIdentityArgs[@]}" "''${extraArgs[@]}" "''${@:2}"
+         fi
+       fi

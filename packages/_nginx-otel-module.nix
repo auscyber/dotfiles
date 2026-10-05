@@ -1,5 +1,6 @@
 {
   abseil-cpp,
+  applyPatches,
   c-ares,
   cmake,
   fetchFromGitHub,
@@ -34,11 +35,18 @@ mkNginxPlugin (finalAttrs: {
   pname = "otel";
   version = "0.1.2";
 
-  src = fetchFromGitHub {
-    owner = "nginxinc";
-    repo = "nginx-otel";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-pGe+1nPH8zUQhcyVxH5/nxwNFMsoOYCUecuDVs1rS4o=";
+  # opentelemetry-cpp here uses C++20 `std::span` as its `nostd::span`, whose
+  # fixed-extent (pointer, size) constructor is explicit, so 0.1.2's
+  # `ToLowerBase16({buf, size})` no longer compiles; the patch names the type.
+  src = applyPatches {
+    name = "nginx-otel-${finalAttrs.version}-source";
+    src = fetchFromGitHub {
+      owner = "nginxinc";
+      repo = "nginx-otel";
+      tag = "v${finalAttrs.version}";
+      hash = "sha256-pGe+1nPH8zUQhcyVxH5/nxwNFMsoOYCUecuDVs1rS4o=";
+    };
+    patches = [ ./nginx-otel-explicit-span.patch ];
   };
 
   # nginx-otel can only be loaded dynamically.

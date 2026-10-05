@@ -25,7 +25,7 @@
       };
     };
 
-    secrets.kagi_token.rekeyFile = ../../../secrets/kagi_token.age;
+    secrets.kagi_token.rekeyFile = ../../../secrets/static/kagi_token.age;
   };
 
   den.aspects.mcp-servers = {
@@ -35,8 +35,8 @@
       den.aspects.packages.jj-mcp-server
       den.aspects.agenix-rekey
 
-      # Cloudflare MCP integration disabled: secrets/cloudflare_token.age was
-      # never created (`nix run .#secret-edit -- secrets/cloudflare_token.age`).
+      # Cloudflare MCP integration disabled: secrets/static/cloudflare_token.age was
+      # never created (`nix run .#secret-edit -- secrets/static/cloudflare_token.age`).
       # Re-enable this block once that secret exists.
       # { # homeManager: lib.mkIf (host.hasAspect den.aspects.claude)
       #   homeManager = {
@@ -55,11 +55,11 @@
     ];
 
     # Cloudflare API token, pasted in by hand:
-    #   nix run .#secret-edit -- secrets/cloudflare_token.age
+    #   nix run .#secret-edit -- secrets/static/cloudflare_token.age
     # Create it at https://dash.cloudflare.com/profile/api-tokens (a user token
     # or an account token; mcp.cloudflare.com accepts either as a bearer).
     # Disabled until that secret exists -- see above.
-    # secrets.cloudflare_token.rekeyFile = ../../../secrets/cloudflare_token.age;
+    # secrets.cloudflare_token.rekeyFile = ../../../secrets/static/cloudflare_token.age;
 
     homeManager =
       {

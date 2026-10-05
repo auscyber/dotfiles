@@ -3,6 +3,38 @@
   __findFile,
   ...
 }:
+# ── NO CELLER INSIDE A SPECIALISATION, AND IT IS NOT A PREFERENCE ──
+#
+# `celler-user`'s secrets resolve through `celler.use celler-caches celler-use`
+# (../base/celler/_lib.nix), and `celler-caches` is a FLEET-WIDE collect:
+# `den.policies.celler-caches` is a `pipe.collectAll`, so it reads every other
+# host's record -- celler2's and secondpc's. A specialisation is evaluated over
+# a PRIVATE ONE-ENTITY FLEET: ../../lib/specialisations.nix replaces the
+# flake-system root's fleet-wide includes with this host's own two effects. So
+# the collect comes back EMPTY inside one and `use` throws:
+#
+#   error: celler-use: no celler server `celler2` (servers: )
+#
+# -- measured when the take below still named celler2; it reads `secondpc` now
+# and fails identically, because the EMPTY server list is the fault and not the
+# name in it.
+#
+# Measured: of the four profiles below only `no-celler` evaluated; `assessment`,
+# `study` and `life-project` all died on that throw, while the base
+# configuration is fine. It is not a celler being down -- a celler cannot be
+# RESOLVED from inside a specialisation at all until that one-entity fleet can
+# see the rest of the house.
+#
+# It is also right on its own terms: an exam profile, a study profile and a dock
+# have no business pushing NARs to a cache. And `nh-checked` is unaffected -- it
+# picks the SMALLEST profile covering the aspects whose checks failed, so
+# `no-celler` stays the cover for a dead celler.
+let
+  noCeller = [
+    den.aspects.celler-host
+    den.aspects.celler-user
+  ];
+in
 {
   den.hosts.aarch64-darwin.Ivys-MacBook-Pro = {
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTsjq9lMzer6RPeDfXZ9eI1eiMf8b/fteSOb5XC5rBG";
@@ -12,7 +44,13 @@
       "dev"
       "gaming"
     ];
+    # Whose machine this is -- a different fact from the household it serves.
+    owner = den.persons.ivy;
+
     users.ivypierlot = {
+      # The human behind this account (../../persons/ivy.nix). The link
+      # points account -> person, never the reverse; ../../base/person.nix says why.
+      person = den.persons.ivy;
       wallpaper = ../../backgrounds/phoebebridgers-2.jpg;
       flakeFolder = "/Users/ivypierlot/dendritic";
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGtwIOzVblYtrx014SIyldn8EhdwxzSVRXGMz5LLtunc ivypierlot@Ivys-MacBook-Pro";
@@ -26,7 +64,10 @@
   };
 
   den.aspects.Ivys-MacBook-Pro = {
-    # celler2 only (see ivypierlot's `celler-use`), not the fleet's secondpc.
+    # NO FLEET-DEFAULT CELLER WIRING. The one celler relationship this machine
+    # has is stated explicitly, as `den.aspects.ivypierlot`'s `takes.celler`
+    # below, so it is the take that decides the server and the carrier rather
+    # than a default this host would inherit and then have to argue with.
     excludes = [ den.aspects.celler-default ];
     includes = [
       den.aspects.js
@@ -58,8 +99,40 @@
       # `whenAspect` (ancestors count), and grows its `t3 serve
       # --tailscale-serve` agent only when it is present.
       den.aspects.tailscale
+      # Backs this machine up to secondpc's Samba share over the tailnet, and
+      # -- the part that matters most -- keeps /nix out of the backup. Pulls in
+      # `tailscale` itself, since the destination name is resolved from
+      # `tailscale status` at activation; see ../darwin/time-machine.nix for
+      # the one-time keychain step it cannot do declaratively.
+      den.aspects.time-machine
+      # ── THE ROAMING RESOLVER ──
+      # This machine is on the house lan for part of the week and in a cafe for
+      # the rest, and the two want different ADDRESSES for the same published
+      # names. `roams` below says which wire that is; the resolver decides at
+      # run time, which is the only time the answer is knowable.
+      #
+      # NOT `den.aspects.roaming-resolver-carrier-names`, which would also pin
+      # `secondpc.tailef3db9.ts.net` and so take the substituters, the ssh
+      # config and the time-machine destination onto the lan at home. That is
+      # the bigger win and the bigger risk; ../network/roaming-resolver.nix says
+      # what has to be checked on the box first.
+      den.aspects.roaming-resolver
       #      den.aspects.builders
     ];
+
+    # ── THE WIRE THIS HOST IS SOMETIMES ON ──
+    #
+    # NOT `includes = [ den.aspects.lan-home ]`, and the difference is the whole
+    # point. Including it would make ../base/capability.nix rank the lan at
+    # preference 20 against the tailnet's 40 for EVERY eval-time answer -- the
+    # celler substituter, the netrc, the push hook, ssh, the time-machine
+    # destination -- and write 192.168.x addresses into a system that spends
+    # half its life somewhere else. It would also make this host a lan sibling
+    # from the other side, where its address is null (measured).
+    #
+    # `roams` is the weaker claim: the route exists when this box happens to be
+    # there. ../network/roaming-resolver.nix is the only reader.
+    roams = [ den.aspects.lan-home ];
 
     provides.to-users.homeManager.programs.git.enable = true;
 
@@ -96,7 +169,8 @@
       den.aspects.jankyborders
       den.aspects.kanata
       den.aspects.coolabah
-    ];
+    ]
+    ++ noCeller;
 
     # "study": everything that is not study, gone. The browser half of this
     # profile (the enterprise-policy site blocklist) is contributed by the zen
@@ -120,7 +194,8 @@
       # `t3 serve --tailscale-serve` agent down with it, so the machine is not
       # quietly reachable from a phone during an exam profile.
       den.aspects.t3code
-    ];
+    ]
+    ++ noCeller;
 
     # "life-project": the machine with a dock that is only the life-project
     # tools. `laptop-dock` owns the everyday dock, so the profile subtracts that
@@ -132,16 +207,25 @@
         den.aspects.neovim # ditto -- this profile is a dock, not a dev shell
         den.aspects.laptop-dock
         den.aspects.darwin-gaming
-      ];
+      ]
+      ++ noCeller;
       includes = [ den.aspects.laptop-dock-focused ];
     };
 
     # "no-celler": no celler caches at all, for when they are down -- nothing
     # substituted from them, nothing pushed to them.
-    specialisations.no-celler.excludes = [
-      den.aspects.celler-host
-      den.aspects.celler-user
-    ];
+    specialisations.no-celler = {
+      excludes = [
+        den.aspects.celler-host
+        den.aspects.celler-user
+      ];
+
+      # WHEN to pick it is not written here: `den.aspects.celler-host` declares
+      # what it `requires` (../base/celler/push.nix), and
+      # ../tooling/nh-checked.nix selects whichever profile excludes the aspects
+      # whose requires failed. The check belongs to the thing that needs it, so
+      # this list and that check cannot drift apart.
+    };
 
     vpn = { };
     nix.settings = {
@@ -257,9 +341,60 @@
   };
 
   den.aspects.ivypierlot = {
-    celler-use.celler2 = {
-      push = [ "main" ];
-      via = "tailscale";
+    # NO `via`. The carrier is DERIVED at the point of use, not chosen here: a
+    # connection to a cache needs a transport, and which one it gets falls out
+    # of the flow's own constraints (../base/celler/push.nix resolves it through
+    # ../base/capability.nix).
+    #
+    # For this push the derivation lands on the tailnet, and for the reason the
+    # override used to encode by hand: `celler push` sends NARs far past
+    # Cloudflare's 100MB body cap, so `takes.http.maxBodyBytes = b: b == null`
+    # excludes the public carrier by arithmetic -- and this laptop has no
+    # `lanAddress`, so the lan is not a candidate either.
+    #
+    # That is the whole argument for deriving it. The override was right, and it
+    # was right only because somebody worked out the same thing once and wrote
+    # the answer down where nothing could check it.
+    # ── THE DECLARATION IS THE CHAIN, AND `celler-use` IS DERIVED FROM IT ──
+    # Was a flat `celler-use.<server>.push = [ "main" ]`, which named the server,
+    # the cache and the flow in one key and so could not say which was which.
+    # As a take it is the path: that celler, its cache `main`, and that cache's
+    # push -- and `push` is not furnished by anybody, it is derived from the
+    # cache above it (../base/capability-types.nix).
+    #
+    # `name = "celler2"` filters the celler level. A celler server is named
+    # after its host, so the name comes off the candidate's host rather than
+    # from anything the giver furnishes -- a giver's `gives` runs in the ASKER's
+    # scope and could only name this laptop.
+    #
+    # This could not be said until celler2 declared itself a celler: it runs a
+    # container-ised one on 8080 and so cannot include `den.aspects.celler`,
+    # whose port is 8069. The capability half is parametric now, and
+    # ../hosts/celler2.nix states its own.
+    #
+    # ── IT SHOULD SAY `secondpc`, AND CHANGING IT NEEDS A SECRET RUN ──
+    #
+    # celler2 is a declared host and an OCI image (`cache2.ivymect.in` through a
+    # cloudflared tunnel) but not a machine that is up, so this push goes
+    # nowhere; secondpc really does serve one, and `celler-host`'s own check on
+    # this host already points at it
+    # (`http://secondpc.tailef3db9.ts.net:8069/nix-cache-info`).
+    #
+    # What stops the one-word edit is that the TOKEN'S SCOPE is this take.
+    # agenix-rekey names a generated secret `<n>-<hash of its scope>.age`, so
+    # flipping the name here renames two files that do not exist yet -- measured:
+    #
+    #   error: host Ivys-MacBook-Pro:
+    #   age.secrets."celler-host/celler_token_celler2".rekeyFile
+    #   (secrets/generated/Ivys-MacBook-Pro/celler-host/celler_token_celler2-5ba000c4.age)
+    #   doesn't exist. Did you run `agenix generate`?
+    #
+    # against the `-888b7d5c` on disk. Minting them is `nix run .#gen-secrets`,
+    # which ../../CLAUDE.md forbids while the master key is mid-recovery. So the
+    # change is one word plus one secret run, in that order, and not before.
+    takes.celler = {
+      name = "celler2";
+      gives.cache.main.gives.push = { };
     };
     study.includes = [ den.aspects.zotero ];
     includes = [
@@ -307,6 +442,10 @@
     provides.Ivys-MacBook-Pro.includes = [
       den.aspects.laptop-brew
       den.aspects.darwin-gaming
+      # esphome + esptool, and the CH34x serial driver cask. Laptop only: the
+      # dashboard on secondpc (../services/homeassistant/esphome.nix) is the
+      # other half, and the two share nothing but the device YAML.
+      den.aspects.esp-dev
     ];
     provides.Ivys-MacBook-Pro.provides.to-users = {
       homeManager = { pkgs, ... }: {

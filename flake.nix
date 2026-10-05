@@ -74,11 +74,7 @@
     };
     agenix = {
       url = "github:ryantm/agenix";
-      inputs = {
-        darwin.follows = "darwin";
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
@@ -108,6 +104,10 @@
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    files = {
+      url = "github:mightyiam/files";
+      flake = false;
+    };
     flake-compat = {
       url = "github:nixos/flake-compat";
       flake = false;
@@ -117,6 +117,9 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
+    gen-algebra.url = "github:sini/gen-algebra";
+    gen-bind.url = "github:sini/gen-bind";
+    gen-scope.url = "github:sini/gen-scope";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

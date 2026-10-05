@@ -30,6 +30,7 @@
 {
   perSystem =
     {
+      config,
       inputs',
       pkgs,
       system,
@@ -43,8 +44,14 @@
         "aarch64-darwin"
       ];
 
-      # Same master identity + age plugins the `.#rekey` app uses, so the sync
-      # app can decrypt the master-encrypted token source with the YubiKey.
+      # `agenix generate` only; DECRYPTION goes through `secret-view`
+      # (../security/agenix-rekey.nix), which is agenix's own `view` subcommand
+      # and therefore already knows the configured `masterIdentities`. This
+      # script used to run `rage -d -i aspects/security/gpg-yubikey.pub` itself,
+      # which hardcoded one master in a second place -- so changing the master
+      # broke it silently, and the plugin list below had to be kept in sync by
+      # hand. ../network/cloudflare.nix and ../network/tailscale.nix already do
+      # it the right way.
       agenixRekeyPkg = inputs'.agenix-rekey.packages.default;
       agePlugins = [
         (inputs.age-plugin-gpg.packages.${system}.age-plugin-gpg.overrideAttrs (attrs: {
@@ -60,6 +67,7 @@
         name = "sync-ci-secrets";
         runtimeInputs = [
           agenixRekeyPkg
+          config.packages.secret-view
           pkgs.gh
           pkgs.coreutils
         ]
@@ -75,21 +83,20 @@
           # its source path is fixed by that, not derived from the secret name.
           # Only the name `agenix generate` is called with picks up the scope.
           src="aspects/base/github_cache_key.age"
-          id="aspects/security/gpg-yubikey.pub"
 
-          GH_TOKEN="$(rage -d -i "$id" "secrets/github_token.age")"
+          GH_TOKEN="$(secret-view secrets/static/github_token.age)"
           export GH_TOKEN
 
-          # Mint the token the first time (touch your YubiKey). It is a long-lived
+          # Mint the token the first time (confirm with Touch ID). It is a long-lived
           # scoped celler JWT (sub=github, push=main), regenerated only if absent.
           if [ ! -e "$src" ]; then
-          	echo "sync-ci-secrets: $src missing, minting it (touch your YubiKey) ..." >&2
+          	echo "sync-ci-secrets: $src missing, minting it (confirm with Touch ID) ..." >&2
           	agenix generate celler/github_cache_key
           fi
 
-          # Decrypt the master-encrypted source with the same identity `.#rekey`
-          # uses. Requires the YubiKey.
-          token="$(rage -d -i "$id" "$src")"
+          # Same path as above: agenix's own `view`, so the master identity is
+          # configured in exactly one place.
+          token="$(secret-view "$src")"
           if [ -z "$token" ]; then
           	echo "sync-ci-secrets: decryption produced an empty token" >&2
           	exit 1

@@ -17,8 +17,22 @@
     # with "expected a set but found a function" (`.#update` included). This
     # takes the deps, ignores them, and returns the named overlay the walker
     # wants -- the same shape as packages/eagle-nvim.nix and packages/ghostty.nix.
+    # ── ONE ATTRIBUTE IS ENOUGH, AND TWO IS A BUILD FAILURE ──
+    # `kanidmWithSecretProvisioning_1_11` is `kanidm_1_11.override
+    # { enableSecretProvisioning = true; }` and resolves through the OVERLAID
+    # `kanidm_1_11`, so it inherits whatever is patched here. Measured:
+    #
+    #   patch kanidm_1_11 only
+    #     -> kanidmWithSecretProvisioning_1_11.patches =
+    #          [oauth2-basic-secret-modify, recover-account, trace-propagation]
+    #     -> and `kanidm_1_11.withSecretProvisioning` is the SAME drvPath
+    #
+    # Patching both -- which looked necessary, since the passthru is bound to a
+    # callPackage argument -- applies every patch TWICE and the build dies on
+    # "Reversed (or previously applied) patch detected". That is how this was
+    # found, so the comment is here rather than in a commit message.
     overlays = _: {
-      kanidm-trace-propagation = final: prev: {
+      kanidm-trace-propagation = _final: prev: {
         kanidm_1_11 = prev.kanidm_1_11.overrideAttrs (old: {
           patches = (old.patches or [ ]) ++ [ ../patches/kanidm/trace-propagation.patch ];
         });

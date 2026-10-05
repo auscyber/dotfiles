@@ -109,17 +109,12 @@ in
           '';
         };
 
-        # agenix restarts a secret's `restartUnits` -- nginx included, for
-        # every gateway map/template -- before it chowns the freshly
-        # decrypted files to their configured owner (chown deliberately
-        # waits on NixOS's own `users`/`groups` activation finishing first,
-        # in case the owner is being created in this same switch). nginx's
-        # own config-test pre-start hook can lose that race and fail to
-        # open a template that's still root-only, and systemd's bare
-        # defaults (StartLimitBurst=5 in 10s) don't give it enough
-        # attempts to outlast the gap -- observed taking up to ~2 minutes
-        # on a busy switch. This makes it self-heal instead of dying
-        # start-limit-hit.
+        # agenix now restarts a secret's `restartUnits` only after the chown
+        # (patches/agenix/templates.patch, `agenixRestart`), so nginx's
+        # config-test pre-start hook no longer races a still-root-only
+        # template. Kept as a safety net: systemd's bare defaults
+        # (StartLimitBurst=5 in 10s) give nginx too few attempts to outlast
+        # any other transient failure on a busy switch.
         # nginx's own module already sets Restart=always/RestartSec=10s and
         # its own startLimit*; mkForce all three rather than a plain
         # override, or eval fails on the conflicting definitions. Shorter

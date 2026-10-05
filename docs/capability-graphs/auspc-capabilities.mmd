@@ -1,0 +1,99 @@
+%%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#e85aad","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
+graph LR
+  auspc([auspc]):::root
+
+  subgraph ctx_host_auspc["host: auspc"]
+  corsair_psu["corsair-psu"]:::corsair_psu_c
+  openrgb["openrgb"]:::openrgb_c
+  vban_turntable["vban-turntable"]:::vban_turntable_c
+  cap_auscyber_celler{{"celler"}}:::cap_auscyber_celler_c
+  cap_celler_cache_pull_http{{"http"}}:::cap_celler_cache_pull_http_c
+  cap_celler_cache_pull_http_t["celler-cache-pull"]:::cap_celler_cache_pull_http_t_c
+  cap_celler_default_celler{{"celler"}}:::cap_celler_default_celler_c
+  cap_celler_default_celler_t["celler-default"]:::cap_celler_default_celler_t_c
+  cap_corsair_psu_home_assistant{{"home-assistant extraComponents=(mqtt)"}}:::cap_corsair_psu_home_assistant_c
+  cap_corsair_psu_mqtt{{"mqtt acl=(write homeassistant/sensor/#,write sensors/#)"}}:::cap_corsair_psu_mqtt_c
+  cap_openrgb_home_assistant{{"home-assistant extraComponents=(openrgb), listensOn=(...)"}}:::cap_openrgb_home_assistant_c
+  cap_paperwork_share{{"share displayName=Paperwork, permissions=(read,write,share,delete)"}}:::cap_paperwork_share_c
+  cap_paperwork_share_t["paperwork"]:::cap_paperwork_share_t_c
+  cap_photos_share{{"share displayName=Photos, quota=200G"}}:::cap_photos_share_c
+  cap_photos_share_t["photos"]:::cap_photos_share_t_c
+  cap_samba_user_samba_user{{"samba-user"}}:::cap_samba_user_samba_user_c
+  cap_samba_user_samba_user_t["samba-user"]:::cap_samba_user_samba_user_t_c
+  cap_vban_turntable_udp{{"udp mtu=<fn>, name=music-assistant"}}:::cap_vban_turntable_udp_c
+  cap_vban_turntable_udp_hx0["tailscale 40 mtu is 1280, which this flow refuses"]:::cap_vban_turntable_udp_hx0_c
+  cap_vban_turntable_udp_wn0["21 other instances wrong instance: want music-assistant"]:::cap_vban_turntable_udp_wn0_c
+  cap_celler_cache_pull_http_t -.->|takes| cap_celler_cache_pull_http
+  cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
+  corsair_psu -.->|takes| cap_corsair_psu_home_assistant
+  corsair_psu -.->|takes| cap_corsair_psu_mqtt
+  openrgb -.->|takes| cap_openrgb_home_assistant
+  cap_paperwork_share_t -.-x cap_paperwork_share
+  cap_photos_share_t -.-x cap_photos_share
+  cap_samba_user_samba_user_t -.-x cap_samba_user_samba_user
+  vban_turntable -.->|takes| cap_vban_turntable_udp
+  cap_vban_turntable_udp -.-x cap_vban_turntable_udp_wn0
+  cap_vban_turntable_udp -.-x cap_vban_turntable_udp_hx0
+  end
+  subgraph ctx_user_auscyber["user: auscyber"]
+  auscyber{{"auscyber"}}:::auscyber_c
+
+  end
+  subgraph ctx_host_secondpc["host: secondpc"]
+  cap_auscyber_celler_g_celler[/"celler on secondpc"\]:::cap_auscyber_celler_g_celler_c
+  cap_celler_cache_pull_http_g_celler[/"celler on secondpc"\]:::cap_celler_cache_pull_http_g_celler_c
+  cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_corsair_psu_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_corsair_psu_home_assistant_g_homeassistant_c
+  cap_corsair_psu_mqtt_g_mosquitto[/"mosquitto on secondpc"\]:::cap_corsair_psu_mqtt_g_mosquitto_c
+  cap_openrgb_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_openrgb_home_assistant_g_homeassistant_c
+  cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
+  cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
+  cap_vban_turntable_udp_g_music_assistant[/"music-assistant on secondpc"\]:::cap_vban_turntable_udp_g_music_assistant_c
+
+  end
+
+  auscyber -.->|takes| cap_auscyber_celler
+  cap_auscyber_celler -.->|not routed| cap_auscyber_celler_g_celler
+  cap_celler_cache_pull_http -.->|lan-home 20 (auspc to secondpc)| cap_celler_cache_pull_http_g_celler
+  cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
+  cap_corsair_psu_home_assistant -.->|not routed| cap_corsair_psu_home_assistant_g_homeassistant
+  cap_corsair_psu_mqtt -.->|lan-home 20 (auspc to secondpc)| cap_corsair_psu_mqtt_g_mosquitto
+  cap_openrgb_home_assistant -.->|not routed| cap_openrgb_home_assistant_g_homeassistant
+  cap_paperwork_share -.-x cap_paperwork_share_ox0
+  cap_photos_share -.-x cap_photos_share_ox0
+  cap_vban_turntable_udp -.->|lan-home 20 (auspc to secondpc)| cap_vban_turntable_udp_g_music_assistant
+
+  classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
+  classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef corsair_psu_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef openrgb_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef vban_turntable_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef cap_auscyber_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_auscyber_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_t_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_mqtt_g_mosquitto_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_openrgb_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_openrgb_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_paperwork_share_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_paperwork_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_paperwork_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_photos_share_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_photos_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_photos_share_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_samba_user_samba_user_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_samba_user_samba_user_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_g_music_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_hx0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_vban_turntable_udp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px

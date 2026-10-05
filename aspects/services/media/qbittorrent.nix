@@ -1,30 +1,85 @@
-{ den, ... }:
+{ den, accessLib, ... }:
 let
   port = 9090;
 in
 {
   den.aspects.qbittorrent = {
-    includes = [
-      den.aspects.gateway
-      den.aspects.homepage
-    ];
+    # The dashboard tile is a capability this aspect gives
+    # (`gives.homepage-widget` below), so it no longer includes the dashboard.
+    includes = [ den.aspects.gateway ];
 
-    # No declarative API-key surface -- qbittorrent authenticates callers with
-    # a username and password, not a key -- so the browser gate is the whole
-    # story at the edge, and the bypasses below are what keep the *arr apps and
-    # nginx from needing a credential at all.
-    homepage = { config, ... }: {
-      qbittorrent = {
-        group = "Downloads";
-        href = config.gateway.services.qbittorrent.url;
-        icon = "qbittorrent.svg";
-        # No widget: qbittorrent's widget wants a username and password,
-        # and LocalHostAuth means there is no longer an account to give it.
+    # ── WHAT IT LISTENS ON, so the proxy can ASK rather than assume ──
+    #
+    # The port used to be a number inside `takes.gated`, which meant the only
+    # thing that could reach this service was the gate, and only because it
+    # hardcoded `http://127.0.0.1:<that number>`. Given here it is an endpoint:
+    # ../../base/capability.nix composes it with whichever carrier the two ends
+    # share -- the loopback for nginx on this box -- and the proxy resolves the
+    # upstream instead of assuming one.
+    #
+    # NOT EXPOSED: loopback only, because the gate is the way in. The firewall
+    # is derived from this (../../base/firewall.nix), so saying nothing here
+    # means the port stays shut on every wire.
+    gives =
+      { self, ... }:
+      {
+        # WHAT THE HOUSE OFFERS: tagged `arr`, even though it is published on its own subdomain -- the tag is about ACCESS, not publishing.
+        service = _: {
+          group = "arr";
+        };
+
+        # A LINK AND NO WIDGET. qbittorrent's widget wants a username and a
+        # password, and LocalHostAuth (below) means there is no longer an
+        # account to give it -- so there is no declarative API-key surface here
+        # at all, and `keyField` is moot: an empty `widget` is a tile homepage
+        # draws as a plain link.
+        homepage-widget = _: {
+          group = "Downloads";
+          icon = "qbittorrent.svg";
+        };
+
+        tcp = _: {
+          name = self.name;
+          ports.http = {
+            inherit port;
+            meta.description = "qbittorrent's WebUI and WebAPI, which asks a loopback caller for no login at all -- so nginx has to be the only path to it.";
+          };
+        };
       };
+
+    # ── WHAT A GRANT ON THE `arr` TAG DOES ──
+    #
+    # Keyed on the TAG, not on this app: one grant on the household's `arr`
+    # group covers all six of these apps, and the gate is how it is honoured.
+    # ../access.nix used to write it centrally for every service in the tree --
+    # the gate is these apps' own mechanism, so it is declared beside the take
+    # that creates it.
+    gated.qbittorrent.extraGroups = accessLib.groupsFor "arr";
+
+    # Out through a private route (../../network/routes.nix), and not at all
+    # when it is down.
+    takes.route = {
+      segment = "internet";
+      private = true;
     };
 
-    gated.qbittorrent = {
-      upstream = "http://127.0.0.1:${toString port}";
+    takes.gated = {
+      # WHO MAY CALL IT -- the service's own fact, which any gate can enforce.
+      # The HOW (which header, which prefix, whether a key is swapped) is the
+      # proxy's and lives on `takes.nginx` below.
+      clients = [
+        # Not "prowlarr": prowlarr has no download client of its own
+        # (downloadClient = false in prowlarr.nix) and never calls
+        # qbittorrent, so granting it a key here only fed a false positive
+        # into prowlarr-connect's target selection -- which reads "prowlarr
+        # holds a key for X" as "X belongs in prowlarr's Applications list"
+        # and then 400s because qbittorrent has no Applications schema
+        # entry to sync (it's a download client, not an indexer-sync app).
+        "sonarr"
+        "radarr"
+        "lidarr"
+      ];
+
       # qBittorrent 5.1 (WebAPI 2.14.1) takes a key as `Authorization: Bearer`,
       # so it joins the per-caller scheme like the *arr apps do.
       #
@@ -34,28 +89,30 @@ in
       # the caller's key and then STRIPS it, and qbittorrent is left trusting
       # loopback via LocalHostAuth below -- nginx is the only path to it, so the
       # gate is the same, without a secret in the store.
+      # qBittorrent.conf is installed read-only (see serverConfig below), so the
+      # settings dialog silently discards everything typed into it. Say so in
+      # the UI rather than letting it look like it worked.
+      banner = "Read-only - qBittorrent's settings are declared in Nix; changes made here are discarded";
+    };
+
+    # ── NGINX-SPECIFIC, SO DECLARED AS SUCH ──
+    #
+    # The key-rewrite machinery is a fact about the PROXY, not about this
+    # service: which header carries the key, whether it is swapped for an
+    # internal one, which env var the service reads it from. Taking `nginx`
+    # says this service depends on that particular proxy -- a host running
+    # traefik does not give `nginx`, so this fails to resolve rather than
+    # publishing with the rewrite silently missing.
+    #
+    # `clients` stays on `takes.gated`: who may call this is the service's own
+    # fact and any gate can enforce it.
+    takes.nginx = {
       api = {
         enable = true;
         header = "Authorization";
         headerPrefix = "Bearer ";
         internalKey = false;
-        clients = [
-          # Not "prowlarr": prowlarr has no download client of its own
-          # (downloadClient = false in prowlarr.nix) and never calls
-          # qbittorrent, so granting it a key here only fed a false positive
-          # into prowlarr-connect's target selection -- which reads "prowlarr
-          # holds a key for X" as "X belongs in prowlarr's Applications list"
-          # and then 400s because qbittorrent has no Applications schema
-          # entry to sync (it's a download client, not an indexer-sync app).
-          "sonarr"
-          "radarr"
-          "lidarr"
-        ];
       };
-      # qBittorrent.conf is installed read-only (see serverConfig below), so the
-      # settings dialog silently discards everything typed into it. Say so in
-      # the UI rather than letting it look like it worked.
-      banner = "Read-only - qBittorrent's settings are declared in Nix; changes made here are discarded";
     };
 
     nixos = { config, ... }: {

@@ -1,0 +1,369 @@
+%%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#e85aad","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
+graph LR
+  auspc([auspc]):::root
+
+  subgraph ctx_host_auspc["host: auspc"]
+  agenix_rekey_host_auspc["agenix-rekey"]:::agenix_rekey_host_auspc_c
+  attachment_interface_check["attachment-interface-check"]:::attachment_interface_check_c
+  ccache__auspc[/"ccache/auspc"\]:::ccache__auspc_c
+  bootlogo["bootlogo"]:::bootlogo_c
+  builder_server["builder-server"]:::builder_server_c
+  builders["builders"]:::builders_c
+  cachyos_kernel["cachyos-kernel"]:::cachyos_kernel_c
+  ccache["ccache"]:::ccache_c
+  celler_host["celler-host"]:::celler_host_c
+  celler_quirk_args_host_auspc["celler-quirk-args"]:::celler_quirk_args_host_auspc_c
+  corsair_psu["corsair-psu"]:::corsair_psu_c
+  den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
+  define_user__auscyber_auspc{{"define-user/auscyber@auspc"}}:::define_user__auscyber_auspc_c
+  derived_firewall["derived-firewall"]:::derived_firewall_c
+  derived_port_exclusion["derived-port-exclusion"]:::derived_port_exclusion_c
+  difftastic{{"difftastic"}}:::difftastic_c
+  disko["disko"]:::disko_c
+  gpus{{"gpus"}}:::gpus_c
+  hda_jack_retask["hda-jack-retask"]:::hda_jack_retask_c
+  home_base["home-base"]:::home_base_c
+  den__batteries__hostname[/"batteries/hostname"\]:::den__batteries__hostname_c
+  hostname__os{{"hostname/os"}}:::hostname__os_c
+  house_wifi["house-wifi"]:::house_wifi_c
+  den__batteries__inputs_[/"batteries/inputs'"\]:::den__batteries__inputs__c
+  inputs___os{{"inputs'/os"}}:::inputs___os_c
+  insecure_predicate["insecure-predicate"]:::insecure_predicate_c
+  jujutsu["jujutsu"]:::jujutsu_c
+  lib["lib"]:::lib_c
+  nix["nix"]:::nix_c
+  nix_conf_parts["nix-conf-parts"]:::nix_conf_parts_c
+  nix_index["nix-index"]:::nix_index_c
+  nixos_general["nixos-general"]:::nixos_general_c
+  nixpkgs_config_host_auspc["nixpkgs-config"]:::nixpkgs_config_host_auspc_c
+  node_metrics["node-metrics"]:::node_metrics_c
+  openrgb["openrgb"]:::openrgb_c
+  openssh["openssh"]:::openssh_c
+  unfree_predicate__os{{"unfree-predicate/os"}}:::unfree_predicate__os_c
+  insecure_predicate__os{{"insecure-predicate/os"}}:::insecure_predicate__os_c
+  overlays["overlays"]:::overlays_c
+  pam_rssh_host_auspc["pam-rssh"]:::pam_rssh_host_auspc_c
+  qemu["qemu"]:::qemu_c
+  secure_boot["secure-boot"]:::secure_boot_c
+  den__batteries__self_[/"batteries/self'"\]:::den__batteries__self__c
+  self___os{{"self'/os"}}:::self___os_c
+  service_user["service-user"]:::service_user_c
+  shell_host_auspc["shell"]:::shell_host_auspc_c
+  den__batteries__sources[/"batteries/sources"\]:::den__batteries__sources_c
+  sources__os{{"sources/os"}}:::sources__os_c
+  specialisations{{"specialisations"}}:::specialisations_c
+  starship["starship"]:::starship_c
+  tailscale["tailscale"]:::tailscale_c
+  auscyber__auspc__to_users[/"auscyber/auspc/to-users"\]:::auscyber__auspc__to_users_c
+  auspc__to_users[/"auspc/to-users"\]:::auspc__to_users_c
+  qemu__to_users[/"qemu/to-users"\]:::qemu__to_users_c
+  turntable_input["turntable-input"]:::turntable_input_c
+  den__provides__unfree_castlabs_electron__host_auspc{{"den/provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__host_auspc_c
+  den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
+  unfree_predicate["unfree-predicate"]:::unfree_predicate_c
+  unfree_predicate__user{{"unfree-predicate/user"}}:::unfree_predicate__user_c
+  insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
+  vban["vban"]:::vban_c
+  vban_turntable["vban-turntable"]:::vban_turntable_c
+  vpn{{"vpn"}}:::vpn_c
+  vpn_secrets["vpn-secrets"]:::vpn_secrets_c
+  cap_auscyber_celler{{"celler"}}:::cap_auscyber_celler_c
+  cap_celler_cache_pull_http{{"http"}}:::cap_celler_cache_pull_http_c
+  cap_celler_cache_pull_http_t["celler-cache-pull"]:::cap_celler_cache_pull_http_t_c
+  cap_celler_default_celler{{"celler"}}:::cap_celler_default_celler_c
+  cap_celler_default_celler_t["celler-default"]:::cap_celler_default_celler_t_c
+  cap_corsair_psu_home_assistant{{"home-assistant extraComponents=(mqtt)"}}:::cap_corsair_psu_home_assistant_c
+  cap_corsair_psu_mqtt{{"mqtt acl=(write homeassistant/sensor/#,write sensors/#)"}}:::cap_corsair_psu_mqtt_c
+  cap_openrgb_home_assistant{{"home-assistant extraComponents=(openrgb), listensOn=(...)"}}:::cap_openrgb_home_assistant_c
+  cap_paperwork_share{{"share displayName=Paperwork, permissions=(read,write,share,delete)"}}:::cap_paperwork_share_c
+  cap_paperwork_share_t["paperwork"]:::cap_paperwork_share_t_c
+  cap_photos_share{{"share displayName=Photos, quota=200G"}}:::cap_photos_share_c
+  cap_photos_share_t["photos"]:::cap_photos_share_t_c
+  cap_samba_user_samba_user{{"samba-user"}}:::cap_samba_user_samba_user_c
+  cap_samba_user_samba_user_t["samba-user"]:::cap_samba_user_samba_user_t_c
+  cap_vban_turntable_udp{{"udp mtu=<fn>, name=music-assistant"}}:::cap_vban_turntable_udp_c
+  cap_vban_turntable_udp_hx0["tailscale 40 mtu is 1280, which this flow refuses"]:::cap_vban_turntable_udp_hx0_c
+  cap_vban_turntable_udp_wn0["21 other instances wrong instance: want music-assistant"]:::cap_vban_turntable_udp_wn0_c
+  auspc --> bootlogo
+  auspc --> builder_server
+  auspc --> cachyos_kernel
+  auspc --> corsair_psu
+  auspc --> disko
+  auspc --> gpus
+  auspc --> house_wifi
+  auspc --> openrgb
+  auspc --> qemu
+  auspc --> secure_boot
+  auspc --> tailscale
+  auspc --> den__provides__unfree_castlabs_electron__host_auspc
+  auspc --> vban_turntable
+  auspc --> vpn
+  cachyos_kernel --> ccache
+  celler_host --> celler_quirk_args_host_auspc
+  den__batteries__define_user --> define_user__auscyber_auspc
+  den__batteries__hostname --> hostname__os
+  den__batteries__inputs_ --> inputs___os
+  den__batteries__self_ --> self___os
+  den__batteries__sources --> sources__os
+  home_base --> shell_host_auspc
+  insecure_predicate --> insecure_predicate__os
+  insecure_predicate --> insecure_predicate__user
+  jujutsu --> difftastic
+  nixpkgs_config_host_auspc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell_host_auspc --> jujutsu
+  shell_host_auspc --> nix_index
+  shell_host_auspc --> starship
+  turntable_input --> hda_jack_retask
+  unfree_predicate --> unfree_predicate__os
+  unfree_predicate --> unfree_predicate__user
+  vban_turntable --> turntable_input
+  vban_turntable --> vban
+  vpn --> vpn_secrets
+  vpn_secrets --> agenix_rekey_host_auspc
+  auspc -.->|provides| auspc__to_users
+  ccache -.->|provides| ccache__auspc
+  qemu -.->|provides| qemu__to_users
+  cap_celler_cache_pull_http_t -.->|takes| cap_celler_cache_pull_http
+  cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
+  corsair_psu -.->|takes| cap_corsair_psu_home_assistant
+  corsair_psu -.->|takes| cap_corsair_psu_mqtt
+  openrgb -.->|takes| cap_openrgb_home_assistant
+  cap_paperwork_share_t -.-x cap_paperwork_share
+  cap_photos_share_t -.-x cap_photos_share
+  cap_samba_user_samba_user_t -.-x cap_samba_user_samba_user
+  vban_turntable -.->|takes| cap_vban_turntable_udp
+  cap_vban_turntable_udp -.-x cap_vban_turntable_udp_wn0
+  cap_vban_turntable_udp -.-x cap_vban_turntable_udp_hx0
+  end
+  subgraph ctx_user_auscyber["user: auscyber"]
+  user___policy_default_role_gaming__2_[/"user/<policy:default-role-gaming>[2]"\]:::user___policy_default_role_gaming__2__c
+  user___policy_eightbitdo_role_gui__4_[/"user/<policy:eightbitdo-role-gui>[4]"\]:::user___policy_eightbitdo_role_gui__4__c
+  user___policy_main_ssh_key__to_hosts__8_[/"user/<policy:main-ssh-key/to-hosts>[8]"\]:::user___policy_main_ssh_key__to_hosts__8__c
+  agenix_rekey_user_auscyber["agenix-rekey"]:::agenix_rekey_user_auscyber_c
+  auscyber{{"auscyber"}}:::auscyber_c
+  auscyber__auspc["auscyber/auspc"]:::auscyber__auspc_c
+  celler_quirk_args_user_auscyber["celler-quirk-args"]:::celler_quirk_args_user_auscyber_c
+  celler_user["celler-user"]:::celler_user_c
+  claude["claude"]:::claude_c
+  dev["dev"]:::dev_c
+  dev_cli["dev-cli"]:::dev_cli_c
+  dev_nix["dev-nix"]:::dev_nix_c
+  fish["fish"]:::fish_c
+  ghostty["ghostty"]:::ghostty_c
+  gpg["gpg"]:::gpg_c
+  gui["gui"]:::gui_c
+  browsers__helium[/"browsers/helium"\]:::browsers__helium_c
+  ivy_fetch["ivy-fetch"]:::ivy_fetch_c
+  lspmux["lspmux"]:::lspmux_c
+  main_ssh_key["main-ssh-key"]:::main_ssh_key_c
+  neovim["neovim"]:::neovim_c
+  nixvim["nixvim"]:::nixvim_c
+  nushell["nushell"]:::nushell_c
+  onepassword["onepassword"]:::onepassword_c
+  pam_rssh_user_auscyber["pam-rssh"]:::pam_rssh_user_auscyber_c
+  plasma["plasma"]:::plasma_c
+  den__batteries__primary_user_auscyber_auspc_{{"batteries/primary-user(auscyber@auspc)"}}:::den__batteries__primary_user_auscyber_auspc__c
+  packages__proton_ge_bin[/"packages/proton-ge-bin"\]:::packages__proton_ge_bin_c
+  shell__to_users["shell/to-users"]:::shell__to_users_c
+  stylix["stylix"]:::stylix_c
+  den__provides__unfree_castlabs_electron__user_auscyber{{"den/provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__user_auscyber_c
+  den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_{{"provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server)"}}:::den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server__c
+  den__provides__unfree_copilot_language_server_copilot_language_server_lspmux_{{"provides/unfree(copilot-language-server,copilot-language-server-lspmux)"}}:::den__provides__unfree_copilot_language_server_copilot_language_server_lspmux__c
+  den__provides__unfree_onepassword_password_manager_{{"provides/unfree(onepassword-password-manager)"}}:::den__provides__unfree_onepassword_password_manager__c
+  user_shell__auscyber_auspc{{"user-shell/auscyber@auspc"}}:::user_shell__auscyber_auspc_c
+  wakatime["wakatime"]:::wakatime_c
+  auscyber --> agenix_rekey_user_auscyber
+  auscyber --> claude
+  auscyber --> fish
+  auscyber --> lspmux
+  auscyber --> den__provides__unfree_castlabs_electron__user_auscyber
+  auscyber__auspc --> dev
+  auscyber__auspc --> gpg
+  auscyber__auspc --> gui
+  auscyber__auspc --> browsers__helium
+  auscyber__auspc --> neovim
+  auscyber__auspc --> nushell
+  auscyber__auspc --> plasma
+  auscyber__auspc --> den__batteries__primary_user_auscyber_auspc_
+  browsers__helium --> stylix
+  celler_user --> celler_quirk_args_user_auscyber
+  dev --> dev_cli
+  dev --> dev_nix
+  fish --> user_shell__auscyber_auspc
+  gui --> ghostty
+  gui --> onepassword
+  lspmux --> den__provides__unfree_copilot_language_server_copilot_language_server_lspmux_
+  main_ssh_key --> pam_rssh_user_auscyber
+  neovim --> nixvim
+  nixvim --> den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server_
+  nixvim --> wakatime
+  onepassword --> den__provides__unfree_onepassword_password_manager_
+  user___policy_default_role_gaming__2_ --> packages__proton_ge_bin
+  end
+  subgraph ctx_host_secondpc["host: secondpc"]
+  cap_auscyber_celler_g_celler[/"celler on secondpc"\]:::cap_auscyber_celler_g_celler_c
+  cap_celler_cache_pull_http_g_celler[/"celler on secondpc"\]:::cap_celler_cache_pull_http_g_celler_c
+  cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_corsair_psu_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_corsair_psu_home_assistant_g_homeassistant_c
+  cap_corsair_psu_mqtt_g_mosquitto[/"mosquitto on secondpc"\]:::cap_corsair_psu_mqtt_g_mosquitto_c
+  cap_openrgb_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_openrgb_home_assistant_g_homeassistant_c
+  cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
+  cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
+  cap_vban_turntable_udp_g_music_assistant[/"music-assistant on secondpc"\]:::cap_vban_turntable_udp_g_music_assistant_c
+
+  end
+
+  auscyber -.->|provides| auscyber__auspc__to_users
+  auscyber -.->|takes| cap_auscyber_celler
+  cap_auscyber_celler -.->|not routed| cap_auscyber_celler_g_celler
+  cap_celler_cache_pull_http -.->|lan-home 20 (auspc to secondpc)| cap_celler_cache_pull_http_g_celler
+  cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
+  cap_corsair_psu_home_assistant -.->|not routed| cap_corsair_psu_home_assistant_g_homeassistant
+  cap_corsair_psu_mqtt -.->|lan-home 20 (auspc to secondpc)| cap_corsair_psu_mqtt_g_mosquitto
+  cap_openrgb_home_assistant -.->|not routed| cap_openrgb_home_assistant_g_homeassistant
+  cap_paperwork_share -.-x cap_paperwork_share_ox0
+  cap_photos_share -.-x cap_photos_share_ox0
+  cap_vban_turntable_udp -.->|lan-home 20 (auspc to secondpc)| cap_vban_turntable_udp_g_music_assistant
+
+  classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
+  classDef user___policy_default_role_gaming__2__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef user___policy_eightbitdo_role_gui__4__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef user___policy_main_ssh_key__to_hosts__8__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef agenix_rekey_host_auspc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef agenix_rekey_user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef attachment_interface_check_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef auscyber__auspc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef ccache__auspc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef bootlogo_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef builder_server_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef cachyos_kernel_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef ccache_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef celler_host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef celler_quirk_args_host_auspc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef celler_quirk_args_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef celler_user_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef corsair_psu_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef define_user__auscyber_auspc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef derived_firewall_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef derived_port_exclusion_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef dev_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef dev_cli_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef dev_nix_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef difftastic_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef disko_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef fish_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef ghostty_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef gpg_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef gpus_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef gui_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef hda_jack_retask_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef browsers__helium_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef home_base_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef den__batteries__hostname_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef hostname__os_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef house_wifi_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef den__batteries__inputs__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef inputs___os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef insecure_predicate_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef ivy_fetch_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef jujutsu_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef lib_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef lspmux_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef neovim_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nix_conf_parts_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef nix_index_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef nixos_general_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef nixpkgs_config_host_auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef nixvim_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef node_metrics_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef nushell_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef onepassword_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef openrgb_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef unfree_predicate__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef insecure_predicate__os_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef overlays_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef packages_c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef pam_rssh_host_auspc_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef pam_rssh_user_auscyber_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef plasma_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef den__batteries__primary_user_auscyber_auspc__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
+  classDef packages__proton_ge_bin_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
+  classDef qemu_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef secure_boot_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef den__batteries__self__c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef self___os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef service_user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef shell_host_auspc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef shell__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px,stroke-dasharray: 8 4
+  classDef den__batteries__sources_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef sources__os_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef specialisations_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef stylix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef tailscale_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef auscyber__auspc__to_users_c fill:#2da44e,stroke:#2da44e,color:#1f2328,stroke-width:3px
+  classDef auspc__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef qemu__to_users_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
+  classDef turntable_input_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef den__provides__unfree_castlabs_electron__host_auspc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_castlabs_electron__user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_copilot_language_server_copilot_language_server_lspmux__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
+  classDef unfree_predicate_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef insecure_predicate__user_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
+  classDef user_shell__auscyber_auspc_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:2px
+  classDef vban_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef vban_turntable_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef vpn_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef vpn_secrets_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef cap_auscyber_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_auscyber_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_cache_pull_http_t_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_corsair_psu_mqtt_g_mosquitto_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_openrgb_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_openrgb_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_paperwork_share_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_paperwork_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_paperwork_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_photos_share_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_photos_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_photos_share_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_samba_user_samba_user_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_samba_user_samba_user_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_g_music_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_vban_turntable_udp_hx0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_vban_turntable_udp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_user_auscyber fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_birdsarentreal fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_iphone fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_lora_pi fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_pentestvm fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_surfacelaptop fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_wsl_nixos fill:#d0d7de,stroke:#8c959f,stroke-width:2px

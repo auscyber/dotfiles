@@ -9,7 +9,13 @@
       "gui"
       "dev"
     ];
+    # Whose machine this is -- a different fact from the household it serves.
+    owner = den.persons.ivy;
+
     users.auscyber = {
+      # The human behind this account (../../persons/ivy.nix). The link
+      # points account -> person, never the reverse; ../../base/person.nix says why.
+      person = den.persons.ivy;
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEGAd35TCPkGwoAExQbajnzKC9eMf52ZYqc0kYEF7i5G auscyber@ivyslaptop";
       roles = [
         "gui"

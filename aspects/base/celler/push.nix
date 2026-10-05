@@ -1,13 +1,138 @@
 {
   den,
   lib,
+  capability,
   ...
 }:
 let
   celler = import ./_lib.nix { inherit lib; };
   inherit (den.lib.policy) pipe;
 
-  # A scope's tokens: one per server it declared on `celler-use`, scoped to
+  # ── THE ADDRESS IS RESOLVED PER FLOW, NOT PER SERVER ──
+  #
+  # Push and pull are separate aspects because they are separate FLOWS with
+  # different constraints, and that only means something if the address differs:
+  #
+  #   PULL   no constraint. Cloudflare's 100MB cap binds on request BODIES, so
+  #          it does not bind on a response -- a pull may take the public route.
+  #   PUSH   `direction = "out"`. `celler push` sends NARs far past 100MB, and
+  #          ../capability-types.nix's rule on `address` turns that into the
+  #          exclusion: a carrier that caps request bodies cannot take a flow
+  #          that sends them.
+  #
+  # This is the loose end the old `celler-use` had in the same place: `pull` and
+  # `push` were already split per server while `via` was ONE value shared by
+  # both, so a cache reachable for pulling and not for pushing could not be
+  # expressed. `cloudflared-tunnel.exclude` holding `cache.ivymect.in` is that
+  # gap patched by hand, one host at a time.
+  #
+  # The takes are read off the aspects rather than restated, so the constraint
+  # lives in ../../services/celler-service.nix next to the flow it belongs to
+  # and this file cannot disagree with it.
+  pullTake = den.aspects.celler-cache-pull.takes.http;
+  pushTake = den.aspects.celler-cache-push.takes.http;
+
+  hosts = lib.concatMap lib.attrValues (lib.attrValues den.hosts);
+
+  # `endpointFor take me c` -- where `me` reaches celler server `c` for a flow
+  # with `take`'s constraints. A celler server is named after its host, so this
+  # is a link between two host entities, which ../capability.nix answers by
+  # intersecting the carriers both ends have AND filtering by the flow.
+  #
+  # Was `c.endpoint`, i.e. `server.addresses.${via}` -- an address map DETECTED
+  # from the serving host's evaluated config plus a `via` override per consumer.
+  # §2.7 said to adopt that vocabulary and it was right about the shape; what it
+  # could not do is answer per PAIR or per FLOW. The evidence was already there:
+  # `consumeVia`'s ordered default picks `virtualHost` and both real callers
+  # override it to `tailscale`, which is what it looks like when the answer
+  # depends on who is asking.
+  # ── THE LINK TO A SERVER, AS ../runtime.nix HOLDS CONFIGURATION TO IT ──
+  # The candidate `endpointFor` would compose its URL from, as `{ carrier;
+  # link; }`; null where nothing carries the flow.
+  linkToServer =
+    take: me: c:
+    let
+      serverHost = lib.findFirst (h: h.name == c.name) null hosts;
+      ps = lib.mapNullable (h: capability.providersFor h "celler") serverHost;
+      cands = lib.optionals (serverHost != null && ps != { }) (
+        capability.reachEndpoint "http" take me {
+          aspect = lib.head (lib.attrValues ps);
+          host = serverHost;
+        }
+      );
+    in
+    lib.mapNullable (x: {
+      carrier = x.via;
+      inherit (x) link;
+    }) (lib.findFirst (_: true) null cands);
+
+  endpointFor =
+    take: me: c:
+    let
+      serverHost = if me ? name then lib.findFirst (h: h.name == c.name) null hosts else null;
+
+      # THE COMPOSED QUERY. The endpoint half -- port 8069, scheme `http://`,
+      # and the `cache` subdomain where it is published -- comes from
+      # `den.aspects.celler`'s own `gives.http`; the carrier half from whichever
+      # carrier this host and the server share, filtered by this flow's take.
+      # Neither side could answer alone: the service has no address and the wire
+      # does not know the port.
+      # ── THE ASPECT THAT ACTUALLY GIVES `celler` ON THAT HOST ──
+      # Was `den.aspects.celler`, hardcoded -- which is secondpc's celler, on
+      # port 8069. ../../hosts/celler2.nix runs a container-ised one on 8080 and
+      # declares its own aspect for it, so a hardcoded giver resolves the right
+      # server at the WRONG port, and the only symptom is a substituter that
+      # 404s.
+      cellerAspectOn =
+        h:
+        let
+          ps = capability.providersFor h "celler";
+        in
+        if ps == { } then den.aspects.celler else lib.head (lib.attrValues ps);
+
+      cands =
+        if serverHost == null then
+          [ ]
+        else
+          capability.reachEndpoint "http" take me {
+            aspect = cellerAspectOn serverHost;
+            host = serverHost;
+          };
+      l = if cands == [ ] then null else (lib.head cands).link;
+      port =
+        if l == null || l.ports == { } then
+          null
+        else
+          (l.ports.default or (lib.head (lib.attrValues l.ports))).port;
+    in
+    if serverHost == null then
+      # NO HOST TO RESOLVE FROM -- a standalone home has no `host` binding (see
+      # ../../security/age-scope.nix on why). Keep the detected endpoint, which
+      # is what this did before, rather than failing a scope that never had the
+      # information.
+      c.endpoint
+    else if l == null || l.address == null || port == null then
+      # NOTHING SATISFIES THE FLOW. For a pull this cannot happen (no clause),
+      # so reaching here means a constrained flow has no route -- and falling
+      # back to the detected endpoint is exactly the silent wrong answer the
+      # constraint exists to prevent: that endpoint may be the public vhost,
+      # whose 100MB cap is what excluded it in the first place.
+      throw
+        # THE TABLE, NOT A SUMMARY. `toPretty` of a take prints `<function>` for
+        # a predicate clause, which is useless for the one case that matters, so
+        # the reason comes per carrier from the judge instead.
+        "celler: no carrier from ${me.name} to ${c.name} carries this flow.\n${
+          capability.explainTake "http" take me (
+            capability.reachEndpoint "http" { } me {
+              aspect = cellerAspectOn serverHost;
+              host = serverHost;
+            }
+          )
+        }"
+    else
+      "${l.protocol}${l.address}:${toString port}";
+
+  # A scope's tokens: one per server it declared on `celler-use`  # A scope's tokens: one per server it declared on `celler-use`, scoped to
   # exactly the caches it declared for that server and minted with that
   # server's own signing key (declared here as an intermediary: present for the
   # generator, never deployed). Not `host.name` for the subject: a `secrets`
@@ -61,14 +186,102 @@ let
   # 'celler-caches' collides with module-system arg". A name no quirk has
   # cannot collide, and it says what this is: the snapshot taken at the host
   # scope, which is not necessarily what a user scope would have seen.
+  # ── `celler-use` DERIVED FROM WHAT A HOST ASKED FOR ──
+  #
+  # One declaration (the take), one derivation, and ./_lib.nix's merge plus all
+  # four consumers -- substituters, netrc, the push hook, the client config --
+  # stay exactly as they were. Same strategy as
+  # ../../services/proxy-nginx.nix translating a take into `gated.<n>`: the
+  # capability becomes the front door and the existing implementation keeps its
+  # job.
+  #
+  # Keyed by the SERVING HOST's name, because that is what `celler-use` and
+  # `celler-caches` agree on -- a celler server is named after its host, and the
+  # chain supplies it: a `pull` candidate's `host` is the box whose cache aspect
+  # furnished it.
+  #
+  # NOT A QUIRK CONTRIBUTION, and that is forced. A quirk body receives a fixed
+  # arg set -- `celler-caches` and `celler-use`, per `quirkArgs` below -- and no
+  # `host`, which ./server.nix documents after hitting the same wall with
+  # `denServices`. So this is computed at file level from the `host` a CLASS body
+  # is given, and merged with whatever was declared by hand.
+  # ── WHOSE TREE ANSWERS "WHO ASKED", AND FROM WHERE IT RESOLVES ──
+  # Two different questions, and `takersOn` conflates them because it takes one
+  # entity for both. MEMBERSHIP is the asking scope's: a user asked for the
+  # cache, and `hasAspect` is projected per entity, so asking the HOST about a
+  # user-scope aspect gets `false` -- which would drop the laptop's push to
+  # celler2 silently, with a post-build hook that simply never fires.
+  # RESOLUTION is the host's, because that is where the network is.
+  usedBy =
+    host: owner:
+    let
+      # Walks the chain from `celler`, so the serving host comes from the celler
+      # level and the cache name from the level below -- which is what
+      # `celler-use` needs as `{ <server>.pull = [ <cache> ]; }`.
+      askers = lib.filterAttrs (_: a: (owner.hasAspect or (_: false)) a) (capability.takers "celler");
+
+      found = lib.concatMap (
+        aspect: capability.resolveChain "celler" ((capability.takesOf aspect).celler or { }) host
+      ) (lib.attrValues askers);
+    in
+    # ONE ENTRY PER LEAF, keyed by the flow the leaf IS. `chain` carries the
+    # resolved link at every level, so the server comes from the celler and the
+    # cache from the level below without either being restated on the leaf.
+    lib.foldl' (
+      acc: c:
+      let
+        server = c.host.name or null;
+        cache = c.chain.cache.name or null;
+        flow = if c.cap == "push" then "push" else "pull";
+      in
+      if
+        server == null
+        || cache == null
+        || !(lib.elem c.cap [
+          "pull"
+          "push"
+        ])
+      then
+        acc
+      else
+        acc
+        // {
+          ${server} = (acc.${server} or { }) // {
+            ${flow} = lib.unique ((acc.${server}.${flow} or [ ]) ++ [ cache ]);
+          };
+        }
+    ) { } found;
+
+  # The snapshot every celler consumer reads. `celler-use` here is the declared
+  # list PLUS what this host asked for via `takes.pull`, so the derivation
+  # happens once and all four consumers -- tokens, netrc, substituters, the push
+  # hook -- see the same set.
+  #
+  # This is a CLASS body, so it gets `host`; the `secrets` and `templates`
+  # bodies downstream do not, which is why the merge cannot live there.
   quirkArgs =
     {
       celler-caches,
       celler-use,
+      host ? { },
       ...
     }:
     {
-      _module.args.cellerHost = { inherit celler-caches celler-use; };
+      _module.args.cellerHost = {
+        inherit celler-caches;
+        # ── NOT `user`, AND THAT IS NOT A CHOICE ──
+        # Taking `user` as an arg here makes den fan this aspect out PER USER on
+        # top of resolving it plainly, so the body runs twice in a user scope and
+        # `_module.args.cellerHost' is defined multiple times while it's
+        # expected to be unique`. An entity arg is a fan-out request, not a
+        # lookup.
+        #
+        # So membership is the host's projected tree, which is what it was. A
+        # user-scope take is visible there iff den projects the user's aspects
+        # onto the host -- verified per host below rather than assumed, since
+        # the failure would be a push hook that never fires.
+        celler-use = celler-use ++ [ (usedBy host host) ];
+      };
     };
 in
 {
@@ -95,9 +308,27 @@ in
     den.aspects.celler-user
   ];
 
-  # Every host substitutes from secondpc's main cache; a host that should not
-  # excludes this aspect.
-  den.aspects.celler-default.celler-use.secondpc.pull = [ "main" ];
+  # ── EVERY HOST PULLS, AND IT ASKS RATHER THAN NAMING ──
+  #
+  # Was `celler-use.secondpc.pull = [ "main" ]`: a server name and a cache name,
+  # both written out, on a default every host inherits. Two strings that nothing
+  # checked -- a renamed cache or a moved celler left this pointing at neither,
+  # and the only symptom would be a substituter that 404s.
+  #
+  # The nested take reads as the chain it walks: a celler (anywhere, since
+  # `den.aspects.celler` has `reach = "fleet"`), its cache `main`, and that
+  # cache's pull. `pull` is not furnished by anybody -- it is derived from the
+  # cache above it (../capability-types.nix), so this asks for something no
+  # aspect declares. The serving host comes from resolution and `celler-use`
+  # below is DERIVED from the answer.
+  #
+  # `main` is named rather than globbed because it is the only cache there is
+  # (../../services/celler-service.nix). `gives.cache."*".gives.pull = { }`
+  # would ask for every cache on every reachable celler, which is a wider
+  # default than the fleet has ever had.
+  #
+  # A host that should not pull still excludes this aspect, exactly as before.
+  den.aspects.celler-default.takes.celler.gives.cache.main.gives.pull = { };
   den.default.includes = [ den.aspects.celler-default ];
 
   # The host side: every declared cache as a substituter next to the fleet-wide
@@ -111,6 +342,63 @@ in
       den.policies.celler-caches
       den.aspects.celler-quirk-args
     ];
+
+    # ── WHAT THIS ASPECT NEEDS TO BE TRUE ──
+    #
+    # A celler that does not answer is not a misconfiguration, it is a machine
+    # that should come up without celler -- so this is a `requires`
+    # (../../framework/requires.nix) rather than an assertion, and
+    # ../../tooling/nh-checked.nix turns a failure into the `no-celler`
+    # specialisation.
+    #
+    # THE ENDPOINT IS RESOLVED, NOT WRITTEN. `endpointFor` composes the
+    # service's half (port 8069, the scheme) with whichever carrier THIS host
+    # and that server share, under the pull flow's own constraints -- loopback
+    # on secondpc, the tailnet from the laptop. A literal URL here would be
+    # `cache.ivymect.in` for everyone, which is the public route: the one with
+    # the 100MB cap, and the one that is up precisely when the direct path is
+    # not. Checking it would answer the wrong question.
+    #
+    # `pullTake` and not `pushTake`: a pull has no body-size clause, so this
+    # asks "can I reach it at all" rather than "can I reach it for the flow with
+    # the tightest constraints".
+    requires =
+      { host, ... }:
+      let
+        # A chain leaf carries its SERVING HOST at `.host`, not a top-level
+        # `name` -- filtering on `c.name` silently matched nothing and produced
+        # no checks at all, which is the quiet failure this shape invites.
+        leaves = lib.filter (c: (c.host.name or null) != null) (
+          capability.resolveChain "celler" (den.aspects.celler-default.takes.celler or { }) host
+        );
+
+        serverNames = lib.unique (map (c: c.host.name) leaves);
+
+        # `endpointFor` THROWS when no carrier carries the flow, which is right
+        # for a build -- a constrained flow with no route is an error, not a
+        # fallback -- and wrong here. A server this host cannot route to at all
+        # is not one this check can say anything about, so it is skipped rather
+        # than turned into a check that always fails for a structural reason.
+        resolved = map (
+          n:
+          builtins.tryEval (
+            endpointFor pullTake host {
+              name = n;
+              endpoint = null;
+            }
+          )
+        ) serverNames;
+
+        urls = lib.unique (map (r: r.value) (lib.filter (r: r.success && r.value != null) resolved));
+      in
+      lib.optionalAttrs (urls != [ ]) {
+        celler-reachable = {
+          description = "a celler answers at ${lib.concatStringsSep ", " urls}";
+          script = lib.concatMapStringsSep "\n" (u: ''
+            curl -fsS --max-time 5 ${lib.escapeShellArg "${u}/nix-cache-info"} >/dev/null
+          '') urls;
+        };
+      };
 
     secrets = tokenSecrets;
 
@@ -139,49 +427,78 @@ in
       {
         pkgs,
         scoped,
-        celler-caches,
-        celler-use,
+        cellerHost,
+        host ? { },
         ...
       }:
       let
-        used = celler.use celler-caches celler-use;
+        # ONE DERIVATION, read from the shared snapshot. This re-ran `usedBy`
+        # itself while claiming in its own comment to read `quirkArgs` -- so the
+        # merge happened twice, and the two copies could only agree by accident.
+        # `templates` above already reads the snapshot; this now matches it.
+        used = celler.use cellerHost.celler-caches cellerHost.celler-use;
         pushing = builtins.filter (c: c.push != [ ]) used;
-        urls = lib.concatMap (c: map (cache: "${c.endpoint}/${cache}") (builtins.attrNames c.keys)) used;
+        # THE PULL FLOW: substituters are reads, so no constraint applies.
+        urlsOf = c: map (cache: "${endpointFor pullTake host c}/${cache}") (builtins.attrNames c.keys);
+        urls = lib.concatMap urlsOf used;
+        partOf = c: "/etc/nix/parts/link-celler-${c.name}.conf";
+        # A server with no cache to read from has nothing to hold.
+        substituting = builtins.filter (c: urlsOf c != [ ]) used;
         token = c: scoped.celler-host.secrets.${tokenOf c.name}.path;
-        build-hook = pkgs.writeTextFile {
-          name = "build-hook";
-          executable = true;
-          destination = "/bin/build-hook";
-          text =
-            # sh
-            ''
-              #!/bin/sh
-              set -eu
-              set -f # disable globbing
-              export IFS=' '
-              export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler-client}/bin:${pkgs.ts}/bin"
-              ${lib.concatMapStrings (c: ''
-                celler login ${c.name} ${c.endpoint} "$(cat ${token c})"
-              '') pushing}
-              echo "Uploading paths" $OUT_PATHS
-              if [[ -n "''${OUT_PATHS:-}" ]]; then
-              	export TS_MAXFINISHED=1000
-              	export TS_SLOTS=10
-              ${lib.concatMapStrings (
-                c:
-                lib.concatMapStrings (cache: ''
-                  printf "%s" "$OUT_PATHS" | xargs ts celler push ${c.name}:${cache}
-                '') c.push
-              ) pushing}
-              fi
-            '';
-          meta.mainProgram = "build-hook";
-        };
+        # ── ONE PUSH SCRIPT PER SERVER, PRESENT WHILE IT CAN BE REACHED ──
+        # nix waits for its post-build hook, so a push to a server that cannot
+        # be reached holds up every build. Each server's script is a path its
+        # own link holds (../runtime.nix); the hook nix runs only dispatches to
+        # whichever are present.
+        hookDir = "/etc/nix/parts/post-build.d";
+        pushHookFor =
+          c:
+          pkgs.writeShellScript "celler-push-${c.name}" ''
+            set -eu
+            export PATH="$PATH:/nix/var/nix/profiles/default/bin:${pkgs.celler-client}/bin:${pkgs.ts}/bin"
+            [ -n "''${OUT_PATHS:-}" ] || exit 0
+            celler login ${c.name} ${endpointFor pushTake host c} "$(cat ${token c})"
+            export TS_MAXFINISHED=1000
+            export TS_SLOTS=10
+            ${lib.concatMapStrings (cache: ''
+              printf "%s" "$OUT_PATHS" | xargs ts celler push ${c.name}:${cache}
+            '') c.push}
+          '';
+        build-hook = pkgs.writeShellScriptBin "build-hook" ''
+          echo "Uploading paths" $OUT_PATHS
+          for hook in ${hookDir}/*; do
+            [ -x "$hook" ] || continue
+            "$hook" || echo "build-hook: $hook failed" >&2
+          done
+        '';
       in
       {
+        # ── EACH SERVER'S SUBSTITUTER, ONLY WHILE IT CAN BE REACHED ──
+        # Trust is static: which caches may be used and their keys. Whether one
+        # IS used is a nix.conf part held to its link (../runtime.nix), so an
+        # unreachable cache is not consulted and builds do not stall on it.
+        runtime.links = lib.listToAttrs (
+          map (
+            c:
+            lib.nameValuePair "celler-${c.name}" {
+              cap = "http";
+              resolved = linkToServer pullTake host c;
+              fragments."${partOf c}" = "extra-substituters = ${lib.concatStringsSep " " (urlsOf c)}";
+            }
+          ) substituting
+          ++ map (
+            c:
+            lib.nameValuePair "celler-push-${c.name}" {
+              cap = "http";
+              resolved = linkToServer pushTake host c;
+              paths."${hookDir}/${c.name}" = pushHookFor c;
+            }
+          ) pushing
+        );
+        nix.extraOptions = lib.concatMapStrings (c: "!include ${partOf c}\n") substituting;
+
         nix.settings = lib.mkMerge [
           {
-            substituters = urls;
             trusted-substituters = urls;
             trusted-public-keys = lib.concatMap (c: builtins.attrValues c.keys) used;
           }
@@ -212,6 +529,7 @@ in
         scoped,
         celler-caches,
         celler-use,
+        host ? { },
         ...
       }:
       let
@@ -234,7 +552,7 @@ in
               + lib.concatMapStrings (c: ''
 
                 [servers.${c.name}]
-                endpoint = "${c.endpoint}"
+                endpoint = "${endpointFor pushTake host c}"
                 token = "${placeholders.${tokenOf c.name}}"
               '') used;
           };

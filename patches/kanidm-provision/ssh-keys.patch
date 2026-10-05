@@ -1,0 +1,161 @@
+Provision a person's SSH public keys.
+
+kanidm can serve a person's authorized_keys to any host that asks
+(`kanidm_ssh_authorizedkeys`, wired by nixpkgs' `services.kanidm.unix
+.sshIntegration`), which is what lets someone log in to a machine that has no
+local account for them and no key in its own config. What it cannot do is learn
+those keys: upstream kanidm-provision's `persons.<n>` carries `displayName`,
+`legalName` and `mailAddresses` and nothing else, so the keys had to be put
+there by hand -- once per person, per key, forever.
+
+This adds `persons.<name>.sshPublicKeys = { <tag> = "<key>"; }`.
+
+WHY NOT THROUGH `update_attrs!`, which every other person attribute uses:
+kanidm's `ssh_publickey` is a (tag, key) PAIR and the generic `_attr` endpoint
+has no way to carry the tag. The dedicated `/_ssh_pubkeys` endpoint is the only
+one that can express it, so the sync is written out rather than declared in the
+macro.
+
+RECONCILED, NOT APPENDED. Every declared tag is POSTed -- which REPLACES a key
+of the same tag, so a rotated key needs no special case -- and every tag kanidm
+holds that is no longer declared is deleted. A key removed from the declaration
+is therefore removed from the person, which is the difference between a
+provisioned set and an append-only one, and it is what makes revocation work.
+
+The tag parsing in `list_ssh_pubkey_tags` reads kanidm's own rendering of an ssh
+key value, `tag: ssh-... comment` (`to_proto_string_clone` in
+`valueset_sshkey.rs`), and takes the part before the first colon.
+
+Pairs with ./application-passwords.patch and ./service-accounts.patch and is
+generated against the tree with both already applied.
+
+--- a/src/state.rs
++++ b/src/state.rs
+@@ -27,6 +27,16 @@
+     /// own model -- so it is the key rather than a field.
+     #[serde(default)]
+     pub application_passwords: HashMap<String, ApplicationPassword>,
++    /// SSH public keys for this person, keyed by TAG. kanidm stores an ssh key
++    /// as a (tag, key) pair and addresses it by tag, so the tag is the key of
++    /// this map rather than a field -- the same reasoning `application_passwords`
++    /// above uses for its label.
++    ///
++    /// These are PUBLIC keys, so unlike an application password the value is
++    /// the material itself and not a path to it: there is nothing here to keep
++    /// out of the state JSON.
++    #[serde(default)]
++    pub ssh_public_keys: HashMap<String, String>,
+ }
+ 
+ /// One application password, as a value this tool SETS rather than one kanidm
+--- a/src/client.rs
++++ b/src/client.rs
+@@ -557,12 +557,72 @@
+                 "displayname": display_name,
+                 "linked_group": { "uuid": group_uuid, "value": group_name }
+             }))
++            .send()?
++            .get_json_response()?;
++
++        Ok(())
++    }
++
++    /// The TAGS of the ssh public keys this person already has. kanidm
++    /// addresses an ssh key by its tag, so a tag is what has to be compared to
++    /// decide whether a key is new, changed or gone -- the same shape
++    /// `list_api_token_labels` uses for tokens.
++    pub fn list_ssh_pubkey_tags(&self, person: &str) -> Result<Vec<String>> {
++        let response = self
++            .client
++            .get(format!("{}{ENDPOINT_PERSON}/{person}/_ssh_pubkeys", self.url))
++            .headers(self.idm_admin_headers.clone())
++            .send()?
++            .get_json_response()?;
++
++        // Each entry reads `tag: ssh-... comment`, which is kanidm's own
++        // rendering of an ssh key value (`to_proto_string_clone`). Only the tag
++        // is wanted, and splitting on the first colon is what recovers it.
++        Ok(response
++            .as_array()
++            .map(|keys| {
++                keys.iter()
++                    .filter_map(Value::as_str)
++                    .filter_map(|k| k.split_once(':'))
++                    .map(|(tag, _)| tag.trim().to_owned())
++                    .collect()
++            })
++            .unwrap_or_default())
++    }
++
++    /// Add or replace one ssh public key. POSTing a tag that already exists
++    /// REPLACES it, which is what makes this idempotent and is why there is no
++    /// read-compare-write here: a key whose material changed under an unchanged
++    /// tag is corrected by the same call that would have created it.
++    pub fn set_ssh_pubkey(&self, person: &str, tag: &str, key: &str) -> Result<()> {
++        log_event("Setting", &format!("{ENDPOINT_PERSON}/{person}/_ssh_pubkeys {tag}"));
++
++        self.client
++            .post(format!("{}{ENDPOINT_PERSON}/{person}/_ssh_pubkeys", self.url))
++            .headers(self.idm_admin_headers.clone())
++            .json(&json!([tag, key]))
+             .send()?
+             .get_json_response()?;
+ 
+         Ok(())
+     }
+ 
++    /// Remove an ssh public key by tag. Used for a tag kanidm holds that the
++    /// declaration no longer names, so a key removed from the state is removed
++    /// from the person -- the declaration is authoritative, which is the whole
++    /// point of provisioning them.
++    pub fn delete_ssh_pubkey(&self, person: &str, tag: &str) -> Result<()> {
++        log_event("Deleting", &format!("{ENDPOINT_PERSON}/{person}/_ssh_pubkeys/{tag}"));
++
++        self.client
++            .delete(format!("{}{ENDPOINT_PERSON}/{person}/_ssh_pubkeys/{tag}", self.url))
++            .headers(self.idm_admin_headers.clone())
++            .send()?
++            .get_json_response()?;
++
++        Ok(())
++    }
++
+     /// Set a person's application password to the contents of `secret_file`.
+     ///
+     /// Requires the kanidm patch that accepts a `secret` on this endpoint.
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -167,6 +167,33 @@
+                 "mail": person.mail_addresses.clone().unwrap_or_else(Vec::new),
+             ]);
+ 
++            // ── SSH KEYS, RECONCILED BY TAG ──
++            //
++            // Not through `update_attrs!`: kanidm's `ssh_publickey` is a
++            // (tag, key) pair and the generic `_attr` path has no way to carry
++            // the tag, so the dedicated `_ssh_pubkeys` endpoint is the only one
++            // that can express it.
++            //
++            // DECLARED IS AUTHORITATIVE, in both directions. Every declared tag
++            // is POSTed -- which replaces an existing one of the same tag, so a
++            // rotated key needs no special case -- and every tag kanidm holds
++            // that is no longer declared is deleted. Removing a key from the
++            // state therefore removes it from the person, which is what makes
++            // this a provisioned set rather than an append-only one.
++            if !person.ssh_public_keys.is_empty() || !kanidm_client.list_ssh_pubkey_tags(name)?.is_empty() {
++                let existing_tags = kanidm_client.list_ssh_pubkey_tags(name)?;
++
++                for (tag, key) in &person.ssh_public_keys {
++                    kanidm_client.set_ssh_pubkey(name, tag, key)?;
++                }
++
++                for tag in existing_tags {
++                    if !person.ssh_public_keys.contains_key(&tag) {
++                        kanidm_client.delete_ssh_pubkey(name, &tag)?;
++                    }
++                }
++            }
++
+             // Application passwords. Set unconditionally -- the server makes no
+             // modification when the value already matches -- so there is no
+             // state to track here and no way for a run to drift.

@@ -2,7 +2,7 @@
   den.aspects.wakatime = {
     includes = [ den.aspects.agenix-rekey ];
     nvim.plugins.wakatime.enable = true;
-    secrets.wakatime.rekeyFile = ../../secrets/wakatime_api.age;
+    secrets.wakatime.rekeyFile = ../../secrets/static/wakatime_api.age;
     homeManager =
       {
         config,

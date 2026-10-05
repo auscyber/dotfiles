@@ -2,9 +2,72 @@
   inputs,
   den,
   lib,
+  config,
   ...
 }:
 let
+  # ── THE CAPABILITY HALF, PARAMETRIC IN THE PORT ──
+  # A celler is a celler whether it runs as this host's service on 8069 or as
+  # ../../hosts/celler2.nix's container image on 8080. What it GIVES is the same
+  # shape with a different number -- and the number cannot be read off config,
+  # because a giver's `gives` is evaluated in the ASKER's scope, so `host` there
+  # is the consumer rather than the server.
+  #
+  # So the port is a PARAMETER of the declaration. Before this, celler2 could
+  # not declare itself a celler at all: including `den.aspects.celler` fixes
+  # `services.cellerd.expose.port` at 8069 against the 8080 it serves, so
+  # nothing there gave the `celler` capability and a nested take had no root to
+  # resolve from -- which silently dropped every edge to it.
+  cellerCapability =
+    { port, subdomain }:
+    {
+      # `reach = "fleet"`: any host may consume it. The laptop builds against it
+      # over the tailnet, secondpc over loopback.
+      reach = "fleet";
+
+      gives =
+        { self, ... }:
+        {
+          # NO `name`: a celler server is named after its host, and the
+          # candidate already carries it -- ../capability.nix falls back to it
+          # for `takes.celler.name = "secondpc"`. Furnishing it here would be
+          # wrong, for the same scope reason the port is a parameter.
+          #
+          # A celler EXPOSES caches, so `cache` is furnished by each cache
+          # aspect (../../services/celler-service.nix) rather than here -- this
+          # level only identifies the server.
+          celler = _: {
+            carrier = self.name;
+          };
+
+          # THE ENDPOINT HALF ONLY: the port, the scheme, and the name it is
+          # published under. NO ADDRESS -- a service has none; it is reached over
+          # whichever carrier the two ends share, and ../capability.nix composes
+          # the two halves.
+          #
+          # `subdomain` is what makes the public route derivable: composed with a
+          # carrier serving the zone `ivymect.in` it is `cache.ivymect.in`, and
+          # neither half holds that string.
+          http = _: {
+            inherit port subdomain;
+            ports.http.meta.description = "cellerd's cache API: NAR pushes from the fleet and substituter fetches, published as ${subdomain}.ivymect.in.";
+            protocol = "http://";
+            carrier = self.name;
+          };
+
+          user = _: {
+            name = "cellerd";
+            carrier = self.name;
+          };
+        };
+    };
+
+  # NO `denServices` CAPTURE ANY MORE. It was here because a quirk body cannot
+  # ask for the registry -- a quirk's thunk gets a fixed arg set, so
+  # `{ denServices, ... }` fails with `called without required argument` -- so
+  # the registry had to be closed over at file level. The cache list now comes
+  # from `den.aspects` and `host.hasAspect`, both of which a quirk body already
+  # has, so there is nothing to capture.
   inherit (den.lib.policy) route;
   celler = import ./_lib.nix { inherit lib; };
   keys = lib.importJSON ./celler-keys.json;
@@ -58,10 +121,13 @@ in
         settings.restartUnits = [ "cellerd.service" ];
       };
 
-      # Named after the host by where agenix puts its generated secrets, the
-      # one thing a `secrets` body can see.
+      # Named after the host. This read `baseNameOf age.rekey.generatedSecretsDir`,
+      # which was the host only while that directory was per host; it is one
+      # directory for the fleet now and its basename is `generated` -- measured,
+      # as `secrets/generated/generated/celler-signing-key.age`. The entity is
+      # its own option (../../../lib/age-scoped.nix), so it is read directly.
       secrets = { age, ... }: {
-        signing_key = celler.signingKey (baseNameOf age.rekey.generatedSecretsDir);
+        signing_key = celler.signingKey age.scopedEntity;
       };
 
       # In the `templates` class rather than raw in `nixos`, because only the
@@ -91,6 +157,16 @@ in
           '';
       };
 
+      # The quirk stays as the TRANSPORT -- it carries `endpoint`/`addresses`,
+      # which are detected from this host's evaluated config and so cannot come
+      # from a flake-level entity. What it no longer carries is the cache LIST:
+      # that is now derived from `den.services`, where each cache is an entity
+      # identified by the celler it depends on (`main/celler@secondpc`).
+      #
+      # Before, this read `caches = if k == { } then [ "main" ] else attrNames k`
+      # -- a hardcoded `main` fallback plus "whatever has a signing key". So the
+      # set of caches was implied by the secrets rather than declared, and a
+      # cache with no key yet was invisible.
       celler-caches =
         {
           config,
@@ -99,12 +175,65 @@ in
         }:
         let
           k = keys.${host.name} or { };
+
+          # THE CACHES THIS HOST SERVES, BY INCLUSION. A cache is an aspect
+          # carrying a `cache` record (../../services/celler-service.nix), so
+          # this host serves the ones whose aspects it includes -- membership is
+          # inclusion, and a host cannot claim a cache it does not include.
+          #
+          # Was a walk over `den.services` filtered by `serviceName == "celler"
+          # && host == host.name`, which needed the registry to have spawned an
+          # instance for this host and to have stamped `children` under it. Two
+          # derived fields and a cascade, for a question that is one `hasAspect`
+          # per candidate.
+          # BY `cache.name`, NOT BY THE ASPECT NAME. The aspect is `celler-main`
+          # and the cache is `main`, which is what celler-keys.json holds and
+          # what a token is scoped to -- reading the aspect name here made every
+          # cache look as though it had no signing key.
+          declared = lib.mapAttrsToList (_: a: a.cache.name) (
+            lib.filterAttrs (_: a: (a ? cache) && host.hasAspect a) den.aspects
+          );
+
+          # A declared cache with no signing key is a cache that does not
+          # exist. `celler.use` filters it out of `keys` SILENTLY, so without
+          # this the token would be scoped to a cache the server cannot sign
+          # for and the only symptom would be a 403 at run time.
+          missingKeys = lib.subtractLists (builtins.attrNames k) (lib.unique declared);
         in
         {
           name = host.name;
+
+          # `endpoint`/`addresses` STAY detected from this host's config, and
+          # the capability does not replace them. Tried and reverted: the record
+          # is pooled fleet-wide, so its `endpoint` has to be an address OTHER
+          # hosts can use -- which is what `consumeVia` picks -- while the
+          # capability resolves an endpoint PER CONSUMER, correctly giving
+          # loopback here and the tailnet from the laptop.
+          #
+          # So the two answer different questions and both are wanted:
+          # ./push.nix's `endpointFor` resolves per consumer and this remains
+          # the fallback, plus the value `flake-file.nixConfig` needs below,
+          # where there is no consuming host to resolve for.
           inherit (config.services.cellerd.expose) endpoint addresses;
           keys = k;
-          caches = if k == { } then [ "main" ] else builtins.attrNames k;
+          # Declared caches win; the key-derived set remains the fallback for a
+          # host that declares no cache aspect, so this stays additive.
+          # A declared cache with no signing key is a cache that does not exist.
+          # `celler.use` filters it out of `keys` silently, so without this the
+          # token would be scoped to a cache the server cannot sign for, and the
+          # only symptom would be a 403 at runtime.
+          missingKeys = lib.subtractLists (builtins.attrNames k) (lib.unique declared);
+
+          caches =
+            if declared != [ ] then
+              if missingKeys == [ ] || k == { } then
+                lib.unique declared
+              else
+                throw "celler on ${host.name}: cache aspect(s) ${lib.concatStringsSep ", " missingKeys} with no signing key in aspects/base/celler/celler-keys.json (it has: ${lib.concatStringsSep ", " (builtins.attrNames k)}). A cache without a key cannot be pushed to -- add the key, or drop the cache aspect from this host."
+            else if k == { } then
+              [ "main" ]
+            else
+              builtins.attrNames k;
         };
 
       # This server's own caches, into the flake's nixConfig. Read off the
@@ -305,12 +434,37 @@ in
   };
 
   # secondpc's celler, cache.ivymect.in.
+  # Exported so ../../hosts/celler2.nix can declare its own celler without
+  # reaching for a path import.
+  _module.args.cellerCapability = cellerCapability;
+
   den.aspects.celler =
     let
       port = 8069;
     in
-    {
+    cellerCapability {
+      inherit port;
+      subdomain = "cache";
+    }
+    // {
       includes = [ den.aspects.celler-server._.nixos ];
+
+      # ── THE SAME CONSTRAINT, DECLARED RATHER THAN HAND-EXCLUDED ──
+      #
+      # `client_max_body_size 15g` on the vhost below, and
+      # `cache.ivymect.in` sitting in `cloudflared-tunnel.exclude` by hand,
+      # are one fact written twice: `celler push` sends NARs far past
+      # Cloudflare's 100MB cap. Declaring the limit lets
+      # ../../network/cloudflare.nix derive the exclusion instead.
+      #
+      # No `port`/`upstream`: the vhost is declared below, with a `root` and
+      # locations this file owns, so ../../services/proxy-nginx.nix records the
+      # take and renders nothing. ../../hosts/celler2.nix takes no proxy at all
+      # -- it publishes through its own cloudflared ingress.
+      takes.proxy = {
+        subdomain = "cache";
+        maxBodyBytes = 15 * 1000 * 1000 * 1000;
+      };
 
       vhosts."cache.ivymect.in" = {
         useACMEHost = "ivymect.in";
@@ -326,15 +480,25 @@ in
       # the connector token -- `cloudflared tunnel run` reads TUNNEL_TOKEN from
       # the environment and asks Cloudflare what to serve.
       #
-      # `consumeVia` is left alone: it still resolves to `virtualHost`, so
-      # adding this changes nothing for existing consumers. It is the way in for
-      # anything that can reach neither the LAN nor the tailnet.
-      # Consumers reach it over the tailnet, like ../../hosts/celler2.nix.
-      # Pushing is what decides this: Cloudflare caps a proxied request body at
-      # 100MB and `celler push` sends NARs far past it (the vhost above says
-      # `client_max_body_size 15g`), and the public vhost is a home connection
-      # either way. The tailnet has neither limit, and it is reachable from off
-      # the LAN, which the LAN address is not.
+      # ── `consumeVia` IS NOW A FALLBACK, NOT THE DECISION ──
+      #
+      # A consumer derives its carrier at the point of use: a connection needs a
+      # transport, and the flow's own constraints pick which
+      # (../base/capability.nix, reached from ./push.nix). This value is what
+      # ../celler/_lib.nix still uses when that resolution finds nothing -- a
+      # scope with no host binding, or a server whose host is not a den entity.
+      #
+      # It stays `tailscale` rather than reverting to the `virtualHost` default
+      # precisely because the fallback must not be the public route: Cloudflare
+      # caps a proxied request body at 100MB and `celler push` sends NARs far
+      # past it (the vhost above says `client_max_body_size 15g`). The tailnet
+      # has neither limit and is reachable from off the LAN, which the LAN
+      # address is not.
+      #
+      # That reasoning is now also the DERIVATION -- `maxBodyBytes` on the
+      # public carrier against `takes.http.maxBodyBytes = b: b == null` on the
+      # push flow -- so the two agree by construction instead of by somebody
+      # having worked it out once.
       #
       # `cache.ivymect.in` stays up and stays a direct A record -- it is
       # excluded from the host's tunnel in ../../hosts/secondpc/default.nix.
@@ -404,21 +568,21 @@ in
   # decrypting its generated signing key with the master identity.
   perSystem =
     {
+      config,
       pkgs,
-      system,
       ...
     }:
     let
       mintToken = pkgs.writeShellApplication {
         name = "celler-token";
+        # `secret-view` is agenix's own `view` subcommand (../../security/
+        # agenix-rekey.nix), so it knows the configured `masterIdentities` and
+        # carries the right age plugins. This used to be a bare `rage -d -i
+        # aspects/security/gpg-yubikey.pub`, which pinned one master here as
+        # well as there -- and broke the moment that master changed.
         runtimeInputs = [
           pkgs.celler
-          pkgs.rage
-          (inputs.age-plugin-gpg.packages.${system}.age-plugin-gpg.overrideAttrs (attrs: {
-            postInstall = (attrs.postInstall or "") + ''
-              ln -s $out/bin/age-plugin-gpg $out/bin/age-plugin-gpg-1
-            '';
-          }))
+          config.packages.secret-view
         ];
         text = ''
           if [ ! -e flake.nix ]; then
@@ -431,7 +595,7 @@ in
           fi
           key="secrets/generated/$1/celler-signing-key.age"
           shift
-          CELLER_SERVER_TOKEN_RS256_SECRET_BASE64="$(rage -d -i aspects/security/gpg-yubikey.pub "$key")"
+          CELLER_SERVER_TOKEN_RS256_SECRET_BASE64="$(secret-view "$key")"
           export CELLER_SERVER_TOKEN_RS256_SECRET_BASE64
           exec celleradm -f ${celler.tokenConfig pkgs} make-token --validity "''${VALIDITY:-10y}" "$@"
         '';

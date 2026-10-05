@@ -6,13 +6,17 @@
 # slskd (soulseek daemon) + its soularr (lidarr<->slskd) bridge. Everything here
 # runs as `music`, the same user lidarr and navidrome use, so a grab lands in
 # /mnt/hdd/Music/Downloads already owned by the account that imports it.
-# Secrets (slskd.env, slskd_soularr_apikey, slskd_secrets_env, lidar_key) need
-# `nix run .#rekey` and `nix run .#gen-secrets` before deploy.
+# Every secret here is generated, in this aspect's own `slskd` scope, so none
+# names a path and `gen-secrets` mints them all -- including the Soulseek
+# account itself, which the network registers on first login.
 {
   den.aspects.slskd = {
+    # `slsk.<zone>`, which `services.slskd.domain` builds its own vhost from --
+    # host config, invisible to ../../network/roaming-resolver.nix otherwise.
+    alsoPublishes = [ "slsk" ];
+
     includes = [
       den.aspects.agenix-rekey
-      den.aspects.user-pwd
       den.aspects.gateway
       den.aspects.lidarr
       # /mnt/hdd/Music, the `music` user and lidarr itself live in media.nix,
@@ -20,6 +24,41 @@
       # `ivymect.in` cert the vhost below rides on.
       den.aspects.secondpc-web
     ];
+
+    secrets = {
+      # What soularr presents to slskd's API.
+      api-key.generator.script = "random-base64-32";
+      # The web UI's own login; the gate is in front of it as well.
+      web-password.generator.script = "random-base64-32";
+      soulseek-username.generator.script =
+        { pkgs, ... }: ''printf 'slsk-%s' "$(${pkgs.openssl}/bin/openssl rand -hex 4)"'';
+      soulseek-password.generator.script = "random-hex-32";
+    };
+
+    templates.env =
+      { secrets, ... }:
+      {
+        owner = "media";
+        group = "media";
+        restartUnits = [ "slskd.service" ];
+        dependencies = {
+          inherit (secrets)
+            api-key
+            web-password
+            soulseek-username
+            soulseek-password
+            ;
+        };
+        content =
+          { placeholders, ... }:
+          ''
+            SLSKD_API_KEY="role=Administrator;cidr=0.0.0.0/0,::/0;${placeholders.api-key}"
+            SLSKD_USERNAME=ivy
+            SLSKD_PASSWORD=${placeholders.web-password}
+            SLSKD_SLSK_USERNAME=${placeholders.soulseek-username}
+            SLSKD_SLSK_PASSWORD=${placeholders.soulseek-password}
+          '';
+      };
 
     nixos =
       {
@@ -78,48 +117,8 @@
           };
         };
 
-        # --- slskd (soulseek): its env is generated from ivy-password +
-        #     a generated API key + the slsk_creds source env. ---
-        age.secrets.slskd_secrets_env = {
-          rekeyFile = ./slsk_creds.env.age;
-          intermediary = true;
-        };
-        age.secrets.slskd_soularr_apikey.generator.script =
-          {
-            pkgs,
-            lib,
-            ...
-          }:
-          ''
-            ${lib.getExe pkgs.openssl} rand -base64 48
-          '';
-        age.secrets."slskd.env" = {
-          owner = "media";
-          group = "media";
-          restartUnits = [ "slskd.service" ];
-          generator = {
-            dependencies = {
-              inherit (config.age.secrets) slskd_soularr_apikey slskd_secrets_env;
-              inherit (scoped.user-pwd.secrets) ivy-password;
-            };
-            script =
-              {
-                pkgs,
-                lib,
-                decrypt,
-                deps,
-                ...
-              }:
-              ''
-                printf 'SLSKD_API_KEY="role=Administrator;cidr=0.0.0.0/0,::/0;%s"\n' $(${decrypt} ${lib.escapeShellArg deps.slskd_soularr_apikey.file})
-                printf 'SLSKD_USERNAME=ivy\n'
-                printf 'SLSKD_PASSWORD=%s\n' $(${decrypt} ${lib.escapeShellArg deps.ivy-password.file})
-                ${decrypt} ${lib.escapeShellArg deps.slskd_secrets_env.file}
-              '';
-          };
-        };
         services.slskd = {
-          environmentFile = config.age.secrets."slskd.env".path;
+          environmentFile = scoped.slskd.templates.env.path;
           domain = "slsk.ivymect.in";
           nginx = {
             forceSSL = true;
@@ -138,7 +137,7 @@
         age.templates.soularr = {
           dependencies = {
             lidar_key = config.age.secrets."soularr/api-key";
-            slskd_api_key = config.age.secrets.slskd_soularr_apikey;
+            slskd_api_key = scoped.slskd.secrets.api-key;
           };
           content =
             {
@@ -149,7 +148,7 @@
             pkgs.lib.generators.toINI { } {
               Lidarr = {
                 api_key = placeholders.lidar_key;
-                host_url = "https://lidarr.${config.gateway.domain}";
+                host_url = config.gateway.services.lidarr.url;
                 download_dir = downloads;
                 disable_sync = "False";
               };

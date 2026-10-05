@@ -41,7 +41,7 @@
       }:
       {
         nix_github_token = {
-          rekeyFile = rootPath + "/secrets/github_token.age";
+          rekeyFile = rootPath + "/secrets/static/github_token.age";
         };
       };
     homeManager =

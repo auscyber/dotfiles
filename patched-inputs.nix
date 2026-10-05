@@ -30,7 +30,7 @@
   layers = {
     darwin-dev = [ "idris2Packages" "pnpm-nix-provider" ];
     darwin-gui = [ "coolabah" "paneru" "zen-browser" ];
-    dev = [ "claude-code" "neovim-nightly-overlay" "nixvim" "op-shell-plugins" ];
+    dev = [ "claude-code" "den-diagram" "neovim-nightly-overlay" "nixvim" "op-shell-plugins" ];
     gui = [ "my-nur" "nur" "stylix" ];
     gui-nixos = [ "plasma-manager" ];
     homebrew = [ "homebrew-cask" "homebrew-core" "homebrew-gcenx" "homebrew-speedtest" "homebrew-typewhisper" "nix-homebrew" ];
@@ -51,9 +51,8 @@
       ./patches/agenix-rekey/stat-portable.patch
       ./patches/agenix-rekey/rekey-mkdir-p.patch
       ./patches/agenix-rekey/derivedFrom.patch
-    ];
-    arion.patches = [
-      ./patches/arion/journald-console.patch
+      ./patches/agenix-rekey/skip-absent-identities.patch
+      ./patches/agenix-rekey/update-masterkeys-skip-unreadable.patch
     ];
     darwin.patches = [
       ./patches/darwin/karabiner.patch
@@ -71,13 +70,12 @@
     zen-browser.patches = [ ];
 
     age-plugin-gpg.hash = "sha256-Gjjt9MiTMJS4UTcUaN514wKHrstebVsoK8sxdPRjqAU=";
-    agenix.hash = "sha256-u+D8OB1XMOAIyd6/u+IKtRToTftdXc0L/A58dRCS/8M=";
-    agenix-rekey.hash = "sha256-p7m57B3lCFVj40SOubd09OqBa/7uSEJzZBO2+LNJjUg=";
-    arion.hash = "sha256-XM8sEWDiEAwjWL1onvSuxrkgyHxL0SAwsD6dXx992NM=";
-    darwin.hash = "sha256-ijSJAEM3e1gFv9vAlogYS+5ONYjOicZ7zlmo9XWesAY=";
-    home-manager.hash = "sha256-xW6fGD1Q3/zBzI3hctmdfFe1XJ06l8Jo5ouJoRgdSGQ=";
-    nh.hash = "sha256-/Wx2bgNWIwvUS+L7swiQpoDEZAq4yEKSFAGcIz2z1JQ=";
-    pnpm-nix-provider.hash = "sha256-/dooptthzfGp/Qmdg27ME4frEuxH0zWxad7zceNsMzw=";
+    agenix.hash = "sha256-EmOkgBPRseZP7g8eHW4FydKGYRaolIdlQypYazI6JBY=";
+    agenix-rekey.hash = "sha256-OVbANLeCVpEWHlkcGkHbXD6MjreXNdHLVnvwGFwwyDM=";
+    darwin.hash = "sha256-R5eoCXc2qGHeApxRvOalf9nBVC06zZkq3wg3dR+fv8Y=";
+    home-manager.hash = "sha256-wV+7jpedHqygdpJ7chowDbImz3qZNNX6oG77rI30I94=";
+    nh.hash = "sha256-Rxa5M0LAFz4Gh/zYRVz4e1rMjsfT6IbjECndZ2J1dws=";
+    pnpm-nix-provider.hash = "sha256-5xZa1zx6lDF6AvI9P80EPIG3dmLkAY25kps2Nyy9aqQ=";
     zen-browser.hash = null;
   };
 }

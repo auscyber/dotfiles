@@ -1,5 +1,4 @@
 diff --git a/apps/generate.nix b/apps/generate.nix
-index c3da7d2095..780197a4ce 100644
 --- a/apps/generate.nix
 +++ b/apps/generate.nix
 @@ -41,6 +41,18 @@
@@ -21,7 +20,7 @@ index c3da7d2095..780197a4ce 100644
    mapListOrAttrs = f: x: if builtins.isList x then map f x else mapAttrs (_: f) x;
    mapListOrAttrValues = f: x: if builtins.isList x then map f x else mapAttrsToList (_: f) x;
    filterListOrAttrValues = f: x: if builtins.isList x then filter f x else filterAttrs (_: f) x;
-@@ -104,6 +116,8 @@
+@@ -118,6 +130,8 @@
              secretName
              script
              ;
@@ -30,7 +29,7 @@ index c3da7d2095..780197a4ce 100644
            defs = (set.${sourceFile}.defs or [ ]) ++ [ "${host}:${secretName}" ];
          };
        };
-@@ -117,6 +131,40 @@
+@@ -131,6 +145,40 @@
    # The command that actually generates a secret.
    secretGenerationCommand = contextSecret: ''
      if wants_secret ${escapeShellArg contextSecret.sourceFile} ${escapeShellArg (concatStringsSep "," contextSecret.secret.generator.tags)} ; then
@@ -71,7 +70,7 @@ index c3da7d2095..780197a4ce 100644
        # If the secret has dependencies, force regeneration if any
        # dependency was modified since its last generation
        dep_mtimes=(
-@@ -144,9 +192,17 @@
+@@ -158,9 +206,17 @@
          } | ${ageMasterEncrypt} -o ${escapeShellArg contextSecret.sourceFile} \
            || die "Failed to generate or encrypt secret."
  
@@ -90,7 +89,6 @@ index c3da7d2095..780197a4ce 100644
        else
          echo "[1;90m    Skipping[m [90m[already exists] "${escapeShellArg contextSecret.sourceFile}" ("${concatStringsSep "', '" (map escapeShellArg contextSecret.defs)}")[m"
 diff --git a/modules/agenix-rekey.nix b/modules/agenix-rekey.nix
-index bc16ca49f0..eb827f9807 100644
 --- a/modules/agenix-rekey.nix
 +++ b/modules/agenix-rekey.nix
 @@ -52,6 +52,38 @@
@@ -131,8 +129,8 @@ index bc16ca49f0..eb827f9807 100644
 +
    # A decryptable dummy secret that is used as a replacement when a secret specifies `intermediary = true`.
    pubkeyOpt = x: if isAbsolutePath x then "-R ${escapeShellArg x}" else "-r ${escapeShellArg x}";
-   dummySecret = pkgs.runCommand "generate-dummy-secret-${target}.age" { } ''
-@@ -182,6 +214,51 @@
+   dummySecret =
+@@ -198,6 +230,51 @@
              submod.config.script;
        };
  
@@ -184,13 +182,34 @@ index bc16ca49f0..eb827f9807 100644
        tags = mkOption {
          type = types.listOf types.str;
          default = [ ];
-@@ -363,7 +440,8 @@
+@@ -375,12 +452,29 @@
+               '';
+             };
+ 
++            # The eval-time half of `generator.derivedFrom`, as the filename
++            # suffix the default below appends. Exposed so a configuration that
++            # sets its own `rekeyFile` default can keep the same staleness
++            # behaviour without re-deriving the hash.
++            derivedNameSuffix = mkOption {
++              type = types.str;
++              readOnly = true;
++              default =
++                if submod.config.generator != null then derivedNameSuffix submod.config.generator else "";
++              description = ''
++                The suffix `generator.derivedFrom` contributes to a generated
++                secret's default filename. Empty without a generator or without
++                `derivedFrom`.
++              '';
++            };
++
+             rekeyFile = mkOption {
+               type = types.nullOr types.path;
                default =
                  if submod.config.generator != null then
                    if config.age.rekey.generatedSecretsDir != null then
 -                    config.age.rekey.generatedSecretsDir + "/${submod.config.id}.age"
 +                    config.age.rekey.generatedSecretsDir
-+                    + "/${submod.config.id}${derivedNameSuffix submod.config.generator}.age"
++                    + "/${submod.config.id}${submod.config.derivedNameSuffix}.age"
                    else
                      null
                  else if config.age.rekey.secretsDir != null then

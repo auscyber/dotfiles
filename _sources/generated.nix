@@ -39,6 +39,17 @@
       sha256 = "sha256-2sOqH2iI7gw5J8QnvG5PAsb4F4m1DW2uPSQHLIK81Pk=";
     };
   };
+  donetick = {
+    pname = "donetick";
+    version = "v0.1.80";
+    src = fetchFromGitHub {
+      owner = "donetick";
+      repo = "donetick";
+      rev = "v0.1.80";
+      fetchSubmodules = false;
+      sha256 = "sha256-KJrMpUsyXqSVydzRSyYm2nsVpeauc1c3wkkizglY19s=";
+    };
+  };
   eagle-nvim = {
     pname = "eagle-nvim";
     version = "e99f4e36eaf2b5da076ff4e3e8ee7559127aa9e2";
@@ -166,6 +177,16 @@
       sha256 = "sha256-ks2S0JrcLBZqZ4b7P/kNdSOoYpJ96QytVPjE00gxRpg=";
     };
     date = "2026-09-16";
+  };
+  splitpro = {
+    pname = "splitpro";
+    version = "v2.1.5";
+    src = dockerTools.pullImage {
+      imageName = "docker.io/ossapps/splitpro";
+      imageDigest = "sha256:efaa52b30d009573c4bf70e5711d6447536914469420db58680e1e6779acde6e";
+      sha256 = "sha256-KGAvB+lG9Gcjif5o2vbGEZPcwcOAWupZSCqi+FaV9RA=";
+      finalImageTag = "v2.1.5";
+    };
   };
   vscode-kanata = {
     pname = "vscode-kanata";

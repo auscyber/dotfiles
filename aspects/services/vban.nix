@@ -1,7 +1,7 @@
 {
   den,
   lib,
-  fleet,
+  capability,
   ...
 }:
 # VBAN sender: a line-level input on this host, streamed to a VBAN receiver
@@ -21,21 +21,36 @@
 let
   inherit (lib) mkOption types;
 
-  # The receiver is named, not addressed: ../hosts/fleet.nix already knows every
-  # machine, so a stream says `host = "secondpc"` and the address follows the
-  # fleet record. `lanAddress` and not `builder.ipAddress` -- that one is a
-  # wireguard address, and pushing uncompressed audio between two boxes on the
-  # same switch through the tunnel is both pointless and a fragmentation
-  # problem, since a full VBAN packet does not fit a 1420-byte tunnel MTU.
-  lanOf =
-    name:
-    let
-      addr = fleet.${name}.lanAddress or null;
-    in
-    if addr != null then
-      addr
-    else
-      throw "services.vbanSend: fleet host '${name}' declares no `lanAddress`; set one on it or give the stream an explicit `destination`.";
+  # ── THE RECEIVER IS RESOLVED, NOT NAMED ──
+  #
+  # Was `host = "secondpc"` on the stream plus a `lanOf` that read that
+  # machine's `lanAddress` out of ../hosts/fleet.nix. Three things were wrong
+  # with it and only the first was visible: the box was named rather than the
+  # SERVICE, so moving Music Assistant to another machine was a silent
+  # mis-send; the port was a second default here, beside the one the receiver
+  # declares; and "not through the tunnel" was a sentence in a comment, which
+  # is not a thing resolution can honour.
+  #
+  # All three are one take now. `name` picks the service (../services/
+  # homeassistant/music-assistant.nix furnishes it), the `mtu` clause is the
+  # comment turned into a comparison -- ../network/segments.nix gives the house
+  # lan `mtu = 1500` and the wireguard tunnel 1420, so the tunnel loses on the
+  # numbers rather than on being excluded by name -- and `reach = "household"`
+  # on that aspect is what allows the link to leave this box at all.
+  #
+  # A full VBAN packet does not fit a 1420-byte tunnel MTU, which is what the
+  # clause is for: an under-MTU path does not fail, it fragments, and
+  # uncompressed audio that fragments is audio that stutters.
+  receiverTake = {
+    name = "music-assistant";
+    mtu = m: m != null && m >= 1500;
+  };
+
+  # `{ address; ports; ... }` for the receiver, from this host, or null when
+  # nothing carries the flow. ../base/capability.nix's `dial` is the two-step:
+  # which giver (reach, clauses, preference) and then which carrier between the
+  # two boxes.
+  receiverFor = host: capability.dial "udp" receiverTake host;
 
   # The rates VBAN's header can encode (module-vban/vban.h `vban_SR`). Anything
   # else is sent with the index that means 44100, so the receiver resamples
@@ -64,80 +79,82 @@ let
     705600
   ];
 
-  streamModule =
-    { config, ... }:
-    {
-      options = {
-        host = mkOption {
-          type = types.nullOr (types.enum (lib.attrNames fleet));
-          default = null;
-          example = "secondpc";
-          description = "Fleet machine running the receiver; its `lanAddress` becomes `destination`.";
-        };
+  streamModule = _: {
+    options = {
+      destination = mkOption {
+        type = types.str;
+        example = "192.168.0.26";
+        description = ''
+          Address of the VBAN receiver. No default and no `host` option: a
+          stream that knows which machine it is sending to has already
+          stopped resolving, so the address is either resolved from a take
+          (see `den.aspects.vban-turntable` below, which is the shape to
+          copy) or it is a literal because the receiver is not something
+          this flake describes.
+        '';
+      };
 
-        destination = mkOption {
-          type = types.str;
-          default = lanOf config.host;
-          defaultText = lib.literalMD "the `lanAddress` of `host` in the fleet";
-          description = "Address of the VBAN receiver, if it is not a fleet machine.";
-        };
+      port = mkOption {
+        type = types.port;
+        default = 6980;
+        description = ''
+          VBAN's registered port. A default rather than a resolution,
+          because a stream may point at a receiver this flake knows nothing
+          about; a stream that resolves its `destination` reads the port off
+          the same link and does not inherit this.
+        '';
+      };
 
-        port = mkOption {
-          type = types.port;
-          default = 6980;
-          description = "VBAN's registered port; both ends default to it.";
-        };
+      source = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "alsa_input.pci-0000_00_1f.3.analog-stereo";
+        description = ''
+          pipewire node to capture from (`target.object`). Null follows
+          whatever wireplumber picks as the default source, which is rarely
+          what is wanted for a fixed physical input.
+        '';
+      };
 
-        source = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          example = "alsa_input.pci-0000_00_1f.3.analog-stereo";
-          description = ''
-            pipewire node to capture from (`target.object`). Null follows
-            whatever wireplumber picks as the default source, which is rarely
-            what is wanted for a fixed physical input.
-          '';
-        };
+      captureSink = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Take `source`'s monitor ports rather than its input ports, for
+          mirroring a sink's playback instead of capturing a device.
+        '';
+      };
 
-        captureSink = mkOption {
-          type = types.bool;
-          default = false;
-          description = ''
-            Take `source`'s monitor ports rather than its input ports, for
-            mirroring a sink's playback instead of capturing a device.
-          '';
-        };
+      rate = mkOption {
+        type = types.enum vbanRates;
+        default = 48000;
+        description = "Sample rate to send at; must be one VBAN can encode.";
+      };
 
-        rate = mkOption {
-          type = types.enum vbanRates;
-          default = 48000;
-          description = "Sample rate to send at; must be one VBAN can encode.";
-        };
+      channels = mkOption {
+        type = types.ints.between 1 256;
+        default = 2;
+      };
 
-        channels = mkOption {
-          type = types.ints.between 1 256;
-          default = 2;
-        };
+      format = mkOption {
+        type = types.enum [
+          "U8"
+          "S16LE"
+          "S24LE"
+          "S32LE"
+          "F32LE"
+          "F64LE"
+        ];
+        default = "S16LE";
+        description = "The subset of pipewire formats VBAN has a datatype for.";
+      };
 
-        format = mkOption {
-          type = types.enum [
-            "U8"
-            "S16LE"
-            "S24LE"
-            "S32LE"
-            "F32LE"
-            "F64LE"
-          ];
-          default = "S16LE";
-          description = "The subset of pipewire formats VBAN has a datatype for.";
-        };
-
-        ttl = mkOption {
-          type = types.ints.between 1 255;
-          default = 16;
-        };
+      ttl = mkOption {
+        type = types.ints.between 1 255;
+        default = 16;
       };
     };
+  };
 
   moduleOf = name: stream: {
     name = "libpipewire-module-vban-send";
@@ -204,15 +221,73 @@ in
   # The turntable feed itself, separate from the generic aspect above so a host
   # that wants to send something else does not inherit this one.
   den.aspects.vban-turntable = {
-    includes = [ den.aspects.vban ];
+    # The capture rig, so a host that wants this stream gets the sound card
+    # configured too. ../nixos/turntable.nix explains why it is a separate
+    # aspect rather than more content in this one -- in short, this aspect is
+    # excluded by `specialisations.no-turntable` and the hardware should not
+    # change when the receiver is off.
+    includes = [
+      den.aspects.vban
+      den.aspects.turntable-input
+    ];
 
-    nixos.services.vbanSend.streams.turntable = {
-      host = "secondpc";
-      # Onboard Realtek codec (Z390 ACE), `0000:00:1f.3` in the facter report.
-      # wireplumber's name for its analog capture node under the default
-      # profile; if the card ends up on `pro-audio` instead this becomes
-      # `alsa_input.pci-0000_00_1f.3.pro-input-0` -- check `wpctl status`.
-      source = "alsa_input.pci-0000_00_1f.3.analog-stereo";
-    };
+    # WHAT THIS STREAM NEEDS, as a take rather than as a destination. The
+    # household is what makes it resolvable: Music Assistant is declared by
+    # `den.households.ivymectin` and its aspect is `reach = "household"`, so a
+    # take from another machine in the same house finds it and one from
+    # anywhere else does not.
+    takes.udp = receiverTake;
+
+    # ── AND WHAT HAPPENS WHEN THE RECEIVER IS NOT THERE ──
+    #
+    # A THROW, not a fallback. The old `lanOf` fell back to the fleet's
+    # recorded address whatever the state of the world, so a Music Assistant
+    # that had moved -- or a tunnel-only path, which fragments -- produced a
+    # stream that ran and was heard by nobody. There is no safe default
+    # address for "send uncompressed audio somewhere", so this fails at
+    # evaluation and says which half is missing.
+    #
+    # ../base/service-reach.nix turns the same take into a `requires` check, so
+    # the RUNTIME version of this question -- the receiver resolved fine and is
+    # simply down -- is answered before a build rather than by a silent stream.
+    nixos =
+      {
+        config,
+        host ? { },
+        ...
+      }:
+      let
+        resolved = receiverFor host;
+
+        receiver =
+          if resolved != null then
+            resolved
+          else
+            throw "den.aspects.vban-turntable: nothing on ${host.name or "this host"} resolves `udp` from a service named `music-assistant` over a carrier with a 1500-byte MTU. Either no host in this household serves it, or the only path between the two boxes is the tunnel -- which fragments VBAN.";
+      in
+      {
+        services.vbanSend.streams.turntable = {
+          destination = receiver.address;
+          # The port the RECEIVER declares, not this module's default: one
+          # number, in `gives.udp.ports.vban`, read back through the link.
+          inherit (receiver.ports.vban) port;
+          # READ OFF THE CAPTURE RIG, not spelled out here.
+          #
+          # This was `alsa_input.pci-0000_00_1f.3.analog-stereo` -- wireplumber's
+          # name for the Realtek's analog capture node under the default
+          # profile. Three things were wrong with that and only the last was
+          # written down: the node is whatever wireplumber decided to call it
+          # (the old comment's own caveat about `pro-input-0` under the
+          # `pro-audio` profile); the turntable on auspc is now TWO ADCs merged
+          # into one source, which that name cannot refer to at all; and
+          # ../nixos/turntable.nix had to be told the node name anyway, so it
+          # was a second definition of one fact.
+          #
+          # `sourceNode` is read-only and equal to the merged source's name by
+          # construction, so this stream follows a single-jack or a merged
+          # arrangement without an edit here.
+          source = config.hardware.turntable.sourceNode;
+        };
+      };
   };
 }

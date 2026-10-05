@@ -1,10 +1,19 @@
 { den, ... }:
-# secondpc's public reverse-proxy surface: ACME (cloudflare DNS-01) certs plus
-# the nginx vhosts fronting the media/vault services. Included by the secondpc
-# host aspect. Secrets are agenix-rekey sources (encrypted to the gpg-yubikey
-# master identity) that must be rekeyed with `nix run .#rekey` before deploy.
+# secondpc's public reverse-proxy surface: ACME (cloudflare DNS-01) certs, and
+# the secrets that go with them. Included by the secondpc host aspect. Secrets
+# are agenix-rekey sources (encrypted to the gpg-yubikey master identity) that
+# must be rekeyed with `nix run .#rekey` before deploy.
+#
+# THE VHOSTS ARE NO LONGER HERE. Each service declares `takes.proxy` beside its
+# own config and ../../services/proxy-nginx.nix renders them -- see the note
+# below.
 {
   den.aspects.secondpc-web = {
+    # `aria2.<zone>`, the raw vhost below -- deliberately raw (see the note
+    # there), which is exactly why ../../network/roaming-resolver.nix has to be
+    # told rather than being able to fold it out of `takes.proxy`.
+    alsoPublishes = [ "aria2" ];
+
     includes = [
       den.aspects.nginx
       den.aspects.agenix-rekey
@@ -19,57 +28,23 @@
     # variable name; the token moved up and the wrapping became a generator --
     # so the token itself is `intermediary` and never lands on this box.
     #
-    # navidrome external-integration env (LastFM/Spotify keys, etc.) -- the one
-    # secret left in this scope. `restartUnits` is still named per secret
-    # rather than inferred: the scope is `secondpc-web`, which is not a
-    # service, so there is nothing for inference to find.
-    secrets.navidrome_env = {
-      rekeyFile = ./navidrome.age;
-      restartUnits = [ "navidrome.service" ];
-    };
-
-    # nginx virtualHosts (forwarded to services.nginx.virtualHosts by the nginx
-    # aspect's `vhosts` class). Ports mirror the services enabled in secondpc.nix.
-    vhosts = {
-      "music.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:4533"; # navidrome default
-      };
-      "audiobookshelf.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:8000"; # audiobookshelf default
-          proxyWebsockets = true;
-        };
-      };
-      # lidarr / arr / bazarr / qbittorrent / tautulli / grafana / homepage are
-      # absent on purpose: the gateway builds those vhosts, certificate
-      # included, from each service aspect's own `gated` entry. Declaring one
-      # here as well is a proxyPass conflict, not an override.
-      # loki, on the same apex as everything else so one oauth2-proxy cookie
-      # covers it (see sso.nix). The older logs.pierlot.com.au vhost in
-      # media.nix stays on basic auth for whatever is already pointed at it.
-      "logs.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/" = {
-          proxyPass = "http://localhost:3100";
-          recommendedProxySettings = true;
-        };
-      };
-      "requests.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:5055"; # seerr (ex-overseerr/jellyseerr) default
-      };
-      "bitwarden.ivymect.in" = {
-        useACMEHost = "ivymect.in";
-        forceSSL = true;
-        locations."/".proxyPass = "http://127.0.0.1:8222"; # vaultwarden ROCKET_PORT
-      };
-    };
+    # ── THE FOUR RAW VHOSTS ARE GONE FROM HERE ──
+    #
+    # `music`, `logs`, `requests` and `bitwarden` were declared here while their
+    # services were configured in ./media.nix, ./observability.nix and
+    # ./vaultwarden.nix -- each service spread across two aspects, with the
+    # vhost in a file that knows nothing about the service.
+    #
+    # Each is now its own aspect declaring `takes.proxy`, beside its own
+    # service config, and ../../services/proxy-nginx.nix renders the vhost. The
+    # rendering is the same: `gateway.acmeHost` defaults to the same zone this
+    # wrote out, and `recommendedProxySettings` is global in
+    # ../../services/nginx.nix rather than per location.
+    #
+    # The arr apps, qbittorrent, tautulli, grafana, homepage and audiobookshelf
+    # were never here either, and for the same reason one step earlier: the
+    # gateway builds those vhosts from each service's own entry, and declaring
+    # one here as well is a proxyPass conflict rather than an override.
 
     nixos =
       {
@@ -141,9 +116,19 @@
           "meet.ivymect.in".environmentFile = scoped.cloudflare.secrets.acme_env.path;
         };
 
-        # navidrome reads its external API keys from the rekeyed env file.
-        services.navidrome.environmentFile = scoped.secondpc-web.secrets.navidrome_env.path;
-
+        # ── NOT CONVERTED TO `takes.proxy`, DELIBERATELY ──
+        #
+        # This is not a service publication. It is a static UI served from a
+        # `root`, an `alias` location for the magnet handler, and a proxyPass on
+        # ONE sub-path -- three nginx features and one proxy. Expressing it
+        # through the capability would mean putting `root` and `alias` on
+        # `den.capabilities.proxy`, which is nginx vocabulary: the type would
+        # become the union of one implementation's options, and traefik would
+        # inherit fields that mean nothing to it.
+        #
+        # The capability covers "publish this service under a name and forward
+        # to it". This is a web page that happens to proxy, so it stays raw.
+        #
         # AriaNg (static UI) + aria2's JSON-RPC (same-origin, so the
         # magnet-handler page needs no CORS setup) + the magnet-handler page
         # itself. aria2's RPC has no auth of its own beyond binding to

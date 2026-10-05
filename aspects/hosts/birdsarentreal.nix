@@ -1,15 +1,62 @@
 {
   den,
   inputs,
+  lib,
+  houseWifi,
   ...
 }:
 # HP Chromebook (coreboot board GOOGLE "setzer", Braswell Celeron N3060, 4G
 # RAM, 32G eMMC) running MrChromebox UEFI firmware. Kodi appliance + AirPlay 2
-# bridge for the bluetooth speakers.
+# and Sendspin bridge for the bluetooth speakers.
+let
+  # ⚠ PLACEHOLDER -- CONFIRM OR CHANGE BEFORE DEPLOYING.
+  #
+  # The house lan is one flat 192.168.0.0/16 (../network/segments.nix) behind a
+  # router at 192.168.0.1, with auspc on 192.168.1.11 and secondpc on
+  # 192.168.0.26. Nothing in this repo records the router's DHCP pool, so this
+  # repo cannot tell whether .1.12 is free -- the same unknown
+  # ../services/airplay-bluetooth.nix's `ip` option describes as "must be free
+  # and outside the DHCP pool". Pick a free address or pin a reservation.
+  lanAddress = "192.168.1.12";
+in
 {
   den.hosts.x86_64-linux.birdsarentreal = {
     roles = [ "gui" ];
-    users.ivy.roles = [ "gui" ];
+
+    # HOW THIS BOX IS ON THE HOUSE LAN. Static rather than a lease, for
+    # ../hosts/fleet.nix's reason: a lease is not a fixed address, so a value
+    # derived from one goes stale silently.
+    #
+    # THE INTERFACE IS THE RADIO, and that is honest rather than a compromise.
+    # There is no ethernet on this chromebook, and ../network/house-wifi.nix's
+    # `alsoVia` already says the radio is a second wire into this one segment;
+    # auspc's own ⚠ calls `attachments.lan-home.interface = <radio>` the
+    # "honest finish" for a host whose lan address lives on wifi.
+    #
+    # NOT `den.aspects.house-wifi`: that aspect drives the association through
+    # NetworkManager, and this host uses `networking.wireless` below -- the two
+    # cannot both own a radio. The association is configured here; the
+    # ATTACHMENT is what the segment reads.
+    attachments.lan-home = {
+      address = lanAddress;
+      interface = "wlp2s0";
+    };
+
+    # An appliance in a room of the household, so it needs the room/area
+    # vocabulary as much as the service host does.
+    # The household whose config this host produces: rooms, members, and who may
+    # reach its services. See ../../base/household.nix.
+    household = den.households.ivymectin;
+
+    # Whose machine this is -- a different fact from the household it serves.
+    owner = den.persons.ivy;
+    users.ivy = {
+      # The human behind this account (../../persons/ivy.nix). The link
+      # points account -> person, never the reverse; ../../base/person.nix
+      # says why.
+      person = den.persons.ivy;
+      roles = [ "gui" ];
+    };
   };
 
   den.aspects.birdsarentreal = {
@@ -22,19 +69,59 @@
       den.aspects.impermanence
       den.aspects.agenix-rekey
       den.aspects.tailscale
+      # THE HOUSE LAN, as the include that makes membership true. Without it
+      # the attachment above is data nothing reads: ../base/capability.nix
+      # computes siblinghood by aspect name, so a host that does not include
+      # this carrier is not on the segment however it is addressed.
+      den.aspects.lan-home
       den.aspects.bluetooth
       den.aspects.kodi
       den.aspects.airplay-bluetooth
+      # A SENDSPIN PLAYER for the same speakers, beside the AirPlay receivers
+      # rather than instead of them: ../services/sendspin-bluetooth.nix dials
+      # the Music Assistant on secondpc, which the house lan include above is
+      # what makes resolvable over the wire rather than the tailnet.
+      den.aspects.sendspin-bluetooth
       den.aspects.bt-console
     ];
 
-    # The wifi PSK. Create it before the first build with
-    #   nix run .#secret-edit -- secrets/bees_wifi.age
-    # one line, no quotes:  bees_psk=<passphrase>
-    secrets.bees-wifi = {
-      rekeyFile = ../../secrets/bees_wifi.age;
-      restartUnits = [ "wpa_supplicant.service" ];
-    };
+    # "no-sendspin": the player, dropped. ../base/service-reach.nix derives a
+    # `requires` from that aspect's household take, and ../tooling/nh-checked.nix
+    # matches a failed aspect against what each specialisation excludes -- so
+    # without this profile a Music Assistant that is off would REFUSE the build
+    # rather than select a configuration that comes up without it. Same shape
+    # as auspc's `no-turntable`, for the same reason.
+    specialisations.no-sendspin.excludes = [ den.aspects.sendspin-bluetooth ];
+
+    # The house wifi passphrase, RAW -- the same one secondpc's AP advertises
+    # (../network/hostapd.nix), so it is one static secret and not a per-host
+    # copy that can drift. The PATH is ../network/house-wifi.nix's too, so the
+    # three declarations of this secret cannot come to name different files.
+    secrets.wifi-password.rekeyFile = houseWifi.secretFile;
+
+    # wpa_supplicant's `ext:` indirection reads a NAMED VARIABLE out of
+    # `secretsFile`, so it needs `bees_psk=<passphrase>` rather than the bare
+    # value -- which is why this used to be its own hand-entered
+    # `bees_wifi.age` holding that whole line. It is a pure function of the
+    # passphrase, so it is a template over it instead: one secret to type, and
+    # hostapd (which wants the file to be JUST the passphrase) and
+    # wpa_supplicant (which wants key=value) can no longer disagree.
+    #
+    # The dependency is in this aspect's OWN scope. A template depending on
+    # another scope's secret closes `age.templates` ->
+    # `age.scoped.<other>.access` -> `age.templates` -- see the note in
+    # ../services/postgres.nix.
+    templates."wpa.env" =
+      { secrets, ... }:
+      {
+        restartUnits = [ "wpa_supplicant.service" ];
+        dependencies = { inherit (secrets) wifi-password; };
+        content =
+          { placeholders, ... }:
+          ''
+            ${houseWifi.pskVar}=${placeholders.wifi-password}
+          '';
+      };
 
     # A module FUNCTION, not a bare attrset: as an attrset this is evaluated
     # while den collects class content, which forces the nixos-layer
@@ -68,17 +155,45 @@
         # `secretsFile` at runtime, so no key reaches the store.
         networking.wireless = {
           enable = true;
-          secretsFile = scoped.birdsarentreal.secrets.bees-wifi.path;
+          secretsFile = scoped.birdsarentreal.templates."wpa.env".path;
           # Recovery hatch for a wifi-only box: if the secret is ever missing
           # (no host key yet, failed rekey) `wpa_cli` can still add a network
           # from the console, and /var/lib/wpa_supplicant is persisted below.
           allowAuxiliaryImperativeNetworks = true;
-          # Both APs share one PSK, so both point at the same variable.
-          networks = {
-            "Bedroom Beehive".pskRaw = "ext:bees_psk";
-            "Hallway Beehive".pskRaw = "ext:bees_psk";
-          };
+          # Both APs share one PSK, so both point at the same variable. The
+          # SSIDs come from ../network/house-wifi.nix rather than being spelled
+          # out here -- they were a copy of what that file now declares, and a
+          # third AP appearing is an edit there and nowhere else.
+          networks = lib.genAttrs houseWifi.allSsids (_: {
+            pskRaw = "ext:${houseWifi.pskVar}";
+          });
         };
+
+        # ── THE STATIC ADDRESS THE ATTACHMENT ABOVE DECLARES ──
+        #
+        # Scripted networking, which is what this host already has (nothing
+        # here turns on networkd), and the same shape auspc and secondpc use.
+        # ../hosts/fleet.nix's `attachment-interface-check` compares the
+        # attachment against exactly this block, so the two cannot drift
+        # without a warning.
+        #
+        # /16, not /24: the house really is one flat segment --
+        # ../network/segments.nix has the measurement.
+        networking.useDHCP = false;
+        networking.interfaces.wlp2s0 = {
+          useDHCP = false;
+          ipv4.addresses = [
+            {
+              address = lanAddress;
+              prefixLength = 16;
+            }
+          ];
+        };
+        networking.defaultGateway = {
+          address = "192.168.0.1";
+          interface = "wlp2s0";
+        };
+        networking.nameservers = [ "1.1.1.1" ];
 
         boot.loader.systemd-boot.enable = true;
         boot.loader.efi.canTouchEfiVariables = true;
@@ -132,6 +247,19 @@
           devices = { };
         };
 
+        # The Sendspin player. No url and no port here: the aspect resolves the
+        # Music Assistant on secondpc and reads its port off the same link.
+        #
+        # NO `name`, so it defaults to the hostname. The rooms in
+        # ../households/ivymectin.nix deliberately do not line up with the wifi
+        # SSIDs and nothing records which of them this appliance sits in, so a
+        # friendlier name here would be invented rather than read.
+        #
+        # `sink` stays null until the speakers are paired -- `bt-console` lists
+        # their nodes, and its combine-sink is the right target when they play
+        # as one.
+        services.sendspinBluetooth.enable = true;
+
         services.btConsole = {
           enable = true;
           openFirewall = true;
@@ -174,6 +302,10 @@
             "/var/lib/bluetooth"
             "/var/lib/docker"
             "/var/lib/upower"
+            # The Sendspin client's cryptographic identity and pairing
+            # records. Losing it makes the box a brand-new device to the
+            # server and needs the PIN typed in again.
+            "/var/lib/sendspin"
             "/var/lib/systemd/coredump"
             "/var/lib/tailscale"
             "/etc/NetworkManager/system-connections"

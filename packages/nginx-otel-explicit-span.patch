@@ -1,0 +1,29 @@
+diff -ru a/src/http_module.cpp b/src/http_module.cpp
+--- a/src/http_module.cpp	2026-10-29 02:13:45
++++ b/src/http_module.cpp	2026-10-29 02:13:45
+@@ -873,7 +873,7 @@
+             return NGX_ERROR;
+         }
+ 
+-        id->ToLowerBase16({buf, size});
++        id->ToLowerBase16(opentelemetry::nostd::span<char, 2 * Id::kSize>{buf, size});
+ 
+         v->len = size;
+         v->valid = 1;
+diff -ru a/src/trace_context.hpp b/src/trace_context.hpp
+--- a/src/trace_context.hpp	2026-10-29 02:17:27
++++ b/src/trace_context.hpp	2026-10-29 02:17:27
+@@ -72,11 +72,11 @@
+         *out++ = '0';
+         *out++ = '-';
+ 
+-        tc.traceId.ToLowerBase16({out, kTraceIdSize});
++        tc.traceId.ToLowerBase16(opentelemetry::nostd::span<char, kTraceIdSize>{out, kTraceIdSize});
+         out += kTraceIdSize;
+         *out++ = '-';
+ 
+-        tc.spanId.ToLowerBase16({out, kSpanIdSize});
++        tc.spanId.ToLowerBase16(opentelemetry::nostd::span<char, kSpanIdSize>{out, kSpanIdSize});
+         out += kSpanIdSize;
+         *out++ = '-';
+ 

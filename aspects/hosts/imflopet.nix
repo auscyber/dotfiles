@@ -1,5 +1,8 @@
 { den, ... }: {
   den.homes.x86_64-linux."ivy@imflopet" = {
+    # The human behind this account (../persons/ivy.nix). The link points
+    # account -> person, never the reverse; ../base/person.nix says why.
+    person = den.persons.ivy;
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOwzECwhRtEus12VIOPw8UrOkBuBwH69VKodEWEuXAsX ivy@imflopet";
   };
 

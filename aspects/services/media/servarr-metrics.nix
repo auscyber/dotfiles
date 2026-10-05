@@ -15,15 +15,19 @@
 # the same key gateway.nix already generates and hands to the app itself,
 # via `internalSecret e = "${e.name}/internal"`) is what exportarr
 # authenticates with; no new secret to mint.
+#
+# `gateway.services.<name>.localUrl`, not a hand-written loopback address: this
+# leg is local and direct -- not through the gateway -- but the app's urlbase is
+# baked into its own routing even on loopback, so a same-host call still has to
+# carry the prefix. `localUrl` is `upstream + subpath`, which is the one place
+# that prefix is decided, so repathing an app on the shared vhost cannot leave
+# its exporter polling a 404.
 {
   den.aspects.sonarr.nixos = { config, ... }: {
     services.prometheus.exporters.exportarr-sonarr = {
       enable = true;
       port = 9707;
-      # Local, direct -- not through the gateway. urlbase is baked into
-      # the app's own routing even on loopback, so it still has to be
-      # here despite this being a same-host call.
-      url = "http://127.0.0.1:8989/sonarr";
+      url = config.gateway.services.sonarr.localUrl;
       apiKeyFile = config.age.secrets."sonarr/internal".path;
     };
   };
@@ -32,7 +36,7 @@
     services.prometheus.exporters.exportarr-radarr = {
       enable = true;
       port = 9708;
-      url = "http://127.0.0.1:7878/radarr";
+      url = config.gateway.services.radarr.localUrl;
       apiKeyFile = config.age.secrets."radarr/internal".path;
     };
   };
@@ -41,8 +45,7 @@
     services.prometheus.exporters.exportarr-lidarr = {
       enable = true;
       port = 9711;
-      # No urlbase for lidarr (see servarr.nix).
-      url = "http://127.0.0.1:8686";
+      url = config.gateway.services.lidarr.localUrl;
       apiKeyFile = config.age.secrets."lidarr/internal".path;
     };
   };

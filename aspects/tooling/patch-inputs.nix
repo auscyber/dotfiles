@@ -6,6 +6,7 @@
   withSystem,
   rootPath,
   realInputs,
+  checkLib,
   ...
 }:
 let
@@ -251,6 +252,80 @@ let
       { }
     else
       lib.mapAttrs (_: v: v.hash or null) (import file).inputs;
+
+  # THE COMMITTED MANIFEST, read whatever `PATCH_HASHES` says. `patchHashes`
+  # above deliberately comes back empty under `PATCH_HASHES=ignore`, because
+  # that is the escape hatch for a stale hash and the option defaults must
+  # follow it. The drift check wants the opposite: the file as committed, so it
+  # can say what is in it.
+  recordedInputs =
+    let
+      file = ../../patched-inputs.nix;
+    in
+    if builtins.pathExists file then (import file).inputs else { };
+
+  # Paths are recorded relative to the flake root, so a comparison has to be
+  # made in the same spelling. Same function the generator uses for
+  # `generatedPatchLines`; one definition would be better and is a change to
+  # that binding's scope rather than to this one.
+  relToRoot =
+    p:
+    let
+      str = toString p;
+      root = toString rootPath;
+    in
+    if lib.hasPrefix root str then "." + lib.removePrefix root str else str;
+
+  # ── WHAT THE MANIFEST CAN BE WRONG ABOUT, ANSWERED IN EVALUATION ──
+  #
+  # `checks.patched-inputs-generated-current` already compares the committed
+  # file with a freshly generated one byte for byte, which is the complete
+  # answer -- including the HASHES, which is the one thing nothing here can
+  # check: an SRI hash is a NAR hash and nothing outside a builder computes NAR
+  # (see `packages.patched-inputs-file`). But it costs building every patched
+  # tree and a full `perSystem` evaluation -- two minutes, measured -- and a
+  # check nobody runs is the state this file was already in when agenix sat on a
+  # tree built from source that `flake.lock` had moved off months earlier.
+  #
+  # So this is the half that is free: the SHAPE of the manifest against the live
+  # declarations. It catches the drift that does not need a hash to detect, in
+  # seconds, and names the input rather than printing a diff.
+  manifestFindings =
+    let
+      live = lib.filterAttrs (_: v: v.isInput) config.patchedInputs;
+
+      missingHash = lib.mapAttrsToList (
+        n: _:
+        "`${n}` has ${
+          toString (lib.length live.${n}.patches)
+        } patch(es) and no recorded hash, so its patched tree is rebuilt on every machine and can never be substituted -- which is how `arion` sat unsubstitutable."
+      ) (lib.filterAttrs (n: v: hasPatches v && (recordedInputs.${n}.hash or null) == null) live);
+
+      orphaned = lib.mapAttrsToList (
+        n: _:
+        "./patched-inputs.nix records `${n}`, which is no longer a patched input of this flake. flake.nix still reads the entry, so a tree is pinned for something nothing patches."
+      ) (lib.filterAttrs (n: _: !(live ? ${n})) recordedInputs);
+
+      drifted = lib.concatLists (
+        lib.mapAttrsToList (
+          n: v:
+          let
+            want = map relToRoot v.patches;
+            # BOTH SIDES THROUGH `relToRoot`. A relative path in the committed
+            # manifest resolves against the file it is written in, so importing
+            # it yields `/nix/store/<flake>-source/patches/...` -- the same
+            # prefix `rootPath` has, and nothing like the `./patches/...` the
+            # file literally contains. Comparing the two spellings reported all
+            # eight inputs as drifted, which is how this is known.
+            have = map relToRoot (recordedInputs.${n}.patches or [ ]);
+          in
+          lib.optional (recordedInputs ? ${n} && want != have) (
+            "`${n}`'s patch list in ./patched-inputs.nix is not what the aspects declare -- recorded [ ${lib.concatStringsSep " " have} ], declared [ ${lib.concatStringsSep " " want} ]."
+          )
+        ) live
+      );
+    in
+    missingHash ++ orphaned ++ drifted;
 
   patchInputScript =
     pkgs:
@@ -829,6 +904,15 @@ in
             value = (patchedDrvs pkgs).${n};
           }) (lib.filterAttrs (n: v: hasPatches v && (patchedDrvs pkgs) ? ${n}) config.patchedInputs)
           // {
+            # The manifest flake.nix reads BEFORE the module system can run,
+            # checked against the declarations the module system holds. See
+            # `manifestFindings` for why this is here and not in `den.checks`.
+            patched-inputs-manifest = checkLib.mkCheck pkgs "patched-inputs-manifest" {
+              description = "./patched-inputs.nix agrees with the live patch declarations: every patched input has a recorded hash, nothing is recorded for an input that is gone, and the patch lists match.";
+              findings = manifestFindings;
+              fix = "nix run .#write-flake (or .#write-patched-inputs for just this file). If a recorded hash has gone stale against a bumped lock, `PATCH_HASHES=ignore` is what lets the regenerating app evaluate at all.";
+            };
+
             # Guard `buildPatched`'s fixpoint: every re-evaluated input — patched or
             # merely auto-unified — must resolve its own inputs to the *patched*
             # versions of them, not the pristine ones. E.g. `agenix` declares

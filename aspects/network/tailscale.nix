@@ -26,7 +26,7 @@
 #      with the `auth_keys` write scope, granted over ${nodeTag}.
 #   2. Put this in the tailnet ACL, or step 3 is rejected:
 #        "tagOwners": { "${nodeTag}": ["autogroup:admin"] }
-#   3. nix run .#secret-edit -- secrets/tailscale_auth.age
+#   3. nix run .#secret-edit -- secrets/static/tailscale_auth.age
 #      Two lines, no quotes, no `export`:
 #        CLIENT_ID=...
 #        CLIENT_SECRET=tskey-client-...
@@ -50,6 +50,8 @@
   den,
   lib,
   fleet,
+  carrierAttachment,
+  routeLib,
   ...
 }:
 let
@@ -58,6 +60,38 @@ let
   # this flake builds; devices enrolled by hand stay untagged and keep their own
   # ACL treatment.
   nodeTag = "tag:nix";
+
+  # ── THE INTERFACE NAME, DECLARED ONCE AND SET FROM HERE ──
+  #
+  # The capability layer is the source and `services.tailscale.interfaceName`
+  # below is set FROM it, not the other way round. Reading it back off the
+  # host's config would mean evaluating that host to answer "which wire does a
+  # tailnet-exposed port open on" -- several GB for one string -- which is the
+  # whole reason an attachment is entity-level data (../hosts/fleet.nix).
+  #
+  # `tailscale0` is also nixpkgs' default, so this changes nothing today; what
+  # it buys is that changing it changes both halves at once.
+  interfaceName = "tailscale0";
+
+  # ── AND IT IS A PER-HOST FACT AFTER ALL ──
+  #
+  # `tailscale0` is what tailscaled creates WHEN IT HAS A TUN. A container with
+  # no TUN and no NET_ADMIN runs `--tun=userspace-networking` and has no
+  # tailscale interface at all -- ../hosts/celler2.nix -- so furnishing
+  # `tailscale0` there tells a consumer to use a wire that does not exist, and
+  # ../base/firewall.nix would open that host's tailnet ports on it.
+  #
+  # Read off the host ENTITY and not its config, for the reason stated above:
+  # an attachment is entity-level data precisely so this question costs no host
+  # eval. `attachments.<carrier>.interface` is the slot ../hosts/fleet.nix
+  # already declares and checks for the lan, so there is nothing new to
+  # declare -- and a host that states nothing keeps `tailscale0`.
+  # `lib.defaultTo`, NOT `or`: `interface` is a declared option with a null
+  # default, so for a host that states the attachment and omits the interface
+  # the attribute EXISTS and `or` never fires -- the null flows on and this
+  # carrier furnishes no wire. ../../CLAUDE.md's first trap; measured here
+  # before it had a caller that could hit it.
+  ifaceFor = h: lib.defaultTo interfaceName (h.attachments.tailscale.interface or null);
 
   # Devices that are part of the tailnet but that this flake does not build, so
   # there is nothing to configure for them -- only a key to hand over. Declared
@@ -200,6 +234,24 @@ let
 
   mintKeyScript = mkMintKeyScript { };
 
+  # ── THE TAILNET'S ROUTES, DERIVED (../network/routes.nix) ──
+  # What this host advertises and which exit node it uses follow from the
+  # route takes across the fleet; `tailscale set` applies them without
+  # touching the login, and an empty plan clears what an earlier one set.
+  routesScript =
+    pkgs: tailscale: plan:
+    pkgs.writeShellScript "tailscale-routes" ''
+      for _ in $(seq 1 60); do
+        tailscale status --peers=false >/dev/null 2>&1 && break
+        sleep 2
+      done
+      ${tailscale}/bin/tailscale set \
+        --advertise-routes=${lib.concatStringsSep "," plan.advertiseRoutes} \
+        --advertise-exit-node=${lib.boolToString plan.advertiseExit} \
+        --exit-node=${lib.defaultTo "" plan.exitNode} \
+        --exit-node-allow-lan-access=true
+    '';
+
   # One name per machine: the tailnet hostname, the admin-console nickname and
   # the auth key's description are all the machine's own hostname, so nothing
   # downstream has to learn a second name for the same box. Shared by both
@@ -304,6 +356,146 @@ in
   den.default.age.generators.tailscale-authkey = authKeyScript;
 
   den.aspects.tailscale = {
+    # ── WHAT THIS ASPECT GIVES, for ../base/capability.nix ──
+    #
+    # Including this aspect IS being on the tailnet. That is the whole point of
+    # membership-by-inclusion: there is no `enrolled = true` to write and
+    # nothing that can disagree with reality, which is what §2.7 asked for and
+    # could not have while the question was asked from outside den.
+    #
+    # `prefix` is what makes this a SEGMENT rather than a per-host thing like a
+    # loopback -- several hosts attach to it and are thereby connected. CGNAT,
+    # fixed by tailscale rather than chosen here.
+    #
+    # `addressOf` answers where a peer is reachable. NOT a `100.x` address:
+    # those are assigned by the coordination server and are not knowable at eval
+    # time, which is the fact that blocked declaring tailnet attachments at all.
+    # A NAME is knowable -- MagicDNS gives every node
+    # `<host>.tailef3db9.ts.net` -- and only its resolution is deferred, which
+    # is §2.7a's "eval time knows the SHAPE, run time knows what is up".
+    # GIVES TAKES SELF, which is the thing an empty `gives.tcp = { }` could not
+    # do. A capability is not a token saying "I have tcp" -- it is what the
+    # consumer RECEIVES, and only the giver can furnish it, because only the
+    # giver knows it addresses its members by MagicDNS name rather than by a
+    # `100.x` the coordination server assigns at run time.
+    #
+    # So the fiber for "how do I reach this peer over the tailnet" lives HERE,
+    # in the segment that knows the answer, rather than in a consumer that would
+    # otherwise have to name `tailef3db9.ts.net` itself. A consumer writes
+    # `uses.tcp` and reads `tcp.address`; it never learns which carrier won, and
+    # the same line is right over the lan.
+    gives =
+      { self, ... }:
+      let
+        # DERIVED FROM THE PEER, never written out. The four MagicDNS names were
+        # literals in a deleted ../network/tailnet.nix, whose own comment argued
+        # that writing them was "cheaper than a mechanism that exists for one
+        # subtype" -- true of the registry it lived in, and false here: the
+        # mechanism is this one line, and it cannot go stale when a host is
+        # added or renamed.
+        nameOf = peer: "${lib.toLower peer.name}.${self.domain}";
+      in
+      {
+        # A NAME, GIVEN AS ITS OWN CAPABILITY. This carrier has a namespace and
+        # the lan does not, which is why the two are separable: a consumer
+        # needing a name a certificate or a known_hosts entry can match asks for
+        # `hostname` and is answered only by a carrier that actually serves one.
+        hostname = { peer, ... }: {
+          hostname = nameOf peer;
+          # MagicDNS answers the bare name inside the tailnet too, which is what
+          # `tailscale ssh secondpc` and ../hosts/iphone.nix's `MagicDNSSuffix`
+          # lookup both rely on. The carrier furnishes it so no consumer has to
+          # know that is true.
+          aliases = [ (lib.toLower peer.name) ];
+          inherit (self) domain;
+        };
+
+        # THE NAME IS ALSO THE ADDRESS HERE, and that is a property of this
+        # carrier rather than a shortcut: a `100.x` is assigned by the
+        # coordination server and is not knowable at eval time, which is the
+        # fact that blocked declaring tailnet attachments at all. A name is
+        # knowable and only its RESOLUTION is deferred -- §2.7a's "eval time
+        # knows the shape, run time knows what is up".
+        # 1280, which is LOWER than ./vpn.nix's 1420 -- so a flow needing 1500
+        # is excluded from BOTH tunnels, and ../services/vban.nix is right for a
+        # stronger reason than its comment states. Verify against a live tunnel
+        # before relying on the exact number.
+        #
+        # No body cap: this is a WireGuard tunnel, not a proxy.
+        # THE INTERFACE IS DERIVED, where the lan's is declared, and the
+        # difference is the point: tailscaled always creates `tailscale0`, so
+        # INCLUDING this aspect is the whole attachment -- there is no
+        # per-host fact to state and nothing that could disagree with the
+        # running box. ../hosts/fleet.nix's `attachments.lan-home` exists
+        # because a bridge name is not derivable in that way.
+        #
+        # What it buys: ../base/firewall.nix can open a port on `tailscale0`
+        # alone, so a service reachable from the tailnet and not from the LAN
+        # is finally a thing this tree can say.
+        #
+        # `mtu` and `maxBodyBytes` are READ OFF THE ASPECT: both are the same
+        # for every pair in the tunnel, so they are carrier facts rather than
+        # halves of a relation -- ./carrier-attachment.nix's roster reads the
+        # one declaration instead of restating them.
+        tcp =
+          { peer, host, ... }:
+          {
+            address = nameOf peer;
+            interface = ifaceFor host;
+            inherit (self) mtu maxBodyBytes;
+            # No `carrier`: derived from this aspect (../base/capability.nix).
+          };
+        udp =
+          { peer, host, ... }:
+          {
+            address = nameOf peer;
+            interface = ifaceFor host;
+            inherit (self) mtu maxBodyBytes;
+            # No `carrier`: derived from this aspect (../base/capability.nix).
+          };
+
+        segment = _: {
+          inherit (self) prefix spans;
+        };
+
+        # Its route to its own segment, in the table tailscaled installs and
+        # owns (52). No `mark`: tailscaled steers into it itself, so
+        # ../network/routes.nix renders nothing for it -- it is here so the
+        # route graph has the tailnet in it.
+        route =
+          { host, ... }:
+          {
+            segment = self.name;
+            inherit (self) prefix;
+            table = 52;
+            dev = ifaceFor host;
+          };
+      };
+
+    # A TUNNEL, so below the wire: tailscale is 1280 MTU and rides the internet,
+    # and a flow that cannot fit that has no business resolving here.
+    preference = 40;
+
+    # ONE tunnel, shared -- the same kind of thing as the lan and not the same
+    # kind of thing as a loopback. See `spans` in ../base/capability-types.nix.
+    spans = "many-hosts";
+
+    probe = { link, ... }: "ping -c1 -W2 ${link.address}";
+
+    prefix = "100.64.0.0/10";
+    domain = "tailef3db9.ts.net";
+
+    # 1280, which is LOWER than ./vpn.nix's 1420 -- so a flow needing 1500 is
+    # excluded from BOTH tunnels. No body cap: this is a WireGuard tunnel, not
+    # a proxy. On the aspect rather than inside the link for
+    # ./carrier-attachment.nix's reason. Verify against a live tunnel before
+    # relying on the exact number.
+    mtu = 1280;
+    maxBodyBytes = null;
+    # The tailnet's own identifier, recorded for the operator; nothing derives
+    # from it.
+    tailnetId = "TKgCTKkv8j11CNTRL";
+
     includes = [ den.aspects.agenix-rekey ];
 
     # The escape hatch lib/age-scoped.nix documents for exactly this shape of
@@ -327,10 +519,31 @@ in
     # for the same reason.
     secretSettings.service = null;
 
-    # Hand-written rather than generated: an OAuth client is minted in the admin
-    # console and has no offline derivation, so there is nothing for a generator
-    # to compute.
-    secrets.auth.rekeyFile = ../../secrets/tailscale_auth.age;
+    secrets =
+      { age, ... }:
+      {
+        # Hand-written rather than generated: an OAuth client is minted in the
+        # admin console and has no offline derivation, so there is nothing for
+        # a generator to compute.
+        #
+        # `intermediary`, so it never reaches a target. It is decrypted on the
+        # ADMIN host at `gen-secrets` time to mint the per-host key below, and
+        # that key is all a machine ever holds. The client can mint for the
+        # whole tailnet, so keeping it off every node is the point -- the same
+        # reasoning ./cloudflare.nix applies to its account token, and what
+        # ../hosts/celler2.nix already did for the one host that could not mint
+        # at boot.
+        auth = {
+          rekeyFile = ../../secrets/static/tailscale_auth.age;
+          intermediary = true;
+        };
+
+        # This host's own key, minted once at generate time rather than on
+        # every boot. `generatedSecretsDir` is `secrets/generated/<host>/`, so
+        # its basename is the hostname -- the same way ./cloudflare.nix names
+        # the tunnel it mints for.
+        ts_authkey = authKeySecret (baseNameOf age.rekey.generatedSecretsDir);
+      };
 
     # NixOS does have `services.tailscale.authKeyFile`, which is why darwin
     # needs a launchd daemon and this does not need an equivalent -- but it
@@ -344,18 +557,36 @@ in
         lib,
         pkgs,
         scoped,
+        host ? { },
         ...
       }:
       let
-        envFile = scoped.tailscale.secrets.auth.path;
+        authKeyFile = scoped.tailscale.secrets.ts_authkey.path;
         inherit (upFlagsFor config) upFlags hostName;
+        plan = routeLib.tailnetPlan host;
+        forwarding =
+          {
+            true = "both";
+            false = "client";
+          }
+          .${lib.boolToString (plan.advertiseRoutes != [ ] || plan.advertiseExit)};
       in
       {
         services.tailscale = {
           enable = true;
           openFirewall = true;
+          # SET FROM THE CARRIER, see `interfaceName` above: the link this
+          # aspect furnishes says traffic arrives on it, and this is what
+          # makes that true rather than a hope.
+          #
+          # `mkDefault` because a host CAN know better and one does:
+          # ../hosts/celler2.nix has no TUN and runs userspace networking. A
+          # plain definition here collided with that one outright, which is how
+          # the per-host case was found.
+          interfaceName = lib.mkDefault interfaceName;
           # `--accept-routes` below only does anything with this on.
-          useRoutingFeatures = lib.mkDefault "client";
+          # A host that advertises a route or an exit node forwards for peers.
+          useRoutingFeatures = lib.mkDefault forwarding;
           # Inert on its own here -- nixpkgs only passes `extraUpFlags` to its
           # own autoconnect unit, which needs an `authKeyFile` this host does
           # not have. It is declared because it is also the published record of
@@ -363,6 +594,22 @@ in
           # `--hostname=` back out of it to build the tailscale address it hands
           # consumers, and the daemon below is passed the same list.
           extraUpFlags = upFlags;
+        };
+
+        systemd.services.tailscale-routes = {
+          description = "Apply this host's derived tailnet routes";
+          after = [ "tailscale-autoconnect.service" ];
+          wants = [ "tailscale-autoconnect.service" ];
+          wantedBy = [ "multi-user.target" ];
+          path = [
+            pkgs.coreutils
+            config.services.tailscale.package
+          ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = routesScript pkgs config.services.tailscale.package plan;
+          };
         };
 
         systemd.services.tailscale-autoconnect = {
@@ -378,14 +625,14 @@ in
           path = [
             config.services.tailscale.package
             pkgs.coreutils
-            pkgs.curl
             pkgs.jq
           ];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            # Every attempt mints a NEW key, so a persistent failure (an ACL
-            # missing ${nodeTag} being the likely one) must not retry tightly.
+            # The key is stored and reusable, so a retry spends nothing -- but
+            # a persistent failure (an ACL missing ${nodeTag} being the likely
+            # one, or an expired key) still should not retry tightly.
             Restart = "on-failure";
             RestartSec = 60;
           };
@@ -403,12 +650,10 @@ in
               exit 0
             fi
 
-            ts_env_file=${lib.escapeShellArg envFile}
-            ts_description=${lib.escapeShellArg hostName}
-            ${mintKeyScript}
-
+            # `file:` rather than the key itself: tailscale reads the path,
+            # so the credential never appears in the process table.
             tailscale up \
-              --auth-key "$authkey" \
+              --auth-key file:${lib.escapeShellArg authKeyFile} \
               --advertise-tags ${lib.escapeShellArg nodeTag} \
               --accept-routes \
               ${lib.escapeShellArgs upFlags}
@@ -422,11 +667,19 @@ in
         config,
         pkgs,
         scoped,
+        host ? { },
         ...
       }:
       let
-        envFile = scoped.tailscale.secrets.auth.path;
+        authKeyFile = scoped.tailscale.secrets.ts_authkey.path;
         inherit (upFlagsFor config) upFlags hostName;
+        plan = routeLib.tailnetPlan host;
+        forwarding =
+          {
+            true = "both";
+            false = "client";
+          }
+          .${lib.boolToString (plan.advertiseRoutes != [ ] || plan.advertiseExit)};
       in
       {
         services.tailscale.enable = true;
@@ -440,6 +693,20 @@ in
         # whose key expired) needs enrolling again without a rebuild. So it
         # waits for the socket, acts only when the backend actually says
         # NeedsLogin, and is a no-op on every other boot.
+        launchd.daemons.tailscale-routes = {
+          command = "${routesScript pkgs config.services.tailscale.package plan}";
+          path = [
+            pkgs.coreutils
+            config.services.tailscale.package
+          ];
+          serviceConfig = {
+            Label = "com.ivy.tailscale-routes";
+            RunAtLoad = true;
+            StandardErrorPath = "/var/log/tailscale-routes.log";
+            StandardOutPath = "/var/log/tailscale-routes.log";
+          };
+        };
+
         launchd.daemons.tailscale-autoconnect = {
           command = "${
             pkgs.writeShellApplication {
@@ -450,7 +717,6 @@ in
               runtimeInputs = [
                 config.services.tailscale.package
                 pkgs.coreutils
-                pkgs.curl
                 pkgs.jq
               ];
               text = ''
@@ -465,23 +731,18 @@ in
                   exit 0
                 fi
 
-                ts_env_file=${lib.escapeShellArg envFile}
-                ts_description=${lib.escapeShellArg hostName}
-                ${mintKeyScript}
-
-                # The key reaches tailscaled as an argument, which is visible in
-                # the process table -- but it is single-use and preauthorized,
-                # so it is spent by the time this returns. The long-lived
-                # credential, the OAuth client, never leaves the env file.
+                # `file:` rather than the key itself, so the credential never
+                # appears in the process table.
+                #
                 # Not `exec`, because what happens on failure matters. launchd
-                # restarts this after ~10s (KeepAlive.SuccessfulExit), and every
-                # attempt mints a NEW key -- so a persistent failure, an ACL
-                # missing ${nodeTag} being the likely one, would otherwise spray
-                # a fresh unused key into the tailnet six times a minute until
-                # noticed. Backing off to a minute bounds that, and says plainly
-                # what to go and look at.
+                # restarts this after ~10s (KeepAlive.SuccessfulExit), so a
+                # persistent failure -- an ACL missing ${nodeTag} being the
+                # likely one, or a key that has expired since it was minted --
+                # would otherwise retry six times a minute until noticed.
+                # Backing off to a minute bounds that, and says plainly what to
+                # go and look at.
                 if tailscale up \
-                  --auth-key "$authkey" \
+                  --auth-key file:${lib.escapeShellArg authKeyFile} \
                   --advertise-tags ${lib.escapeShellArg nodeTag} \
                   --accept-routes \
                   ${lib.escapeShellArgs upFlags}
@@ -490,7 +751,7 @@ in
                   exit 0
                 fi
 
-                echo "tailscale: 'tailscale up' failed -- check that ${nodeTag} is in the tailnet ACL's tagOwners and that the OAuth client owns it" >&2
+                echo "tailscale: 'tailscale up' failed -- check that ${nodeTag} is in the tailnet ACL's tagOwners, that the OAuth client owns it, and that ${hostName}'s stored key has not expired (re-mint with: nix run .#gen-secrets)" >&2
                 sleep 60
                 exit 1
               '';
@@ -586,7 +847,7 @@ in
           tmp="$(mktemp -d)"
           trap 'rm -rf "$tmp"' EXIT
 
-          src="secrets/tailscale_auth.age"
+          src="secrets/static/tailscale_auth.age"
           if [ -e "$src" ] && (umask 077; secret-view "$src" > "$tmp/env" 2>/dev/null); then
             :
           else
@@ -632,4 +893,43 @@ in
         program = lib.getExe config.packages.tailscale-client-key;
       };
     };
+
+  # ── THE TAILNET'S HALF OF AN ATTACHMENT ──
+  #
+  # See ./carrier-attachment.nix. THE NAME IS THE ADDRESS, and that is a
+  # property of this carrier rather than a shortcut: a `100.x` is assigned by
+  # the coordination server and is not knowable at eval time, which is the fact
+  # that blocked declaring tailnet attachments at all. A MagicDNS name is
+  # knowable from the host's own name, so the half needs no declared
+  # `attachments.tailscale` -- which is also why tailscale is the one carrier
+  # whose half is a pure function of the entity's name.
+  #
+  # The INTERFACE is derived for the same reason `gives` above gives -- but from
+  # the HOST, not from a constant. This said "tailscaled always creates
+  # `tailscale0`, so there is no per-host fact to state", and ../hosts/celler2.nix
+  # is the counterexample: no TUN in a container, so no interface at all.
+  den.carrierAttachments.tailscale =
+    let
+      nameOf = h: "${lib.toLower h.name}.${den.aspects.tailscale.domain}";
+    in
+    {
+      # NO `attachesVia`: there is no `attachments.tailscale` and there should
+      # not be. A `100.x` is assigned by the coordination server and is not
+      # knowable at eval time, which is the fact that blocked declaring tailnet
+      # attachments at all -- and the name that replaces it is a function of
+      # the host's own name, so there is nothing for a host to write down.
+      attachesVia = [ ];
+      dialAt = nameOf;
+      interfacesOn = h: [ (ifaceFor h) ];
+
+      # MagicDNS answers the bare name inside the tailnet too, which is what
+      # `tailscale ssh secondpc` and ../hosts/iphone.nix's `MagicDNSSuffix`
+      # lookup both rely on.
+      hostnameAt = nameOf;
+      aliasesAt = h: [ (lib.toLower h.name) ];
+    };
+
+  den.aspects.tailscale.carrier-attachment =
+    { host, ... }:
+    [ (carrierAttachment.half "tailscale" host) ];
 }

@@ -158,9 +158,53 @@ in
           }) tapNames;
           enable = true;
           inherit casks brews;
+          # ── `autoUpdate = false` BECAUSE THE TAPS ARE PINNED ──
+          #
+          # Not a performance tweak -- a coherence fix. `nix-homebrew.taps` above
+          # binds every tap to `inputs."<input-name>"`, so each one is a FLAKE
+          # INPUT: an immutable store path, pinned in flake.lock. `autoUpdate`
+          # makes nix-darwin run `brew update`, which git-fetches the taps. There
+          # is nothing to fetch into a store path, so the work was not merely
+          # wasted, it was attempting something the pinning model forbids.
+          #
+          # The way to update a tap here is `nix flake update` on its input --
+          # the same way everything else in this tree moves. A homebrew that
+          # updated itself would be a second, invisible source of versions
+          # alongside the lock, which is exactly what pinning the taps was for.
+          #
+          # ── `upgrade = false` FOR A DIFFERENT REASON ──
+          #
+          # Cask VERSIONS are not pinned the way tap contents are: a cask
+          # definition in a pinned tap still points at an upstream download. So
+          # `upgrade` does do something real -- which is the problem. It makes
+          # `darwin-rebuild switch` silently change third-party software
+          # versions, and `--greedy` makes five casks here (craft, font-sf-pro,
+          # raycast, sf-symbols, zotero) outdated BY DEFINITION, so they were
+          # reinstalled on every single switch. Measured on this Mac:
+          #
+          #   brew bundle check, auto-update suppressed, nothing to do   3.02 s
+          #   brew outdated --greedy                                    20.74 s
+          #
+          # That 20 s was also paid on every entry into a SPECIALISATION, which
+          # ../framework/specialisations.nix resolves from scratch and therefore
+          # activates in full.
+          #
+          # WHAT THIS COSTS: upgrading becomes deliberate -- `brew upgrade`, or
+          # flip this for one build. The Brewfile is still the declaration, so
+          # `brew bundle` installs what is missing and `cleanup` removes what is
+          # not listed; only "and also fetch whatever is newest" is gone.
+          #
+          # A ~3 s floor remains: nix-darwin runs `brew bundle` unconditionally
+          # whenever `homebrew.enable` is true, and only emits its skip guards
+          # when these two are false (modules/homebrew.nix: `optional (onlyCheck
+          # || !config.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1"`). Removing the
+          # floor needs a guard on the Brewfile having changed -- the pattern
+          # nix-darwin already uses one step up, where
+          # `activationScripts.nix-daemon` gates a reload on a `diff` against the
+          # live generation.
           onActivation = {
-            autoUpdate = true; # Fetch the newest stable branch of Homebrew's git repo
-            upgrade = true; # Upgrade outdated casks, formulae, and App Store apps
+            autoUpdate = false;
+            upgrade = false;
             # 'zap': uninstalls all formulae(and related files) not listed in the generated Brewfile
             cleanup = "uninstall";
           };
