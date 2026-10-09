@@ -63,26 +63,26 @@
   };
   ghostty-tip = {
     pname = "ghostty-tip";
-    version = "33da6848d63b3bba2b4f31ab1531d618f2795192";
+    version = "8f0dd3709050b1026f6324368805033197d8b4a5";
     src = fetchurl {
-      url = "https://tip.files.ghostty.org/33da6848d63b3bba2b4f31ab1531d618f2795192/Ghostty.dmg";
-      sha256 = "sha256-O9xKn6RwCqe3iiC0Hn4hTNIEOVY1duLZApBDkoqIY5Y=";
+      url = "https://tip.files.ghostty.org/8f0dd3709050b1026f6324368805033197d8b4a5/Ghostty.dmg";
+      sha256 = "sha256-/rj1kVJ9TDxlvh5k9WvAwPoqvqA/PKJnbt9wu9vLUW4=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.18.2.1";
+    version = "0.19.2.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.18.2.1/helium-0.18.2.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-QizbNVsqd21aCDulbtBccbYkK6jrvTpA6uphLWZ8YAg=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.19.2.1/helium-0.19.2.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-GsscpSDD4WojV7uu1wps2HEmkJzOZRYR90rrVDIjCD8=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.18.2.1";
+    version = "0.19.2.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.18.2.1/helium_0.18.2.1_arm64-macos.dmg";
-      sha256 = "sha256-hpgtjfNA1aG/Ggx2raM9fSZ5fGw0JKRK+mdhWbaj4+s=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.19.2.1/helium_0.19.2.1_arm64-macos.dmg";
+      sha256 = "sha256-wH2rnBVxz2jPhWs1xtC/IcLPU/d8QyRRYwGOeICU6/E=";
     };
   };
   jankyborders = {
@@ -169,17 +169,17 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "2e61fe4dbe34344c3c00c856d5215ba6ae8bc997";
+    version = "ed1bd6d7520e0b405685a21b978279d0a611386f";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "2e61fe4dbe34344c3c00c856d5215ba6ae8bc997";
+      rev = "ed1bd6d7520e0b405685a21b978279d0a611386f";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-4hquXhJ7z/vfshffDdftaZdWzezGXFk3s9Mr6nluMYI=";
+      sha256 = "sha256-EvTLXOIUGXFsNUV/uiLy4VA/XEuImQ1dHkpI9jz5ogs=";
     };
-    date = "2026-09-28";
+    date = "2026-10-08";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
@@ -207,10 +207,10 @@
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.68";
+    version = "9.0.71";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.68/zotero-better-bibtex-9.0.68.xpi";
-      sha256 = "sha256-02maNI8AEl85C1pp5aJjM0BELKx3in4Mjwm+r+HK6Lg=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.71/zotero-better-bibtex-9.0.71.xpi";
+      sha256 = "sha256-v2GhaQ3IorerCb6d4siZhvT7bUlcgkB9ibECsm+6qdU=";
     };
   };
   zotero-better-notes = {
@@ -246,7 +246,7 @@
     version = "papersgpt-v1.7.0";
     src = fetchurl {
       url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.7.0/papersgpt-v1.7.0.xpi";
-      sha256 = "sha256-y5Qr9qa41ih2h3KI5YzB5zDA4gsc0cgELa0NmjlSt3I=";
+      sha256 = "sha256-qaeloEFR7YfhFF4+VxYQAK2pveN2ui4cterFwyVbgqk=";
     };
   };
   zotero-zotlit = {
