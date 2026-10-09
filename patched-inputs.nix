@@ -34,7 +34,7 @@
     gui = [ "my-nur" "nur" "stylix" ];
     gui-nixos = [ "plasma-manager" ];
     homebrew = [ "homebrew-cask" "homebrew-core" "homebrew-gcenx" "homebrew-speedtest" "homebrew-typewhisper" "nix-homebrew" ];
-    nixos = [ "arion" "disko" "disko-zfs" "impermanence" "lanzaboote" "nix-cachyos-kernel" "nix-flatpak" "nixos-hardware" "nixos-images" "nixos-mailserver" "nixos-raspberrypi" "nixos-wsl" "nixpkgs-nvmd" "nixvirt" "searchix" ];
+    nixos = [ "arion" "disko" "disko-zfs" "impermanence" "lanzaboote" "nix-cachyos-kernel" "nix-flatpak" "nixos-hardware" "nixos-images" "nixos-mailserver" "nixos-raspberrypi" "nixos-wsl" "nixpkgs-nvmd" "searchix" ];
     root = [ "age-plugin-gpg" "agenix" "agenix-rekey" "celler" "crane" "darwin" "ivixlib" "ivylix" "izlix" "nix-index-database" ];
   };
 
