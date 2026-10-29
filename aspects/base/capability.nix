@@ -494,48 +494,87 @@ let
 
   # ── WHAT AN ENTITY HAS ON ITS OWN ──
   #
-  # den's `hasAspect` reads the entity's full resolved tree, and `resolve.shared`
-  # grafts each child scope into its parent's -- measured: secondpc answered
-  # `hasAspect` true for its own user's aspect and for a container's. For a
-  # user that has been harmless. For a container it is the whole problem: a
-  # host that "has" its container's service would offer that service's takes
-  # from the host, over the loopback, which is precisely the wire a container
-  # does not share.
-  #
-  # So a host with containers is asked about its OWN tree: `ownView` tells
-  # `host-to-containers` (./container.nix) not to fan out, while what the
-  # containers deliver to their host with `provides.to-hosts` still lands.
-  # One extra resolution, and only for a host that has containers.
-  ownHasAspect =
-    h:
-    if (h.containers or { }) == { } then
-      h.hasAspect
-    else
-      den.lib.aspects.mkEntityHasAspect {
-        tree = den.lib.resolveEntity "host" {
-          host = h // {
-            ownView = true;
-          };
-        };
-        primaryClass = h.class;
-        classes = [ h.class ];
-      };
+  # Read off the path set each machine's production run already leaves
+  # (`__pathSetByScope`, one bucket per scope's entity), never `hasAspect`,
+  # which re-runs the whole pipeline per entity. A host answers for itself
+  # and its users; a container is its own bucket, so a host does not "have" a
+  # container's service. `id_hash` ignores the parent, hence keyed by machine.
+  # The same key den's `hasAspect` looks up.
+  aspectKey =
+    a:
+    den.lib.aspects.fx.identity.pathKey (
+      if a ? name && a ? meta then den.lib.aspects.fx.identity.aspectPath a else a.__aspectChain
+    );
+  # `defaultTo`, not `or`: `parent` is declared, so it exists as null.
+  runOf = e: lib.defaultTo e.name (lib.defaultTo (e.host.name or null) (e.parent or null));
+  memberships = lib.mapAttrs (
+    _: h:
+    let
+      ps = h.__pathSetByScope;
+    in
+    ps
+    // (den.lib.container.pathSets.${h.name} or { })
+    // {
+      ${h.id_hash} = lib.foldl' (acc: u: acc // (ps.${u.id_hash} or { })) (ps.${h.id_hash} or { }) (
+        lib.attrValues (h.users or { })
+      );
+    }
+  ) hostEntities;
 
-  ownHasMemo = lib.mapAttrs (_: ownHasAspect) hostEntities;
+  # An nspawn container brings its own run's set (../base/container.nix);
+  # anything else outside a run is resolved on its own.
+  has =
+    e: a:
+    lib.defaultTo (e.hasAspect a) (
+      lib.mapNullable (b: b ? ${aspectKey a}) (memberships.${runOf e}.${e.id_hash or ""} or null)
+    );
 
-  # Membership as the resolver means it. Keyed by name so a class body's
-  # projected `host` is asked through the same memo as the entity.
-  has = h: a: (ownHasMemo.${h.name or ""} or h.hasAspect) a;
+  # ── WHAT EACH ENTITY HOLDS, INVERTED ONCE PER RUN ──
+  # The bucket's keys mapped back to aspects, then grouped by the capability
+  # each takes and gives, so every query below is a lookup rather than a
+  # filter over all aspects.
+  aspectByKey = lib.listToAttrs (
+    lib.mapAttrsToList (n: a: lib.nameValuePair (aspectKey a) n) (
+      lib.filterAttrs (_: a: builtins.isAttrs a && a ? name && a ? meta) den.aspects
+    )
+  );
+  heldBy =
+    e:
+    lib.defaultTo (lib.filterAttrs (_: a: e.hasAspect a) den.aspects) (
+      lib.mapNullable (
+        b:
+        lib.listToAttrs (
+          map (k: lib.nameValuePair aspectByKey.${k} den.aspects.${aspectByKey.${k}}) (
+            lib.filter (k: aspectByKey ? ${k}) (lib.attrNames b)
+          )
+        )
+      ) (memberships.${runOf e}.${e.id_hash or ""} or null)
+    );
+  indexFor =
+    e:
+    let
+      held = heldBy e;
+      pairs = lib.concatMap (
+        n:
+        map (c: {
+          inherit c;
+          entry = lib.nameValuePair n held.${n};
+        }) (lib.unique (lib.concatMap capClosure (lib.attrNames (takesOf held.${n}))))
+      ) (lib.attrNames held);
+    in
+    {
+      inherit held;
+      takes = lib.mapAttrs (_: xs: lib.listToAttrs (map (x: x.entry) xs)) (lib.groupBy (x: x.c) pairs);
+      gives = cap: lib.intersectAttrs held (givers { host = e; } cap);
+    };
+  entityIndex = lib.mapAttrs (_: indexFor) hostsOf;
+  indexOf = e: entityIndex.${e.name or ""} or (indexFor e);
+  takesAt = e: cap: (indexOf e).takes.${cap} or { };
 
   # WHICH PROVIDERS THIS HOST HAS. Membership is inclusion: a host that includes
   # `den.aspects.tailscale` is on the tailnet, and there is nothing to declare
   # and nothing that can disagree with reality.
-  providersFor =
-    host: cap:
-    let
-      ctx = { inherit host; };
-    in
-    lib.filterAttrs (_: a: has host a) (givers ctx cap);
+  providersFor = host: (indexOf host).gives;
 
   # ── WHO ASKS, which the giver needs in order to provision ──
   # The inverse of `givers`, and the half a pure query layer was missing: a
@@ -561,10 +600,7 @@ let
   takersAt =
     host: cap:
     lib.concatMap (
-      entity:
-      lib.mapAttrsToList (name: aspect: { inherit name aspect entity; }) (
-        lib.filterAttrs (_: a: has entity a) (takers cap)
-      )
+      entity: lib.mapAttrsToList (name: aspect: { inherit name aspect entity; }) (takesAt entity cap)
     ) (entitiesOn host);
   takersOn =
     host: cap: lib.listToAttrs (map (t: lib.nameValuePair t.name t.aspect) (takersAt host cap));
@@ -581,7 +617,7 @@ let
       lib.mapAttrsToList (name: aspect: {
         inherit name aspect;
         host = h;
-      }) (lib.filterAttrs (_: a: has h a) (takers cap))
+      }) (takesAt h cap)
     ) (lib.filter (reaches from giver) (lib.attrValues hostsOf));
 
   takersReaching =
@@ -597,7 +633,7 @@ let
         lib.mapAttrsToList (name: aspect: {
           inherit name aspect;
           host = h;
-        }) (lib.filterAttrs (_: a: has h a) (takers cap))
+        }) (takesAt h cap)
       ) candidates;
     in
     # ONE ENTRY PER TAKER, not per (taker, host): an aspect included on two
@@ -996,8 +1032,8 @@ in
       );
   };
 
-  _module.args.capability = rec {
-    inherit providersFor ownLinksFor;
+  den.lib.capability = rec {
+    inherit providersFor ownLinksFor heldBy;
 
     # A giver reading the link it itself furnished, by name -- the supported
     # route, and the one ../services/tempo.nix takes. See `ownLinksFor` above

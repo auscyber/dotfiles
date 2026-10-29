@@ -13,7 +13,7 @@
       homeManager =
         { pkgs, host, ... }:
         {
-          config = lib.mkIf (host.hasAspect den.aspects.jujutsu) {
+          config = lib.mkIf (den.lib.capability.has host den.aspects.jujutsu) {
             programs.mcp.servers.mcp_jujutsu.command = lib.getExe pkgs.jj-mcp-server;
           };
         };

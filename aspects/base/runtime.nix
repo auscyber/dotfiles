@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # ── CONFIGURATION THAT HOLDS WHILE A LINK IS UP ──
@@ -27,7 +26,7 @@ let
   # `dial`'s answer for a link a body declares by capability and clauses.
   dialFor =
     host: cap: take:
-    capability.dial cap take (hostsOf.${host.name or ""} or host);
+    den.lib.capability.dial cap take (hostsOf.${host.name or ""} or host);
 
   linkType = lib.types.submodule {
     options = {
@@ -94,7 +93,7 @@ let
       up=1
       ${lib.concatMapStrings (p: ''
         ${p} >/dev/null 2>&1 || up=0
-      '') (capability.probesFor l.cap l.resolved)}
+      '') (den.lib.capability.probesFor l.cap l.resolved)}
       was=0
       [ -e ${state} ] && was=1
       if [ "$up" = 1 ]; then

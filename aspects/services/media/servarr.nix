@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   accessLib,
   ...
 }:
@@ -18,7 +17,6 @@ let
     inherit
       den
       lib
-      capability
       accessLib
       ;
   };

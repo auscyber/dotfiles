@@ -50,7 +50,6 @@
 {
   lib,
   den,
-  capability,
   ...
 }:
 let
@@ -169,7 +168,7 @@ let
           giver = n;
           aspect = a;
           on = h;
-        }) (tryOr { } (capability.providersFor h cap))
+        }) (tryOr { } (den.lib.capability.providersFor h cap))
       ) hostsOf
     );
 
@@ -187,7 +186,7 @@ let
             take
             ;
         }) (aspect.takes or { })
-      ) (lib.filterAttrs (_: a: (a.takes or { }) != { } && host.hasAspect a) den.aspects)
+      ) (lib.filterAttrs (_: a: (a.takes or { }) != { }) (den.lib.capability.heldBy host))
     );
 
   # ── ONE TAKE, RESOLVED IN THE TWO STAGES `dial` RESOLVES IT IN ──
@@ -207,15 +206,15 @@ let
     site:
     let
       inherit (site) cap;
-      t = capability.emptyTake // site.take;
+      t = den.lib.capability.emptyTake // site.take;
 
       # WHICH INSTANCE, and nothing about the wire -- for a routed capability,
       # whose flow clauses wait for the carrier. Anything else (a `route`) is
       # judged whole on the giver's own furnish, as `resolveFrom` judges it.
-      routed = tryOr false (capability.isRouted cap);
+      routed = tryOr false (den.lib.capability.isRouted cap);
       whoTake =
         {
-          true = capability.emptyTake // {
+          true = den.lib.capability.emptyTake // {
             inherit (t)
               name
               within
@@ -231,7 +230,7 @@ let
         name = null;
       };
 
-      vis = tryOr { } (capability.visibleFrom host cap);
+      vis = tryOr { } (den.lib.capability.visibleFrom host cap);
 
       # ── THE WHAT-IF ──
       # A giver named in `reachOverride` is treated as though its `reach` were
@@ -243,7 +242,9 @@ let
       pretendOut = lib.filterAttrs (
         n: a:
         reachOverride ? ${n}
-        && !(lib.any (h: h.hasAspect a && inReach reachOverride.${n} host h) (lib.attrValues hostsOf))
+        && !(lib.any (h: den.lib.capability.has h a && inReach reachOverride.${n} host h) (
+          lib.attrValues hostsOf
+        ))
       ) vis;
       visible = removeAttrs vis (lib.attrNames pretendOut);
 
@@ -260,17 +261,21 @@ let
                 via = giver;
                 host = ph;
                 sameHost = ph.name == host.name;
-                link = capability.linkFor giver cap {
+                link = den.lib.capability.linkFor giver cap {
                   inherit host;
                   peer = host;
                 };
               })
-              (lib.filter (h: capability.has h giver && capability.reaches host giver h) (lib.attrValues hostsOf))
+              (
+                lib.filter (h: den.lib.capability.has h giver && den.lib.capability.reaches host giver h) (
+                  lib.attrValues hostsOf
+                )
+              )
           ) visible
         )
       );
 
-      whoV = tryOr [ ] (capability.judge cap whoTake host whoCands);
+      whoV = tryOr [ ] (den.lib.capability.judge cap whoTake host whoCands);
       whoWon = lib.filter (v: v.ok) whoV;
       winner = if whoWon == [ ] then null else (lib.head whoWon).cand;
 
@@ -299,7 +304,7 @@ let
           null
         else
           tryOr null (
-            capability.endpointHalf winner.via cap {
+            den.lib.capability.endpointHalf winner.via cap {
               inherit host;
               peer = host;
             }
@@ -313,7 +318,7 @@ let
         else
           tryOr { } (
             lib.filterAttrs (
-              _: a: a.domain != null && a.attachment == "provider" && giverHost.hasAspect a
+              _: a: a.domain != null && a.attachment == "provider" && den.lib.capability.has giverHost a
             ) den.aspects
           );
 
@@ -327,20 +332,21 @@ let
         if giverHost == null || !routed then
           [ ]
         else
-          tryOr [ ] (capability.linksBetween (capability.carrierCapFor cap) host giverHost);
+          tryOr [ ] (den.lib.capability.linksBetween (den.lib.capability.carrierCapFor cap) host giverHost);
 
       composed = map (
         c:
         c
         // {
-          link = capability.composeLink cap {
+          link = den.lib.capability.composeLink cap {
             inherit endpoint published;
             carrier = c.link;
           };
         }
       ) carriers;
 
-      howV = if composed == [ ] then [ ] else tryOr [ ] (capability.judge cap howTake host composed);
+      howV =
+        if composed == [ ] then [ ] else tryOr [ ] (den.lib.capability.judge cap howTake host composed);
       howWon = lib.filter (v: v.ok) howV;
       carrierWon = if howWon == [ ] then null else (lib.head howWon).cand;
 
@@ -361,7 +367,7 @@ let
       # `judge` threw on this take, which means a clause names something the
       # capability neither furnishes nor accepts. The aspect's own content
       # still raises it where it reads.
-      broken = threw (capability.judge cap whoTake host whoCands);
+      broken = threw (den.lib.capability.judge cap whoTake host whoCands);
 
       who = {
         winner =
@@ -411,9 +417,12 @@ let
       # actually decided. Kept so a textual report and the graph cannot
       # disagree about why something lost.
       explain = {
-        who = tryOr "<threw>" (capability.explainTake cap whoTake host whoCands);
+        who = tryOr "<threw>" (den.lib.capability.explainTake cap whoTake host whoCands);
         how =
-          if composed == [ ] then "" else tryOr "<threw>" (capability.explainTake cap howTake host composed);
+          if composed == [ ] then
+            ""
+          else
+            tryOr "<threw>" (den.lib.capability.explainTake cap howTake host composed);
       };
     };
 

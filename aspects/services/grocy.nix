@@ -2,7 +2,6 @@
   accessLib,
   den,
   lib,
-  capability,
   ...
 }:
 # grocy (household ERP: stock, shopping lists, recipes and meal plans,
@@ -343,7 +342,7 @@ in
           # (../network/segments.nix), so even that string is not in this file.
           listen = [
             {
-              addr = capability.bindAddressFor host den.aspects.grocy "tcp" "http";
+              addr = den.lib.capability.bindAddressFor host den.aspects.grocy "tcp" "http";
               inherit port;
             }
           ];

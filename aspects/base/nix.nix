@@ -92,7 +92,7 @@
     { host, ... }:
     {
       nix.settings.experimental-features =
-        if host.hasAspect den.aspects.lix then
+        if den.lib.capability.has host den.aspects.lix then
           [
             "pipe-operator"
             "flake-self-attrs"

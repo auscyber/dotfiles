@@ -28,14 +28,65 @@
 {
 
   layers = {
-    darwin-dev = [ "idris2Packages" "pnpm-nix-provider" ];
-    darwin-gui = [ "coolabah" "paneru" "zen-browser" ];
-    dev = [ "claude-code" "den-diagram" "neovim-nightly-overlay" "nixvim" "op-shell-plugins" ];
-    gui = [ "my-nur" "nur" "stylix" ];
+    darwin-dev = [
+      "idris2Packages"
+      "pnpm-nix-provider"
+    ];
+    darwin-gui = [
+      "coolabah"
+      "paneru"
+      "zen-browser"
+    ];
+    dev = [
+      "claude-code"
+      "den-diagram"
+      "neovim-nightly-overlay"
+      "nixvim"
+      "op-shell-plugins"
+    ];
+    gui = [
+      "my-nur"
+      "nur"
+      "stylix"
+    ];
     gui-nixos = [ "plasma-manager" ];
-    homebrew = [ "homebrew-cask" "homebrew-core" "homebrew-gcenx" "homebrew-speedtest" "homebrew-typewhisper" "nix-homebrew" ];
-    nixos = [ "arion" "disko" "disko-zfs" "impermanence" "lanzaboote" "nix-cachyos-kernel" "nix-flatpak" "nixos-hardware" "nixos-images" "nixos-mailserver" "nixos-raspberrypi" "nixos-wsl" "nixpkgs-nvmd" "searchix" ];
-    root = [ "age-plugin-gpg" "agenix" "agenix-rekey" "celler" "crane" "darwin" "ivixlib" "ivylix" "izlix" "nix-index-database" ];
+    homebrew = [
+      "homebrew-cask"
+      "homebrew-core"
+      "homebrew-gcenx"
+      "homebrew-speedtest"
+      "homebrew-typewhisper"
+      "nix-homebrew"
+    ];
+    nixos = [
+      "arion"
+      "disko"
+      "disko-zfs"
+      "impermanence"
+      "lanzaboote"
+      "nix-cachyos-kernel"
+      "nix-flatpak"
+      "nixos-hardware"
+      "nixos-images"
+      "nixos-mailserver"
+      "nixos-raspberrypi"
+      "nixos-wsl"
+      "nixpkgs-nvmd"
+      "pia"
+      "searchix"
+    ];
+    root = [
+      "age-plugin-gpg"
+      "agenix"
+      "agenix-rekey"
+      "celler"
+      "crane"
+      "darwin"
+      "ivixlib"
+      "ivylix"
+      "izlix"
+      "nix-index-database"
+    ];
   };
 
   inputs = {
@@ -58,6 +109,9 @@
       ./patches/darwin/karabiner.patch
       ./patches/darwin/specialisation.patch
     ];
+    den.patches = [
+      ./patches/den/lib-gen.patch
+    ];
     home-manager.patches = [
       ./patches/home-manager/edit.patch
     ];
@@ -73,6 +127,7 @@
     agenix.hash = "sha256-EmOkgBPRseZP7g8eHW4FydKGYRaolIdlQypYazI6JBY=";
     agenix-rekey.hash = "sha256-OVbANLeCVpEWHlkcGkHbXD6MjreXNdHLVnvwGFwwyDM=";
     darwin.hash = "sha256-R5eoCXc2qGHeApxRvOalf9nBVC06zZkq3wg3dR+fv8Y=";
+    den.hash = "sha256-K3F1Uw+CA9xHnOFRN/TGT9zTCRuWJLCVd9HmirTDG38=";
     home-manager.hash = "sha256-wV+7jpedHqygdpJ7chowDbImz3qZNNX6oG77rI30I94=";
     nh.hash = "sha256-Rxa5M0LAFz4Gh/zYRVz4e1rMjsfT6IbjECndZ2J1dws=";
     pnpm-nix-provider.hash = "sha256-5xZa1zx6lDF6AvI9P80EPIG3dmLkAY25kps2Nyy9aqQ=";

@@ -7,13 +7,17 @@
 }:
 {
   _module.args.__findFile = den.lib.__findFile;
-  # den is NOT patched in-tree: it provides the flake's own evaluation machinery,
-  # so producing `den-patched` (via newInputs) requires a full raw-den evaluation
-  # first — a bootstrap cycle for any change the flake's eval depends on. The
-  # standalone-home guard + scope-identity fixes therefore live config-level (see
-  # aspects/base/home-standalone.nix). patches/den/*.patch document the intended
-  # upstream changes but stay dormant (no patch.enable).
+  # Patched through ../../patched-inputs.nix, which flake.nix reads before any
+  # evaluation, so a den patch only bootstraps if the tree still evaluates
+  # without it: `write-patched-inputs` runs on the unpatched den the first time.
+  # The other patches/den/*.patch stay dormant.
   ff.den.url = "github:denful/den/main";
+  ff.den.patch = {
+    enable = true;
+    autoIncludePatches = false;
+    # `den.lib.gen`: the roster den itself evaluates with.
+    patches = [ ../../patches/den/lib-gen.patch ];
+  };
   imports = [
     (inputs.flake-file.flakeModules.dendritic or { })
     #    inputs.den.flakeModules.strict

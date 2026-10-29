@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   checkLib,
   routeLib,
   ...
@@ -15,7 +14,7 @@ let
   # This is why every `expose` in the tree was inert. A class body's `host`
   # carries den's PROJECTED `hasAspect`, which answers "is this delivered into
   # THIS scope" rather than "does that host have it" -- so
-  # `capability.providersFor host "tcp"` came back EMPTY here and the derived
+  # `den.lib.capability.providersFor host "tcp"` came back EMPTY here and the derived
   # firewall opened nothing, for as long as it has existed. Every port that
   # looked derived was in fact a literal somewhere else, which is exactly why
   # nobody noticed.
@@ -69,10 +68,10 @@ in
               let
                 aspect = den.aspects.${carrier} or null;
                 half =
-                  if aspect == null || !(me.hasAspect aspect) then
+                  if aspect == null || !(den.lib.capability.has me aspect) then
                     null
                   else
-                    capability.carrierHalf aspect cap {
+                    den.lib.capability.carrierHalf aspect cap {
                       host = me;
                       peer = me;
                     };
@@ -85,7 +84,7 @@ in
         # resolved ONCE and read by both of the passes below.
         # ── THE HALF AND THE ASPECT THAT FURNISHED IT ──
         # Paired, because the exposure of a port is no longer a field ON the
-        # port: `capability.exposeFor` needs the giver to ask who resolves it,
+        # port: `den.lib.capability.exposeFor` needs the giver to ask who resolves it,
         # and reading the half alone threw that away.
         givenHalves =
           cap:
@@ -94,18 +93,18 @@ in
             # and no address, and typing it against the full set -- which
             lib.mapAttrsToList (_: aspect: {
               inherit aspect;
-              half = capability.endpointHalf aspect cap {
+              half = den.lib.capability.endpointHalf aspect cap {
                 host = me;
                 peer = me;
               };
-            }) (capability.providersFor me cap)
+            }) (den.lib.capability.providersFor me cap)
           );
 
         halves = cap: map (x: x.half) (givenHalves cap);
 
         # EVERY (aspect, port name, port, exposure) this host gives for a
         # capability, with the exposure RESOLVED -- the stated list unioned with
-        # the wires consumers actually reach it over. `capability.exposeFor` is
+        # the wires consumers actually reach it over. `den.lib.capability.exposeFor` is
         # the one answer, shared with the bind address, so the two cannot
         # disagree about which wires are in play.
         exposures =
@@ -115,7 +114,7 @@ in
             lib.mapAttrsToList (pn: p: {
               inherit (x) aspect;
               inherit (p) port;
-              carriers = capability.exposeFor me x.aspect cap pn;
+              carriers = den.lib.capability.exposeFor me x.aspect cap pn;
             }) x.half.ports
           ) (givenHalves cap);
 
@@ -134,7 +133,7 @@ in
           lib.mapAttrsToList (
             k: _:
             let
-              got = (capability.contributions me k).listensOn or { };
+              got = (den.lib.capability.contributions me k).listensOn or { };
             in
             lib.concatLists (
               # The ASPECT comes from `takersOn`, which returns references. `got`
@@ -153,7 +152,7 @@ in
                     spec
                     ;
                 }
-              ) (capability.takersOn me k)
+              ) (den.lib.capability.takersOn me k)
             )
           ) den.capabilities
         );
@@ -161,7 +160,7 @@ in
         # Hosts that give the contribution capability, i.e. where the consumer is.
         consumersOf =
           k:
-          lib.filter (h: (h.name or "") != (me.name or "") && (capability.providersFor h k) != { }) (
+          lib.filter (h: (h.name or "") != (me.name or "") && (den.lib.capability.providersFor h k) != { }) (
             lib.attrValues hostsOf
           );
 
@@ -177,7 +176,7 @@ in
               if aspect == null then
                 [ ]
               else
-                capability.reachEndpoint cap { } peer {
+                den.lib.capability.reachEndpoint cap { } peer {
                   inherit aspect;
                   host = me;
                 };
@@ -190,10 +189,10 @@ in
           let
             aspect = den.aspects.${carrier} or null;
             half =
-              if aspect == null || !(me.hasAspect aspect) then
+              if aspect == null || !(den.lib.capability.has me aspect) then
                 null
               else
-                capability.carrierHalf aspect cap {
+                den.lib.capability.carrierHalf aspect cap {
                   host = me;
                   peer = me;
                 };
@@ -360,8 +359,8 @@ in
     findings = lib.unique (
       lib.concatMap (
         h:
-        checkLib.probe (h.name or "?") "capability.exclusionsIn ${h.name or "?"}" (
-          capability.exclusionsIn h
+        checkLib.probe (h.name or "?") "den.lib.capability.exclusionsIn ${h.name or "?"}" (
+          den.lib.capability.exclusionsIn h
         )
       ) checkLib.hostEntities
     );
@@ -402,7 +401,7 @@ in
         assertions = map (m: {
           assertion = false;
           message = m;
-        }) (capability.exclusionsIn host);
+        }) (den.lib.capability.exclusionsIn host);
       };
   };
 }

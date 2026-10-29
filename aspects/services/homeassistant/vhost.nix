@@ -1,6 +1,5 @@
 {
   den,
-  capability,
   ...
 }:
 # How Home Assistant is reached: home.<domain>, on its own vhost outside the
@@ -86,7 +85,7 @@ in
         # collapse to -- which is exactly why they are named.
         services.nginx.virtualHosts."home.${domain}".locations."/".proxyPass =
           let
-            ha = capability.dial "tcp" {
+            ha = den.lib.capability.dial "tcp" {
               name = "home-assistant";
               sameHost = true;
             } host;

@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # A SENDSPIN PLAYER THAT OUTPUTS INTO THIS BOX'S BLUETOOTH SINKS.
@@ -32,7 +31,7 @@ let
     name = "music-assistant";
   };
 
-  serverFor = host: capability.dial "tcp" serverTake host;
+  serverFor = host: den.lib.capability.dial "tcp" serverTake host;
 in
 {
   den.aspects.sendspin-bluetooth = {

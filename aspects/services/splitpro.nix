@@ -2,7 +2,6 @@
   den,
   lib,
   accessLib,
-  capability,
   ...
 }:
 # SplitPro (shared expenses). A container, because upstream ships a Next.js +
@@ -41,7 +40,7 @@ let
   db =
     container:
     let
-      d = capability.dial "tcp" { name = "postgres"; } container;
+      d = den.lib.capability.dial "tcp" { name = "postgres"; } container;
     in
     "${d.address}:${toString d.port}";
 in

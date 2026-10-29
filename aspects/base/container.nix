@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # ── A CONTAINER IS AN ENTITY, DECLARED UNDER THE HOST IT RUNS ON ──
@@ -139,10 +138,22 @@ let
   # host: its `nixos` content as the container's configuration, its `scoped`
   # content into the HOST's `age.scoped`, so the host decrypts its secrets and
   # the container only sees them bound in.
+  treeOf = host: container: den.lib.resolveEntity "container" { inherit host container; };
+
+  # One class run per container: its configuration's imports and, for
+  # `capability.has`, its membership come from the same result.
+  runs = lib.mapAttrs (
+    _: h:
+    lib.mapAttrs (_: c: {
+      id = c.id_hash;
+      run = den.lib.aspects.resolveWithPaths c.class (treeOf h c);
+    }) (nspawnOf h)
+  ) (lib.concatMapAttrs (_: hs: hs) den.hosts);
+
   systemOf =
     host: container:
     let
-      tree = den.lib.resolveEntity "container" { inherit host container; };
+      tree = treeOf host container;
     in
     [
       (provide {
@@ -152,7 +163,7 @@ let
           container.name
           "config"
         ];
-        module = _: den.lib.aspects.resolve container.class tree;
+        module = _: { inherit (runs.${host.name}.${container.name}.run) imports; };
       })
       # `age.scoped` is attrs of submodules, so the class modules are shifted
       # under it here: each scope collected as a deferred module and imported
@@ -218,6 +229,17 @@ let
     );
 in
 {
+  # Each nspawn container's membership, from its own run, for `capability.has`.
+  den.lib.container.pathSets = lib.mapAttrs (
+    _: rs:
+    lib.listToAttrs (
+      lib.mapAttrsToList (
+        _: x:
+        lib.nameValuePair x.id (den.lib.aspects.fx.identity.flattenPathSetByScope x.run.pathSetByScope)
+      ) rs
+    )
+  ) runs;
+
   den.schema.container = {
     parent = "host";
     inherits = [ den.schema.conf ];
@@ -256,7 +278,7 @@ in
           # Every tcp port it gives, on the machine's loopback: where
           # ../network/container-bridge.nix tells the machine to dial it.
           ports = lib.mapAttrsToList (_: p: "127.0.0.1:${toString p}:${toString p}") (
-            capability.portsFor container container.aspect "tcp"
+            den.lib.capability.portsFor container container.aspect "tcp"
           );
           environmentFiles = lib.optional (templates ? env) templates.env.path;
           volumes = map (t: "${t.path}:${t.path}:ro") mounted;
@@ -291,7 +313,7 @@ in
   den.aspects.nspawn-container = {
     includes = [
       den.aspects.nspawn-bridge
-      # Its own system, so its own nixpkgs needs the collected overlays.
+      # Declares `_overlays` for content that sets it; the nixpkgs is the host's.
       den.aspects.overlays
     ];
 
@@ -306,7 +328,12 @@ in
           den.aspects.nspawn-host
         ];
         nixos =
-          { config, scoped, ... }:
+          {
+            config,
+            pkgs,
+            scoped,
+            ...
+          }:
           let
             bridge = den.aspects.nspawn-bridge;
             templates = (scoped.${scopeOf container} or { }).templates or { };
@@ -333,9 +360,14 @@ in
                   inherit (config.age) secrets templates;
                 };
                 networking.defaultGateway = bridge.gatewayAddress;
+                # The host's instance, overlays already applied: a second
+                # nixpkgs per container is most of its eval.
+                nixpkgs.pkgs = lib.mkForce pkgs;
+                nixpkgs.overlays = lib.mkForce [ ];
+                documentation.enable = false;
               }
               # The host decrypts; nothing in here holds a key.
-              // lib.optionalAttrs (capability.has container den.aspects.agenix-rekey) {
+              // lib.optionalAttrs (den.lib.capability.has container den.aspects.agenix-rekey) {
                 age.enable = lib.mkForce false;
               };
             };
@@ -357,8 +389,6 @@ in
   # `resolve.shared` gives each container its own scope whose content is part
   # of the host's configuration; an entity-named key on the host's aspect is
   # included into that scope, as den does for a user.
-  # `ownView` (../base/capability.nix's `ownHasAspect`) asks for the host
-  # without its containers' scopes but with what they hand it.
   den.policies.host-to-containers =
     { host, ... }:
     let
@@ -370,7 +400,7 @@ in
       container:
       [ (resolve.shared { inherit container; }) ]
       ++ lib.optional (hasChild container.name) (include aspect.${container.name})
-    ) (lib.attrValues (if host.ownView or false then { } else sharedOf host));
+    ) (lib.attrValues (sharedOf host));
 
   # ── WHAT EACH CONTAINER HANDS ITS HOST ──
   # Its own policy because an include beside a `resolve` lands in the scopes
@@ -386,9 +416,7 @@ in
     }:
     lib.optionals (user == null && container == null) (
       map include (lib.concatMap toHostsOf (lib.attrValues (host.containers or { })))
-      ++ lib.optionals (!(host.ownView or false)) (
-        lib.concatMap (systemOf host) (lib.attrValues (nspawnOf host))
-      )
+      ++ lib.concatMap (systemOf host) (lib.attrValues (nspawnOf host))
     );
 
   # A separate module only because `den.schema.host` is already defined above

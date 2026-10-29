@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # ── THE ROAMING LOCAL RESOLVER ──
@@ -34,10 +33,10 @@
 # evaluation.
 #
 # So this aspect never joins a segment. It asks a DIFFERENT question -- "if I
-# were on that wire, where would that peer be" -- which `capability.linkFor`
+# were on that wire, where would that peer be" -- which `den.lib.capability.linkFor`
 # answers for one NAMED carrier without any membership rule applying. Measured:
 #
-#   capability.linkFor den.aspects.lan-home "tcp"
+#   den.lib.capability.linkFor den.aspects.lan-home "tcp"
 #     { host = <laptop>; peer = <secondpc>; }
 #   => { address = "192.168.0.26"; interface = null; mtu = 1500; }
 #
@@ -72,7 +71,7 @@ let
     in
     if r.success then r.value else null;
 
-  aspectsOn = host: lib.filterAttrs (_: a: host.hasAspect a) den.aspects;
+  aspectsOn = host: den.lib.capability.heldBy host;
 
   # ── THE WIRES THIS HOST MIGHT BE ON ──
   # Unioned across every aspect it has, the way `includes` is, so a role or a
@@ -107,7 +106,7 @@ let
     peer:
     let
       zone = zoneOn peer;
-      subs = try ((capability.contributions peer "proxy").subdomain or { });
+      subs = try ((den.lib.capability.contributions peer "proxy").subdomain or { });
 
       # ── A SERVICE UNDER A SUBPATH HAS NO NAME OF ITS OWN ──
       # `subpath` is `proxy`'s own vocabulary for "several services under one
@@ -122,7 +121,8 @@ let
       #
       # `!= "/"` and not `or`: `contributions` is the TYPED fold, so the
       # option's `default = "/"` has materialised and the attribute exists.
-      paths = if subs == null then { } else (capability.contributions peer "proxy").subpath or { };
+      paths =
+        if subs == null then { } else (den.lib.capability.contributions peer "proxy").subpath or { };
 
       fromProxy =
         if subs == null then
@@ -138,7 +138,7 @@ let
         a:
         let
           h = try (
-            capability.endpointHalf a "http" {
+            den.lib.capability.endpointHalf a "http" {
               host = peer;
               peer = peer;
             }
@@ -186,7 +186,7 @@ let
         peer:
         let
           l = try (
-            capability.linkFor carrier "tcp" {
+            den.lib.capability.linkFor carrier "tcp" {
               inherit host peer;
             }
           );
@@ -227,23 +227,31 @@ let
           # conditions that make the ADDRESS this group pins meaningful.
           carrierNames =
             let
-              segs = lib.filterAttrs (_: a: a.spans == "many-hosts") (capability.providersFor peer "segment");
+              segs = lib.filterAttrs (_: a: a.spans == "many-hosts") (
+                den.lib.capability.providersFor peer "segment"
+              );
             in
             lib.unique (
-              lib.concatMap (
-                a:
-                let
-                  n = try (
-                    capability.linkFor a "hostname" {
-                      inherit host peer;
-                    }
-                  );
-                in
-                if n == null then [ ] else [ n.hostname ] ++ (n.aliases or [ ])
-              ) (lib.attrValues (lib.filterAttrs (n: _: segs ? ${n}) (capability.providersFor host "hostname")))
+              lib.concatMap
+                (
+                  a:
+                  let
+                    n = try (
+                      den.lib.capability.linkFor a "hostname" {
+                        inherit host peer;
+                      }
+                    );
+                  in
+                  if n == null then [ ] else [ n.hostname ] ++ (n.aliases or [ ])
+                )
+                (
+                  lib.attrValues (
+                    lib.filterAttrs (n: _: segs ? ${n}) (den.lib.capability.providersFor host "hostname")
+                  )
+                )
             );
         }
-      ) (lib.filter (p: p.name != host.name && p.hasAspect carrier) (lib.attrValues hostsOf))
+      ) (lib.filter (p: p.name != host.name && den.lib.capability.has p carrier) (lib.attrValues hostsOf))
     ) (roamsOn host);
 
   # ── RESOLVED OFF THE REAL ENTITY, NEVER THE PROJECTED ONE ──
@@ -294,7 +302,7 @@ in
 
         It exists because ../services/proxy-nginx.nix's `emits` is false for a
         taker with no port and no upstream, so a raw vhost's name cannot be
-        folded out of `capability.contributions`. Declared beside the vhost it
+        folded out of `den.lib.capability.contributions`. Declared beside the vhost it
         describes, which is the only place it cannot go stale.
       '';
     };
@@ -363,7 +371,8 @@ in
         groups = planFor (host.name or "");
         me = entityFor (host.name or "");
 
-        withCarrierNames = me != null && me.hasAspect den.aspects.roaming-resolver-carrier-names;
+        withCarrierNames =
+          me != null && den.lib.capability.has me den.aspects.roaming-resolver-carrier-names;
 
         namesOf = g: g.names ++ lib.optionals withCarrierNames g.carrierNames;
 
@@ -522,7 +531,7 @@ in
         # ── ONE FILE PER NAME, NOT ONE PER ZONE ──
         #
         # `/etc/resolver/ivymect.in` would route the WHOLE zone here, and the
-        # zone is not only vhosts: `capability.contributions secondpc "dns"`
+        # zone is not only vhosts: `den.lib.capability.contributions secondpc "dns"`
         # holds the apex A and MX, `_dmarc`, `_imaps._tcp` and
         # `_submissions._tcp` SRVs, and a second set of the same under
         # `bitwarden.ivymect.in` (measured). A local view answering NODATA for

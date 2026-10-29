@@ -57,7 +57,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   carrierAttachment,
   ...
@@ -916,7 +915,7 @@ in
             readOnly = true;
             default =
               let
-                limits = capability.contributions host "proxy";
+                limits = den.lib.capability.contributions host "proxy";
                 subs = limits.subdomain or { };
                 caps = limits.maxBodyBytes or { };
                 zone = config.gateway.domain;
@@ -1246,7 +1245,7 @@ in
         # services wanting names in this zone produce one record set and no
         # file collects them. Same call `cloudflare-tunnel` makes for `proxy`
         # limits above.
-        asked = capability.contributions host "dns";
+        asked = den.lib.capability.contributions host "dns";
       in
       {
         gateway.domain = "ivymect.in";

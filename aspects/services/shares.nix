@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   ...
 }:
@@ -39,12 +38,12 @@
 #     place of a `norm` that applied defaults with `or` and checked nothing.
 #   * EVERY INCLUDER SEES THE SAME SHARE BY CONSTRUCTION. The quirk emitted once
 #     per includer, so a field-by-field `pick` had to throw when two emissions
-#     disagreed; `capability.contributions` reads one declaration off one
+#     disagreed; `den.lib.capability.contributions` reads one declaration off one
 #     aspect, so there is nothing left to disagree.
 #
 # ── MEMBERSHIP IS ASKED OF THE ACCOUNT, AND THAT IS WHY `pipe.expose` IS GONE ──
 #
-# `capability.takersOn` answers "which aspects here take this", and it takes any
+# `den.lib.capability.takersOn` answers "which aspects here take this", and it takes any
 # entity with `hasAspect` -- so the entity to ask is the ACCOUNT, not the host.
 # A person's `includes` are delivered to their accounts (../base/person.nix), so
 # a share aspect resolves at the USER scope; the `host` a class body is handed
@@ -118,16 +117,16 @@ let
       asked =
         map (u: {
           person = if (u.person or null) == null then null else u.person.kanidm.name;
-          takers = capability.takersOn u "share";
-          contributed = capability.contributions u "share";
+          takers = den.lib.capability.takersOn u "share";
+          contributed = den.lib.capability.contributions u "share";
         }) accounts
         ++ map (m: {
           # A membership always has a person -- ../base/household.nix throws on
           # a member naming one that is not declared -- so there is no null
           # case to carry here.
           person = m.person.kanidm.name;
-          takers = capability.takersOn m "share";
-          contributed = capability.contributions m "share";
+          takers = den.lib.capability.takersOn m "share";
+          contributed = den.lib.capability.contributions m "share";
         }) members;
 
       takers = lib.foldl' (acc: a: acc // a.takers) { } asked;

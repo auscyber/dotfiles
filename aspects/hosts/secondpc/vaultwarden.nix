@@ -1,6 +1,5 @@
 {
   den,
-  capability,
   ...
 }:
 # Vaultwarden, as its own aspect.
@@ -25,7 +24,7 @@ let
   #
   # ── `linkFor`, WITH BOTH ENDS NAMED ──
   #
-  # Not `capability.dial`: the From address is composed from THIS aspect's own
+  # Not `den.lib.capability.dial`: the From address is composed from THIS aspect's own
   # local part, and `dial` binds the giver's `peer` to the asking host -- so a
   # dialled link would come back addressed as `secondpc@`. The same reason
   # ../../services/mail.nix resolves its own directory link this way.
@@ -36,7 +35,7 @@ let
   # answerable at FILE level, with no host fixpoint behind it.
   mail =
     let
-      l = capability.linkFor den.aspects.mail "smtp" {
+      l = den.lib.capability.linkFor den.aspects.mail "smtp" {
         host = { };
         peer = den.aspects.vaultwarden;
       };

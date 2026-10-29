@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   ...
 }:
@@ -24,7 +23,7 @@ let
   # `takersOn`. So every aspect in the flake declaring `takes.mqtt` gets a
   # credential minted in this broker's scope, and whether it also gets a login
   # depends on whether it is actually on this box.
-  takers = capability.takers "mqtt";
+  takers = den.lib.capability.takers "mqtt";
   takerNames = lib.attrNames takers;
 
   # The account a taker authenticates as: its own `username` where it states
@@ -254,7 +253,7 @@ in
       # aspect is on THIS box -- which is right for a `reach = "host"` giver and
       # wrong the moment the broker serves the house. MEASURED on this file
       # before the change: the secrets for ../corsair-psu.nix were minted (the
-      # `secrets` block above asks `capability.takers`, which is fleet-wide and
+      # `secrets` block above asks `den.lib.capability.takers`, which is fleet-wide and
       # has no host to filter on) and the broker's rendered user list was
       # `{ homeassistant; music-assistant; sendspin; }` with no `corsair-psu` in
       # it. A credential that exists, a password file deployed on the client, and
@@ -270,8 +269,8 @@ in
       # `takersReaching` yields `{ aspect; host; }` per entry rather than a bare
       # aspect, so only the NAMES are used below -- which is all the user list
       # ever wanted.
-      asked = capability.takersReaching den.aspects.mosquitto "mqtt" host;
-      contributed = capability.contributionsReaching den.aspects.mosquitto "mqtt" host;
+      asked = den.lib.capability.takersReaching den.aspects.mosquitto "mqtt" host;
+      contributed = den.lib.capability.contributionsReaching den.aspects.mosquitto "mqtt" host;
     in
     {
       # NO `tmpfiles` DIRECTORY. It existed to hold two files a human wrote;
@@ -291,7 +290,7 @@ in
             # right answer rather than `192.168.0.26`: the ESPHome nodes reach
             # this over the house lan, and Home Assistant reaches it over the
             # loopback on this box, so the socket has to answer on both.
-            address = capability.bindAddressFor host den.aspects.mosquitto "tcp" "mqtt";
+            address = den.lib.capability.bindAddressFor host den.aspects.mosquitto "tcp" "mqtt";
             port = mqttPort;
 
             # `acl` is not optional -- the module renders a user with an empty

@@ -71,14 +71,14 @@ of plain attrsets instead of going through a host eval: seconds rather than
 minutes, no den, no import-from-derivation, no host entities.
 
 **The capability layer has its own version of this, and it is much faster than a
-host eval.** `aspects/base/capability.nix` exports through `_module.args`, and
+host eval.** `aspects/base/capability.nix` exports as `den.lib.capability`, and
 `debug = true` puts the whole flake config in the `debug` output, so every
 resolver query can be driven against real host ENTITIES without building a
 single NixOS config:
 
 ```
 nix eval --impure --json .#debug.config --apply 'cfg:
-  let cap = cfg._module.args.capability; h = cfg.den.hosts.x86_64-linux.secondpc;
+  let cap = cfg.den.lib.capability; h = cfg.den.hosts.x86_64-linux.secondpc;
   in { msgs = cap.exclusionsIn h; bind = cap.bindAddressFor h cfg.den.aspects.grocy "tcp" "http"; }'
 ```
 

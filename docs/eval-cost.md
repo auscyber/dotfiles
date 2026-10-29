@@ -436,7 +436,7 @@ itself.
 # /tmp/dN.nix, applied to .#debug.config
 cfg:
 let
-  cap = cfg._module.args.capability;
+  cap = cfg.den.lib.capability;
   h = cfg.den.hosts.x86_64-linux.secondpc;
 in
 builtins.stringLength (

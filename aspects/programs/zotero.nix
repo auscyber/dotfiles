@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 let
@@ -23,7 +22,7 @@ let
   syncFor =
     host:
     let
-      cands = capability.resolveFrom host "webdav-provisioned" {
+      cands = den.lib.capability.resolveFrom host "webdav-provisioned" {
         name = null;
         carrier = null;
         within = null;
@@ -36,11 +35,11 @@ let
       null
     else
       {
-        link = capability.linkFor cand.via "webdav-provisioned" {
+        link = den.lib.capability.linkFor cand.via "webdav-provisioned" {
           inherit host;
           peer = den.aspects.zotero;
         };
-        r = capability.realiseOn "webdav-provisioned" {
+        r = den.lib.capability.realiseOn "webdav-provisioned" {
           inherit cand;
           taker = den.aspects.zotero;
           from = host;

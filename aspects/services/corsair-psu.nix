@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # The power supply's own telemetry, published to the house MQTT broker as a
@@ -145,7 +144,7 @@ in
     # the same sensor declared twice, in two places, on two boxes.
     #
     # This reaches Home Assistant at all only because core.nix folds with
-    # `capability.contributionsReaching` -- see ./openrgb.nix, which is the
+    # `den.lib.capability.contributionsReaching` -- see ./openrgb.nix, which is the
     # taker that found that gap.
     takes.home-assistant.extraComponents = [ "mqtt" ];
 
@@ -174,7 +173,7 @@ in
         # `hasAspect` is a PROJECTED lookup (see ../../CLAUDE.md), so this reads
         # the inclusion graph and not any host's configuration fixpoint.
         hosts = lib.attrValues (lib.concatMapAttrs (_: hs: hs) den.hosts);
-        brokers = lib.filter (h: h.hasAspect den.aspects.mosquitto) hosts;
+        brokers = lib.filter (h: den.lib.capability.has h den.aspects.mosquitto) hosts;
 
         # BOTH FAILURES NAMED, because they are different mistakes with the
         # same symptom -- an `.age` file nothing generates. Zero brokers is a
@@ -249,7 +248,7 @@ in
         # `address` from the carrier it is composed with, and only `dial`
         # composes. ./homeassistant/mosquitto.nix's own note explains why
         # forcing a whole `mqtt` link does not work.
-        broker = capability.dial "mqtt" { } host;
+        broker = den.lib.capability.dial "mqtt" { } host;
 
         # `broker.link.port`, not `broker.port`. `dial` derives the latter from
         # a `ports` attrset, which an `mqtt` giver does not furnish -- it

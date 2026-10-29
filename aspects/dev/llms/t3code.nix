@@ -60,7 +60,7 @@ in
             };
           }
 
-          (lib.mkIf (host.hasAspect den.aspects.claude) {
+          (lib.mkIf (den.lib.capability.has host den.aspects.claude) {
             t3code.runtimeTools.enableClaude = true;
             programs.t3code.userSettings.providerInstances.claude = {
               driver = "claudeAgent";
@@ -88,7 +88,7 @@ in
           # `serverUrl = ""` is what makes t3code spawn its own `opencode serve`
           # on demand; setting it would point the driver at an externally
           # managed server instead, which nothing here runs.
-          (lib.mkIf (host.hasAspect den.aspects.opencode) {
+          (lib.mkIf (den.lib.capability.has host den.aspects.opencode) {
             t3code.runtimeTools.enableOpencode = true;
             programs.t3code.userSettings.providerInstances.opencode = {
               driver = "opencode";
@@ -105,7 +105,7 @@ in
             };
           })
 
-          (lib.mkIf (host.hasAspect den.aspects.jujutsu) {
+          (lib.mkIf (den.lib.capability.has host den.aspects.jujutsu) {
             t3code.runtimeTools.enableJujutsu = true;
           })
 
@@ -118,7 +118,7 @@ in
           # point of reaching this from a phone is that it works when it is not.
           # Tailscale falls back to a DERP relay, so the laptop stays reachable
           # from anywhere without depending on that box being up.
-          (lib.mkIf (host.hasAspect den.aspects.tailscale) {
+          (lib.mkIf (den.lib.capability.has host den.aspects.tailscale) {
             launchd.agents.t3code-serve = {
               enable = true;
               config = {

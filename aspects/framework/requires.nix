@@ -108,7 +108,7 @@ let
         lib.mapAttrs (_: checkOf) (
           lib.filterAttrs (n: _: !internal n) (requiresOf { inherit host; } aspect)
         )
-      ) (lib.filterAttrs (_: a: (a.requires or null) != null && host.hasAspect a) den.aspects);
+      ) (lib.filterAttrs (_: a: (a.requires or null) != null) (den.lib.capability.heldBy host));
     in
     lib.filterAttrs (_: v: v != { }) (
       lib.genAttrs (lib.unique (lib.attrNames declared ++ lib.attrNames derived)) (
@@ -256,7 +256,7 @@ in
       forHost =
         host:
         let
-          mine = lib.filterAttrs (_: a: host.hasAspect a) den.aspects;
+          mine = den.lib.capability.heldBy host;
 
           requires = requiresFor host;
 

@@ -21,7 +21,7 @@
         provides.to-hosts.nixos =
           { host, ... }:
           {
-            config = lib.mkIf (host.hasAspect den.aspects.onepassword) {
+            config = lib.mkIf (den.lib.capability.has host den.aspects.onepassword) {
               environment.etc."1password/custom_allowed_browsers" = {
                 text = lib.mkAfter ''
                   .zen

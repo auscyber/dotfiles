@@ -2,7 +2,6 @@
   den,
   lib,
   caps,
-  capability,
   ...
 }:
 # ── ROUTES ARE WHAT A CARRIER GIVES A SEGMENT ──
@@ -38,7 +37,7 @@ let
           "user"
         ]
       );
-      cands = capability.resolveFrom host "route" (
+      cands = den.lib.capability.resolveFrom host "route" (
         {
           name = null;
           carrier = null;
@@ -82,7 +81,7 @@ let
     host: take:
     let
       h = entityOf host;
-      onTailnet = b: capability.has b den.aspects.tailscale;
+      onTailnet = b: den.lib.capability.has b den.aspects.tailscale;
       answers = b: onTailnet h && onTailnet b && b.name != h.name && advertised (resolve b take);
     in
     lib.mapNullable (
@@ -105,7 +104,9 @@ let
   overTailnet =
     a:
     lib.filter (r: (lib.defaultTo { } r).carrier or null == "tailscale") (
-      lib.mapAttrsToList (_: aspect: resolveAnywhere a (takeOf aspect)) (capability.takersOn a "route")
+      lib.mapAttrsToList (_: aspect: resolveAnywhere a (takeOf aspect)) (
+        den.lib.capability.takersOn a "route"
+      )
     );
   isExit = r: r.prefix == "0.0.0.0/0";
   tailnetPlan =
@@ -127,14 +128,14 @@ let
     host:
     let
       h = entityOf host;
-      c = capability.contributions h "route";
+      c = den.lib.capability.contributions h "route";
     in
     lib.mapAttrs (name: aspect: {
       route = resolveAnywhere h (takeOf aspect);
       fallback = c.fallback.${name};
       units = lib.defaultTo [ name ] c.units.${name};
       user = c.user.${name};
-    }) (capability.takersOn h "route");
+    }) (den.lib.capability.takersOn h "route");
 
   # The house's own wires on this host, which a routed taker still reaches
   # directly: every segment it is attached to that has a prefix.
@@ -146,7 +147,7 @@ let
     lib.unique (
       lib.filter (p: p != null) (
         lib.mapAttrsToList (_: aspect: lib.defaultTo null (aspect.prefix or null)) (
-          capability.providersFor h "segment"
+          den.lib.capability.providersFor h "segment"
         )
       )
     );

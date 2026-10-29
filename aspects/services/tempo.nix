@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # Trace storage, so kanidm's OpenTelemetry export has somewhere to land and
@@ -100,7 +99,7 @@
     # configured from the same value a consumer resolves, and the port is
     # written exactly once -- in `gives.grpc` above.
     #
-    # `capability.ownLinkFor host`, not a `{ grpc, ... }` module argument: den
+    # `den.lib.capability.ownLinkFor host`, not a `{ grpc, ... }` module argument: den
     # resolves an aspect's arguments through its own binder before any aspect's
     # `_module.args` has merged, so the argument form fell through to
     # `config._module.args.grpc` and failed with `attribute 'grpc' missing`.
@@ -110,7 +109,7 @@
         ...
       }:
       let
-        grpc = capability.ownLinkFor host "grpc";
+        grpc = den.lib.capability.ownLinkFor host "grpc";
       in
       {
         services.tempo = {
@@ -122,8 +121,8 @@
               # exposure -- nothing exposes it and every consumer is on this
               # box, so it answers the loopback, which is the same
               # `127.0.0.1` this used to state.
-              http_listen_address = capability.bindAddressFor host den.aspects.tempo "tcp" "query";
-              http_listen_port = capability.portFor host den.aspects.tempo "tcp" "query";
+              http_listen_address = den.lib.capability.bindAddressFor host den.aspects.tempo "tcp" "query";
+              http_listen_port = den.lib.capability.portFor host den.aspects.tempo "tcp" "query";
               # 9095 is loki's; the internal modules dial this address in
               # single-binary mode, so it has to be reachable on loopback.
               grpc_listen_address = "127.0.0.1";

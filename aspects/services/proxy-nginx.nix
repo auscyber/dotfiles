@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # ── IT TRANSLATES, IT DOES NOT REIMPLEMENT ──
@@ -14,24 +13,24 @@ let
   entriesFor =
     host:
     let
-      asked = capability.takersOn host "proxy";
-      p = capability.contributions host "proxy";
-      g = capability.contributions host "gated";
-      n = capability.contributions host "nginx";
+      asked = den.lib.capability.takersOn host "proxy";
+      p = den.lib.capability.contributions host "proxy";
+      g = den.lib.capability.contributions host "gated";
+      n = den.lib.capability.contributions host "nginx";
 
       # The zone this host publishes under, which is a CARRIER it includes
       # (../network/cloudflare.nix) rather than a field anywhere -- so a
       zone =
         let
           zones = lib.filterAttrs (
-            _: a: a.domain != null && a.attachment == "provider" && host.hasAspect a
+            _: a: a.domain != null && a.attachment == "provider" && den.lib.capability.has host a
           ) den.aspects;
         in
         if zones == { } then null else (lib.head (lib.attrValues zones)).domain;
 
       # Did this service ask for the NARROWING? A bare `takes.proxy` is
       # published and not gated; `takes.gated` is both.
-      isGated = name: capability.takeKeyFor "proxy" asked.${name} == "gated";
+      isGated = name: den.lib.capability.takeKeyFor "proxy" asked.${name} == "gated";
 
       # ── THE UPSTREAM, RESOLVED RATHER THAN ASSUMED ──
       #
@@ -54,7 +53,7 @@ let
       resolved =
         name:
         let
-          d = capability.dial "tcp" {
+          d = den.lib.capability.dial "tcp" {
             name = name;
             sameHost = true;
           } host;

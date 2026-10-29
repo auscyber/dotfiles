@@ -1,7 +1,6 @@
 {
   accessLib,
   den,
-  capability,
   ...
 }:
 # paperless-ngx: scan a receipt in, get a searchable PDF and its OCR text out.
@@ -279,7 +278,7 @@ in
           # declaration that decides which wires ../base/firewall.nix opens
           # (none) and what this listener binds, and the loopback carrier
           # (../network/segments.nix) furnishes the string.
-          address = capability.bindAddressFor host den.aspects.paperless "tcp" "http";
+          address = den.lib.capability.bindAddressFor host den.aspects.paperless "tcp" "http";
           inherit port;
 
           # ── THE PUBLIC NAME, ASKED FOR RATHER THAN RESTATED ──
@@ -357,7 +356,9 @@ in
             # a failed-login log line attributable to a real client rather than
             # to nginx. The same resolved loopback the listener binds, so there
             # is no address literal in this file.
-            PAPERLESS_TRUSTED_PROXIES = capability.bindAddressFor host den.aspects.paperless "tcp" "http";
+            PAPERLESS_TRUSTED_PROXIES =
+              den.lib.capability.bindAddressFor host den.aspects.paperless "tcp"
+                "http";
 
             # ── THE DATABASE, OVER THE SOCKET ──
             #

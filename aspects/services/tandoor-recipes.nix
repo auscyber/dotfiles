@@ -1,7 +1,6 @@
 {
   accessLib,
   den,
-  capability,
   ...
 }:
 # Tandoor Recipes (recipes, meal plans, a shopping list and a pantry), a Django
@@ -68,7 +67,7 @@ let
   # Read by `gives.tcp` below -- which is what ./proxy-nginx.nix resolves the
   # upstream from, and what makes the public https address derivable -- and by
   # the service's own option, which is what makes it listen there. A `let` and
-  # not `capability.ownLinkFor` for the reason ./vikunja.nix gives: that binds
+  # not `den.lib.capability.ownLinkFor` for the reason ./vikunja.nix gives: that binds
   # a capability by name across the whole host and throws when two aspects give
   # one, which on this box is every service that listens on tcp.
   #
@@ -121,7 +120,7 @@ let
   # string is agreed by hand: the provider names a client after whoever asked,
   # and the issuer is derived from the domain that instance serves.
   #
-  # `host = { }` is honest rather than lazy. `capability.linkFor` only needs a
+  # `host = { }` is honest rather than lazy. `den.lib.capability.linkFor` only needs a
   # host to hand the giver's outer scope, and kanidm's `oidc` body reads
   # `self` and `peer` and nothing else -- so this is answerable at FILE level,
   # which is what lets the template below (whose body cannot reach a host's
@@ -146,7 +145,7 @@ let
   # off the capability rather than restating them.
   oidc =
     let
-      l = capability.linkFor den.aspects.kanidm "oidc" {
+      l = den.lib.capability.linkFor den.aspects.kanidm "oidc" {
         host = { };
         peer = den.aspects.tandoor;
       };
@@ -458,7 +457,7 @@ in
           #
           # It also sets the module's own `ALLOWED_HOSTS` default, which
           # `extraConfig` below replaces.
-          address = capability.bindAddressFor host den.aspects.tandoor "tcp" "http";
+          address = den.lib.capability.bindAddressFor host den.aspects.tandoor "tcp" "http";
           port = port;
 
           # NOT the module's own postgres. `createLocally` writes its own

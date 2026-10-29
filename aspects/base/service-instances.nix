@@ -2,7 +2,6 @@
   den,
   lib,
   config,
-  inputs,
   ...
 }:
 # INSTANCES ARE SPAWNED BY gen-scope. DEFINITIONS ARE WRITTEN.
@@ -59,7 +58,7 @@
 # from `den.services` -- and that separation is independently right, since a
 # definition has no host.
 let
-  gs = inputs.gen-scope.lib;
+  gs = den.lib.gen.scope;
 
   hosts = lib.concatMapAttrs (_: hs: hs) den.hosts;
   types = config.den.serviceTypes;

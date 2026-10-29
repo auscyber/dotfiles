@@ -2,7 +2,6 @@
   den,
   lib,
   config,
-  capability,
   checkLib,
   ...
 }:
@@ -115,7 +114,7 @@ let
   checkFor =
     host: aspect: cap: take:
     let
-      d = try (capability.dial cap take host);
+      d = try (den.lib.capability.dial cap take host);
       p = if d == null then null else placementOf d;
     in
     if d == null || d.sameHost || p == null || d.port == null then
@@ -160,12 +159,12 @@ let
         lib.listToAttrs (
           lib.filter (x: x != null) (lib.mapAttrsToList (checkFor host aspect) (aspect.takes or { }))
         )
-      ) (lib.filterAttrs (_: a: (a.takes or { }) != { } && host.hasAspect a) den.aspects)
+      ) (lib.filterAttrs (_: a: (a.takes or { }) != { }) (den.lib.capability.heldBy host))
     );
 
   # ── A TAKE THAT RESOLVES FROM NOWHERE, FOR THE WHOLE FLEET AT ONCE ──
   #
-  # `capability.linkTo` already throws with a derived message when nothing
+  # `den.lib.capability.linkTo` already throws with a derived message when nothing
   # reachable gives a capability -- but it throws for ONE host, while that host
   # is being built, which is the last moment it still helps and only ever
   # reports the first broken route. This asks the same question of every take in
@@ -227,7 +226,7 @@ let
       # took the wrong side -- so `share`, `gated`, `postgres` and six others
       # were asked whether they resolve to a giver when they furnish no address
       # and never will.
-      routedSites = lib.filter (s: capability.isRouted s.cap) sites;
+      routedSites = lib.filter (s: den.lib.capability.isRouted s.cap) sites;
 
       # WHO, and nothing about the wire -- the same split `dial` makes, and for
       # the same reason: the flow clauses (`mtu`, `maxBodyBytes`) are judged
@@ -236,9 +235,9 @@ let
       whoTakeOf =
         take:
         let
-          t = capability.emptyTake // take;
+          t = den.lib.capability.emptyTake // take;
         in
-        capability.emptyTake
+        den.lib.capability.emptyTake
         // {
           inherit (t)
             name
@@ -251,7 +250,7 @@ let
       findingFor =
         site:
         let
-          on = lib.filter (h: h.hasAspect site.aspect) checkLib.hostEntities;
+          on = lib.filter (h: den.lib.capability.has h site.aspect) checkLib.hostEntities;
           whoTake = whoTakeOf site.take;
 
           # PER HOST, not `lib.any`. This was "one host resolving is the
@@ -260,7 +259,7 @@ let
           # twelve dead `share` sites behind one success on secondpc. A take
           # sits on a host because that host needs it, so each host that has it
           # is its own question.
-          failedOn = lib.filter (h: (capability.resolveFrom h site.cap whoTake) == [ ]) on;
+          failedOn = lib.filter (h: (den.lib.capability.resolveFrom h site.cap whoTake) == [ ]) on;
           resolves = failedOn == [ ];
 
           # WHERE IT IS GIVEN, named rather than asserted. `providersFor` is the
@@ -268,11 +267,11 @@ let
           # reach" half of the message -- and empty means the stronger thing.
           placed = lib.unique (
             lib.concatMap (
-              h: lib.optional ((capability.providersFor h site.cap) != { }) (h.name or "?")
+              h: lib.optional ((den.lib.capability.providersFor h site.cap) != { }) (h.name or "?")
             ) checkLib.hostEntities
           );
 
-          named = (capability.emptyTake // site.take).name;
+          named = (den.lib.capability.emptyTake // site.take).name;
         in
         if on == [ ] || resolves then
           [ ]
@@ -298,7 +297,7 @@ let
     lib.concatMap (
       site:
       checkLib.probe "${site.aspectName}/${site.cap}"
-        "capability.resolveFrom <host> \"${site.cap}\" <take>"
+        "den.lib.capability.resolveFrom <host> \"${site.cap}\" <take>"
         (findingFor site)
     ) routedSites;
 in
@@ -306,7 +305,7 @@ in
   config.den.checks.take-routes = {
     description = "Every take resolves to a giver on at least one host that declares it.";
     findings = takeRoutes;
-    fix = "Place a giver of that capability on a host within its `reach`, correct the take's instance name, or drop the take. ./capability-types.nix declares each capability's `reach`; `capability.explainTake` prints the per-carrier table for one take.";
+    fix = "Place a giver of that capability on a host within its `reach`, correct the take's instance name, or drop the take. ./capability-types.nix declares each capability's `reach`; `den.lib.capability.explainTake` prints the per-carrier table for one take.";
   };
 
   # ../framework/requires.nix declares `den.derivedRequires` and folds it into

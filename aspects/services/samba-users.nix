@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   ...
 }:
@@ -41,14 +40,14 @@
 # ./shares.nix's own header records for the same move:
 #
 #   * THE PERSON IS DERIVED FROM WHERE THE TAKE IS FOUND, not stamped onto an
-#     emission. `capability.takersOn` works on any entity with `hasAspect`, so
+#     emission. `den.lib.capability.takersOn` works on any entity with `hasAspect`, so
 #     the asker is the account or the membership, and `pipe.expose` -- which
 #     existed only to cross the user-scope-to-host-scope edge -- is unnecessary.
 #   * ITS FIELDS ARE TYPED, by the `taker` module, where `norm` applied defaults
 #     with `or` and checked nothing.
 #   * AND THERE IS NOTHING LEFT TO DISAGREE. The quirk emitted once per includer,
 #     so a field-by-field `pick` had to throw when two emissions for one person
-#     conflicted. `capability.contributions` reads one declaration off one
+#     conflicted. `den.lib.capability.contributions` reads one declaration off one
 #     aspect, so a person asked twice -- once as an account, once as a member --
 #     answers identically by construction and the duplicate collapses.
 #
@@ -167,8 +166,8 @@ in
         # derivation below reads `passwordSecret` off it.
         ask = p: e: {
           person = p;
-          takers = capability.takersOn e "samba-user";
-          contributed = capability.contributions e "samba-user";
+          takers = den.lib.capability.takersOn e "samba-user";
+          contributed = den.lib.capability.contributions e "samba-user";
         };
 
         asked =

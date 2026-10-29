@@ -3,7 +3,6 @@
   lib,
   rootPath,
   fleet,
-  capability,
   ...
 }:
 # Remote build machines. In aspects/base rather than aspects/nixos because it
@@ -121,7 +120,7 @@ let
   # two, said for the credential, which keys its folder by them.
   linkCredential =
     client: builder:
-    capability.realise "builder" {
+    den.lib.capability.realise "builder" {
       giver = den.aspects.nix-builder;
       taker = den.aspects.builders;
       host = builder;

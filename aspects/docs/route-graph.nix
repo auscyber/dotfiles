@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   capabilityGraph,
   routeLib,
   ...
@@ -13,7 +12,7 @@
 # instances (subgraphs), segments sit outside them, a carrier's route is a
 # `provide` edge to the segment it reaches, and every route take shows the
 # route it won and each one that lost with the clause it lost on -- the
-# verdicts `capability.judge` gave, read from `capabilityGraph.resolutionsFor`.
+# verdicts `den.lib.capability.judge` gave, read from `capabilityGraph.resolutionsFor`.
 let
   inherit (capabilityGraph) mkNode mkEdge;
   hosts = lib.concatMapAttrs (_: hs: hs) den.hosts;
@@ -57,7 +56,7 @@ let
 
   linkOf =
     h: aspect:
-    capability.linkFor aspect "route" {
+    den.lib.capability.linkFor aspect "route" {
       host = h;
       peer = h;
     };
@@ -69,7 +68,7 @@ let
         entityKind = kind;
         entityInstance = inst kind name;
       };
-      routes = capability.providersFor h "route";
+      routes = den.lib.capability.providersFor h "route";
       takes = lib.filter (r: r.cap == "route") (capabilityGraph.resolutionsFor { host = h; });
       plan = routeLib.tailnetPlan h;
       self = "${id name}__self";
@@ -125,7 +124,7 @@ let
             to = segId h s;
             label = "on";
           }
-        ) (capability.providersFor h "segment")
+        ) (den.lib.capability.providersFor h "segment")
         # Each route to the segment it reaches.
         ++ lib.mapAttrsToList (
           c: aspect:
@@ -196,8 +195,8 @@ let
     lib.concatMap (
       h:
       map (s: segAt h s // { label = s; }) (
-        lib.attrNames (capability.providersFor h "segment")
-        ++ lib.mapAttrsToList (_: a: (linkOf h a).segment) (capability.providersFor h "route")
+        lib.attrNames (den.lib.capability.providersFor h "segment")
+        ++ lib.mapAttrsToList (_: a: (linkOf h a).segment) (den.lib.capability.providersFor h "route")
       )
     ) everyone
   );

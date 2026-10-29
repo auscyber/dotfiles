@@ -921,7 +921,7 @@ note, but the probe is the thing to run first:
 
 ```
 evallock nix eval --impure --json .#debug.config --apply 'cfg:
-  let lib = cfg._module.args.lib; cap = cfg._module.args.capability;
+  let lib = cfg._module.args.lib; cap = cfg.den.lib.capability;
       s = cfg.den.hosts.x86_64-linux.secondpc;
       mk = ns: { name = "dyson"; hasAspect = a: lib.elem (a.name or "?") ns;
                  attachments.lan-home = { address = "192.168.0.77"; interface = "wlan0"; };

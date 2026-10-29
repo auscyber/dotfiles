@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 let
@@ -53,9 +52,9 @@ let
     take: me: c:
     let
       serverHost = lib.findFirst (h: h.name == c.name) null hosts;
-      ps = lib.mapNullable (h: capability.providersFor h "celler") serverHost;
+      ps = lib.mapNullable (h: den.lib.capability.providersFor h "celler") serverHost;
       cands = lib.optionals (serverHost != null && ps != { }) (
-        capability.reachEndpoint "http" take me {
+        den.lib.capability.reachEndpoint "http" take me {
           aspect = lib.head (lib.attrValues ps);
           host = serverHost;
         }
@@ -86,7 +85,7 @@ let
       cellerAspectOn =
         h:
         let
-          ps = capability.providersFor h "celler";
+          ps = den.lib.capability.providersFor h "celler";
         in
         if ps == { } then den.aspects.celler else lib.head (lib.attrValues ps);
 
@@ -94,7 +93,7 @@ let
         if serverHost == null then
           [ ]
         else
-          capability.reachEndpoint "http" take me {
+          den.lib.capability.reachEndpoint "http" take me {
             aspect = cellerAspectOn serverHost;
             host = serverHost;
           };
@@ -122,8 +121,8 @@ let
         # a predicate clause, which is useless for the one case that matters, so
         # the reason comes per carrier from the judge instead.
         "celler: no carrier from ${me.name} to ${c.name} carries this flow.\n${
-          capability.explainTake "http" take me (
-            capability.reachEndpoint "http" { } me {
+          den.lib.capability.explainTake "http" take me (
+            den.lib.capability.reachEndpoint "http" { } me {
               aspect = cellerAspectOn serverHost;
               host = serverHost;
             }
@@ -218,10 +217,13 @@ let
       # Walks the chain from `celler`, so the serving host comes from the celler
       # level and the cache name from the level below -- which is what
       # `celler-use` needs as `{ <server>.pull = [ <cache> ]; }`.
-      askers = lib.filterAttrs (_: a: (owner.hasAspect or (_: false)) a) (capability.takers "celler");
+      askers = lib.filterAttrs (_: a: den.lib.capability.has owner a) (
+        den.lib.capability.takers "celler"
+      );
 
       found = lib.concatMap (
-        aspect: capability.resolveChain "celler" ((capability.takesOf aspect).celler or { }) host
+        aspect:
+        den.lib.capability.resolveChain "celler" ((den.lib.capability.takesOf aspect).celler or { }) host
       ) (lib.attrValues askers);
     in
     # ONE ENTRY PER LEAF, keyed by the flow the leaf IS. `chain` carries the
@@ -369,7 +371,7 @@ in
         # `name` -- filtering on `c.name` silently matched nothing and produced
         # no checks at all, which is the quiet failure this shape invites.
         leaves = lib.filter (c: (c.host.name or null) != null) (
-          capability.resolveChain "celler" (den.aspects.celler-default.takes.celler or { }) host
+          den.lib.capability.resolveChain "celler" (den.aspects.celler-default.takes.celler or { }) host
         );
 
         serverNames = lib.unique (map (c: c.host.name) leaves);

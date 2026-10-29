@@ -1,0 +1,49 @@
+diff -ruN a/nix/lib/default.nix b/nix/lib/default.nix
+--- a/nix/lib/default.nix
++++ b/nix/lib/default.nix
+@@ -36,6 +36,7 @@
+     schemaUtil = ./schema-util.nix;
+     synthesizePolicies = ./synthesize-policies.nix;
+     fx = ./fx.nix;
++    gen = ./gen.nix;
+     schema = ./schema.nix;
+   };
+ in
+diff -ruN a/nix/lib/gen.nix b/nix/lib/gen.nix
+--- a/nix/lib/gen.nix
++++ b/nix/lib/gen.nix
+@@ -0,0 +1,11 @@
++# The gen roster den evaluates with, exported so consumers share its revision.
++{ inputs, ... }:
++let
++  lock = builtins.fromJSON (builtins.readFile ../../templates/ci/flake.lock);
++  locked = lock.nodes.gen.locked;
++  genSrc = builtins.fetchTarball {
++    url = "https://github.com/${locked.owner}/${locked.repo}/archive/${locked.rev}.zip";
++    sha256 = locked.narHash;
++  };
++in
++if inputs ? gen then inputs.gen.lib.mkGenLibs { } else import genSrc { }
+diff -ruN a/nix/lib/schema.nix b/nix/lib/schema.nix
+--- a/nix/lib/schema.nix
++++ b/nix/lib/schema.nix
+@@ -24,18 +24,7 @@
+   ...
+ }:
+ let
+-  lock = builtins.fromJSON (builtins.readFile ../../templates/ci/flake.lock);
+-  locked = lock.nodes.gen.locked;
+-  genSrc = builtins.fetchTarball {
+-    url = "https://github.com/${locked.owner}/${locked.repo}/archive/${locked.rev}.zip";
+-    sha256 = locked.narHash;
+-  };
+-  # Two entry shapes for one roster: the flake publishes `lib.mkGenLibs` (a
+-  # function of a vestigial argument), the standalone root yields the roster
+-  # directly. Dispatch on which channel supplied it rather than probing the
+-  # value, so a member that changes shape is loud here instead of silently
+-  # taking the other arm.
+-  roster = if inputs ? gen then inputs.gen.lib.mkGenLibs { } else import genSrc { };
++  roster = import ./gen.nix { inherit inputs; };
+ in
+ let
+   base = roster.schema;

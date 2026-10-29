@@ -191,7 +191,7 @@ in
           # what a token is scoped to -- reading the aspect name here made every
           # cache look as though it had no signing key.
           declared = lib.mapAttrsToList (_: a: a.cache.name) (
-            lib.filterAttrs (_: a: (a ? cache) && host.hasAspect a) den.aspects
+            lib.filterAttrs (_: a: (a ? cache)) (den.lib.capability.heldBy host)
           );
 
           # A declared cache with no signing key is a cache that does not

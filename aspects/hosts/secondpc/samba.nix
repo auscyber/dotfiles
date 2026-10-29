@@ -1,7 +1,6 @@
 {
   den,
   sharesFor,
-  capability,
   ...
 }:
 # Network file sharing for secondpc: Samba exposing /mnt/hdd (including the
@@ -157,7 +156,7 @@
         ncData = config.services.nextcloud.settings.datadirectory;
         # The account nextcloud's own `webdav` give names.
         ncUser =
-          (capability.linkFor den.aspects.nextcloud "webdav" {
+          (den.lib.capability.linkFor den.aspects.nextcloud "webdav" {
             inherit host;
             peer = host;
           }).username;

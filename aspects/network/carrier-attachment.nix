@@ -2,7 +2,6 @@
   den,
   lib,
   config,
-  capability,
   checkLib,
   ...
 }:
@@ -22,7 +21,7 @@
 # .interface`, so it furnishes a DIFFERENT link for every (host, peer) pair.
 # Resolution therefore calls that function once per pair per call site, and
 # there are 59 of those in this tree, 25 of them inside
-# `capability.contributions`.
+# `den.lib.capability.contributions`.
 #
 # But the relation decomposes, and every carrier in this tree decomposes the
 # same way:
@@ -201,7 +200,7 @@ let
   # `interfaces` IS THE PLURAL, AND IT IS THE POINT. A host attaches to one
   # segment over as many wires as it has: auspc is on the house lan over
   # `enp6s0` and over `wlo1`, and both are the same network. `hearsOn` is the
-  # first of them, which is the single value `capability.linksBetween`'s link
+  # first of them, which is the single value `den.lib.capability.linksBetween`'s link
   # can hold -- and the gap between the two is exactly what
   # ../services/openrgb.nix's `expose = [ "lan-home" "house-wifi" ]` is working
   # around.
@@ -229,7 +228,7 @@ let
   poolFor =
     hostEntities:
     lib.concatMap (
-      h: map (n: halfOf n h) (lib.filter (n: h.hasAspect den.aspects.${n}) carrierNames)
+      h: map (n: halfOf n h) (lib.filter (n: den.lib.capability.has h den.aspects.${n}) carrierNames)
     ) hostEntities;
 
   # ── HOST-LOCAL: SHARING A NAME IS NOT SHARING A WIRE ──
@@ -289,7 +288,7 @@ let
       }) (lib.filter (e: e.host == hostName) roster)
     );
 
-  # ── THE FOLD: THE SAME QUESTION `capability.linksBetween` ANSWERS ──
+  # ── THE FOLD: THE SAME QUESTION `den.lib.capability.linksBetween` ANSWERS ──
   #
   # Every clause below mirrors one in that function, deliberately and in the
   # same order, because the check compares them literally:
@@ -482,8 +481,10 @@ let
       map (c: {
         inherit A B c;
         mine = brief (linksFrom fleetRoster c A B);
-        theirs = brief (lib.filter (l: lib.elem l.carrier carrierNames) (capability.linksBetween c A B));
-        extras = lib.filter (l: !(lib.elem l.carrier carrierNames)) (capability.linksBetween c A B);
+        theirs = brief (
+          lib.filter (l: lib.elem l.carrier carrierNames) (den.lib.capability.linksBetween c A B)
+        );
+        extras = lib.filter (l: !(lib.elem l.carrier carrierNames)) (den.lib.capability.linksBetween c A B);
       }) capNames
     ) hostEntities
   ) hostEntities;
@@ -604,7 +605,7 @@ in
                 in
                 if is == [ ] then null else lib.head is;
               defaultText = "the first of `interfacesOn`";
-              description = "The one interface a single-valued link can hold, which is the first of `interfacesOn`. The plural is the honest answer; this is the one `capability.linksBetween` can carry.";
+              description = "The one interface a single-valued link can hold, which is the first of `interfacesOn`. The plural is the honest answer; this is the one `den.lib.capability.linksBetween` can carry.";
             };
 
             hostnameAt = mkOption {
@@ -767,7 +768,7 @@ in
     # ── THE REAL DELIVERABLE ──
     #
     # For every (hostA, hostB, capability) triple in the fleet, the roster fold
-    # and `capability.linksBetween` must agree on the carrier set, the
+    # and `den.lib.capability.linksBetween` must agree on the carrier set, the
     # addresses, the interfaces, the body caps and the order. Without this, a
     # swap is a guess.
     #
@@ -776,7 +777,7 @@ in
     # `probe` because one broken aspect would otherwise take the whole
     # fleet-wide comparison down as an opaque trace.
     den.checks.carrier-roster-equals-resolution = {
-      description = "The pooled attachment roster's local fold answers every (hostA, hostB, capability) triple exactly as `capability.linksBetween` does.";
+      description = "The pooled attachment roster's local fold answers every (hostA, hostB, capability) triple exactly as `den.lib.capability.linksBetween` does.";
 
       findings =
         checkLib.probe "carrier-roster-equals-resolution"
@@ -785,7 +786,7 @@ in
             lib.concatMap (
               x:
               lib.optional (x.mine != x.theirs)
-                "${x.A.name} -> ${x.B.name} over `${x.c}`: the roster fold says [${show x.mine}] and capability.linksBetween says [${show x.theirs}]."
+                "${x.A.name} -> ${x.B.name} over `${x.c}`: the roster fold says [${show x.mine}] and den.lib.capability.linksBetween says [${show x.theirs}]."
             ) comparisons
           );
 
@@ -808,7 +809,7 @@ in
     # `report`, not `error`: the finding is about the shape of the existing
     # resolver and nothing here can make it go away.
     den.checks.carrier-roster-covers-resolution = {
-      description = "Which aspects `capability.linksBetween` returns as candidates that no carrier emits an attachment half for.";
+      description = "Which aspects `den.lib.capability.linksBetween` returns as candidates that no carrier emits an attachment half for.";
       severity = "report";
 
       findings =
@@ -1008,7 +1009,7 @@ in
     # look at who is asking. This checks the ANSWER: having looked, does it say
     # no. A giver can bind `peer`, ignore it, and be just as wrong.
     #
-    # Asked of `capability.carrierHalf` -- the LIVE giver, through the real
+    # Asked of `den.lib.capability.carrierHalf` -- the LIVE giver, through the real
     # resolver, not through the roster -- for every cross-host pair and every
     # capability a host-local carrier furnishes. A host-local carrier is one
     # attached to by exactly one host (no `segment`, not a provider), so there
@@ -1035,11 +1036,11 @@ in
                   A:
                   lib.concatMap (
                     B:
-                    lib.optionals (A.name != B.name && A.hasAspect den.aspects.${name}) (
+                    lib.optionals (A.name != B.name && den.lib.capability.has A den.aspects.${name}) (
                       lib.concatMap (
                         c:
                         let
-                          half = capability.carrierHalf den.aspects.${name} c {
+                          half = den.lib.capability.carrierHalf den.aspects.${name} c {
                             host = A;
                             peer = B;
                           };
@@ -1165,7 +1166,7 @@ in
     # ── WHERE ONE SEGMENT REACHES A HOST OVER MORE THAN ONE WIRE ──
     #
     # The evidence for the paragraph above, as data rather than as prose, and
-    # the thing `capability.linksBetween`'s link CANNOT carry: its `interface`
+    # the thing `den.lib.capability.linksBetween`'s link CANNOT carry: its `interface`
     # is one string, so a host on the house lan over a cable and a radio gets
     # whichever comes first and the other wire is invisible to
     # ../base/firewall.nix. That is why `expose` names two carriers.
@@ -1229,7 +1230,7 @@ in
                 let
                   here = capsOfWith h n;
                 in
-                lib.optional (h.hasAspect den.aspects.${n} && here != neutral)
+                lib.optional (den.lib.capability.has h den.aspects.${n} && here != neutral)
                   "den.aspects.${n}: `gives` furnishes [${lib.concatStringsSep " " here}] on ${h.name} and [${lib.concatStringsSep " " neutral}] with no host, so which capabilities this carrier answers is not a carrier fact."
               ) hostEntities
             ) carrierNames

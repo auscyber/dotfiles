@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # One place to say how a service is reached: which vhost and path, whether the
@@ -103,7 +102,7 @@ let
   # `den.aspects` and the host's own inclusion set needs no host fixpoint,
   # while the same expression inside a class body can only be forced by a full
   # host evaluation.
-  callerFactsFor = host: capability.contributions host "credential";
+  callerFactsFor = host: den.lib.capability.contributions host "credential";
 in
 {
   den.aspects.gateway = {
@@ -188,7 +187,7 @@ in
         # caller nothing calls has none.
         #
         # Read off `gateway.services` rather than from
-        # `capability.contributions host "gated"`, which carries the same `api`
+        # `den.lib.capability.contributions host "gated"`, which carries the same `api`
         # blocks: this way it covers every route into `api.clients` -- a
         # `takes.gated` translated by ./proxy-nginx.nix, a literal entry, or
         # ./service-accounts.nix's minted registry -- where the capability fold

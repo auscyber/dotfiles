@@ -2,7 +2,6 @@
   den,
   lib,
   sharesFor,
-  capability,
   ...
 }:
 # Nextcloud on secondpc, per https://wiki.nixos.org/wiki/Nextcloud: nginx +
@@ -34,7 +33,7 @@ let
   # HOST -- cannot carry it.
   mail =
     let
-      l = capability.linkFor den.aspects.mail "smtp" {
+      l = den.lib.capability.linkFor den.aspects.mail "smtp" {
         host = { };
         peer = den.aspects.nextcloud;
       };
@@ -505,7 +504,7 @@ in
         # Every client of `webdav-provisioned`, one per host it is on.
         serviceEdges = map (e: {
           inherit e;
-          r = capability.realise "webdav-provisioned" {
+          r = den.lib.capability.realise "webdav-provisioned" {
             giver = den.aspects.nextcloud;
             taker = e.aspect;
             host = e.host;
@@ -513,7 +512,7 @@ in
             giverHost = host;
             takerHost = e.host;
           };
-        }) (capability.takerEdgesReaching den.aspects.nextcloud "webdav-provisioned" host);
+        }) (den.lib.capability.takerEdgesReaching den.aspects.nextcloud "webdav-provisioned" host);
         serviceAccounts = map (
           { e, r }:
           {

@@ -325,7 +325,7 @@ let
         inherit (e) path quirk;
         host = h.name;
         kind = "quirk";
-      }) (lib.filter (h: h.hasAspect e.aspect) hostList)
+      }) (lib.filter (h: den.lib.capability.has h e.aspect) hostList)
     ) emitters;
 
   # ── SOURCES: THE CAPABILITY HALF ──
@@ -346,7 +346,7 @@ let
         quirk = "gives (reach = \"${reach}\")";
         kind = "capability";
         inherit reach;
-      }) (lib.filter (h: h.hasAspect a) hostList)
+      }) (lib.filter (h: den.lib.capability.has h a) hostList)
     )
   ) aspectEntries;
 

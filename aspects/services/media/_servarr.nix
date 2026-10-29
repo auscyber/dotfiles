@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   accessLib,
 }:
 # The shape every servarr app shares: a gateway entry, a dashboard entry,
@@ -181,7 +180,8 @@ in
             # `host`, which cost an "attribute 'host' missing" on every secondpc
             # eval once already, so the dial lives in the `nixos` body where it is
             # actually supplied.
-            client = if downloadClient then capability.dial "tcp" { name = "qbittorrent"; } host else null;
+            client =
+              if downloadClient then den.lib.capability.dial "tcp" { name = "qbittorrent"; } host else null;
 
             # A THROW, not a fallback, and for ../vban.nix's reason: there is no safe
             # default endpoint for "reconcile a download client". The old literals

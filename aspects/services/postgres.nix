@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   ...
 }:
@@ -39,7 +38,7 @@ let
   # missing key rather than a thrown attribute deep in a map.
   # ── WHO ASKED, AND FOR WHAT, FOLDED AT FILE LEVEL ──
   #
-  # `capability.contributions` collects every taker's `takes.postgres`: one
+  # `den.lib.capability.contributions` collects every taker's `takes.postgres`: one
   # entry per taker for `services`, and one value for the three `takerMerged`
   # keys below -- `extensions` and `preload` concatenate and dedupe through
   # their own type, and `settings` is server-global, so two takers defining one
@@ -55,8 +54,8 @@ let
   takerDbsFor =
     host:
     let
-      c = capability.contributions host "postgres";
-      askers = capability.takersAt host "postgres";
+      c = den.lib.capability.contributions host "postgres";
+      askers = den.lib.capability.takersAt host "postgres";
     in
     map (
       {
@@ -65,7 +64,7 @@ let
         entity,
       }:
       let
-        account = capability.linkFor aspect "user" {
+        account = den.lib.capability.linkFor aspect "user" {
           host = entity;
           peer = entity;
         };
@@ -83,7 +82,7 @@ let
         # ADMIT. A taker on this host itself stays on the loopback and socket.
         via =
           let
-            l = capability.dial "tcp" { name = "postgres"; } entity;
+            l = den.lib.capability.dial "tcp" { name = "postgres"; } entity;
           in
           if entity.name == host.name || l == null then
             null
@@ -116,7 +115,7 @@ let
               if !(c.tcp.${name} or false) then
                 null
               else
-                capability.realise "postgres" {
+                den.lib.capability.realise "postgres" {
                   giver = den.aspects.postgres;
                   taker = aspect;
                   inherit host;
@@ -141,7 +140,7 @@ let
           if !(c.tcp.${name} or false) then
             null
           else
-            capability.realise "postgres" {
+            den.lib.capability.realise "postgres" {
               giver = den.aspects.postgres;
               taker = aspect;
               inherit host;
@@ -368,7 +367,7 @@ in
         # a cascade, to answer a question that is "which aspects on this host
         # declare `takes.postgres`".
         #
-        # `capability.contributions` folds every taker's contribution by the
+        # `den.lib.capability.contributions` folds every taker's contribution by the
         # discipline ../base/capability-types.nix declares for each key: one
         # entry per taker for `services`, `lib.unique` for `extensions` and
         # `preload`, and a THROW for `settings`, which is server-global and so

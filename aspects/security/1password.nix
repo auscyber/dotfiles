@@ -56,7 +56,7 @@
     # still defines it.
     homeManager =
       { pkgs, host, ... }:
-      lib.optionalAttrs (host.hasAspect den.aspects.browsers.zen) {
+      lib.optionalAttrs (den.lib.capability.has host den.aspects.browsers.zen) {
         programs.zen-browser._internalProfile.extensions.packages = [
           pkgs.firefox-addons.onepassword-password-manager
         ];

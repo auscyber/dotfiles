@@ -2,7 +2,6 @@
   den,
   lib,
   inputs,
-  capability,
   caps,
   ...
 }:
@@ -274,7 +273,7 @@ let
   # walks `den.hosts` entities itself, where a `takersOn host` from a class
   # body asks a projected `hasAspect` and silently comes back empty
   # (../base/firewall.nix's header, ../services/shares.nix before it).
-  smtpTakers = host: capability.takersReaching den.aspects.mail "smtp" host;
+  smtpTakers = host: den.lib.capability.takersReaching den.aspects.mail "smtp" host;
 
   # ── THE STAMP, COMPUTED WHERE THE PERSON IS ALREADY BOUND ──
   #
@@ -348,8 +347,8 @@ in
   #
   # ── IT IS RESOLVED WITH BOTH ENDS NAMED ──
   #
-  # `capability.linkFor <mail> "smtp" { host; peer = <me>; }`, not
-  # `capability.dial`. Half of what this furnishes is PER CONSUMER -- the From
+  # `den.lib.capability.linkFor <mail> "smtp" { host; peer = <me>; }`, not
+  # `den.lib.capability.dial`. Half of what this furnishes is PER CONSUMER -- the From
   # address is composed from the asker's own local part -- and `dial` binds the
   # giver's `peer` to the asking HOST (../base/capability.nix's `reachEndpoint`:
   # `peer = from`), so a dialled link comes back describing the machine rather
@@ -943,7 +942,7 @@ in
         # capability, this host and the aspects that could give it -- so it
         # stays true as the tree changes, which a message written here would
         # not.
-        dir = capability.linkTo "ldap" {
+        dir = den.lib.capability.linkTo "ldap" {
           inherit host;
           peer = den.aspects.mail;
         };
@@ -973,7 +972,7 @@ in
         # opt-in.
         members = lib.attrValues ((host.household or null).members or { });
         fromMembers = lib.concatMap (
-          m: if m.hasAspect den.aspects.mailbox then mailboxFor m.person else [ ]
+          m: if den.lib.capability.has m den.aspects.mailbox then mailboxFor m.person else [ ]
         ) members;
 
         # ONE SET. A person who is both a member here and has an account here

@@ -3,7 +3,6 @@
   config,
   den,
   self,
-  capability,
   ...
 }:
 # ── A CHECK IS A LIST OF FINDINGS, AND THE DERIVATION IS PLUMBING ──
@@ -14,7 +13,7 @@
 #
 #   den.checks.socket-exclusions = {
 #     description = "No two givers claim one exclusive resource.";
-#     findings = lib.concatMap capability.exclusionsIn checkLib.hostEntities;
+#     findings = lib.concatMap den.lib.capability.exclusionsIn checkLib.hostEntities;
 #     fix = "...";
 #   };
 #
@@ -224,20 +223,20 @@ let
           perTaker =
             n: aspect:
             let
-              k = capability.takeKeyFor cap aspect;
+              k = den.lib.capability.takeKeyFor cap aspect;
               # RAW take: it carries only the keys the taker actually SET, which
               # is the question here -- a default that materialises through
               # `contributions` is not a contribution anybody made.
               # ../../CLAUDE.md's second trap, and `or` is the correct operator
               # on a raw take for exactly that reason.
-              take = (capability.takesOf aspect).${k} or { };
+              take = (den.lib.capability.takesOf aspect).${k} or { };
             in
             map (key: {
               inherit key;
               taker = n;
-            }) (lib.filter (key: take ? ${key}) (capability.takerNames cap));
+            }) (lib.filter (key: take ? ${key}) (den.lib.capability.takerNames cap));
 
-          flat = lib.concatLists (lib.mapAttrsToList perTaker (capability.takers cap));
+          flat = lib.concatLists (lib.mapAttrsToList perTaker (den.lib.capability.takers cap));
         in
         lib.mapAttrs (_: es: map (e: e.taker) es) (lib.groupBy (e: e.key) flat);
     in
@@ -249,7 +248,7 @@ let
         )
         (
           lib.mapAttrs settersOf (
-            lib.filterAttrs (cap: _: capability.takerNames cap != [ ]) config.den.capabilities
+            lib.filterAttrs (cap: _: den.lib.capability.takerNames cap != [ ]) config.den.capabilities
           )
         )
     );
@@ -361,7 +360,7 @@ in
                 echo "      No giver folds \"$cap\" in (contributions/contributionsReaching/takersOn/takersReaching)" >&2
                 echo "      and nothing that names \"$cap\" reads \`take.$key\`, so every value above is" >&2
                 echo "      collected and discarded -- the feature is absent while every file looks correct." >&2
-                echo "      Fix: fold it in from the giver (capability.contributionsReaching den.aspects.<giver> \"$cap\" host)," >&2
+                echo "      Fix: fold it in from the giver (den.lib.capability.contributionsReaching den.aspects.<giver> \"$cap\" host)," >&2
                 echo "      or drop taker.options.$key so nothing can set it." >&2
               done < "$spec"
 

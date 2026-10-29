@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   ...
 }:
@@ -67,7 +66,7 @@
       # for broker logins.
       # ── REACHING, NOT LOCAL ──
       #
-      # `capability.contributions` asks `takersOn host` -- takers whose aspect
+      # `den.lib.capability.contributions` asks `takersOn host` -- takers whose aspect
       # is on THIS box. Every taker in this directory is, so that worked by
       # accident until ../openrgb.nix: auspc's lighting daemon, which this
       # service integrates with across the house. Its component resolved and
@@ -78,7 +77,9 @@
       # `reach = "household"` below is what decides how far this looks, so the
       # giver is passed rather than only the host. See `contributionsReaching`
       # in ../../base/capability.nix.
-      contributed = capability.contributionsReaching den.aspects.homeassistant "home-assistant" host;
+      contributed =
+        den.lib.capability.contributionsReaching den.aspects.homeassistant "home-assistant"
+          host;
     in
     {
       services.home-assistant = {

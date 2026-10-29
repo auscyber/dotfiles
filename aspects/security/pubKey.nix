@@ -56,7 +56,7 @@ in
             "nixos"
             "darwin"
           ];
-        holdsSecrets = h: lib.any (a: h.hasAspect den.aspects.${a}) secretBearing;
+        holdsSecrets = h: lib.any (a: den.lib.capability.has h den.aspects.${a}) secretBearing;
       in
       lib.concatMap (
         h:

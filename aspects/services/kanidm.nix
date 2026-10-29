@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   caps,
   persons,
   ...
@@ -48,11 +47,11 @@ let
   #
   # An OIDC client is precisely the relation that crosses hosts: the identity
   # provider is one box and the services authenticating against it need not be.
-  oidcTakers = host: capability.takersReaching den.aspects.kanidm "oidc" host;
+  oidcTakers = host: den.lib.capability.takersReaching den.aspects.kanidm "oidc" host;
 
   # ── THE EDGE, REALISED, ONE PER ASKER ──
   #
-  # `capability.realise` hands back what ../base/capability-types.nix's
+  # `den.lib.capability.realise` hands back what ../base/capability-types.nix's
   # `credential` definition says a credential IS: the two accounts and the two
   # scope entries. Computed here because both ends are aspects and the whole
   # thing is a function of declarations -- no host fixpoint, and no `config`.
@@ -60,7 +59,7 @@ let
     host:
     lib.mapAttrs (
       _: t:
-      capability.realise "oidc" {
+      den.lib.capability.realise "oidc" {
         giver = den.aspects.kanidm;
         taker = t.aspect;
         # THE TAKER'S OWN HOST, not kanidm's. A credential materialised for a
@@ -122,7 +121,7 @@ let
   # Who asked for the directory. `takersReaching`, for the reason `oidcTakers`
   # gives above: kanidm is `reach = "household"`, so a consumer on another box
   # in the household still needs its account provisioned here.
-  ldapTakers = host: capability.takersReaching den.aspects.kanidm "ldap" host;
+  ldapTakers = host: den.lib.capability.takersReaching den.aspects.kanidm "ldap" host;
 
   # The kanidm APPLICATION a consumer's people hold a password for, where it
   # named one. Read off the taker's own declaration rather than passed through
@@ -491,11 +490,13 @@ in
         # over `takers`, not the `{ aspect; host; }` records `takersReaching`
         # builds. The two are easy to confuse and the symptom is
         # "attribute 'aspect' missing" from whichever consumer guessed.
-        handedOff = lib.filterAttrs (_: a: tokenPathFor a != null) (capability.takersOn host "ldap");
+        handedOff = lib.filterAttrs (_: a: tokenPathFor a != null) (
+          den.lib.capability.takersOn host "ldap"
+        );
 
         # The oidc askers, keyed by name, carrying `{ aspect; host; }`. Bound
         # here because `gateway.oidcClients` below needs the TAKE and
-        # `capability.realise` does not carry one -- see the note there.
+        # `den.lib.capability.realise` does not carry one -- see the note there.
         oidcHere = oidcTakers host;
       in
       {
@@ -635,7 +636,7 @@ in
         # required one at once.
         #
         # It went unnoticed because nothing takes `oidc` yet: measured,
-        # `capability.takers "oidc"` is empty, so this `mapAttrs` has always run
+        # `den.lib.capability.takers "oidc"` is empty, so this `mapAttrs` has always run
         # over `{ }` and never produced an entry to typecheck. A derived
         # registration that no consumer exercises is indistinguishable from a
         # correct one.
@@ -645,7 +646,7 @@ in
         # it here was a second definition of one fact.
         # ── THE TAKE COMES FROM THE TAKERS, NOT FROM `realise` ──
         #
-        # `capability.realise` returns `{ giver; scope; secrets; taker }` and no
+        # `den.lib.capability.realise` returns `{ giver; scope; secrets; taker }` and no
         # `take` -- measured. So `r.take.callback or ""` would have fired the
         # `or` on a MISSING attribute and registered every client with an empty
         # redirect path: the same trap that has now cost this repo six bugs
@@ -662,7 +663,7 @@ in
             # base shape -- measured: a probe aspect setting only `callback`
             # produced a take with `callback` and no `displayName`, although
             # both are declared taker options. Defaults materialise through
-            # `capability.contributions`, not here.
+            # `den.lib.capability.contributions`, not here.
             #
             # So these attributes are genuinely ABSENT rather than null, which
             # is exactly the case `or` answers. The bug it keeps causing is the
@@ -736,7 +737,7 @@ in
         systemd.services = lib.mapAttrs' (
           _: aspect:
           let
-            account = capability.linkFor aspect "user" {
+            account = den.lib.capability.linkFor aspect "user" {
               inherit host;
               peer = aspect;
             };

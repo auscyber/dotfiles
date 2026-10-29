@@ -2,7 +2,6 @@
   lib,
   den,
   caps,
-  capability,
   checkLib,
   ...
 }:
@@ -25,7 +24,7 @@
 #     which icon names it, which section it belongs in: homepage knows none of
 #     that about plex, and a `taker.options` block holding all of it would be
 #     the current forward class under a new name.
-#   * `capability.contributions` folds a per-taker contribution into ONE
+#   * `den.lib.capability.contributions` folds a per-taker contribution into ONE
 #     value per taker, so a take could not carry a tile that is not named after
 #     the taking aspect -- and the tile's whole point is provenance.
 #
@@ -111,11 +110,11 @@ let
     in
     lib.mapAttrs (
       _: aspect:
-      capability.linkFor aspect "homepage-widget" {
+      den.lib.capability.linkFor aspect "homepage-widget" {
         host = h;
         peer = den.aspects.homepage;
       }
-    ) (capability.providersFor h "homepage-widget");
+    ) (den.lib.capability.providersFor h "homepage-widget");
 
   # ── THE API KEY STAYS AN EDGE ──
   #
@@ -224,7 +223,7 @@ let
       let
         c = containerOf m;
         # Every page is this one aspect; which one is the entity it runs on.
-        d = capability.dial "tcp" {
+        d = den.lib.capability.dial "tcp" {
           name = "homepage-page";
           where = cand: (cand.host.name or c) == c;
         } h;
@@ -317,7 +316,7 @@ in
     description = "Every member of a household served by homepage has a page of their own -- a container the router can dial, one kanidm account name each.";
     findings = lib.concatMap (
       h: checkLib.probe (h.name or "?") "homepage pages on ${h.name or "?"}" (pageFindings h)
-    ) (lib.filter (h: h.hasAspect den.aspects.homepage) checkLib.hostEntities);
+    ) (lib.filter (h: den.lib.capability.has h den.aspects.homepage) checkLib.hostEntities);
     fix = "Declare `containers = homepageLib.containersFor household;` on the host; a repeated account name is two people sharing `den.persons.<n>.kanidm.name`.";
   };
 

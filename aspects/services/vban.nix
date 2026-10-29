@@ -1,7 +1,6 @@
 {
   den,
   lib,
-  capability,
   ...
 }:
 # VBAN sender: a line-level input on this host, streamed to a VBAN receiver
@@ -50,7 +49,7 @@ let
   # nothing carries the flow. ../base/capability.nix's `dial` is the two-step:
   # which giver (reach, clauses, preference) and then which carrier between the
   # two boxes.
-  receiverFor = host: capability.dial "udp" receiverTake host;
+  receiverFor = host: den.lib.capability.dial "udp" receiverTake host;
 
   # The rates VBAN's header can encode (module-vban/vban.h `vban_SR`). Anything
   # else is sent with the index that means 44100, so the receiver resamples

@@ -117,9 +117,6 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
-    gen-algebra.url = "github:sini/gen-algebra";
-    gen-bind.url = "github:sini/gen-bind";
-    gen-scope.url = "github:sini/gen-scope";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -1,8 +1,6 @@
 {
   lib,
   den,
-  inputs,
-  capability,
   ...
 }:
 # THE SERVICE LIBRARIES, EVALUATED ONCE AND READ FROM A LIB SCOPE.
@@ -30,15 +28,18 @@ let
   # reason this file exists: ../base/household.nix imported the path directly,
   # so the type -- and the capability queries its derived `endpoints` runs --
   # was constructed per call site.
-  mkHouseholdServiceType = import ../../lib/service-type.nix { inherit lib den capability; };
+  mkHouseholdServiceType = import ../../lib/service-type.nix {
+    inherit lib den;
+    capability = den.lib.capability;
+  };
 
   mkServiceType = import ../../lib/service-dep-type.nix {
     inherit lib den;
-    genScope = inputs.gen-scope.lib;
+    genScope = den.lib.gen.scope;
     # The inheritance merge over `includes`. gen-algebra exposes it as
     # `lib.record`, and the fold the service type needs is `foldLayersTraced` --
     # plain `foldLayers` refuses the "semilattice-set" strategy by name.
-    record = inputs.gen-algebra.lib.record;
+    record = den.lib.gen.algebra.record;
   };
 in
 {

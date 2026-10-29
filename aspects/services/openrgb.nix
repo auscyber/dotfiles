@@ -85,7 +85,7 @@ in
     # answers from whatever the host record currently says:
     #
     #   nix eval --impure --raw .#debug.config --apply 'cfg:
-    #     let cap = cfg._module.args.capability; hs = cfg.den.hosts.x86_64-linux;
+    #     let cap = cfg.den.lib.capability; hs = cfg.den.hosts.x86_64-linux;
     #         l = cap.dial "tcp" { name = "openrgb"; } hs.secondpc;
     #     in "${l.address}:${toString l.ports.sdk.port}"'
     #
