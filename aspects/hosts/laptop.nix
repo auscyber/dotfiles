@@ -396,7 +396,10 @@ in
       name = "celler2";
       gives.cache.main.gives.push = { };
     };
-    study.includes = [ den.aspects.zotero ];
+    study.includes = [
+      den.aspects.zotero
+      den.aspects.obsidian
+    ];
     includes = [
       den.aspects.zig
       den.aspects.homebrew
@@ -490,21 +493,6 @@ in
           git.sign-on-push = true;
         };
 
-        # Laptop SSH hosts + 1Password agent socket. auspc/secondpc come from
-        # den.aspects.vpn-ssh-config (aspects/modules/network/vpn/ssh-config.nix),
-        # pulled in automatically via den.aspects.vpn.includes.
-        programs.ssh.settings = {
-          "faggot.sh" = {
-            hostname = "faggot.sh";
-            user = "ivy";
-            forwardAgent = true;
-          };
-          "imflo.pet" = {
-            hostname = "imflo.pet";
-            user = "ivy";
-            forwardAgent = true;
-          };
-        };
         # macOS per-user defaults carried over from the old home config.
         targets.darwin.defaults.NSGlobalDomain = {
           AppleIconAppearanceCustomTintColor = "0.593048 1.000000 0.728584 0.596341";

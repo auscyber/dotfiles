@@ -350,9 +350,7 @@ let
     )
   ) aspectEntries;
 
-  sameHousehold =
-    a: b:
-    (a.household.name or null) != null && (a.household.name or null) == (b.household.name or null);
+  inherit (den.lib.capability) sameHousehold;
 
   # ── THE EDGES ──
   # K -> H reads "building K's configuration forces H's". A self edge is dropped:

@@ -408,7 +408,12 @@ in
     # since nothing builds or forwards an agent to it -- and no wireguard
     # keypair, which keeps it out of the tunnel peer list and the ssh aliases.
     fleet.external."faggot.sh" = {
-      user = "ivy";
+      # An account with no home here, linked to its person like any other.
+      users.ivy.person = den.persons.ivy;
+      aspects = [
+        den.aspects.openssh
+        den.aspects.tailscale
+      ];
       # ed25519, from `ssh-keyscan faggot.sh`. The box also still offers the
       # ssh-rsa key that is already in ~/.ssh/known_hosts; this is the modern one.
       hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMWQGIJW7xP4ayNXSF0FOMdvpoPb1abvBxftF6L8ajn3";

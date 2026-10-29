@@ -490,7 +490,38 @@ let
   # A container is declared under its host (./container.nix) and is an entity
   # in its own right: something resolves FROM it, and other things reach it.
   # So the universe the resolver searches is the hosts and their containers.
-  hostsOf = hostEntities // lib.concatMapAttrs (_: h: h.containers or { }) hostEntities;
+  hostsOf =
+    hostEntities // lib.concatMapAttrs (_: h: h.containers or { }) hostEntities // externalEntities;
+
+  allHomes = lib.concatMap lib.attrValues (lib.attrValues den.homes);
+
+  # ── MACHINES WE ONLY DIAL ──
+  # A `fleet.external` record is an entity too: nothing resolves on it, so what
+  # it holds is what its record's `aspects` says.
+  externalEntities = lib.mapAttrs (
+    n: r:
+    {
+      users = { };
+      attachments = { };
+      aliases = [ ];
+      household = null;
+      parent = null;
+    }
+    // r
+    // {
+      name = n;
+      id_hash = "external:${n}";
+      # Its accounts: any it states, and the homes that name it as their host.
+      users =
+        r.users or { }
+        // lib.listToAttrs (
+          map (h: lib.nameValuePair h.userName { inherit (h) person; }) (
+            lib.filter (h: lib.elem h.hostName ([ n ] ++ r.aliases or [ ])) allHomes
+          )
+        );
+      hasAspect = a: lib.elem (a.name or null) (map (x: x.name) (r.aspects or [ ]));
+    }
+  ) config.fleet.external;
 
   # ── WHAT AN ENTITY HAS ON ITS OWN ──
   #
@@ -661,9 +692,9 @@ let
 
   sameMachine = a: b: (machineOf a) != null && (machineOf a) == (machineOf b);
 
-  sameHousehold =
-    a: b:
-    (a.household.name or null) != null && (a.household.name or null) == (b.household.name or null);
+  # A container's or user's household is its machine's.
+  householdOf = e: (hostEntities.${runOf e} or e).household.name or null;
+  sameHousehold = a: b: householdOf a != null && householdOf a == householdOf b;
 
   # ── HOW FAR A GIVER REACHES: ONE CONDITION, READ TWICE ──
   #
@@ -1033,7 +1064,14 @@ in
   };
 
   den.lib.capability = rec {
-    inherit providersFor ownLinksFor heldBy;
+    inherit
+      providersFor
+      ownLinksFor
+      heldBy
+      householdOf
+      sameHousehold
+      hostsOf
+      ;
 
     # A giver reading the link it itself furnished, by name -- the supported
     # route, and the one ../services/tempo.nix takes. See `ownLinksFor` above
@@ -1356,11 +1394,7 @@ in
           in
           if cand.sameHost or false then
             "host"
-          else if
-            h != null
-            && (from.household.name or null) != null
-            && (h.household.name or null) == (from.household.name or null)
-          then
+          else if h != null && sameHousehold from h then
             "household"
           else
             "fleet";
@@ -1945,8 +1979,9 @@ in
         serviceAspect = service.aspect;
         serviceHost = service.host;
 
+        # The giver's own host outside, the dialer as `peer`.
         endpoint = endpointHalf serviceAspect cap {
-          host = from;
+          host = serviceHost;
           peer = from;
         };
 

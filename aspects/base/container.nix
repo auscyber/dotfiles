@@ -87,6 +87,29 @@ let
                 defaultText = "den.aspects.<name>";
                 description = "Aspect that configures this container.";
               };
+
+              # One evaluated system per image, not per container: an nspawn
+              # system is a whole eval-config run.
+              image = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                description = "nspawn containers on one host with the same image share one evaluated system; what differs between them comes in through the host's `bindMounts`.";
+              };
+
+              sharesWith = mkOption {
+                type = types.str;
+                readOnly = true;
+                default = lib.head (
+                  lib.sort (a: b: a < b) (
+                    lib.attrNames (
+                      lib.filterAttrs (
+                        n: c: n == name || (config.image != null && c.image == config.image)
+                      ) host.containers
+                    )
+                  )
+                );
+                description = "The container whose evaluated system this one runs: itself, unless an earlier one has its image.";
+              };
             };
 
             # ITS SIDE OF THE BRIDGE ITS RUNTIME HANGS IT OFF, so no container
@@ -155,16 +178,16 @@ let
     let
       tree = treeOf host container;
     in
-    [
-      (provide {
-        class = host.class;
-        path = [
-          "containers"
-          container.name
-          "config"
-        ];
-        module = _: { inherit (runs.${host.name}.${container.name}.run) imports; };
-      })
+    lib.optional (container.sharesWith == container.name) (provide {
+      class = host.class;
+      path = [
+        "containers"
+        container.name
+        "config"
+      ];
+      module = _: { inherit (runs.${host.name}.${container.name}.run) imports; };
+    })
+    ++ [
       # `age.scoped` is attrs of submodules, so the class modules are shifted
       # under it here: each scope collected as a deferred module and imported
       # into the host's scope of that name.
@@ -352,6 +375,11 @@ in
                   isReadOnly = true;
                 }
               ) templates;
+            }
+            // lib.optionalAttrs (container.sharesWith != container.name) {
+              inherit (config.containers.${container.sharesWith}) path;
+            }
+            // lib.optionalAttrs (container.sharesWith == container.name) {
               config = {
                 # The host's view, whose paths the bind mounts above make true
                 # in here too.
@@ -369,6 +397,12 @@ in
               # The host decrypts; nothing in here holds a key.
               // lib.optionalAttrs (den.lib.capability.has container den.aspects.agenix-rekey) {
                 age.enable = lib.mkForce false;
+              }
+              # Shared, so it names no one: the address is set from the host
+              # side at start, and the hostname is nspawn's machine name.
+              // lib.optionalAttrs (container.image != null) {
+                networking.interfaces.eth0.ipv4.addresses = lib.mkForce [ ];
+                networking.hostName = lib.mkForce "";
               };
             };
           };

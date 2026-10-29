@@ -83,6 +83,7 @@ let
   sharedPort = port + 2; # the fallback page, which is the nixpkgs instance
   # Inside each member's container, which has a namespace of its own.
   pagePort = 8082;
+  pageDir = "/srv/homepage";
 
   # ── THE REAL HOST ENTITY, NOT THE PROJECTED ONE ──
   #
@@ -203,6 +204,7 @@ let
       m: _:
       lib.nameValuePair (containerOf m) {
         runtime = "nspawn";
+        image = "homepage-page";
         aspect = den.aspects.homepage-page;
       }
     ) household.members;
@@ -428,13 +430,25 @@ in
         };
       };
     };
-    nixos = {
-      services.homepage-dashboard = {
-        enable = true;
-        listenPort = pagePort;
+    # One image for every member's container: what the page shows is bound in
+    # at `pageDir` by the host (`pageFor` below).
+    nixos =
+      { templates, ... }:
+      {
+        services.homepage-dashboard = {
+          enable = true;
+          listenPort = pagePort;
+        };
+        systemd.services.homepage-dashboard = {
+          environment.HOMEPAGE_CONFIG_DIR = lib.mkForce pageDir;
+          # Read after `environment`, so its `HOMEPAGE_ALLOWED_HOSTS` wins.
+          serviceConfig.EnvironmentFile = lib.mkForce [
+            templates."gateway/account-homepage.env".path
+            "${pageDir}/env"
+          ];
+        };
+        networking.firewall.interfaces.eth0.allowedTCPPorts = [ pagePort ];
       };
-      networking.firewall.interfaces.eth0.allowedTCPPorts = [ pagePort ];
-    };
   };
 
   den.aspects.homepage = {
@@ -601,27 +615,29 @@ in
         # A MEMBER'S PAGE, rendered here and handed to their container: the
         # tiles need this host's gateway urls, and the widget keys are this
         # host's template, bound in read-only at the same path.
+        yaml = (pkgs.formats.yaml { }).generate;
+        pageFiles =
+          pg:
+          pkgs.linkFarm "homepage-page-${pg.member}" (
+            {
+              "custom.css" = pkgs.writeText "custom.css" sharedCfg.customCSS;
+              "custom.js" = pkgs.writeText "custom.js" sharedCfg.customJS;
+              env = pkgs.writeText "env" "HOMEPAGE_ALLOWED_HOSTS=homepage.${config.gateway.domain},${pg.address}:${toString pg.port}\n";
+              "services.yaml" = yaml "services.yaml" (servicesFor [ pg.member ]);
+              "settings.yaml" = yaml "settings.yaml" (sharedCfg.settings // { title = pg.title; });
+            }
+            // lib.genAttrs' [ "bookmarks" "docker" "kubernetes" "proxmox" "widgets" ] (
+              n: lib.nameValuePair "${n}.yaml" (yaml "${n}.yaml" sharedCfg.${n})
+            )
+          );
         pageFor = pg: {
           bindMounts.${toString envFile} = {
             hostPath = toString envFile;
             isReadOnly = true;
           };
-          config.services.homepage-dashboard = {
-            environmentFile = envFile;
-            allowedHosts = "homepage.${config.gateway.domain},${pg.address}:${toString pg.port}";
-            services = servicesFor [ pg.member ];
-            settings = sharedCfg.settings // {
-              title = pg.title;
-            };
-            inherit (sharedCfg)
-              widgets
-              bookmarks
-              docker
-              kubernetes
-              proxmox
-              customCSS
-              customJS
-              ;
+          bindMounts.${pageDir} = {
+            hostPath = "${pageFiles pg}";
+            isReadOnly = true;
           };
         };
 

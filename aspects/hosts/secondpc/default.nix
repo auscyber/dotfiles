@@ -132,7 +132,7 @@ in
     builder = {
       ipAddress = "10.100.0.1";
       systems = [ "x86_64-linux" ];
-      maxJobs = 5;
+      maxJobs = 2;
       speedFactor = 5;
       features = [
         "big-parallel"
@@ -340,6 +340,13 @@ in
           "net.ipv6.conf.all.accept_ra" = 2;
           "net.ipv6.conf.all.accept_redirects" = 1;
           "net.ipv6.conf.all.accept_source_route" = 1;
+        };
+
+        # 15G, no swap, and the service stack resident: builds get OOM-killed.
+        zramSwap.enable = true;
+        nix.settings = {
+          max-jobs = 2;
+          cores = 2;
         };
 
         # Disk layout (disko + disko-zfs). Two SATA disks:

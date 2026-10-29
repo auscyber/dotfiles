@@ -1,4 +1,12 @@
 { den, lib, ... }:
+let
+  # home-manager's `services.gpg-agent` paths. Linux's is per uid; 1000 is the
+  # first normal user's.
+  agentSocket = {
+    darwin = "/private/var/run/org.nix-community.home.gpg-agent/S.gpg-agent";
+    nixos = "/run/user/1000/gnupg/S.gpg-agent";
+  };
+in
 # ── SSH AS A CAPABILITY ──
 #
 # It was `services.openssh.enable = true` and nothing else, while three other
@@ -27,9 +35,36 @@
     includes = [ den.capabilities.tcp ];
 
     options = {
+      # Never a host-wide default: whoever dials lands in their own account.
       user = lib.mkOption {
-        type = lib.types.str;
-        description = "The account a client connects as by default.";
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "The account of the dialing entity's person on this host. Null for a dialer with no person, or a person with no account here.";
+      };
+
+      accounts = lib.mkOption {
+        type = lib.types.attrsOf (
+          lib.types.submodule {
+            options = {
+              user = lib.mkOption {
+                type = lib.types.str;
+                description = "The account name.";
+              };
+              gpgAgentSocket = lib.mkOption {
+                type = lib.types.str;
+                description = "Where that account's gpg-agent listens, for a client's `RemoteForward`.";
+              };
+            };
+          }
+        );
+        default = { };
+        description = "Each person's account on this host, keyed by person name.";
+      };
+
+      aliases = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "Other names a client may call this host by.";
       };
 
       hostKey = lib.mkOption {
@@ -50,7 +85,11 @@
     # refused -- it reads as `No route to host` on 22 while 80 and 443 stay
     # open. So it runs last, only once the cheap probes pass, and `BatchMode`
     # keeps it from ever prompting.
-    probe = { link, ... }: "ssh -o BatchMode=yes -o ConnectTimeout=5 ${link.user}@${link.address} true";
+    probe =
+      { link, ... }:
+      "ssh -o BatchMode=yes -o ConnectTimeout=5 ${
+        lib.optionalString (link.user != null) "${link.user}@"
+      }${link.address} true";
   };
 
   den.aspects.openssh = {
@@ -67,15 +106,28 @@
         ...
       }:
       {
-        ssh = _: {
-          name = self.name;
-          ports.ssh = {
-            port = 22;
-            meta.description = "sshd. Who may reach it is resolution's answer, not a hand-opened hole.";
+        ssh =
+          {
+            peer ? { },
+            ...
+          }:
+          rec {
+            name = self.name;
+            ports.ssh = {
+              port = 22;
+              meta.description = "sshd. Who may reach it is resolution's answer, not a hand-opened hole.";
+            };
+            accounts = lib.mapAttrs' (
+              n: u:
+              lib.nameValuePair u.person.name {
+                user = n;
+                gpgAgentSocket = agentSocket.${host.class or "nixos"} or agentSocket.nixos;
+              }
+            ) (lib.filterAttrs (_: u: (u.person or null) != null) (host.users or { }));
+            user = accounts.${(peer.person or { }).name or ""}.user or null;
+            aliases = host.aliases or [ ];
+            hostKey = host.hostPublicKey or null;
           };
-          user = host.user or "root";
-          hostKey = host.hostPublicKey or null;
-        };
       };
 
     # ANY host in the fleet may dial it; who may actually log in is the

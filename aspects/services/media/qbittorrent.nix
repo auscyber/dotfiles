@@ -89,10 +89,6 @@ in
       # the caller's key and then STRIPS it, and qbittorrent is left trusting
       # loopback via LocalHostAuth below -- nginx is the only path to it, so the
       # gate is the same, without a secret in the store.
-      # qBittorrent.conf is installed read-only (see serverConfig below), so the
-      # settings dialog silently discards everything typed into it. Say so in
-      # the UI rather than letting it look like it worked.
-      banner = "Read-only - qBittorrent's settings are declared in Nix; changes made here are discarded";
     };
 
     # ── NGINX-SPECIFIC, SO DECLARED AS SUCH ──
@@ -113,6 +109,10 @@ in
         headerPrefix = "Bearer ";
         internalKey = false;
       };
+      # qBittorrent.conf is installed read-only (see serverConfig below), so the
+      # settings dialog silently discards everything typed into it. Say so in
+      # the UI rather than letting it look like it worked.
+      banner = "Read-only - qBittorrent's settings are declared in Nix; changes made here are discarded";
     };
 
     nixos = { config, ... }: {

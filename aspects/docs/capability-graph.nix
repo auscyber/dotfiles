@@ -144,9 +144,7 @@ let
   # set of givers PLACED somewhere but out of reach (so an unresolvable take
   # says which machines could have answered it), and the `reachOverride`
   # what-if below.
-  sameHousehold =
-    a: b:
-    (a.household.name or null) != null && (a.household.name or null) == (b.household.name or null);
+  inherit (den.lib.capability) sameHousehold;
 
   inReach =
     reach: from: on:

@@ -31,11 +31,6 @@
         ssh = {
           enable = true;
           enableDefaultConfig = false;
-          settings = {
-            "imflo.pet" = {
-              forwardAgent = true;
-            };
-          };
         };
         direnv = {
           enable = true;

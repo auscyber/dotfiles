@@ -437,10 +437,11 @@ in
         # for every pair in the tunnel, so they are carrier facts rather than
         # halves of a relation -- ./carrier-attachment.nix's roster reads the
         # one declaration instead of restating them.
+        # A stated address wins: an external's tailnet name is not its key.
         tcp =
           { peer, host, ... }:
           {
-            address = nameOf peer;
+            address = lib.defaultTo (nameOf peer) (peer.attachments.tailscale.address or null);
             interface = ifaceFor host;
             inherit (self) mtu maxBodyBytes;
             # No `carrier`: derived from this aspect (../base/capability.nix).
@@ -448,7 +449,7 @@ in
         udp =
           { peer, host, ... }:
           {
-            address = nameOf peer;
+            address = lib.defaultTo (nameOf peer) (peer.attachments.tailscale.address or null);
             interface = ifaceFor host;
             inherit (self) mtu maxBodyBytes;
             # No `carrier`: derived from this aspect (../base/capability.nix).

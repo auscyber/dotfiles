@@ -239,6 +239,822 @@
         },
         "version": "18861f9d59e74ece8d867772cf07fa302c2dae98"
     },
+    "obsidian-colored-bases-properties-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-colored-bases-properties-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-6eEiz+T5qDJ1RGn3IHHdRDV2IxYegYD5jHpcgYh0K5k=",
+            "type": "url",
+            "url": "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/main.js"
+        },
+        "version": "0.3.7"
+    },
+    "obsidian-colored-bases-properties-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-colored-bases-properties-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-nKd2p6clEHfxOLvYj9Z6dNU59Y5sON8JhXNBrpBEkSI=",
+            "type": "url",
+            "url": "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/manifest.json"
+        },
+        "version": "0.3.7"
+    },
+    "obsidian-colored-bases-properties-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-colored-bases-properties-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Y5mn9RKhH0TwwdurXENqD6n46HFKr93ACMHagn0lPRg=",
+            "type": "url",
+            "url": "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/styles.css"
+        },
+        "version": "0.3.7"
+    },
+    "obsidian-dataview-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-dataview-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-a7HPcBCvrYMOc1dfyg4r+9MnnFYuPZ0k8tL0UWHrfQA=",
+            "type": "url",
+            "url": "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/main.js"
+        },
+        "version": "0.5.70"
+    },
+    "obsidian-dataview-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-dataview-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-kjXbRxEtqBuFWRx57LmuJXTl5yIHBW6XZHL5BhYoYYU=",
+            "type": "url",
+            "url": "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/manifest.json"
+        },
+        "version": "0.5.70"
+    },
+    "obsidian-dataview-properties-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-dataview-properties-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-unQqpxyC+IuvWpCzN0pdOqDKY4I1k/Dv2D1h9TxNZ/0=",
+            "type": "url",
+            "url": "https://github.com/mara-li/obsidian-dataview-properties/releases/download/1.0.2/main.js"
+        },
+        "version": "1.0.2"
+    },
+    "obsidian-dataview-properties-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-dataview-properties-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-u7Zh7PHO6uDD5WsmGFn/OgTtQG9s5lbKAcgywxW7JFM=",
+            "type": "url",
+            "url": "https://github.com/mara-li/obsidian-dataview-properties/releases/download/1.0.2/manifest.json"
+        },
+        "version": "1.0.2"
+    },
+    "obsidian-dataview-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-dataview-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-MwbdkDLgD5ibpyM6N/0lW8TT9DQM7mYXYulS8/aqHek=",
+            "type": "url",
+            "url": "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/styles.css"
+        },
+        "version": "0.5.70"
+    },
+    "obsidian-editing-toolbar-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-editing-toolbar-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-MOoz/N0/EI1jwgkSz8baP8Xq8567NLGmm2dq1yqkVjQ=",
+            "type": "url",
+            "url": "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/main.js"
+        },
+        "version": "4.1.11"
+    },
+    "obsidian-editing-toolbar-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-editing-toolbar-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-jObjIasISGu8w7KqtRhIS2f65sUNNglv1oKeu7rfwxU=",
+            "type": "url",
+            "url": "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/manifest.json"
+        },
+        "version": "4.1.11"
+    },
+    "obsidian-editing-toolbar-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-editing-toolbar-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-uEc/r/EnJ5TMQRr/WcybY8H3G58gnvH4nbVpYLTFvlw=",
+            "type": "url",
+            "url": "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/styles.css"
+        },
+        "version": "4.1.11"
+    },
+    "obsidian-folder-notes-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-folder-notes-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-g9e5GBmrrDliY0nBsgrvJQOny0M5M01SEVZQrsARohY=",
+            "type": "url",
+            "url": "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/main.js"
+        },
+        "version": "1.8.26"
+    },
+    "obsidian-folder-notes-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-folder-notes-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-1ocEy3h/toej1iYad+k9OclAnvHatON7/Gem+WtJNTY=",
+            "type": "url",
+            "url": "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/manifest.json"
+        },
+        "version": "1.8.26"
+    },
+    "obsidian-folder-notes-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-folder-notes-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-xzZzKIDHc3ow9xPVSW82YSpPZMzpa6sDFTl84UuXX2s=",
+            "type": "url",
+            "url": "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/styles.css"
+        },
+        "version": "1.8.26"
+    },
+    "obsidian-js-engine-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-js-engine-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-NU2p/pHqillUvuvXS+pvPaw+eJfhyLHROlG1xpHCnQw=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/main.js"
+        },
+        "version": "0.4.0"
+    },
+    "obsidian-js-engine-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-js-engine-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-zv73crfieg8wO3LuOFjbhM6IevEPZHte9bTiyQ7Vu8E=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/manifest.json"
+        },
+        "version": "0.4.0"
+    },
+    "obsidian-js-engine-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-js-engine-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-kjuI4gNAMTiDUUF/gEw5d4T2FkhOVSr6WoYWMfsK+bY=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/styles.css"
+        },
+        "version": "0.4.0"
+    },
+    "obsidian-make-md-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-make-md-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-cgcCiHjHTgv04hmnirK5ad/2WcrpwGbPcCf3yTuTUmc=",
+            "type": "url",
+            "url": "https://github.com/make-md/makemd/releases/download/1.3.5/main.js"
+        },
+        "version": "1.3.5"
+    },
+    "obsidian-make-md-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-make-md-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-GM4UMsuH5LbuSOuRWDyKEcUNtZpg5RfN3E8VimGCWTQ=",
+            "type": "url",
+            "url": "https://github.com/make-md/makemd/releases/download/1.3.5/manifest.json"
+        },
+        "version": "1.3.5"
+    },
+    "obsidian-make-md-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-make-md-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-3dLABwS6VOiZ73/qdd34/m+Dj1bIGc/GlpTE+/pMGcU=",
+            "type": "url",
+            "url": "https://github.com/make-md/makemd/releases/download/1.3.5/styles.css"
+        },
+        "version": "1.3.5"
+    },
+    "obsidian-notion-bases-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-notion-bases-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-sbbpg7qXLN5GE5XQw4kRzixPTlOVO4oY+HSAHe3Y6JM=",
+            "type": "url",
+            "url": "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/main.js"
+        },
+        "version": "1.13.0"
+    },
+    "obsidian-notion-bases-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-notion-bases-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-DJpqI3CTJZrFakvrrd2FRV5Re0mS0UASBWu8BeYMpGo=",
+            "type": "url",
+            "url": "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/manifest.json"
+        },
+        "version": "1.13.0"
+    },
+    "obsidian-notion-bases-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-notion-bases-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-st5IIw39ZY/sFRbjTixn6Q4i1yuV96XjUZ5m9xBF3Ok=",
+            "type": "url",
+            "url": "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/styles.css"
+        },
+        "version": "1.13.0"
+    },
+    "obsidian-obsidian-git-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-git-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-SW2xSLzqQWn0VeI0uwLwj4xQwxfArVr947J8CQTa8TM=",
+            "type": "url",
+            "url": "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/main.js"
+        },
+        "version": "2.42.0"
+    },
+    "obsidian-obsidian-git-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-git-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-etmOjM4VfphGtHlBxqfLmwIrydXG0ReCKQ56ehZLRw0=",
+            "type": "url",
+            "url": "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/manifest.json"
+        },
+        "version": "2.42.0"
+    },
+    "obsidian-obsidian-git-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-git-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-8wrSykL+/jtwTFSPd0fShcIDj6TOkGAeaP5v1mBJQFI=",
+            "type": "url",
+            "url": "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/styles.css"
+        },
+        "version": "2.42.0"
+    },
+    "obsidian-obsidian-meta-bind-plugin-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-meta-bind-plugin-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-0yi/qk0fSCWQdLKPJJqfkR6jQyfn4RI9ih8q/D6XhLM=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/main.js"
+        },
+        "version": "1.5.1"
+    },
+    "obsidian-obsidian-meta-bind-plugin-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-meta-bind-plugin-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-PB3/HjaheBGFHzx0Rrh1z5ASiLcyYcrqYbwNRA08QyU=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/manifest.json"
+        },
+        "version": "1.5.1"
+    },
+    "obsidian-obsidian-meta-bind-plugin-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-obsidian-meta-bind-plugin-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-lwaeGDIkxVQo/guYPUJDWqLNSsFND1AYYTi0dRrVXWE=",
+            "type": "url",
+            "url": "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/styles.css"
+        },
+        "version": "1.5.1"
+    },
+    "obsidian-omnisearch-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-omnisearch-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-JzTWTU5IN3P3kh/QcQBzUZVF9yyJ9yyqnpaz6useleo=",
+            "type": "url",
+            "url": "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/main.js"
+        },
+        "version": "1.32.0"
+    },
+    "obsidian-omnisearch-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-omnisearch-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Dkj4envOImw5h4J2D1LAuJKqo5bNWnYvSKIAx+d5Ah8=",
+            "type": "url",
+            "url": "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/manifest.json"
+        },
+        "version": "1.32.0"
+    },
+    "obsidian-omnisearch-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-omnisearch-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-xqVrGhj/hn8S67s6E5BgoklwQoHhtEkAP/SHlpYhouY=",
+            "type": "url",
+            "url": "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/styles.css"
+        },
+        "version": "1.32.0"
+    },
+    "obsidian-pretty-properties-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-pretty-properties-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-wlgUq+jGF3SYDgr2sn/waTwMMjl1EnJWE29d+TgejCM=",
+            "type": "url",
+            "url": "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/main.js"
+        },
+        "version": "2.3.1"
+    },
+    "obsidian-pretty-properties-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-pretty-properties-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Y5+uI6+RZIkiBtH8fUbZOphmU8KofoqMYe3iFHMpZRM=",
+            "type": "url",
+            "url": "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/manifest.json"
+        },
+        "version": "2.3.1"
+    },
+    "obsidian-pretty-properties-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-pretty-properties-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-4XDTbOTovHsesC9I+WUthzq/hW4pVDf1yoPFXD+xaOY=",
+            "type": "url",
+            "url": "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/styles.css"
+        },
+        "version": "2.3.1"
+    },
+    "obsidian-realclaudian-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-realclaudian-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-OgxS+tmI60wtrM3DfmRswsjU2AHT0haAusjbSbmfUss=",
+            "type": "url",
+            "url": "https://github.com/yishentu/claudian/releases/download/2.3.36/main.js"
+        },
+        "version": "2.3.36"
+    },
+    "obsidian-realclaudian-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-realclaudian-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Akkj5JyDd6s8FRaLUbfjZEjJotPWlct6GEdHSgbTqnA=",
+            "type": "url",
+            "url": "https://github.com/yishentu/claudian/releases/download/2.3.36/manifest.json"
+        },
+        "version": "2.3.36"
+    },
+    "obsidian-realclaudian-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-realclaudian-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-OawopNtwqvkIOP0WO0eoSFHmHsniFfB/V1vT2vFtB74=",
+            "type": "url",
+            "url": "https://github.com/yishentu/claudian/releases/download/2.3.36/styles.css"
+        },
+        "version": "2.3.36"
+    },
+    "obsidian-sqlite-db-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-sqlite-db-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-cywhNfUf6g3eGkqAg5Oi3m2decOg93BAZYHBEcArxzI=",
+            "type": "url",
+            "url": "https://github.com/stfrigerio/sqliteDB/releases/download/1.0.3/main.js"
+        },
+        "version": "1.0.3"
+    },
+    "obsidian-sqlite-db-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-sqlite-db-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-h1iCGT9jx/rVUBE9SSBaRoJWtGo0t7pzKo3z0+BotOs=",
+            "type": "url",
+            "url": "https://github.com/stfrigerio/sqliteDB/releases/download/1.0.3/manifest.json"
+        },
+        "version": "1.0.3"
+    },
+    "obsidian-table-editor-obsidian-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-table-editor-obsidian-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-z13U3b3evvaMyZzZOog+M4lcfxI9BLxdEQbqbjOLp5E=",
+            "type": "url",
+            "url": "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/main.js"
+        },
+        "version": "0.23.2"
+    },
+    "obsidian-table-editor-obsidian-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-table-editor-obsidian-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-aYtPd0ReB9iH8zRQ6vUzoo4Jm3tIP2QvqIM2L/vY/+k=",
+            "type": "url",
+            "url": "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/manifest.json"
+        },
+        "version": "0.23.2"
+    },
+    "obsidian-table-editor-obsidian-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-table-editor-obsidian-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-I/ow128Rf9PRYkxMLm3e2r+AmSOZawU0iV+CVOpqOfc=",
+            "type": "url",
+            "url": "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/styles.css"
+        },
+        "version": "0.23.2"
+    },
+    "obsidian-tag-wrangler-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-tag-wrangler-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-85C/E1E1AzyyuEhUOK9C77mT3dkyVawINgFuES7pqyA=",
+            "type": "url",
+            "url": "https://github.com/pjeby/tag-wrangler/releases/download/0.6.5/main.js"
+        },
+        "version": "0.6.5"
+    },
+    "obsidian-tag-wrangler-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-tag-wrangler-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-JxqT5gWwn2iftLBa8fc/UIDgh2/CR2NeT+niwtiK2pY=",
+            "type": "url",
+            "url": "https://github.com/pjeby/tag-wrangler/releases/download/0.6.5/manifest.json"
+        },
+        "version": "0.6.5"
+    },
+    "obsidian-templater-obsidian-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-templater-obsidian-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Cs1Fz9s6czfivvURaZvB+BncZGRa00gN8zV51C0ty6o=",
+            "type": "url",
+            "url": "https://github.com/silentvoid13/Templater/releases/download/2.26.0/main.js"
+        },
+        "version": "2.26.0"
+    },
+    "obsidian-templater-obsidian-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-templater-obsidian-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-kcn6hRAIL/+gs9AiqsSYbjs5IpWxEm6Efq1+1yiRabg=",
+            "type": "url",
+            "url": "https://github.com/silentvoid13/Templater/releases/download/2.26.0/manifest.json"
+        },
+        "version": "2.26.0"
+    },
+    "obsidian-templater-obsidian-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-templater-obsidian-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-Z6bdLR1t7coSh8M0yohOxBlkM/ccpHOIoL0+rBTPi18=",
+            "type": "url",
+            "url": "https://github.com/silentvoid13/Templater/releases/download/2.26.0/styles.css"
+        },
+        "version": "2.26.0"
+    },
+    "obsidian-zotlit-main": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-zotlit-main",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-TRiu/bsSvtWoy7YSbO0ubd7Ul5oJG69iXbQPEeKMRnU=",
+            "type": "url",
+            "url": "https://github.com/aidenlx/zotlit/releases/download/2.2.0/main.js"
+        },
+        "version": "2.2.0"
+    },
+    "obsidian-zotlit-manifest": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-zotlit-manifest",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-p3PN+zeRlNYHsRfUI/r8xBfvYIHlic9+p/2K0KRAakY=",
+            "type": "url",
+            "url": "https://github.com/aidenlx/zotlit/releases/download/2.2.0/manifest.json"
+        },
+        "version": "2.2.0"
+    },
+    "obsidian-zotlit-styles": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "obsidian-zotlit-styles",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "name": null,
+            "sha256": "sha256-+1598dDafDbti/vF75/MgjukobIb8GCNDbEDGgozS6s=",
+            "type": "url",
+            "url": "https://github.com/aidenlx/zotlit/releases/download/2.2.0/styles.css"
+        },
+        "version": "2.2.0"
+    },
     "pam_rssh": {
         "cargoLock": {
             "Cargo.lock": [

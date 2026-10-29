@@ -141,6 +141,414 @@
     };
     date = "2026-03-11";
   };
+  obsidian-colored-bases-properties-main = {
+    pname = "obsidian-colored-bases-properties-main";
+    version = "0.3.7";
+    src = fetchurl {
+      url = "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/main.js";
+      sha256 = "sha256-6eEiz+T5qDJ1RGn3IHHdRDV2IxYegYD5jHpcgYh0K5k=";
+    };
+  };
+  obsidian-colored-bases-properties-manifest = {
+    pname = "obsidian-colored-bases-properties-manifest";
+    version = "0.3.7";
+    src = fetchurl {
+      url = "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/manifest.json";
+      sha256 = "sha256-nKd2p6clEHfxOLvYj9Z6dNU59Y5sON8JhXNBrpBEkSI=";
+    };
+  };
+  obsidian-colored-bases-properties-styles = {
+    pname = "obsidian-colored-bases-properties-styles";
+    version = "0.3.7";
+    src = fetchurl {
+      url = "https://github.com/rafjaf/obsidian-colored-bases-properties/releases/download/0.3.7/styles.css";
+      sha256 = "sha256-Y5mn9RKhH0TwwdurXENqD6n46HFKr93ACMHagn0lPRg=";
+    };
+  };
+  obsidian-dataview-main = {
+    pname = "obsidian-dataview-main";
+    version = "0.5.70";
+    src = fetchurl {
+      url = "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/main.js";
+      sha256 = "sha256-a7HPcBCvrYMOc1dfyg4r+9MnnFYuPZ0k8tL0UWHrfQA=";
+    };
+  };
+  obsidian-dataview-manifest = {
+    pname = "obsidian-dataview-manifest";
+    version = "0.5.70";
+    src = fetchurl {
+      url = "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/manifest.json";
+      sha256 = "sha256-kjXbRxEtqBuFWRx57LmuJXTl5yIHBW6XZHL5BhYoYYU=";
+    };
+  };
+  obsidian-dataview-properties-main = {
+    pname = "obsidian-dataview-properties-main";
+    version = "1.0.2";
+    src = fetchurl {
+      url = "https://github.com/mara-li/obsidian-dataview-properties/releases/download/1.0.2/main.js";
+      sha256 = "sha256-unQqpxyC+IuvWpCzN0pdOqDKY4I1k/Dv2D1h9TxNZ/0=";
+    };
+  };
+  obsidian-dataview-properties-manifest = {
+    pname = "obsidian-dataview-properties-manifest";
+    version = "1.0.2";
+    src = fetchurl {
+      url = "https://github.com/mara-li/obsidian-dataview-properties/releases/download/1.0.2/manifest.json";
+      sha256 = "sha256-u7Zh7PHO6uDD5WsmGFn/OgTtQG9s5lbKAcgywxW7JFM=";
+    };
+  };
+  obsidian-dataview-styles = {
+    pname = "obsidian-dataview-styles";
+    version = "0.5.70";
+    src = fetchurl {
+      url = "https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.70/styles.css";
+      sha256 = "sha256-MwbdkDLgD5ibpyM6N/0lW8TT9DQM7mYXYulS8/aqHek=";
+    };
+  };
+  obsidian-editing-toolbar-main = {
+    pname = "obsidian-editing-toolbar-main";
+    version = "4.1.11";
+    src = fetchurl {
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/main.js";
+      sha256 = "sha256-MOoz/N0/EI1jwgkSz8baP8Xq8567NLGmm2dq1yqkVjQ=";
+    };
+  };
+  obsidian-editing-toolbar-manifest = {
+    pname = "obsidian-editing-toolbar-manifest";
+    version = "4.1.11";
+    src = fetchurl {
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/manifest.json";
+      sha256 = "sha256-jObjIasISGu8w7KqtRhIS2f65sUNNglv1oKeu7rfwxU=";
+    };
+  };
+  obsidian-editing-toolbar-styles = {
+    pname = "obsidian-editing-toolbar-styles";
+    version = "4.1.11";
+    src = fetchurl {
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/styles.css";
+      sha256 = "sha256-uEc/r/EnJ5TMQRr/WcybY8H3G58gnvH4nbVpYLTFvlw=";
+    };
+  };
+  obsidian-folder-notes-main = {
+    pname = "obsidian-folder-notes-main";
+    version = "1.8.26";
+    src = fetchurl {
+      url = "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/main.js";
+      sha256 = "sha256-g9e5GBmrrDliY0nBsgrvJQOny0M5M01SEVZQrsARohY=";
+    };
+  };
+  obsidian-folder-notes-manifest = {
+    pname = "obsidian-folder-notes-manifest";
+    version = "1.8.26";
+    src = fetchurl {
+      url = "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/manifest.json";
+      sha256 = "sha256-1ocEy3h/toej1iYad+k9OclAnvHatON7/Gem+WtJNTY=";
+    };
+  };
+  obsidian-folder-notes-styles = {
+    pname = "obsidian-folder-notes-styles";
+    version = "1.8.26";
+    src = fetchurl {
+      url = "https://github.com/lostpaul/obsidian-folder-notes/releases/download/1.8.26/styles.css";
+      sha256 = "sha256-xzZzKIDHc3ow9xPVSW82YSpPZMzpa6sDFTl84UuXX2s=";
+    };
+  };
+  obsidian-js-engine-main = {
+    pname = "obsidian-js-engine-main";
+    version = "0.4.0";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/main.js";
+      sha256 = "sha256-NU2p/pHqillUvuvXS+pvPaw+eJfhyLHROlG1xpHCnQw=";
+    };
+  };
+  obsidian-js-engine-manifest = {
+    pname = "obsidian-js-engine-manifest";
+    version = "0.4.0";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/manifest.json";
+      sha256 = "sha256-zv73crfieg8wO3LuOFjbhM6IevEPZHte9bTiyQ7Vu8E=";
+    };
+  };
+  obsidian-js-engine-styles = {
+    pname = "obsidian-js-engine-styles";
+    version = "0.4.0";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-js-engine-plugin/releases/download/0.4.0/styles.css";
+      sha256 = "sha256-kjuI4gNAMTiDUUF/gEw5d4T2FkhOVSr6WoYWMfsK+bY=";
+    };
+  };
+  obsidian-make-md-main = {
+    pname = "obsidian-make-md-main";
+    version = "1.3.5";
+    src = fetchurl {
+      url = "https://github.com/make-md/makemd/releases/download/1.3.5/main.js";
+      sha256 = "sha256-cgcCiHjHTgv04hmnirK5ad/2WcrpwGbPcCf3yTuTUmc=";
+    };
+  };
+  obsidian-make-md-manifest = {
+    pname = "obsidian-make-md-manifest";
+    version = "1.3.5";
+    src = fetchurl {
+      url = "https://github.com/make-md/makemd/releases/download/1.3.5/manifest.json";
+      sha256 = "sha256-GM4UMsuH5LbuSOuRWDyKEcUNtZpg5RfN3E8VimGCWTQ=";
+    };
+  };
+  obsidian-make-md-styles = {
+    pname = "obsidian-make-md-styles";
+    version = "1.3.5";
+    src = fetchurl {
+      url = "https://github.com/make-md/makemd/releases/download/1.3.5/styles.css";
+      sha256 = "sha256-3dLABwS6VOiZ73/qdd34/m+Dj1bIGc/GlpTE+/pMGcU=";
+    };
+  };
+  obsidian-notion-bases-main = {
+    pname = "obsidian-notion-bases-main";
+    version = "1.13.0";
+    src = fetchurl {
+      url = "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/main.js";
+      sha256 = "sha256-sbbpg7qXLN5GE5XQw4kRzixPTlOVO4oY+HSAHe3Y6JM=";
+    };
+  };
+  obsidian-notion-bases-manifest = {
+    pname = "obsidian-notion-bases-manifest";
+    version = "1.13.0";
+    src = fetchurl {
+      url = "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/manifest.json";
+      sha256 = "sha256-DJpqI3CTJZrFakvrrd2FRV5Re0mS0UASBWu8BeYMpGo=";
+    };
+  };
+  obsidian-notion-bases-styles = {
+    pname = "obsidian-notion-bases-styles";
+    version = "1.13.0";
+    src = fetchurl {
+      url = "https://github.com/bgarciamoura/obsidian-notion-bases-plugin/releases/download/1.13.0/styles.css";
+      sha256 = "sha256-st5IIw39ZY/sFRbjTixn6Q4i1yuV96XjUZ5m9xBF3Ok=";
+    };
+  };
+  obsidian-obsidian-git-main = {
+    pname = "obsidian-obsidian-git-main";
+    version = "2.42.0";
+    src = fetchurl {
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/main.js";
+      sha256 = "sha256-SW2xSLzqQWn0VeI0uwLwj4xQwxfArVr947J8CQTa8TM=";
+    };
+  };
+  obsidian-obsidian-git-manifest = {
+    pname = "obsidian-obsidian-git-manifest";
+    version = "2.42.0";
+    src = fetchurl {
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/manifest.json";
+      sha256 = "sha256-etmOjM4VfphGtHlBxqfLmwIrydXG0ReCKQ56ehZLRw0=";
+    };
+  };
+  obsidian-obsidian-git-styles = {
+    pname = "obsidian-obsidian-git-styles";
+    version = "2.42.0";
+    src = fetchurl {
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/styles.css";
+      sha256 = "sha256-8wrSykL+/jtwTFSPd0fShcIDj6TOkGAeaP5v1mBJQFI=";
+    };
+  };
+  obsidian-obsidian-meta-bind-plugin-main = {
+    pname = "obsidian-obsidian-meta-bind-plugin-main";
+    version = "1.5.1";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/main.js";
+      sha256 = "sha256-0yi/qk0fSCWQdLKPJJqfkR6jQyfn4RI9ih8q/D6XhLM=";
+    };
+  };
+  obsidian-obsidian-meta-bind-plugin-manifest = {
+    pname = "obsidian-obsidian-meta-bind-plugin-manifest";
+    version = "1.5.1";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/manifest.json";
+      sha256 = "sha256-PB3/HjaheBGFHzx0Rrh1z5ASiLcyYcrqYbwNRA08QyU=";
+    };
+  };
+  obsidian-obsidian-meta-bind-plugin-styles = {
+    pname = "obsidian-obsidian-meta-bind-plugin-styles";
+    version = "1.5.1";
+    src = fetchurl {
+      url = "https://github.com/mprojectscode/obsidian-meta-bind-plugin/releases/download/1.5.1/styles.css";
+      sha256 = "sha256-lwaeGDIkxVQo/guYPUJDWqLNSsFND1AYYTi0dRrVXWE=";
+    };
+  };
+  obsidian-omnisearch-main = {
+    pname = "obsidian-omnisearch-main";
+    version = "1.32.0";
+    src = fetchurl {
+      url = "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/main.js";
+      sha256 = "sha256-JzTWTU5IN3P3kh/QcQBzUZVF9yyJ9yyqnpaz6useleo=";
+    };
+  };
+  obsidian-omnisearch-manifest = {
+    pname = "obsidian-omnisearch-manifest";
+    version = "1.32.0";
+    src = fetchurl {
+      url = "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/manifest.json";
+      sha256 = "sha256-Dkj4envOImw5h4J2D1LAuJKqo5bNWnYvSKIAx+d5Ah8=";
+    };
+  };
+  obsidian-omnisearch-styles = {
+    pname = "obsidian-omnisearch-styles";
+    version = "1.32.0";
+    src = fetchurl {
+      url = "https://github.com/scambier/obsidian-omnisearch/releases/download/1.32.0/styles.css";
+      sha256 = "sha256-xqVrGhj/hn8S67s6E5BgoklwQoHhtEkAP/SHlpYhouY=";
+    };
+  };
+  obsidian-pretty-properties-main = {
+    pname = "obsidian-pretty-properties-main";
+    version = "2.3.1";
+    src = fetchurl {
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/main.js";
+      sha256 = "sha256-wlgUq+jGF3SYDgr2sn/waTwMMjl1EnJWE29d+TgejCM=";
+    };
+  };
+  obsidian-pretty-properties-manifest = {
+    pname = "obsidian-pretty-properties-manifest";
+    version = "2.3.1";
+    src = fetchurl {
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/manifest.json";
+      sha256 = "sha256-Y5+uI6+RZIkiBtH8fUbZOphmU8KofoqMYe3iFHMpZRM=";
+    };
+  };
+  obsidian-pretty-properties-styles = {
+    pname = "obsidian-pretty-properties-styles";
+    version = "2.3.1";
+    src = fetchurl {
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/styles.css";
+      sha256 = "sha256-4XDTbOTovHsesC9I+WUthzq/hW4pVDf1yoPFXD+xaOY=";
+    };
+  };
+  obsidian-realclaudian-main = {
+    pname = "obsidian-realclaudian-main";
+    version = "2.3.36";
+    src = fetchurl {
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/main.js";
+      sha256 = "sha256-OgxS+tmI60wtrM3DfmRswsjU2AHT0haAusjbSbmfUss=";
+    };
+  };
+  obsidian-realclaudian-manifest = {
+    pname = "obsidian-realclaudian-manifest";
+    version = "2.3.36";
+    src = fetchurl {
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/manifest.json";
+      sha256 = "sha256-Akkj5JyDd6s8FRaLUbfjZEjJotPWlct6GEdHSgbTqnA=";
+    };
+  };
+  obsidian-realclaudian-styles = {
+    pname = "obsidian-realclaudian-styles";
+    version = "2.3.36";
+    src = fetchurl {
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/styles.css";
+      sha256 = "sha256-OawopNtwqvkIOP0WO0eoSFHmHsniFfB/V1vT2vFtB74=";
+    };
+  };
+  obsidian-sqlite-db-main = {
+    pname = "obsidian-sqlite-db-main";
+    version = "1.0.3";
+    src = fetchurl {
+      url = "https://github.com/stfrigerio/sqliteDB/releases/download/1.0.3/main.js";
+      sha256 = "sha256-cywhNfUf6g3eGkqAg5Oi3m2decOg93BAZYHBEcArxzI=";
+    };
+  };
+  obsidian-sqlite-db-manifest = {
+    pname = "obsidian-sqlite-db-manifest";
+    version = "1.0.3";
+    src = fetchurl {
+      url = "https://github.com/stfrigerio/sqliteDB/releases/download/1.0.3/manifest.json";
+      sha256 = "sha256-h1iCGT9jx/rVUBE9SSBaRoJWtGo0t7pzKo3z0+BotOs=";
+    };
+  };
+  obsidian-table-editor-obsidian-main = {
+    pname = "obsidian-table-editor-obsidian-main";
+    version = "0.23.2";
+    src = fetchurl {
+      url = "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/main.js";
+      sha256 = "sha256-z13U3b3evvaMyZzZOog+M4lcfxI9BLxdEQbqbjOLp5E=";
+    };
+  };
+  obsidian-table-editor-obsidian-manifest = {
+    pname = "obsidian-table-editor-obsidian-manifest";
+    version = "0.23.2";
+    src = fetchurl {
+      url = "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/manifest.json";
+      sha256 = "sha256-aYtPd0ReB9iH8zRQ6vUzoo4Jm3tIP2QvqIM2L/vY/+k=";
+    };
+  };
+  obsidian-table-editor-obsidian-styles = {
+    pname = "obsidian-table-editor-obsidian-styles";
+    version = "0.23.2";
+    src = fetchurl {
+      url = "https://github.com/tgrosinger/advanced-tables-obsidian/releases/download/0.23.2/styles.css";
+      sha256 = "sha256-I/ow128Rf9PRYkxMLm3e2r+AmSOZawU0iV+CVOpqOfc=";
+    };
+  };
+  obsidian-tag-wrangler-main = {
+    pname = "obsidian-tag-wrangler-main";
+    version = "0.6.5";
+    src = fetchurl {
+      url = "https://github.com/pjeby/tag-wrangler/releases/download/0.6.5/main.js";
+      sha256 = "sha256-85C/E1E1AzyyuEhUOK9C77mT3dkyVawINgFuES7pqyA=";
+    };
+  };
+  obsidian-tag-wrangler-manifest = {
+    pname = "obsidian-tag-wrangler-manifest";
+    version = "0.6.5";
+    src = fetchurl {
+      url = "https://github.com/pjeby/tag-wrangler/releases/download/0.6.5/manifest.json";
+      sha256 = "sha256-JxqT5gWwn2iftLBa8fc/UIDgh2/CR2NeT+niwtiK2pY=";
+    };
+  };
+  obsidian-templater-obsidian-main = {
+    pname = "obsidian-templater-obsidian-main";
+    version = "2.26.0";
+    src = fetchurl {
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/main.js";
+      sha256 = "sha256-Cs1Fz9s6czfivvURaZvB+BncZGRa00gN8zV51C0ty6o=";
+    };
+  };
+  obsidian-templater-obsidian-manifest = {
+    pname = "obsidian-templater-obsidian-manifest";
+    version = "2.26.0";
+    src = fetchurl {
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/manifest.json";
+      sha256 = "sha256-kcn6hRAIL/+gs9AiqsSYbjs5IpWxEm6Efq1+1yiRabg=";
+    };
+  };
+  obsidian-templater-obsidian-styles = {
+    pname = "obsidian-templater-obsidian-styles";
+    version = "2.26.0";
+    src = fetchurl {
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/styles.css";
+      sha256 = "sha256-Z6bdLR1t7coSh8M0yohOxBlkM/ccpHOIoL0+rBTPi18=";
+    };
+  };
+  obsidian-zotlit-main = {
+    pname = "obsidian-zotlit-main";
+    version = "2.2.0";
+    src = fetchurl {
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/main.js";
+      sha256 = "sha256-TRiu/bsSvtWoy7YSbO0ubd7Ul5oJG69iXbQPEeKMRnU=";
+    };
+  };
+  obsidian-zotlit-manifest = {
+    pname = "obsidian-zotlit-manifest";
+    version = "2.2.0";
+    src = fetchurl {
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/manifest.json";
+      sha256 = "sha256-p3PN+zeRlNYHsRfUI/r8xBfvYIHlic9+p/2K0KRAakY=";
+    };
+  };
+  obsidian-zotlit-styles = {
+    pname = "obsidian-zotlit-styles";
+    version = "2.2.0";
+    src = fetchurl {
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/styles.css";
+      sha256 = "sha256-+1598dDafDbti/vF75/MgjukobIb8GCNDbEDGgozS6s=";
+    };
+  };
   pam_rssh = {
     pname = "pam_rssh";
     version = "v1.2.2-rc2";
