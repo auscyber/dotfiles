@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "cce60f7e80a42d0a2d20200c6aa3591e6844ceca";
+    version = "c27d33bc3266f06e7f1f45ea28451639e0a69dc4";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "cce60f7e80a42d0a2d20200c6aa3591e6844ceca";
+      rev = "c27d33bc3266f06e7f1f45ea28451639e0a69dc4";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-kFKX41tsSFr0kWlXtyrVpy7Y7o3lnBtt+JUybgoxvM0=";
+      sha256 = "sha256-pBX65c1nQVg2uqPFvI25VlablBezAOcMCJei2e3bjHo=";
     };
-    date = "2026-09-29";
+    date = "2026-10-29";
   };
   cotabby = {
     pname = "cotabby";
@@ -41,13 +41,13 @@
   };
   donetick = {
     pname = "donetick";
-    version = "v0.1.80";
+    version = "v0.1.85";
     src = fetchFromGitHub {
       owner = "donetick";
       repo = "donetick";
-      rev = "v0.1.80";
+      rev = "v0.1.85";
       fetchSubmodules = false;
-      sha256 = "sha256-KJrMpUsyXqSVydzRSyYm2nsVpeauc1c3wkkizglY19s=";
+      sha256 = "sha256-HsGd3OpbS0VRqcjQnpG4eZLsLzU8zR4Uxlkg1fW8mtA=";
     };
   };
   eagle-nvim = {
@@ -74,26 +74,26 @@
   };
   ghostty-tip = {
     pname = "ghostty-tip";
-    version = "8f0dd3709050b1026f6324368805033197d8b4a5";
+    version = "93967b7f9478e94dcbb42125c8a90f34feb40d75";
     src = fetchurl {
-      url = "https://tip.files.ghostty.org/8f0dd3709050b1026f6324368805033197d8b4a5/Ghostty.dmg";
-      sha256 = "sha256-/rj1kVJ9TDxlvh5k9WvAwPoqvqA/PKJnbt9wu9vLUW4=";
+      url = "https://tip.files.ghostty.org/93967b7f9478e94dcbb42125c8a90f34feb40d75/Ghostty.dmg";
+      sha256 = "sha256-Mu0plL44hKdiX3D5zppAgGjtfY+F/bKwaQG0oMsVtco=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.19.2.1";
+    version = "0.20.2.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.19.2.1/helium-0.19.2.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-GsscpSDD4WojV7uu1wps2HEmkJzOZRYR90rrVDIjCD8=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.20.2.1/helium-0.20.2.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-4oDM8q8BJyVCp7sMdC7PvCNRdWxLmJu3F3svFF0K2xE=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.19.2.1";
+    version = "0.20.2.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.19.2.1/helium_0.19.2.1_arm64-macos.dmg";
-      sha256 = "sha256-wH2rnBVxz2jPhWs1xtC/IcLPU/d8QyRRYwGOeICU6/E=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.20.2.1/helium_0.20.2.1_arm64-macos.dmg";
+      sha256 = "sha256-LL99IeEN9GxYos9b2b+lgRXWAhkZLH3aNCS+8+kqoxk=";
     };
   };
   jankyborders = {
@@ -160,54 +160,54 @@
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton11-7";
+    version = "GE-Proton11-11";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.tar.gz";
-      sha256 = "sha256-ftW0vE45v2JsbaYqo/So0ZFfvdtakHX0XEXEE4TdxLk=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-11/GE-Proton11-11-x86_64.tar.gz";
+      sha256 = "sha256-3tVgf83IkteFtVo/bHd4yG1xCtPeuW8FXaTrHOLjvKQ=";
     };
   };
   sketchybar = {
     pname = "sketchybar";
-    version = "5f358ec94d117d3e0ccc515b21fafa325940ab2d";
+    version = "a18fc9488d14cba1f15f2c95e61822dc01b2d032";
     src = fetchFromGitHub {
       owner = "felixkratz";
       repo = "sketchybar";
-      rev = "5f358ec94d117d3e0ccc515b21fafa325940ab2d";
+      rev = "a18fc9488d14cba1f15f2c95e61822dc01b2d032";
       fetchSubmodules = false;
-      sha256 = "sha256-ks2S0JrcLBZqZ4b7P/kNdSOoYpJ96QytVPjE00gxRpg=";
+      sha256 = "sha256-Uvxu7tQ0KOjBKBTTUREeFcsUb+eIuKH4qlRUiL621rw=";
     };
-    date = "2026-09-16";
+    date = "2026-10-14";
   };
   splitpro = {
     pname = "splitpro";
-    version = "v2.1.5";
+    version = "v2.1.6";
     src = dockerTools.pullImage {
       imageName = "docker.io/ossapps/splitpro";
-      imageDigest = "sha256:efaa52b30d009573c4bf70e5711d6447536914469420db58680e1e6779acde6e";
-      sha256 = "sha256-KGAvB+lG9Gcjif5o2vbGEZPcwcOAWupZSCqi+FaV9RA=";
-      finalImageTag = "v2.1.5";
+      imageDigest = "sha256:dc6914ed24a7d595dfc74eaecc649f24336856ae517deca2f10f35da6faa5ac6";
+      sha256 = "sha256-RoVlqzrX1xaY/A67qpXd5dQukv2qsh4CNnV2G+ipoPk=";
+      finalImageTag = "v2.1.6";
     };
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "ed1bd6d7520e0b405685a21b978279d0a611386f";
+    version = "6fe27bceb4b303ea88e0fdb622198de75d3f1697";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "ed1bd6d7520e0b405685a21b978279d0a611386f";
+      rev = "6fe27bceb4b303ea88e0fdb622198de75d3f1697";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-EvTLXOIUGXFsNUV/uiLy4VA/XEuImQ1dHkpI9jz5ogs=";
+      sha256 = "sha256-FSUlqu5g4PDo8laKt77YhHyjI+SVHTKMjK6td9LOl5c=";
     };
-    date = "2026-10-08";
+    date = "2026-10-29";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
-    version = "2.6.1";
+    version = "2.6.2";
     src = fetchurl {
-      url = "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.6.1/actions-and-tags-for-zotero.xpi";
-      sha256 = "sha256-lVm1FVQylurzuldELohEEHEgNBHm5jr8GjHfTVdq65U=";
+      url = "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.6.2/actions-and-tags-for-zotero.xpi";
+      sha256 = "sha256-BeC6zGDsX5N/OpnbSR63I7mLsV0tq+iH0eypFYsfpJU=";
     };
   };
   zotero-aria = {
@@ -220,10 +220,10 @@
   };
   zotero-attanger = {
     pname = "zotero-attanger";
-    version = "v1.5.0";
+    version = "v1.5.5";
     src = fetchurl {
-      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.0/zotero-attanger.xpi";
-      sha256 = "sha256-3/dpVWSoBnb8cGSHtAw5+4E8dPXUhw91LIeGWCpxW6c=";
+      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.5/zotero-attanger.xpi";
+      sha256 = "sha256-M0LP1QL/hVB01h+KZ6ZrpMYiN6jsCvO1AA58zsN30d0=";
     };
   };
   zotero-better-bibtex = {
@@ -256,18 +256,18 @@
   };
   zotero-ocr = {
     pname = "zotero-ocr";
-    version = "0.9.6";
+    version = "0.9.7";
     src = fetchurl {
-      url = "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.6/zotero-ocr-0.9.6.xpi";
-      sha256 = "sha256-k2JzTfNfTVOmDI7GOkE0o1ebvCI6XZfYSI7KbcjJ4L8=";
+      url = "https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.7/zotero-ocr-0.9.7.xpi";
+      sha256 = "sha256-idoQ0ml3peMW0SZLMb+TT8fnLAJ4anlqKPRdjXBarjg=";
     };
   };
   zotero-papersgpt = {
     pname = "zotero-papersgpt";
-    version = "papersgpt-v1.7.0";
+    version = "papersgpt-v2.1.0";
     src = fetchurl {
-      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v1.7.0/papersgpt-v1.7.0.xpi";
-      sha256 = "sha256-qaeloEFR7YfhFF4+VxYQAK2pveN2ui4cterFwyVbgqk=";
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v2.1.0/papersgpt-v2.1.0.xpi";
+      sha256 = "sha256-OREbMGjRSlol+IMlM8Tu5WxigQUfqQHoZfYOe1NMK7Y=";
     };
   };
   zotero-zotlit = {
