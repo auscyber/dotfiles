@@ -2,11 +2,9 @@
   lib,
   pkgs,
   inputs,
-  # Hosts whose option trees must NOT be evaluated here. The docs are derived
-  # from `self.<class>Configurations.<host>.options`, so indexing the host that
-  # *runs* searchix would make that host's module evaluation depend on its own
-  # option tree (infinite recursion).
-  excludeHosts ? [ "secondpc" ],
+  # Hosts whose option trees must not be evaluated here. Built in CI, not by
+  # the host running searchix, so none have to be.
+  excludeHosts ? [ ],
 }:
 # Builds the option sources that our searchix instance indexes. Each source is a
 # directory holding `options.json` + `revision`, which is the layout searchix's
@@ -120,6 +118,10 @@ let
   # aarch64-darwin-only derivation, while docs are built on any other platform.
   unbuildableOptions = [ "services.paneru.configFile" ];
 
+  # searchix's module binds `package` in its `let`, so its `with types;
+  # oneOf [ str path package ]` holds a derivation, not a type.
+  untypedOptions = [ "services.searchix.environment" ];
+
   # Options that throw when forced (agenix-rekey's secrets derivation: "Accessing
   # the secrets derivation is only possible when `storageMode` is set to
   # `derivation`"). One of them would otherwise take down the whole source.
@@ -133,7 +135,7 @@ let
     options:
     renderable (
       removeAttrs (pkgs.nixosOptionsDoc { inherit options; }).optionsNix (
-        abortingOptions ++ unbuildableOptions
+        abortingOptions ++ unbuildableOptions ++ untypedOptions
       )
     );
 

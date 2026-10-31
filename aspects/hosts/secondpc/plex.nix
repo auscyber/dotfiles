@@ -31,6 +31,9 @@ in
       # separate `den.aspects.plex.includes` line, which would be a second
       # definition of this same attribute in one literal.
       den.aspects.tautulli
+      # auspc and any other `clusterplex-worker` transcode for this server.
+      den.aspects.clusterplex-orchestrator
+      den.aspects.nfs-server
     ];
 
     # TAUTULLI IS DECLARED BELOW, AS ITS OWN ASPECT THAT THIS ONE INCLUDES.
@@ -219,6 +222,7 @@ in
     nixos =
       {
         config,
+        lib,
         pkgs,
         scoped,
         ...
@@ -244,6 +248,27 @@ in
           # the carriers it names. (avahi's same-named option defaults to
           # TRUE -- see ./samba.nix -- so the default is not to be relied on.)
           openFirewall = false;
+          package = den.lib.clusterplex.plex pkgs;
+        };
+
+        # Plex has no option for this; it lives in Preferences.xml, and
+        # ClusterPlex workers need it on the shared path.
+        systemd.services.plex.preStart =
+          let
+            prefs = "${config.services.plex.dataDir}/Plex Media Server/Preferences.xml";
+          in
+          ''
+            if [ -f ${lib.escapeShellArg prefs} ]; then
+              ${lib.getExe pkgs.xmlstarlet} ed -L \
+                -i '/Preferences[not(@TranscoderTempDirectory)]' -t attr -n TranscoderTempDirectory -v ${den.lib.clusterplex.transcodeDir} \
+                -u '/Preferences/@TranscoderTempDirectory' -v ${den.lib.clusterplex.transcodeDir} \
+                ${lib.escapeShellArg prefs}
+            fi
+          '';
+        systemd.tmpfiles.settings.media.${den.lib.clusterplex.transcodeDir}."d" = {
+          user = "plex";
+          group = "media";
+          mode = "2770";
         };
 
         # Shared group for the media library: plex plus whoever should browse

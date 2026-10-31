@@ -188,6 +188,8 @@
       # and ../services/vban.nix dials it, so moving that service to another
       # machine moves the stream with it.
       den.aspects.vban-turntable
+      # Remote Plex transcoding on the NVIDIA card, for secondpc's Plex.
+      den.aspects.clusterplex-worker
       # THE SOUND CARD HALF, included DIRECTLY as well as through
       # `vban-turntable` above (which includes it too). That is not redundant:
       # `specialisations.no-turntable` below excludes `vban-turntable`, and

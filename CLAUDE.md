@@ -146,13 +146,6 @@ taker option does not reach it. Both readings therefore appear in
 
 ## Secrets
 
-**Never run `nix run .#rekey` or `nix run .#gen-secrets`** while the master key
-is mid-recovery — roughly ten secrets are currently unrecoverable, and
-regenerating one replaces a value that cannot currently be decrypted.
-
-The `secrets` workflow (`.github/workflows/secrets.yml`) is the same
-operation run as the CI master; it falls under the same rule.
-
 Never print secret plaintext. An agenix generator's stdout IS the secret, so
 every diagnostic goes to stderr.
 

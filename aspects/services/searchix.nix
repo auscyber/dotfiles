@@ -13,10 +13,33 @@ let
   # searchix's own web listener. It stays on loopback; nginx fronts it.
   port = 51313;
 
-  # Static server for the generated option sources. searchix's `download`
-  # fetcher is HTTP-only (it does url.JoinPath(URL, "options.json")), so the
-  # store paths have to be served rather than read from disk.
-  sourcePort = 51314;
+  # The option sources are built and published by CI
+  # (.github/workflows/searchix-sources.yml): evaluating them here pulled every
+  # other host's option tree into this host's eval, ~10GB of it.
+  sourcesURL = "https://auscyber.github.io/dotfiles/searchix";
+
+  sources = lib.imap0 (order: s: s // { inherit order; }) [
+    {
+      key = "dendritic";
+      name = "Dendritic";
+    }
+    {
+      key = "nixos";
+      name = "NixOS";
+    }
+    {
+      key = "home-manager";
+      name = "Home Manager";
+    }
+    {
+      key = "nixvim";
+      name = "Nixvim";
+    }
+    {
+      key = "darwin";
+      name = "nix-darwin";
+    }
+  ];
 
   domain = "search.ivymect.in";
 in
@@ -35,9 +58,7 @@ in
 
     includes = [ den.aspects.nginx ];
 
-    # Public entry point. (The loopback source server lives in the `nixos`
-    # module below instead of here, because its root is a derivation and so
-    # needs `pkgs`, which the static `vhosts` class content doesn't get.)
+    # Public entry point.
     vhosts.${domain} = {
       useACMEHost = "ivymect.in";
       forceSSL = true;
@@ -45,20 +66,21 @@ in
     };
 
     nixos =
-      { pkgs, ... }:
       let
-        optionSources = import ../docs/_searchix-sources.nix { inherit lib pkgs inputs; };
-
-        mkSource = _: src: {
+        mkSource = src: {
           inherit (src) key name order;
           enable = true;
           fetcher = "download";
           importer = "options";
-          url = "http://127.0.0.1:${toString sourcePort}/${src.key}";
+          url = "${sourcesURL}/${src.key}";
           # options.json is a flat { "option.name": {...} } object.
           jsonDepth = 1;
           timeout = "5m";
-          repo = optionSources.repo;
+          repo = {
+            type = "github";
+            owner = "auscyber";
+            repo = "dotfiles";
+          };
         };
       in
       {
@@ -74,7 +96,7 @@ in
               baseURL = "https://${domain}";
             };
 
-            importer.sources = lib.mapAttrs mkSource optionSources.meta // {
+            importer.sources = lib.listToAttrs (map (s: lib.nameValuePair s.key (mkSource s)) sources) // {
               # Upstream sources, all fetched over the network and rebuilt daily.
               # Package search wants a ~15min nix build of packages.json, so it
               # stays off until asked for; flip `enable` to get it.
@@ -84,31 +106,9 @@ in
           };
         };
 
-        # The importer runs on startup, and it fetches its sources over HTTP from
-        # the nginx below.
         systemd.services.searchix = {
-          after = [ "nginx.service" ];
-          wants = [ "nginx.service" ];
-        };
-
-        services.nginx.virtualHosts.searchix-sources = {
-          # Loopback-only; no server_name matching, this port serves nothing else.
-          serverName = null;
-          listen = [
-            {
-              addr = "127.0.0.1";
-              port = sourcePort;
-            }
-          ];
-          root = optionSources.tree;
-          locations."/".extraConfig = ''
-            # Store files are all mtime 1970, so nginx would answer searchix's
-            # conditional requests with a permanent 304 and it would never see a
-            # new revision. Serve unconditionally and let the `revision` file
-            # decide whether a re-import is needed.
-            if_modified_since off;
-            etag off;
-          '';
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
         };
       };
   };

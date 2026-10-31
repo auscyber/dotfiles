@@ -251,6 +251,11 @@ in
 
   config.den.schema.host.includes = [ den.aspects.requires-check ];
 
+  # One aspect's checks in a scope, for aspects the host does not hold yet.
+  config.den.lib.requiresOf =
+    ctx: aspect:
+    lib.mapAttrs (_: checkOf) (lib.filterAttrs (n: _: !internal n) (requiresOf ctx aspect));
+
   config.flake.buildConditions =
     let
       forHost =

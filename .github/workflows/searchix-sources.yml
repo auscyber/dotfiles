@@ -1,0 +1,56 @@
+name: "searchix sources"
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# Builds the option sources secondpc's searchix indexes and publishes them on
+# GitHub Pages. Built here rather than in secondpc's own config: they are every
+# host's option tree, ~10GB of eval.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: wimpysworld/nothing-but-nix@main
+        with:
+          hatchet-protocol: cleave
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v15
+        with:
+          name: auscyber
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: |
+          nix build .#searchix-option-sources
+          mkdir -p site
+          cp -rL result site/searchix
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
