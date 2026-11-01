@@ -1,4 +1,10 @@
-{ den, ... }:
+{
+  den,
+  lib,
+  config,
+  houseWifi,
+  ...
+}:
 # What used to be the esphome add-on: the ESPHome Device Builder dashboard,
 # where the YAML for every node in the house is edited and its firmware is
 # compiled and flashed.
@@ -11,6 +17,8 @@ let
   # and furnished in `gives.tcp` below, so ../proxy-nginx.nix resolves the
   # upstream instead of being told a number.
   esphomePort = 6052;
+  stateDir = "/var/lib/esphome";
+  nodes = config.flake.esphomeConfigurations;
 in
 {
   # ── ITS OWN ASPECT, PULLED IN BY HOME ASSISTANT ──
@@ -87,30 +95,113 @@ in
         };
       };
 
-    nixos = {
-      # Loopback only; the gate is the way in. Device configs live in its state
-      # dir, which is where the add-on's own copies go --
-      # /var/lib/private/esphome, since the module is `DynamicUser`. ./state.nix
-      # is what carries them off the box.
-      services.esphome = {
-        enable = true;
-        address = "127.0.0.1";
-        port = esphomePort;
-
-        # The module's default is `[ "char-ttyS" "char-ttyUSB" ]`, and it is
-        # combined with `DevicePolicy = "closed"`, so a device class absent
-        # from this list is not merely un-chowned but invisible to the unit.
-        # `char-ttyACM` is the gap: an ESP32-S2/S3/C3/C6 flashed over its
-        # NATIVE USB (no CP210x or CH340 bridge) enumerates as a CDC-ACM
-        # device, /dev/ttyACM*, and the dashboard's "plug into this computer"
-        # option silently offers nothing for one. The two defaults are kept --
-        # a bridge-chip board still appears as ttyUSB*.
-        allowedDevices = [
-          "char-ttyS"
-          "char-ttyUSB"
-          "char-ttyACM"
-        ];
+    # Every node's `!secret`s, rendered beside the YAML: `!secret` resolves
+    # lexically next to the config path, never through the symlink.
+    secrets.wifi-password.rekeyFile = houseWifi.secretFile;
+    templates."secrets.yaml" =
+      { secrets, ... }:
+      {
+        owner = "esphome";
+        group = "esphome";
+        dependencies = { inherit (secrets) wifi-password; };
+        content =
+          { placeholders, ... }:
+          ''
+            wifi_password: ${placeholders.wifi-password}
+          '';
       };
-    };
+
+    nixos =
+      {
+        config,
+        pkgs,
+        scoped,
+        ...
+      }:
+      let
+        fmt = pkgs.formats.yaml { tags = true; };
+        rendered = lib.mapAttrs (_: node: rec {
+          name = node.config.node.name;
+          yaml = fmt.generate "${name}.yaml" node.config.node.yaml;
+          path = "${stateDir}/${name}.yaml";
+        }) nodes;
+
+        esphomeEnv = {
+          inherit (config.systemd.services.esphome.environment) PLATFORMIO_CORE_DIR HOME;
+        };
+
+        upload = pkgs.writeShellApplication {
+          name = "esphome-upload";
+          runtimeInputs = [ pkgs.esphome ];
+          text = ''
+            [ "$#" -eq 1 ] || { echo "usage: esphome-upload <node-name>" >&2; exit 64; }
+            ${lib.toShellVars esphomeEnv}
+            export ${lib.concatStringsSep " " (lib.attrNames esphomeEnv)}
+            cd ${stateDir}
+            exec esphome upload --device OTA "${stateDir}/$1.yaml"
+          '';
+        };
+      in
+      {
+        systemd.tmpfiles.rules = [
+          "d ${stateDir} 0750 esphome esphome -"
+          "L+ ${stateDir}/secrets.yaml - - - - ${scoped.esphome.templates."secrets.yaml".path}"
+        ]
+        ++ lib.mapAttrsToList (_: n: "L+ ${n.path} - - - - ${n.yaml}") rendered;
+
+        # Compiles in the background when a node's YAML changes; Type=exec so a
+        # rebuild never waits on platformio. Flashing stays manual:
+        # `sudo -u esphome esphome-upload <node>`.
+        systemd.services = lib.mapAttrs' (
+          host: n:
+          lib.nameValuePair "esphome-compile-${host}" {
+            description = "Compile ESPHome firmware for ${n.name}";
+            wants = [ "network-online.target" ];
+            after = [
+              "network-online.target"
+              "systemd-tmpfiles-setup.service"
+            ];
+            wantedBy = [ "multi-user.target" ];
+            restartTriggers = [ n.yaml ];
+            environment = esphomeEnv;
+            serviceConfig = {
+              Type = "exec";
+              RemainAfterExit = true;
+              User = "esphome";
+              Group = "esphome";
+              WorkingDirectory = stateDir;
+              ExecStart = "${lib.getExe pkgs.esphome} compile ${n.path}";
+              Nice = 19;
+              PrivateTmp = true;
+              ProtectSystem = "strict";
+              ReadWritePaths = [ stateDir ];
+            };
+          }
+        ) rendered;
+
+        environment.systemPackages = [ upload ];
+
+        # Loopback only; the gate is the way in. ./state.nix carries
+        # ${stateDir} off the box.
+        services.esphome = {
+          enable = true;
+          address = "127.0.0.1";
+          port = esphomePort;
+
+          # The module's default is `[ "char-ttyS" "char-ttyUSB" ]`, and it is
+          # combined with `DevicePolicy = "closed"`, so a device class absent
+          # from this list is not merely un-chowned but invisible to the unit.
+          # `char-ttyACM` is the gap: an ESP32-S2/S3/C3/C6 flashed over its
+          # NATIVE USB (no CP210x or CH340 bridge) enumerates as a CDC-ACM
+          # device, /dev/ttyACM*, and the dashboard's "plug into this computer"
+          # option silently offers nothing for one. The two defaults are kept --
+          # a bridge-chip board still appears as ttyUSB*.
+          allowedDevices = [
+            "char-ttyS"
+            "char-ttyUSB"
+            "char-ttyACM"
+          ];
+        };
+      };
   };
 }

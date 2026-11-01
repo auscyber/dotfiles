@@ -9,6 +9,10 @@ let
   # `includes` reaches `den.aspects.<other>`. Safe because a narrowing never
   caps = config.den.capabilities;
 
+  # A reach is an entity kind (./capability.nix `sameReach`): any declared
+  # `den.schema` kind, `flake` meaning everyone.
+  reachKind = types.enum (lib.attrNames config.den.schema);
+
   # ── A CAPABILITY MAY BE PARAMETRIC OVER THE CHAIN IT HANGS UNDER ──
   # `den.capabilities.push = { cache, celler, ... }: { ... }`. A nested
   # capability is not furnished by anyone: there is one `pull` per cache and its
@@ -104,13 +108,7 @@ let
       # "in this environment is reach type of deal" -- yes, and `reach`
       # alone is only half of it. `reach` is the GIVER's willingness to
       within = mkOption {
-        type = types.nullOr (
-          types.enum [
-            "host"
-            "household"
-            "fleet"
-          ]
-        );
+        type = types.nullOr (reachKind);
         default = null;
         description = ''
           Furthest environment this take will resolve into. The
@@ -371,11 +369,7 @@ in
                 types.submodule {
                   options = {
                     scope = mkOption {
-                      type = types.enum [
-                        "host"
-                        "household"
-                        "fleet"
-                      ];
+                      type = reachKind;
                       default = "host";
                       description = "How far the claim has to be unique. A socket is per host; a published name is per zone, so fleet.";
                     };
@@ -721,11 +715,7 @@ in
       };
 
       reach = mkOption {
-        type = types.enum [
-          "host"
-          "household"
-          "fleet"
-        ];
+        type = reachKind;
         default = "host";
         description = ''
           How far a take may resolve to this giver. The DEFAULT IS `host`
@@ -736,8 +726,9 @@ in
           never secondpc's -- and for a socket-only provider it is belt and
           braces, because `unix` narrows no address and so cannot leave the box
           anyway. `household` is the shared appliance (music-assistant,
-          audiobookshelf). `fleet` is infrastructure every host may reach, and
-          owes an explanation.
+          audiobookshelf). `flake` is infrastructure every host may reach, and
+          owes an explanation. Any other entity kind (`llm-cluster`) reaches
+          the hosts whose field of that name names the same instance.
         '';
       };
     };
@@ -1455,6 +1446,13 @@ in
         type = types.nullOr types.str;
         default = null;
       };
+
+      # Every reachable giver rather than the best one: ./capability.nix's
+      # `dialAll`, and `consumerCarriers` opens the port on each of them.
+      taker.options.every = mkOption {
+        type = types.bool;
+        default = false;
+      };
       # ── A SOCKET IS ONE PER HOST, AND A PUBLISHED NAME ONE PER ZONE ──
       # Both are resources rather than values, and both were unchecked. The
       # second claimant on a port gets EADDRINUSE at boot; the second claimant
@@ -1516,7 +1514,7 @@ in
         # subdomain is the bug a per-host check cannot see, and moving a service
         # between hosts is exactly when it happens.
         subdomain = {
-          scope = "fleet";
+          scope = "flake";
           claims = link: _: lib.optional ((link.subdomain or null) != null) { inherit (link) subdomain; };
           key = c: c.subdomain;
           describe = c: "`${c.subdomain}`";

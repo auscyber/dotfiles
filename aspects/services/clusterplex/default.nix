@@ -187,10 +187,11 @@ in
       };
   };
 
-  den.aspects.clusterplex-worker = {
+  # Separate from the worker: an aspect resolves one take per parent
+  # capability, and `nfs` and `transcode` both narrow tcp.
+  den.aspects.clusterplex-mounts = {
     includes = [ den.aspects.nfs-client ];
 
-    takes.transcode.name = "clusterplex-orchestrator";
     takes.nfs.mounts = lib.genAttrs cp.mediaRoots (_: "ro") // {
       ${cp.transcodeDir} = "rw";
     };
@@ -205,6 +206,12 @@ in
           carrier = self.name;
         };
       };
+  };
+
+  den.aspects.clusterplex-worker = {
+    includes = [ den.aspects.clusterplex-mounts ];
+
+    takes.transcode.name = "clusterplex-orchestrator";
 
     nixos =
       {

@@ -52,14 +52,14 @@
   # `direction = "out"` is the whole declaration -- `address`'s rule derives the
   # rest, so a carrier that caps request bodies cannot take it.
   den.aspects.celler-cache-push = {
-    reach = "fleet";
+    reach = "flake";
     takes.http.direction = "out";
   };
 
   # No clause: the cap does not bind on responses, so a pull may take a route
   # push may not.
   den.aspects.celler-cache-pull = {
-    reach = "fleet";
+    reach = "flake";
     takes.http = { };
   };
 }

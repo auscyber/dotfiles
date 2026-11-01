@@ -6,13 +6,13 @@
   den.aspects.inline-snapshot-fix = {
     overlays = { ... }: {
       inline-snapshot = final: prev: {
-        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-          (pyFinal: pyPrev: {
-            inline-snapshot = pyPrev.inline-snapshot.overrideAttrs (old: {
-              disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [ "tests/test_docs.py" ];
-            });
-          })
-        ];
+        #        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        #          (pyFinal: pyPrev: {
+        #            inline-snapshot = pyPrev.inline-snapshot.overrideAttrs (old: {
+        #              disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [ "tests/test_docs.py" ];
+        #            });
+        #          })
+        #        ];
       };
     };
   };

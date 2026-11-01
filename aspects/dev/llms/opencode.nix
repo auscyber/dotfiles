@@ -29,13 +29,20 @@
   # fastmcp-slim-3.2.4 has a broken unpackPhase (sourceRoot points at a
   # non-existent `source/fastmcp_slim`), which failed the whole system build.
 
+  # The cluster head from ../../services/llm-cluster, wherever it lives.
+  den.aspects.opencode.takes.llm-api.name = "llm-head";
+
   den.aspects.opencode.homeManager =
     {
       pkgs,
       lib,
       config,
+      host,
       ...
     }:
+    let
+      api = den.lib.capability.dial "llm-api" { name = "llm-head"; } host;
+    in
     {
       home.packages = with pkgs; [
         #        gemini-cli
@@ -76,6 +83,18 @@
                 baseUrl = "http://127.0.0.1:3456";
                 apiKey = "dummy";
               };
+            };
+          }
+          // lib.optionalAttrs (api != null) {
+            # A model's attribute name is sent as `model` on the wire, so the
+            # ids are the cluster's own, furnished through the link.
+            llm-cluster = {
+              name = "llama.cpp cluster (${api.host.name})";
+              npm = "@ai-sdk/openai-compatible";
+              options.baseURL = "${api.protocol}${api.address}:${toString api.port}/v1";
+              models = lib.genAttrs api.link.models (id: {
+                name = id;
+              });
             };
 
             #            "llama-local" = {

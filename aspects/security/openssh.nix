@@ -132,7 +132,7 @@ in
 
     # ANY host in the fleet may dial it; who may actually log in is the
     # server's own business (`authorizedKeys`), not the resolver's.
-    reach = "fleet";
+    reach = "flake";
 
     nixos = {
       services.openssh = {

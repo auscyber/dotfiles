@@ -30,6 +30,7 @@
     # The household whose config this host produces: rooms, members, and who may
     # reach its services. See ../../base/household.nix.
     household = den.households.ivymectin;
+    llm-cluster = den.llm-clusters.home;
 
     # Reachable on the LAN here rather than through the wireguard tunnel.
     #

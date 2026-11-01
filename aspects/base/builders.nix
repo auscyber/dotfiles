@@ -461,7 +461,7 @@ in
     takes.ssh = { };
 
     # ANY host may offload to it, so the whole fleet.
-    reach = "fleet";
+    reach = "flake";
   };
 
   den.aspects.builders = {

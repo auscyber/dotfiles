@@ -144,16 +144,8 @@ let
   # set of givers PLACED somewhere but out of reach (so an unresolvable take
   # says which machines could have answered it), and the `reachOverride`
   # what-if below.
-  inherit (den.lib.capability) sameHousehold;
 
-  inReach =
-    reach: from: on:
-    if reach == "fleet" then
-      true
-    else if reach == "household" then
-      sameHousehold from on
-    else
-      on.name == from.name;
+  inReach = den.lib.capability.sameReach;
 
   # Every giver of `cap` that sits on some host in the fleet, whether or not it
   # is in reach of the asker.

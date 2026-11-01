@@ -692,9 +692,28 @@ let
 
   sameMachine = a: b: (machineOf a) != null && (machineOf a) == (machineOf b);
 
-  # A container's or user's household is its machine's.
-  householdOf = e: (hostEntities.${runOf e} or e).household.name or null;
-  sameHousehold = a: b: householdOf a != null && householdOf a == householdOf b;
+  # ── A REACH IS AN ENTITY KIND ──
+  # Two entities share a reach when they belong to the same instance of that
+  # kind: `host` is the machine, `flake` is everyone, and any other kind is the
+  # host's field of the same name (`household`, `llm-cluster`). A container's
+  # or user's membership is its machine's.
+  reachKeyOf =
+    kind: e:
+    if kind == "flake" then
+      "flake"
+    else if kind == "host" then
+      machineOf e
+    else
+      (hostEntities.${runOf e} or e).${kind}.name or null;
+  sameReach =
+    kind: a: b:
+    let
+      k = reachKeyOf kind a;
+    in
+    k != null && k == reachKeyOf kind b;
+
+  householdOf = reachKeyOf "household";
+  sameHousehold = sameReach "household";
 
   # ── HOW FAR A GIVER REACHES: ONE CONDITION, READ TWICE ──
   #
@@ -713,18 +732,7 @@ let
   # resolved on secondpc to the loopback of Ivys-MacBook-Pro.
   reaches =
     from: giver: on:
-    if giver.reach == "fleet" then
-      true
-    else if giver.reach == "household" then
-      sameHousehold from on
-    # `host` MEANS THIS MACHINE, which is what it always meant: a container on
-    # secondpc reaches secondpc's postgres because it runs on that box. Names
-    # were the same test while every entity was its own machine; a container
-    # entity (`parent`) is where they part, and this is then still the right
-    # one. `linksBetween` decides HOW -- the loopback stops at one entity, so a
-    # container arrives over its bridge.
-    else
-      sameMachine from on;
+    sameReach giver.reach from on;
 
   # ── PLACEMENT RESOLUTION, for the non-routed half ──
   visibleFrom =
@@ -1070,6 +1078,8 @@ in
       heldBy
       householdOf
       sameHousehold
+      reachKeyOf
+      sameReach
       hostsOf
       ;
 
@@ -1387,41 +1397,18 @@ in
         # ── HOW FAR AWAY A CANDIDATE IS ──
         # NULL, NOT ABSENT. The three declared clauses always exist now that
         # ./capability-types.nix types them on the aspect, so "no opinion" is a
-        distanceOf =
-          cand:
-          let
-            h = cand.host or null;
-          in
-          if cand.sameHost or false then
-            "host"
-          else if h != null && sameHousehold from h then
-            "household"
-          else
-            "fleet";
-
-        # Ascending, so `within = "household"` admits a host-local candidate
-        # too: a nearer provider is always acceptable to a consumer willing to
-        # go further.
-        rank =
-          d:
-          if d == "host" then
-            0
-          else if d == "household" then
-            1
-          else
-            2;
+        # `within` is a reach kind: the candidate must share that entity with
+        # the asker. Same-host always does.
+        withinOk = cand: (cand.sameHost or false) || (cand ? host && sameReach take.within from cand.host);
 
         edgeVerdict =
           cand:
           lib.filter (x: x != null) [
             (
-              let
-                d = distanceOf cand;
-              in
-              if take.within == null || rank d <= rank take.within then
+              if take.within == null || withinOk cand then
                 null
               else
-                "is ${d}-distant, and this take resolves no further than ${take.within}"
+                "is outside the asker's ${take.within}, and this take resolves no further"
             )
             (
               if take.carrier == null || lib.elem cand.carrier (lib.toList take.carrier) then
@@ -1748,9 +1735,16 @@ in
             # `acl` that tcp neither furnishes nor accepts". The taker's key is
             # also the more precise question, since it narrows `cap` by
             # construction.
-            d = if key == null then null else dial key take v.host;
+            # A RAW take, so `or`: the key is absent unless the taker set it.
+            ds =
+              if key == null then
+                [ ]
+              else if take.every or false then
+                dialAll key take v.host
+              else
+                [ (dial key take v.host) ];
           in
-          lib.optional (serves d) (d.carrier.name or d.carrier);
+          map (d: d.carrier.name or d.carrier) (lib.filter serves ds);
 
         # OFF-BOX ASKERS ONLY. A same-host consumer dials the loopback, which
         # needs no hole -- that is what makes "nothing else wants it" render as
@@ -1859,14 +1853,14 @@ in
     exclusionsIn =
       host:
       let
+        # `host` stays this entity: a container on the same machine has its
+        # own sockets.
         hostsFor =
           scope:
-          if scope == "fleet" then
-            lib.attrValues hostsOf
-          else if scope == "household" then
-            lib.filter (h: sameHousehold host h) (lib.attrValues hostsOf)
+          if scope == "host" then
+            [ host ]
           else
-            [ host ];
+            lib.filter (h: sameReach scope host h) (lib.attrValues hostsOf);
 
         # EVERY CLAIM IN SCOPE, tagged with who made it and where, because the
         # whole value of the message is naming both claimants.
@@ -2300,7 +2294,9 @@ in
       else
         linkFor chosen cap { inherit host peer; };
 
-    dial =
+    # Every (giver, carrier) pair a take accepts, best first. `dial` is the
+    # head of it and `dialAll` the head per giver.
+    dialRanked =
       cap: rawTake: from:
       let
         # `emptyTake //` so the take is TOTAL. The clauses `judge` reads off
@@ -2335,16 +2331,18 @@ in
             }
           )
         ) (resolveFrom from cap whoTake);
+      in
+      # ASCENDING DEPTH OF LAYERING, across every (giver, carrier) pair
+      # rather than within one: a loopback to a second instance on this box
+      # beats the lan to the first, which is the same judgement
+      # `linksBetween` makes one pair at a time.
+      lib.sort (x: y: x.via.preference < y.via.preference) cands;
 
-        # ASCENDING DEPTH OF LAYERING, across every (giver, carrier) pair
-        # rather than within one: a loopback to a second instance on this box
-        # beats the lan to the first, which is the same judgement
-        # `linksBetween` makes one pair at a time.
-        ranked = lib.sort (x: y: x.via.preference < y.via.preference) cands;
-        winner = if ranked == [ ] then null else lib.head ranked;
-
-        l = if winner == null then null else winner.link;
-        ports = if l == null then { } else l.ports or { };
+    dialRecord =
+      from: winner:
+      let
+        l = winner.link;
+        ports = l.ports or { };
 
         # The single port, where there is one. A service with several named
         # ports (garage's three, music-assistant's api and receiver) has no
@@ -2358,7 +2356,7 @@ in
           else
             null;
       in
-      if l == null || (l.address or null) == null then
+      if (l.address or null) == null then
         null
       else
         {
@@ -2373,6 +2371,25 @@ in
           sameHost = sameMachine winner.giver.host from;
           link = l;
         };
+
+    dial =
+      cap: rawTake: from:
+      let
+        ranked = dialRanked cap rawTake from;
+      in
+      if ranked == [ ] then null else dialRecord from (lib.head ranked);
+
+    # One `dial` per giver instance, for a take with `every = true`.
+    dialAll =
+      cap: rawTake: from:
+      let
+        byGiver = lib.groupBy (c: "${c.giver.host.name or ""}/${c.giver.via.name or ""}") (
+          dialRanked cap rawTake from
+        );
+      in
+      lib.filter (d: d != null) (
+        lib.mapAttrsToList (_: ranked: dialRecord from (lib.head ranked)) byGiver
+      );
 
     # EVERY ACCEPTABLE LINK FROM `host` TO `peer`, in preference order. This is
     # the query a consumer's declaration turns into, and it is deliberately the

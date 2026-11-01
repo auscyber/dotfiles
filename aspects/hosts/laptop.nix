@@ -46,6 +46,7 @@ in
     ];
     # Whose machine this is -- a different fact from the household it serves.
     owner = den.persons.ivy;
+    llm-cluster = den.llm-clusters.home;
 
     users.ivypierlot = {
       # The human behind this account (../../persons/ivy.nix). The link

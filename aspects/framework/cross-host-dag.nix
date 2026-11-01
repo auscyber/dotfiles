@@ -350,7 +350,7 @@ let
     )
   ) aspectEntries;
 
-  inherit (den.lib.capability) sameHousehold;
+  inherit (den.lib.capability) sameReach;
 
   # ── THE EDGES ──
   # K -> H reads "building K's configuration forces H's". A self edge is dropped:
@@ -376,7 +376,7 @@ let
       in
       lib.concatMap (
         k:
-        lib.optional (k.name != s.host && (if s.reach == "fleet" then true else sameHousehold k src)) {
+        lib.optional (k.name != s.host && sameReach s.reach k src) {
           from = k.name;
           to = s.host;
           via = s.quirk;

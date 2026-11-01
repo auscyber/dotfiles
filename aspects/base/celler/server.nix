@@ -23,7 +23,7 @@ let
     {
       # `reach = "fleet"`: any host may consume it. The laptop builds against it
       # over the tailnet, secondpc over loopback.
-      reach = "fleet";
+      reach = "flake";
 
       gives =
         { self, ... }:
