@@ -124,6 +124,7 @@ linkStyle 36 stroke:#9399b2,stroke-width:1px,stroke-dasharray:3 3
 ### Aspects
 - Ivys-MacBook-Pro/to-users
 - agenix-rekey
+- autopen
 - batteries/define-user
 - batteries/hostname
 - batteries/inputs&#39;
@@ -222,7 +223,6 @@ linkStyle 36 stroke:#9399b2,stroke-width:1px,stroke-dasharray:3 3
 - vpn-secrets
 - wakatime
 - wake-on-lan-sender
-- wrapperd
 - zig
 - zotero
 
@@ -240,7 +240,6 @@ graph LR
   root --> n17bca5cc46["lix"]
   root --> na4dcdabd33["laptop-dock"]
   root --> nb856ab6f82["codesign-identity"]
-  root --> n169ce1a1c4["wrapperd"]
   root --> n15f90b1816["tailscale"]
   root --> n600ee077cd["time-machine"]
   root --> n9da8774360["roaming-resolver"]
