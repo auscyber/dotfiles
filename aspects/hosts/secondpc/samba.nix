@@ -487,7 +487,12 @@
 
         services.samba = {
           enable = true;
-          package = pkgs.samba4Full; # built with avahi, so smbd does its own mDNS
+          # Avahi (smbd does its own mDNS) and LDAP. Not `samba4Full`: that also
+          # enables CephFS, pulling in a ceph build for nothing.
+          package = pkgs.samba4.override {
+            enableMDNS = true;
+            enableLDAP = true;
+          };
           # ⚠ STILL THE GLOBAL LISTS (139/445 tcp, 137/138 udp, no `-i`), and
           # deliberately so: see the `gives` note above -- there is no carrier
           # for the wireguard tunnel the "hosts allow" below admits, so these
