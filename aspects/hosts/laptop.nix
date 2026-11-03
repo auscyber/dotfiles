@@ -81,20 +81,15 @@ in
       den.aspects.sccache
       den.aspects.lix
       den.aspects.laptop-dock
-      # Signs coolabah/paneru/kanata and execs them from a fixed path so their
-      # TCC grants survive a rebuild, and (via `wrapperd`, which pulls in
-      # `codesign`) replants that fixed path at boot and orders the agents that
-      # exec it. Host level, not user level: it is an overlay, and overlays only
-      # reach the host's `nixpkgs.overlays`.
+      # Signs coolabah/paneru/sketchybar/kanata as .app bundles so their TCC
+      # grants survive a rebuild. Host level: it is an overlay.
       #
-      # Two aspects on purpose: `codesign` (via `wrapperd`) cannot build until
-      # the identity `codesign-identity` deploys is already on disk, and a switch
-      # builds before it activates. To bootstrap (or to recover if the identity
-      # is ever lost), comment out `den.aspects.wrapperd`, switch, then restore
-      # it. `codesign-identity` also carries `sandbox = "relaxed"`, which is what
-      # keeps every other derivation from reading the signing key.
+      # Two aspects on purpose: `codesign-identity` deploys the autopen daemon
+      # and the sandbox settings that signing builds need, and a switch builds
+      # before it activates. To bootstrap, comment out `den.aspects.codesign`,
+      # switch, then restore it.
       den.aspects.codesign-identity
-      den.aspects.wrapperd
+      #      den.aspects.codesign
       # Host level, not user level: tailscaled is a root launchd daemon and its
       # auth key has to be readable by root, so the secret belongs to the host's
       # agenix scope. The user-level `t3code` aspect probes for this one with

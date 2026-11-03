@@ -5,13 +5,6 @@
   config,
   ...
 }:
-let
-  # Alias for the flake-parts top-level `config`, captured here before
-  # `homeManager` below binds its own (home-manager) `config` of the same name --
-  # which would otherwise shadow this one and put `codesign.mkSignedWrapper`
-  # out of reach inside it.
-  flakeParts = config;
-in
 {
   den.aspects.coolabah = {
     # Only `gui` is declared -- `darwin` is inferred from the hosts that
@@ -164,21 +157,6 @@ in
                   )
                 );
 
-            # `programs.coolabah.finalPackage` (coolabah's own home-manager
-            # module, `nix/hm-module.nix`) wraps `programs.coolabah.package` a
-            # second time -- for `extraPackages` on PATH -- through a plain
-            # `symlinkJoin` + `wrapProgram` that has never heard of
-            # `mkSignedWrapper`. Same shape, and for the same reason, as
-            # sketchybar and paneru: `pkgs.coolabah` is deliberately absent from
-            # the `signed` list in ../../darwin/codesign.nix so that wrap is
-            # the ONLY one `finalPackage` carries, and it is signed here
-            # instead. coolabah drives SkyLight and the Accessibility API, so
-            # its TCC grant is worth exactly as much as the stability of the
-            # path launchd execs.
-            coolabahSigned = flakeParts.flake.lib.codesign.mkSignedWrapper pkgs {
-              package = config.programs.coolabah.finalPackage;
-              entitlements = flakeParts.flake.lib.codesign.entitlementsFor.coolabah or { };
-            };
           in
           {
             programs.coolabah = {
@@ -236,21 +214,6 @@ in
               "coolabah/icon_map.lua".source = iconMapFile;
             };
 
-            # coolabah's own home-manager module points this launchd job's
-            # `Program` at `programs.coolabah.finalPackage` directly, which is the
-            # UNSIGNED wrapProgram wrap (see `coolabahSigned` above). Routed
-            # through `wrapperd-wait` instead, so the job blocks until `wrapperd`
-            # has planted the wrappers and then execs the signed copy at
-            # `${trustedDir}/coolabah` -- TCC's Accessibility/Screen-Recording
-            # grants are worthless to a client whose path never survives a
-            # rebuild, or is missing after a reboot (see
-            # `aspects/darwin/wrapperd.nix`). `KeepAlive` and the rest keep
-            # whatever that module set.
-            launchd.agents.coolabah.config = flakeParts.flake.lib.wrapperd.waitConfig {
-              inherit pkgs;
-              label = "coolabah";
-              name = "coolabah";
-            };
           };
       };
 

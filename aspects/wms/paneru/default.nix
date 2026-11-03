@@ -5,13 +5,6 @@
   config,
   ...
 }:
-let
-  # Alias for the flake-parts top-level `config`, captured here before the
-  # `homeManager` module below binds its own (home-manager) `config` of the
-  # same name -- which would otherwise shadow this one and put
-  # `codesign.mkSignedWrapper` out of reach inside it.
-  flakeParts = config;
-in
 {
   # ./sketchybar/paneru-bar.lua drives sketchybar from a `window_focused`
   # handler through `paneru.exec`, and a failed exec raises a Lua error that
@@ -427,10 +420,6 @@ in
               lua = pkgs.luajit;
             };
 
-            paneruSigned = flakeParts.flake.lib.codesign.mkSignedWrapper pkgs {
-              package = config.services.paneru.finalPackage;
-              entitlements = flakeParts.flake.lib.codesign.entitlementsFor.paneru or { };
-            };
           in
           lib.mkMerge [
             (lib.optionalAttrs (options.programs ? kanata) {
@@ -596,23 +585,6 @@ in
                 # gesture finger count has to be here or no swipe is ever
                 # intercepted.
                 config = paneruInitLua;
-              };
-
-              # `services.paneru`'s own home-manager module (nix/home.nix)
-              # points this launchd job's `Program` at
-              # `services.paneru.finalPackage` directly, which is the UNSIGNED
-              # wrapPaneru wrap (see `paneruSigned` above). Routed through
-              # `wrapperd-wait` instead, so the job blocks until `wrapperd` has
-              # planted the wrappers (it does not at boot otherwise -- see
-              # `aspects/darwin/wrapperd.nix`) and then execs the signed copy at
-              # `${trustedDir}/paneru`. TCC's Accessibility grant is worthless to
-              # a client whose path never survives a rebuild, and worthless again
-              # if the path is missing after a reboot. `Label`, `KeepAlive` and
-              # the rest keep whatever that module set.
-              launchd.agents.paneru.config = flakeParts.flake.lib.wrapperd.waitConfig {
-                inherit pkgs;
-                label = "paneru";
-                name = "paneru";
               };
 
               # Stop macOS from also acting on a 3-finger vertical swipe

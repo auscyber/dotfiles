@@ -1,61 +1,24 @@
-# Signs sketchybar/paneru/kanata with a local certificate and execs them from a
-# fixed path, so their TCC grants survive a rebuild.
+# Signs sketchybar/paneru/coolabah/kanata so their TCC grants survive a rebuild.
 #
-# Two separate things invalidate a grant, and both have to go:
+# Two things invalidate a grant, and signed bundles answer both:
 #
-#   * TCC keys a non-bundled executable by absolute path (`client_type = 1`),
-#     and every rebuild moves the store path. Hence `trustedDir`: each signed
-#     binary moves to `trusted/`, `bin/<name>` becomes a makeWrapper shim
-#     exec'ing `${trustedDir}/<name>`, and activation plants the copy there.
-#     The exec resolves before the process exists, so TCC sees the stable path
-#     -- and nothing referring to `${pkgs.sketchybar}/bin/sketchybar` has to be
-#     repointed, which is the point of doing it here and not per launchd job.
+#   * the path. TCC keys a bare executable by absolute path, and every rebuild
+#     moves the store path. A bundle is keyed by its identifier instead, so each
+#     program becomes `libexec/<name>.app` (`in.ivymect.<name>`) and may live
+#     anywhere -- no fixed path, nothing to plant, nothing to wait for at boot.
 #
-#   * the recorded `csreq`. An ad-hoc signature (what nixpkgs applies) has no
-#     certificate, so the requirement degrades to a `cdhash` and dies on any
-#     content change. A real certificate pins it to the certificate hash
-#     instead -- `codesign -d -r-` on a signed output reports
-#     `identifier "hello" and certificate root = H"7b3f55..."`, which is a hash
-#     comparison and so survives any rebuild of the same program. That is why
-#     the certificate must never be regenerated: a new one is a new hash, and
-#     every grant made against the old one dies with it.
+#   * the recorded `csreq`. An ad-hoc signature pins a `cdhash` that dies on any
+#     content change; a real certificate pins `certificate root = H"..."`, which
+#     survives any rebuild. A new certificate is a new hash, so it is minted once.
 #
-# Where the repointing happens: in `bin/`, never in the launchd plist.
+# `bin/<name>` stays the entry point in either shape a package has:
 #
-# Pointing each job's `Program`/`ProgramArguments` straight at
-# `${trustedDir}/<name>` looks like the obvious simplification, and it is
-# correct for a job whose environment comes from the plist -- kanata,
-# kanata_tray and kanata-vk-agent all qualify (../input/kanata/_kanata.nix sets
-# PATH in `EnvironmentVariables` and wraps nothing). It is wrong for a job whose
-# environment comes from a wrapper script, which is the far more common shape:
-# paneru's `finalPackage` is `wrapPaneru (...)`, a symlinkJoin whose `bin/paneru`
-# is a wrapProgram script exporting LUA_PATH, and home-manager wraps sketchybar
-# the same way to put `extraPackages` on PATH. Exec the signed binary directly
-# and those exports never run.
-#
-# So the plists are left alone and `bin/` carries the repointing, in whichever
-# of the two shapes the package turns out to have:
-#
-#   bin/<name> is a Mach-O          it is signed and planted as
-#                                   ${trustedDir}/<name>.
-#   bin/<name> is a makeWrapper     the `.<name>-wrapped` payload it execs is
-#   script                          signed and planted as
-#                                   ${trustedDir}/.<name>-wrapped, and upstream's
-#                                   script is planted beside it as
-#                                   ${trustedDir}/<name>, kept VERBATIM with only
-#                                   its exec target repointed at that payload.
-#
-# Both halves of a wrapped chain are planted, not just the binary: a script that
-# still exec'd a store path would put a rebuild-varying path back in the middle
-# of the chain. Either way `bin/<name>` in the package is a shim onto
-# ${trustedDir}/<name>, so the entry point is one path regardless of shape.
-#
-# The second case is the reason this generalises. `bin/<name>` plus a hidden
-# `.<name>-wrapped` sibling is a nixpkgs-wide convention, not a paneru quirk, so
-# handling it structurally means upstream modules keep working untouched: no
-# option is repointed, no `mkForce` is needed, and nothing here has to know what
-# any particular wrapper put in the environment. A module that starts wrapping
-# something it did not wrap before is absorbed without a change.
+#   a Mach-O              signed as the bundle's executable; `bin/<name>` links
+#                         to it.
+#   a makeWrapper script  its `.<name>-wrapped` payload is the bundle's
+#                         executable, and upstream's script (which exports
+#                         LUA_PATH, PATH and the rest) is kept verbatim with only
+#                         its exec target repointed into the bundle.
 #
 # Signing produces a separate WRAPPER derivation (`mkSignedWrapper`), not an
 # `overrideAttrs` on the package. The package itself builds purely and
@@ -75,23 +38,6 @@
 }:
 let
   autopen = den.lib.autopen;
-
-  # What TCC records as the client for every shimmed program, so it is as
-  # permanent as the grants. Shares `/run/wrappers/bin` with
-  # `extraModules/darwin/wrappers`'s `security.wrappers` -- the same
-  # NixOS-`security.wrapperDir`-flavoured stable bin directory, one fixed path
-  # regardless of what happens to land in it.
-  #
-  # `/run` is a synthetic firmlink macOS clears on boot, and nix-darwin
-  # activation only reruns at `darwin-rebuild` time, not at boot
-  # (`org.nixos.activate-system`'s `RunAtLoad` job only relinks
-  # `/run/current-system` and `/etc`, it does not rerun `activate`) -- so a
-  # naive planter leaves every shim missing until the next switch after a
-  # reboot. `den.aspects.wrapperd` (`aspects/darwin/wrapperd.nix`) is what
-  # closes that gap: it replants at boot from a LaunchDaemon and gates the
-  # dependent agents on it. This aspect only produces the signed binaries; it
-  # no longer plants them.
-  trustedDir = "/run/wrappers/bin";
 
   subject = autopen.commonName;
 
@@ -118,12 +64,11 @@ let
   #
   # Here the package builds normally, purely, and substitutes like anything else.
   # Only this `runCommand` is impure, and all it does is copy `bin/` through a
-  # signature. What it produces is the same shape the activation script has
-  # always planted from:
+  # signature:
   #
-  #   trusted/<name>  the signed binary, which activation copies to trustedDir
-  #   bin/<name>         a makeWrapper shim exec'ing ${trustedDir}/<name>
-  #   everything else    symlinked straight through from the original
+  #   libexec/<name>.app  the signed bundle
+  #   bin/<name>          the entry point into it
+  #   everything else     symlinked straight through from the original
   #
   # `override`/`overrideAttrs` re-enter `mkSignedWrapper`, which is what makes
   # this usable as a module's `package`. paneru's module computes
@@ -167,7 +112,7 @@ let
         allowSubstitutes = false;
         preferLocalBuild = true;
 
-        nativeBuildInputs = [ pkgs.makeWrapper ] ++ lib.optional (signer != null) signer.tool;
+        nativeBuildInputs = lib.optional (signer != null) signer.tool;
 
         # Consumers reach through these. `services.paneru.lua` defaults to
         # `cfg.package.luaModule.lua`, and four call sites in
@@ -192,14 +137,10 @@ let
         meta = package.meta or { };
       }
       ''
-        # `trusted/` is planted verbatim into ${trustedDir} by activation, and
-        # `bin/<name>` is always a shim onto ${trustedDir}/<name>. Everything
-        # that has to sit at a stable path lives in `trusted/` -- for a wrapped
-        # program that is BOTH the script and the payload it execs, because a
-        # script that execs a store path puts a rebuild-varying path back in the
-        # middle of the chain, which is the thing this whole aspect exists to
-        # avoid.
-        mkdir -p "$out/bin" "$out/trusted"
+        # Each signed program becomes `libexec/<name>.app`, identified by
+        # `in.ivymect.<name>`. TCC keys a bundle by its identifier and the
+        # certificate, not by path, so the store path may move on every rebuild.
+        mkdir -p "$out/bin" "$out/libexec"
 
         # Mach-O by magic number; `file` is not in every stdenv. Follows
         # symlinks, which matters: inside a symlinkJoin every bin/ entry is one.
@@ -210,23 +151,21 @@ let
         	esac
         }
 
-        # A wrapper adds a signature; it is not a rebuild. Everything that is
-        # not bin/ is the original, so it is symlinked rather than copied.
         shopt -s nullglob
         for entry in ${package}/*; do
         	name="$(basename "$entry")"
-        	# `if`, not `[ ... ] && continue`: the builder runs under `set -e`, so
-        	# a false test at the end of the body would abort the whole build.
-        	if [ "$name" = bin ]; then
+        	# `if`, not `[ ... ] && continue`: the builder runs under `set -e`.
+        	if [ "$name" = bin ] || [ "$name" = libexec ]; then
         		continue
         	fi
         	ln -s "$entry" "$out/$name"
         done
+        if [ -d ${package}/libexec ]; then
+        	for entry in ${package}/libexec/*; do
+        		ln -s "$entry" "$out/libexec/$(basename "$entry")"
+        	done
+        fi
 
-        # Inherited by siblings with no bin/ at all -- paneru's loadable Lua
-        # module, for one. Producing no trusted/ is the correct outcome
-        # there: activation plants what it finds, so a package with nothing to
-        # sign contributes nothing.
         if [ ! -d ${package}/bin ]; then
         	echo "codesign: ${package} has no bin/, nothing to sign"
         	exit 0
@@ -240,8 +179,7 @@ let
         for f in ${package}/bin/*; do
         	name="$(basename "$f")"
 
-        	# makeWrapper's hidden payloads are reached through their wrapper
-        	# below, never signed under their own name.
+        	# makeWrapper's hidden payloads are reached through their wrapper.
         	case "$name" in
         	.*-wrapped) continue ;;
         	esac
@@ -251,9 +189,8 @@ let
         		continue
         	fi
 
-        	# Find the Mach-O this entry ultimately runs. Either it IS one, or it
-        	# is a makeWrapper script and the real binary is the `.<name>-wrapped`
-        	# sibling it execs, possibly through several layers of wrapping.
+        	# The Mach-O this entry runs: itself, or the `.<name>-wrapped` payload
+        	# of a makeWrapper script (one layer only).
         	target="$f"
         	depth=0
         	while ! isMachO "$target"; do
@@ -262,12 +199,6 @@ let
         			target=""
         			break
         		fi
-        		# Only one layer is handled. The rewrite below substitutes the
-        		# path the SCRIPT references, and past one layer that is an
-        		# intermediate script rather than the Mach-O -- each layer would
-        		# have to be planted and repointed in turn. Nothing here is wrapped
-        		# twice; if something starts being, this says so instead of
-        		# substituting the wrong path.
         		if [ "$depth" -ge 1 ]; then
         			echo "codesign: $name is wrapped more than one layer deep, which this does not handle" >&2
         			exit 1
@@ -276,89 +207,58 @@ let
         		depth=$((depth + 1))
         	done
 
-        	# Not a Mach-O and not a wrapper around one: a plain script, of which
-        	# sketchybar ships several. Carried through untouched -- there is
-        	# nothing to sign and nothing to plant.
+        	# A plain script: nothing to sign.
         	if [ -z "$target" ]; then
         		ln -s "$f" "$out/bin/$name"
         		continue
         	fi
 
-        	# Where the signed payload has to land. A bare binary IS the program,
-        	# so it takes the program's own name. A wrapped one keeps
-        	# makeWrapper's hidden name, because the script that execs it is
-        	# planted alongside under the program name and has to find it there.
-        	if [ "$target" = "$f" ]; then
-        		payload="$name"
-        	else
-        		payload=".$name-wrapped"
-        	fi
+        	id="in.ivymect.$name"
+        	stage="$TMPDIR/$name.app"
+        	mkdir -p "$stage/Contents/MacOS"
+        	cp "$target" "$stage/Contents/MacOS/$name"
+        	chmod 755 "$stage/Contents/MacOS/$name"
+        	cat >"$stage/Contents/Info.plist" <<PLIST
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0"><dict>
+          <key>CFBundleIdentifier</key><string>$id</string>
+          <key>CFBundleExecutable</key><string>$name</string>
+          <key>CFBundleName</key><string>$name</string>
+          <key>CFBundlePackageType</key><string>APPL</string>
+          <key>CFBundleVersion</key><string>1</string>
+          <key>LSUIElement</key><true/>
+        </dict></plist>
+        PLIST
 
-        	# `$target` is a Mach-O by construction -- the loop above only exits
-        	# with it set once `isMachO` passed -- so this signs the real binary,
-        	# never a wrapper script. A script cannot carry a code signature TCC
-        	# would honour anyway.
-        	#
-        	# The identifier is the stable half of the requirement, so it is the
-        	# name rather than anything version-derived.
         	# No timestamp: the requirement TCC stores is the certificate hash.
         	autopen-codesign --remote-key ${if signer == null then "/nonexistent" else signer.remoteKey} \
         		--certificate ${if signer == null then "/nonexistent" else signer.certificate} \
-        		--binary-identifier "$name" ${entitlementsArg} \
-        		"$target" "$out/trusted/$payload"
-        	chmod 755 "$out/trusted/$payload"
+        		--binary-identifier "$id" ${entitlementsArg} \
+        		"$stage" "$out/libexec/$name.app"
+        	exe="$out/libexec/$name.app/Contents/MacOS/$name"
 
-        	if [ "$target" != "$f" ]; then
-        		# Wrap the wrapper. The script is upstream's and it is what exports
-        		# LUA_PATH, PATH and the rest, so it is kept verbatim and ONLY its
-        		# exec target is repointed -- from the store copy of the payload to
-        		# the planted one. Both halves of the chain then live at fixed
-        		# paths, so nothing a rebuild moves is left in it.
-        		cp "$f" "$out/trusted/$name"
-        		chmod +w "$out/trusted/$name"
-        		substituteInPlace "$out/trusted/$name" --replace-fail "$target" "${trustedDir}/$payload"
-        		chmod 755 "$out/trusted/$name"
+        	if [ "$target" = "$f" ]; then
+        		ln -s "$exe" "$out/bin/$name"
+        	else
+        		# Upstream's script is what exports LUA_PATH, PATH and the rest, so
+        		# it is kept verbatim with only its exec target repointed.
+        		cp "$f" "$out/bin/$name"
+        		chmod +w "$out/bin/$name"
+        		substituteInPlace "$out/bin/$name" --replace-fail "$target" "$exe"
+        		chmod 755 "$out/bin/$name"
         	fi
-
-        	# Uniform regardless of shape: what the package exposes is a shim onto
-        	# the stable path. makeWrapper cannot target ${trustedDir} directly --
-        	# assertExecutable rejects a path that only exists after activation --
-        	# so it is aimed at the planted file and then re-pointed.
-        	makeWrapper "$out/trusted/$name" "$out/bin/$name"
-        	substituteInPlace "$out/bin/$name" --replace-fail "$out/trusted/$name" "${trustedDir}/$name"
         done
       '';
 
-  # In this host's TCC database keyed by a store path, which is the whole
-  # reason for the list. NOT paneru or sketchybar: both home-manager modules
-  # wrap `cfg.package` *again* after this overlay runs -- paneru's own
-  # `services.paneru.finalPackage` (`nix/_paneru-common.nix`) and
-  # home-manager's `programs.sketchybar.finalPackage`
-  # (`modules/programs/sketchybar.nix`) -- via a plain `symlinkJoin` +
-  # `wrapProgram` that has never heard of `mkSignedWrapper`, to inject
-  # `LUA_PATH`/`LUA_CPATH`/`PATH` (sketchybar's own `extraPackages`/
-  # `extraLuaPackages`, e.g. jq/yq/nowplaying-cli and the colours/icon-map Lua
-  # modules -- aspects/desktop/sketchybar/sketchybar.nix). Feeding that a
-  # pre-signed `pkgs.<name>` produces a *second*, unsigned
-  # wrapper-around-a-wrapper whose store path drifts on every rebuild that
-  # touches any of those dependencies, which is often -- exactly the
-  # instability this whole aspect exists to remove, just one layer further
-  # out. Leaving them out of `signed` keeps `pkgs.<name>` (hence `cfg.package`)
-  # plain, so `finalPackage` ends up wrapped exactly *once* over the real
-  # Mach-O -- the shape `mkSignedWrapper` already handles below. Each is
-  # signed explicitly at that point instead: see the `fromUser` entries in
-  # `den.aspects.codesign.darwin` and the matching calls in
-  # `aspects/wms/paneru/default.nix` and
-  # `aspects/desktop/sketchybar/sketchybar.nix`, which sign `finalPackage`
-  # itself (same inputs, so the same derivation either way).
+  # Signed in the overlay itself. A module may wrap these again (paneru's
+  # `finalPackage`, home-manager's sketchybar): the exec chain still ends in the
+  # signed bundle, which TCC identifies by bundle id, so no launchd job needs
+  # repointing.
   signed = [
-    # `kanata-with-cmd`, not `kanata`: `aspects/input/kanata/_kanata.nix`
-    # defaults `programs.kanata.package` to it, because the keybinds in the
-    # paneru aspect are all `(t! runasuser ...)` and `cmd` is a build feature.
-    # Signing plain `kanata` would sign a package nothing runs. Not
-    # double-wrapped like paneru/sketchybar above: its plist sets `PATH` via
-    # `EnvironmentVariables` directly and wraps nothing
-    # (aspects/input/kanata/_kanata.nix).
+    "sketchybar"
+    "paneru"
+    "coolabah"
     "kanata-with-cmd"
     "kanata-vk-agent"
   ];
@@ -373,7 +273,6 @@ in
     inherit
       mkSignedWrapper
       entitlementsFor
-      trustedDir
       subject
       ;
   };
@@ -414,15 +313,5 @@ in
         )
       )
     ];
-
-    # Planting -- copying each signed `trusted/<name>` into `trustedDir` -- used
-    # to live here in `postActivation`. It moved to `den.aspects.wrapperd`
-    # (`aspects/darwin/wrapperd.nix`), which owns the whole
-    # `trustedDir`/reboot-gap story: it generates a manifest from the same
-    # `enable`-gated `finalPackage` collection this aspect used, plants it on
-    # activation AND at boot (via a LaunchDaemon -- activation does not rerun at
-    # boot), and gates the launchd agents on that planter over a Mach service.
-    # This aspect is now purely the signer: `mkSignedWrapper`, the entitlements
-    # map, and the `zzz-codesign` overlay above.
   };
 }

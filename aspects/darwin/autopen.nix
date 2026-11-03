@@ -28,6 +28,8 @@ in
 
   # Generated once, on the admin host: the key is the secret; its verification
   # key and the self-signed certificate land beside it as `.vk` and `.crt.der`.
+  # 365 days is autopen's maximum. TCC pins the certificate's hash, and expiry
+  # is not checked there, so it is not reissued when it lapses.
   den.aspects.agenix-rekey.age.generators.autopen_codesign =
     {
       pkgs,
@@ -40,13 +42,14 @@ in
       base = lib.escapeShellArg (lib.removeSuffix ".age" file);
     in
     ''
+      set -euo pipefail
       dir=$(mktemp -d)
       trap 'rm -rf "$dir"' EXIT
       ${a} signing-key software rsa3072-pkcs1-sha256 generate --output "$dir/key" >&2
       ${a} signing-key get-verification-key --signing-key "$dir/key" --output ${base}.vk >&2
       cert=(--verification-key ${base}.vk --purpose code-signing
         --common-name ${lib.escapeShellArg den.lib.autopen.commonName}
-        --not-before "$(date -u +%Y-%m-%dT00:00:00Z)" --lifetime-days 7300)
+        --not-before "$(date -u +%Y-%m-%dT00:00:00Z)" --lifetime-days 365)
       ${a} x509 create-tbs-certificate --output "$dir/tbs" "''${cert[@]}" >&2
       ${a} sign --signing-key "$dir/key" --output "$dir/tbs.sig" "$dir/tbs" >&2
       ${a} x509 create-certificate --signature "$dir/tbs.sig" --output ${base}.crt.der "''${cert[@]}" >&2
