@@ -44,14 +44,15 @@
     "flake-parts": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "flake-parts_2": {
       "inputs": {
@@ -115,14 +116,15 @@
     "nixpkgs": {
       "flake": false,
       "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "nixvim": {
       "inputs": {

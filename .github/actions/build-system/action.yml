@@ -44,13 +44,6 @@ inputs:
     description: "Cap on nix-eval-jobs workers. Empty leaves nix-fast-build's default."
     required: false
     default: ""
-  codesign-identity:
-    description: >-
-      macOS only, and optional: passed straight through to
-      ./.github/actions/codesign-identity, which mints a throwaway identity when
-      it is empty. There is no reason to set it -- see that action for why.
-    required: false
-    default: ""
 
 runs:
   using: "composite"
@@ -144,8 +137,6 @@ runs:
     # that includes `den.aspects.codesign` fails to build without it, and cannot
     # fall back to the cache. See the action for the whole story.
     - uses: ./.github/actions/codesign-identity
-      with:
-        identity: ${{ inputs.codesign-identity }}
 
     # Every patched-input tree is a fixed-output derivation once its hash is
     # recorded (lib/patched-inputs.nix), so the output path is identical on

@@ -85,6 +85,7 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
+    autopen.url = "github:emilazy/boot-security-tools";
     celler = {
       url = "github:auscyber/celler/main";
       inputs = {
