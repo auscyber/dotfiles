@@ -72,9 +72,9 @@ in
       # against unless an aspect here gives it.
       #
       # That gap is what dropped the laptop's and auspc's pushes the moment
-      # their hand-written `celler-use` became a take. It has no signing key in
-      # ../base/celler/celler-keys.json yet, which is why `caches` keeps the
-      # key-derived fallback and does not throw.
+      # their hand-written `celler-use` became a take. It has no generated cache key
+      # yet, which is why `caches` keeps the
+      # key-derived fallback.
       #
       # `cache-main` and NOT `celler-main`: the latter also brings
       # `den.aspects.celler`, whose `expose.port` is 8069 and conflicts with the

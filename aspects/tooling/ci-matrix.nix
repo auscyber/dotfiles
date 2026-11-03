@@ -20,7 +20,7 @@
 #     for anything that does want a row per host.
 #   * The build jobs run against THIS flake with `accept-flake-config`, so they
 #     pick up substituters + trusted-public-keys straight from the flake's
-#     nixConfig -- everything derived from aspects/base/celler/celler-keys.json -- with
+#     nixConfig -- everything derived from the generated celler-cache-*.pub keys -- with
 #     nothing hardcoded in the workflow.
 let
   self = inputs.self;

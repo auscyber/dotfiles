@@ -5,8 +5,8 @@
 # A cache does NOT include its flows: a flow is what a consumer wants, and
 # bundling them forced both onto any host that serves the cache.
 #
-# Only `main` exists -- ../base/celler/celler-keys.json holds `secondpc.main`
-# and nothing else, and server.nix throws for a cache with no signing key.
+# Only `main` exists, and server.nix generates and loads a signing key for
+# every cache a host declares.
 {
   # ── THE CACHE, SEPARATE FROM THE SERVER THAT CARRIES IT ──
   # Two facts, and bundling them was wrong in a way celler2 made visible: it
@@ -16,7 +16,7 @@
   # not thereby be told how to run a server.
   den.aspects.cache-main = {
     # `name` is the CACHE's name, not the aspect's -- `main` is what
-    # ../base/celler/celler-keys.json holds and what a token is scoped to.
+    # ../base/celler/server.nix keys and a token is scoped to.
     # ../base/celler/server.nix reads this rather than the aspect name.
     cache = {
       name = "main";

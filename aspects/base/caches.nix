@@ -26,7 +26,7 @@ in
   debug = true;
 
   # In the `packages` registry, which overlays.nix walks regardless of
-  # inclusion, so the perSystem `pkgs` (update-celler-keys, celler-token) has
+  # inclusion, so the perSystem `pkgs` (celler-token) has
   # `pkgs.celler` whether or not any host is resolved there. Hosts get it the
   # normal way, by `includes`-ing it -- the same shape as ./ivy-fetch.nix.
   den.aspects.packages.celler.overlays.celler = lib.optional (

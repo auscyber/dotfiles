@@ -70,7 +70,6 @@ let
   # has, so there is nothing to capture.
   inherit (den.lib.policy) route;
   celler = import ./_lib.nix { inherit lib; };
-  keys = lib.importJSON ./celler-keys.json;
 in
 {
   # cellerd's `settings`, as a den class. `den.aspects.celler-server` holds what
@@ -174,7 +173,7 @@ in
           ...
         }:
         let
-          k = keys.${host.name} or { };
+          k = celler.keysFor host.name;
 
           # THE CACHES THIS HOST SERVES, BY INCLUSION. A cache is an aspect
           # carrying a `cache` record (../../services/celler-service.nix), so
@@ -187,18 +186,12 @@ in
           # derived fields and a cascade, for a question that is one `hasAspect`
           # per candidate.
           # BY `cache.name`, NOT BY THE ASPECT NAME. The aspect is `celler-main`
-          # and the cache is `main`, which is what celler-keys.json holds and
+          # and the cache is `main`, which is what its key file is named after and
           # what a token is scoped to -- reading the aspect name here made every
           # cache look as though it had no signing key.
           declared = lib.mapAttrsToList (_: a: a.cache.name) (
             lib.filterAttrs (_: a: (a ? cache)) (den.lib.capability.heldBy host)
           );
-
-          # A declared cache with no signing key is a cache that does not
-          # exist. `celler.use` filters it out of `keys` SILENTLY, so without
-          # this the token would be scoped to a cache the server cannot sign
-          # for and the only symptom would be a 403 at run time.
-          missingKeys = lib.subtractLists (builtins.attrNames k) (lib.unique declared);
         in
         {
           name = host.name;
@@ -217,19 +210,11 @@ in
           inherit (config.services.cellerd.expose) endpoint addresses;
           keys = k;
           # Declared caches win; the key-derived set remains the fallback for a
-          # host that declares no cache aspect, so this stays additive.
-          # A declared cache with no signing key is a cache that does not exist.
-          # `celler.use` filters it out of `keys` silently, so without this the
-          # token would be scoped to a cache the server cannot sign for, and the
-          # only symptom would be a 403 at runtime.
-          missingKeys = lib.subtractLists (builtins.attrNames k) (lib.unique declared);
-
+          # host that declares no cache aspect. A declared cache has no key in
+          # `keys` until gen-secrets writes its `.pub`.
           caches =
             if declared != [ ] then
-              if missingKeys == [ ] || k == { } then
-                lib.unique declared
-              else
-                throw "celler on ${host.name}: cache aspect(s) ${lib.concatStringsSep ", " missingKeys} with no signing key in aspects/base/celler/celler-keys.json (it has: ${lib.concatStringsSep ", " (builtins.attrNames k)}). A cache without a key cannot be pushed to -- add the key, or drop the cache aspect from this host."
+              lib.unique declared
             else if k == { } then
               [ "main" ]
             else
@@ -243,7 +228,7 @@ in
         { host, ... }:
         let
           expose = inputs.self.nixosConfigurations.${host.name}.config.services.cellerd.expose;
-          k = keys.${host.name} or { };
+          k = celler.keysFor host.name;
         in
         {
           nixConfig = {
@@ -267,7 +252,7 @@ in
           # Name -> `public`; null leaves visibility alone for an undeclared cache.
           serverCaches =
             let
-              k = keys.${host.name} or { };
+              k = celler.keysFor host.name;
               declared = lib.listToAttrs (
                 lib.mapAttrsToList (_: a: lib.nameValuePair a.cache.name (a.cache.public or false)) (
                   lib.filterAttrs (_: a: a ? cache) (den.lib.capability.heldBy host)
@@ -350,6 +335,11 @@ in
           };
 
           config = {
+            # Here rather than in `secrets`: a routed `secrets` body is not given `host`.
+            age.scoped.celler.secrets = lib.mapAttrs' (
+              c: _: lib.nameValuePair "cache_${c}" (celler.cacheKey host.name c)
+            ) serverCaches;
+
             services.cellerd = {
               enable = true;
               useFlakeCompatOverlay = false;
@@ -362,7 +352,7 @@ in
 
             # Create the caches this server serves, with a token it mints from
             # its own signing key -- so a fresh server (or a fresh R2 bucket)
-            # comes up serving the caches ./celler-keys.json says it has,
+            # comes up serving the caches it declares, signing with their generated keys,
             # rather than 404ing until someone runs `celler cache create` by
             # hand.
             #
@@ -407,6 +397,11 @@ in
                     echo "cellerd: creating cache ${c}"
                     ${lib.getExe pkgs.celler-client} cache create ${lib.escapeShellArg "self:${c}"}
                   fi
+                  ${lib.getExe pkgs.jq} -n --rawfile k "$CREDENTIALS_DIRECTORY/cache-${c}" \
+                    '{keypair: {Keypair: ($k | rtrimstr("\n"))}}' \
+                    | ${lib.getExe pkgs.curl} -sSf -X PATCH \
+                      -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+                      --data @- http://localhost:${toString cfg.port}/_api/v1/cache-config/${c}
                   ${lib.optionalString (public != null) ''
                     ${lib.getExe pkgs.celler-client} cache configure ${
                       if public then "--public" else "--private"
@@ -416,6 +411,10 @@ in
               )}
             '';
             systemd.services.cellerd.serviceConfig.RuntimeDirectory = "cellerd";
+            # The unit is a DynamicUser, so the root-owned age files reach it as credentials.
+            systemd.services.cellerd.serviceConfig.LoadCredential = lib.mapAttrsToList (
+              c: _: "cache-${c}:${scoped.celler.secrets."cache_${c}".path}"
+            ) serverCaches;
 
             systemd.services.cloudflared-tunnel = lib.mkIf (cfg.cloudflared.hostname != null) {
               wantedBy = [ "multi-user.target" ];

@@ -49,7 +49,7 @@ in
     # One cache declared, four instances generated
     # (../../base/service-instances.nix): the daemon, `main`, and `main`'s
     # implied push and pull. `main` because that is the only cache there is --
-    # ../../base/celler/celler-keys.json holds `secondpc.main` and nothing else,
+    # its generated key is `secrets/generated/secondpc/celler-cache-main.pub`,
     # and under this split the cache list and the key list come from this one
     # declaration rather than from two places that can disagree.
     # `main` is PUBLIC -- it is `cache.ivymect.in`, readable without a
@@ -179,7 +179,7 @@ in
       # record (../../services/celler-service.nix), and including it is what
       # makes this the host that serves it -- ../../base/celler/server.nix
       # derives its cache list from exactly this inclusion, so the list and the
-      # signing keys in celler-keys.json cannot disagree.
+      # cache keys generated from it cannot disagree.
       den.aspects.celler-main
 
       # Declared in ../../nixos/impermanence.nix now, so birdsarentreal can

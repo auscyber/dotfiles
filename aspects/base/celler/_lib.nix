@@ -73,6 +73,38 @@ rec {
     };
   };
 
+  # A server's public cache keys by cache name, read from the `.pub` sidecars
+  # `cacheKey` writes.
+  keysFor =
+    server:
+    let
+      dir = ../../../secrets/generated + "/${server}";
+      cacheOf = n: builtins.match "celler-cache-(.+)\\.pub" n;
+      pubs = lib.filterAttrs (n: t: t == "regular" && cacheOf n != null) (builtins.readDir dir);
+    in
+    lib.optionalAttrs (builtins.pathExists dir) (
+      lib.mapAttrs' (
+        n: _: lib.nameValuePair (lib.head (cacheOf n)) (lib.trim (builtins.readFile (dir + "/${n}")))
+      ) pubs
+    );
+
+  # A cache's narinfo signing key, in `nix key generate-secret` form; the public
+  # half is written beside it as `.pub`, which is where `keysFor` reads it.
+  cacheKey = server: cache: {
+    rekeyFile = ../../../secrets/generated + "/${server}/celler-cache-${cache}.age";
+    generator.script =
+      { pkgs, file, ... }:
+      let
+        nix = "${lib.getExe pkgs.nix} --extra-experimental-features nix-command";
+      in
+      ''
+        key="$(${nix} key generate-secret --key-name ${lib.escapeShellArg "${server}-${cache}"})"
+        printf '%s' "$key" | ${nix} key convert-secret-to-public \
+          > ${lib.escapeShellArg (lib.removeSuffix ".age" file + ".pub")}
+        printf '%s' "$key"
+      '';
+  };
+
   # A consumer's token for one server, scoped to what it declared for it.
   #
   # The scope is declared as `generator.derivedFrom`, NOT baked into the file
@@ -111,8 +143,7 @@ rec {
         # place, still signed by the dead key, with nothing to trigger
         # regeneration: `derivedFrom` decided the stamp, the stamp decided the
         # filename, the file existed, so agenix had nothing to do. The only
-        # symptom would be a 403 at run time -- the exact failure `missingKeys`
-        # in ./server.nix exists to prevent, arriving by the other route.
+        # symptom would be a 403 at run time.
         #
         # THE SECRET ITSELF, not a hash of it. `derivedFrom` already knows the
         # difference: ../../../patches/agenix-rekey/derivedFrom.patch's

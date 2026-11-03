@@ -188,10 +188,6 @@ let
       lib.filterAttrs (n: _: n != (self.name or "")) collectBuilders
     );
 
-  builderOptions = ''
-    builders-use-substitutes = true
-  '';
-
   # Shared by the `nixos` and `darwin` classes below, which are separate classes
   # and so cannot share a `let` binding of their own.
   clientConfig =
@@ -205,7 +201,6 @@ let
     in
     {
       nix.distributedBuilds = true;
-      nix.extraOptions = builderOptions;
       nix.buildMachines = buildMachinesFor self scoped;
 
       # ── THIS CLIENT'S HALF OF EVERY LINK ──

@@ -4,7 +4,7 @@
 # Worth having because cache.ivymect.in is a cache this flake both *writes* and
 # *trusts*, which makes it the one substituter that can be wrong in a way
 # upstream caches cannot: a half-pushed NAR, a stale signature after
-# celler-keys.json drifts, or the box simply being down and every fetch hanging
+# a cache key is re-generated, or the box simply being down and every fetch hanging
 # on a connect timeout. Pulling it out is the difference between "my build is
 # broken" and "my cache is broken", and there is otherwise no quick way to ask.
 #
