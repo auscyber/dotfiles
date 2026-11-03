@@ -264,11 +264,18 @@ in
           cfg = config.services.cellerd.expose;
           # The caches this server is meant to serve, by the same rule
           # `celler-caches` above publishes them.
+          # Name -> `public`; null leaves visibility alone for an undeclared cache.
           serverCaches =
             let
               k = keys.${host.name} or { };
+              declared = lib.listToAttrs (
+                lib.mapAttrsToList (_: a: lib.nameValuePair a.cache.name (a.cache.public or false)) (
+                  lib.filterAttrs (_: a: a ? cache) (den.lib.capability.heldBy host)
+                )
+              );
+              fallback = lib.genAttrs (if k == { } then [ "main" ] else builtins.attrNames k) (_: null);
             in
-            if k == { } then [ "main" ] else builtins.attrNames k;
+            if declared != { } then declared else fallback;
           local = [
             "http://localhost:${toString cfg.port}"
             "http://127.0.0.1:${toString cfg.port}"
@@ -390,16 +397,23 @@ in
               ${lib.getExe pkgs.celler-client} login self \
                 http://localhost:${toString cfg.port} "$token"
 
-              ${lib.concatMapStrings (c: ''
-                if ${lib.getExe pkgs.celler-client} cache info ${lib.escapeShellArg "self:${c}"} \
-                  >/dev/null 2>&1
-                then
-                  echo "cellerd: cache ${c} already exists"
-                else
-                  echo "cellerd: creating cache ${c}"
-                  ${lib.getExe pkgs.celler-client} cache create ${lib.escapeShellArg "self:${c}"}
-                fi
-              '') serverCaches}
+              ${lib.concatStrings (
+                lib.mapAttrsToList (c: public: ''
+                  if ${lib.getExe pkgs.celler-client} cache info ${lib.escapeShellArg "self:${c}"} \
+                    >/dev/null 2>&1
+                  then
+                    echo "cellerd: cache ${c} already exists"
+                  else
+                    echo "cellerd: creating cache ${c}"
+                    ${lib.getExe pkgs.celler-client} cache create ${lib.escapeShellArg "self:${c}"}
+                  fi
+                  ${lib.optionalString (public != null) ''
+                    ${lib.getExe pkgs.celler-client} cache configure ${
+                      if public then "--public" else "--private"
+                    } ${lib.escapeShellArg "self:${c}"}
+                  ''}
+                '') serverCaches
+              )}
             '';
             systemd.services.cellerd.serviceConfig.RuntimeDirectory = "cellerd";
 

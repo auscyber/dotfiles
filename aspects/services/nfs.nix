@@ -114,23 +114,6 @@ in
     includes = [ den.aspects.agenix-rekey ];
     reach = "household";
 
-    secrets =
-      { host, ... }:
-      {
-        nfs-server = {
-          generator.script = "x509_pair";
-          settings = {
-            cn = host.name;
-            san = [
-              "DNS:${host.name}"
-            ]
-            ++ map (a: "IP:${a}") (
-              lib.filter (a: a != null) (lib.mapAttrsToList (_: a: a.address or null) (host.attachments or { }))
-            );
-          };
-        };
-      };
-
     gives =
       {
         self,
@@ -216,7 +199,26 @@ in
             "nfs-server: ${x.e.name} on ${x.e.host.name} has no address on the carrier it reaches ${host.name} over, so it gets no export."
           ) (lib.filter (x: x.address == null) edges);
 
-          age.scoped = lib.mkMerge (map (x: { ${x.r.scope}.secrets = x.r.giverSecrets; }) edges);
+          # Here rather than in `secrets`: a routed `secrets` body is not given `host`.
+          age.scoped = lib.mkMerge (
+            [
+              {
+                nfs-server.secrets.nfs-server = {
+                  generator.script = "x509_pair";
+                  settings = {
+                    cn = host.name;
+                    san = [
+                      "DNS:${host.name}"
+                    ]
+                    ++ map (a: "IP:${a}") (
+                      lib.filter (a: a != null) (lib.mapAttrsToList (_: a: a.address or null) (host.attachments or { }))
+                    );
+                  };
+                };
+              }
+            ]
+            ++ map (x: { ${x.r.scope}.secrets = x.r.giverSecrets; }) edges
+          );
 
           services.nfs.server = {
             enable = true;
