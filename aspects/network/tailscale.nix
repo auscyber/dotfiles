@@ -356,6 +356,15 @@ in
   den.default.age.generators.tailscale-authkey = authKeyScript;
 
   den.aspects.tailscale = {
+    # Every tailnet member should be able to reach the house LAN. The route
+    # resolves directly on hosts attached to `lan-home`; on tailnet-only hosts
+    # it resolves through the member that advertises that subnet (secondpc).
+    # This is a forwarding route, not a service socket, so it has no units.
+    takes.route = {
+      segment = "lan-home";
+      units = [ ];
+    };
+
     # ── WHAT THIS ASPECT GIVES, for ../base/capability.nix ──
     #
     # Including this aspect IS being on the tailnet. That is the whole point of

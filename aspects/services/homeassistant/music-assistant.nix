@@ -92,6 +92,7 @@ in
           ports.http = {
             port = musicAssistantPort;
             meta.description = "Music Assistant's API and web UI, which Home Assistant dials over the loopback on this same box.";
+            expose = [ "tailscale" ];
           };
           # THE EXTERNAL SENDSPIN CLIENTS' PORT, which the note below said to
           # declare here "if a real external client appears". One has:
