@@ -229,7 +229,68 @@ let
     ++ map (e: e.line) edges
     ++ linkStyles
   );
+
+  # The README's view: machines, the segments they sit on, and one edge per
+  # (taker machine, giver machine, carrier) naming what flows over it.
+  overview =
+    let
+      crossLinks = lib.filter (r: !r.who.winner.sameHost) links;
+      # Carrierless links (a record like `celler`) are drawn dashed and unlabelled.
+      via =
+        r:
+        if (r.how.winner.carrier or null) != null then
+          r.how.winner.carrier
+        else if r.broken or false then
+          "no path"
+        else
+          "local";
+      grouped = lib.groupBy (r: "${machineOf r.from}|${machineOf entities.${r.who.winner.on}}|${via r}") (
+        lib.filter (r: entities ? ${r.who.winner.on}) crossLinks
+      );
+      connection =
+        rs:
+        let
+          r = lib.head rs;
+          from = machineOf r.from;
+          to = machineOf entities.${r.who.winner.on};
+        in
+        lib.optional (from != to) {
+          line = "${entId from} -->|${q "${lib.concatStringsSep ", " (lib.unique (map (x: x.cap) rs))}${lib.optionalString (via r != "local") " · ${via r}"}"}| ${entId to}";
+          style = via r;
+        };
+      connections = lib.concatMap connection (lib.attrValues grouped);
+      machineAttachments = lib.concatMap (
+        e:
+        lib.mapAttrsToList (s: a: {
+          line = "${entId e.name} ---|${q (lib.defaultTo s (addressOn e a))}| seg_${id s}";
+          style = "attach";
+        }) (lib.filterAttrs (s: _: spansOf s == "many-hosts") (segmentsOf e))
+      ) (lib.attrValues machines);
+      shown = machineAttachments ++ connections;
+      attached = lib.unique (
+        lib.concatMap (
+          e: lib.attrNames (lib.filterAttrs (s: _: spansOf s == "many-hosts") (segmentsOf e))
+        ) (lib.attrValues machines)
+      );
+    in
+    lib.concatStringsSep "\n" (
+      [
+        "flowchart LR"
+        "classDef seg fill:#45475a,stroke:#f9e2af,color:#f9e2af"
+      ]
+      ++ lib.mapAttrsToList (n: _: "  ${entId n}([${q n}])") machines
+      ++ map (
+        s:
+        "  seg_${id s}{{${
+            q (lib.concatStringsSep "<br/>" ([ s ] ++ lib.optional (prefixOf s != null) (prefixOf s)))
+          }}}:::seg"
+      ) attached
+      ++ map (e: e.line) shown
+      ++ lib.imap0 (
+        i: e: "linkStyle ${toString i} ${colours.${e.style} or "stroke:#f38ba8,stroke-width:2px"}"
+      ) shown
+    );
 in
 {
-  _module.args.fleetGraph = { inherit mermaid; };
+  _module.args.fleetGraph = { inherit mermaid overview; };
 }

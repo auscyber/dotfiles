@@ -65,13 +65,8 @@ Other things that are true but were NOT the main cause:
 
 ### The fast feedback loop
 
-For anything in the service model's resolution layer (`lib/service-scope.nix`,
-`lib/service-link.nix`), drive the libraries directly against a fixture registry
-of plain attrsets instead of going through a host eval: seconds rather than
-minutes, no den, no import-from-derivation, no host entities.
-
-**The capability layer has its own version of this, and it is much faster than a
-host eval.** `aspects/base/capability.nix` exports as `den.lib.capability`, and
+**The capability layer can be queried much faster than a host eval.**
+`aspects/base/capability.nix` exports as `den.lib.capability`, and
 `debug = true` puts the whole flake config in the `debug` output, so every
 resolver query can be driven against real host ENTITIES without building a
 single NixOS config:

@@ -4,6 +4,7 @@
   den,
   capabilityGraph,
   routeGraph,
+  fleetGraph,
   ...
 }:
 let
@@ -12,6 +13,36 @@ let
 
   # All hosts flattened: { hostName -> hostAttr }
   allHosts = lib.mergeAttrsList (builtins.attrValues den.hosts);
+
+  # The README's graph: a host, what its own aspect lists, its roles and the
+  # household services it claims. One level, no den internals.
+  shallowMermaid =
+    hostName: host:
+    let
+      inherit (den.lib.aspects.fx) identity;
+      nodeId = label: "n" + builtins.substring 0 10 (builtins.hashString "sha1" label);
+      services = lib.attrValues (host.serves or { });
+      serviceAspects = map (s: s.aspect.name) (lib.filter (s: s.aspect != null) services);
+      aspects = lib.subtractLists serviceAspects (
+        lib.unique (
+          map (a: lib.removePrefix "den/provides/" (identity.pathKey (identity.aspectPath a))) (
+            lib.filter builtins.isAttrs (den.aspects.${hostName}.includes or [ ])
+          )
+        )
+      );
+      edge =
+        shape: arrow: label:
+        "  root ${arrow} ${nodeId label}${shape label}";
+    in
+    lib.concatStringsSep "\n" (
+      [
+        "graph LR"
+        "  root([${hostName}])"
+      ]
+      ++ map (edge (l: "[\"${l}\"]") "-->") aspects
+      ++ map (edge (l: "{{\"${l}\"}}") "-.->|serves|") (map (s: s.name) services)
+      ++ map (edge (l: ">\"${l}\"]") "---") (host.roles or [ ])
+    );
 in
 {
   # Moved from the now-deleted aspects/docs/diagram.nix, which was this
@@ -120,11 +151,12 @@ in
           name = hostName;
           system = host.system or "unknown";
           roles = lib.concatStringsSep ", " (host.roles or [ ]);
-          mermaid = hostDiagrams.${hostName}.mermaid;
+          mermaid = shallowMermaid hostName host;
           aspects = hostDiagrams.${hostName}.aspects;
         }) allHosts;
 
         packages = packageList;
+        network = fleetGraph.overview;
       };
 
       input = pkgs.writeText "input.yaml" (lib.generators.toYAML { } data);

@@ -32,6 +32,18 @@ let
       # published and not gated; `takes.gated` is both.
       isGated = name: den.lib.capability.takeKeyFor "proxy" asked.${name} == "gated";
 
+      # Keyed by implementing aspect, which is what `takersOn` keys by. A taker
+      # that is no household service (tautulli) stays public, as before.
+      exposureOf =
+        let
+          byAspect = lib.listToAttrs (
+            map (s: lib.nameValuePair s.aspect.name s.exposure) (
+              lib.filter (s: s.aspect != null) (lib.attrValues (host.serves or { }))
+            )
+          );
+        in
+        name: byAspect.${name} or "public";
+
       # ── THE UPSTREAM, RESOLVED RATHER THAN ASSUMED ──
       #
       # Was `http://127.0.0.1:${port}`, justified as "loopback is the proxy's
@@ -87,6 +99,8 @@ let
           # variable to read and the answer is false rather than defaulted --
           # the same reasoning `oauthProxy` above uses.
           forwardUser = if isGated name then (g.forwardUser.${name} or false) else false;
+
+          exposure = exposureOf name;
         }
         // lib.optionalAttrs ((p.subdomain.${name} or null) != null) {
           # ── `domain`, COMPOSED, NOT `subdomain` ──
@@ -151,7 +165,10 @@ let
       # value defined`.
       emits =
         name:
-        (p.port.${name} or null) != null || (p.upstream.${name} or null) != null || resolved name != null;
+        exposureOf name != "internal"
+        && (
+          (p.port.${name} or null) != null || (p.upstream.${name} or null) != null || resolved name != null
+        );
     in
     # A HOST WITH NO ZONE PUBLISHES NOTHING. Entries whose `domain` interpolated
     # a null would be names like `music.`, so a host including no zone carrier

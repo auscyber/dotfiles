@@ -326,7 +326,6 @@ in
         "raycast"
         "calibre"
         "sf-symbols"
-        "font-sf-pro"
         "todoist-app"
         "dockdoor"
         "beeper"

@@ -927,9 +927,18 @@ in
                 tooBig = lib.filter (
                   n: (subs.${n} or null) != null && (caps.${n} or null) != null && caps.${n} > tunnelBodyCap
                 ) (lib.attrNames subs);
+
+                # Vhosts every one of whose services is lan or tailnet only.
+                private = lib.attrNames (
+                  lib.filterAttrs (_: es: lib.all (e: e.exposure != "public") es) (
+                    lib.groupBy (e: e.domain) (
+                      lib.filter (e: e.enable) (lib.attrValues (config.gateway.services or { }))
+                    )
+                  )
+                );
               in
-              if zone == null then [ ] else map (n: "${subs.${n}}.${zone}") tooBig;
-            description = "Published names whose declared body limit exceeds the tunnel's cap.";
+              private ++ lib.optionals (zone != null) (map (n: "${subs.${n}}.${zone}") tooBig);
+            description = "Published names that stay off the tunnel: over its body cap, or with no public service.";
           };
 
           ingress = lib.mkOption {

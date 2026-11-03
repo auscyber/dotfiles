@@ -9,8 +9,9 @@
 # INSTANCE is in scope, because `users` below is derived from that household's
 # members, and a type built from the schema alone cannot see them.
 #
-# The rest of the service model is in aspects/base/service.nix: the schema, the
-# per-host `enable` claim, `serves`, and the `serviceHosts` fleet walk.
+# The rest of the service model is in aspects/base/service.nix (the schema, the
+# per-host `enable` claim, `serves`) and aspects/base/service-propagate.nix (what
+# a claiming host includes).
 #
 # ── WHAT A HOUSEHOLD DECLARES, AND WHAT IT NO LONGER RESTATES ──
 #
@@ -207,6 +208,34 @@ den.lib.schema.mkInstanceType {
               service is dropped from the grant collector and every member
               granted it looks granted while no group is ever created.
             '';
+          };
+
+          includes = mkOption {
+            type = types.listOf types.raw;
+            default = [ ];
+            description = "Aspects this service brings, beside `aspect`, to every host that claims it.";
+          };
+
+          exposure = mkOption {
+            type = types.enum [
+              "internal"
+              "lan"
+              "tailnet"
+              "public"
+            ];
+            default = "public";
+            description = ''
+              How far this service's vhost is published. `internal`: no vhost.
+              `lan`: lan-home and loopback only. `tailnet`: lan plus the tailnet.
+              `public`: also through the cloudflare tunnel. The default is what
+              every vhost on a tunnelled host already was.
+            '';
+          };
+
+          discoverable = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Listed to the household's members, e.g. as a dashboard tile.";
           };
 
           reach = mkOption {

@@ -178,7 +178,9 @@ let
         else
           lib.attrNames (lib.filterAttrs (_: m: m.services ? ${svc.group}) household.members);
     in
-    if svc == null || (svc.access == null && groupAccess == null) then
+    if svc != null && !svc.discoverable then
+      [ ]
+    else if svc == null || (svc.access == null && groupAccess == null) then
       null
     else
       lib.unique (direct ++ viaGroup);

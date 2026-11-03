@@ -103,6 +103,26 @@ let
   # while the same expression inside a class body can only be forced by a full
   # host evaluation.
   callerFactsFor = host: den.lib.capability.contributions host "credential";
+
+  # nginx access rules for a non-public service. cloudflared dials from
+  # loopback, so a tunnelled request is refused by its header, not its address.
+  exposureRules =
+    exposure:
+    let
+      sources = {
+        lan = [ den.aspects.lan-home.prefix ];
+        tailnet = [
+          den.aspects.lan-home.prefix
+          den.aspects.tailscale.prefix
+        ];
+      };
+    in
+    lib.optionalString (sources ? ${exposure}) ''
+      if ($http_cf_connecting_ip) { return 403; }
+      allow 127.0.0.0/8;
+      allow ::1;
+      ${lib.concatMapStrings (p: "allow ${p};\n") sources.${exposure}}deny all;
+    '';
 in
 {
   den.aspects.gateway = {
@@ -718,6 +738,15 @@ in
                     example = "http://127.0.0.1:8989";
                     description = "Scheme, host and port of the backend.";
                   };
+                  exposure = mkOption {
+                    type = types.enum [
+                      "lan"
+                      "tailnet"
+                      "public"
+                    ];
+                    default = "public";
+                    description = "Who may reach this service's locations. Only `public` is published through the tunnel.";
+                  };
                   banner = mkOption {
                     type = types.nullOr types.str;
                     default = null;
@@ -1186,7 +1215,8 @@ in
                       # third `auth_request_set` beside them, and `extraConfig`
                       # is `types.lines`, so the two merge.
                       extraConfig =
-                        lib.optionalString e.forwardUser ''
+                        exposureRules e.exposure
+                        + lib.optionalString e.forwardUser ''
                           auth_request_set $gw_person $upstream_http_x_auth_request_preferred_username;
                           proxy_set_header Remote-User $gw_person;
                         ''
@@ -1232,7 +1262,7 @@ in
                     lib.nameValuePair e.api.subpath {
                       proxyPass = "${e.upstream}${e.api.subpath}";
                       # A longer prefix than the UI location, so it wins.
-                      extraConfig = ''
+                      extraConfig = exposureRules e.exposure + ''
                         # An API location must not inherit the vhost's login
                         # redirect: a caller presenting a bad or absent key then
                         # gets a 302 chain ending in kanidm's HTML login page,
