@@ -221,6 +221,7 @@ linkStyle 36 stroke:#9399b2,stroke-width:1px,stroke-dasharray:3 3
 - vpn
 - vpn-secrets
 - wakatime
+- wake-on-lan-sender
 - wrapperd
 - zig
 - zotero
@@ -243,6 +244,7 @@ graph LR
   root --> n15f90b1816["tailscale"]
   root --> n600ee077cd["time-machine"]
   root --> n9da8774360["roaming-resolver"]
+  root --> nb1395d6d2c["wake-on-lan-sender"]
   root --- n885534c19d>"study"]
   root --- nd6a7af1345>"gui"]
   root --- n34c6fceca7>"dev"]
@@ -300,6 +302,7 @@ graph LR
 - home-base
 - hostname/os
 - house-wifi
+- initrd-ssh
 - inputs&#39;/os
 - insecure-predicate
 - insecure-predicate/os
@@ -357,8 +360,9 @@ graph LR
 - vban
 - vban-turntable
 - vpn
-- vpn-secrets
 - wakatime
+- wake-on-lan
+- wake-on-lan-sender
 
 ### Aspect Graph
 
@@ -368,6 +372,9 @@ graph LR
   root --> n0fb7ec51ff["corsair"]
   root --> ncacab80da8["razer"]
   root --> n00e01e76d5["eightbitdo"]
+  root --> n214b18b9eb["initrd-ssh"]
+  root --> n69d2f567a8["wake-on-lan"]
+  root --> nb1395d6d2c["wake-on-lan-sender"]
   root --> na9d26e348d["qemu"]
   root --> n3fe17355b4["vpn"]
   root --> n15f90b1816["tailscale"]
@@ -1008,12 +1015,16 @@ graph LR
 - vpn-secrets
 - vpn-server
 - wakatime
+- wake-on-lan
+- wake-on-lan-sender
 
 ### Aspect Graph
 
 ```mermaid
 graph LR
   root([secondpc])
+  root --> n69d2f567a8["wake-on-lan"]
+  root --> nb1395d6d2c["wake-on-lan-sender"]
   root --> n58c54bb3de["celler-main"]
   root --> n66f66ceb39["impermanence"]
   root --> n58a3ed6f29["nginx"]
@@ -1230,8 +1241,8 @@ graph LR
 | cotabby | `v0.6.2-beta` |  |
 | donetick | `v0.1.85` | Self-hosted task and chore manager |
 | flaresolverr | `3.5.2` | Proxy server to bypass Cloudflare protection |
-| ghostty | `93967b7f9478e94dcbb42125c8a90f34feb40d75` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.20.2.1` |  |
+| ghostty | `1.4.0` | Fast, native, feature-rich terminal emulator pushing modern features |
+| helium | `0.20.2.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
