@@ -9,6 +9,7 @@
 | auspc | x86_64-linux | gui, gaming, dev |
 | birdsarentreal | x86_64-linux | gui |
 | celler2 | x86_64-linux |  |
+| dyson | esp32-idf |  |
 | iphone | aarch64-ios |  |
 | lora-pi | aarch64-linux |  |
 | macmini | aarch64-darwin | gui |
@@ -34,8 +35,6 @@
 - browsers
 - browsers/zen
 - builders
-- ccache
-- ccache/Ivys-MacBook-Pro
 - celler-host
 - celler-quirk-args
 - celler-user
@@ -79,6 +78,7 @@
 - laptop-dock
 - lib
 - linux-builder
+- llm-node
 - lspmux
 - main-ssh-key
 - mcp-servers
@@ -99,6 +99,7 @@
 - provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server)
 - provides/unfree(copilot-language-server,copilot-language-server-lspmux)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(cuda_cccl,cuda_cudart,cuda_nvcc,cuda_nvml_dev,libcublas)
 - provides/unfree(libkey-nomad,onepassword-password-manager)
 - provides/unfree(onepassword-password-manager)
 - roaming-resolver
@@ -134,10 +135,8 @@ graph LR
   Ivys_MacBook_Pro([Ivys-MacBook-Pro]):::root
 
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
-  ccache__Ivys_MacBook_Pro[/"ccache/Ivys-MacBook-Pro"\]:::ccache__Ivys_MacBook_Pro_c
   agenix_rekey_host_Ivys_MacBook_Pro["agenix-rekey"]:::agenix_rekey_host_Ivys_MacBook_Pro_c
   builders["builders"]:::builders_c
-  ccache["ccache"]:::ccache_c
   celler_host["celler-host"]:::celler_host_c
   celler_quirk_args_host_Ivys_MacBook_Pro["celler-quirk-args"]:::celler_quirk_args_host_Ivys_MacBook_Pro_c
   codesign_identity["codesign-identity"]:::codesign_identity_c
@@ -161,6 +160,7 @@ graph LR
   laptop_dock["laptop-dock"]:::laptop_dock_c
   lib["lib"]:::lib_c
   linux_builder["linux-builder"]:::linux_builder_c
+  llm_node["llm-node"]:::llm_node_c
   nix["nix"]:::nix_c
   nix_conf_parts["nix-conf-parts"]:::nix_conf_parts_c
   nix_index["nix-index"]:::nix_index_c
@@ -186,6 +186,7 @@ graph LR
   ivypierlot__Ivys_MacBook_Pro__to_users[/"ivypierlot/Ivys-MacBook-Pro/to-users"\]:::ivypierlot__Ivys_MacBook_Pro__to_users_c
   js__to_users[/"js/to-users"\]:::js__to_users_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
+  den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas_{{"provides/unfree(cuda_cccl,cuda_cudart,cuda_nvcc,cuda_nvml_dev,libcublas)"}}:::den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__user{{"unfree-predicate/user"}}:::unfree_predicate__user_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
@@ -200,6 +201,7 @@ graph LR
   cap_nix_builder_ssh{{"ssh"}}:::cap_nix_builder_ssh_c
   cap_nix_builder_ssh_g_openssh[/"openssh on Ivys-MacBook-Pro"\]:::cap_nix_builder_ssh_g_openssh_c
   cap_nix_builder_ssh_t["nix-builder"]:::cap_nix_builder_ssh_t_c
+  cap_opencode_llm_api{{"llm-api name=llm-head"}}:::cap_opencode_llm_api_c
   cap_paperwork_share{{"share displayName=Paperwork, permissions=(read,write,share,delete)"}}:::cap_paperwork_share_c
   cap_paperwork_share_t["paperwork"]:::cap_paperwork_share_t_c
   cap_photos_share{{"share displayName=Photos, quota=200G"}}:::cap_photos_share_c
@@ -209,7 +211,6 @@ graph LR
   cap_zotero_library_share{{"share displayName=zotero"}}:::cap_zotero_library_share_c
   cap_zotero_library_share_t["zotero-library"]:::cap_zotero_library_share_t_c
   cap_zotero_webdav_provisioned{{"webdav-provisioned account=zotero, shares=(zotero-library)"}}:::cap_zotero_webdav_provisioned_c
-  Ivys_MacBook_Pro --> ccache
   Ivys_MacBook_Pro --> codesign_identity
   Ivys_MacBook_Pro --> homebrew_host_Ivys_MacBook_Pro
   Ivys_MacBook_Pro --> js
@@ -235,6 +236,7 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  llm_node --> den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas_
   nix --> linux_builder
   nixpkgs_config_host_Ivys_MacBook_Pro --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
   shell_host_Ivys_MacBook_Pro --> jujutsu
@@ -245,7 +247,6 @@ graph LR
   vpn --> vpn_secrets
   vpn_secrets --> agenix_rekey_host_Ivys_MacBook_Pro
   Ivys_MacBook_Pro -.->|provides| Ivys_MacBook_Pro__to_users
-  ccache -.->|provides| ccache__Ivys_MacBook_Pro
   js -.->|provides| js__to_users
   builders -.-x cap_builders_builder
   cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
@@ -348,12 +349,13 @@ graph LR
   zig --> lspmux
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_opencode_llm_api_g_llm_head[/"llm-head on secondpc"\]:::cap_opencode_llm_api_g_llm_head_c
   cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
   cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
   cap_zotero_library_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_zotero_library_share_ox0_c
@@ -366,6 +368,8 @@ graph LR
   cap_builders_builder -.-x cap_builders_builder_ox1
   cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
   ivypierlot -.-x cap_ivypierlot_celler
+  opencode -.->|takes| cap_opencode_llm_api
+  cap_opencode_llm_api -.->|tailscale 40 (Ivys-MacBook-Pro to secondpc)| cap_opencode_llm_api_g_llm_head
   cap_paperwork_share -.-x cap_paperwork_share_ox0
   cap_photos_share -.-x cap_photos_share_ox0
   zotero -.->|takes| cap_zotero_webdav_provisioned
@@ -375,12 +379,10 @@ graph LR
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
   classDef user___policy_ivypierlot_role_study__7__c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef Ivys_MacBook_Pro_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
-  classDef ccache__Ivys_MacBook_Pro_c fill:#bf8700,stroke:#bf8700,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_host_Ivys_MacBook_Pro_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef agenix_rekey_user_ivypierlot_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef browsers_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef builders_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
-  classDef ccache_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef celler_host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef celler_quirk_args_host_Ivys_MacBook_Pro_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef celler_quirk_args_user_ivypierlot_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
@@ -425,6 +427,7 @@ graph LR
   classDef laptop_dock_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef linux_builder_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef llm_node_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lspmux_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef mcp_servers_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
@@ -468,6 +471,7 @@ graph LR
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_language_server_copilot_language_server_lspmux__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_libkey_nomad_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
@@ -483,7 +487,7 @@ graph LR
   classDef zotero_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -492,6 +496,8 @@ graph LR
   classDef cap_nix_builder_ssh_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_g_openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_opencode_llm_api_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_opencode_llm_api_g_llm_head_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_paperwork_share_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_paperwork_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_paperwork_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -542,6 +548,8 @@ style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - celler-quirk-args
 - celler-user
 - claude
+- clusterplex-mounts
+- clusterplex-worker
 - corsair-psu
 - define-user/auscyber@auspc
 - den/provides/unfree(castlabs-electron)
@@ -568,9 +576,11 @@ style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - ivy-fetch
 - jujutsu
 - lib
+- llm-node
 - lspmux
 - main-ssh-key
 - neovim
+- nfs-client
 - nix
 - nix-conf-parts
 - nix-index
@@ -590,6 +600,7 @@ style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - provides/unfree(cmp-nvim-lsp-document-symbol,copilot-language-server)
 - provides/unfree(copilot-language-server,copilot-language-server-lspmux)
 - provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- provides/unfree(cuda_cccl,cuda_cudart,cuda_nvcc,cuda_nvml_dev,libcublas)
 - provides/unfree(onepassword-password-manager)
 - qemu
 - qemu/to-users
@@ -637,6 +648,8 @@ graph LR
   ccache["ccache"]:::ccache_c
   celler_host["celler-host"]:::celler_host_c
   celler_quirk_args_host_auspc["celler-quirk-args"]:::celler_quirk_args_host_auspc_c
+  clusterplex_mounts["clusterplex-mounts"]:::clusterplex_mounts_c
+  clusterplex_worker["clusterplex-worker"]:::clusterplex_worker_c
   corsair_psu["corsair-psu"]:::corsair_psu_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   define_user__auscyber_auspc{{"define-user/auscyber@auspc"}}:::define_user__auscyber_auspc_c
@@ -655,6 +668,8 @@ graph LR
   insecure_predicate["insecure-predicate"]:::insecure_predicate_c
   jujutsu["jujutsu"]:::jujutsu_c
   lib["lib"]:::lib_c
+  llm_node["llm-node"]:::llm_node_c
+  nfs_client["nfs-client"]:::nfs_client_c
   nix["nix"]:::nix_c
   nix_conf_parts["nix-conf-parts"]:::nix_conf_parts_c
   nix_index["nix-index"]:::nix_index_c
@@ -686,6 +701,7 @@ graph LR
   turntable_input["turntable-input"]:::turntable_input_c
   den__provides__unfree_castlabs_electron__host_auspc{{"den/provides/unfree(castlabs-electron)"}}:::den__provides__unfree_castlabs_electron__host_auspc_c
   den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
+  den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas_{{"provides/unfree(cuda_cccl,cuda_cudart,cuda_nvcc,cuda_nvml_dev,libcublas)"}}:::den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas__c
   unfree_predicate["unfree-predicate"]:::unfree_predicate_c
   unfree_predicate__user{{"unfree-predicate/user"}}:::unfree_predicate__user_c
   insecure_predicate__user{{"insecure-predicate/user"}}:::insecure_predicate__user_c
@@ -699,6 +715,8 @@ graph LR
   cap_celler_cache_pull_http_t["celler-cache-pull"]:::cap_celler_cache_pull_http_t_c
   cap_celler_default_celler{{"celler"}}:::cap_celler_default_celler_c
   cap_celler_default_celler_t["celler-default"]:::cap_celler_default_celler_t_c
+  cap_clusterplex_mounts_nfs{{"nfs mounts=(...)"}}:::cap_clusterplex_mounts_nfs_c
+  cap_clusterplex_worker_transcode{{"transcode name=clusterplex-orchestrator"}}:::cap_clusterplex_worker_transcode_c
   cap_corsair_psu_home_assistant{{"home-assistant extraComponents=(mqtt)"}}:::cap_corsair_psu_home_assistant_c
   cap_corsair_psu_mqtt{{"mqtt acl=(write homeassistant/sensor/#,write sensors/#)"}}:::cap_corsair_psu_mqtt_c
   cap_nix_builder_ssh{{"ssh"}}:::cap_nix_builder_ssh_c
@@ -718,6 +736,7 @@ graph LR
   auspc --> bootlogo
   auspc --> builder_server
   auspc --> cachyos_kernel
+  auspc --> clusterplex_worker
   auspc --> corsair_psu
   auspc --> disko
   auspc --> gpus
@@ -731,6 +750,8 @@ graph LR
   auspc --> vpn
   cachyos_kernel --> ccache
   celler_host --> celler_quirk_args_host_auspc
+  clusterplex_mounts --> nfs_client
+  clusterplex_worker --> clusterplex_mounts
   den__batteries__define_user --> define_user__auscyber_auspc
   den__batteries__hostname --> hostname__os
   den__batteries__inputs_ --> inputs___os
@@ -740,6 +761,7 @@ graph LR
   insecure_predicate --> insecure_predicate__os
   insecure_predicate --> insecure_predicate__user
   jujutsu --> difftastic
+  llm_node --> den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas_
   nixpkgs_config_host_auspc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
   shell_host_auspc --> jujutsu
   shell_host_auspc --> nix_index
@@ -757,6 +779,8 @@ graph LR
   builders -.->|takes| cap_builders_builder
   cap_celler_cache_pull_http_t -.->|takes| cap_celler_cache_pull_http
   cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
+  clusterplex_mounts -.->|takes| cap_clusterplex_mounts_nfs
+  clusterplex_worker -.->|takes| cap_clusterplex_worker_transcode
   corsair_psu -.->|takes| cap_corsair_psu_home_assistant
   corsair_psu -.->|takes| cap_corsair_psu_mqtt
   cap_nix_builder_ssh_t -.->|takes| cap_nix_builder_ssh
@@ -838,6 +862,8 @@ graph LR
   cap_auscyber_celler_g_celler[/"celler on secondpc"\]:::cap_auscyber_celler_g_celler_c
   cap_celler_cache_pull_http_g_celler[/"celler on secondpc"\]:::cap_celler_cache_pull_http_g_celler_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_clusterplex_mounts_nfs_g_nfs_server[/"nfs-server on secondpc"\]:::cap_clusterplex_mounts_nfs_g_nfs_server_c
+  cap_clusterplex_worker_transcode_g_clusterplex_orchestrator[/"clusterplex-orchestrator on secondpc"\]:::cap_clusterplex_worker_transcode_g_clusterplex_orchestrator_c
   cap_corsair_psu_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_corsair_psu_home_assistant_g_homeassistant_c
   cap_corsair_psu_mqtt_g_mosquitto[/"mosquitto on secondpc"\]:::cap_corsair_psu_mqtt_g_mosquitto_c
   cap_openrgb_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_openrgb_home_assistant_g_homeassistant_c
@@ -859,6 +885,8 @@ graph LR
   cap_builders_builder -.->|not routed| cap_builders_builder_g_nix_builder
   cap_celler_cache_pull_http -.->|lan-home 20 (auspc to secondpc)| cap_celler_cache_pull_http_g_celler
   cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
+  cap_clusterplex_mounts_nfs -.->|lan-home 20 (auspc to secondpc)| cap_clusterplex_mounts_nfs_g_nfs_server
+  cap_clusterplex_worker_transcode -.->|lan-home 20 (auspc to secondpc)| cap_clusterplex_worker_transcode_g_clusterplex_orchestrator
   cap_corsair_psu_home_assistant -.->|not routed| cap_corsair_psu_home_assistant_g_homeassistant
   cap_corsair_psu_mqtt -.->|lan-home 20 (auspc to secondpc)| cap_corsair_psu_mqtt_g_mosquitto
   cap_nix_builder_ssh -.->|tailscale 40 (auspc to Ivys-MacBook-Pro)| cap_nix_builder_ssh_g_openssh
@@ -890,6 +918,8 @@ graph LR
   classDef celler_quirk_args_user_auscyber_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef celler_user_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
+  classDef clusterplex_mounts_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef clusterplex_worker_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef corsair_psu_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef define_user__auscyber_auspc_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -917,9 +947,11 @@ graph LR
   classDef ivy_fetch_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef jujutsu_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef llm_node_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lspmux_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef main_ssh_key_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef neovim_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nfs_client_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef nix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef nix_conf_parts_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef nix_index_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
@@ -964,6 +996,7 @@ graph LR
   classDef den__provides__unfree_cmp_nvim_lsp_document_symbol_copilot_language_server__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_language_server_copilot_language_server_lspmux__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef den__provides__unfree_cuda_cccl_cuda_cudart_cuda_nvcc_cuda_nvml_dev_libcublas__c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef den__provides__unfree_onepassword_password_manager__c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:2px
   classDef unfree_predicate_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef unfree_predicate__user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
@@ -984,6 +1017,10 @@ graph LR
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_clusterplex_mounts_nfs_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_clusterplex_mounts_nfs_g_nfs_server_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_clusterplex_worker_transcode_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_clusterplex_worker_transcode_g_clusterplex_orchestrator_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_corsair_psu_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_corsair_psu_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_corsair_psu_mqtt_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
@@ -1162,7 +1199,7 @@ graph LR
   cap_samba_user_samba_user{{"samba-user"}}:::cap_samba_user_samba_user_c
   cap_samba_user_samba_user_t["samba-user"]:::cap_samba_user_samba_user_t_c
   cap_sendspin_bluetooth_tcp{{"tcp name=music-assistant"}}:::cap_sendspin_bluetooth_tcp_c
-  cap_sendspin_bluetooth_tcp_wn0["23 other instances wrong instance: want music-assistant"]:::cap_sendspin_bluetooth_tcp_wn0_c
+  cap_sendspin_bluetooth_tcp_wn0["27 other instances wrong instance: want music-assistant"]:::cap_sendspin_bluetooth_tcp_wn0_c
   cap_zotero_library_share{{"share displayName=zotero"}}:::cap_zotero_library_share_c
   cap_zotero_library_share_t["zotero-library"]:::cap_zotero_library_share_t_c
   birdsarentreal --> agenix_rekey
@@ -1238,11 +1275,11 @@ graph LR
   rust --> lspmux
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
   cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
   cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
@@ -1340,7 +1377,7 @@ graph LR
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -1357,7 +1394,7 @@ graph LR
   classDef cap_samba_user_samba_user_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_sendspin_bluetooth_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_sendspin_bluetooth_tcp_g_music_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
-  classDef cap_sendspin_bluetooth_tcp_wn0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_sendspin_bluetooth_tcp_wn0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_zotero_library_share_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_zotero_library_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_zotero_library_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -1367,6 +1404,7 @@ style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_dyson fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_iphone fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_lora_pi fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -1495,11 +1533,11 @@ graph LR
   cap_nix_builder_ssh_t -.->|takes| cap_nix_builder_ssh
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
 
   end
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
@@ -1556,11 +1594,173 @@ graph LR
   classDef unfree_predicate_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_nix_builder_ssh_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_g_openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
 style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+```
+
+## dyson
+
+**Architecture:** `esp32-idf`
+
+### Aspects
+- agenix-rekey
+- attachment-interface-check
+- builders
+- celler-host
+- celler-quirk-args
+- derived-firewall
+- derived-port-exclusion
+- home-base
+- house-wifi
+- jujutsu
+- lib
+- nix
+- nix-conf-parts
+- nix-index
+- nixos-general
+- nixpkgs-config
+- node-metrics
+- openssh
+- overlays
+- pam-rssh
+- provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)
+- routing
+- runtime-links
+- service-user
+- shell
+- specialisations
+- starship
+
+### Aspect Graph
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"activationBkgColor":"#d0d7de","activationBorderColor":"#8c959f","actorBkg":"#d0d7de","actorBorder":"#6e7781","actorLineColor":"#6e7781","actorTextColor":"#424a53","background":"#eaeef2","classText":"#424a53","clusterBkg":"#d0d7de","clusterBorder":"#8c959f","edgeLabelBackground":"#eaeef2","labelBoxBkgColor":"#d0d7de","labelBoxBorderColor":"#6e7781","labelTextColor":"#424a53","lineColor":"#6e7781","loopTextColor":"#424a53","mainBkg":"#d0d7de","nodeBkg":"#d0d7de","nodeBorder":"#6e7781","nodeTextColor":"#424a53","noteBkgColor":"#d0d7de","noteBorderColor":"#8c959f","noteTextColor":"#424a53","pie1":"#fa4549","pie2":"#e16f24","pie3":"#bf8700","pie4":"#2da44e","pie5":"#339D9B","pie6":"#218bff","pie7":"#a475f9","pie8":"#e85aad","pieLegendTextColor":"#424a53","pieOuterStrokeColor":"#8c959f","pieSectionTextColor":"#424a53","pieStrokeColor":"#8c959f","pieTitleTextColor":"#424a53","primaryBorderColor":"#6e7781","primaryColor":"#d0d7de","primaryTextColor":"#424a53","secondBkg":"#d0d7de","secondaryBorderColor":"#8c959f","secondaryColor":"#d0d7de","secondaryTextColor":"#424a53","sequenceNumberColor":"#eaeef2","signalColor":"#6e7781","signalTextColor":"#424a53","tertiaryBorderColor":"#8c959f","tertiaryColor":"#d0d7de","tertiaryTextColor":"#424a53","textColor":"#424a53","titleColor":"#424a53"}}}%%
+graph LR
+  dyson([dyson]):::root
+
+  subgraph ctx_host_dyson["host: dyson"]
+  agenix_rekey["agenix-rekey"]:::agenix_rekey_c
+  attachment_interface_check["attachment-interface-check"]:::attachment_interface_check_c
+  builders["builders"]:::builders_c
+  celler_host["celler-host"]:::celler_host_c
+  celler_quirk_args["celler-quirk-args"]:::celler_quirk_args_c
+  derived_firewall["derived-firewall"]:::derived_firewall_c
+  derived_port_exclusion["derived-port-exclusion"]:::derived_port_exclusion_c
+  home_base["home-base"]:::home_base_c
+  house_wifi["house-wifi"]:::house_wifi_c
+  jujutsu["jujutsu"]:::jujutsu_c
+  lib["lib"]:::lib_c
+  nix["nix"]:::nix_c
+  nix_conf_parts["nix-conf-parts"]:::nix_conf_parts_c
+  nix_index["nix-index"]:::nix_index_c
+  nixos_general["nixos-general"]:::nixos_general_c
+  nixpkgs_config["nixpkgs-config"]:::nixpkgs_config_c
+  node_metrics["node-metrics"]:::node_metrics_c
+  openssh["openssh"]:::openssh_c
+  overlays["overlays"]:::overlays_c
+  pam_rssh["pam-rssh"]:::pam_rssh_c
+  routing["routing"]:::routing_c
+  runtime_links["runtime-links"]:::runtime_links_c
+  service_user["service-user"]:::service_user_c
+  shell["shell"]:::shell_c
+  specialisations{{"specialisations"}}:::specialisations_c
+  starship["starship"]:::starship_c
+  den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_{{"provides/unfree(copilot.vim,idris2-vim,presence.nvim,cmp-copilot,intel-ocl,code,1password,1password-cli,1password-gui,1password-gui-beta,claude-code,discord,google-chrome,helium,helium-bin,libkey-nomad,memorymate,minecraft-launcher,minecraft-server,nvidia-settings,nvidia-x11,obsidian,opencode,slack,spotify,steam,steam-original,steam-run,steam-runtime,steam-unwrapped,tidal-hifi,vscode,zoom,cmp-nvim-lsp-document-symbol)"}}:::den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c
+  cap_builders_builder{{"builder"}}:::cap_builders_builder_c
+  cap_celler_default_celler{{"celler"}}:::cap_celler_default_celler_c
+  cap_celler_default_celler_t["celler-default"]:::cap_celler_default_celler_t_c
+  cap_dyson_home_assistant{{"home-assistant extraComponents=(esphome)"}}:::cap_dyson_home_assistant_c
+  cap_esphome_bluetooth_proxy_home_assistant{{"home-assistant extraComponents=(bluetooth)"}}:::cap_esphome_bluetooth_proxy_home_assistant_c
+  cap_esphome_bluetooth_proxy_home_assistant_t["esphome-bluetooth-proxy"]:::cap_esphome_bluetooth_proxy_home_assistant_t_c
+  cap_nix_builder_ssh{{"ssh"}}:::cap_nix_builder_ssh_c
+  cap_nix_builder_ssh_t["nix-builder"]:::cap_nix_builder_ssh_t_c
+  celler_host --> celler_quirk_args
+  dyson --> house_wifi
+  home_base --> shell
+  house_wifi --> agenix_rekey
+  nixpkgs_config --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  shell --> jujutsu
+  shell --> nix_index
+  shell --> starship
+  builders -.-x cap_builders_builder
+  cap_celler_default_celler_t -.->|takes| cap_celler_default_celler
+  dyson -.->|takes| cap_dyson_home_assistant
+  cap_esphome_bluetooth_proxy_home_assistant_t -.->|takes| cap_esphome_bluetooth_proxy_home_assistant
+  cap_nix_builder_ssh_t -.->|takes| cap_nix_builder_ssh
+  end
+  subgraph ctx_host_auspc["host: auspc"]
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
+
+  end
+  subgraph ctx_host_secondpc["host: secondpc"]
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
+  cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_dyson_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_dyson_home_assistant_g_homeassistant_c
+  cap_esphome_bluetooth_proxy_home_assistant_g_homeassistant[/"homeassistant on secondpc"\]:::cap_esphome_bluetooth_proxy_home_assistant_g_homeassistant_c
+
+  end
+  subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
+  cap_nix_builder_ssh_g_openssh[/"openssh on Ivys-MacBook-Pro"\]:::cap_nix_builder_ssh_g_openssh_c
+
+  end
+
+  cap_builders_builder -.-x cap_builders_builder_ox0
+  cap_builders_builder -.-x cap_builders_builder_ox1
+  cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
+  cap_dyson_home_assistant -.->|not routed| cap_dyson_home_assistant_g_homeassistant
+  cap_esphome_bluetooth_proxy_home_assistant -.->|not routed| cap_esphome_bluetooth_proxy_home_assistant_g_homeassistant
+  cap_nix_builder_ssh -.->|resolved| cap_nix_builder_ssh_g_openssh
+
+  classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
+  classDef agenix_rekey_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef attachment_interface_check_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef builders_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef celler_host_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef celler_quirk_args_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef derived_firewall_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef derived_port_exclusion_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef dyson_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef home_base_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef house_wifi_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef jujutsu_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef lib_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nix_conf_parts_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef nix_index_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef nixos_general_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef nixpkgs_config_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef node_metrics_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef overlays_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef pam_rssh_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
+  classDef routing_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef runtime_links_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef service_user_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef shell_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef specialisations_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef starship_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
+  classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_dyson_home_assistant_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_dyson_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_bluetooth_proxy_home_assistant_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_bluetooth_proxy_home_assistant_g_homeassistant_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_esphome_bluetooth_proxy_home_assistant_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_nix_builder_ssh_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_nix_builder_ssh_g_openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
+  classDef cap_nix_builder_ssh_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+style ctx_host_dyson fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_secondpc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -1648,11 +1848,11 @@ graph LR
   cap_nix_builder_ssh_t -.->|takes| cap_nix_builder_ssh
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
 
   end
@@ -1695,7 +1895,7 @@ graph LR
   classDef den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol__c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -1905,11 +2105,11 @@ graph LR
   rust --> lspmux
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
   cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
   cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
@@ -1998,7 +2198,7 @@ graph LR
   classDef wakatime_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -2168,6 +2368,7 @@ graph LR
   cap_ivypierlot_celler_wn0["2 other instances wrong instance: want celler2"]:::cap_ivypierlot_celler_wn0_c
   cap_nix_builder_ssh{{"ssh"}}:::cap_nix_builder_ssh_c
   cap_nix_builder_ssh_t["nix-builder"]:::cap_nix_builder_ssh_t_c
+  cap_opencode_llm_api{{"llm-api name=llm-head"}}:::cap_opencode_llm_api_c
   cap_paperwork_share{{"share displayName=Paperwork, permissions=(read,write,share,delete)"}}:::cap_paperwork_share_c
   cap_paperwork_share_t["paperwork"]:::cap_paperwork_share_t_c
   cap_photos_share{{"share displayName=Photos, quota=200G"}}:::cap_photos_share_c
@@ -2288,12 +2489,13 @@ graph LR
   zig --> lspmux
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
+  cap_opencode_llm_api_g_llm_head[/"llm-head on secondpc"\]:::cap_opencode_llm_api_g_llm_head_c
   cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
   cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
   cap_zotero_library_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_zotero_library_share_ox0_c
@@ -2309,6 +2511,8 @@ graph LR
   cap_celler_default_celler -.->|not routed| cap_celler_default_celler_g_celler
   ivypierlot -.-x cap_ivypierlot_celler
   cap_nix_builder_ssh -.->|resolved| cap_nix_builder_ssh_g_openssh
+  opencode -.->|takes| cap_opencode_llm_api
+  cap_opencode_llm_api -.->|publish-ivymect-in 60 (macmini to secondpc)| cap_opencode_llm_api_g_llm_head
   cap_paperwork_share -.-x cap_paperwork_share_ox0
   cap_photos_share -.-x cap_photos_share_ox0
   cap_zotero_library_share -.-x cap_zotero_library_share_ox0
@@ -2402,7 +2606,7 @@ graph LR
   classDef zig_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -2411,6 +2615,8 @@ graph LR
   classDef cap_nix_builder_ssh_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_g_openssh_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_nix_builder_ssh_t_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
+  classDef cap_opencode_llm_api_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_opencode_llm_api_g_llm_head_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_paperwork_share_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_paperwork_share_ox0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_paperwork_share_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -2577,11 +2783,11 @@ graph LR
   main_ssh_key --> pam_rssh_user_admin
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
 
   end
@@ -2651,7 +2857,7 @@ graph LR
   classDef insecure_predicate__user_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-dasharray: 3 3,stroke-width:1px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -2695,6 +2901,7 @@ style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - celler-user
 - claude
 - cloudflare-tunnel
+- clusterplex-orchestrator
 - container
 - define-user/auscyber@secondpc
 - derived-firewall
@@ -2730,6 +2937,7 @@ style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - kanidm
 - lib
 - lidarr
+- llm-head
 - local
 - loki
 - lspmux
@@ -2743,6 +2951,7 @@ style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 - neovim
 - netbootxyz
 - nextcloud
+- nfs-server
 - nginx
 - nix
 - nix-conf-parts
@@ -2838,6 +3047,7 @@ graph LR
   celler_quirk_args_host_secondpc["celler-quirk-args"]:::celler_quirk_args_host_secondpc_c
   celler_server["celler-server"]:::celler_server_c
   cloudflare_tunnel["cloudflare-tunnel"]:::cloudflare_tunnel_c
+  clusterplex_orchestrator["clusterplex-orchestrator"]:::clusterplex_orchestrator_c
   den__batteries__define_user[/"batteries/define-user"\]:::den__batteries__define_user_c
   define_user__auscyber_secondpc{{"define-user/auscyber@secondpc"}}:::define_user__auscyber_secondpc_c
   derived_firewall["derived-firewall"]:::derived_firewall_c
@@ -2866,6 +3076,7 @@ graph LR
   kanidm["kanidm"]:::kanidm_c
   lib["lib"]:::lib_c
   lidarr["lidarr"]:::lidarr_c
+  llm_head["llm-head"]:::llm_head_c
   local["local"]:::local_c
   loki["loki"]:::loki_c
   mail["mail"]:::mail_c
@@ -2876,6 +3087,7 @@ graph LR
   navidrome["navidrome"]:::navidrome_c
   netbootxyz["netbootxyz"]:::netbootxyz_c
   nextcloud["nextcloud"]:::nextcloud_c
+  nfs_server["nfs-server"]:::nfs_server_c
   nginx_host_secondpc{{"nginx"}}:::nginx_host_secondpc_c
   nix["nix"]:::nix_c
   nix_conf_parts["nix-conf-parts"]:::nix_conf_parts_c
@@ -2970,7 +3182,8 @@ graph LR
   cap_lidarr_route_wx1["uplink on secondpc private is false, want true"]:::cap_lidarr_route_wx1_c
   cap_lidarr_route_wx2["tailscale on secondpc private is false, want true; segment is tailscale, want internet"]:::cap_lidarr_route_wx2_c
   cap_lidarr_tcp{{"tcp name=qbittorrent"}}:::cap_lidarr_tcp_c
-  cap_lidarr_tcp_wn0["47 other instances wrong instance: want qbittorrent"]:::cap_lidarr_tcp_wn0_c
+  cap_lidarr_tcp_wn0["53 other instances wrong instance: want qbittorrent"]:::cap_lidarr_tcp_wn0_c
+  cap_llm_head_llm_rpc{{"llm-rpc every=true"}}:::cap_llm_head_llm_rpc_c
   cap_loki_proxy{{"proxy port=3100, subdomain=logs"}}:::cap_loki_proxy_c
   cap_mail_ddns_dns{{"dns dynamic=(mail.ivymect.in)"}}:::cap_mail_ddns_dns_c
   cap_mail_dns{{"dns records=((...),(...),(...),(...),(...),(...),(...),(...),(...),(...),(...))"}}:::cap_mail_dns_c
@@ -3014,7 +3227,7 @@ graph LR
   cap_radarr_route_wx1["uplink on secondpc private is false, want true"]:::cap_radarr_route_wx1_c
   cap_radarr_route_wx2["tailscale on secondpc private is false, want true; segment is tailscale, want internet"]:::cap_radarr_route_wx2_c
   cap_radarr_tcp{{"tcp name=qbittorrent"}}:::cap_radarr_tcp_c
-  cap_radarr_tcp_wn0["47 other instances wrong instance: want qbittorrent"]:::cap_radarr_tcp_wn0_c
+  cap_radarr_tcp_wn0["53 other instances wrong instance: want qbittorrent"]:::cap_radarr_tcp_wn0_c
   cap_samba_user_samba_user{{"samba-user"}}:::cap_samba_user_samba_user_c
   cap_samba_user_samba_user_t["samba-user"]:::cap_samba_user_samba_user_t_c
   cap_seerr_credential{{"credential description=Request frontend, talks to sonarr and radarr"}}:::cap_seerr_credential_c
@@ -3026,7 +3239,7 @@ graph LR
   cap_sonarr_route_wx1["uplink on secondpc private is false, want true"]:::cap_sonarr_route_wx1_c
   cap_sonarr_route_wx2["tailscale on secondpc private is false, want true; segment is tailscale, want internet"]:::cap_sonarr_route_wx2_c
   cap_sonarr_tcp{{"tcp name=qbittorrent"}}:::cap_sonarr_tcp_c
-  cap_sonarr_tcp_wn0["47 other instances wrong instance: want qbittorrent"]:::cap_sonarr_tcp_wn0_c
+  cap_sonarr_tcp_wn0["53 other instances wrong instance: want qbittorrent"]:::cap_sonarr_tcp_wn0_c
   cap_tandoor_gated{{"gated maxBodyBytes=67108864, oauthProxy=false"}}:::cap_tandoor_gated_c
   cap_tandoor_postgres{{"postgres services=(tandoor-recipes)"}}:::cap_tandoor_postgres_c
   cap_tautulli_gated{{"gated port=8181"}}:::cap_tautulli_gated_c
@@ -3064,7 +3277,9 @@ graph LR
   mail --> mail_ddns
   nextcloud --> shares
   nixpkgs_config_host_secondpc --> den__provides__unfree_copilot_vim_idris2_vim_presence_nvim_cmp_copilot_intel_ocl_code_1password_1password_cli_1password_gui_1password_gui_beta_claude_code_discord_google_chrome_helium_helium_bin_libkey_nomad_memorymate_minecraft_launcher_minecraft_server_nvidia_settings_nvidia_x11_obsidian_opencode_slack_spotify_steam_steam_original_steam_run_steam_runtime_steam_unwrapped_tidal_hifi_vscode_zoom_cmp_nvim_lsp_document_symbol_
+  plex --> clusterplex_orchestrator
   plex --> gateway
+  plex --> nfs_server
   plex --> tautulli
   publish_ivymect_in --> cloudflare_tunnel
   samba --> samba_users
@@ -3185,6 +3400,7 @@ graph LR
   lidarr -.->|takes| cap_lidarr_tcp
   cap_lidarr_tcp -.->|loopback 0 (same host)| qbittorrent
   cap_lidarr_tcp -.-x cap_lidarr_tcp_wn0
+  llm_head -.->|takes| cap_llm_head_llm_rpc
   loki -.->|takes| cap_loki_proxy
   cap_loki_proxy -.->|not routed| gated_oauth2_proxy
   mail -.->|takes| cap_mail_dns
@@ -3347,12 +3563,14 @@ graph LR
   end
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
   cap_builders_builder_g_nix_builder[/"nix-builder on Ivys-MacBook-Pro"\]:::cap_builders_builder_g_nix_builder_c
+  cap_llm_head_llm_rpc_g_llm_node[/"llm-node on Ivys-MacBook-Pro"\]:::cap_llm_head_llm_rpc_g_llm_node_c
   cap_nix_builder_ssh_g_openssh[/"openssh on Ivys-MacBook-Pro"\]:::cap_nix_builder_ssh_g_openssh_c
 
   end
 
   auscyber -.->|takes| cap_auscyber_celler
   cap_builders_builder -.->|not routed| cap_builders_builder_g_nix_builder
+  cap_llm_head_llm_rpc -.->|tailscale 40 (secondpc to Ivys-MacBook-Pro)| cap_llm_head_llm_rpc_g_llm_node
   cap_nix_builder_ssh -.->|tailscale 40 (secondpc to Ivys-MacBook-Pro)| cap_nix_builder_ssh_g_openssh
 
   classDef root fill:#218bff,stroke:#218bff,color:#1f2328,font-weight:bold
@@ -3382,6 +3600,7 @@ graph LR
   classDef celler_user_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef claude_c fill:#fa4549,stroke:#fa4549,color:#1f2328,stroke-width:3px
   classDef cloudflare_tunnel_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef clusterplex_orchestrator_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef container_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef den__batteries__define_user_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef define_user__auscyber_secondpc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
@@ -3414,6 +3633,7 @@ graph LR
   classDef kanidm_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lib_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef lidarr_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef llm_head_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef local_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef loki_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef lspmux_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
@@ -3427,6 +3647,7 @@ graph LR
   classDef neovim_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef netbootxyz_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:3px
   classDef nextcloud_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
+  classDef nfs_server_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef nginx_host_secondpc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
   classDef nginx_user_auscyber_c fill:#e16f24,stroke:#e16f24,color:#1f2328,stroke-width:3px
   classDef nix_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:3px
@@ -3537,7 +3758,9 @@ graph LR
   classDef cap_lidarr_route_wx1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_lidarr_route_wx2_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_lidarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
-  classDef cap_lidarr_tcp_wn0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_lidarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_llm_head_llm_rpc_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
+  classDef cap_llm_head_llm_rpc_g_llm_node_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_loki_proxy_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_mail_ddns_dns_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_mail_dns_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -3582,7 +3805,7 @@ graph LR
   classDef cap_radarr_route_wx1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_radarr_route_wx2_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_radarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
-  classDef cap_radarr_tcp_wn0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_radarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_samba_user_samba_user_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_samba_user_samba_user_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_seerr_credential_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
@@ -3594,7 +3817,7 @@ graph LR
   classDef cap_sonarr_route_wx1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_sonarr_route_wx2_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_sonarr_tcp_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
-  classDef cap_sonarr_tcp_wn0_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_sonarr_tcp_wn0_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_tandoor_gated_c fill:#e85aad,stroke:#e85aad,color:#1f2328,stroke-width:2px
   classDef cap_tandoor_postgres_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_tautulli_gated_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
@@ -3613,6 +3836,7 @@ style ctx_host_Ivys_MacBook_Pro fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_celler2 fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_auspc fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_birdsarentreal fill:#d0d7de,stroke:#8c959f,stroke-width:2px
+style ctx_host_dyson fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_iphone fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_lora_pi fill:#d0d7de,stroke:#8c959f,stroke-width:2px
 style ctx_host_macmini fill:#d0d7de,stroke:#8c959f,stroke-width:2px
@@ -3825,7 +4049,7 @@ graph LR
   end
   subgraph ctx_host_secondpc["host: secondpc"]
   cap_auscyber_celler_g_celler[/"celler on secondpc"\]:::cap_auscyber_celler_g_celler_c
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
   cap_paperwork_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_paperwork_share_ox0_c
   cap_photos_share_ox0["shares on secondpc out of reach: reach = host"]:::cap_photos_share_ox0_c
@@ -3833,7 +4057,7 @@ graph LR
 
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_Ivys_MacBook_Pro["host: Ivys-MacBook-Pro"]
@@ -3924,7 +4148,7 @@ graph LR
   classDef cap_auscyber_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
@@ -4104,11 +4328,11 @@ graph LR
   nixos --> den__batteries__primary_user_nixos_wsl_nixos_
   end
   subgraph ctx_host_auspc["host: auspc"]
-  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = fleet"]:::cap_builders_builder_ox0_c
+  cap_builders_builder_ox0["nix-builder on auspc out of reach: reach = flake"]:::cap_builders_builder_ox0_c
 
   end
   subgraph ctx_host_secondpc["host: secondpc"]
-  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = fleet"]:::cap_builders_builder_ox1_c
+  cap_builders_builder_ox1["nix-builder on secondpc out of reach: reach = flake"]:::cap_builders_builder_ox1_c
   cap_celler_default_celler_g_celler[/"celler on secondpc"\]:::cap_celler_default_celler_g_celler_c
 
   end
@@ -4181,7 +4405,7 @@ graph LR
   classDef wsl_nixos_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:3px
   classDef cap_builders_builder_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_builders_builder_ox0_c fill:#218bff,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
-  classDef cap_builders_builder_ox1_c fill:#e85aad,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
+  classDef cap_builders_builder_ox1_c fill:#a475f9,stroke:#fa4549,color:#1f2328,stroke-dasharray: 5 5,stroke-width:2px
   classDef cap_celler_default_celler_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_g_celler_c fill:#218bff,stroke:#218bff,color:#1f2328,stroke-width:2px
   classDef cap_celler_default_celler_t_c fill:#a475f9,stroke:#a475f9,color:#1f2328,stroke-width:2px
