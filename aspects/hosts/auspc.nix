@@ -149,6 +149,9 @@
   };
   den.aspects.auspc = {
     includes = [
+      # Remote ZFS unlock over the wired port (enp6s0, `alx`): only reachable
+      # while a cable is in.
+      den.aspects.initrd-ssh
       den.aspects.qemu
       den.aspects.vpn
       # On the tailnet as well as the wireguard tunnel. Needed for the laptop to
@@ -306,6 +309,8 @@
         time.timeZone = "Australia/Melbourne";
         i18n.defaultLocale = "en_AU.UTF-8";
         boot.initrd.compressor = "xz";
+        # The wired NIC, for ../nixos/initrd-ssh.nix.
+        boot.initrd.availableKernelModules = [ "alx" ];
 
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
         boot.supportedFilesystems = [
