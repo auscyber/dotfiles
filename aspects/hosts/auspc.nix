@@ -5,6 +5,11 @@
 }:
 {
   den.hosts.x86_64-linux.auspc = {
+    # The wired port; `alx-wol` below is the driver that makes it wake.
+    wakeOnLan = {
+      interface = "enp6s0";
+      mac = "00:d8:61:0b:e6:a2";
+    };
     hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYM1mZ3fYfOjhyMhIiKbUOLYTQifG82P2NnGWHyIwHt root@nixos";
     gpu = "nvidia";
     roles = [
@@ -152,6 +157,8 @@
       # Remote ZFS unlock over the wired port (enp6s0, `alx`): only reachable
       # while a cable is in.
       den.aspects.initrd-ssh
+      den.aspects.wake-on-lan
+      den.aspects.wake-on-lan-sender
       den.aspects.qemu
       den.aspects.vpn
       # On the tailnet as well as the wireguard tunnel. Needed for the laptop to

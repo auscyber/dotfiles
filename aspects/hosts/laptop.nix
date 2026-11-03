@@ -119,6 +119,7 @@ in
       # the bigger win and the bigger risk; ../network/roaming-resolver.nix says
       # what has to be checked on the box first.
       den.aspects.roaming-resolver
+      den.aspects.wake-on-lan-sender
       #      den.aspects.builders
     ];
 

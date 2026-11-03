@@ -12,6 +12,10 @@ let
 in
 {
   den.hosts.x86_64-linux.secondpc = {
+    wakeOnLan = {
+      interface = "enp2s0";
+      mac = "d8:cb:8a:72:3b:62";
+    };
     # HOW THIS BOX IS ON THE HOUSE LAN: the address other hosts dial it at,
     # and the wire it hears them on. `br0` and not the NIC, because this host
     # bridges its ethernet and its access point together (below -- hostapd
@@ -175,6 +179,8 @@ in
     inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
     includes = [
+      den.aspects.wake-on-lan
+      den.aspects.wake-on-lan-sender
       # THE CACHE THIS HOST SERVES. `den.aspects.celler-main` carries the cache
       # record (../../services/celler-service.nix), and including it is what
       # makes this the host that serves it -- ../../base/celler/server.nix
