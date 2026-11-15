@@ -1238,21 +1238,21 @@ graph LR
 |---------|---------|-------------|
 | celler | `0.1.0` | Multi-tenant Nix binary cache system |
 | cotabby | `v0.6.2-beta` |  |
-| donetick | `v0.1.85` | Self-hosted task and chore manager |
+| donetick | `v0.1.86` | Self-hosted task and chore manager |
 | flaresolverr | `3.5.2` | Proxy server to bypass Cloudflare protection |
 | ghostty | `1.4.0` | Fast, native, feature-rich terminal emulator pushing modern features |
-| helium | `0.20.2.1` | Private, fast, and honest web browser based on Chromium |
+| helium | `0.21.3.1` | Private, fast, and honest web browser based on Chromium |
 | ivy-fetch | `unknown` |  |
 | jankyborders | `a7297ca7d1933f3a30b12e8f10750e8d84eeee1e` | Lightweight tool designed to add colored borders to user windows on macOS 14.0+ |
 | jj-mcp-server | `1.0.1` | Model Context Protocol server for the Jujutsu (jj) version control system |
-| kanata-ls | `6fe27bceb4b303ea88e0fdb622198de75d3f1697` | Kanata Language Server |
+| kanata-ls | `b862716b431bba722c6e7cc8759083cf31658824` | Kanata Language Server |
 | kanata-tray | `v0.8.0` | Tray Icon for Kanata  |
 | kanidm-provision | `1.3.0` | Small utility to help with kanidm provisioning |
 | lspmux | `18861f9d59e74ece8d867772cf07fa302c2dae98` |  |
 | ms-365-mcp-server | `0.145.1` | Microsoft 365 / Outlook MCP server (mail, calendar, OneDrive, Excel) over Microsoft Graph |
 | oauth2c | `1.21.1` | User-friendly OAuth2 CLI |
 | prom-device | `0.2.0` | Prometheus instant queries as one Home Assistant device per host |
-| proton-ge-bin | `GE-Proton11-11` | Compatibility tool for Steam Play based on Wine and additional components.
+| proton-ge-bin | `GE-Proton11-12` | Compatibility tool for Steam Play based on Wine and additional components.
 
 (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
  |
