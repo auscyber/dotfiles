@@ -19,17 +19,17 @@
   };
   app_font = {
     pname = "app_font";
-    version = "c27d33bc3266f06e7f1f45ea28451639e0a69dc4";
+    version = "28fb6be9793eb3807778aa1a105bbe83e7764d72";
     src = fetchgit {
       url = "https://github.com/kvndrsslr/sketchybar-app-font";
-      rev = "c27d33bc3266f06e7f1f45ea28451639e0a69dc4";
+      rev = "28fb6be9793eb3807778aa1a105bbe83e7764d72";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-pBX65c1nQVg2uqPFvI25VlablBezAOcMCJei2e3bjHo=";
+      sha256 = "sha256-obtPwfhvJ9QjjHQhbuyJQHIdCOgkd9BUrSQsVqtQQL0=";
     };
-    date = "2026-10-29";
+    date = "2026-11-14";
   };
   cotabby = {
     pname = "cotabby";
@@ -41,13 +41,13 @@
   };
   donetick = {
     pname = "donetick";
-    version = "v0.1.85";
+    version = "v0.1.86";
     src = fetchFromGitHub {
       owner = "donetick";
       repo = "donetick";
-      rev = "v0.1.85";
+      rev = "v0.1.86";
       fetchSubmodules = false;
-      sha256 = "sha256-HsGd3OpbS0VRqcjQnpG4eZLsLzU8zR4Uxlkg1fW8mtA=";
+      sha256 = "sha256-lXR8oEhPuW2tRRcKS/Tk+RYbLBUP1mOSRfDt/1qYlJg=";
     };
   };
   eagle-nvim = {
@@ -74,26 +74,26 @@
   };
   ghostty-tip = {
     pname = "ghostty-tip";
-    version = "93967b7f9478e94dcbb42125c8a90f34feb40d75";
+    version = "6d9577708a211b0e6c5e6c6886f3cfb7efc47555";
     src = fetchurl {
-      url = "https://tip.files.ghostty.org/93967b7f9478e94dcbb42125c8a90f34feb40d75/Ghostty.dmg";
-      sha256 = "sha256-Mu0plL44hKdiX3D5zppAgGjtfY+F/bKwaQG0oMsVtco=";
+      url = "https://tip.files.ghostty.org/6d9577708a211b0e6c5e6c6886f3cfb7efc47555/Ghostty.dmg";
+      sha256 = "sha256-CVyO6cjZQyTnZ97jp7DRAzW+kJSzU7ctkRjT+ZaaO+c=";
     };
   };
   helium_linux = {
     pname = "helium_linux";
-    version = "0.20.2.1";
+    version = "0.21.3.1";
     src = fetchTarball {
-      url = "https://github.com/imputnet/helium-linux/releases/download/0.20.2.1/helium-0.20.2.1-x86_64_linux.tar.xz";
-      sha256 = "sha256-4oDM8q8BJyVCp7sMdC7PvCNRdWxLmJu3F3svFF0K2xE=";
+      url = "https://github.com/imputnet/helium-linux/releases/download/0.21.3.1/helium-0.21.3.1-x86_64_linux.tar.xz";
+      sha256 = "sha256-qROKTb/A0NKdeGWo7ilJUqHmC+k1HXnYyNKHCkRmQ9Q=";
     };
   };
   helium_macos = {
     pname = "helium_macos";
-    version = "0.20.2.1";
+    version = "0.21.3.1";
     src = fetchurl {
-      url = "https://github.com/imputnet/helium-macos/releases/download/0.20.2.1/helium_0.20.2.1_arm64-macos.dmg";
-      sha256 = "sha256-LL99IeEN9GxYos9b2b+lgRXWAhkZLH3aNCS+8+kqoxk=";
+      url = "https://github.com/imputnet/helium-macos/releases/download/0.21.3.1/helium_0.21.3.1_arm64-macos.dmg";
+      sha256 = "sha256-PevQ8vOjzw9L+l375NgHozkcF8dSF4vkRJcZJF7QYQs=";
     };
   };
   jankyborders = {
@@ -207,25 +207,25 @@
   };
   obsidian-editing-toolbar-main = {
     pname = "obsidian-editing-toolbar-main";
-    version = "4.1.11";
+    version = "4.1.12";
     src = fetchurl {
-      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/main.js";
-      sha256 = "sha256-MOoz/N0/EI1jwgkSz8baP8Xq8567NLGmm2dq1yqkVjQ=";
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.12/main.js";
+      sha256 = "sha256-YQ2YkfqH4DjwGCg3Mvrzq2uhOrmunq09jORnroTwN9Y=";
     };
   };
   obsidian-editing-toolbar-manifest = {
     pname = "obsidian-editing-toolbar-manifest";
-    version = "4.1.11";
+    version = "4.1.12";
     src = fetchurl {
-      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/manifest.json";
-      sha256 = "sha256-jObjIasISGu8w7KqtRhIS2f65sUNNglv1oKeu7rfwxU=";
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.12/manifest.json";
+      sha256 = "sha256-coVxLYqVHKb1/LdCQwtjVlndTraA29pkWhX7zZ1pAlI=";
     };
   };
   obsidian-editing-toolbar-styles = {
     pname = "obsidian-editing-toolbar-styles";
-    version = "4.1.11";
+    version = "4.1.12";
     src = fetchurl {
-      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.11/styles.css";
+      url = "https://github.com/pkm-er/obsidian-editing-toolbar/releases/download/4.1.12/styles.css";
       sha256 = "sha256-uEc/r/EnJ5TMQRr/WcybY8H3G58gnvH4nbVpYLTFvlw=";
     };
   };
@@ -327,26 +327,26 @@
   };
   obsidian-obsidian-git-main = {
     pname = "obsidian-obsidian-git-main";
-    version = "2.42.0";
+    version = "2.43.0";
     src = fetchurl {
-      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/main.js";
-      sha256 = "sha256-SW2xSLzqQWn0VeI0uwLwj4xQwxfArVr947J8CQTa8TM=";
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.43.0/main.js";
+      sha256 = "sha256-WL6wmBh1xnL8gzUOOx8g22yh3zyiBHol9JGQseMeJEM=";
     };
   };
   obsidian-obsidian-git-manifest = {
     pname = "obsidian-obsidian-git-manifest";
-    version = "2.42.0";
+    version = "2.43.0";
     src = fetchurl {
-      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/manifest.json";
-      sha256 = "sha256-etmOjM4VfphGtHlBxqfLmwIrydXG0ReCKQ56ehZLRw0=";
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.43.0/manifest.json";
+      sha256 = "sha256-TzRQ8yAfAuLh6L8qhzC/yDfPQqJduZG7XZMFbRcJOVE=";
     };
   };
   obsidian-obsidian-git-styles = {
     pname = "obsidian-obsidian-git-styles";
-    version = "2.42.0";
+    version = "2.43.0";
     src = fetchurl {
-      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.42.0/styles.css";
-      sha256 = "sha256-8wrSykL+/jtwTFSPd0fShcIDj6TOkGAeaP5v1mBJQFI=";
+      url = "https://github.com/vinzent03/obsidian-git/releases/download/2.43.0/styles.css";
+      sha256 = "sha256-kq6A0mAOW8dkPdq8qjfYiOEul2Pv/2PcqVzJSkQhB4E=";
     };
   };
   obsidian-obsidian-meta-bind-plugin-main = {
@@ -399,50 +399,50 @@
   };
   obsidian-pretty-properties-main = {
     pname = "obsidian-pretty-properties-main";
-    version = "2.3.1";
+    version = "2.3.4";
     src = fetchurl {
-      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/main.js";
-      sha256 = "sha256-wlgUq+jGF3SYDgr2sn/waTwMMjl1EnJWE29d+TgejCM=";
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.4/main.js";
+      sha256 = "sha256-k6nJezX0cHWT24d1wSeWeDcjS+nGjkyQWWK01tqTzmw=";
     };
   };
   obsidian-pretty-properties-manifest = {
     pname = "obsidian-pretty-properties-manifest";
-    version = "2.3.1";
+    version = "2.3.4";
     src = fetchurl {
-      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/manifest.json";
-      sha256 = "sha256-Y5+uI6+RZIkiBtH8fUbZOphmU8KofoqMYe3iFHMpZRM=";
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.4/manifest.json";
+      sha256 = "sha256-z607N9H3aqmtrpn+R6MmoJvJDbDLabGExp5RWh9kCko=";
     };
   };
   obsidian-pretty-properties-styles = {
     pname = "obsidian-pretty-properties-styles";
-    version = "2.3.1";
+    version = "2.3.4";
     src = fetchurl {
-      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.1/styles.css";
-      sha256 = "sha256-4XDTbOTovHsesC9I+WUthzq/hW4pVDf1yoPFXD+xaOY=";
+      url = "https://github.com/anareaty/pretty-properties/releases/download/2.3.4/styles.css";
+      sha256 = "sha256-ay2ZInuqKTllj+2nDXCfXmtTDq3LcAx0r/8/5WPiWZk=";
     };
   };
   obsidian-realclaudian-main = {
     pname = "obsidian-realclaudian-main";
-    version = "2.3.36";
+    version = "2.3.43";
     src = fetchurl {
-      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/main.js";
-      sha256 = "sha256-OgxS+tmI60wtrM3DfmRswsjU2AHT0haAusjbSbmfUss=";
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.43/main.js";
+      sha256 = "sha256-b9c0IW4IJm2sJAzLPe2r6Z6keZRc4uRfas4w2mvm6Ro=";
     };
   };
   obsidian-realclaudian-manifest = {
     pname = "obsidian-realclaudian-manifest";
-    version = "2.3.36";
+    version = "2.3.43";
     src = fetchurl {
-      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/manifest.json";
-      sha256 = "sha256-Akkj5JyDd6s8FRaLUbfjZEjJotPWlct6GEdHSgbTqnA=";
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.43/manifest.json";
+      sha256 = "sha256-BwJ7e6bFC3X7BvGa9CcX9Ska7wmydPFL3KaCYTVz+mo=";
     };
   };
   obsidian-realclaudian-styles = {
     pname = "obsidian-realclaudian-styles";
-    version = "2.3.36";
+    version = "2.3.43";
     src = fetchurl {
-      url = "https://github.com/yishentu/claudian/releases/download/2.3.36/styles.css";
-      sha256 = "sha256-OawopNtwqvkIOP0WO0eoSFHmHsniFfB/V1vT2vFtB74=";
+      url = "https://github.com/yishentu/claudian/releases/download/2.3.43/styles.css";
+      sha256 = "sha256-tszhZ3ep/DhGgRxe//1n9b2KWN/3DDA+tmGHTNb5dwY=";
     };
   };
   obsidian-sqlite-db-main = {
@@ -503,50 +503,50 @@
   };
   obsidian-templater-obsidian-main = {
     pname = "obsidian-templater-obsidian-main";
-    version = "2.26.0";
+    version = "2.27.0";
     src = fetchurl {
-      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/main.js";
-      sha256 = "sha256-Cs1Fz9s6czfivvURaZvB+BncZGRa00gN8zV51C0ty6o=";
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.27.0/main.js";
+      sha256 = "sha256-C0oi56OHH5KeGGVtnzx979hYjJ3FhFYguaFuCtt8mi8=";
     };
   };
   obsidian-templater-obsidian-manifest = {
     pname = "obsidian-templater-obsidian-manifest";
-    version = "2.26.0";
+    version = "2.27.0";
     src = fetchurl {
-      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/manifest.json";
-      sha256 = "sha256-kcn6hRAIL/+gs9AiqsSYbjs5IpWxEm6Efq1+1yiRabg=";
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.27.0/manifest.json";
+      sha256 = "sha256-qdEN9Ee5zmDnLfd1zqZvJG2sqsHy5QiwI1hVUvCL6QA=";
     };
   };
   obsidian-templater-obsidian-styles = {
     pname = "obsidian-templater-obsidian-styles";
-    version = "2.26.0";
+    version = "2.27.0";
     src = fetchurl {
-      url = "https://github.com/silentvoid13/Templater/releases/download/2.26.0/styles.css";
+      url = "https://github.com/silentvoid13/Templater/releases/download/2.27.0/styles.css";
       sha256 = "sha256-Z6bdLR1t7coSh8M0yohOxBlkM/ccpHOIoL0+rBTPi18=";
     };
   };
   obsidian-zotlit-main = {
     pname = "obsidian-zotlit-main";
-    version = "2.2.0";
+    version = "2.2.3";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/main.js";
-      sha256 = "sha256-TRiu/bsSvtWoy7YSbO0ubd7Ul5oJG69iXbQPEeKMRnU=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.3/main.js";
+      sha256 = "sha256-NGWzNWkQg7H8hySMt/SyHrq0Fa/V1zmDTQOTVCeuYWg=";
     };
   };
   obsidian-zotlit-manifest = {
     pname = "obsidian-zotlit-manifest";
-    version = "2.2.0";
+    version = "2.2.3";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/manifest.json";
-      sha256 = "sha256-p3PN+zeRlNYHsRfUI/r8xBfvYIHlic9+p/2K0KRAakY=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.3/manifest.json";
+      sha256 = "sha256-zv3KrbxJS2Er61QIzxIREjJe5+QtWTtAZau/M0+YurI=";
     };
   };
   obsidian-zotlit-styles = {
     pname = "obsidian-zotlit-styles";
-    version = "2.2.0";
+    version = "2.2.3";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.0/styles.css";
-      sha256 = "sha256-+1598dDafDbti/vF75/MgjukobIb8GCNDbEDGgozS6s=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/2.2.3/styles.css";
+      sha256 = "sha256-xvXGKlZZbYYKVTXrqr4P5Uv8CRJ2Y5uazRm/XqxpE0M=";
     };
   };
   pam_rssh = {
@@ -568,10 +568,10 @@
   };
   proton-ge-bin = {
     pname = "proton-ge-bin";
-    version = "GE-Proton11-11";
+    version = "GE-Proton11-12";
     src = fetchTarball {
-      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-11/GE-Proton11-11-x86_64.tar.gz";
-      sha256 = "sha256-3tVgf83IkteFtVo/bHd4yG1xCtPeuW8FXaTrHOLjvKQ=";
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-12/GE-Proton11-12-x86_64.tar.gz";
+      sha256 = "sha256-i20g9lDz7bR0SXWmvHZHztN4m8AHkcD0/OVGSC4ZzI8=";
     };
   };
   sketchybar = {
@@ -598,24 +598,24 @@
   };
   vscode-kanata = {
     pname = "vscode-kanata";
-    version = "6fe27bceb4b303ea88e0fdb622198de75d3f1697";
+    version = "b862716b431bba722c6e7cc8759083cf31658824";
     src = fetchgit {
       url = "https://github.com/rszyma/vscode-kanata.git";
-      rev = "6fe27bceb4b303ea88e0fdb622198de75d3f1697";
+      rev = "b862716b431bba722c6e7cc8759083cf31658824";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-FSUlqu5g4PDo8laKt77YhHyjI+SVHTKMjK6td9LOl5c=";
+      sha256 = "sha256-aZzcx+YxPwqcJ2iY/QSrelyOuCmxzvzPF2aEX9KN1wM=";
     };
-    date = "2026-10-29";
+    date = "2026-11-02";
   };
   zotero-actions-tags = {
     pname = "zotero-actions-tags";
-    version = "2.6.2";
+    version = "2.6.3";
     src = fetchurl {
-      url = "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.6.2/actions-and-tags-for-zotero.xpi";
-      sha256 = "sha256-BeC6zGDsX5N/OpnbSR63I7mLsV0tq+iH0eypFYsfpJU=";
+      url = "https://github.com/windingwind/zotero-actions-tags/releases/download/v2.6.3/actions-and-tags-for-zotero.xpi";
+      sha256 = "sha256-apfXZZKnoysodJ2ZNJjP6FfAS83HnHfSEkd+Y1aScr4=";
     };
   };
   zotero-aria = {
@@ -628,26 +628,26 @@
   };
   zotero-attanger = {
     pname = "zotero-attanger";
-    version = "v1.5.5";
+    version = "v1.5.6";
     src = fetchurl {
-      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.5/zotero-attanger.xpi";
-      sha256 = "sha256-M0LP1QL/hVB01h+KZ6ZrpMYiN6jsCvO1AA58zsN30d0=";
+      url = "https://github.com/MuiseDestiny/zotero-attanger/releases/download/v1.5.6/zotero-attanger.xpi";
+      sha256 = "sha256-AsWjc2aHA9BtAyXI3Op9paRNf8YMbbKIV4BGVOPHDL8=";
     };
   };
   zotero-better-bibtex = {
     pname = "zotero-better-bibtex";
-    version = "9.0.71";
+    version = "9.0.77";
     src = fetchurl {
-      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.71/zotero-better-bibtex-9.0.71.xpi";
-      sha256 = "sha256-v2GhaQ3IorerCb6d4siZhvT7bUlcgkB9ibECsm+6qdU=";
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.77/zotero-better-bibtex-9.0.77.xpi";
+      sha256 = "sha256-pfHSuvj/QshXYbej2PZ5n/wwbwgugCTVuDzoDoWSvQs=";
     };
   };
   zotero-better-notes = {
     pname = "zotero-better-notes";
-    version = "3.3.3";
+    version = "3.3.5";
     src = fetchurl {
-      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.3/better-notes-for-zotero.xpi";
-      sha256 = "sha256-SNQmAYM4vs14xx+FFZw2wDu+P2KZq1pWQJniN5CwHB4=";
+      url = "https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.5/better-notes-for-zotero.xpi";
+      sha256 = "sha256-fb44yZRgjFhkrHajPFADFdszYZBLn2+SvV94Vlwyw5A=";
     };
   };
   zotero-notero = {
@@ -672,18 +672,18 @@
   };
   zotero-papersgpt = {
     pname = "zotero-papersgpt";
-    version = "papersgpt-v2.1.0";
+    version = "papersgpt-v2.3.0";
     src = fetchurl {
-      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v2.1.0/papersgpt-v2.1.0.xpi";
-      sha256 = "sha256-OREbMGjRSlol+IMlM8Tu5WxigQUfqQHoZfYOe1NMK7Y=";
+      url = "https://github.com/papersgpt/papersgpt-for-zotero/releases/download/papersgpt-v2.3.0/papersgpt-v2.3.0.xpi";
+      sha256 = "sha256-f1D1+1IN/cEiCfh+RlLdVgnzErhG4i5y6TAvEF1PmkY=";
     };
   };
   zotero-zotlit = {
     pname = "zotero-zotlit";
-    version = "2.2.0-beta.1";
+    version = "2.2.3";
     src = fetchurl {
-      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.0-beta.1/zotlit-zotero-2.2.0-beta.1.xpi";
-      sha256 = "sha256-t4suYgy5WpSWO4dQXmlqjK97+9AcUYTFYID0HLYpNFc=";
+      url = "https://github.com/aidenlx/zotlit/releases/download/zt-2.2.3/zotlit-zotero-2.2.3.xpi";
+      sha256 = "sha256-3EqFHy3NN9UYOv3QZRgXngFvxihMkETtyV3JIBuHlfU=";
     };
   };
 }

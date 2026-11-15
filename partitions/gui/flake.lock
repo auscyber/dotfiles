@@ -122,15 +122,14 @@
     "flake-parts": {
       "flake": false,
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "flake-utils": {
       "inputs": {
@@ -242,15 +241,14 @@
     "nixpkgs_3": {
       "flake": false,
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "nur": {
       "inputs": {
@@ -262,11 +260,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793350526,
-        "narHash": "sha256-wBVd2czk47yVxGlWTJUOZCLHqFty+n2Vbv4BVSvBPKw=",
+        "lastModified": 1794736366,
+        "narHash": "sha256-o67Gw5+KKxsxHbYkZiFNIc3pKggTqlLUOYWLov1VUMY=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "22c51506f7918f2538f25aec37f76037b19032b1",
+        "rev": "ce24b4daecfa60adcbc9d63459ebdf242e20002b",
         "type": "github"
       },
       "original": {
