@@ -168,17 +168,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1793292140,
-        "narHash": "sha256-/O1JCsz2ple0YDe1MOdkujgt7PVPIC0a0RopwZPOQxQ=",
+        "lastModified": 1794551775,
+        "narHash": "sha256-mw5jmS4Zu2janKQpD+BOkneVUXXfMInwytfIRvrb9Wo=",
         "owner": "idris-lang",
         "repo": "idris2",
-        "rev": "c35a6bd16ca2adea9484c64507bfc2041ceec75a",
+        "rev": "680aab47e6d37bb1d39a3a053261ba9151ce4169",
         "type": "github"
       },
       "original": {
         "owner": "idris-lang",
         "repo": "idris2",
-        "rev": "c35a6bd16ca2adea9484c64507bfc2041ceec75a",
+        "rev": "680aab47e6d37bb1d39a3a053261ba9151ce4169",
         "type": "github"
       }
     },
@@ -286,11 +286,11 @@
     "idris2PackDbSrc": {
       "flake": false,
       "locked": {
-        "lastModified": 1793326515,
-        "narHash": "sha256-dYtklo0ED6Z7X9Ogavs9XYIgWUC6L8aZFpquiIG7lH4=",
+        "lastModified": 1794624609,
+        "narHash": "sha256-X0Y0C1oqzmFtyZV0O9FGGR8CE1Bp/0efNoXxAD/OIiw=",
         "owner": "stefan-hoeck",
         "repo": "idris2-pack-db",
-        "rev": "3e6571e7557218ac604428a017cdce037e0d32e6",
+        "rev": "2ac15572f5e6a1253b5bd3af513b94be6b8fca34",
         "type": "github"
       },
       "original": {
@@ -309,11 +309,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793344667,
-        "narHash": "sha256-gXcgtBYoxc57c+lyM2ArFvk27DP1bDrCc8YVHVcj3/c=",
+        "lastModified": 1794706297,
+        "narHash": "sha256-qcyL+4DqjFrCs/rb+r3Bk2z5ifqfDeDj5BLWtDu6Ip8=",
         "owner": "mattpolzin",
         "repo": "nix-idris2-packages",
-        "rev": "03a7cc49e6839f81ef2e1bd6666820ac2779d110",
+        "rev": "8a911444a25bd8bb876f5600dff349cb0a5de872",
         "type": "github"
       },
       "original": {
@@ -392,15 +392,14 @@
     "nixpkgs": {
       "flake": false,
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-LpmV5CKLCsO8/icht45kM+F47yiZSplqdqbEKlJzEdU=",
         "path": "../../lib/stub",
         "type": "path"
       },
       "original": {
         "path": "../../lib/stub",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "pnpm-nix-provider": {
       "inputs": {
